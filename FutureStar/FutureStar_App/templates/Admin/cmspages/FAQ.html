@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<!-- Plugins css Ends-->
+
+{% endblock %}
+{% block title %}FAQ Page Edit{% endblock %}
+
+{% block content %}
+{% include "components/loader.html" %}
+
+<div class="page-body">
+    <div class="container-fluid">
+        {% include "layouts/breadcrumb.html" %}
+        <div class="card">
+            <form class="form theme-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div>
+                        <h1 style="font-size:25px">CMS FAQ Page Edit</h1>
+                    </div>    
+
+                    <p id="heading-error"></p>
+
+                    <br>
+                    <div>
+                        <p id = "heading-warning"></p>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Heading Section</h4>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    
+                    <!--heading-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-title">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="1" placeholder="Heading Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-title_arabic">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="1" placeholder="Heading Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    
+                    <!--heading content-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-content">Heading Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content_ar" type="text" placeholder="Heading content (Arabic)">1</textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-title_arabic">Heading Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">1</textarea>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-banner">Heading banner </label>
+                                <input class="form-control btn-pill" id="heading-section-banner" name="heading_section_banner" type="file"  onchange= "displaybanner(event)" accept="image/*">
+                                
+
+                                <img  id="selected-banner"  style="display: block; width: 300px; height: 50px;" />
+
+                            </div>
+                        </div>
+                        <p id = "banner-warning"></p>
+                    </div>
+
+                    
+                   
+                </div>
+                <div class="card-footer text-end">
+                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--javascript-->
+<script>
+
+    function displayImageMail(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-mail-icon');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('icon-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function displayImagePhone(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-phone-icon');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('icon-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function displaybanner(event) {
+        try{
+            const file = event.target.files[0];
+            const imgElement = document.getElementById('selected-banner');
+
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                //imgElement.style.display = 'block'; 
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            //imgElement.style.display = 'none'; 
+        }
+        }
+        catch(err){
+            alert(err)
+            var icon_warning = document.getElementById('banner-warning')
+
+            icon_warning.innerText = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function  backtolist(){
+
+        url = "{% url 'cmspages_urls' %}";
+        
+
+        window.location.href = url
+        return false
+
+        
+    }
+    function checkValidation(){
+        var validationcheckpoint
+
+        var heading_title_en = document.getElementById("heading-section-title-en")
+        var heading_title_ar = document.getElementById("heading-section-title-ar")
+        var heading_content_en = document.getElementById("heading-section-content-en")
+        var heading_content_ar = document.getElementById("heading-section-content-ar")
+        if(heading_title_en.value == ""){
+            return validationcheckpoint = "error"
+        }
+        else if(heading_title_ar.value == ""){
+            return validationcheckpoint = "error"
+
+        }
+        else if(heading_content_en.value == ""){
+            return validationcheckpoint = "error"
+
+        }
+        else if(heading_content_ar.value == ""){
+            return validationcheckpoint = "error"
+
+        }
+        else{
+            return validationcheckpoint = "success"
+        }
+        
+
+
+    }
+    function sendData(){
+
+        var validation = checkValidation()
+        if(validation == "success"){
+
+        
+            try{
+
+                //text
+                var heading_title_en = document.getElementById("heading-section-title-en")
+                var heading_title_ar = document.getElementById("heading-section-title-ar")
+                var heading_content_en = document.getElementById("heading-section-content-en")
+                var heading_content_ar = document.getElementById("heading-section-content-ar")
+                var heading_banner = document.getElementById("heading-section-banner")
+
+                //Image
+                var heading_banner_1 = heading_banner.files[0]
+
+                try{
+                    const formData = new FormData();
+                    //text
+                    formData.append('heading_title_en', heading_title_en.value );
+                    formData.append('heading_title_ar', heading_title_ar.value );
+                    //formData.append('heading_section_video', heading_section_video);
+                    formData.append('heading_content_en', heading_content_en.value );
+                    formData.append('heading_content_ar', heading_content_ar.value );
+                    
+
+
+                    //images
+                    formData.append('heading_banner',heading_banner_1);
+
+
+                    fetch("/saveFAQedit/", {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken') 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+
+                    function getCookie(name) {
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                            const cookies = document.cookie.split(';');
+                            for (let i = 0; i < cookies.length; i++) {
+                                const cookie = cookies[i].trim();
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                return false
+
+                }
+                catch(err){
+                
+                    alert(err);
+                    return false
+
+                }
+                
+                //console.log(country_name_ar.value)
+                
+                return false;
+
+            }
+            catch(err){
+                var  warning = document.getElementById('heading-error')
+
+                warning.innerText = err
+                warning.style.color = "red"
+
+                return false;
+            }
+        }
+        else if(validation == "error"){
+
+            var missing_text = document.getElementById('heading-error')
+            
+            missing_text.innerText = "Fill the blank field!"
+            missing_text.style.color = "red"
+            window.scrollTo(0,0)
+            return false
+        }
+    
+        
+    }
+
+    
+</script>
+{% endblock %}
+

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 {% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
@@ -411,3 +412,479 @@
 
 
 </script> {% endblock %}
+=======
+{% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+
+    .icon-img {
+    width: 24px;  /* Adjust the width */
+    height: 24px; /* Adjust the height */
+    object-fit: contain; /* Keeps the aspect ratio */
+    cursor: pointer; /* Optional: make it clickable */
+    }
+    /* Container for the dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #e6e6e6; /* Purple background */
+    min-width: 100px; /* Set width as needed */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Style the links inside the dropdown */
+.dropdown-content a {
+    color: rgb(0, 0, 0); /* Text color */
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #505050; /* Darker purple on hover */
+}
+
+/* Show the dropdown content when the image is clicked */
+.show {
+    display: block;
+}
+
+/* Optional: Style for the icon image */
+.icon-img {
+    cursor: pointer;
+}
+
+
+    
+</style>
+
+
+<!-- Bootstrap JS (for dropdown functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Plugins css Ends--> {% endblock %} {% block title %}Player List{% endblock %} {% block content %} <div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{breadcrumb.child}}</h3>
+            </div>
+            <div class="col-6"></div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="display" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Name (in english)</th>
+                              <th>Name (in arabic)</th>
+                              <th>Action</th>
+                           </tr>
+                        </thead>
+                        <tbody> <tr>
+                              <td>1.</td>
+                              <td>Home</td>
+                              <td>الصفحة الرئيسية</td>
+                              <td>
+                                <div class="dropdown">
+                                    <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img" alt="Menu" onclick="toggleDropdown()"/>
+                                    <div class="dropdown-content">
+                                        <a href="#" id="editLink">Edit</a>
+                                    </div>
+                                </div>
+                            </td>
+                           </tr> 
+
+                           <tr>
+                            <td>2.</td>
+                            <td>Discovery</td>
+                            <td>اكتشاف</td>
+                            <td>
+                                <div class="dropdown">
+                                    <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img" alt="Menu" onclick="toggleDropdown()"/>
+                                    <div class="dropdown-content">
+                                        <a href="#" id="editLink">Edit</a>
+                                    </div>
+                                </div>
+                            </td>
+                         </tr> 
+
+                         <tr>
+                            <td>3.</td>
+                            <td>Success Story</td>
+                            <td>قصة نجاح</td>
+                            <td>
+                                <div class="dropdown">
+                                    <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img" alt="Menu" onclick="toggleDropdown()"/>
+                                    <div class="dropdown-content">
+                                        <a href="#" id="editLink" onclick = "return cmsEditPage('successStory')">Edit</a>
+                                    </div>
+                                </div>
+                            </td>
+                         </tr>
+                         
+                         <!--<tr>
+                            <td>4.</td>
+                            <td>News</td>
+                            <td>أخبار</td>
+                            <td>
+                              <div class="dropdown">
+                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
+                                  <div class="dropdown-content">
+                                    <a href="#" id="editLink">Edit</a>
+                                </div>
+                              </div>
+                          </td>
+                         </tr> -->
+
+                         <tr>
+                            <td>4.</td>
+                            <td>Advertise</td>
+                            <td>أعلن</td>
+                            <td>
+                              <div class="dropdown">
+                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
+                                  <div class="dropdown-content">
+                                    <a href="#" id="editLink">Edit</a>
+                                </div>
+                              </div>
+                          </td>
+                         </tr> 
+
+                         <tr>
+                            <td>5.</td>
+                            <td>Contact Us</td>
+                            <td>اتصل بنا</td>
+                            <td>
+                              <div class="dropdown">
+                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
+                                  <div class="dropdown-content">
+                                    <a href="#" onclick = "return cmsEditPage('contactus')" id="editLink">Edit</a>
+                                </div>
+                              </div>
+                          </td>
+                         </tr> 
+
+                         <tr>
+                            <td>6.</td>
+                            <td>Privacy Policy</td>
+                            <td>سياسة الخصوصية
+                            </td>
+                            <td>
+                              <div class="dropdown">
+                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
+                                  <div class="dropdown-content">
+                                    <a href="#" id="editLink">Edit</a>
+                                </div>
+                              </div>
+                          </td>
+                         </tr> 
+
+                         <tr>
+                            <td>7.</td>
+                            <td>About</td>
+                            <td>عن</td>
+                            <td>
+                              <div class="dropdown">
+                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
+                                  <div class="dropdown-content">
+                                    <a href="#" onclick = "return cmsEditPage('About')" id="editLink">Edit</a>
+                                </div>
+                              </div>
+                          </td>
+                         </tr> 
+                         <tr>
+                           <td>8.</td>
+                           <td>FAQ</td>
+                           <td>التعليمات</td>
+                           <td>
+                             <div class="dropdown">
+                                 <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
+                                 <div class="dropdown-content">
+                                   <a href="#" onclick = "return cmsEditPage('FAQ')" id="editLink">Edit</a>
+                               </div>
+                             </div>
+                         </td>
+                        </tr> 
+                        
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="editUserModalLabel">Edit Player</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form id="editUserForm" method="post"> {% csrf_token %} <input type="hidden" name="user_id" id="user_id">
+               <div class="mb-3">
+                  <label class="form-label" for="first_name">First Name</label>
+                  <input class="form-control" id="first_name" name="first_name" type="text">
+                  <div class="text-danger" id="first_name_error"></div>
+               </div>
+               <div class="mb-3">
+                  <label class="form-label" for="last_name">Last Name</label>
+                  <input class="form-control" id="last_name" name="last_name" type="text">
+                  <div class="text-danger" id="last_name_error"></div>
+               </div>
+               <div class="mb-3">
+                  <label class="form-label" for="email">Email</label>
+                  <input class="form-control" id="email" name="email" type="email">
+                  <div class="text-danger" id="email_error"></div>
+               </div>
+               <div class="mb-3">
+                  <label class="form-label" for="phone">Phone</label>
+                  <input class="form-control" id="phone" name="phone" type="text">
+                  <div class="text-danger" id="phone_error"></div>
+               </div>
+               <div class="mb-3">
+                  <label class="form-label" for="role">Role</label>
+                  <select class="form-control" id="role" name="role"> {% for role in roles %} <option value="{{ role.id }}">{{ role.name }}</option> {% endfor %} </select>
+                  <div class="text-danger" id="role_error"></div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            <button class="btn btn-primary" type="submit" form="editUserForm">Save</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="deleteUserModalLabel">Delete Player</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" id="deleteUserForm"> {% csrf_token %} <input type="hidden" id="deleteUserId" name="id">
+               <p>Are you sure you want to delete this user?</p>
+               <button type="submit" class="btn btn-danger">Delete User</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div> {% endblock %} {% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<!-- Plugins JS Ends-->
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // Edit button click handler
+      document.querySelectorAll('.edit').forEach(function(button) {
+         button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = this.getAttribute('data-id');
+            // Fetch user details
+            fetch('/users/' + userId + '/edit/').then(response => response.json()).then(data => {
+               document.getElementById('user_id').value = data.id;
+               document.getElementById('first_name').value = data.first_name;
+               document.getElementById('last_name').value = data.last_name;
+               document.getElementById('email').value = data.email;
+               document.getElementById('phone').value = data.phone;
+               // Set selected role
+               var roleSelect = document.getElementById('role');
+               roleSelect.value = data.role || '';
+               // Show modal using Bootstrap
+               $('#editUserModal').modal('show');
+            });
+         });
+      });
+      // Edit user form submit with validation error handling
+      document.getElementById('editUserForm').addEventListener('submit', function(e) {
+         e.preventDefault();
+         var formData = new FormData(this);
+         fetch('/users/' + document.getElementById('user_id').value + '/update/', {
+            method: 'POST',
+            body: formData
+         }).then(response => response.json()).then(data => {
+            if (data.success) {
+               location.reload(); // Reload the page to see changes
+            } else {
+               // Clear previous errors
+               document.querySelectorAll('.text-danger').forEach(function(el) {
+                  el.textContent = '';
+               });
+               // Display errors
+               if (data.errors.first_name) {
+                  document.getElementById('first_name_error').textContent = data.errors.first_name;
+               }
+               if (data.errors.last_name) {
+                  document.getElementById('last_name_error').textContent = data.errors.last_name;
+               }
+               if (data.errors.email) {
+                  document.getElementById('email_error').textContent = data.errors.email;
+               }
+               if (data.errors.phone) {
+                  document.getElementById('phone_error').textContent = data.errors.phone;
+               }
+               if (data.errors.role) {
+                  document.getElementById('role_error').textContent = data.errors.role;
+               }
+            }
+         });
+      });
+      // Delete button click handler
+      document.querySelectorAll('.delete').forEach(function(button) {
+         button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = this.getAttribute('data-id');
+            document.getElementById('deleteUserId').value = userId;
+            $('#deleteUserModal').modal('show');
+         });
+      });
+      // Delete user form submit
+      document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
+         e.preventDefault();
+         var formData = new FormData(this);
+         fetch('/users/' + document.getElementById('deleteUserId').value + '/delete/', {
+            method: 'POST',
+            body: formData
+         }).then(response => {
+            location.reload(); // Reload the page after deletion
+         });
+      });
+      // Toggle User Status
+      document.querySelectorAll('.toggle-status').forEach(function(button) {
+         button.addEventListener('click', function() {
+            var userId = button.getAttribute('data-user-id');
+            var status = button.getAttribute('data-status');
+            var url = "{% url 'user_toggle_status' pk='0' %}".replace('0', userId);
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            var csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            form.appendChild(csrfToken);
+            var statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'status';
+            statusInput.value = status;
+            form.appendChild(statusInput);
+            document.body.appendChild(form);
+            form.submit();
+         });
+      });
+   });
+</script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // Toggle the visibility of the action card
+      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+         menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                  card.style.display = 'none';
+               }
+            });
+         });
+      });
+      // Hide action card if clicking outside
+      document.addEventListener('click', function(event) {
+         var isClickInside = event.target.closest('.action-menu-container');
+         if (!isClickInside) {
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+            });
+         }
+      });
+      function toggleDropdown(event) {
+        event.stopPropagation(); // Prevents the click event from bubbling up
+        var dropdown = event.target.nextElementSibling;
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    }
+
+    // Attach the toggleDropdown function to each icon-img
+    document.querySelectorAll('.icon-img').forEach(function(icon) {
+        icon.addEventListener('click', toggleDropdown);
+    });
+
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+        if (!event.target.matches('.icon-img')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+   });
+
+  
+
+   
+   function cmsEditPage(name){
+
+      if(name == "FAQ"){
+         var  url = "{%url 'cms_faqpage' %}"
+
+
+         window.location.href = url;
+
+      }
+      else if(name == "About"){
+         var  url = "{%url 'cms_aboutpage' %}"
+
+
+         window.location.href = url;
+      }
+      else if(name == "contactus"){
+         var url = "{%url 'cms_contactpage' %}"
+
+         window.location.href = url;
+
+      }
+      else if(name == "successStory"){
+         var url = "{%url 'cms_successStorypage' %}"
+
+         window.location.href = url;
+      }
+
+
+      return false
+   }
+
+
+
+</script> {% endblock %}
+>>>>>>> Stashed changes

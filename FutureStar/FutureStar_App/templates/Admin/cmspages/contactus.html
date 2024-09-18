@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<!-- Plugins css Ends-->
+
+{% endblock %}
+{% block title %}Contact Page Edit{% endblock %}
+
+    
+   
+{% block content %}
+
+{% include "components/loader.html" %}
+
+<div class="page-body">
+    <div class="container-fluid">
+        {% include "layouts/breadcrumb.html" %}
+        <div class="card">
+            <form class="form theme-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div>
+                        <h1 style="font-size:25px">CMS Contact Page Edit</h1>
+                    </div>    
+                    <br>
+                    <div>
+                        <p id = "heading-warning"></p>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Heading Section</h4>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    <!--heading-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-title">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="" placeholder="Heading Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-title_arabic">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="" placeholder="Heading Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+                    <!--heading content-->
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-content">Heading content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content" type="text" value="" placeholder="Heading content (English)"></textarea>
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-content-arabic">Heading content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text" value="" placeholder="Heading content (Arabic)"></textarea>
+
+
+                               
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label" for="heading-section-banner">Heading banner </label>
+                                <input class="form-control btn-pill" id="heading-section-banner" name="heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
+                                <!--{% if system_settings.fav_icon %}-->
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                <!--{% endif %}-->
+
+                                <img id="selected-banner" style="display: none; width: 200px; height: 50px;" />
+
+                            </div>
+                        </div>
+                        <p id = "banner-warning"></p>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Sub Section - 1</h4>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>                    
+                    <!-- sub section heading title-->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-title-en">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="sub-heading-title-en" name="sub_heading_title_en" type="text" value="" placeholder="Heading Title (English)">
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-title-ar">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill " id="sub-heading-title-ar" name="sub-heading_title_ar" type="text" value="" placeholder="Heading Title (English)">
+
+
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-sub-title-en">Sub Title (English)</label>
+                                <input class="form-control btn-pill " id="sub-heading-sub-title-en" name="sub_heading_sub_title_en" type="text" value="" placeholder="Title (English)">
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-sub-title-ar">Sub Title (Arabic)</label>
+                                <input class="form-control btn-pill " id="sub-heading-sub-title-ar" name="sub-heading_sub_title_ar" type="text" value="" placeholder="Title (English)">
+
+
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-country-name-en">Country Name (English) </label>
+                                <input class="form-control btn-pill " id="sub-country-name-en" name="sub-country-name-en" type="text" value="" placeholder="Name (English)">
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-country-name-ar">Country Name (Arabic) </label>
+                                <input class="form-control btn-pill " id="sub-country-name-ar" name="sub-country-name-ar" type="text" value="" placeholder="Name (arabic)">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-mail-icon">Mail Icon  </label>
+                                <input class="form-control btn-pill" id="sub-mail-icon" name="sub_mail_icon" type="file" onchange= "displayImageMail(event)" accept="image/*">
+
+                                <!--{% if system_settings.fav_icon %}-->
+                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                <!--{% endif %}-->
+
+                                <img id="selected-mail-icon" style="display: none; width: 35px; height: 35px;" />
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-phone-icon">Phone Icon </label>
+                                <input class="form-control btn-pill" id="sub-phone-icon" name="sub_phone_icon" type="file" onchange= "displayImagePhone(event)" accept="image/*">
+                                <!--{% if system_settings.fav_icon %}-->
+                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                <!--{% endif %}-->
+
+                                <img id="selected-phone-icon" style="display: none; width: 35px; height: 35px;" />
+
+                            </div>
+                        </div>
+                        <p id = "icon-warning"></p>
+
+                    </div>
+
+                    <!--sub-section-2-->
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Sub Section - 2</h4>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-name-2">Heading Name (English)</label>
+                                <input class="form-control btn-pill " id="sub-heading-name-2-en" name="sub_heading_name_2" type="text" value="" placeholder="Heading Name (English)">
+
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-name-2-ar">Heading Name (Arabic)</label>
+                                <input class="form-control btn-pill " id="sub-heading-name-2-ar" name="sub_heading_name_2_ar" type="text" value="" placeholder="Heading name (Arabic)">
+
+                    
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-title-2">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="sub-heading-title-2-en" name="sub_heading_title_2" type="text" value="" placeholder="Heading Title (English)">
+
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="sub-heading-title-2-ar">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill " id="sub-heading-title-2-ar" name="sub_heading_title_2_ar" type="text" value="" placeholder="Heading Title (Arabic)">
+
+                    
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                   
+                </div>
+                <div class="card-footer text-end">
+                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--javascript-->
+<script>
+
+    function displayImageMail(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-mail-icon');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('icon-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function displayImagePhone(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-phone-icon');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('icon-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function displayImageBanner(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-banner');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('banner-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function  backtolist(){
+
+        url = "{% url 'cmspages_urls' %}";
+        
+
+        window.location.href = url
+        return false
+
+        
+    }
+
+    function sendData(){
+        try{
+            //text
+            var heading_title_en  = document.getElementById("heading-section-title-en")
+            var heading_title_ar = document.getElementById("heading-section-title-ar")
+            var heading_content_en = document.getElementById("heading-section-content-en")
+            var heading_content_ar = document.getElementById("heading-section-content-ar")
+            //var heading_content_ar = document.getElementById("heading-section-content-ar")
+            var sub_heading_title_en  = document.getElementById("sub-heading-title-en")
+            var sub_heading_title_ar  = document.getElementById("sub-heading-title-ar")
+            var sub_heading_sub_title_en  = document.getElementById("sub-heading-sub-title-en")
+            var sub_heading_sub_title_ar  = document.getElementById("sub-heading-sub-title-ar")
+            var country_name_en  = document.getElementById("sub-country-name-en")
+            var country_name_ar  = document.getElementById("sub-country-name-ar")
+            var sub_heading_name_en  = document.getElementById("sub-heading-name-2-en")
+            var sub_heading_name_ar  = document.getElementById("sub-heading-name-2-ar")
+            var sub_heading_title_2_en  = document.getElementById("sub-heading-title-2-en")
+            var sub_heading_title_2_ar  = document.getElementById("sub-heading-title-2-ar")
+
+
+
+            //image
+            var heading_banner = document.getElementById("heading-section-banner")
+            var mail_icon = document.getElementById("sub-mail-icon")
+            var phone_icon = document.getElementById("sub-phone-icon")
+
+            var banner = heading_banner.files[0]
+            var mailicon = mail_icon.files[0]
+            var phoneicon = phone_icon.files[0]
+
+            try{
+                const formData = new FormData();
+                //text
+                formData.append('heading_title_en', heading_title_en.value );
+                formData.append('heading_title_ar', heading_title_ar.value );
+                formData.append('heading_content_en',heading_content_en.value);
+                formData.append('heading_content_ar',heading_content_ar.value);
+                formData.append('heading_content_ar',heading_content_ar.value);
+                formData.append('sub_heading_title_en',sub_heading_title_en.value);
+                formData.append('sub_heading_title_ar',sub_heading_title_ar.value);
+                formData.append('sub_heading_sub_title_en',sub_heading_sub_title_en.value);
+                formData.append('sub_heading_sub_title_ar',sub_heading_sub_title_ar.value);
+                formData.append('country_name_en',country_name_en.value);
+                formData.append('country_name_ar',country_name_ar.value);
+                formData.append('sub_heading_name_en',sub_heading_name_en.value);
+                formData.append('sub_heading_name_ar',sub_heading_name_ar.value);
+                formData.append('sub_heading_title_2_en',sub_heading_title_2_en.value);
+                formData.append('sub_heading_title_2_ar',sub_heading_title_2_ar.value);
+
+                //images
+                console.log(banner)
+                formData.append('banner',banner);
+
+
+                fetch("/savecontactedit/", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')  // Include CSRF token
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+
+                function getCookie(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+
+                return false
+            }
+            catch(err){
+            
+                alert(err);
+                return false
+
+            }
+            
+            //console.log(country_name_ar.value)
+            
+            return false;
+
+        }
+        catch(err){
+            var  warning = document.getElementById('heading-warning')
+
+            warning.value = err
+
+            return false;
+        }
+        
+    }
+</script>
+{% endblock %}
+
