@@ -30,21 +30,15 @@
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for user in users %} <tr>
+                        <tbody> {% for user in users %} 
+                           <tr>
                               <td>{{ user.username }}</td>
                               <td>{{ user.first_name }}</td>
                               <td>{{ user.last_name }}</td>
                               <td>{{ user.email }}</td>
                               <td>{{ user.phone }}</td>
-                              <td>
-                                 <form method="post" action="{% url 'user_toggle_status' pk=user.id %}" class="status-form">
-                                     {% csrf_token %}
-                                     <input type="hidden" name="source_page" value="referee_list">
-                                     <input type="hidden" name="status" id="status-{{ user.id }}" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
-                                     <button type="submit" class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}">
-                                         {% if user.is_active %}Active{% else %}Deactive{% endif %}
-                                     </button>
-                                 </form>
+                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}"  style="padding: 5px; margin-top: 10px; justify-self: center; justify-items: center;" >
+                                 {% if user.is_active %}Active{% else %}Deactive{% endif %}
                              </td>
                               {% if user.role %} 
                               <td>{{ user.role.name }}</td> 
@@ -60,14 +54,28 @@
                                     <!-- Hidden card for actions -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
-                                          <li style="padding: 8px 12px;">
-                                             <a class="edit" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" data-id="{{ user.id }}">
-                                                <i data-feather="edit"></i> Edit </a>
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                             <a href="#" class="toggle-status" data-id="{{ user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                                {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                             </a>
+                                             <form id="status-form-{{ user.id }}" method="post" action="{% url 'user_toggle_status' pk=user.id %}" style="display: none;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="source_page" value="referee_list">
+                                                <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                             </form>
                                           </li>
+                                          
+                                          <!-- <li style="padding: 8px 12px;">
+                                             <a class="edit" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" data-id="{{ user.id }}">
+                                                Edit
+                                             </a>
+                                          </li>
+                                          
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                              <a class="delete" href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-id="{{ user.id }}">
-                                                <i data-feather="trash-2"></i> Delete </a>
-                                          </li>
+                                                Delete
+                                             </a>
+                                          </li> -->
                                        </ul>
                                     </div>
                                  </div>
@@ -81,148 +89,13 @@
       </div>
    </div>
 </div>
-<!-- Edit User Modal -->
-<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
-   <div class="modal-dialog" role="document">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title" id="editUserModalLabel">Edit Player</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body">
-            <form id="editUserForm" method="post"> {% csrf_token %} <input type="hidden" name="user_id" id="user_id">
-               <div class="mb-3">
-                  <label class="form-label" for="first_name">First Name</label>
-                  <input class="form-control" id="first_name" name="first_name" type="text">
-                  <div class="text-danger" id="first_name_error"></div>
-               </div>
-               <div class="mb-3">
-                  <label class="form-label" for="last_name">Last Name</label>
-                  <input class="form-control" id="last_name" name="last_name" type="text">
-                  <div class="text-danger" id="last_name_error"></div>
-               </div>
-               <div class="mb-3">
-                  <label class="form-label" for="email">Email</label>
-                  <input class="form-control" id="email" name="email" type="email">
-                  <div class="text-danger" id="email_error"></div>
-               </div>
-               <div class="mb-3">
-                  <label class="form-label" for="phone">Phone</label>
-                  <input class="form-control" id="phone" name="phone" type="text">
-                  <div class="text-danger" id="phone_error"></div>
-               </div>
-               <div class="mb-3">
-                  <label class="form-label" for="role">Role</label>
-                  <select class="form-control" id="role" name="role"> {% for role in roles %} <option value="{{ role.id }}">{{ role.name }}</option> {% endfor %} </select>
-                  <div class="text-danger" id="role_error"></div>
-               </div>
-            </form>
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-            <button class="btn btn-primary" type="submit" form="editUserForm">Save</button>
-         </div>
-      </div>
-   </div>
-</div>
-<!-- Delete User Modal -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title" id="deleteUserModalLabel">Delete Player</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body">
-            <form method="post" id="deleteUserForm"> {% csrf_token %} <input type="hidden" id="deleteUserId" name="id">
-               <p>Are you sure you want to delete this user?</p>
-               <button type="submit" class="btn btn-danger">Delete User</button>
-            </form>
-         </div>
-      </div>
-   </div>
-</div> {% endblock %} {% block scriptcontent %}
+ {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <!-- Plugins JS Ends-->
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-      // Edit button click handler
-      document.querySelectorAll('.edit').forEach(function(button) {
-         button.addEventListener('click', function(e) {
-            e.preventDefault();
-            var userId = this.getAttribute('data-id');
-            // Fetch user details
-            fetch('/users/' + userId + '/edit/').then(response => response.json()).then(data => {
-               document.getElementById('user_id').value = data.id;
-               document.getElementById('first_name').value = data.first_name;
-               document.getElementById('last_name').value = data.last_name;
-               document.getElementById('email').value = data.email;
-               document.getElementById('phone').value = data.phone;
-               // Set selected role
-               var roleSelect = document.getElementById('role');
-               roleSelect.value = data.role || '';
-               // Show modal using Bootstrap
-               $('#editUserModal').modal('show');
-            });
-         });
-      });
-      // Edit user form submit with validation error handling
-      document.getElementById('editUserForm').addEventListener('submit', function(e) {
-         e.preventDefault();
-         var formData = new FormData(this);
-         fetch('/users/' + document.getElementById('user_id').value + '/update/', {
-            method: 'POST',
-            body: formData
-         }).then(response => response.json()).then(data => {
-            if (data.success) {
-               location.reload(); // Reload the page to see changes
-            } else {
-               // Clear previous errors
-               document.querySelectorAll('.text-danger').forEach(function(el) {
-                  el.textContent = '';
-               });
-               // Display errors
-               if (data.errors.first_name) {
-                  document.getElementById('first_name_error').textContent = data.errors.first_name;
-               }
-               if (data.errors.last_name) {
-                  document.getElementById('last_name_error').textContent = data.errors.last_name;
-               }
-               if (data.errors.email) {
-                  document.getElementById('email_error').textContent = data.errors.email;
-               }
-               if (data.errors.phone) {
-                  document.getElementById('phone_error').textContent = data.errors.phone;
-               }
-               if (data.errors.role) {
-                  document.getElementById('role_error').textContent = data.errors.role;
-               }
-            }
-         });
-      });
-      // Delete button click handler
-      document.querySelectorAll('.delete').forEach(function(button) {
-         button.addEventListener('click', function(e) {
-            e.preventDefault();
-            var userId = this.getAttribute('data-id');
-            document.getElementById('deleteUserId').value = userId;
-            $('#deleteUserModal').modal('show');
-         });
-      });
-      // Delete user form submit
-      document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
-         e.preventDefault();
-         var formData = new FormData(this);
-         fetch('/users/' + document.getElementById('deleteUserId').value + '/delete/', {
-            method: 'POST',
-            body: formData
-         }).then(response => {
-            location.reload(); // Reload the page after deletion
-         });
-      });
       // Toggle User Status
       document.querySelectorAll('.toggle-status').forEach(function(button) {
          button.addEventListener('click', function() {
@@ -246,7 +119,6 @@
             form.submit();
          });
       });
-   });
 </script>
 <script>
    document.addEventListener('DOMContentLoaded', function() {
@@ -274,6 +146,14 @@
          }
       });
    });
-
-   
+   document.addEventListener('DOMContentLoaded', function() {
+   document.querySelectorAll('.toggle-status').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+         e.preventDefault();
+         var userId = this.getAttribute('data-id');
+         var form = document.getElementById('status-form-' + userId);
+         form.submit();
+      });
+   });
+});
 </script> {% endblock %}
