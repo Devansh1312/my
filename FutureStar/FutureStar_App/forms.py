@@ -48,9 +48,11 @@ class SignUpForm(UserCreationForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name"]
+        fields = ["name_en", "name_ar"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Enter category name"}),
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter category name"}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل اسم الفئة"}),
+
         }
 
 
@@ -58,9 +60,11 @@ class CategoryForm(forms.ModelForm):
 class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
-        fields = ["name"]
+        fields = ["name_en","name_ar"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Enter role name"}),
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter role name"}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "باسم أدخل لفة"}),
+
         }
 
 
@@ -98,9 +102,11 @@ class FieldCapacityForm(forms.ModelForm):
 class Slider_ContentForm(forms.ModelForm):
     class Meta:
         model = Slider_Content
-        fields = ["content"]
+        fields = ["content_en","content_ar"]
         widgets = {
-            "content": forms.TextInput(attrs={"placeholder": "Enter content"}),
+            "content_en": forms.TextInput(attrs={"placeholder": "Enter content"}),
+            "content_ar": forms.TextInput(attrs={"placeholder": "Enter content"}),
+
         }
 
 
@@ -108,9 +114,11 @@ class Slider_ContentForm(forms.ModelForm):
 class GroundMaterialForm(forms.ModelForm):
     class Meta:
         model = GroundMaterial
-        fields = ["name"]
+        fields = ["name_en","name_ar"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Enter Ground Material"}),
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter Ground Material"}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل المواد الأرضية"}),
+
         }
 
 
@@ -118,9 +126,11 @@ class GroundMaterialForm(forms.ModelForm):
 class TournamentStyleForm(forms.ModelForm):
     class Meta:
         model = TournamentStyle
-        fields = ["name"]
+        fields = ["name_en","name_ar"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Enter Tournament Style"}),
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter Tournament Style"}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل نمط البطولة"}),
+
         }
 
 
@@ -128,9 +138,11 @@ class TournamentStyleForm(forms.ModelForm):
 class EventTypeForm(forms.ModelForm):
     class Meta:
         model = EventType
-        fields = ["name"]
+        fields = ["name_en","name_ar"]
         widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Enter Event Type"}),
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter Event Type"}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل نوع الحدث"}),
+
         }
 
 
@@ -143,7 +155,6 @@ class UserUpdateProfileForm(forms.ModelForm):
             "username",
             "email",
             "phone",
-            "role",
             "profile_picture",
             "card_header",
         ]
@@ -157,7 +168,7 @@ class UserUpdateProfileForm(forms.ModelForm):
             field.required = False
 
         # Make specific fields read-only
-        readonly_fields = ["username", "email", "phone", "role"]
+        readonly_fields = ["username", "email", "phone"]
         for field_name in readonly_fields:
             self.fields[field_name].widget.attrs["readonly"] = True
 
@@ -189,15 +200,3 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             attrs={"autocomplete": "new-password", "class": "form-control"}
         ),
     )
-
-
-#News Form
-class NewsForm(forms.ModelForm):
-    class Meta:
-        model = News
-        fields = ["title", "description", "image"]
-        widgets = {
-            "title": forms.TextInput(attrs={"placeholder": "Enter news title"}),
-            "description": forms.Textarea(attrs={"placeholder": "Enter news description"}),
-            "image": forms.TextInput(attrs={"placeholder": "Enter image URL or upload path"}),
-        }

@@ -25,13 +25,17 @@
                         <thead>
                            <tr>
                               <th>ID No.</th>
-                              <th>Tournament Style</th>
+                              <th>Tournament Style (English)</th>
+                              <th>Tournament Style (Arabic)</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for tournamentstyle in tournamentstyles %} <tr>
+                        <tbody>
+                           {% for tournamentstyles in tournamentstyles %}
+                           <tr>
                               <td>{{ forloop.counter }}</td>
-                              <td>{{ tournamentstyle.name }}</td>
+                              <td>{{ tournamentstyles.name_en }}</td>
+                              <td>{{ tournamentstyles.name_ar }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -42,19 +46,21 @@
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editTournamentStyleModal" data-tournamentstyle-id="{{ tournamentstyle.id }}" data-tournamentstyle-name="{{ tournamentstyle.name }}">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editTournamentStyleModal" data-tournamentstyles-id="{{ tournamentstyles.id }}" data-tournamentstyles-name-en="{{ tournamentstyles.name_en }}" data-tournamentstyles-name-ar="{{ tournamentstyles.name_ar }}">
                                                 <i data-feather="edit"></i> Edit </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTournamentStyleModal" data-tournamentstyle-id="{{ tournamentstyle.id }}">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTournamentStyleModal" data-tournamentstyles-id="{{ tournamentstyles.id }}">
                                                 <i data-feather="trash-2"></i> Delete </a>
                                           </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
-                     </table>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>                     
                   </div>
                </div>
             </div>
@@ -71,10 +77,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'tournamentstyle_create' %}" id="addTournamentStyleForm"> {% csrf_token %} <div class="mb-3">
-                  <label for="name" class="form-label">Tournament Style</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter Tournament Style">
-                  <div id="addTournamentStyleError" class="text-danger mt-2"></div>
+            <form method="post" action="{% url 'tournamentstyle_create' %}" id="addTournamentStyleForm"> {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name_en" class="form-label">Tournament Style (English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Tournament Style (English)">
+                  <div id="addTournamentStyleEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Tournament Style (Arabic)</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Tournament Style (Arabic)">
+                  <div id="addTournamentStyleArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Add Tournament Style</button>
             </form>
@@ -91,11 +103,17 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'tournamentstyle_update' pk=0 %}" id="editTournamentStyleForm"> {% csrf_token %} <input type="hidden" id="editTournamentStyleId" name="id">
+            <form method="post" action="{% url 'tournamentstyle_update' pk=0 %}" id="editTournamentStyleForm"> {% csrf_token %}
+               <input type="hidden" id="editTournamentStyleId" name="id">
                <div class="mb-3">
-                  <label for="editName" class="form-label">Tournament Style</label>
-                  <input type="text" class="form-control" id="editName" name="name" placeholder="Enter Tournament Style">
-                  <div id="editTournamentStyleError" class="text-danger mt-2"></div>
+                  <label for="editName_en" class="form-label">Tournament Style (English)</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter Tournament Style (English)">
+                  <div id="editTournamentStyleEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Tournament Style (Arabic)</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Tournament Style (Arabic)">
+                  <div id="editTournamentStyleArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Update Tournament Style</button>
             </form>
@@ -103,17 +121,18 @@
       </div>
    </div>
 </div>
+
 <!-- Delete TournamentStyle Modal -->
 <div class="modal fade" id="deleteTournamentStyleModal" tabindex="-1" aria-labelledby="deleteTournamentStyleModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="deleteTournamentStyleModalLabel">Delete Tournament Style</h5>
+            <h5 class="modal-title" id="deleteTournamentStyleModalLabel">Delete TournamentStyle</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
             <form method="post" action="{% url 'tournamentstyle_delete' pk=0 %}" id="deleteTournamentStyleForm"> {% csrf_token %} <input type="hidden" id="deleteTournamentStyleId" name="id">
-               <p>Are you sure you want to delete this tournament style?</p>
+               <p>Are you sure you want to delete this Tournament Style?</p>
                <button type="submit" class="btn btn-danger">Delete Tournament Style</button>
             </form>
          </div>
@@ -126,68 +145,89 @@
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-      // Edit TournamentStyle Modal
-      var editTournamentStyleModal = document.getElementById('editTournamentStyleModal');
-      if (editTournamentStyleModal) {
-         editTournamentStyleModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Button that triggered the modal
-            var tournamentstyleId = button.getAttribute('data-tournamentstyle-id');
-            var tournamentstyleName = button.getAttribute('data-tournamentstyle-name');
-            var form = document.getElementById('editTournamentStyleForm');
-            form.action = "{% url 'tournamentstyle_update' pk='0' %}".replace('0', tournamentstyleId);
-            form.querySelector('#editTournamentStyleId').value = tournamentstyleId;
-            form.querySelector('#editName').value = tournamentstyleName;
-            // Clear previous error message
-            document.getElementById('editTournamentStyleError').textContent = '';
-         });
-      }
-      // Delete TournamentStyle Modal
-      var deleteTournamentStyleModal = document.getElementById('deleteTournamentStyleModal');
-      if (deleteTournamentStyleModal) {
-         deleteTournamentStyleModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Button that triggered the modal
-            var tournamentstyleId = button.getAttribute('data-tournamentstyle-id');
-            var form = document.getElementById('deleteTournamentStyleForm');
-            form.action = "{% url 'tournamentstyle_delete' pk='0' %}".replace('0', tournamentstyleId);
-            form.querySelector('#deleteTournamentStyleId').value = tournamentstyleId;
-         });
-      }
-      // Add TournamentStyle Form Validation
-      var addTournamentStyleForm = document.getElementById('addTournamentStyleForm');
-      if (addTournamentStyleForm) {
-         addTournamentStyleForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('name');
-            var errorContainer = document.getElementById('addTournamentStyleError');
-            var nameValue = nameInput.value.trim();
-            // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
-               event.preventDefault();
-               errorContainer.textContent = 'Tournament Style cannot be empty.';
-               return false;
-            }
-            // Additional validation for uniqueness can be handled server-side
-         });
-      }
-      // Edit TournamentStyle Form Validation
-      var editTournamentStyleForm = document.getElementById('editTournamentStyleForm');
-      if (editTournamentStyleForm) {
-         editTournamentStyleForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('editName');
-            var errorContainer = document.getElementById('editTournamentStyleError');
-            var nameValue = nameInput.value.trim();
-            // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
-               event.preventDefault();
-               errorContainer.textContent = 'Tournament Style cannot be empty.';
-               return false;
-            }
-            // Additional validation for uniqueness can be handled server-side
-         });
-      }
-   });
+document.addEventListener('DOMContentLoaded', function() {
+   // Edit TournamentStyle Modal
+   var editTournamentStyleModal = document.getElementById('editTournamentStyleModal');
+   if (editTournamentStyleModal) {
+      editTournamentStyleModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget; // Button that triggered the modal
+         var tournamentstyleId = button.getAttribute('data-tournamentstyles-id');
+         var tournamentstyleNameEn = button.getAttribute('data-tournamentstyles-name-en');
+         var tournamentstyleNameAr = button.getAttribute('data-tournamentstyles-name-ar');
+         var form = document.getElementById('editTournamentStyleForm');
+         form.action = "{% url 'tournamentstyle_update' pk='0' %}".replace('0', tournamentstyleId);
+         form.querySelector('#editTournamentStyleId').value = tournamentstyleId;
+         form.querySelector('#editName_en').value = tournamentstyleNameEn;
+         form.querySelector('#editName_ar').value = tournamentstyleNameAr;
+         // Clear previous error messages
+         document.getElementById('editTournamentStyleEnError').textContent = '';
+         document.getElementById('editTournamentStyleArError').textContent = '';
+      });
+   }
+   // Delete TournamentStyle Modal
+   var deleteTournamentStyleModal = document.getElementById('deleteTournamentStyleModal');
+   if (deleteTournamentStyleModal) {
+      deleteTournamentStyleModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget; // Button that triggered the modal
+         var tournamentstyleId = button.getAttribute('data-tournamentstyles-id');
+         var form = document.getElementById('deleteTournamentStyleForm');
+         form.action = "{% url 'tournamentstyle_delete' pk='0' %}".replace('0', tournamentstyleId);
+         form.querySelector('#deleteTournamentStyleId').value = tournamentstyleId;
+      });
+   }
+   // Add TournamentStyle Form Validation
+   var addTournamentStyleForm = document.getElementById('addTournamentStyleForm');
+   if (addTournamentStyleForm) {
+      addTournamentStyleForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('name_en');
+         var nameArInput = document.getElementById('name_ar');
+         var errorEnContainer = document.getElementById('addTournamentStyleEnError');
+         var errorArContainer = document.getElementById('addTournamentStyleArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous error messages
+         errorEnContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorEnContainer.textContent = 'English name cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Arabic name cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   }
+   // Edit TournamentStyle Form Validation
+   var editTournamentStyleForm = document.getElementById('editTournamentStyleForm');
+   if (editTournamentStyleForm) {
+      editTournamentStyleForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('editName_en');
+         var nameArInput = document.getElementById('editName_ar');
+         var errorEnContainer = document.getElementById('editTournamentStyleEnError');
+         var errorArContainer = document.getElementById('editTournamentStyleArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous error messages
+         errorEnContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorEnContainer.textContent = 'English name cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Arabic name cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   }
+});
 </script>
 <script>
    document.addEventListener('DOMContentLoaded', function() {

@@ -1,12 +1,22 @@
-{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% load sass_tags %} {% block css %}
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+{% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}User Category{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}User Category{% endblock %}
+
+{% block content %}
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
             <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
+               <h3>{{ breadcrumb.child }}</h3>
             </div>
             <div class="col-6">
                <ol class="breadcrumb">
@@ -25,13 +35,17 @@
                         <thead>
                            <tr>
                               <th>ID</th>
-                              <th>Name</th>
+                              <th>English Name</th>
+                              <th>Arabic Name</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for category in categories %} <tr>
+                        <tbody>
+                           {% for category in categories %}
+                           <tr>
                               <td>{{ forloop.counter }}</td>
-                              <td>{{ category.name }}</td>
+                              <td>{{ category.name_en }}</td>
+                              <td>{{ category.name_ar }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -42,7 +56,7 @@
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}" data-category-name="{{ category.name }}">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}" data-category-name-en="{{ category.name_en }}" data-category-name-ar="{{ category.name_ar }}">
                                                 <i data-feather="edit"></i> Edit </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
@@ -53,7 +67,9 @@
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
                      </table>
                   </div>
                </div>
@@ -62,6 +78,7 @@
       </div>
    </div>
 </div>
+
 <!-- Add Category Modal -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -71,17 +88,25 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'category_create' %}" id="addCategoryForm"> {% csrf_token %} <div class="mb-3">
-                  <label for="name" class="form-label">Category Type</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter Category Type">
-                  <div id="addCategoryError" class="text-danger mt-2"></div>
+            <form method="post" action="{% url 'category_create' %}" id="addCategoryForm">
+               {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name_en" class="form-label">English Name</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter English Name">
+                  <div id="addCategoryEnError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Category Type</button>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Arabic Name</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Arabic Name">
+                  <div id="addCategoryArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Add Category</button>
             </form>
          </div>
       </div>
    </div>
 </div>
+
 <!-- Edit Category Modal -->
 <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -91,18 +116,26 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'category_update' pk=0 %}" id="editCategoryForm"> {% csrf_token %} <input type="hidden" id="editCategoryId" name="id">
+            <form method="post" action="{% url 'category_update' pk=0 %}" id="editCategoryForm">
+               {% csrf_token %}
+               <input type="hidden" id="editCategoryId" name="id">
                <div class="mb-3">
-                  <label for="editName" class="form-label">Category Type</label>
-                  <input type="text" class="form-control" id="editName" name="name" placeholder="Enter Category Type">
-                  <div id="editCategoryError" class="text-danger mt-2"></div>
+                  <label for="editName_en" class="form-label">English Name</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter English Name">
+                  <div id="editCategoryEnError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update Category Type</button>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Arabic Name</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Arabic Name">
+                  <div id="editCategoryArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Update Category</button>
             </form>
          </div>
       </div>
    </div>
 </div>
+
 <!-- Delete Category Modal -->
 <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -112,19 +145,26 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'category_delete' pk=0 %}" id="deleteCategoryForm"> {% csrf_token %} <input type="hidden" id="deleteCategoryId" name="id">
+            <form method="post" action="{% url 'category_delete' pk=0 %}" id="deleteCategoryForm">
+               {% csrf_token %}
+               <input type="hidden" id="deleteCategoryId" name="id">
                <p>Are you sure you want to delete this category?</p>
                <button type="submit" class="btn btn-danger">Delete Category</button>
             </form>
          </div>
       </div>
    </div>
-</div> {% endblock %} {% block scriptcontent %}
+</div>
+
+{% endblock %}
+
+{% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <!-- Plugins JS Ends-->
+
 <script>
    document.addEventListener('DOMContentLoaded', function() {
       // Edit Category Modal
@@ -133,13 +173,16 @@
          editCategoryModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
             var categoryId = button.getAttribute('data-category-id');
-            var categoryName = button.getAttribute('data-category-name');
+            var categoryNameEn = button.getAttribute('data-category-name-en');
+            var categoryNameAr = button.getAttribute('data-category-name-ar');
             var form = document.getElementById('editCategoryForm');
             form.action = "{% url 'category_update' pk='0' %}".replace('0', categoryId);
             form.querySelector('#editCategoryId').value = categoryId;
-            form.querySelector('#editName').value = categoryName;
+            form.querySelector('#editName_en').value = categoryNameEn;
+            form.querySelector('#editName_ar').value = categoryNameAr;
             // Clear previous error message
-            document.getElementById('editCategoryError').textContent = '';
+            document.getElementById('editCategoryEnError').textContent = '';
+            document.getElementById('editCategoryArError').textContent = '';
          });
       }
       // Delete Category Modal
@@ -157,14 +200,23 @@
       var addCategoryForm = document.getElementById('addCategoryForm');
       if (addCategoryForm) {
          addCategoryForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('name');
-            var errorContainer = document.getElementById('addCategoryError');
-            var nameValue = nameInput.value.trim();
+            var nameEnInput = document.getElementById('name_en');
+            var nameArInput = document.getElementById('name_ar');
+            var errorEnContainer = document.getElementById('addCategoryEnError');
+            var errorArContainer = document.getElementById('addCategoryArError');
+            var nameEnValue = nameEnInput.value.trim();
+            var nameArValue = nameArInput.value.trim();
             // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
+            errorEnContainer.textContent = '';
+            errorArContainer.textContent = '';
+            if (nameEnValue === '') {
                event.preventDefault();
-               errorContainer.textContent = 'Category name cannot be empty.';
+               errorEnContainer.textContent = 'English name cannot be empty.';
+               return false;
+            }
+            if (nameArValue === '') {
+               event.preventDefault();
+               errorArContainer.textContent = 'Arabic name cannot be empty.';
                return false;
             }
             // Additional validation for uniqueness can be handled server-side
@@ -174,14 +226,23 @@
       var editCategoryForm = document.getElementById('editCategoryForm');
       if (editCategoryForm) {
          editCategoryForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('editName');
-            var errorContainer = document.getElementById('editCategoryError');
-            var nameValue = nameInput.value.trim();
+            var nameEnInput = document.getElementById('editName_en');
+            var nameArInput = document.getElementById('editName_ar');
+            var errorEnContainer = document.getElementById('editCategoryEnError');
+            var errorArContainer = document.getElementById('editCategoryArError');
+            var nameEnValue = nameEnInput.value.trim();
+            var nameArValue = nameArInput.value.trim();
             // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
+            errorEnContainer.textContent = '';
+            errorArContainer.textContent = '';
+            if (nameEnValue === '') {
                event.preventDefault();
-               errorContainer.textContent = 'Category name cannot be empty.';
+               errorEnContainer.textContent = 'English name cannot be empty.';
+               return false;
+            }
+            if (nameArValue === '') {
+               event.preventDefault();
+               errorArContainer.textContent = 'Arabic name cannot be empty.';
                return false;
             }
             // Additional validation for uniqueness can be handled server-side
@@ -189,6 +250,7 @@
       }
    });
 </script>
+
 <script>
    document.addEventListener('DOMContentLoaded', function() {
       // Toggle the visibility of the action card
@@ -215,4 +277,5 @@
          }
       });
    });
-</script> {% endblock %}
+</script>
+{% endblock %}

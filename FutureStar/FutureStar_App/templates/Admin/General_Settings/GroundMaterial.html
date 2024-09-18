@@ -25,13 +25,17 @@
                         <thead>
                            <tr>
                               <th>ID No.</th>
-                              <th>Ground Material</th>
+                              <th>Ground Material (English)</th>
+                              <th>Ground Material (Arabic)</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for groundmaterial in groundmaterials %} <tr>
+                        <tbody>
+                           {% for groundmaterial in groundmaterials %}
+                           <tr>
                               <td>{{ forloop.counter }}</td>
-                              <td>{{ groundmaterial.name }}</td>
+                              <td>{{ groundmaterial.name_en }}</td>
+                              <td>{{ groundmaterial.name_ar }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -42,7 +46,7 @@
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGroundMaterialModal" data-groundmaterial-id="{{ groundmaterial.id }}" data-groundmaterial-name="{{ groundmaterial.name }}">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGroundMaterialModal" data-groundmaterial-id="{{ groundmaterial.id }}" data-groundmaterial-name-en="{{ groundmaterial.name_en }}" data-groundmaterial-name-ar="{{ groundmaterial.name_ar }}">
                                                 <i data-feather="edit"></i> Edit </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
@@ -53,8 +57,10 @@
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
-                     </table>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>                     
                   </div>
                </div>
             </div>
@@ -62,6 +68,7 @@
       </div>
    </div>
 </div>
+<!-- Add GroundMaterial Modal -->
 <!-- Add GroundMaterial Modal -->
 <div class="modal fade" id="addGroundMaterialModal" tabindex="-1" aria-labelledby="addGroundMaterialModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -71,10 +78,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'groundmaterial_create' %}" id="addGroundMaterialForm"> {% csrf_token %} <div class="mb-3">
-                  <label for="name" class="form-label">Ground Material</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter Ground Material">
-                  <div id="addGroundMaterialError" class="text-danger mt-2"></div>
+            <form method="post" action="{% url 'groundmaterial_create' %}" id="addGroundMaterialForm"> {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name_en" class="form-label">Ground Material (English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Ground Material (English)">
+                  <div id="addGroundMaterialEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Ground Material (Arabic)</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Ground Material (Arabic)">
+                  <div id="addGroundMaterialArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Add Ground Material</button>
             </form>
@@ -91,11 +104,17 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'groundmaterial_update' pk=0 %}" id="editGroundMaterialForm"> {% csrf_token %} <input type="hidden" id="editGroundMaterialId" name="id">
+            <form method="post" action="{% url 'groundmaterial_update' pk=0 %}" id="editGroundMaterialForm"> {% csrf_token %}
+               <input type="hidden" id="editGroundMaterialId" name="id">
                <div class="mb-3">
-                  <label for="editName" class="form-label">Ground Material</label>
-                  <input type="text" class="form-control" id="editName" name="name" placeholder="Enter Ground Material">
-                  <div id="editGroundMaterialError" class="text-danger mt-2"></div>
+                  <label for="editName_en" class="form-label">Ground Material (English)</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter Ground Material (English)">
+                  <div id="editGroundMaterialEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Ground Material (Arabic)</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Ground Material (Arabic)">
+                  <div id="editGroundMaterialArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Update Ground Material</button>
             </form>
@@ -103,6 +122,7 @@
       </div>
    </div>
 </div>
+
 <!-- Delete GroundMaterial Modal -->
 <div class="modal fade" id="deleteGroundMaterialModal" tabindex="-1" aria-labelledby="deleteGroundMaterialModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -126,68 +146,89 @@
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-      // Edit GroundMaterial Modal
-      var editGroundMaterialModal = document.getElementById('editGroundMaterialModal');
-      if (editGroundMaterialModal) {
-         editGroundMaterialModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Button that triggered the modal
-            var groundmaterialId = button.getAttribute('data-groundmaterial-id');
-            var groundmaterialName = button.getAttribute('data-groundmaterial-name');
-            var form = document.getElementById('editGroundMaterialForm');
-            form.action = "{% url 'groundmaterial_update' pk='0' %}".replace('0', groundmaterialId);
-            form.querySelector('#editGroundMaterialId').value = groundmaterialId;
-            form.querySelector('#editName').value = groundmaterialName;
-            // Clear previous error message
-            document.getElementById('editGroundMaterialError').textContent = '';
-         });
-      }
-      // Delete GroundMaterial Modal
-      var deleteGroundMaterialModal = document.getElementById('deleteGroundMaterialModal');
-      if (deleteGroundMaterialModal) {
-         deleteGroundMaterialModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Button that triggered the modal
-            var groundmaterialId = button.getAttribute('data-groundmaterial-id');
-            var form = document.getElementById('deleteGroundMaterialForm');
-            form.action = "{% url 'groundmaterial_delete' pk='0' %}".replace('0', groundmaterialId);
-            form.querySelector('#deleteGroundMaterialId').value = groundmaterialId;
-         });
-      }
-      // Add GroundMaterial Form Validation
-      var addGroundMaterialForm = document.getElementById('addGroundMaterialForm');
-      if (addGroundMaterialForm) {
-         addGroundMaterialForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('name');
-            var errorContainer = document.getElementById('addGroundMaterialError');
-            var nameValue = nameInput.value.trim();
-            // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
-               event.preventDefault();
-               errorContainer.textContent = 'Ground Material cannot be empty.';
-               return false;
-            }
-            // Additional validation for uniqueness can be handled server-side
-         });
-      }
-      // Edit GroundMaterial Form Validation
-      var editGroundMaterialForm = document.getElementById('editGroundMaterialForm');
-      if (editGroundMaterialForm) {
-         editGroundMaterialForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('editName');
-            var errorContainer = document.getElementById('editGroundMaterialError');
-            var nameValue = nameInput.value.trim();
-            // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
-               event.preventDefault();
-               errorContainer.textContent = 'Ground Material cannot be empty.';
-               return false;
-            }
-            // Additional validation for uniqueness can be handled server-side
-         });
-      }
-   });
+document.addEventListener('DOMContentLoaded', function() {
+   // Edit GroundMaterial Modal
+   var editGroundMaterialModal = document.getElementById('editGroundMaterialModal');
+   if (editGroundMaterialModal) {
+      editGroundMaterialModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget; // Button that triggered the modal
+         var groundmaterialId = button.getAttribute('data-groundmaterial-id');
+         var groundmaterialNameEn = button.getAttribute('data-groundmaterial-name-en');
+         var groundmaterialNameAr = button.getAttribute('data-groundmaterial-name-ar');
+         var form = document.getElementById('editGroundMaterialForm');
+         form.action = "{% url 'groundmaterial_update' pk='0' %}".replace('0', groundmaterialId);
+         form.querySelector('#editGroundMaterialId').value = groundmaterialId;
+         form.querySelector('#editName_en').value = groundmaterialNameEn;
+         form.querySelector('#editName_ar').value = groundmaterialNameAr;
+         // Clear previous error messages
+         document.getElementById('editGroundMaterialEnError').textContent = '';
+         document.getElementById('editGroundMaterialArError').textContent = '';
+      });
+   }
+   // Delete GroundMaterial Modal
+   var deleteGroundMaterialModal = document.getElementById('deleteGroundMaterialModal');
+   if (deleteGroundMaterialModal) {
+      deleteGroundMaterialModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget; // Button that triggered the modal
+         var groundmaterialId = button.getAttribute('data-groundmaterial-id');
+         var form = document.getElementById('deleteGroundMaterialForm');
+         form.action = "{% url 'groundmaterial_delete' pk='0' %}".replace('0', groundmaterialId);
+         form.querySelector('#deleteGroundMaterialId').value = groundmaterialId;
+      });
+   }
+   // Add GroundMaterial Form Validation
+   var addGroundMaterialForm = document.getElementById('addGroundMaterialForm');
+   if (addGroundMaterialForm) {
+      addGroundMaterialForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('name_en');
+         var nameArInput = document.getElementById('name_ar');
+         var errorEnContainer = document.getElementById('addGroundMaterialEnError');
+         var errorArContainer = document.getElementById('addGroundMaterialArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous error messages
+         errorEnContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorEnContainer.textContent = 'English name cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Arabic name cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   }
+   // Edit GroundMaterial Form Validation
+   var editGroundMaterialForm = document.getElementById('editGroundMaterialForm');
+   if (editGroundMaterialForm) {
+      editGroundMaterialForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('editName_en');
+         var nameArInput = document.getElementById('editName_ar');
+         var errorEnContainer = document.getElementById('editGroundMaterialEnError');
+         var errorArContainer = document.getElementById('editGroundMaterialArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous error messages
+         errorEnContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorEnContainer.textContent = 'English name cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Arabic name cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   }
+});
 </script>
 <script>
    document.addEventListener('DOMContentLoaded', function() {

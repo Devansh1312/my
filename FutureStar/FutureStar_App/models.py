@@ -17,18 +17,20 @@ class Inquire(models.Model):
     
 # Role Model
 class Role(models.Model):
-    name = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100,null=True,blank=True)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 
 # User Category Model
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100,null=True,blank=True)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 
 # Custom User Manager
@@ -133,26 +135,32 @@ class FieldCapacity(models.Model):
 
 # Ground Materials Model
 class GroundMaterial(models.Model):
-    name = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
+
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 
 # Tournamebt Style Model
 class TournamentStyle(models.Model):
-    name = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
+
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 
 # Event Types Model
 class EventType(models.Model):
-    name = models.CharField(max_length=100)
+    name_en = models.CharField(max_length=100)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
+
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 
 #User Profile
@@ -218,13 +226,15 @@ class Player_Profile(models.Model):
 
 #News Blog Management        
 class News(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
+    title_en = models.CharField(max_length=255)
+    title_ar = models.CharField(max_length=255,blank=True, null=True)
+    description_en = models.TextField()
+    description_ar = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='news/', blank=True, null=True)
     news_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return self.title_en
 
 # Partners Blog Management
 class Partners(models.Model):
@@ -252,14 +262,17 @@ class Tryout_Club(models.Model):
 
 # Tryout Club Blog Management    
 class Testimonial(models.Model):
-    name = models.CharField(max_length=255)
-    designation = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255, blank=True, null=True)
+    designation_en = models.CharField(max_length=255)
+    designation_ar = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='testimonial/')
-    content = models.TextField()
+    content_en = models.TextField()
+    content_ar = models.TextField(blank=True, null=True)
     rattings = models.CharField(max_length=5)
 
     def __str__(self):
-        return self.name
+        return self.name_en
     
 #Team Members    
 class Team_Members(models.Model):
@@ -280,83 +293,12 @@ class App_Feature(models.Model):
     def __str__(self):
         return self.title
 
-# Event Types Model
+# Slider Content Model
 class Slider_Content(models.Model):
-    content = models.CharField(max_length=100)
-
+    content_en = models.CharField(max_length=100,null=True,blank=True)
+    content_ar = models.CharField(max_length=100,null=True,blank=True)
     def __str__(self):
-        return self.content
-# class UserPost(models.Model):
-    
-#     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-#     title = models.CharField(max_length=255)  
-#     description = models.TextField() 
-#     photo = models.CharField(upload_to='profile_pics/',null=True, blank=True)  
-        
-#     class Meta:
-#         db_table = "FutureStar_App_UserPost"
-
-# class Sponsor(models.Model):
-#     sponsor_name = models.CharField(max_length=255)  
-#     sponsor_logo = models.ImageField(upload_to='sponsor_logos/')  
-#     phone_number = models.CharField(max_length=20, blank=True, null=True)  
-#     email_address = models.EmailField(blank=True, null=True)  
-
-#     def __str__(self):
-#         return self.sponsor_name
-
-# class EditStuff(models.Model):
-    
-#     role = models.CharField(max_length=20)  
-#     name = models.CharField(max_length=255)  
-#     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)  
-#     phone_number = models.CharField(max_length=20, blank=True, null=True) 
-#     email_address = models.EmailField(blank=True, null=True)  
-#     country = models.CharField(max_length=100)  
-#     city = models.CharField(max_length=100)  
-
-#     def __str__(self):
-#         return self.name
-
-# class PlayerBranch(models.Model):
-#     name = models.CharField(max_length=255)
-    
-#     position = models.CharField(max_length=100)
-    
-#     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
-
-#     phone_number = models.CharField(max_length=20, blank=True, null=True)
-    
-#     email_address = models.EmailField(blank=True, null=True)
-    
-#     country = models.CharField(max_length=100)
-    
-#     city = models.CharField(max_length=100)
-    
-#     weight = models.FloatField()
-    
-#     height = models.FloatField()
-    
-#     age = models.PositiveIntegerField()
-    
-#     date_of_birth = models.DateField()
-    
-#     def __str__(self):
-#         return self.name    
-
-# class FriendlyGame(models.Model):
-    # game_number = models.PositiveIntegerField(unique=True)
-    # start_date = models.DateField()
-    # start_time = models.TimeField()
-    # team_A = models.CharField(max_length=255)
-    # team_B = models.CharField(max_length=255)
-    # game_field = models.CharField(max_length=255)
-    # referee_name = models.CharField(max_length=255)
-    # def __str__(self):
-    #     return f"Game {self.game_number}: {self.team_A} vs {self.team_B} on {self.start_date}"
-    # 
-
-# News Module  Model
+        return self.content_en
 
 #contact model
 

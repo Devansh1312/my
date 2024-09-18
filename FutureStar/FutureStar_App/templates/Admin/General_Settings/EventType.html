@@ -1,8 +1,7 @@
 {% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Event Type{% endblock %} {% block content %} 
-<div class="page-body">
+<!-- Plugins css Ends--> {% endblock %} {% block title %}Event Type{% endblock %} {% block content %} <div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
@@ -20,22 +19,23 @@
          <!-- EventType List -->
          <div class="col-sm-12">
             <div class="card">
-               <!-- <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center"><div></div><button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addEventTypeModal">Add Event Type</button></div> -->
                <div class="card-body">
                   <div class="table-responsive">
                      <table class="display" id="basic-1">
                         <thead>
                            <tr>
                               <th>ID No.</th>
-                              <th>Event Type</th>
+                              <th>Event Type (English)</th>
+                              <th>Event Type (Arabic)</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
                         <tbody>
-                           {% for eventtype in eventtypes %} 
+                           {% for eventtypes in eventtypes %}
                            <tr>
                               <td>{{ forloop.counter }}</td>
-                              <td>{{ eventtype.name }}</td>
+                              <td>{{ eventtypes.name_en }}</td>
+                              <td>{{ eventtypes.name_ar }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -46,21 +46,21 @@
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editEventTypeModal" data-eventtype-id="{{ eventtype.id }}" data-eventtype-name="{{ eventtype.name }}">
-                                             <i data-feather="edit"></i> Edit </a>
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editEventTypeModal" data-eventtypes-id="{{ eventtypes.id }}" data-eventtypes-name-en="{{ eventtypes.name_en }}" data-eventtypes-name-ar="{{ eventtypes.name_ar }}">
+                                                <i data-feather="edit"></i> Edit </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteEventTypeModal" data-eventtype-id="{{ eventtype.id }}">
-                                             <i data-feather="trash-2"></i> Delete </a>
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteEventTypeModal" data-eventtypes-id="{{ eventtypes.id }}">
+                                                <i data-feather="trash-2"></i> Delete </a>
                                           </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
                            </tr>
-                           {% endfor %} 
+                           {% endfor %}
                         </tbody>
-                     </table>
+                     </table>                     
                   </div>
                </div>
             </div>
@@ -77,12 +77,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'eventtype_create' %}" id="addEventTypeForm">
-               {% csrf_token %} 
+            <form method="post" action="{% url 'eventtype_create' %}" id="addEventTypeForm"> {% csrf_token %}
                <div class="mb-3">
-                  <label for="name" class="form-label">Tournament Style</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter Event Type">
-                  <div id="addEventTypeError" class="text-danger mt-2"></div>
+                  <label for="name_en" class="form-label">Event Type (English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Event Type (English)">
+                  <div id="addEventTypeEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Event Type (Arabic)</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Event Type (Arabic)">
+                  <div id="addEventTypeArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Add Event Type</button>
             </form>
@@ -99,12 +103,17 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'eventtype_update' pk=0 %}" id="editEventTypeForm">
-               {% csrf_token %} <input type="hidden" id="editEventTypeId" name="id">
+            <form method="post" action="{% url 'eventtype_update' pk=0 %}" id="editEventTypeForm"> {% csrf_token %}
+               <input type="hidden" id="editEventTypeId" name="id">
                <div class="mb-3">
-                  <label for="editName" class="form-label">Event Type</label>
-                  <input type="text" class="form-control" id="editName" name="name" placeholder="Enter Event Type">
-                  <div id="editEventTypeError" class="text-danger mt-2"></div>
+                  <label for="editName_en" class="form-label">Event Type (English)</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter Event Type (English)">
+                  <div id="editEventTypeEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Event Type (Arabic)</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Event Type (Arabic)">
+                  <div id="editEventTypeArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Update Event Type</button>
             </form>
@@ -112,93 +121,113 @@
       </div>
    </div>
 </div>
+
 <!-- Delete EventType Modal -->
 <div class="modal fade" id="deleteEventTypeModal" tabindex="-1" aria-labelledby="deleteEventTypeModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="deleteEventTypeModalLabel">Delete Event Type</h5>
+            <h5 class="modal-title" id="deleteEventTypeModalLabel">Delete EventType</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'eventtype_delete' pk=0 %}" id="deleteEventTypeForm">
-               {% csrf_token %} <input type="hidden" id="deleteEventTypeId" name="id">
-               <p>Are you sure you want to delete this eventtype?</p>
+            <form method="post" action="{% url 'eventtype_delete' pk=0 %}" id="deleteEventTypeForm"> {% csrf_token %} <input type="hidden" id="deleteEventTypeId" name="id">
+               <p>Are you sure you want to delete this Event Type?</p>
                <button type="submit" class="btn btn-danger">Delete Event Type</button>
             </form>
          </div>
       </div>
    </div>
-</div>
-{% endblock %} {% block scriptcontent %}
+</div> {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-      // Edit EventType Modal
-      var editEventTypeModal = document.getElementById('editEventTypeModal');
-      if (editEventTypeModal) {
-         editEventTypeModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Button that triggered the modal
-            var eventtypeId = button.getAttribute('data-eventtype-id');
-            var eventtypeName = button.getAttribute('data-eventtype-name');
-            var form = document.getElementById('editEventTypeForm');
-            form.action = "{% url 'eventtype_update' pk='0' %}".replace('0', eventtypeId);
-            form.querySelector('#editEventTypeId').value = eventtypeId;
-            form.querySelector('#editName').value = eventtypeName;
-            // Clear previous error message
-            document.getElementById('editEventTypeError').textContent = '';
-         });
-      }
-      // Delete EventType Modal
-      var deleteEventTypeModal = document.getElementById('deleteEventTypeModal');
-      if (deleteEventTypeModal) {
-         deleteEventTypeModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget; // Button that triggered the modal
-            var eventtypeId = button.getAttribute('data-eventtype-id');
-            var form = document.getElementById('deleteEventTypeForm');
-            form.action = "{% url 'eventtype_delete' pk='0' %}".replace('0', eventtypeId);
-            form.querySelector('#deleteEventTypeId').value = eventtypeId;
-         });
-      }
-      // Add EventType Form Validation
-      var addEventTypeForm = document.getElementById('addEventTypeForm');
-      if (addEventTypeForm) {
-         addEventTypeForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('name');
-            var errorContainer = document.getElementById('addEventTypeError');
-            var nameValue = nameInput.value.trim();
-            // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
-               event.preventDefault();
-               errorContainer.textContent = 'Event Type cannot be empty.';
-               return false;
-            }
-            // Additional validation for uniqueness can be handled server-side
-         });
-      }
-      // Edit EventType Form Validation
-      var editEventTypeForm = document.getElementById('editEventTypeForm');
-      if (editEventTypeForm) {
-         editEventTypeForm.addEventListener('submit', function(event) {
-            var nameInput = document.getElementById('editName');
-            var errorContainer = document.getElementById('editEventTypeError');
-            var nameValue = nameInput.value.trim();
-            // Clear previous error messages
-            errorContainer.textContent = '';
-            if (nameValue === '') {
-               event.preventDefault();
-               errorContainer.textContent = 'Event Type cannot be empty.';
-               return false;
-            }
-            // Additional validation for uniqueness can be handled server-side
-         });
-      }
-   });
+document.addEventListener('DOMContentLoaded', function() {
+   // Edit EventType Modal
+   var editEventTypeModal = document.getElementById('editEventTypeModal');
+   if (editEventTypeModal) {
+      editEventTypeModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget; // Button that triggered the modal
+         var eventtypeId = button.getAttribute('data-eventtypes-id');
+         var eventtypeNameEn = button.getAttribute('data-eventtypes-name-en');
+         var eventtypeNameAr = button.getAttribute('data-eventtypes-name-ar');
+         var form = document.getElementById('editEventTypeForm');
+         form.action = "{% url 'eventtype_update' pk='0' %}".replace('0', eventtypeId);
+         form.querySelector('#editEventTypeId').value = eventtypeId;
+         form.querySelector('#editName_en').value = eventtypeNameEn;
+         form.querySelector('#editName_ar').value = eventtypeNameAr;
+         // Clear previous error messages
+         document.getElementById('editEventTypeEnError').textContent = '';
+         document.getElementById('editEventTypeArError').textContent = '';
+      });
+   }
+   // Delete EventType Modal
+   var deleteEventTypeModal = document.getElementById('deleteEventTypeModal');
+   if (deleteEventTypeModal) {
+      deleteEventTypeModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget; // Button that triggered the modal
+         var eventtypeId = button.getAttribute('data-eventtypes-id');
+         var form = document.getElementById('deleteEventTypeForm');
+         form.action = "{% url 'eventtype_delete' pk='0' %}".replace('0', eventtypeId);
+         form.querySelector('#deleteEventTypeId').value = eventtypeId;
+      });
+   }
+   // Add EventType Form Validation
+   var addEventTypeForm = document.getElementById('addEventTypeForm');
+   if (addEventTypeForm) {
+      addEventTypeForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('name_en');
+         var nameArInput = document.getElementById('name_ar');
+         var errorEnContainer = document.getElementById('addEventTypeEnError');
+         var errorArContainer = document.getElementById('addEventTypeArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous error messages
+         errorEnContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorEnContainer.textContent = 'English name cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Arabic name cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   }
+   // Edit EventType Form Validation
+   var editEventTypeForm = document.getElementById('editEventTypeForm');
+   if (editEventTypeForm) {
+      editEventTypeForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('editName_en');
+         var nameArInput = document.getElementById('editName_ar');
+         var errorEnContainer = document.getElementById('editEventTypeEnError');
+         var errorArContainer = document.getElementById('editEventTypeArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous error messages
+         errorEnContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorEnContainer.textContent = 'English name cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Arabic name cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   }
+});
 </script>
 <script>
    document.addEventListener('DOMContentLoaded', function() {

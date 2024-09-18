@@ -1088,10 +1088,12 @@ class NewsListView(LoginRequiredMixin, View):
 
 class NewsCreateView(View):
     def post(self, request):
-        title = request.POST.get('title')
-        description = request.POST.get('description')
+        title_en = request.POST.get('title_en')
+        description_en = request.POST.get('description_en')
+        title_ar = request.POST.get('title_ar')
+        description_ar = request.POST.get('description_ar')
 
-        if not title or not description:
+        if not title_en or not description_ar or not title_ar or not description_en:
             messages.error(request, "Title and Description are required.")
             return redirect('news_list')
 
@@ -1104,8 +1106,10 @@ class NewsCreateView(View):
             image_name = 'news/' + image_name
 
         news = News.objects.create(
-            title=title,
-            description=description,
+            title_en=title_en,
+            title_ar=title_ar,
+            description_ar=description_ar,
+            description_en=description_en,
             image=image_name  # Save the relative image path in the database
         )
 
@@ -1118,15 +1122,19 @@ class NewsEditView(View):
     def post(self, request, news_id):
         news_item = get_object_or_404(News, id=news_id)
 
-        title = request.POST.get('title')
-        description = request.POST.get('description')
+        title_en = request.POST.get('title_en')
+        description_en = request.POST.get('description_en')
+        title_ar = request.POST.get('title_ar')
+        description_ar = request.POST.get('description_ar')
 
-        if not title or not description:
+        if not title_en or not description_ar or not title_ar or not description_en:
             messages.error(request, "Title and Description are required.")
             return redirect('news_list')
 
-        news_item.title = title
-        news_item.description = description
+        news_item.title_en=title_en,
+        news_item.title_ar=title_ar,
+        news_item.description_ar=description_ar,
+        news_item.description_en=description_en,
 
         image_file = request.FILES.get('image')
         if image_file:
@@ -1411,10 +1419,14 @@ class TestimonialListView(LoginRequiredMixin, View):
 
 class TestimonialCreateView(View):
     def post(self, request):
-        name = request.POST.get('name')
-        designation = request.POST.get('designation')
-        content = request.POST.get('content')
+        name_en = request.POST.get('name_en')
+        designation_en = request.POST.get('designation_en')
+        content_en = request.POST.get('content_en')
         rattings = request.POST.get('rattings')
+        name_ar = request.POST.get('name_ar')
+        designation_ar = request.POST.get('designation_ar')
+        content_ar = request.POST.get('content_ar')
+
 
         # Handling image upload
         image_file = request.FILES.get('image')
@@ -1425,14 +1437,17 @@ class TestimonialCreateView(View):
             image_name = 'testimonial/' + image_name
 
         testimonial = Testimonial.objects.create(
-            name=name,
-            designation=designation,
-            content=content,
+            name_en=name_en,
+            designation_en=designation_en,
+            content_en=content_en,
+            name_ar=name_ar,
+            designation_ar=designation_ar,
+            content_ar=content_ar,
             rattings=rattings,
             image=image_name  # Save the relative image path in the database
         )
 
-        messages.success(request, "Tryout Club created successfully.")
+        messages.success(request, "Testimonial Created successfully.")
         return redirect('testimonial_list')
 
 class TestimonialEditView(View):
@@ -1441,15 +1456,21 @@ class TestimonialEditView(View):
     def post(self, request, testimonial_id):
         testimonial_item = get_object_or_404(Testimonial, id=testimonial_id)
 
-        name = request.POST.get('name')
-        designation = request.POST.get('designation')
-        content = request.POST.get('content')
+        name_en = request.POST.get('name_en')
+        designation_en = request.POST.get('designation_en')
+        content_en = request.POST.get('content_en')
         rattings = request.POST.get('rattings')
+        name_ar = request.POST.get('name_ar')
+        designation_ar = request.POST.get('designation_ar')
+        content_ar = request.POST.get('content_ar')
 
 
-        testimonial_item.name = name
-        testimonial_item.designation = designation
-        testimonial_item.content = content
+        testimonial_item.name_en = name_en
+        testimonial_item.designation_en = designation_en
+        testimonial_item.content_en = content_en
+        testimonial_item.name_ar = name_ar
+        testimonial_item.designation_ar = designation_ar
+        testimonial_item.content_ar = content_ar
         testimonial_item.rattings = rattings
         image_file = request.FILES.get('image')
         if image_file:
@@ -1463,14 +1484,14 @@ class TestimonialEditView(View):
 
         testimonial_item.save()
 
-        messages.success(request, "Tryout Club updated successfully.")
+        messages.success(request, "Testimonial updated successfully.")
         return redirect('testimonial_list')
 
 class TestimonialDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         testimonial = get_object_or_404(Testimonial, pk=pk)
         testimonial.delete()
-        messages.success(request, "Tryout Club Deleted Successfully.")
+        messages.success(request, "Testimonial Deleted Successfully.")
         return redirect("testimonial_list")
 
 

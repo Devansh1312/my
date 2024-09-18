@@ -1,7 +1,17 @@
-{% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
+{% extends 'base.html' %} 
+{% load static %} 
+{% load sass_tags %} 
+
+{% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Slider Content{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends--> 
+{% endblock %} 
+
+{% block title %}Slider Content{% endblock %} 
+
+{% block content %} 
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
@@ -10,7 +20,7 @@
             </div>
             <div class="col-6">
                <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addSlider_ContentModal">Add Slider_Content</button>
+                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addSlider_ContentModal">Add Slider Content</button>
                </ol>
             </div>
          </div>
@@ -25,13 +35,17 @@
                         <thead>
                            <tr>
                               <th>ID No.</th>
-                              <th>Content</th>
+                              <th>Content (English)</th>
+                              <th>Content (Arabic)</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for slider_content in slider_contents %} <tr>
+                        <tbody> 
+                           {% for slider_content in slider_contents %} 
+                           <tr>
                               <td>{{ forloop.counter }}</td>
-                              <td>{{ slider_content.content }}</td>
+                              <td>{{ slider_content.content_en }}</td>
+                              <td>{{ slider_content.content_ar }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -42,18 +56,22 @@
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editSlider_ContentModal" data-slider_content-id="{{ slider_content.id }}" data-slider_content-content="{{ slider_content.content }}">
-                                                <i data-feather="edit"></i> Edit </a>
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editSlider_ContentModal" data-slider_content-id="{{ slider_content.id }}" data-slider_content-content_en="{{ slider_content.content_en }}" data-slider_content-content_ar="{{ slider_content.content_ar }}">
+                                                <i data-feather="edit"></i> Edit 
+                                             </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteSlider_ContentModal" data-slider_content-id="{{ slider_content.id }}">
-                                                <i data-feather="trash-2"></i> Delete </a>
+                                                <i data-feather="trash-2"></i> Delete 
+                                             </a>
                                           </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
+                           </tr> 
+                           {% endfor %} 
+                        </tbody>
                      </table>
                   </div>
                </div>
@@ -62,19 +80,27 @@
       </div>
    </div>
 </div>
+
 <!-- Add Slider_Content Modal -->
 <div class="modal fade" id="addSlider_ContentModal" tabindex="-1" aria-labelledby="addSlider_ContentModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="addSlider_ContentModalLabel">Add Slider Content  </h5>
+            <h5 class="modal-title" id="addSlider_ContentModalLabel">Add Slider Content</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'slider_content_create' %}" id="addSlider_ContentForm"> {% csrf_token %} <div class="mb-3">
-                  <label for="content" class="form-label">Content</label>
-                  <input type="text" class="form-control" id="content" name="content" placeholder="Enter Content">
-                  <div id="addSlider_ContentError" class="text-danger mt-2"></div>
+            <form method="post" action="{% url 'slider_content_create' %}" id="addSlider_ContentForm"> 
+               {% csrf_token %} 
+               <div class="mb-3">
+                  <label for="content_en" class="form-label">Content (English)</label>
+                  <input type="text" class="form-control" id="content_en" name="content_en" placeholder="Enter Content (English)">
+                  <div id="addSlider_ContentEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="content_ar" class="form-label">Content (Arabic)</label>
+                  <input type="text" class="form-control" id="content_ar" name="content_ar" placeholder="Enter Content (Arabic)">
+                  <div id="addSlider_ContentArError" class="text-danger mt-2"></div>
                </div>
                <button type="submit" class="btn btn-primary">Add Content</button>
             </form>
@@ -82,44 +108,59 @@
       </div>
    </div>
 </div>
+
 <!-- Edit Slider_Content Modal -->
 <div class="modal fade" id="editSlider_ContentModal" tabindex="-1" aria-labelledby="editSlider_ContentModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="editSlider_ContentModalLabel">Edit Slider_Content </h5>
+            <h5 class="modal-title" id="editSlider_ContentModalLabel">Edit Slider Content</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'slider_content_update' pk=0 %}" id="editSlider_ContentForm"> {% csrf_token %} <input type="hidden" id="editSlider_ContentId" content="id">
+            <form method="post" action="{% url 'slider_content_update' pk=0 %}" id="editSlider_ContentForm"> 
+               {% csrf_token %} 
+               <input type="hidden" id="editSlider_ContentId" name="id">
                <div class="mb-3">
-                  <label for="editContent" class="form-label">Slider Content</label>
-                  <input type="text" class="form-control" id="editContent" name="content" placeholder="Enter slider content">
-                  <div id="editSlider_ContentError" class="text-danger mt-2"></div>
+                  <label for="editContent_en" class="form-label">Content (English)</label>
+                  <input type="text" class="form-control" id="editContent_en" name="content_en" placeholder="Enter Content (English)">
+                  <div id="editSlider_ContentEnError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update Slider Content</button>
+               <div class="mb-3">
+                  <label for="editContent_ar" class="form-label">Content (Arabic)</label>
+                  <input type="text" class="form-control" id="editContent_ar" name="content_ar" placeholder="Enter Content (Arabic)">
+                  <div id="editSlider_ContentArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Update Content</button>
             </form>
          </div>
       </div>
    </div>
 </div>
+
 <!-- Delete Slider_Content Modal -->
 <div class="modal fade" id="deleteSlider_ContentModal" tabindex="-1" aria-labelledby="deleteSlider_ContentModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="deleteSlider_ContentModalLabel">Delete Slider_Content</h5>
+            <h5 class="modal-title" id="deleteSlider_ContentModalLabel">Delete Slider Content</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'slider_content_delete' pk=0 %}" id="deleteSlider_ContentForm"> {% csrf_token %} <input type="hidden" id="deleteSlider_ContentId" name="id">
-               <p>Are you sure you want to delete this slider_content?</p>
-               <button type="submit" class="btn btn-danger">Delete Slider_Content</button>
+            <form method="post" action="{% url 'slider_content_delete' pk=0 %}" id="deleteSlider_ContentForm"> 
+               {% csrf_token %} 
+               <input type="hidden" id="deleteSlider_ContentId" name="id">
+               <p>Are you sure you want to delete this slider content?</p>
+               <button type="submit" class="btn btn-danger">Delete Content</button>
             </form>
          </div>
       </div>
    </div>
-</div> {% endblock %} {% block scriptcontent %}
+</div> 
+
+{% endblock %} 
+
+{% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
@@ -133,13 +174,16 @@
          editSlider_ContentModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Button that triggered the modal
             var slider_contentId = button.getAttribute('data-slider_content-id');
-            var slider_contentContent = button.getAttribute('data-slider_content-content');
+            var slider_contentContentEn = button.getAttribute('data-slider_content-content_en');
+            var slider_contentContentAr = button.getAttribute('data-slider_content-content_ar');
             var form = document.getElementById('editSlider_ContentForm');
             form.action = "{% url 'slider_content_update' pk='0' %}".replace('0', slider_contentId);
             form.querySelector('#editSlider_ContentId').value = slider_contentId;
-            form.querySelector('#editContent').value = slider_contentContent;
-            // Clear previous error message
-            document.getElementById('editSlider_ContentError').textContent = '';
+            form.querySelector('#editContent_en').value = slider_contentContentEn;
+            form.querySelector('#editContent_ar').value = slider_contentContentAr;
+            // Clear previous error messages
+            document.getElementById('editSlider_ContentEnError').textContent = '';
+            document.getElementById('editSlider_ContentArError').textContent = '';
          });
       }
       // Delete Slider_Content Modal
@@ -157,34 +201,50 @@
       var addSlider_ContentForm = document.getElementById('addSlider_ContentForm');
       if (addSlider_ContentForm) {
          addSlider_ContentForm.addEventListener('submit', function(event) {
-            var contentInput = document.getElementById('content');
-            var errorContainer = document.getElementById('addSlider_ContentError');
-            var contentValue = contentInput.value.trim();
+            var contentEnInput = document.getElementById('content_en');
+            var contentArInput = document.getElementById('content_ar');
+            var errorEnContainer = document.getElementById('addSlider_ContentEnError');
+            var errorArContainer = document.getElementById('addSlider_ContentArError');
+            var contentEnValue = contentEnInput.value.trim();
+            var contentArValue = contentArInput.value.trim();
             // Clear previous error messages
-            errorContainer.textContent = '';
-            if (contentValue === '') {
+            errorEnContainer.textContent = '';
+            errorArContainer.textContent = '';
+            if (contentEnValue === '') {
                event.preventDefault();
-               errorContainer.textContent = 'Content cannot be empty.';
+               errorEnContainer.textContent = 'Content (English) cannot be empty.';
                return false;
             }
-            // Additional validation for uniqueness can be handled server-side
+            if (contentArValue === '') {
+               event.preventDefault();
+               errorArContainer.textContent = 'Content (Arabic) cannot be empty.';
+               return false;
+            }
          });
       }
       // Edit Slider_Content Form Validation
       var editSlider_ContentForm = document.getElementById('editSlider_ContentForm');
       if (editSlider_ContentForm) {
          editSlider_ContentForm.addEventListener('submit', function(event) {
-            var contentInput = document.getElementById('editContent');
-            var errorContainer = document.getElementById('editSlider_ContentError');
-            var contentValue = contentInput.value.trim();
+            var contentEnInput = document.getElementById('editContent_en');
+            var contentArInput = document.getElementById('editContent_ar');
+            var errorEnContainer = document.getElementById('editSlider_ContentEnError');
+            var errorArContainer = document.getElementById('editSlider_ContentArError');
+            var contentEnValue = contentEnInput.value.trim();
+            var contentArValue = contentArInput.value.trim();
             // Clear previous error messages
-            errorContainer.textContent = '';
-            if (contentValue === '') {
+            errorEnContainer.textContent = '';
+            errorArContainer.textContent = '';
+            if (contentEnValue === '') {
                event.preventDefault();
-               errorContainer.textContent = 'Content cannot be empty.';
+               errorEnContainer.textContent = 'Content (English) cannot be empty.';
                return false;
             }
-            // Additional validation for uniqueness can be handled server-side
+            if (contentArValue === '') {
+               event.preventDefault();
+               errorArContainer.textContent = 'Content (Arabic) cannot be empty.';
+               return false;
+            }
          });
       }
    });
@@ -215,4 +275,5 @@
          }
       });
    });
-</script> {% endblock %}
+</script> 
+{% endblock %}

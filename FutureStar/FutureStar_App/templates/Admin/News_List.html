@@ -45,8 +45,10 @@ News Management
                             <tr>
                                 <th>ID</th>
                                 <th>Image</th> <!-- New column for the image -->
-                                <th>Title</th>
-                                <th>Description</th>
+                                <th>Title (English)</th>
+                                <th>Title (English)</th>
+                                <th>Description (Arabic)</th>
+                                <th>Description (Arabic)</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -57,13 +59,15 @@ News Management
                                 <td>{{ forloop.counter }}</td>
                                 <td>
                                     {% if news_item.image %}
-                                        <img src="{{ news_item.image.url }}" alt="{{ news_item.title }}" width="100" height="auto">
+                                        <img src="{{ news_item.image.url }}" alt="{{ news_item.title_en }}" width="100" height="auto">
                                     {% else %}
                                         No Image
                                     {% endif %}
                                 </td>                                
-                                <td>{{ news_item.title }}</td>
-                                <td>{{ news_item.description }}</td>
+                                <td>{{ news_item.title_en }}</td>
+                                <td>{{ news_item.title_ar }}</td>
+                                <td>{{ news_item.description_en }}</td>
+                                <td>{{ news_item.description_ar }}</td>
                                 <td>{{ news_item.news_date }}</td>
                                 <td>
                                     <!-- Action buttons -->
@@ -75,10 +79,12 @@ News Management
                                           <ul style="list-style: none; padding: 0; margin: 0;">
                                              <li style="padding: 8px 12px;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editNewsModal"  data-news-id="{{ news_item.id }}" 
-                                                data-news-title="{{ news_item.title }}" 
-                                                data-news-description="{{ news_item.description }}" 
+                                                data-news-title_en="{{ news_item.title_en }}" 
+                                                data-news-description_en="{{ news_item.description_en }}"
+                                                data-news-title_ar="{{ news_item.title_ar }}" 
+                                                data-news-description_ar="{{ news_item.description_ar }}" 
                                                 data-news-image="{{ news_item.image.url }}">
-                                                   <i data-feather="edit"></i> Edit </a>
+                                                   Edit </a>
                                              </li>
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteNewsModal" data-news-id="{{ news_item.id }}">
@@ -109,24 +115,37 @@ News Management
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
+            
             <form method="post" action="{% url 'news_create' %}" id="addNewsForm" enctype="multipart/form-data">
                {% csrf_token %}
-               <div class="mb-3">
-                  <label for="title" class="form-label">Title</label>
-                  <input type="text" class="form-control" id="title" name="title" placeholder="Enter News Title">
-                  <div class="invalid-feedback" id="title-error"></div> <!-- Error message container -->
+               <div class="row">
+                  <div class="col-6 mb-3">
+                     <label for="title_en" class="form-label">Title in English</label>
+                     <input type="text" class="form-control" id="title_en" name="title_en" placeholder="Enter News Title">
+                     <div class="invalid-feedback" id="title_en-error"></div> <!-- Error message container -->
+                  </div>
+                  <div class="col-6 mb-3">
+                     <label for="title_ar" class="form-label">Title in Arabic</label>
+                     <input type="text" class="form-control" id="title_ar" name="title_ar" placeholder="Enter News Title">
+                     <div class="invalid-feedback" id="title_ar-error"></div> <!-- Error message container -->
+                  </div>
+                  <div class="col-6 mb-3">
+                     <label for="description_en" class="form-label">Description in English</label>
+                     <input type="text" class="form-control" id="description_en" name="description_en" placeholder="Enter News Description">
+                     <div class="invalid-feedback" id="description_en-error"></div> <!-- Error message container -->
+                  </div>
+                  <div class="col-6 mb-3">
+                     <label for="description_ar" class="form-label">Description in Arabic</label>
+                     <input type="text" class="form-control" id="description_ar" name="description_ar" placeholder="Enter News Description">
+                     <div class="invalid-feedback" id="description_ar-error"></div> <!-- Error message container -->
+                  </div>
+                  <div class="col-12 mb-3">
+                     <label for="image" class="form-label">Image</label>
+                     <input type="file" class="form-control" id="image" name="image">
+                     <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
+                  </div>
+                  <button type="submit" class="btn btn-primary">Add News</button>
                </div>
-               <div class="mb-3">
-                  <label for="description" class="form-label">Description</label>
-                  <input type="text" class="form-control" id="description" name="description" placeholder="Enter News Description">
-                  <div class="invalid-feedback" id="description-error"></div> <!-- Error message container -->
-               </div>
-               <div class="mb-3">
-                    <label for="image" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
-                    <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
-                </div>
-               <button type="submit" class="btn btn-primary">Add News</button>
             </form>
          </div>
       </div>
@@ -143,26 +162,39 @@ News Management
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" id="editNewsForm" enctype="multipart/form-data">
-               {% csrf_token %}
-               <input type="hidden" id="editNewsId" name="id">
-               <div class="mb-3">
-                  <label for="editTitle" class="form-label">Title</label>
-                  <input type="text" class="form-control" id="editTitle" name="title" placeholder="Enter News Title">
-                  <div class="invalid-feedback" id="edit-title-error"></div> <!-- Error message container -->
-               </div>
-               <div class="mb-3">
-                  <label for="editDescription" class="form-label">Description</label>
-                  <input type="text" class="form-control" id="editDescription" name="description" placeholder="Enter News Description">
-                  <div class="invalid-feedback" id="edit-description-error"></div> <!-- Error message container -->
-               </div>
-               <div class="mb-3">
-                  <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
-                  <img id="editNewsImagePreview" style="width: 100px; margin-top: 10px;">
-               </div>
-               <button type="submit" class="btn btn-primary">Update News</button>
-            </form>
+               <form method="post" id="editNewsForm" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="row">
+                     <input type="hidden" id="editNewsId" name="id">
+                     <div class="col-6 mb-3">
+                        <label for="editTitle_en" class="form-label">Title in English</label>
+                        <input type="text" class="form-control" id="editTitle_en" name="title_en" placeholder="Enter News Title">
+                        <div class="invalid-feedback" id="edit-title_en-error"></div> <!-- Error message container -->
+                     </div>
+                     <div class="col-6 mb-3">
+                        <label for="editTitle_ar" class="form-label">Title in Arabic</label>
+                        <input type="text" class="form-control" id="editTitle_ar" name="title_ar" placeholder="Enter News Title">
+                        <div class="invalid-feedback" id="edit-title_ar-error"></div> <!-- Error message container -->
+                     </div>
+                     <div class="col-6 mb-3">
+                        <label for="editDescription_en" class="form-label">Description in English</label>
+                        <input type="text" class="form-control" id="editDescription_en" name="description_en" placeholder="Enter News Description">
+                        <div class="invalid-feedback" id="edit-description_en-error"></div> <!-- Error message container -->
+                     </div>
+                     <div class="col-6 mb-3">
+                        <label for="editDescription_ar" class="form-label">Description in Arabic</label>
+                        <input type="text" class="form-control" id="editDescription_ar" name="description_ar" placeholder="Enter News Description">
+                        <div class="invalid-feedback" id="edit-description_ar-error"></div> <!-- Error message container -->
+                     </div>
+                     <div class="col-12 mb-3">
+                        <label for="editImage" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="editImage" name="image">
+                        <img id="editNewsImagePreview" style="width: 100px; margin-top: 10px;">
+                     </div>
+                     <button type="submit" class="btn btn-primary">Update News</button>
+                  </div>
+               </form>
+            </div>
          </div>
       </div>
    </div>
@@ -204,16 +236,20 @@ News Management
         editNewsModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
             var newsId = button.getAttribute('data-news-id');
-            var newsTitle = button.getAttribute('data-news-title');
-            var newsDescription = button.getAttribute('data-news-description');
+            var newsTitle_en = button.getAttribute('data-news-title_en');
+            var newsDescription_en = button.getAttribute('data-news-description_en');
+            var newsTitle_ar = button.getAttribute('data-news-title_ar');
+            var newsDescription_ar = button.getAttribute('data-news-description_ar');
             var newsImageUrl = button.getAttribute('data-news-image');
 
             var form = document.getElementById('editNewsForm');
             form.action = "{% url 'news_edit' 0 %}".replace('0', newsId);
 
             form.querySelector('#editNewsId').value = newsId;
-            form.querySelector('#editTitle').value = newsTitle;
-            form.querySelector('#editDescription').value = newsDescription;
+            form.querySelector('#editTitle_en').value = newsTitle_en;
+            form.querySelector('#editDescription_en').value = newsDescription_en;
+            form.querySelector('#editTitle_ar').value = newsTitle_ar;
+            form.querySelector('#editDescription_ar').value = newsDescription_ar;
 
             var imagePreview = document.getElementById('editNewsImagePreview');
             if (newsImageUrl) {
@@ -239,62 +275,97 @@ News Management
 
 // Form validation for Add and Edit News modals
 function validateForm(form) {
-    var title = form.querySelector('input[name="title"]');
-    var description = form.querySelector('input[name="description"]');
-    var image = form.querySelector('input[name="image"]');
-    var isValid = true;
+        var title_en = form.querySelector('input[name="title_en"]');
+        var description_en = form.querySelector('input[name="description_en"]');
+        var title_ar = form.querySelector('input[name="title_ar"]');
+        var description_ar = form.querySelector('input[name="description_ar"]');
+        var image = form.querySelector('input[name="image"]');
+        var isValid = true;
 
-    // Title validation
-    if (title.value.trim() === '') {
-        title.classList.add('is-invalid');
-        var titleErrorId = form.id === 'addNewsForm' ? 'title-error' : 'edit-title-error';
-        document.getElementById(titleErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        title.classList.remove('is-invalid');
-        var titleErrorId = form.id === 'addNewsForm' ? 'title-error' : 'edit-title-error';
-        document.getElementById(titleErrorId).textContent = '';
+        // Title validation English
+        if (title_en.value.trim() === '') {
+            title_en.classList.add('is-invalid');
+            var title_enErrorId = form.id === 'addNewsForm' ? 'title_en-error' : 'edit-title_en-error';
+            document.getElementById(title_enErrorId).textContent = 'This field is required.';
+            isValid = false;
+        } else {
+            title_en.classList.remove('is-invalid');
+            var title_enErrorId = form.id === 'addNewsForm' ? 'title_en-error' : 'edit-title_en-error';
+            document.getElementById(title_enErrorId).textContent = '';
+        }
+
+        // Title validation Arabic
+        if (title_ar.value.trim() === '') {
+            title_ar.classList.add('is-invalid');
+            var title_arErrorId = form.id === 'addNewsForm' ? 'title_ar-error' : 'edit-title_ar-error';
+            document.getElementById(title_arErrorId).textContent = 'This field is required.';
+            isValid = false;
+        } else {
+            title_ar.classList.remove('is-invalid');
+            var title_arErrorId = form.id === 'addNewsForm' ? 'title_ar-error' : 'edit-title_ar-error';
+            document.getElementById(title_arErrorId).textContent = '';
+        }
+
+        // Description validation English
+        if (description_en.value.trim() === '') {
+            description_en.classList.add('is-invalid');
+            var description_enErrorId = form.id === 'addNewsForm' ? 'description_en-error' : 'edit-description_en-error';
+            document.getElementById(description_enErrorId).textContent = 'This field is required.';
+            isValid = false;
+        } else {
+            description_en.classList.remove('is-invalid');
+            var description_enErrorId = form.id === 'addNewsForm' ? 'description_en-error' : 'edit-description_en-error';
+            document.getElementById(description_enErrorId).textContent = '';
+        }
+
+        // Description validation Arabic
+        if (description_ar.value.trim() === '') {
+            description_ar.classList.add('is-invalid');
+            var description_arErrorId = form.id === 'addNewsForm' ? 'description_ar-error' : 'edit-description_ar-error';
+            document.getElementById(description_arErrorId).textContent = 'This field is required.';
+            isValid = false;
+        } else {
+            description_ar.classList.remove('is-invalid');
+            var description_arErrorId = form.id === 'addNewsForm' ? 'description_ar-error' : 'edit-description_ar-error';
+            document.getElementById(description_arErrorId).textContent = '';
+        }
+
+        // Image validation (only for Add News)
+        if (form.id === 'addNewsForm' && image.files.length === 0) {
+            image.classList.add('is-invalid');
+            document.getElementById('image-error').textContent = 'An image is required.';
+            isValid = false;
+        } else {
+            image.classList.remove('is-invalid');
+            document.getElementById('image-error').textContent = '';
+        }
+
+        return isValid;
     }
 
-    // Description validation
-    if (description.value.trim() === '') {
-        description.classList.add('is-invalid');
-        var descriptionErrorId = form.id === 'addNewsForm' ? 'description-error' : 'edit-description-error';
-        document.getElementById(descriptionErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        description.classList.remove('is-invalid');
-        var descriptionErrorId = form.id === 'addNewsForm' ? 'description-error' : 'edit-description-error';
-        document.getElementById(descriptionErrorId).textContent = '';
+    var addNewsForm = document.getElementById('addNewsForm');
+    if (addNewsForm) {
+        addNewsForm.addEventListener('submit', function(event) {
+            console.log('Add News Form Submitted');
+            var form = event.target;
+            if (!validateForm(form)) {
+                console.log('Validation failed');
+                event.preventDefault(); // Prevent form submission
+            }
+        });
     }
 
-    // Image validation (only for Add News)
-    if (form.id === 'addNewsForm' && image.files.length === 0) {
-        image.classList.add('is-invalid');
-        document.getElementById('image-error').textContent = 'An image is required.';
-        isValid = false;
-    } else {
-        image.classList.remove('is-invalid');
-        document.getElementById('image-error').textContent = '';
+    var editNewsForm = document.getElementById('editNewsForm');
+    if (editNewsForm) {
+        editNewsForm.addEventListener('submit', function(event) {
+            console.log('Edit News Form Submitted');
+            var form = event.target;
+            if (!validateForm(form)) {
+                console.log('Validation failed');
+                event.preventDefault(); // Prevent form submission
+            }
+        });
     }
-
-    return isValid;
-}
-
-document.getElementById('addNewsForm').addEventListener('submit', function(event) {
-    var form = event.target;
-    if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
-    }
-});
-
-document.getElementById('editNewsForm').addEventListener('submit', function(event) {
-    var form = event.target;
-    if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
-    }
-});
-
 // Toggle the visibility of the action card
 document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
     menu.addEventListener('click', function(event) {
