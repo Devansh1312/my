@@ -303,24 +303,182 @@ class Slider_Content(models.Model):
     def __str__(self):
         return self.content_en
 
-#contact model
-
-class ContactPage(models.Model):
+#cmspages
+class cms_pages(models.Model):
     
-    Title = models.CharField(max_length=255,blank=True)
-    Title_content = models.CharField(max_length = 1000,blank =True)
-    Title_background = models.TextField(max_length=255,blank=True)
-    contact_us = models.CharField(max_length = 255,blank = True)
-    contact_us_title = models.CharField(max_length=255,blank=True)
-    contact_country = models.CharField(max_length=255,blank=True)
-    contact_mail_icon = models.TextField(max_length=255,blank = True)
-    contact_phone_icon = models.TextField(max_length=255,blank=True)
-    quote = models.CharField(max_length=255,blank=True)
-    quote_title = models.CharField(max_length=255,blank=True)
+    
+    #name 
+    name_en = models.CharField(max_length=100,null=True,blank=True)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
+    
+    #heading-section-1   
+    heading_en =  models.CharField(max_length=100,blank= True,null=True)
+    heading_ar = models.CharField(max_length=100,blank = True,null=True)
+    heading_title_en = models.CharField(max_length=100,blank = True,null=True)
+    heading_title_ar = models.CharField(max_length=100,blank = True,null=True)
+
+    heading_content_en = models.TextField(blank = True,null=True)
+    heading_content_ar = models.TextField(blank = True,null=True)
+    heading_video = models.FileField(upload_to='cmspages/',blank =True,null=True)
+    heading_banner = models.ImageField(upload_to='cmspages/', blank=True, null=True)
+    heading_image_1 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
+    heading_image_2 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
+    heading_image_3 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
+    heading_year_title = models.CharField(max_length=100,blank=True,null=True)
+    
+    #heading-section-2
+    sub_heading_logo = models.ImageField(upload_to='cmspages/',blank =True,null = True)
+    sub_heading_en = models.CharField(max_length=100,blank=True,null=True)
+    sub_heading_ar = models.CharField(max_length=100,blank=True,null=True)
+    sub_heading_title_en = models.CharField(max_length=100,blank=True,null=True)
+    sub_heading_title_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    #heading-section-3
+    sub_heading_icon_1 = models.ImageField(upload_to='cmspages/',blank =True,null = True)
+    sub_heading_logo_title_1_en = models.CharField(max_length=100,blank =True,null=True)
+    sub_heading_logo_title_1_ar = models.CharField(max_length=100,blank =True,null=True)
+    sub_heading_logo_content_1_en = models.TextField(blank =True,null=True)
+    sub_heading_logo_content_1_ar = models.TextField(blank =True,null=True)
+
+    sub_heading_icon_2 = models.ImageField(upload_to='cmspages/',blank =True,null = True)
+    sub_heading_logo_title_2_en = models.CharField(max_length=100,blank =True,null=True)
+    sub_heading_logo_title_2_ar = models.CharField(max_length=100,blank =True,null=True)
+    sub_heading_logo_content_2_en = models.TextField(blank =True,null=True)
+    sub_heading_logo_content_2_ar = models.TextField(blank =True,null=True)
+
+    #section-2
+    section_2_heading_en = models.CharField(max_length=100,blank =True,null=True)
+    section_2_heading_ar = models.CharField(max_length=100,blank =True,null=True)
+    section_2_title_en = models.CharField(max_length=100,blank=True,null=True)
+    section_2_title_ar = models.CharField(max_length=100,blank=True,null=True)
+    section_2_content_en = models.TextField(max_length=100,blank=True,null=True)
+    section_2_content_ar = models.TextField(max_length=100,blank=True,null=True)
+    section_2_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    section_2_images = models.CharField(max_length=255,blank=True,null=True)
+    
+    sub_section_2_title_1_en = models.CharField(max_length=100,blank=True,null=True)
+    sub_section_2_title_1_ar = models.CharField(max_length=100,blank=True,null=True)
+    sub_section_2_content_1_en = models.TextField(blank =True,null=True)
+    sub_section_2_content_1_ar = models.TextField(blank =True,null=True)
+    
+    sub_section_2_title_2_en = models.CharField(max_length=100,blank=True,null=True)
+    sub_section_2_title_2_ar = models.CharField(max_length=100,blank=True,null=True)
+    sub_section_2_content_2_en = models.TextField(blank =True,null=True)
+    sub_section_2_content_2_ar = models.TextField(blank =True,null=True)
+
+    sub_section_2_1_icon = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    sub_section_2_2_icon = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
+    #section-3
+    section_3_heading_en = models.CharField(max_length=100,blank=True,null=True)
+    section_3_heading_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_3_title_en = models.CharField(max_length=100,blank=True,null=True)
+    section_3_title_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_3_content_en = models.TextField(blank=True,null=True)
+    section_3_content_ar = models.TextField(blank=True,null=True)
+    
+    section_3_feature_icons = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    section_3_feature_title_en = models.CharField(max_length=100,blank=True,null=True)
+    section_3_feature_title_ar = models.CharField(max_length=100,blank=True,null=True)
+
+    section_3_feature_short_content_en = models.TextField(blank=True,null=True)
+    section_3_feature_short_content_ar = models.TextField(blank=True,null=True)
+    
+    #for discovery page
+    section_3_long_title_en = models.TextField(blank=True,null=True)
+    section_3_long_title_ar = models.TextField(blank=True,null=True)
+    section_3_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    
+    
+    #section-4
+    
+    section_4_heading_en = models.CharField(max_length=100,blank=True,null=True)
+    section_4_heading_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_4_title_en = models.CharField(max_length=100,blank=True,null=True)
+    section_4_title_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_4_content_en = models.TextField(blank=True,null=True)
+    section_4_content_ar = models.TextField(blank=True,null=True)
+    
+    section_4_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    
+    #for advertise
+    section_4_info_1 = models.TextField(blank=-True,null=True)
+    section_4_info_2 = models.TextField(blank=True,null=True)
+    section_4_info_3 = models.TextField(blank=True,null=True)
+    section_4_info_4 = models.TextField(blank=True,null=True)
+    section_4_info_5 = models.TextField(blank=True,null=True)
+    section_4_info_6 = models.TextField(blank=True,null=True)
+
+    #section 5
+    section_5_heading_en = models.CharField(max_length=100,blank=True,null=True)
+    section_5_heading_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_5_title_en = models.CharField(max_length=100,blank=True,null=True)
+    section_5_title_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_5_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    
+    section_5_info_title_1_en = models.CharField(max_length=100,blank=True,null=True)
+    section_5_info_title_2_en = models.CharField(max_length=100,blank=True,null=True)
+    section_5_info_title_3_en = models.CharField(max_length=100,blank=True,null=True)
+    section_5_info_title_4_en = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_5_info_title_1_ar = models.CharField(max_length=100,blank=True,null=True)
+    section_5_info_title_2_ar = models.CharField(max_length=100,blank=True,null=True)
+    section_5_info_title_3_ar = models.CharField(max_length=100,blank=True,null=True)
+    section_5_info_title_4_ar = models.CharField(max_length=100,blank=True,null=True)
+    
+    section_5_info_short_content_1_en = models.TextField(blank=True,null=True)
+    section_5_info_short_content_2_en = models.TextField(blank=True,null=True)
+    section_5_info_short_Content_3_en = models.TextField(blank=True,null=True)
+    section_5_info_short_content_4_en = models.TextField(blank=True,null=True)
+
+    section_5_info_short_content_1_ar = models.TextField(blank=True,null=True)
+    section_5_info_short_content_2_ar = models.TextField(blank=True,null=True)
+    section_5_info_short_Content_3_ar = models.TextField(blank=True,null=True)
+    section_5_info_short_content_4_ar = models.TextField(blank=True,null=True)
+    
+    #section 6
+    section_6_heading_en = models.CharField(max_length=100,blank =True,null=True)
+    section_6_heading_ar = models.CharField(max_length=100,blank =True,null=True)
+
+    section_6_title_en = models.CharField(max_length=100,blank =True,null=True)
+    section_6_title_ar = models.CharField(max_length=100,blank =True,null=True)
+
+    #section 7
+    section_7_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    section_7_image  = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    
+    #section 8
+    section_8_heading_en = models.CharField(max_length=100,blank =True,null=True)
+    section_8_heading_ar = models.CharField(max_length=100,blank =True,null=True)
+
+    section_8_title_en = models.CharField(max_length=100,blank =True,null=True)
+    section_8_title_ar = models.CharField(max_length=100,blank =True,null=True)
+    
+     #section 9
+    
+    section_9_heading_en = models.CharField(max_length=100,blank =True,null=True)
+    section_9_heading_ar = models.CharField(max_length=100,blank =True,null=True)
+
+    section_9_title_en = models.CharField(max_length=100,blank =True,null=True)
+    section_9_title_ar = models.CharField(max_length=100,blank =True,null=True)
+    
+    meta_title_en = models.CharField(max_length=100,blank = True,null =True)
+    meta_title_ar = models.CharField(max_length=100,blank = True,null =True)
+    
+    meta_content_en = models.TextField(blank = True,null =True)
+    meta_content_ar = models.TextField(blank = True,null =True)
+
+    
     
     def __str__(self):
-            return self.Title
-        
+        return self.heading_en
+
 
 
  

@@ -81,131 +81,28 @@
                               <th>Action</th>
                            </tr>
                         </thead>
-                        <tbody> <tr>
-                              <td>1.</td>
-                              <td>Home</td>
-                              <td>الصفحة الرئيسية</td>
+                        <tbody> 
+                           {% for cmspage in cms_pages_name %}
+                           <tr>
+                              <td>{{forloop.counter}}</td>
+                              <td>{{cmspage.name_en}}</td>
+                              <td>{{cmspage.name_ar}}</td>
                               <td>
                                 <div class="dropdown">
                                     <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img" alt="Menu" onclick="toggleDropdown()"/>
                                     <div class="dropdown-content">
-                                        <a href="#" id="editLink">Edit</a>
+                                        <a href="#" id="editLink" onclick = "return cmsEditPage('{{cmspage.name_en}}')" >Edit</a>
                                     </div>
                                 </div>
                             </td>
                            </tr> 
+                           {% endfor %}
 
-                           <tr>
-                            <td>2.</td>
-                            <td>Discovery</td>
-                            <td>اكتشاف</td>
-                            <td>
-                                <div class="dropdown">
-                                    <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img" alt="Menu" onclick="toggleDropdown()"/>
-                                    <div class="dropdown-content">
-                                        <a href="#" id="editLink">Edit</a>
-                                    </div>
-                                </div>
-                            </td>
-                         </tr> 
+                           
 
-                         <tr>
-                            <td>3.</td>
-                            <td>Success Story</td>
-                            <td>قصة نجاح</td>
-                            <td>
-                                <div class="dropdown">
-                                    <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img" alt="Menu" onclick="toggleDropdown()"/>
-                                    <div class="dropdown-content">
-                                        <a href="#" id="editLink" onclick = "return cmsEditPage('successStory')">Edit</a>
-                                    </div>
-                                </div>
-                            </td>
-                         </tr>
                          
-                         <!--<tr>
-                            <td>4.</td>
-                            <td>News</td>
-                            <td>أخبار</td>
-                            <td>
-                              <div class="dropdown">
-                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
-                                  <div class="dropdown-content">
-                                    <a href="#" id="editLink">Edit</a>
-                                </div>
-                              </div>
-                          </td>
-                         </tr> -->
-
-                         <tr>
-                            <td>4.</td>
-                            <td>Advertise</td>
-                            <td>أعلن</td>
-                            <td>
-                              <div class="dropdown">
-                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
-                                  <div class="dropdown-content">
-                                    <a href="#" id="editLink">Edit</a>
-                                </div>
-                              </div>
-                          </td>
-                         </tr> 
-
-                         <tr>
-                            <td>5.</td>
-                            <td>Contact Us</td>
-                            <td>اتصل بنا</td>
-                            <td>
-                              <div class="dropdown">
-                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
-                                  <div class="dropdown-content">
-                                    <a href="#" onclick = "return cmsEditPage('contactus')" id="editLink">Edit</a>
-                                </div>
-                              </div>
-                          </td>
-                         </tr> 
-
-                         <tr>
-                            <td>6.</td>
-                            <td>Privacy Policy</td>
-                            <td>سياسة الخصوصية
-                            </td>
-                            <td>
-                              <div class="dropdown">
-                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
-                                  <div class="dropdown-content">
-                                    <a href="#" id="editLink">Edit</a>
-                                </div>
-                              </div>
-                          </td>
-                         </tr> 
-
-                         <tr>
-                            <td>7.</td>
-                            <td>About</td>
-                            <td>عن</td>
-                            <td>
-                              <div class="dropdown">
-                                  <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
-                                  <div class="dropdown-content">
-                                    <a href="#" onclick = "return cmsEditPage('About')" id="editLink">Edit</a>
-                                </div>
-                              </div>
-                          </td>
-                         </tr> 
-                         <tr>
-                           <td>8.</td>
-                           <td>FAQ</td>
-                           <td>التعليمات</td>
-                           <td>
-                             <div class="dropdown">
-                                 <img src="{% static 'assets/icons/menu_page.png' %}" class="icon-img"/>
-                                 <div class="dropdown-content">
-                                   <a href="#" onclick = "return cmsEditPage('FAQ')" id="editLink">Edit</a>
-                               </div>
-                             </div>
-                         </td>
-                        </tr> 
+                         
+                         
                         
                         </tbody>
                      </table>
@@ -439,8 +336,7 @@
 
    
    function cmsEditPage(name){
-
-      if(name == "FAQ"){
+      if(name == "News"){
          var  url = "{%url 'cms_faqpage' %}"
 
 
@@ -453,18 +349,45 @@
 
          window.location.href = url;
       }
-      else if(name == "contactus"){
+      else if(name == "Contacts"){
          var url = "{%url 'cms_contactpage' %}"
 
          window.location.href = url;
 
       }
-      else if(name == "successStory"){
+      else if(name == "Success Stories"){
          var url = "{%url 'cms_successStorypage' %}"
 
          window.location.href = url;
       }
+      else if(name == "Home"){
+         
+         alert("empty")
+      }
+      else if(name == "Discovery"){
+         alert("empty")
+      }
+      else if(name == "News Detial"){
+         alert("empty")
+      }
+      else if(name == "Advertise"){
+         alert("empty")
+      }
+      else if(name == "Terms of Services"){
+         alert("empty")
+      }
+      else if(name == "Privacy Policy"){
+         alert("empty")
+      }
+      else if(name == "Terms & condition"){
+         var url = "{%url 'termcondition' %}"
 
+         window.location.href = url;
+      }
+      else{
+         alert('something wrong')
+         return false;
+      }
 
       return false
    }
