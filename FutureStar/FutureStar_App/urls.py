@@ -16,7 +16,7 @@ urlpatterns = [
 
 
     #Login URL
-    path('', LoginFormView,name="login"),
+    path('adminlogin/', LoginFormView,name="adminlogin"),
 
 
     #Dashboard URL

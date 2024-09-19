@@ -24,7 +24,7 @@ from datetime import timedelta
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
-
+# Login Module
 def LoginFormView(request):
     # If the user is already logged in, redirect to the dashboard
     if request.user.is_authenticated:
@@ -33,22 +33,33 @@ def LoginFormView(request):
     form = LoginForm(request.POST or None)
 
     if request.method == "POST":
-        remember_me = request.POST.get('rememberMe') == 'on'
+        remember_me = request.POST.get("rememberMe") == "on"
         if form.is_valid():
             email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password")
-            user = authenticate(request, email=email, password=password)  # Authenticate with email
+            user = authenticate(
+                request, email=email, password=password
+            )  # Authenticate with email
 
             if user is not None:
                 if user.is_active:  # Check if the user is active
-                    login(request, user)
-                    if remember_me:
-                        request.session.set_expiry(1209600)
-                    messages.success(request, "Login Successful")
-                    return redirect("Dashboard")
+                    if user.role_id == 1:  # Check if user's role_id is 1
+                        login(request, user)
+                        if remember_me:
+                            request.session.set_expiry(1209600)
+                        messages.success(request, "Login Successful")
+                        return redirect("Dashboard")
+                    else:
+                        messages.error(
+                            request,
+                            "You do not have the required role to access this site.",
+                        )
                 else:
                     # Add error message if user account is deactivated
-                    messages.error(request, "Your account is deactivated. Please contact the admin.")
+                    messages.error(
+                        request,
+                        "Your account is deactivated. Please contact the admin.",
+                    )
             else:
                 # Add error message for invalid credentials
                 messages.error(request, "Invalid email or password")
@@ -57,50 +68,56 @@ def LoginFormView(request):
 
     return render(request, "login.html", {"form": form})
 
+
+# Forgot Password Module
 class ForgotPasswordView(View):
-    template_name = 'Admin/Auth/forgot_password.html'
+    template_name = "Admin/Auth/forgot_password.html"
     User = get_user_model()
 
     def get(self, request):
         return render(request, self.template_name)
 
     def post(self, request):
-        email = request.POST.get('email')
+        email = request.POST.get("email")
         user = self.User.objects.filter(email=email).first()
 
         if user:
             user.remember_token = get_random_string(40)
             user.token_created_at = timezone.now()
             user.save()
-            reset_url = request.build_absolute_uri(reverse('reset_password', args=[user.remember_token]))
+            reset_url = request.build_absolute_uri(
+                reverse("reset_password", args=[user.remember_token])
+            )
 
-            context = {
-                'user': user,
-                'reset_url': reset_url
-            }
+            context = {"user": user, "reset_url": reset_url}
 
-            subject = 'Reset Your Password'
+            subject = "Reset Your Password"
             from_email = settings.DEFAULT_FROM_EMAIL
             to_email = [user.email]
-            html_content = render_to_string('Admin/Email/reset_password.html', context)
+            html_content = render_to_string("Admin/Email/reset_password.html", context)
 
-            msg = EmailMultiAlternatives(subject, '', from_email, to_email)
+            msg = EmailMultiAlternatives(subject, "", from_email, to_email)
             msg.attach_alternative(html_content, "text/html")
 
             try:
                 msg.send()
-                messages.success(request, 'Please check your email for the reset link.')
+                messages.success(request, "Please check your email for the reset link.")
             except Exception as e:
-                messages.error(request, 'There was an error sending the email. Please try again later.')
+                messages.error(
+                    request,
+                    "There was an error sending the email. Please try again later.",
+                )
 
-            return redirect("login")
+            return redirect("adminlogin")
         else:
-            messages.error(request, 'Email not found.')
+            messages.error(request, "Email not found.")
 
-        return redirect('forgot_password')
+        return redirect("forgot_password")
 
+
+# Reset Password Module
 class ResetPasswordView(View):
-    template_name = 'Admin/Auth/reset_password.html'
+    template_name = "Admin/Auth/reset_password.html"
     User = get_user_model()
 
     def get(self, request, token):
@@ -109,10 +126,10 @@ class ResetPasswordView(View):
         # Check if the token has expired (1 hour expiration)
         expiration_time = timezone.now() - timedelta(hours=1)
         if user.token_created_at and user.token_created_at < expiration_time:
-            messages.error(request, 'This reset link has expired.')
-            return redirect('forgot_password')
+            messages.error(request, "This reset link has expired.")
+            return redirect("forgot_password")
 
-        return render(request, self.template_name, {'token': token})
+        return render(request, self.template_name, {"token": token})
 
     def post(self, request, token):
         user = get_object_or_404(User, remember_token=token)
@@ -120,11 +137,11 @@ class ResetPasswordView(View):
         # Check if the token has expired (1 hour expiration)
         expiration_time = timezone.now() - timedelta(hours=1)
         if user.token_created_at and user.token_created_at < expiration_time:
-            messages.error(request, 'This reset link has expired.')
-            return redirect('forgot_password')
+            messages.error(request, "This reset link has expired.")
+            return redirect("forgot_password")
 
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
 
         if password == confirm_password:
             user.set_password(password)
@@ -133,32 +150,31 @@ class ResetPasswordView(View):
             user.remember_token = get_random_string(40)  # Invalidate the token
             user.token_created_at = None  # Clear the token creation time
             user.save()
-            messages.success(request, 'Your password has been reset. You can now log in.')
-            return redirect('login')
+            messages.success(
+                request, "Your password has been reset. You can now log in."
+            )
+            return redirect("adminlogin")
         else:
-            messages.error(request, 'Passwords do not match.')
+            messages.error(request, "Passwords do not match.")
 
-        return render(request, self.template_name, {'token': token})
+        return render(request, self.template_name, {"token": token})
+
 
 # Dashboard View
 class Dashboard(LoginRequiredMixin, View):
-    # Redirect the user to the login page if not authenticated
-    login_url = "/"  # Specify your login URL if it's different
-    redirect_field_name = (
-        "redirect_to"  # Optional: specify where to redirect after login
-    )
-
-    # def get(self, request, *args, **kwargs):
-    #     return render(request, 'Admin/Dashboard.html')
+    login_url = "/"
+    redirect_field_name = "redirect_to"
 
     def get(self, request, *args, **kwargs):
         context = {"breadcrumb": {"parent": "Admin", "child": "Dashboard"}}
         return render(request, "Admin/Dashboard.html", context)
 
 
+# Logout Module
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("adminlogin")
+
 
 ##################################################### User Profile View ###############################################################
 class UserProfileView(LoginRequiredMixin, View):
@@ -195,19 +211,28 @@ class UserUpdateProfileView(View):
     def post(self, request, *args, **kwargs):
         if "change_password" in request.POST:
             # Handle password change
-            password_change_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+            password_change_form = CustomPasswordChangeForm(
+                user=request.user, data=request.POST
+            )
             if password_change_form.is_valid():
                 user = password_change_form.save()
                 logout(request)  # Log out the user after password change
-                messages.success(request, "Your password has been changed successfully. Please log in again.")
-                return redirect("login")
+                messages.success(
+                    request,
+                    "Your password has been changed successfully. Please log in again.",
+                )
+                return redirect("adminlogin")
             else:
                 form = UserUpdateProfileForm(instance=request.user)
                 # Render the same template with the form errors
                 return render(
                     request,
                     "Admin/Dashboard.html",
-                    {"form": form, "password_change_form": password_change_form, "show_change_password_modal": True},
+                    {
+                        "form": form,
+                        "password_change_form": password_change_form,
+                        "show_change_password_modal": True,
+                    },
                 )
         else:
             # Handle profile update
@@ -353,22 +378,26 @@ class System_Settings(LoginRequiredMixin, View):
             system_settings.line_of_code = request.POST.get("line_of_code")
             system_settings.downloads = request.POST.get("downloads")
             system_settings.app_rate = request.POST.get("app_rate")
-            system_settings.years_of_experience = request.POST.get("years_of_experience")
+            system_settings.years_of_experience = request.POST.get(
+                "years_of_experience"
+            )
             system_settings.project_completed = request.POST.get("project_completed")
-            system_settings.proffesioan_team_members = request.POST.get("proffesioan_team_members")
+            system_settings.proffesioan_team_members = request.POST.get(
+                "proffesioan_team_members"
+            )
             system_settings.awards_winning = request.POST.get("awards_winning")
 
             fields = {
-                    'website_name_english': "This field is required.",
-                    'website_name_arabic': "This field is required.",
-                    'phone': "This field is required.",
-                    'email': "This field is required.",
-                    'address': "This field is required.",
-                    'happy_user' : "This field is required.",
-                    'line_of_code' : "This field is required.",
-                    'downloads': "This field is required.",
-                    'app_rate': "This field is required.",
-                }
+                "website_name_english": "This field is required.",
+                "website_name_arabic": "This field is required.",
+                "phone": "This field is required.",
+                "email": "This field is required.",
+                "address": "This field is required.",
+                "happy_user": "This field is required.",
+                "line_of_code": "This field is required.",
+                "downloads": "This field is required.",
+                "app_rate": "This field is required.",
+            }
 
             for field, error_message in fields.items():
                 if not getattr(system_settings, field):
@@ -382,32 +411,40 @@ class System_Settings(LoginRequiredMixin, View):
                 system_settings.save()
                 success = True
                 messages.success(request, "System settings Updated Successfully.")
-        
+
         except Exception as e:
             messages.error(request, f"An error occurred: {e}")
 
         if errors:
-            return render(request, "Admin/System_Settings.html", {
-                "system_settings": system_settings,
-                "MEDIA_URL": settings.MEDIA_URL,
-                "breadcrumb": {
-                    "parent": "Admin",
-                    "child": "System Settings",
+            return render(
+                request,
+                "Admin/System_Settings.html",
+                {
+                    "system_settings": system_settings,
+                    "MEDIA_URL": settings.MEDIA_URL,
+                    "breadcrumb": {
+                        "parent": "Admin",
+                        "child": "System Settings",
+                    },
+                    "errors": errors,
                 },
-                "errors": errors,
-            })
+            )
         elif success:
             return redirect("Dashboard")
         else:
             return redirect("Dashboard")
 
 
+#######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
+
 # User Active & Deactive Function
 class ToggleUserStatusView(View):
     def post(self, request, pk, *args, **kwargs):
         user = get_object_or_404(User, pk=pk)
         new_status = request.POST.get("status")
-        source_page = request.POST.get("source_page", "Dashboard")  # Default to Dashboard if not provided
+        source_page = request.POST.get(
+            "source_page", "Dashboard"
+        )  # Default to Dashboard if not provided
 
         # Check if the user is a superuser
         if user.role_id == 1:
@@ -416,10 +453,12 @@ class ToggleUserStatusView(View):
 
         # Check if the current user is trying to deactivate their own account
         if user == request.user and new_status == "deactivate":
-            messages.info(request, "Your account has been deactivated. Please log in again.")
+            messages.info(
+                request, "Your account has been deactivated. Please log in again."
+            )
             user.is_active = False
             user.save()
-            return redirect(reverse("login"))
+            return redirect(reverse("adminlogin"))
 
         # Update the user's status
         if new_status == "activate":
@@ -442,6 +481,7 @@ class ToggleUserStatusView(View):
             return redirect(reverse("Dashboard"))
 
 
+# Player List View
 class PlayerListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Player_List.html"
 
@@ -459,6 +499,8 @@ class PlayerListView(LoginRequiredMixin, View):
             },
         )
 
+
+# Coach List View
 class CoachListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Coach_List.html"
 
@@ -476,6 +518,8 @@ class CoachListView(LoginRequiredMixin, View):
             },
         )
 
+
+# Refree List View
 class RefereeListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Referee_List.html"
 
@@ -492,68 +536,9 @@ class RefereeListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Referee List"},
             },
         )
-# class UserEditForm(forms.ModelForm):
-#     class Meta:
-#         model = get_user_model()
-#         fields = ['first_name', 'last_name', 'email', 'phone', 'role']
-
-#     def clean_email(self):
-#         email = self.cleaned_data['email']
-#         if get_user_model().objects.filter(email=email).exclude(id=self.instance.id).exists():
-#             raise forms.ValidationError('A user with this email already exists.')
-#         return email
 
 
-# class UserEditView(LoginRequiredMixin, View):
-#     def get(self, request, user_id):
-#         user = get_object_or_404(get_user_model(), id=user_id)
-#         roles = Role.objects.all()
-#         return JsonResponse(
-#             {
-#                 "id": user.id,
-#                 "first_name": user.first_name,
-#                 "last_name": user.last_name,
-#                 "email": user.email,
-#                 "phone": user.phone,
-#                 "role": user.role.id if user.role else None,
-#             }
-#         )
-
-#     @method_decorator(csrf_exempt)
-#     def post(self, request, user_id):
-#         user = get_object_or_404(get_user_model(), id=user_id)
-#         form = UserEditForm(request.POST, instance=user)
-
-#         if form.is_valid():
-#             form.save()
-#             # Use Django messages to pass success message
-#             messages.success(request, f"User {user.username} Updated Successfully.")
-#             return JsonResponse({"success": True})
-#         else:
-#             # Return form errors if the form is invalid
-#             return JsonResponse({"success": False, "errors": form.errors})
-
-# class UserDeleteView(LoginRequiredMixin, View):
-#     def get(self, request, pk):
-#         user = get_object_or_404(User, pk=pk)
-#         user.delete()
-#         messages.success(request, f"User {user.username} Deleted Successfully.")
-#         return redirect("user_list")  # Redirect to the user list after successful deletion
-
-#     def post(self, request, pk):
-#         user = get_object_or_404(User, pk=pk)
-#         print(user)
-#         print(user.role_id)
-#         if user.role_id == 1 or user.role is None:
-#             messages.error(request,"SuperUser Can not deleted.")
-#             print(messages.success(request,"SuperUser Can not deleted."))
-#             return redirect("user_list")
-#         else:
-#             user.delete()
-#             messages.success(request, f"User {user.username} Deleted Successfully.")
-#             return redirect("user_list")  # Redirect to the user list after successful deletion
-
-
+##############################################  User Category Type Module  ################################################
 # Category CRUD Views
 class CategoryCreateView(LoginRequiredMixin, View):
     def get(self, request):
@@ -633,7 +618,7 @@ class CategoryListView(LoginRequiredMixin, View):
         )
 
 
-# Role CRUD Views
+################################################################# Role CRUD Views ###################################################
 class RoleCreateView(LoginRequiredMixin, View):
     template_name = "Admin/User_Role.html"
 
@@ -702,7 +687,7 @@ class RoleListView(LoginRequiredMixin, View):
         )
 
 
-# # Gender CRUD Views
+##########################################  Gender CRUD Views  ###########################################
 # class GenderCreateView(LoginRequiredMixin, View):
 #     template_name = "forms/gender_form.html"
 
@@ -773,7 +758,8 @@ class RoleListView(LoginRequiredMixin, View):
 #             },
 #         )
 
-# fieldcapacity CRUD Views
+
+####################################### fieldcapacity CRUD Views  ########################################################
 class FieldCapacityCreateView(LoginRequiredMixin, View):
     template_name = "forms/fieldcapacity_form.html"
 
@@ -845,7 +831,7 @@ class FieldCapacityListView(LoginRequiredMixin, View):
         )
 
 
-# Groun dMaterials CRUD Views
+####################################################### Ground Materials CRUD Views  ###########################################
 class GroundMaterialCreateView(LoginRequiredMixin, View):
     template_name = "forms/groundmaterial_form.html"
 
@@ -920,7 +906,7 @@ class GroundMaterialListView(LoginRequiredMixin, View):
         )
 
 
-# Tournament Style CRUD Views
+######################################  Tournament Style CRUD Views  #############################################################
 class TournamentStyleCreateView(LoginRequiredMixin, View):
     template_name = "forms/tournamentstyle_form.html"
 
@@ -992,7 +978,7 @@ class TournamentStyleListView(LoginRequiredMixin, View):
         )
 
 
-# Event Type CRUD Views
+################################################### Event Type CRUD Views #######################################################
 class EventTypeCreateView(LoginRequiredMixin, View):
     template_name = "forms/eventtype_form.html"
 
@@ -1063,15 +1049,16 @@ class EventTypeListView(LoginRequiredMixin, View):
             },
         )
 
-########################## CMS PAGES #################################        
+
+########################## CMS PAGES #################################
 class CMSPages(LoginRequiredMixin, View):
     template_name = "Admin/cmspages.html"
 
-    def get(self,request):
+    def get(self, request):
         return render(request, self.template_name)
-    
 
-#################################### News Module ###############################################
+
+######################################################### News Module ###############################################
 class NewsListView(LoginRequiredMixin, View):
     template_name = "Admin/News_List.html"
 
@@ -1086,35 +1073,37 @@ class NewsListView(LoginRequiredMixin, View):
             },
         )
 
+
 class NewsCreateView(View):
     def post(self, request):
-        title_en = request.POST.get('title_en')
-        description_en = request.POST.get('description_en')
-        title_ar = request.POST.get('title_ar')
-        description_ar = request.POST.get('description_ar')
+        title_en = request.POST.get("title_en")
+        description_en = request.POST.get("description_en")
+        title_ar = request.POST.get("title_ar")
+        description_ar = request.POST.get("description_ar")
 
         if not title_en or not description_ar or not title_ar or not description_en:
             messages.error(request, "Title and Description are required.")
-            return redirect('news_list')
+            return redirect("news_list")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'news'))
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "news"))
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'news/' + image_name
+            image_name = "news/" + image_name
 
         news = News.objects.create(
             title_en=title_en,
             title_ar=title_ar,
             description_ar=description_ar,
             description_en=description_en,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "News created successfully.")
-        return redirect('news_list')
+        return redirect("news_list")
+
 
 class NewsEditView(View):
     template_name = "Admin/News_List.html"
@@ -1122,34 +1111,35 @@ class NewsEditView(View):
     def post(self, request, news_id):
         news_item = get_object_or_404(News, id=news_id)
 
-        title_en = request.POST.get('title_en')
-        description_en = request.POST.get('description_en')
-        title_ar = request.POST.get('title_ar')
-        description_ar = request.POST.get('description_ar')
+        title_en = request.POST.get("title_en")
+        description_en = request.POST.get("description_en")
+        title_ar = request.POST.get("title_ar")
+        description_ar = request.POST.get("description_ar")
 
         if not title_en or not description_ar or not title_ar or not description_en:
             messages.error(request, "Title and Description are required.")
-            return redirect('news_list')
+            return redirect("news_list")
 
-        news_item.title_en=title_en,
-        news_item.title_ar=title_ar,
-        news_item.description_ar=description_ar,
-        news_item.description_en=description_en,
+        news_item.title_en = (title_en,)
+        news_item.title_ar = (title_ar,)
+        news_item.description_ar = (description_ar,)
+        news_item.description_en = (description_en,)
 
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'news'))
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "news"))
             if news_item.image and news_item.image.path:
                 old_image_path = news_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            news_item.image = 'news/' + image_name
+            news_item.image = "news/" + image_name
 
         news_item.save()
 
         messages.success(request, "News updated successfully.")
-        return redirect('news_list')
+        return redirect("news_list")
+
 
 class NewsDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1159,9 +1149,7 @@ class NewsDeleteView(LoginRequiredMixin, View):
         return redirect("news_list")
 
 
-
-
-#################################### Partners Module ###############################################
+############################################################## Partners Module ###############################################
 class PartnersListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Partners_List.html"
 
@@ -1176,29 +1164,33 @@ class PartnersListView(LoginRequiredMixin, View):
             },
         )
 
+
 class PartnersCreateView(View):
     def post(self, request):
-        title = request.POST.get('title')
+        title = request.POST.get("title")
 
         if not title:
             messages.error(request, "Partner Title is required.")
-            return redirect('partners_list')
+            return redirect("partners_list")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'partners'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "partners")
+            )
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'partners/' + image_name
+            image_name = "partners/" + image_name
 
         partners = Partners.objects.create(
             title=title,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "Partners created successfully.")
-        return redirect('partners_list')
+        return redirect("partners_list")
+
 
 class PartnersEditView(View):
     template_name = "Admin/General_Settings/Partners_List.html"
@@ -1206,27 +1198,30 @@ class PartnersEditView(View):
     def post(self, request, partners_id):
         partners_item = get_object_or_404(Partners, id=partners_id)
 
-        title = request.POST.get('title')
+        title = request.POST.get("title")
 
         if not title:
             messages.error(request, "Partner Title is required.")
-            return redirect('partners_list')
+            return redirect("partners_list")
 
         partners_item.title = title
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'partners'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "partners")
+            )
             if partners_item.image and partners_item.image.path:
                 old_image_path = partners_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            partners_item.image = 'partners/' + image_name
+            partners_item.image = "partners/" + image_name
 
         partners_item.save()
 
         messages.success(request, "Partners updated successfully.")
-        return redirect('partners_list')
+        return redirect("partners_list")
+
 
 class PartnersDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1235,7 +1230,8 @@ class PartnersDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Partners Deleted Successfully.")
         return redirect("partners_list")
 
-#################################### Global Clients Module ###############################################
+
+############################################################ Global Clients Module ###############################################
 class Global_ClientsListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Global_Clients_List.html"
 
@@ -1250,29 +1246,33 @@ class Global_ClientsListView(LoginRequiredMixin, View):
             },
         )
 
+
 class Global_ClientsCreateView(View):
     def post(self, request):
-        title = request.POST.get('title')
+        title = request.POST.get("title")
 
         if not title:
             messages.error(request, "Global Clients Title is required.")
-            return redirect('global_clients_list')
+            return redirect("global_clients_list")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'global_clients'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "global_clients")
+            )
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'global_clients/' + image_name
+            image_name = "global_clients/" + image_name
 
         global_clients = Global_Clients.objects.create(
             title=title,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "Global Client created successfully.")
-        return redirect('global_clients_list')
+        return redirect("global_clients_list")
+
 
 class Global_ClientsEditView(View):
     template_name = "Admin/General_Settings/Global_Clients_List.html"
@@ -1280,27 +1280,30 @@ class Global_ClientsEditView(View):
     def post(self, request, global_clients_id):
         global_clients_item = get_object_or_404(Global_Clients, id=global_clients_id)
 
-        title = request.POST.get('title')
+        title = request.POST.get("title")
 
         if not title:
             messages.error(request, "Global Client Title is required.")
-            return redirect('global_clients_list')
+            return redirect("global_clients_list")
 
         global_clients_item.title = title
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'global_clients'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "global_clients")
+            )
             if global_clients_item.image and global_clients_item.image.path:
                 old_image_path = global_clients_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            global_clients_item.image = 'global_clients/' + image_name
+            global_clients_item.image = "global_clients/" + image_name
 
         global_clients_item.save()
 
         messages.success(request, "Global Client updated successfully.")
-        return redirect('global_clients_list')
+        return redirect("global_clients_list")
+
 
 class Global_ClientsDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1308,8 +1311,9 @@ class Global_ClientsDeleteView(LoginRequiredMixin, View):
         global_clients.delete()
         messages.success(request, "Global Client Deleted Successfully.")
         return redirect("global_clients_list")
-    
-#################################### Tryout Club Module ###############################################
+
+
+################################################################# Tryout Club Module ###############################################
 class Tryout_ClubListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Tryout_Club_List.html"
 
@@ -1324,29 +1328,33 @@ class Tryout_ClubListView(LoginRequiredMixin, View):
             },
         )
 
+
 class Tryout_ClubCreateView(View):
     def post(self, request):
-        title = request.POST.get('title')
+        title = request.POST.get("title")
 
         if not title:
             messages.error(request, "Tryout Club Title is required.")
-            return redirect('tryout_club_list')
+            return redirect("tryout_club_list")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'tryout_club'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "tryout_club")
+            )
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'tryout_club/' + image_name
+            image_name = "tryout_club/" + image_name
 
         tryout_club = Tryout_Club.objects.create(
             title=title,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "Tryout Club created successfully.")
-        return redirect('tryout_club_list')
+        return redirect("tryout_club_list")
+
 
 class Tryout_ClubEditView(View):
     template_name = "Admin/General_Settings/Tryout_Club_List.html"
@@ -1354,27 +1362,30 @@ class Tryout_ClubEditView(View):
     def post(self, request, tryout_club_id):
         tryout_club_item = get_object_or_404(Tryout_Club, id=tryout_club_id)
 
-        title = request.POST.get('title')
+        title = request.POST.get("title")
 
         if not title:
             messages.error(request, "Tryout Club Title is required.")
-            return redirect('tryout_club_list')
+            return redirect("tryout_club_list")
 
         tryout_club_item.title = title
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'tryout_club'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "tryout_club")
+            )
             if tryout_club_item.image and tryout_club_item.image.path:
                 old_image_path = tryout_club_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            tryout_club_item.image = 'tryout_club/' + image_name
+            tryout_club_item.image = "tryout_club/" + image_name
 
         tryout_club_item.save()
 
         messages.success(request, "Tryout Club updated successfully.")
-        return redirect('tryout_club_list')
+        return redirect("tryout_club_list")
+
 
 class Tryout_ClubDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1382,14 +1393,14 @@ class Tryout_ClubDeleteView(LoginRequiredMixin, View):
         tryout_club.delete()
         messages.success(request, "Tryout Club Deleted Successfully.")
         return redirect("tryout_club_list")
-    
 
-#################################### Inquires Module ###############################################
+
+#################################################################### Inquires Module ###############################################
 class InquireListView(LoginRequiredMixin, View):
     template_name = "Admin/Inquire_List.html"
 
     def get(self, request):
-        inquire = Inquire.objects.all().order_by('-id')
+        inquire = Inquire.objects.all().order_by("-id")
         print(inquire)
         return render(
             request,
@@ -1401,8 +1412,7 @@ class InquireListView(LoginRequiredMixin, View):
         )
 
 
-
-#################################### Testimonial Module ###############################################
+################################################################ Testimonial Module ###############################################
 class TestimonialListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Testimonial_List.html"
 
@@ -1417,24 +1427,26 @@ class TestimonialListView(LoginRequiredMixin, View):
             },
         )
 
+
 class TestimonialCreateView(View):
     def post(self, request):
-        name_en = request.POST.get('name_en')
-        designation_en = request.POST.get('designation_en')
-        content_en = request.POST.get('content_en')
-        rattings = request.POST.get('rattings')
-        name_ar = request.POST.get('name_ar')
-        designation_ar = request.POST.get('designation_ar')
-        content_ar = request.POST.get('content_ar')
-
+        name_en = request.POST.get("name_en")
+        designation_en = request.POST.get("designation_en")
+        content_en = request.POST.get("content_en")
+        rattings = request.POST.get("rattings")
+        name_ar = request.POST.get("name_ar")
+        designation_ar = request.POST.get("designation_ar")
+        content_ar = request.POST.get("content_ar")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'testimonial'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "testimonial")
+            )
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'testimonial/' + image_name
+            image_name = "testimonial/" + image_name
 
         testimonial = Testimonial.objects.create(
             name_en=name_en,
@@ -1444,11 +1456,12 @@ class TestimonialCreateView(View):
             designation_ar=designation_ar,
             content_ar=content_ar,
             rattings=rattings,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "Testimonial Created successfully.")
-        return redirect('testimonial_list')
+        return redirect("testimonial_list")
+
 
 class TestimonialEditView(View):
     template_name = "Admin/General_Settings/Testimonial_List.html"
@@ -1456,14 +1469,13 @@ class TestimonialEditView(View):
     def post(self, request, testimonial_id):
         testimonial_item = get_object_or_404(Testimonial, id=testimonial_id)
 
-        name_en = request.POST.get('name_en')
-        designation_en = request.POST.get('designation_en')
-        content_en = request.POST.get('content_en')
-        rattings = request.POST.get('rattings')
-        name_ar = request.POST.get('name_ar')
-        designation_ar = request.POST.get('designation_ar')
-        content_ar = request.POST.get('content_ar')
-
+        name_en = request.POST.get("name_en")
+        designation_en = request.POST.get("designation_en")
+        content_en = request.POST.get("content_en")
+        rattings = request.POST.get("rattings")
+        name_ar = request.POST.get("name_ar")
+        designation_ar = request.POST.get("designation_ar")
+        content_ar = request.POST.get("content_ar")
 
         testimonial_item.name_en = name_en
         testimonial_item.designation_en = designation_en
@@ -1472,20 +1484,23 @@ class TestimonialEditView(View):
         testimonial_item.designation_ar = designation_ar
         testimonial_item.content_ar = content_ar
         testimonial_item.rattings = rattings
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'testimonial'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "testimonial")
+            )
             if testimonial_item.image and testimonial_item.image.path:
                 old_image_path = testimonial_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            testimonial_item.image = 'testimonial/' + image_name
+            testimonial_item.image = "testimonial/" + image_name
 
         testimonial_item.save()
 
         messages.success(request, "Testimonial updated successfully.")
-        return redirect('testimonial_list')
+        return redirect("testimonial_list")
+
 
 class TestimonialDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1495,7 +1510,7 @@ class TestimonialDeleteView(LoginRequiredMixin, View):
         return redirect("testimonial_list")
 
 
-#################################### Team_Members Module ###############################################
+################################################################ Team_Members Module ###############################################
 class Team_MembersListView(LoginRequiredMixin, View):
     template_name = "Admin/Team_Members_List.html"
 
@@ -1510,31 +1525,35 @@ class Team_MembersListView(LoginRequiredMixin, View):
             },
         )
 
+
 class Team_MembersCreateView(View):
     def post(self, request):
-        name_en = request.POST.get('name_en')
-        designations_en = request.POST.get('designations_en')
-        name_ar = request.POST.get('name_ar')
-        designations_ar = request.POST.get('designations_ar')
+        name_en = request.POST.get("name_en")
+        designations_en = request.POST.get("designations_en")
+        name_ar = request.POST.get("name_ar")
+        designations_ar = request.POST.get("designations_ar")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'team_members'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "team_members")
+            )
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'team_members/' + image_name
+            image_name = "team_members/" + image_name
 
         team_members = Team_Members.objects.create(
             name_en=name_en,
             designations_en=designations_en,
             name_ar=name_ar,
             designations_ar=designations_ar,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "Team Member created successfully.")
-        return redirect('team_members_list')
+        return redirect("team_members_list")
+
 
 class Team_MembersEditView(View):
     template_name = "Admin/Team_Members_List.html"
@@ -1542,31 +1561,33 @@ class Team_MembersEditView(View):
     def post(self, request, team_members_id):
         team_members_item = get_object_or_404(Team_Members, id=team_members_id)
 
-        name_en = request.POST.get('name_en')
-        designations_en = request.POST.get('designations_en')
-        name_ar = request.POST.get('name_ar')
-        designations_ar = request.POST.get('designations_ar')
-
+        name_en = request.POST.get("name_en")
+        designations_en = request.POST.get("designations_en")
+        name_ar = request.POST.get("name_ar")
+        designations_ar = request.POST.get("designations_ar")
 
         team_members_item.designations_en = designations_en
         team_members_item.name_en = name_en
         team_members_item.name_ar = name_ar
         team_members_item.designations_ar = designations_ar
 
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'team_members'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "team_members")
+            )
             if team_members_item.image and team_members_item.image.path:
                 old_image_path = team_members_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            team_members_item.image = 'team_members/' + image_name
+            team_members_item.image = "team_members/" + image_name
 
         team_members_item.save()
 
         messages.success(request, "Team Member updated successfully.")
-        return redirect('team_members_list')
+        return redirect("team_members_list")
+
 
 class Team_MembersDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1576,7 +1597,7 @@ class Team_MembersDeleteView(LoginRequiredMixin, View):
         return redirect("team_members_list")
 
 
-#################################### App_Feature Module ###############################################
+################################################################ App_Feature Module ###############################################
 class App_FeatureListView(LoginRequiredMixin, View):
     template_name = "Admin/App_Feature_List.html"
 
@@ -1591,31 +1612,35 @@ class App_FeatureListView(LoginRequiredMixin, View):
             },
         )
 
+
 class App_FeatureCreateView(View):
     def post(self, request):
-        title_en = request.POST.get('title_en')
-        sub_title_en = request.POST.get('sub_title_en')
-        title_ar = request.POST.get('title_ar')
-        sub_title_ar = request.POST.get('sub_title_ar')
+        title_en = request.POST.get("title_en")
+        sub_title_en = request.POST.get("sub_title_en")
+        title_ar = request.POST.get("title_ar")
+        sub_title_ar = request.POST.get("sub_title_ar")
 
         # Handling image upload
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'app_feature'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "app_feature")
+            )
             image_name = fs.save(image_file.name, image_file)
-            image_name = 'app_feature/' + image_name
+            image_name = "app_feature/" + image_name
 
         app_feature = App_Feature.objects.create(
             title_en=title_en,
             sub_title_en=sub_title_en,
             title_ar=title_ar,
             sub_title_ar=sub_title_ar,
-            image=image_name  # Save the relative image path in the database
+            image=image_name,  # Save the relative image path in the database
         )
 
         messages.success(request, "App Feature created successfully.")
-        return redirect('app_feature_list')
+        return redirect("app_feature_list")
+
 
 class App_FeatureEditView(View):
     template_name = "Admin/App_Feature_List.html"
@@ -1623,30 +1648,33 @@ class App_FeatureEditView(View):
     def post(self, request, app_feature_id):
         app_feature_item = get_object_or_404(App_Feature, id=app_feature_id)
 
-        title_en = request.POST.get('title_en')
-        sub_title_en = request.POST.get('sub_title_en')
-        title_ar = request.POST.get('title_ar')
-        sub_title_ar = request.POST.get('sub_title_ar')
+        title_en = request.POST.get("title_en")
+        sub_title_en = request.POST.get("sub_title_en")
+        title_ar = request.POST.get("title_ar")
+        sub_title_ar = request.POST.get("sub_title_ar")
 
         app_feature_item.title_en = title_en
         app_feature_item.sub_title_en = sub_title_en
         app_feature_item.title_ar = title_ar
         app_feature_item.sub_title_ar = sub_title_ar
 
-        image_file = request.FILES.get('image')
+        image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'app_feature'))
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "app_feature")
+            )
             if app_feature_item.image and app_feature_item.image.path:
                 old_image_path = app_feature_item.image.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             image_name = fs.save(image_file.name, image_file)
-            app_feature_item.image = 'app_feature/' + image_name
+            app_feature_item.image = "app_feature/" + image_name
 
         app_feature_item.save()
 
         messages.success(request, "App Feature updated successfully.")
-        return redirect('app_feature_list')
+        return redirect("app_feature_list")
+
 
 class App_FeatureDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -1654,7 +1682,8 @@ class App_FeatureDeleteView(LoginRequiredMixin, View):
         app_feature.delete()
         messages.success(request, "App Feature Deleted Successfully.")
         return redirect("app_feature_list")
-    
+
+
 #################################################   Slider_Content CRUD Views  #######################################################
 class Slider_ContentCreateView(LoginRequiredMixin, View):
     template_name = "forms/slider_content_form.html"
@@ -1725,197 +1754,181 @@ class Slider_ContentListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Slider Content"},
             },
         )
-    
-######################################## cms_contact_page  ##############################################################      
+
+
+################################################### cms_contact_page  ##############################################################
 class cms_contactpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/contactus.html"
 
     def get(self, request):
-        
+
         return render(
             request,
             self.template_name,
-            
         )
-        
+
+
 @csrf_exempt
 def savecontactpage(request):
-        try:
-            if request.method == "POST":
-                #text
-                heading_title_en  = request.POST.get('heading_title_en')
-                heading_title_ar  = request.POST.get('heading_title_ar')
-                heading_content_en = request.POST.get('heading_content_en')
-                heading_content_ar = request.POST.get('heading_content_ar')
-                sub_heading_title_en = request.POST.get('sub_heading_title_en')
-                sub_heading_title_ar = request.POST.get('sub_heading_title_ar')
-                sub_heading_sub_title_en= request.POST.get('sub_heading_sub_title_en')
-                sub_heading_sub_title_ar= request.POST.get('sub_heading_sub_title_ar')
-                country_name_en= request.POST.get('country_name_en')
-                country_name_ar= request.POST.get('country_name_ar')
-                sub_heading_name_en= request.POST.get('sub_heading_name_en')
-                sub_heading_name_ar= request.POST.get('sub_heading_name_ar')
-                sub_heading_title_2_en = request.POST.get('sub_heading_title_2_en')
-                sub_heading_title_2_ar = request.POST.get('sub_heading_title_2_ar')
+    try:
+        if request.method == "POST":
+            # text
+            heading_title_en = request.POST.get("heading_title_en")
+            heading_title_ar = request.POST.get("heading_title_ar")
+            heading_content_en = request.POST.get("heading_content_en")
+            heading_content_ar = request.POST.get("heading_content_ar")
+            sub_heading_title_en = request.POST.get("sub_heading_title_en")
+            sub_heading_title_ar = request.POST.get("sub_heading_title_ar")
+            sub_heading_sub_title_en = request.POST.get("sub_heading_sub_title_en")
+            sub_heading_sub_title_ar = request.POST.get("sub_heading_sub_title_ar")
+            country_name_en = request.POST.get("country_name_en")
+            country_name_ar = request.POST.get("country_name_ar")
+            sub_heading_name_en = request.POST.get("sub_heading_name_en")
+            sub_heading_name_ar = request.POST.get("sub_heading_name_ar")
+            sub_heading_title_2_en = request.POST.get("sub_heading_title_2_en")
+            sub_heading_title_2_ar = request.POST.get("sub_heading_title_2_ar")
+
+            response_data = {
+                "status": "success",
+                "message": "Data and uploaded successfully",
+                "heading_title_en": "",
+            }
+
+            return JsonResponse(response_data)
+
+        else:
+            response_data = {"status": "error", "message": "Missing data or image file"}
+
+            return JsonResponse(response_data)
+    except Exception as e:
+        response_data = {"status": "error", "message": str(e)}
+
+        return JsonResponse(response_data)
 
 
-                
-
-
-                
-                
-                response_data = {
-                        'status': 'success',
-                        'message': 'Data and uploaded successfully',
-                        'heading_title_en': ''
-                    }
-                
-                return JsonResponse(response_data)
-
-            else:
-                response_data = {'status': 'error', 'message': 'Missing data or image file'}
-
-                return JsonResponse(response_data)
-        except Exception as e:
-            response_data = {'status': 'error', 'message': str(e)}
-
-            return JsonResponse(response_data) 
-
-    
-#cms_about_page     
+# cms_about_page
 class cms_aboutpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/aboutus.html"
 
     def get(self, request):
-        
+
         return render(
             request,
             self.template_name,
-            
         )
-        
+
+
 @csrf_exempt
 def saveAboutUspage(request):
-        try:
-            if request.method == "POST":
-                #text
-                heading_title_en  = request.POST.get('heading_title_en')
-                heading_title_ar  = request.POST.get('heading_title_ar')
-                #heading_section_video  = request.FILES['heading_section_video']
-                heading_content_en  = request.POST.get('heading_content_en')
-                heading_content_ar  = request.POST.get('heading_content_ar')
-                heading_year_en  = request.POST.get('heading_year_en')
-                heading_year_ar  = request.POST.get('heading_year_ar')
-                sub_heading_en  = request.POST.get('sub_heading_en')
-                sub_heading_ar  = request.POST.get('sub_heading_ar')
-                whoweare_title_en  = request.POST.get('whoweare_title_en')
-                whoweare_title_ar  = request.POST.get('whoweare_title_ar')
-                global_client_heading_en  = request.POST.get('global_client_heading_en')
-                global_client_heading_ar  = request.POST.get('global_client_heading_ar')
+    try:
+        if request.method == "POST":
+            # text
+            heading_title_en = request.POST.get("heading_title_en")
+            heading_title_ar = request.POST.get("heading_title_ar")
+            # heading_section_video  = request.FILES['heading_section_video']
+            heading_content_en = request.POST.get("heading_content_en")
+            heading_content_ar = request.POST.get("heading_content_ar")
+            heading_year_en = request.POST.get("heading_year_en")
+            heading_year_ar = request.POST.get("heading_year_ar")
+            sub_heading_en = request.POST.get("sub_heading_en")
+            sub_heading_ar = request.POST.get("sub_heading_ar")
+            whoweare_title_en = request.POST.get("whoweare_title_en")
+            whoweare_title_ar = request.POST.get("whoweare_title_ar")
+            global_client_heading_en = request.POST.get("global_client_heading_en")
+            global_client_heading_ar = request.POST.get("global_client_heading_ar")
+
+            response_data = {
+                "status": "success",
+                "message": "Data uploaded successfully",
+                "heading_title_en": "",
+            }
+
+            return JsonResponse(response_data)
+
+        else:
+            response_data = {"status": "error", "message": "Missing data or image file"}
+
+            return JsonResponse(response_data)
+    except Exception as e:
+        response_data = {"status": "error", "message": str(e)}
+
+        return JsonResponse(response_data)
 
 
-
-
-
-                
-
-
-                
-                
-                response_data = {
-                        'status': 'success',
-                        'message': 'Data uploaded successfully',
-                        'heading_title_en': ''
-                    }
-                
-                return JsonResponse(response_data)
-
-            else:
-                response_data = {'status': 'error', 'message': 'Missing data or image file'}
-
-                return JsonResponse(response_data)
-        except Exception as e:
-               response_data = {'status': 'error', 'message': str(e)}
-
-               return JsonResponse(response_data) 
-
-#cms_about_page     
+# cms_about_page
 class cms_FAQPage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/FAQ.html"
 
     def get(self, request):
-        
+
         return render(
             request,
             self.template_name,
-            
         )
-              
+
+
 @csrf_exempt
 def saveFAQpage(request):
-        try:
-            if request.method == "POST":
-                #text
-                heading_title_en  = request.POST.get('heading_title_en')
-                heading_title_ar  = request.POST.get('heading_title_ar')
-                #heading_section_video  = request.FILES['heading_section_video']
-                heading_content_en  = request.POST.get('heading_content_en')
-                heading_content_ar  = request.POST.get('heading_content_ar')
-                heading_banner = request.FILES['heading_banner']
-                
-               
-                
-                return JsonResponse(response_data)
+    try:
+        if request.method == "POST":
+            # text
+            heading_title_en = request.POST.get("heading_title_en")
+            heading_title_ar = request.POST.get("heading_title_ar")
+            # heading_section_video  = request.FILES['heading_section_video']
+            heading_content_en = request.POST.get("heading_content_en")
+            heading_content_ar = request.POST.get("heading_content_ar")
+            heading_banner = request.FILES["heading_banner"]
 
-            else:
-                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+            return JsonResponse(response_data)
 
-                return JsonResponse(response_data)
-        except Exception as e:
-               response_data = {'status': 'error', 'message': str(e)}
+        else:
+            response_data = {"status": "error", "message": "Missing data or image file"}
 
-               return JsonResponse(response_data) 
-                   
-#cms_about_page     
+            return JsonResponse(response_data)
+    except Exception as e:
+        response_data = {"status": "error", "message": str(e)}
+
+        return JsonResponse(response_data)
+
+
+# cms_about_page
 class cms_successStory(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/successtory.html"
 
     def get(self, request):
-        
+
         return render(
             request,
             self.template_name,
-            
-    )
-        
+        )
+
+
 @csrf_exempt
 def saveSucessStorypage(request):
-        try:
-            if request.method == "POST":
-                #text
-                heading_title_en  = request.POST.get('heading_title_en')
-                heading_title_ar  = request.POST.get('heading_title_ar')
-                #heading_section_video  = request.FILES['heading_section_video']
-                heading_content_en  = request.POST.get('heading_content_en')
-                heading_content_ar  = request.POST.get('heading_content_ar')
-                tryoutclubs_title_en  = request.POST.get('tryoutclubs-title-en')
-                tryoutclubs_title_ar  = request.POST.get('tryoutclubs-title-ar')
+    try:
+        if request.method == "POST":
+            # text
+            heading_title_en = request.POST.get("heading_title_en")
+            heading_title_ar = request.POST.get("heading_title_ar")
+            # heading_section_video  = request.FILES['heading_section_video']
+            heading_content_en = request.POST.get("heading_content_en")
+            heading_content_ar = request.POST.get("heading_content_ar")
+            tryoutclubs_title_en = request.POST.get("tryoutclubs-title-en")
+            tryoutclubs_title_ar = request.POST.get("tryoutclubs-title-ar")
 
-                
-                
-                response_data = {
-                        'status': 'success',
-                        'message': 'Data uploaded successfully',
-                        'heading_title_en': ''
-                }
-                
-                return JsonResponse(response_data)
+            response_data = {
+                "status": "success",
+                "message": "Data uploaded successfully",
+                "heading_title_en": "",
+            }
 
-            else:
-                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+            return JsonResponse(response_data)
 
-                return JsonResponse(response_data)
-        except Exception as e:
-               response_data = {'status': 'error', 'message': str(e)}
+        else:
+            response_data = {"status": "error", "message": "Missing data or image file"}
 
-               return JsonResponse(response_data) 
+            return JsonResponse(response_data)
+    except Exception as e:
+        response_data = {"status": "error", "message": str(e)}
+
+        return JsonResponse(response_data)
