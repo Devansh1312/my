@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'FutureStar_App',
+    'FutureStarFrontend',
     'rest_framework',
     'sass_processor',
     'widget_tweaks',
@@ -89,9 +90,9 @@ WSGI_APPLICATION = 'FutureStar.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'futurestar',
+        'NAME': 'futurestar2',
         'USER': 'root',
-        'PASSWORD': '12345',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306'
     }

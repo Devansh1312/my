@@ -1,0 +1,125 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %} Future Star - Conatct {% endblock %}
+{% block content %}
+<!-- Page Banner Start -->
+<section class="page-banner-area overlay pt-220 rpt-150 pb-170 rpb-100 rel z-1 bgs-cover text-center" style="background-image: url('{% static 'frontend/assets/images/banner/banner-bg.jpg' %}');">
+    <div class="container">
+        <div class="banner-inner rpt-10">
+            <h2 class="page-title wow fadeInUp delay-0-2s">Contact Us</h2>
+            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>                    
+        </div>
+    </div>
+</section>
+<!-- Page Banner End -->
+
+<!-- Contact Form Area start -->
+<section class="services-area-six pt-100 pb-100 rel z-1 bgs-cover">
+    <div class="container">
+       <div class="row justify-content-between">
+            <div class="col-lg-6">
+                <div class="our-location-part rmb-55 wow fadeInUp delay-0-2s">
+                    <div class="row">
+                        <div class="col-xl-10">
+                            <div class="section-title mb-60">
+                                <span class="sub-title mb-15">Contact Us</span>
+                                <h2>Ready to Work Your Next Projects</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gap-80 pb-30">
+                        <div class="col-sm-6">
+                            <div class="our-location-address mb-40">
+                                <h5>UAE</h5>
+                                <p>{{ system_settings.address }}</p>
+                                <a class="callto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a><br><br>
+                                <a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a>
+                            </div>
+                        </div>
+                      
+                    </div>
+                    <h4>Follow Us</h4>
+                    <div class="social-style-two pt-15">
+                        <a href="{{ system_settings.facebook }}"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ system_settings.twitter }}"><i class="fab fa-twitter"></i></a>
+                        <a href="{{ system_settings.instagram }}"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ system_settings.linkedin }}"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-5 col-lg-6">
+                <div class="contact-page-form form-style-one wow fadeInUp delay-0-2s">
+                    <div class="section-title mb-35">
+                        <span class="sub-title mb-15">Get Free Quote</span>
+                        <h3>Drop Us a Message</h3>
+                    </div>
+                    <form id="contactForm" class="contactForm"  action="{% url 'contact' %}" name="contactForm" method="post">
+                        {% csrf_token %}
+                        <div class="row gap-60 pt-15">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="fullname">Full Name</label>
+                                    <input type="text" id="fullname" name="fullname" class="form-control" value="" placeholder="" required data-error="Please enter your name">
+                                    <div class="help-block with-errors"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="text" id="phone" name="phone" class="form-control" value="" placeholder="" required data-error="Please enter your Number">
+                                    <div class="help-block with-errors"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" class="form-control" value="" placeholder="" required data-error="Please enter your Email Address">
+                                    <div class="help-block with-errors"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" class="form-control" rows="2" placeholder="" required data-error="Please enter your Message"></textarea>
+                                    <div class="help-block with-errors"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group pt-5 mb-0">
+                                    <button type="submit" class="theme-btn style-two w-100">Send Message us <i class="far fa-arrow-right"></i></button>
+                                    <div id="msgSubmit" class="hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Contact Form Area end -->
+
+
+<!-- Location Map Area Start -->
+<div class="contact-page-map mb-120 rpb-90 wow fadeInUp delay-0-2s">
+    <div class="container">
+        <div class="our-location">
+            <iframe src="https://maps.google.com/maps?q={{ system_settings.address|urlencode }}&output=embed" style="border:0; width: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</div>
+<!-- Location Map Area End -->
+{% endblock %}
+
+{% block scriptcontent %}
+
+{% endblock %}
+{% block script %} 
+{% endblock %}

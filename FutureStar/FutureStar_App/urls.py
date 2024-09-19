@@ -112,10 +112,10 @@ urlpatterns = [
     path('saveSuccessStory/',saveSucessStorypage,name = "saveSucessStorypage"),
     
     #News List URL
-    path('news/', NewsListView.as_view(), name='news_list'),
-    path('news/create/', NewsCreateView.as_view(), name='news_create'),
-    path('news/edit/<int:news_id>/', NewsEditView.as_view(), name='news_edit'),  # Edit URL
-    path('news/delete/<int:pk>/', NewsDeleteView.as_view(), name='news_delete'),
+    path('news_list/', NewsListView.as_view(), name='news_list'),
+    path('news_list/create/', NewsCreateView.as_view(), name='news_create'),
+    path('news_list/edit/<int:news_id>/', NewsEditView.as_view(), name='news_edit'),  # Edit URL
+    path('news_list/delete/<int:pk>/', NewsDeleteView.as_view(), name='news_delete'),
 
     #Partners List URL
     path('partners/', PartnersListView.as_view(), name='partners_list'),
