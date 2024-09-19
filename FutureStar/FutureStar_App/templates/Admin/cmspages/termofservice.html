@@ -127,7 +127,7 @@
                    
                 </div>
                 <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return sendData1()">Save</button>
+                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
                     <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
                 </div>
             </form>
@@ -237,6 +237,7 @@
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
                 var seo_content_ar = document.getElementById("meta-content-ar")
+                var missing_text = document.getElementById('heading-error')
 
                 try{
                     const formData = new FormData();
@@ -262,7 +263,12 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
-                        
+
+                        if(missing_text.style.display != "none"){
+                            missing_text.style.display = "none"
+
+                        }
+
                         
                         
                     })
@@ -301,6 +307,7 @@
                 return false;
             }
             catch(err){
+
                 var  warning = document.getElementById('heading-error')
 
                 warning.innerText = err
@@ -313,13 +320,21 @@
         else if(validation == "error"){
 
             var missing_text = document.getElementById('heading-error')
+
             
+            
+            
+            missing_text.style.display = 'block'
             missing_text.innerText = "Fill the blank field!"
             missing_text.style.color = "red"
             window.scrollTo(0,0)
             return false
-        }
+}
             
+            
+            
+        
+        
     
         
     }
