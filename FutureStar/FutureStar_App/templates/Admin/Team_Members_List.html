@@ -13,8 +13,8 @@
    border-color: #dc3545;
    background-color: #f8d7da;
 }
-
 </style>
+
 {% block title %}
 Team Members List
 {% endblock %}
@@ -45,8 +45,10 @@ Team Members List
                             <tr>
                                 <th>ID</th>
                                 <th>Image</th> <!-- New column for the image -->
-                                <th>Name</th>
-                                <th>Designations</th>
+                                <th>Name ( English)</th>
+                                <th>Name ( Arabic )</th>
+                                <th>Designations ( English)</th>
+                                <th>Designations ( Arabic )</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -56,13 +58,15 @@ Team Members List
                                 <td>{{ forloop.counter }}</td>
                                 <td>
                                     {% if team_members_item.image %}
-                                        <img src="{{ team_members_item.image.url }}" alt="{{ team_members_item.name }}" width="100" height="auto">
+                                        <img src="{{ team_members_item.image.url }}" alt="{{ team_members_item.name_en }}" width="100" height="auto">
                                     {% else %}
                                         No Image
                                     {% endif %}
-                                </td>                                
-                                <td>{{ team_members_item.name }}</td>
-                                <td>{{ team_members_item.designations }}</td>
+                                </td>
+                                <td>{{ team_members_item.name_en }}</td>
+                                <td>{{ team_members_item.name_ar }}</td>
+                                <td>{{ team_members_item.designations_en }}</td>
+                                <td>{{ team_members_item.designations_ar }}</td>
                                 <td>
                                     <!-- Action buttons -->
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">
@@ -73,8 +77,10 @@ Team Members List
                                           <ul style="list-style: none; padding: 0; margin: 0;">
                                              <li style="padding: 8px 12px;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editTeam_MembersModal"  data-team_members-id="{{ team_members_item.id }}" 
-                                                data-team_members-name="{{ team_members_item.name }}" 
-                                                data-team_members-designations="{{ team_members_item.designations }}" 
+                                                data-team_members-name-en="{{ team_members_item.name_en }}" 
+                                                data-team_members-name-ar="{{ team_members_item.name_ar }}" 
+                                                data-team_members-designations-en="{{ team_members_item.designations_en }}" 
+                                                data-team_members-designations-ar="{{ team_members_item.designations_ar }}" 
                                                 data-team_members-image="{{ team_members_item.image.url }}">
                                                    <i data-feather="edit"></i> Edit </a>
                                              </li>
@@ -103,34 +109,43 @@ Team Members List
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="addTeam_MembersModalLabel">Add Team_Members</h5>
+            <h5 class="modal-title" id="addTeam_MembersModalLabel">Add Team Member</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
             <form method="post" action="{% url 'team_members_create' %}" id="addTeam_MembersForm" enctype="multipart/form-data">
                {% csrf_token %}
                <div class="mb-3">
-                  <label for="name" class="form-label">Enter Team Member Name</label>
-                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter Team Member Name">
-                  <div class="invalid-feedback" id="name-error"></div> <!-- Error message container -->
+                  <label for="name_en" class="form-label">Enter Team Member Name ( English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Team Member Name ( English)">
+                  <div class="invalid-feedback" id="name_en-error"></div>
                </div>
                <div class="mb-3">
-                  <label for="designations" class="form-label">Designations</label>
-                  <input type="text" class="form-control" id="designations" name="designations" placeholder="Enter Team Member Designations">
-                  <div class="invalid-feedback" id="designations-error"></div> <!-- Error message container -->
+                  <label for="name_ar" class="form-label">Enter Team Member Name ( Arabic )</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Team Member Name ( Arabic )">
+                  <div class="invalid-feedback" id="name_ar-error"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="designations_en" class="form-label">Designations ( English)</label>
+                  <input type="text" class="form-control" id="designations_en" name="designations_en" placeholder="Enter Team Member Designations ( English)">
+                  <div class="invalid-feedback" id="designations_en-error"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="designations_ar" class="form-label">Designations ( Arabic )</label>
+                  <input type="text" class="form-control" id="designations_ar" name="designations_ar" placeholder="Enter Team Member Designations ( Arabic )">
+                  <div class="invalid-feedback" id="designations_ar-error"></div>
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
                     <input type="file" class="form-control" id="image" name="image">
-                    <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
-                </div>
+                    <div class="invalid-feedback" id="image-error"></div>
+               </div>
                <button type="submit" class="btn btn-primary">Add Team Member</button>
             </form>
          </div>
       </div>
    </div>
 </div>
-
 
 <!-- Edit Team_Members Modal -->
 <div class="modal fade" id="editTeam_MembersModal" tabindex="-1" aria-labelledby="editTeam_MembersModalLabel" aria-hidden="true">
@@ -145,27 +160,36 @@ Team Members List
                {% csrf_token %}
                <input type="hidden" id="editTeam_MembersId" name="id">
                <div class="mb-3">
-                  <label for="editName" class="form-label">Name</label>
-                  <input type="text" class="form-control" id="editName" name="name" placeholder="Enter Team Members Name">
-                  <div class="invalid-feedback" id="edit-name-error"></div> <!-- Error message container -->
+                  <label for="editNameEn" class="form-label">Name ( English)</label>
+                  <input type="text" class="form-control" id="editNameEn" name="name_en" placeholder="Enter Team Member Name ( English)">
+                  <div class="invalid-feedback" id="edit-name-en-error"></div>
                </div>
                <div class="mb-3">
-                  <label for="editDesignations" class="form-label">Designations</label>
-                  <input type="text" class="form-control" id="editDesignations" name="designations" placeholder="Enter Team_Members Designations">
-                  <div class="invalid-feedback" id="edit-designations-error"></div> <!-- Error message container -->
+                  <label for="editNameAr" class="form-label">Name ( Arabic )</label>
+                  <input type="text" class="form-control" id="editNameAr" name="name_ar" placeholder="Enter Team Member Name ( Arabic )">
+                  <div class="invalid-feedback" id="edit-name-ar-error"></div>
                </div>
                <div class="mb-3">
-                  <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
-                  <img id="editTeam_MembersImagePreview" style="width: 100px; margin-top: 10px;">
+                  <label for="editDesignationsEn" class="form-label">Designations ( English)</label>
+                  <input type="text" class="form-control" id="editDesignationsEn" name="designations_en" placeholder="Enter Team Member Designations ( English)">
+                  <div class="invalid-feedback" id="edit-designations-en-error"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update Team_Members</button>
+               <div class="mb-3">
+                  <label for="editDesignationsAr" class="form-label">Designations ( Arabic )</label>
+                  <input type="text" class="form-control" id="editDesignationsAr" name="designations_ar" placeholder="Enter Team Member Designations ( Arabic )">
+                  <div class="invalid-feedback" id="edit-designations-ar-error"></div>
+               </div>
+               <div class="mb-3">
+                    <label for="editImage" class="form-label">Image</label>
+                    <input type="file" class="form-control" id="editImage" name="image">
+                    <div class="invalid-feedback" id="edit-image-error"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Update Team Member</button>
             </form>
          </div>
       </div>
    </div>
 </div>
-
 
 <!-- Delete Team_Members Modal -->
 <div class="modal fade" id="deleteTeam_MembersModal" tabindex="-1" aria-labelledby="deleteTeam_MembersModalLabel" aria-hidden="true">
@@ -176,11 +200,11 @@ Team Members List
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="" id="deleteTeam_MembersForm">
+            <p>Are you sure you want to delete this team member?</p>
+            <form method="post" id="deleteTeam_MembersForm">
                {% csrf_token %}
                <input type="hidden" id="deleteTeam_MembersId" name="id">
-               <p>Are you sure you want to delete this team_members?</p>
-               <button type="submit" class="btn btn-danger">Delete Team Member</button>
+               <button type="submit" class="btn btn-danger">Delete</button>
             </form>
          </div>
       </div>
@@ -202,16 +226,20 @@ Team Members List
         editTeam_MembersModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget;
             var team_membersId = button.getAttribute('data-team_members-id');
-            var team_membersName = button.getAttribute('data-team_members-name');
-            var team_membersDesignations = button.getAttribute('data-team_members-designations');
+            var team_membersNameEn = button.getAttribute('data-team_members-name-en');
+            var team_membersNameAr = button.getAttribute('data-team_members-name-ar');
+            var team_membersDesignationsEn = button.getAttribute('data-team_members-designations-en');
+            var team_membersDesignationsAr = button.getAttribute('data-team_members-designations-ar');
             var team_membersImageUrl = button.getAttribute('data-team_members-image');
 
             var form = document.getElementById('editTeam_MembersForm');
             form.action = "{% url 'team_members_edit' 0 %}".replace('0', team_membersId);
 
             form.querySelector('#editTeam_MembersId').value = team_membersId;
-            form.querySelector('#editName').value = team_membersName;
-            form.querySelector('#editDesignations').value = team_membersDesignations;
+            form.querySelector('#editNameEn').value = team_membersNameEn;
+            form.querySelector('#editNameAr').value = team_membersNameAr;
+            form.querySelector('#editDesignationsEn').value = team_membersDesignationsEn;
+            form.querySelector('#editDesignationsAr').value = team_membersDesignationsAr;
 
             var imagePreview = document.getElementById('editTeam_MembersImagePreview');
             if (team_membersImageUrl) {
@@ -235,34 +263,61 @@ Team Members List
     }
 });
 
+
 // Form validation for Add and Edit Team_Members modals
 function validateForm(form) {
-    var name = form.querySelector('input[name="name"]');
-    var designations = form.querySelector('input[name="designations"]');
+    var nameEn = form.querySelector('input[name="name_en"]');
+    var nameAr = form.querySelector('input[name="name_ar"]');
+    var designationsEn = form.querySelector('input[name="designations_en"]');
+    var designationsAr = form.querySelector('input[name="designations_ar"]');
     var image = form.querySelector('input[name="image"]');
     var isValid = true;
 
-    // Name validation
-    if (name.value.trim() === '') {
-        name.classList.add('is-invalid');
-        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-error' : 'edit-name-error';
+    // English Name validation
+    if (nameEn.value.trim() === '') {
+        nameEn.classList.add('is-invalid');
+        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-en-error' : 'edit-name-en-error';
         document.getElementById(nameErrorId).textContent = 'This field is required.';
         isValid = false;
     } else {
-        name.classList.remove('is-invalid');
-        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-error' : 'edit-name-error';
+        nameEn.classList.remove('is-invalid');
+        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-en-error' : 'edit-name-en-error';
         document.getElementById(nameErrorId).textContent = '';
     }
 
-    // Designations validation
-    if (designations.value.trim() === '') {
-        designations.classList.add('is-invalid');
-        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-error' : 'edit-designations-error';
+    // Arabic Name validation
+    if (nameAr.value.trim() === '') {
+        nameAr.classList.add('is-invalid');
+        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-ar-error' : 'edit-name-ar-error';
+        document.getElementById(nameErrorId).textContent = 'This field is required.';
+        isValid = false;
+    } else {
+        nameAr.classList.remove('is-invalid');
+        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-ar-error' : 'edit-name-ar-error';
+        document.getElementById(nameErrorId).textContent = '';
+    }
+
+    // English Designations validation
+    if (designationsEn.value.trim() === '') {
+        designationsEn.classList.add('is-invalid');
+        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-en-error' : 'edit-designations-en-error';
         document.getElementById(designationsErrorId).textContent = 'This field is required.';
         isValid = false;
     } else {
-        designations.classList.remove('is-invalid');
-        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-error' : 'edit-designations-error';
+        designationsEn.classList.remove('is-invalid');
+        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-en-error' : 'edit-designations-en-error';
+        document.getElementById(designationsErrorId).textContent = '';
+    }
+
+    // Arabic Designations validation
+    if (designationsAr.value.trim() === '') {
+        designationsAr.classList.add('is-invalid');
+        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-ar-error' : 'edit-designations-ar-error';
+        document.getElementById(designationsErrorId).textContent = 'This field is required.';
+        isValid = false;
+    } else {
+        designationsAr.classList.remove('is-invalid');
+        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-ar-error' : 'edit-designations-ar-error';
         document.getElementById(designationsErrorId).textContent = '';
     }
 
@@ -318,5 +373,5 @@ document.addEventListener('click', function(event) {
     }
 });
 </script>
-
 {% endblock %}
+

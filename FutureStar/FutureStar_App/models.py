@@ -276,18 +276,21 @@ class Testimonial(models.Model):
     
 #Team Members    
 class Team_Members(models.Model):
-    name = models.CharField(max_length=255)
-    designations = models.CharField(max_length=255)
+    name_en = models.CharField(max_length=255)
+    designations_en = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255, blank=True, null=True)
+    designations_ar = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='team_members/', blank=True, null=True)
-    news_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.name_en
 
 #App_Feature Members    
 class App_Feature(models.Model):
-    title = models.CharField(max_length=255)
-    sub_title = models.CharField(max_length=255)
+    title_en = models.CharField(max_length=255)
+    sub_title_en = models.CharField(max_length=255)
+    title_ar = models.CharField(max_length=255, blank=True, null=True)
+    sub_title_ar = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='app_feature/')
     
     def __str__(self):

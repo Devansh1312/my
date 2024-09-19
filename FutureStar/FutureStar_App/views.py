@@ -1512,8 +1512,10 @@ class Team_MembersListView(LoginRequiredMixin, View):
 
 class Team_MembersCreateView(View):
     def post(self, request):
-        name = request.POST.get('name')
-        designations = request.POST.get('designations')
+        name_en = request.POST.get('name_en')
+        designations_en = request.POST.get('designations_en')
+        name_ar = request.POST.get('name_ar')
+        designations_ar = request.POST.get('designations_ar')
 
         # Handling image upload
         image_file = request.FILES.get('image')
@@ -1524,8 +1526,10 @@ class Team_MembersCreateView(View):
             image_name = 'team_members/' + image_name
 
         team_members = Team_Members.objects.create(
-            name=name,
-            designations=designations,
+            name_en=name_en,
+            designations_en=designations_en,
+            name_ar=name_ar,
+            designations_ar=designations_ar,
             image=image_name  # Save the relative image path in the database
         )
 
@@ -1538,11 +1542,16 @@ class Team_MembersEditView(View):
     def post(self, request, team_members_id):
         team_members_item = get_object_or_404(Team_Members, id=team_members_id)
 
-        name = request.POST.get('name')
-        designations = request.POST.get('designations')
+        name_en = request.POST.get('name_en')
+        designations_en = request.POST.get('designations_en')
+        name_ar = request.POST.get('name_ar')
+        designations_ar = request.POST.get('designations_ar')
 
-        team_members_item.designations = designations
-        team_members_item.name = name
+
+        team_members_item.designations_en = designations_en
+        team_members_item.name_en = name_en
+        team_members_item.name_ar = name_ar
+        team_members_item.designations_ar = designations_ar
 
         image_file = request.FILES.get('image')
         if image_file:
@@ -1584,8 +1593,10 @@ class App_FeatureListView(LoginRequiredMixin, View):
 
 class App_FeatureCreateView(View):
     def post(self, request):
-        title = request.POST.get('title')
-        sub_title = request.POST.get('sub_title')
+        title_en = request.POST.get('title_en')
+        sub_title_en = request.POST.get('sub_title_en')
+        title_ar = request.POST.get('title_ar')
+        sub_title_ar = request.POST.get('sub_title_ar')
 
         # Handling image upload
         image_file = request.FILES.get('image')
@@ -1596,8 +1607,10 @@ class App_FeatureCreateView(View):
             image_name = 'app_feature/' + image_name
 
         app_feature = App_Feature.objects.create(
-            title=title,
-            sub_title=sub_title,
+            title_en=title_en,
+            sub_title_en=sub_title_en,
+            title_ar=title_ar,
+            sub_title_ar=sub_title_ar,
             image=image_name  # Save the relative image path in the database
         )
 
@@ -1610,11 +1623,15 @@ class App_FeatureEditView(View):
     def post(self, request, app_feature_id):
         app_feature_item = get_object_or_404(App_Feature, id=app_feature_id)
 
-        title = request.POST.get('title')
-        sub_title = request.POST.get('sub_title')
+        title_en = request.POST.get('title_en')
+        sub_title_en = request.POST.get('sub_title_en')
+        title_ar = request.POST.get('title_ar')
+        sub_title_ar = request.POST.get('sub_title_ar')
 
-        app_feature_item.sub_title = sub_title
-        app_feature_item.title = title
+        app_feature_item.title_en = title_en
+        app_feature_item.sub_title_en = sub_title_en
+        app_feature_item.title_ar = title_ar
+        app_feature_item.sub_title_ar = sub_title_ar
 
         image_file = request.FILES.get('image')
         if image_file:
@@ -1638,7 +1655,7 @@ class App_FeatureDeleteView(LoginRequiredMixin, View):
         messages.success(request, "App Feature Deleted Successfully.")
         return redirect("app_feature_list")
     
-# Slider_Content CRUD Views
+#################################################   Slider_Content CRUD Views  #######################################################
 class Slider_ContentCreateView(LoginRequiredMixin, View):
     template_name = "forms/slider_content_form.html"
 
@@ -1709,7 +1726,7 @@ class Slider_ContentListView(LoginRequiredMixin, View):
             },
         )
     
-#cms_contact_page        
+######################################## cms_contact_page  ##############################################################      
 class cms_contactpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/contactus.html"
 
