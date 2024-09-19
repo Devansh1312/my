@@ -30,6 +30,12 @@ class NewsPage(View):
         
         return render(request, "news.html")
 
+class AdvertisePage(View):
+    
+    def get(self, request, *args, **kwargs):
+        
+        return render(request, "advertise.html")
+
 
 class ContactPage(View):
     

@@ -13,6 +13,8 @@ urlpatterns = [
     path('discover/', DiscoverPage.as_view(),name="discover"),
     path('success-stories/', SuccessStoriesPage.as_view(),name="success-stories"),
     path('news/', NewsPage.as_view(),name="news"),
+    path('advertise/', AdvertisePage.as_view(),name="advertise"),
+
 
 
 
