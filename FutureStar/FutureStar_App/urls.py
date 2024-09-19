@@ -162,4 +162,8 @@ urlpatterns = [
     path('slider_content/update/<int:pk>/', Slider_ContentUpdateView.as_view(), name='slider_content_update'),
     path('slider_content/delete/<int:pk>/', Slider_ContentDeleteView.as_view(), name='slider_content_delete'),
 
+    path('termcondition/',cms_termcondition.as_view(),name="termcondition"),
+    path('savetermcondition/',savetermconditionpage,name="savetermconditionpage"),
+    
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   

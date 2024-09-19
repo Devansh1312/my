@@ -1050,14 +1050,6 @@ class EventTypeListView(LoginRequiredMixin, View):
         )
 
 
-########################## CMS PAGES #################################
-class CMSPages(LoginRequiredMixin, View):
-    template_name = "Admin/cmspages.html"
-
-    def get(self, request):
-        return render(request, self.template_name)
-
-
 ######################################################### News Module ###############################################
 class NewsListView(LoginRequiredMixin, View):
     template_name = "Admin/News_List.html"
@@ -1756,179 +1748,287 @@ class Slider_ContentListView(LoginRequiredMixin, View):
         )
 
 
-################################################### cms_contact_page  ##############################################################
+
+########################## CMS PAGES #################################        
+class CMSPages(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages.html"
+    
+
+    def get(self,request):
+        
+        cms_pages_name = cms_pages.objects.all()
+        
+        context = {
+            'cms_pages_name': cms_pages_name
+        }
+        
+        
+        return render(request, self.template_name,context)
+    
+ 
+ 
+ 
+
+ 
+######################################## cms_contact_page  ##############################################################      
 class cms_contactpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/contactus.html"
 
     def get(self, request):
-
+        
         return render(
             request,
             self.template_name,
+            
         )
-
-
+        
 @csrf_exempt
 def savecontactpage(request):
-    try:
-        if request.method == "POST":
-            # text
-            heading_title_en = request.POST.get("heading_title_en")
-            heading_title_ar = request.POST.get("heading_title_ar")
-            heading_content_en = request.POST.get("heading_content_en")
-            heading_content_ar = request.POST.get("heading_content_ar")
-            sub_heading_title_en = request.POST.get("sub_heading_title_en")
-            sub_heading_title_ar = request.POST.get("sub_heading_title_ar")
-            sub_heading_sub_title_en = request.POST.get("sub_heading_sub_title_en")
-            sub_heading_sub_title_ar = request.POST.get("sub_heading_sub_title_ar")
-            country_name_en = request.POST.get("country_name_en")
-            country_name_ar = request.POST.get("country_name_ar")
-            sub_heading_name_en = request.POST.get("sub_heading_name_en")
-            sub_heading_name_ar = request.POST.get("sub_heading_name_ar")
-            sub_heading_title_2_en = request.POST.get("sub_heading_title_2_en")
-            sub_heading_title_2_ar = request.POST.get("sub_heading_title_2_ar")
-
-            response_data = {
-                "status": "success",
-                "message": "Data and uploaded successfully",
-                "heading_title_en": "",
-            }
-
-            return JsonResponse(response_data)
-
-        else:
-            response_data = {"status": "error", "message": "Missing data or image file"}
-
-            return JsonResponse(response_data)
-    except Exception as e:
-        response_data = {"status": "error", "message": str(e)}
-
-        return JsonResponse(response_data)
+        try:
+            if request.method == "POST":
+                #text
+                heading_title_en  = request.POST.get('heading_title_en')
+                heading_title_ar  = request.POST.get('heading_title_ar')
+                heading_content_en = request.POST.get('heading_content_en')
+                heading_content_ar = request.POST.get('heading_content_ar')
+                sub_heading_title_en = request.POST.get('sub_heading_title_en')
+                sub_heading_title_ar = request.POST.get('sub_heading_title_ar')
+                sub_heading_sub_title_en= request.POST.get('sub_heading_sub_title_en')
+                sub_heading_sub_title_ar= request.POST.get('sub_heading_sub_title_ar')
+                country_name_en= request.POST.get('country_name_en')
+                country_name_ar= request.POST.get('country_name_ar')
+                sub_heading_name_en= request.POST.get('sub_heading_name_en')
+                sub_heading_name_ar= request.POST.get('sub_heading_name_ar')
+                sub_heading_title_2_en = request.POST.get('sub_heading_title_2_en')
+                sub_heading_title_2_ar = request.POST.get('sub_heading_title_2_ar')
 
 
-# cms_about_page
+                
+
+
+                
+                
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data and uploaded successfully',
+                        'heading_title_en': ''
+                    }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+            response_data = {'status': 'error', 'message': str(e)}
+
+            return JsonResponse(response_data) 
+
+    
+#cms_about_page     
 class cms_aboutpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/aboutus.html"
 
     def get(self, request):
-
+        
         return render(
             request,
             self.template_name,
+            
         )
-
-
+        
 @csrf_exempt
 def saveAboutUspage(request):
-    try:
-        if request.method == "POST":
-            # text
-            heading_title_en = request.POST.get("heading_title_en")
-            heading_title_ar = request.POST.get("heading_title_ar")
-            # heading_section_video  = request.FILES['heading_section_video']
-            heading_content_en = request.POST.get("heading_content_en")
-            heading_content_ar = request.POST.get("heading_content_ar")
-            heading_year_en = request.POST.get("heading_year_en")
-            heading_year_ar = request.POST.get("heading_year_ar")
-            sub_heading_en = request.POST.get("sub_heading_en")
-            sub_heading_ar = request.POST.get("sub_heading_ar")
-            whoweare_title_en = request.POST.get("whoweare_title_en")
-            whoweare_title_ar = request.POST.get("whoweare_title_ar")
-            global_client_heading_en = request.POST.get("global_client_heading_en")
-            global_client_heading_ar = request.POST.get("global_client_heading_ar")
-
-            response_data = {
-                "status": "success",
-                "message": "Data uploaded successfully",
-                "heading_title_en": "",
-            }
-
-            return JsonResponse(response_data)
-
-        else:
-            response_data = {"status": "error", "message": "Missing data or image file"}
-
-            return JsonResponse(response_data)
-    except Exception as e:
-        response_data = {"status": "error", "message": str(e)}
-
-        return JsonResponse(response_data)
+        try:
+            if request.method == "POST":
+                #text
+                heading_title_en  = request.POST.get('heading_title_en')
+                heading_title_ar  = request.POST.get('heading_title_ar')
+                #heading_section_video  = request.FILES['heading_section_video']
+                heading_content_en  = request.POST.get('heading_content_en')
+                heading_content_ar  = request.POST.get('heading_content_ar')
+                heading_year_en  = request.POST.get('heading_year_en')
+                heading_year_ar  = request.POST.get('heading_year_ar')
+                sub_heading_en  = request.POST.get('sub_heading_en')
+                sub_heading_ar  = request.POST.get('sub_heading_ar')
+                whoweare_title_en  = request.POST.get('whoweare_title_en')
+                whoweare_title_ar  = request.POST.get('whoweare_title_ar')
+                global_client_heading_en  = request.POST.get('global_client_heading_en')
+                global_client_heading_ar  = request.POST.get('global_client_heading_ar')
 
 
-# cms_about_page
+
+
+
+                
+
+
+                
+                
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'heading_title_en': ''
+                    }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+
+#cms_about_page     
 class cms_FAQPage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/FAQ.html"
 
     def get(self, request):
-
+        
         return render(
             request,
             self.template_name,
+            
         )
-
-
+              
 @csrf_exempt
 def saveFAQpage(request):
-    try:
-        if request.method == "POST":
-            # text
-            heading_title_en = request.POST.get("heading_title_en")
-            heading_title_ar = request.POST.get("heading_title_ar")
-            # heading_section_video  = request.FILES['heading_section_video']
-            heading_content_en = request.POST.get("heading_content_en")
-            heading_content_ar = request.POST.get("heading_content_ar")
-            heading_banner = request.FILES["heading_banner"]
+        try:
+            if request.method == "POST":
+                #text
+                heading_title_en  = request.POST.get('heading_title_en')
+                heading_title_ar  = request.POST.get('heading_title_ar')
+                #heading_section_video  = request.FILES['heading_section_video']
+                heading_content_en  = request.POST.get('heading_content_en')
+                heading_content_ar  = request.POST.get('heading_content_ar')
+                heading_banner = request.FILES['heading_banner']
+                
+               
+                
+                return JsonResponse(response_data)
 
-            return JsonResponse(response_data)
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
 
-        else:
-            response_data = {"status": "error", "message": "Missing data or image file"}
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
 
-            return JsonResponse(response_data)
-    except Exception as e:
-        response_data = {"status": "error", "message": str(e)}
-
-        return JsonResponse(response_data)
-
-
-# cms_about_page
+               return JsonResponse(response_data) 
+                   
+#cms_about_page     
 class cms_successStory(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/successtory.html"
 
     def get(self, request):
-
+        
         return render(
             request,
             self.template_name,
-        )
-
-
+            
+    )
+        
 @csrf_exempt
 def saveSucessStorypage(request):
-    try:
-        if request.method == "POST":
-            # text
-            heading_title_en = request.POST.get("heading_title_en")
-            heading_title_ar = request.POST.get("heading_title_ar")
-            # heading_section_video  = request.FILES['heading_section_video']
-            heading_content_en = request.POST.get("heading_content_en")
-            heading_content_ar = request.POST.get("heading_content_ar")
-            tryoutclubs_title_en = request.POST.get("tryoutclubs-title-en")
-            tryoutclubs_title_ar = request.POST.get("tryoutclubs-title-ar")
+        try:
+            if request.method == "POST":
+                #text
+                heading_title_en  = request.POST.get('heading_title_en')
+                heading_title_ar  = request.POST.get('heading_title_ar')
+                #heading_section_video  = request.FILES['heading_section_video']
+                heading_content_en  = request.POST.get('heading_content_en')
+                heading_content_ar  = request.POST.get('heading_content_ar')
+                tryoutclubs_title_en  = request.POST.get('tryoutclubs-title-en')
+                tryoutclubs_title_ar  = request.POST.get('tryoutclubs-title-ar')
 
-            response_data = {
-                "status": "success",
-                "message": "Data uploaded successfully",
-                "heading_title_en": "",
-            }
+                
+                
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'heading_title_en': ''
+                }
+                
+                return JsonResponse(response_data)
 
-            return JsonResponse(response_data)
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
 
-        else:
-            response_data = {"status": "error", "message": "Missing data or image file"}
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
 
-            return JsonResponse(response_data)
-    except Exception as e:
-        response_data = {"status": "error", "message": str(e)}
+               return JsonResponse(response_data) 
 
-        return JsonResponse(response_data)
+#cms_about_page     
+class cms_termcondition(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/termofservice.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )
+        
+@csrf_exempt
+def savetermconditionpage(request):
+        try:
+            if request.method == "POST":
+                saving_error = "None"
+                #text
+                tc_title_en  = request.POST.get('tc_title_en')
+                tc_title_ar  = request.POST.get('tc_title_ar')
+                tc_content_en  = request.POST.get('tc_content_en')
+                tc_content_ar  = request.POST.get('tc_content_ar')
+                seo_title_en  = request.POST.get('seo_title_en')
+                seo_title_ar  = request.POST.get('seo_title_ar')
+                seo_content_en  = request.POST.get('seo_content_en')
+                seo_content_ar  = request.POST.get('seo_content_ar')
+                
+                try:
+                    termcondition = cms_pages.objects.get(id='11')
+                    termcondition.heading_title_en = tc_title_en
+                    termcondition.heading_title_ar = tc_title_ar
+                    termcondition.heading_content_en = tc_content_en
+                    termcondition.heading_content_ar = tc_content_ar
+                    termcondition.meta_title_en = seo_title_en
+                    termcondition.meta_title_ar = seo_title_ar
+                    termcondition.meta_content_en = seo_content_en
+                    termcondition.meta_content_ar = seo_content_ar
+                     
+                    termcondition.save()
+
+                    response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        }
+                    return JsonResponse(response_data)
+
+                except Exception as e:
+                    saving_error = str(e)
+                    
+            
+                    response_data = {
+                            'status': 'success',
+                            'message': saving_error,
+                    }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+        
+        
+     

@@ -303,6 +303,7 @@ class Slider_Content(models.Model):
     def __str__(self):
         return self.content_en
 
+
 #cmspages
 class cms_pages(models.Model):
     
@@ -478,7 +479,6 @@ class cms_pages(models.Model):
     
     def __str__(self):
         return self.heading_en
-
 
 
  
