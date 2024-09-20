@@ -364,28 +364,36 @@
          
          alert("empty")
       }
-      else if(name == "Discovery"){
-         alert("empty")
+      else if(name == "Discover"){
+         var url = "{%url 'cms_discoverypage' %}"
+
+         window.location.href = url;
       }
-      else if(name == "News Detial"){
-         alert("empty")
+      else if(name == "News Detail"){
+         var url = "{%url 'cms_newsdetail' %}"
+
+         window.location.href = url;
       }
       else if(name == "Advertise"){
          alert("empty")
       }
       else if(name == "Terms of Services"){
-         alert("empty")
+         var url = "{%url 'cms_termandservicepage' %}"
+
+         window.location.href = url;
       }
       else if(name == "Privacy Policy"){
-         alert("empty")
+         var url = "{%url 'cms_privacypolicypage' %}"
+
+         window.location.href = url;
       }
-      else if(name == "Terms & condition"){
+      else if(name == "Terms & Condition"){
          var url = "{%url 'termcondition' %}"
 
          window.location.href = url;
       }
       else{
-         alert('something wrong')
+         alert(name)
          return false;
       }
 

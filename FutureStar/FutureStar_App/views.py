@@ -66,7 +66,7 @@ def LoginFormView(request):
         else:
             messages.error(request, "Invalid email or password")
 
-    return render(request, "login.html", {"form": form})
+    return render(request, "AdminLogin.html", {"form": form})
 
 
 # Forgot Password Module
@@ -1112,10 +1112,10 @@ class NewsEditView(View):
             messages.error(request, "Title and Description are required.")
             return redirect("news_list")
 
-        news_item.title_en = (title_en,)
-        news_item.title_ar = (title_ar,)
-        news_item.description_ar = (description_ar,)
-        news_item.description_en = (description_en,)
+        news_item.title_en = title_en
+        news_item.title_ar = title_ar
+        news_item.description_ar = description_ar
+        news_item.description_en = description_en
 
         image_file = request.FILES.get("image")
         if image_file:
@@ -1966,7 +1966,7 @@ def saveSucessStorypage(request):
 
 #cms_about_page     
 class cms_termcondition(LoginRequiredMixin, View):
-    template_name = "Admin/cmspages/termofservice.html"
+    template_name = "Admin/cmspages/term&condition.html"
 
     def get(self, request):
         
@@ -2030,5 +2030,49 @@ def savetermconditionpage(request):
 
                return JsonResponse(response_data) 
         
+#cms privacy policy page     
+class cms_privacypolicy(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/privacypolicy.html"
+
+    def get(self, request):
         
-     
+        return render(
+            request,
+            self.template_name,
+            
+    )
+
+#cms term and service  
+class cms_termandserice(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/term&service.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )    
+        
+#cms news detail  
+class cms_newsdetail(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/newsdetail.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )   
+#cms descovery page 
+class cms_discoverypage(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/discovery.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )                     

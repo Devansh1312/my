@@ -111,6 +111,18 @@ urlpatterns = [
     path('successStory/',cms_successStory.as_view(),name="cms_successStorypage"),
     path('saveSuccessStory/',saveSucessStorypage,name = "saveSucessStorypage"),
     
+    #privacypolicy
+    path('privacypolicy/',cms_privacypolicy.as_view(),name = "cms_privacypolicypage"),
+    
+    #termandservice
+    path('termandservice/',cms_termandserice.as_view(),name = "cms_termandservicepage"),
+    
+    #newsdetail
+    path('cms_newsdetail/',cms_newsdetail.as_view(),name = "cms_newsdetail"),
+
+    #cms_discoverypage
+    path('cms_discoverypage/',cms_discoverypage.as_view(),name = "cms_discoverypage"),
+
     #News List URL
     path('news_list/', NewsListView.as_view(), name='news_list'),
     path('news_list/create/', NewsCreateView.as_view(), name='news_create'),
