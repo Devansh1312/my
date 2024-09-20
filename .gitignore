@@ -52,6 +52,9 @@ coverage.xml
 cover/
 *.txt
 
+# Ignore the settings.py file
+FutureStar/FutureStar/settings.py
+
 # Translations
 *.mo
 *.pot
