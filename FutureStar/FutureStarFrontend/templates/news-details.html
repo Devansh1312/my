@@ -1,0 +1,79 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %} Future Star || News-Detail{% endblock %}
+{% block content %}
+
+<!-- Page Banner Start -->
+<section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url('{% static 'frontend/assets/images/banner/banner-bg-two.jpg' %}');">
+    <div class="container">
+        <div class="banner-inner">
+            <div class="row">
+                <div class="col-xl-8">
+                    <ul class="blog-meta mb-15 wow fadeInUp delay-0-2s">
+                        <li>
+                            <i class="fal fa-user-alt"></i>
+                            <a href="#">Richard N. Dixon</a>
+                        </li>
+                        <li>
+                            <i class="far fa-calendar-alt"></i>
+                            <a href="#">{{ news.news_date }}</a>
+                        </li>
+                        <li>
+                            <i class="far fa-comments"></i>
+                            <a href="#">Comment (5)</a>
+                        </li>
+                    </ul>
+                    <h2 class="page-title wow fadeInUp delay-0-3s">{{ news.title_en }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Page Banner End -->
+
+
+<!-- Blog Details Page Area start -->
+<section class="blog-details-page py-130 rpy-100 rel z-1">
+    <div class="container container-1290">
+        <div class="row gap-60">
+            <div class="col">
+                <div class="blog-single-content">
+                    <div class="image wow fadeInUp delay-0-2s">
+                        <img class="news-details-img" src="{{ news.image.url }}" alt="News Details">
+                    </div>
+                    <p class="big-first-letter">{{ news.description_en }}</p>
+                    <div class="row mt-50 pb-20">
+                        <div class="col-md-6">
+                            <div class="image mb-30 wow fadeInUp delay-0-2s">
+                                <img src="assets/images/blog/blog-middle1.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="image mb-30 wow fadeInUp delay-0-4s">
+                                <img src="assets/images/blog/blog-middle2.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Amazing Solutions For Web Design</h3>
+                    <p>Must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Details Page Area end -->
+{% endblock %}
+
+{% block scriptcontent %}
+
+{% endblock %}
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}

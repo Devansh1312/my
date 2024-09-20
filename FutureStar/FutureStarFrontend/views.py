@@ -4,6 +4,7 @@ from django import views
 from django.contrib import messages
 from FutureStar_App.models import *
 from django.views import View
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class HomePage(View):
@@ -42,8 +43,38 @@ class SuccessStoriesPage(View):
 class NewsPage(View):
     
     def get(self, request, *args, **kwargs):
+        news_list = News.objects.all().order_by('-id')
         
+        # Pagination
+        page = request.GET.get('page', 1)
+        paginator = Paginator(news_list, 6)  # Display 6 items per page
+        
+        try:
+            news = paginator.page(page)
+        except PageNotAnInteger:
+            news = paginator.page(1)
+        except EmptyPage:
+            news = paginator.page(paginator.num_pages)
+
+        context = {
+            "news": news,
+        }
+        return render(request, "news.html", context)
+
+class NewsDetailPage(View):
+    def get(self, request, *args, **kwargs):
         return render(request, "news.html")
+
+    def post(self, request):
+        id = request.POST.get("id")
+        
+        # Find the news with the matching id or raise 404 if not found
+        news = get_object_or_404(News, id=id)
+        
+        context = {
+            "news": news,
+        }
+        return render(request, "news-details.html", context)
 
 class AdvertisePage(View):
     
