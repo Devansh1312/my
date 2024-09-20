@@ -214,7 +214,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 #     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 # ]
 
-# ROOT_URLCONF = 'FutureStar_Project.urls'
+# ROOT_URLCONF = 'FutureStar.urls'
 
 # TEMPLATES = [
 #     {
@@ -233,7 +233,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 #     },
 # ]
 
-# WSGI_APPLICATION = 'FutureStar_Project.wsgi.application'
+# WSGI_APPLICATION = 'FutureStar.wsgi.application'
 
 
 # # Database
@@ -242,8 +242,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'redspar2_futurestardata',
-#         'USER': 'redspar2_redspark_futurestar',
+#         'NAME': 'redspar2_futurestardata2',
+#         'USER': 'redspar2_futurestar',
 #         'PASSWORD': 'redspark@1',
 #         'HOST': 'localhost',
 #         'PORT': '3306'
