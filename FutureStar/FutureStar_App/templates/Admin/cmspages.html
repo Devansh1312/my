@@ -375,7 +375,9 @@
          window.location.href = url;
       }
       else if(name == "Advertise"){
-         alert("empty")
+         var url = "{%url 'cms_advertisepage' %}"
+
+         window.location.href = url;
       }
       else if(name == "Terms of Services"){
          var url = "{%url 'cms_termandservicepage' %}"

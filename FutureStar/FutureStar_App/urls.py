@@ -123,6 +123,9 @@ urlpatterns = [
     #cms_discoverypage
     path('cms_discoverypage/',cms_discoverypage.as_view(),name = "cms_discoverypage"),
 
+    #cms_advertisepage
+    path('cms_advertisepage/',cms_advertisepage.as_view(),name = "cms_advertisepage"),
+
     #News List URL
     path('news_list/', NewsListView.as_view(), name='news_list'),
     path('news_list/create/', NewsCreateView.as_view(), name='news_create'),

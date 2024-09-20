@@ -2065,7 +2065,7 @@ class cms_newsdetail(LoginRequiredMixin, View):
             self.template_name,
             
     )   
-#cms descovery page 
+#cms descovery page
 class cms_discoverypage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/discovery.html"
 
@@ -2075,4 +2075,15 @@ class cms_discoverypage(LoginRequiredMixin, View):
             request,
             self.template_name,
             
-    )                     
+    )  
+#cms Advertise page
+class cms_advertisepage(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/advertise.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )                                 

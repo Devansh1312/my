@@ -491,3 +491,11 @@ class cms_dicovery_dynamic_view(models.Model):
 
     def __str__(self):
         return self.title
+    
+class cms_dicovery_dynamic_image(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
+    def __str__(self):
+        return self.images   

@@ -8,7 +8,7 @@
 {% endblock %}
 <meta name="description" content="{% block meta_description %}Default description{% endblock %}">
 
-{% block title %}Discover Page Edit{% endblock %}
+{% block title %}Advertise Page Edit{% endblock %}
 
 {% block content %}
 {% include "components/loader.html" %}
@@ -21,7 +21,7 @@
                 {% csrf_token %}
                 <div class="card-body">
                     <div>
-                        <h1 style="font-size:25px">CMS Discover Page Edit</h1>
+                        <h1 style="font-size:25px">CMS Advertise Page Edit</h1>
                     </div>    
 
                     <p id="heading-error"></p>
@@ -41,56 +41,36 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="heading-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="heading-title-en" name="heading_title" type="text" value="1" placeholder="Title (English)">
+                                <label class="form-label" for="advertise-heading-title">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="advertise-heading-title-en" name="advertise_heading_title" type="text" value="1" placeholder="Title (English)">
                                
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="heading-title-ar" name="heading-title-ar" type="text" value="1" placeholder="Title (Arabic)">
+                                <label class="form-label" for="advertise-heading-title-arabic">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="advertise-heading-title-ar" name="advertise_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
                                
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="discovery-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="newsdetail-title-en" name="discovery_title" type="text" value="1" placeholder="Title (English)">
-                               
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="discovery-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="discovery-title-ar" name="discovery-title-ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
-                            </div>
-                        </div>
-                    </div>
-
-                   
-                    
                     <!--heading content-->
                         
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="heading-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-content-en" name="heading-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <label class="form-label" for="advertise-heading-content-en">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-en" name="advertise_heading_content_en" type="text" placeholder="content (English)">1</textarea>
 
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="heading-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-content-ar" name="heading-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <label class="form-label" for="advertise-heading-content-ar">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-ar" name="advertise_heading_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
 
                             </div>
                         </div>
@@ -100,17 +80,17 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label" for="discovery-heading-section-banner">Heading banner </label>
-                                <input class="form-control btn-pill" id="discovery-heading-section-banner" name="discovery_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
+                                <label class="form-label" for="advertise-heading-section-banner">Heading banner </label>
+                                <input class="form-control btn-pill" id="advertise-heading-section-banner" name="advertise_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-banner" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-advertise-banner" style="display: none; width: 200px; height: 50px;" />
 
                             </div>
                         </div>
-                        <p id = "banner-warning"></p>
+                        <p id = "banner-advertise-warning"></p>
                     </div>
                     <br>
                     <div class="row" style="margin-bottom: 10px;">
@@ -727,7 +707,7 @@
         }
         
     }
-    function displayImageBanner(event) {
+    /*function displayImageBanner(event) {
         try{
             const file = event.target.files[0];
         const imgElement = document.getElementById('selected-banner');
@@ -754,14 +734,14 @@
 
         }
         
-    }
+    }*/
 
-    function displaygameImage(event,count) {
+    function displayImageBanner(event) {
 
         try{
             const file = event.target.files[0];
-        const imgElement = document.getElementById(`selected-game-image-${count}`);
-        console.log(count)
+            const imgElement = document.getElementById('selected-advertise-banner');
+
         if (file) {
             const reader = new FileReader();
             
@@ -777,7 +757,8 @@
         }
         catch(err){
             alert(err)
-            var icon_warning = document.getElementById(`game-image-warning-1${count}`)
+
+            var icon_warning = document.getElementById(`banner-advertise-warning`)
 
             icon_warning.value = err
 
