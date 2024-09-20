@@ -14,9 +14,9 @@ urlpatterns = [
     path('success-stories/', SuccessStoriesPage.as_view(),name="success-stories"),
     path('news/', NewsPage.as_view(),name="news"),
     path('advertise/', AdvertisePage.as_view(),name="advertise"),
-
-
-
+    path('about/', AboutPage.as_view(),name="about"),
+    path('login/', LoginPage.as_view(),name="login"),
+    path('register/', RegisterPage.as_view(),name="register"),
 
 
 

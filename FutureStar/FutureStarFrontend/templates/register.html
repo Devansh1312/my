@@ -1,0 +1,89 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %} Future Star || Register{% endblock %}
+{% block content %}
+
+<!-- Page Banner Start -->
+<section class="services-area-six pt-170 rpt-100 pb-100 rpb-100 rel z-1 bgs-cover">
+    <div class="container">
+        <div class="row justify-content-center">
+             <div class="col-xl-12">
+                 <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
+                     <h2>Create an account into <br> Future Stars Platform</h2>
+                 </div>
+             </div>
+             <div class="col-xl-5 col-lg-4">
+                 <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s"  action="#" name="teamForm" method="post">
+                     <div class="row">
+                         <div class="col-md-12">
+                             <div class="form-group">
+                                 <label for="name">Username</label>
+                                 <input type="text" id="name" name="name" class="form-control" value="" placeholder="" required>
+                             </div>
+                         </div>
+                         <div class="col-md-12">
+                             <div class="form-group">
+                                 <label for="name">Phone Number</label>
+                                 <input type="text" id="name" name="name" class="form-control" value="" placeholder="" required>
+                             </div>
+                         </div>
+                         <div class="col-md-12">
+                             <div class="form-group">
+                                 <label for="phone">Password</label>
+                                 <input type="password" id="phone" name="phone" class="form-control" value="" placeholder="">
+                             </div>
+                         </div>
+                         <div class="col-md-12">
+                             <div class="form-group">
+                                 <label for="phone">Confirm Password</label>
+                                 <input type="password" id="phone" name="phone" class="form-control" value="" placeholder="">
+                             </div>
+                         </div>
+                         <div class="col-md-12">
+                             <div class="d-flex mb-30 justify-content-between">
+                             <label>
+                                 <input type="checkbox" /> You agree to our Terms and have read and acknowledge the Privacy Policy
+                             </label>
+                             
+                             </div>
+                         </div>
+                         <div class="col-md-12">
+                             <div class="form-group pt-5 mb-60">
+                                 <button type="submit" class="theme-btn style-two w-100">Sign Up <i class="far fa-arrow-right"></i></button>
+                             </div>
+                             <div class="text-center">
+                                 Already have an account? <a href="#">Sign In</a>
+                             </div>
+                         </div>
+                         <div class="col-md-12">
+                             <div class="form-group">
+                                 <div class="or"><span>OR</span></div>
+                             </div>
+                             <div class="continue-with-social text-center">
+                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-google.png'%}" class="img-fluid" alt="" /></span> Signup With Google</button>
+                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png'%}" class="img-fluid" alt="" /></span> Signup With Apple</button>
+                            </div>
+                         </div>
+                     </div>
+                 </form>
+             </div>
+         </div>
+     </div>
+</section>
+<!-- Page Banner End -->
+
+{% endblock %}
+
+{% block scriptcontent %}
+
+{% endblock %}
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}

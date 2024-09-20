@@ -2,15 +2,26 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django import views
 # from .forms import *
 from django.contrib import messages
-from FutureStar_App.models import Inquire
+from FutureStar_App.models import *
 from django.views import View
 
 
 class HomePage(View):
-    
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "home.html")
+        marquee = Slider_Content.objects.all()
+        app_features = App_Feature.objects.all()
+        testimonials = Testimonial.objects.all().order_by('-id')[:3]
+        news = News.objects.all().order_by('-id')[:4]
+        partner = Partners.objects.all()
+
+        context = {
+            "marquee": marquee,
+            "app_features": app_features,
+            "testimonials": testimonials,
+            "news": news,
+            "partner": partner,
+        }
+        return render(request, "home.html", context)
 
 class DiscoverPage(View):
     
@@ -21,8 +32,12 @@ class DiscoverPage(View):
 class SuccessStoriesPage(View):
     
     def get(self, request, *args, **kwargs):
+        tryout_clubs = Tryout_Club.objects.all()
+        context = {
+            "tryout_clubs": tryout_clubs,
+        }
         
-        return render(request, "success-stories.html")
+        return render(request, "success-stories.html",context)
 
 class NewsPage(View):
     
@@ -35,6 +50,33 @@ class AdvertisePage(View):
     def get(self, request, *args, **kwargs):
         
         return render(request, "advertise.html")
+
+class AboutPage(View):
+    
+    def get(self, request, *args, **kwargs):
+        marquee = Slider_Content.objects.all()
+        testimonials = Testimonial.objects.all().order_by('-id')[:3]
+        global_clients = Global_Clients.objects.all()
+
+        context = {
+            "marquee": marquee,
+            "testimonials": testimonials,
+            "global_clients": global_clients,
+
+        }
+        return render(request, "about.html",context)
+
+class LoginPage(View):
+    
+    def get(self, request, *args, **kwargs):
+        
+        return render(request, "login.html")
+
+class RegisterPage(View):
+    
+    def get(self, request, *args, **kwargs):
+        
+        return render(request, "register.html")
 
 
 class ContactPage(View):

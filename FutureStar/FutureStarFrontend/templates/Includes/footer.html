@@ -8,7 +8,7 @@
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget newsletter-widget wow fadeInUp delay-0-2s">
                     <div class="footer-logo mb-20">
-                        <a href="index.html"><img src="{{ footer_logo }}" alt="Logo"></a>
+                        <a href="{% url 'index' %}"><img src="{{ footer_logo }}" alt="Logo"></a>
                     </div>
                     <div class="text mb-25">Ut enim ad minima veniam nostrum exercitationem ullam corporise
                     </div>
@@ -20,11 +20,11 @@
                     <h5 class="footer-title">Explore</h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
-                            <li><a href="#">Discover</a></li>
-                            <li><a href="#">Success Stories</a></li>
-                            <li><a href="#">News</a></li>
-                            <li><a href="#">Advertise</a></li>
-                            <li><a href="#">Contacts</a></li>
+                            <li><a href="{% url 'discover' %}">Discover</a></li>
+                                <li><a href="{% url 'success-stories' %}">Success Stories</a></li>
+                                <li><a href="{% url 'news' %}">News</a></li>
+                                <li><a href="{% url 'advertise' %}">Advertise</a></li>
+                                <li><a href="{% url 'contact' %}">Contacts</a></li>
                         </ul>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="footer-copyright-text wow fadeInUp delay-0-2s">
-                        <p>Copyright @2024, <a href="index.html">Future Stars</a> All Rights Reserved</p>
+                        <p>Copyright @2024, <a href="{% url 'index' %}">Future Stars</a> All Rights Reserved</p>
                     </div>
                 </div>
                 <div class="col-lg-6">

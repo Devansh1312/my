@@ -1,0 +1,291 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+
+{% block css %}
+<!-- Plugins css start-->
+<style>
+    .star-rating {
+        display: inline-block;
+        font-size: 20px;
+        color: lightgray;
+        position: relative;
+    }
+    .star-rating .filled-stars {
+        color: rgb(17, 167, 12);
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 0%;
+    }
+</style>
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %} Future Star || About{% endblock %}
+{% block content %}
+
+<!-- Page Banner Section Start -->
+<section class="page-banner pt-150 pb-50 rel z-1" style="background-image: ('{% static 'frontend/assets/images/hero/hero-two-bg.png' %}')">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
+                    Future Stars your gateway to millions of players                            
+                </h1>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Page Banner Section End -->
+
+
+<!-- Video Area start -->
+<div class="video-area-two rel pb-50 z-1">
+    <div class="container">
+        <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
+            <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
+            <a href="https://www.youtube.com/watch?v=9Y7ma241N8k" class="mfp-iframe video-play"><i class="fas fa-play"></i></a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 wow fadeInLeft delay-0-2s">
+                <div class="client-text text-lg-start text-center mt-40 pb-50">
+                    Sed ut perspiciatis unde omnis iste natus error sit voluptat emey accusantium doloremque laudantium totam aperiam eaque quabillo inventore veritatisey quasi architecto beatae dictasunt
+                </div>
+               
+            </div>
+            <div class="col-lg-6 wow fadeInRight delay-0-2s">
+                <div class="video-year text-lg-end text-center rel">
+                    1980
+                    <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Video Area end -->
+
+ <!-- Headline area start -->
+ <div class="headline-area bgc-primary pt-50 pb-50">
+    <div class="container-fluid">
+        <div class="headline-wrap marquee">
+            <span>
+                {% for marquee in marquee %}
+                    <span class="marquee-item">
+                        <i class="fas fa-star-of-life"></i>
+                        <b>{{ marquee.content_en }}</b>
+                    </span>
+                {% endfor %}
+            </span>
+        </div>
+    </div>
+</div>
+<!-- Headline Area end -->
+
+<!-- Who We Are start -->
+<section class="who-we-are-area pt-100 rpt-80 rel z-1">
+    <div class="container container-1290">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="section-title text-center mb-70 wow fadeInUp delay-0-2s">
+                    <span class="sub-title mb-15">Who We Are</span>
+                    <h2>We are Professional and Experience Team </h2>
+                </div>
+            </div>
+        </div>    
+        <div class="row row-cols-md-4 row-cols-sm-3 row-cols-1">
+            <div class="col">
+                <div class="team-member wow fadeInUp delay-0-2s">
+                    <div class="image">
+                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
+                    </div>
+                    <div class="content">
+                        <h4>Patrick V. Schroeder</h4>
+                        <span>Head Coach</span>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="col">
+                <div class="team-member wow fadeInUp delay-0-3s">
+                    <div class="image">
+                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
+                    </div>
+                    <div class="content">
+                        <h4>Michael A. Braun</h4>
+                        <span>Head Coach</span>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col">
+                <div class="team-member wow fadeInUp delay-0-4s">
+                    <div class="image">
+                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
+                    </div>
+                    <div class="content">
+                        <h4>James V. Decastro</h4>
+                        <span>Head Coach</span>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="col">
+                <div class="team-member wow fadeInUp delay-0-5s">
+                    <div class="image">
+                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
+                    </div>
+                    <div class="content">
+                        <h4>Troy V. Richardson</h4>
+                        <span>Head Coach</span>
+                    </div>
+                   
+                </div>
+            </div>
+            
+        </div>            
+    </div>
+</section>
+<!-- Who We Are end -->
+
+
+
+
+
+
+<!-- Statistics Area start -->
+<div class="statistics-area pt-100 rpt-70 rel z-1" style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg.png' %}')">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-xl-2 col-lg-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInRight delay-0-2s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.years_of_experience }}">0</span>
+                    <span class="counter-title">Years Of Experience</span>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInRight delay-0-3s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.project_completed }}">0</span>
+                    <span class="counter-title">Project’s Complete</span>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInRight delay-0-4s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.proffesioan_team_members }}">0</span>
+                    <span class="counter-title">Professionals Team Member</span>
+                </div>
+            </div>
+            <div class="col-xl-2 col-lg-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInRight delay-0-5s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.awards_winning }}">0</span>
+                    <span class="counter-title">Awards Winning</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Statistics Area end -->
+
+
+<!-- Testimonial Area start -->
+<section class="testimonial-section pt-70 rpt-30">
+    <div class="container container-1210">
+        <div class="row">
+           <div class="col-lg-6">
+               <div class="image-border-shape rmb-20 wow fadeInRight delay-0-2s">
+                   <img src="{% static 'frontend/assets/images/testimonials-four.png' %}" alt="Testimonial Left Image">
+                   <div class="bottom-border"></div>
+               </div>
+           </div>
+            <div class="col-lg-6">
+                <div class="testimonial-one-right-part wow fadeInLeft delay-0-2s">
+                    <div class="testimonials-active">
+                        {% for testimonial in testimonials %}
+                            <div class="testimonial-item">
+                                <div class="author-speech">
+                                    <p><span class="quote">“</span> {{ testimonial.content_en }} <span
+                                            class="quote right-quote">“</span></p>
+                                </div>
+                                <hr>
+                                <div class="testimonial-footer">
+                                    <div class="testimonial-author">
+                                        <div class="author-image">
+                                            <img src="{{ testimonial.image.url }}" alt="Author Image">
+                                        </div>
+                                        <div class="author-info">
+                                            <h4>{{ testimonial.name_en }}</h4>
+                                            <span class="designation">{{ testimonial.designation_en}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="ratting style-two">
+                                        <div class="star-rating" data-rating="{{ testimonial.rattings }}">
+                                            <div class="filled-stars">★★★★★</div>
+                                            ★★★★★
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="testimonial-controls mt-75 rmt-40">
+                        <button class="testimonial-prev">
+                            <i class="far fa-chevron-left"></i>
+                        </button>
+                        <div class="testimonial-dots"></div>
+                        <button class="testimonial-next">
+                            <i class="far fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Testimonial Area end -->
+
+
+<!-- Client Logo Two start -->
+<section class="client-logo-area pt-130 rpt-100 pb-100 rpb-70">
+    <div class="container">
+        <div class="section-title text-center mb-60">
+            <h4>We Have 1520+Global Clients</h4>
+        </div>
+        <div class="client-logo-wrap">
+
+            {% for global_client in global_clients %}
+
+                <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
+                    <img src="{{ global_client.image.url }}" alt="Client Logo">
+                </a>
+
+            {% endfor %}
+            
+        </div>
+    </div>
+</section>
+<!-- Client Logo Two end -->
+
+{% endblock %}
+
+{% block scriptcontent %}
+
+{% endblock %}
+{% block script %}
+<script>
+    // Initialize star ratings
+    const starRatings = document.querySelectorAll('.star-rating');
+    starRatings.forEach(function(starRating) {
+        const rating = parseFloat(starRating.getAttribute('data-rating'));
+        const widthPercentage = (rating / 5) * 100;
+        starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
+    });
+</script> 
+<script>new WOW().init();</script>
+{% endblock %}

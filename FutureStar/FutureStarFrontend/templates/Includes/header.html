@@ -9,7 +9,7 @@
 
             <div class="header-inner rpy-10 rel d-flex align-items-center">
                 <div class="logo-outer">
-                    <div class="logo"><a href="index.html"><img src="{{ header_logo }}" alt="Logo"
+                    <div class="logo"><a href="{% url 'index' %}"><img src="{{ header_logo }}" alt="Logo"
                                 title="Logo"></a></div>
                 </div>
 
@@ -18,7 +18,7 @@
                     <nav class="main-menu navbar-expand-lg">
                         <div class="navbar-header py-10">
                             <div class="mobile-logo">
-                                <a href="index.html">
+                                <a href="{% url 'index' %}">
                                     <img src="{{ header_logo }}" alt="Logo" title="Logo">
                                 </a>
                             </div>
@@ -34,14 +34,26 @@
 
                         <div class="navbar-collapse collapse clearfix">
                             <ul class="navigation clearfix">
-                                <li><a href="discover.html">Discover</a></li>
-                                <li><a href="success-stories.html">Success Stories</a></li>
-                                <li><a href="news.html">News</a></li>
-                                <li><a href="advertise.html">Advertise</a></li>
-                                <li><a href="about.html">About</a></li>
-                                <li><a href="{% url 'contact' %}">Contacts</a></li>
+                                <li class="{% if request.resolver_match.url_name == 'discover' %}active{% endif %}">
+                                    <a href="{% url 'discover' %}">Discover</a>
+                                </li>
+                                <li class="{% if request.resolver_match.url_name == 'success-stories' %}active{% endif %}">
+                                    <a href="{% url 'success-stories' %}">Success Stories</a>
+                                </li>
+                                <li class="{% if request.resolver_match.url_name == 'news' %}active{% endif %}">
+                                    <a href="{% url 'news' %}">News</a>
+                                </li>
+                                <li class="{% if request.resolver_match.url_name == 'advertise' %}active{% endif %}">
+                                    <a href="{% url 'advertise' %}">Advertise</a>
+                                </li>
+                                <li class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                                    <a href="{% url 'about' %}">About</a>
+                                </li>
+                                <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                                    <a href="{% url 'contact' %}">Contacts</a>
+                                </li>
                             </ul>
-                        </div>
+                        </div>                        
 
                     </nav>
                     <!-- Main Menu End-->
@@ -51,9 +63,9 @@
 
                 <!-- Menu Button -->
                 <div class="menu-btns">
-                    <a href="login.html" class="theme-btn style-one me-4">Login <i
+                    <a href="{% url 'login' %}" class="theme-btn style-one me-4">Login <i
                             class="far fa-arrow-right"></i></a>
-                    <a href="register.html" class="theme-btn style-two me-4">Register <i
+                    <a href="{% url 'register' %}" class="theme-btn style-two me-4">Register <i
                             class="far fa-arrow-right"></i></a>
                     <!-- menu sidbar -->
                     <div class="menu-sidebar">
@@ -100,10 +112,10 @@
 
         <!--Social Icons-->
         <div class="social-style-one">
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-pinterest-p"></i></a>
+            <a href="{{ system_settings.facebook }}"><i class="fab fa-facebook-f"></i></a>
+            <a href="{{ system_settings.twitter }}"><i class="fab fa-twitter"></i></a>
+            <a href="{{ system_settings.instagram }}"><i class="fab fa-instagram"></i></a>
+            <a href="{{ system_settings.pinterest }}"><i class="fab fa-pinterest-p"></i></a>
         </div>
     </div>
 </section>

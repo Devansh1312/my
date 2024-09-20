@@ -4,6 +4,23 @@
 
 {% block css %}
 <!-- Plugins css start-->
+<style>
+    .star-rating {
+        display: inline-block;
+        font-size: 20px;
+        color: lightgray;
+        position: relative;
+    }
+    .star-rating .filled-stars {
+        color: rgb(17, 167, 12);
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 0%;
+    }
+</style>
 
 <!-- Plugins css Ends-->
 {% endblock %}
@@ -432,35 +449,18 @@
         <div class="container-fluid">
             <div class="headline-wrap marquee">
                 <span>
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>Clients Say Us</b>
-                    </span>
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>Global Clients</b>
-                    </span>
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>Awards Winning</b>
-                    </span>
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>Clients Say Us</b>
-                    </span>
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>Global Clients</b>
-                    </span>
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>Awards Winning</b>
-                    </span>
+                    {% for marquee in marquee %}
+                        <span class="marquee-item">
+                            <i class="fas fa-star-of-life"></i>
+                            <b>{{ marquee.content_en }}</b>
+                        </span>
+                    {% endfor %}
                 </span>
             </div>
         </div>
     </div>
-    <!-- Headline Area end -->
+<!-- Headline Area end -->
+
 
 
     <!-- Work Gallery Area start -->
@@ -477,66 +477,23 @@
         </div>
         <div class="container-fluid">
             <div class="work-gallery-active">
+
+                {% for app_feature in app_features %}
+
                 <div class="project-item style-four wow fadeInUp delay-0-2s">
                     <div class="image">
-                        <img src="{% static 'frontend/assets/images/projects/work-gallery1.jpg'%}" alt="Work Gallery">
-                        <a href="project-details.html" class="project-btn"><i class="far fa-arrow-right"></i></a>
+                        <img src="{{ app_feature.image.url }}" alt="Work Gallery">
+                        <a href="{% url 'index' %}" class="project-btn"><i class="far fa-arrow-right"></i></a>
                     </div>
                     <div class="content">
-                        <a href="projects.html" class="category">Project Development</a>
-                        <h4><a href="project-details.html">Task Management Dashboard</a></h4>
+                        <a href="{% url 'index' %}" class="category">{{ app_feature.title_en }}</a>
+                        <h4><a href="{% url 'index' %}">{{ app_feature.sub_title_en }}</a></h4>
                     </div>
                 </div>
-                <div class="project-item style-four wow fadeInUp delay-0-4s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/projects/work-gallery2.jpg'%}" alt="Work Gallery">
-                        <a href="project-details.html" class="project-btn"><i class="far fa-arrow-right"></i></a>
-                    </div>
-                    <div class="content">
-                        <a href="projects.html" class="category">UI/UX Design</a>
-                        <h4><a href="project-details.html">Website Development</a></h4>
-                    </div>
-                </div>
-                <div class="project-item style-four wow fadeInUp delay-0-6s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/projects/work-gallery3.jpg'%}" alt="Work Gallery">
-                        <a href="project-details.html" class="project-btn"><i class="far fa-arrow-right"></i></a>
-                    </div>
-                    <div class="content">
-                        <a href="projects.html" class="category">Product Design</a>
-                        <h4><a href="project-details.html">Mobile Application Development</a></h4>
-                    </div>
-                </div>
-                <div class="project-item style-four wow fadeInUp delay-0-2s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/projects/work-gallery1.jpg'%}" alt="Work Gallery">
-                        <a href="project-details.html" class="project-btn"><i class="far fa-arrow-right"></i></a>
-                    </div>
-                    <div class="content">
-                        <a href="projects.html" class="category">Project Development</a>
-                        <h4><a href="project-details.html">Task Management Dashboard</a></h4>
-                    </div>
-                </div>
-                <div class="project-item style-four wow fadeInUp delay-0-2s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/projects/work-gallery2.jpg'%}" alt="Work Gallery">
-                        <a href="project-details.html" class="project-btn"><i class="far fa-arrow-right"></i></a>
-                    </div>
-                    <div class="content">
-                        <a href="projects.html" class="category">UI/UX Design</a>
-                        <h4><a href="project-details.html">Website Development</a></h4>
-                    </div>
-                </div>
-                <div class="project-item style-four wow fadeInUp delay-0-2s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/projects/work-gallery3.jpg'%}" alt="Work Gallery">
-                        <a href="project-details.html" class="project-btn"><i class="far fa-arrow-right"></i></a>
-                    </div>
-                    <div class="content">
-                        <a href="projects.html" class="category">Product Design</a>
-                        <h4><a href="project-details.html">Mobile Application Development</a></h4>
-                    </div>
-                </div>
+
+                {% endfor %}
+
+                
             </div>
             <div class="work-gallery-controls">
                 <button class="work-gallery-prev">
@@ -559,28 +516,28 @@
                 <div class="col-xl-2 col-lg-3 col-6">
                     <div class="counter-item counter-text-wrap wow fadeInUp delay-0-2s">
                         <i class="fal fa-check-circle"></i>
-                        <span class="count-text" data-speed="3000" data-stop="25">0</span>
+                        <span class="count-text" data-speed="3000" data-stop="{{ system_settings.happy_user }}">0</span>
                         <span class="counter-title">Happy User</span>
                     </div>
                 </div>
                 <div class="col-xl-2 col-lg-3 col-6">
                     <div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
                         <i class="fal fa-check-circle"></i>
-                        <span class="count-text k" data-speed="3000" data-stop="3">0</span>
+                        <span class="count-text k" data-speed="3000" data-stop="{{ system_settings.line_of_code }}">0</span>
                         <span class="counter-title">Line of Code</span>
                     </div>
                 </div>
                 <div class="col-xl-2 col-lg-3 col-6">
                     <div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
                         <i class="fal fa-check-circle"></i>
-                        <span class="count-text" data-speed="3000" data-stop="48">0</span>
+                        <span class="count-text" data-speed="3000" data-stop="{{ system_settings.downloads }}">0</span>
                         <span class="counter-title">Downloads</span>
                     </div>
                 </div>
                 <div class="col-xl-2 col-lg-3 col-6">
                     <div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
                         <i class="fal fa-check-circle"></i>
-                        <span class="count-text" data-speed="3000" data-stop="92">0</span>
+                        <span class="count-text" data-speed="3000" data-stop="{{ system_settings.app_rate }}">0</span>
                         <span class="counter-title">App Rates</span>
                     </div>
                 </div>
@@ -607,111 +564,36 @@
                             <img src="{% static 'frontend/assets/images/about/circle-text.svg'%}" alt="Circle Text">
                         </div>
                         <div class="testimonials-active">
+
+                            {% for testimonial in testimonials %}
                             <div class="testimonial-item">
                                 <div class="author-speech">
-                                    <p><span class="quote">“</span> On the other hand denounce with righteous
-                                        indignation and dislike men beguiled demoralized charms pleasure moments
-                                        line desire that they foresee pain and trouble that boon <span
+                                    <p><span class="quote">“</span> {{ testimonial.content_en }} <span
                                             class="quote right-quote">“</span></p>
                                 </div>
                                 <hr>
                                 <div class="testimonial-footer">
                                     <div class="testimonial-author">
                                         <div class="author-image">
-                                            <img src="{% static 'frontend/assets/images/testimonials/author1.png'%}" alt="Author Image">
+                                            <img src="{{ testimonial.image.url }}" alt="Author Image">
                                         </div>
                                         <div class="author-info">
-                                            <h4>James N. Johnson</h4>
-                                            <span class="designation">CEO & Founder</span>
+                                            <h4>{{ testimonial.name_en }}</h4>
+                                            <span class="designation">{{ testimonial.designation_en}}</span>
                                         </div>
                                     </div>
                                     <div class="ratting style-two">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
+                                        <div class="star-rating" data-rating="{{ testimonial.rattings }}">
+                                            <div class="filled-stars">★★★★★</div>
+                                            ★★★★★
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="testimonial-item">
-                                <div class="author-speech">
-                                    <p><span class="quote">“</span> On the other hand denounce with righteous
-                                        indignation and dislike men beguiled demoralized charms pleasure moments
-                                        line desire that they foresee pain and trouble that boon <span
-                                            class="quote right-quote">“</span></p>
-                                </div>
-                                <div class="testimonial-footer">
-                                    <div class="testimonial-author">
-                                        <div class="author-image">
-                                            <img src="{% static 'frontend/assets/images/testimonials/author1.png'%}" alt="Author Image">
-                                        </div>
-                                        <div class="author-info">
-                                            <h4>James N. Johnson</h4>
-                                            <span class="designation">CEO & Founder</span>
-                                        </div>
-                                    </div>
-                                    <div class="ratting style-two">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="testimonial-item">
-                                <div class="author-speech">
-                                    <p><span class="quote">“</span> On the other hand denounce with righteous
-                                        indignation and dislike men beguiled demoralized charms pleasure moments
-                                        line desire that they foresee pain and trouble that boon <span
-                                            class="quote right-quote">“</span></p>
-                                </div>
-                                <div class="testimonial-footer">
-                                    <div class="testimonial-author">
-                                        <div class="author-image">
-                                            <img src="{% static 'frontend/assets/images/testimonials/author1.png'%}" alt="Author Image">
-                                        </div>
-                                        <div class="author-info">
-                                            <h4>James N. Johnson</h4>
-                                            <span class="designation">CEO & Founder</span>
-                                        </div>
-                                    </div>
-                                    <div class="ratting style-two">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="testimonial-item">
-                                <div class="author-speech">
-                                    <p><span class="quote">“</span> On the other hand denounce with righteous
-                                        indignation and dislike men beguiled demoralized charms pleasure moments
-                                        line desire that they foresee pain and trouble that boon <span
-                                            class="quote right-quote">“</span></p>
-                                </div>
-                                <div class="testimonial-footer">
-                                    <div class="testimonial-author">
-                                        <div class="author-image">
-                                            <img src="{% static 'frontend/assets/images/testimonials/author1.png'%}" alt="Author Image">
-                                        </div>
-                                        <div class="author-info">
-                                            <h4>James N. Johnson</h4>
-                                            <span class="designation">CEO & Founder</span>
-                                        </div>
-                                    </div>
-                                    <div class="ratting style-two">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                    </div>
-                                </div>
-                            </div>
+                            {% endfor %}
+
+
+
                         </div>
                         <div class="testimonial-controls mt-105 rmt-50">
                             <div class="testimonial-dots mx-0"></div>
@@ -736,17 +618,18 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-4 col-md-6">
+                {% for news in news %}
+                <div class="col-xl-3 col-md-4">
                     <div class="blog-item style-two wow fadeInUp delay-0-2s">
                         <div class="image">
-                            <img src="{% static 'frontend/assets/images/blog/blog-six1.jpg'%}" alt="Blog">
+                            <img src="{{ news.image.url }}" alt="Blog">
                         </div>
-                        <h4><a href="blog-details.html">Voice Skills For Google Assistant And Amazon Alexa</a></h4>
+                        <h4><a href="">{{ news.title_en }}</a></h4>
                         <hr>
                         <ul class="blog-meta">
                             <li>
                                 <i class="far fa-calendar-alt"></i>
-                                <span>February 18, 2023</span>
+                                <span>{{ news.news_date }}</span>
                             </li>
                             <li>
                                 <i class="far fa-comments"></i>
@@ -754,47 +637,8 @@
                             </li>
                         </ul>
                     </div>
-                </div>
-                <div class="col-xl-4 col-md-6">
-                    <div class="blog-item style-two wow fadeInUp delay-0-4s">
-                        <div class="image">
-                            <img src="{% static 'frontend/assets/images/blog/blog-six2.jpg'%}" alt="Blog">
-                        </div>
-                        <h4><a href="blog-details.html">Inclusive Design And Accessibility Stream Heydon
-                                Pickering</a></h4>
-                        <hr>
-                        <ul class="blog-meta">
-                            <li>
-                                <i class="far fa-calendar-alt"></i>
-                                <span>February 18, 2023</span>
-                            </li>
-                            <li>
-                                <i class="far fa-comments"></i>
-                                <a href="#">Comment (5)</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6">
-                    <div class="blog-item style-two wow fadeInUp delay-0-6s">
-                        <div class="image">
-                            <img src="{% static 'frontend/assets/images/blog/blog-six3.jpg'%}" alt="Blog">
-                        </div>
-                        <h4><a href="blog-details.html">Creating Online Environments The Work Well For Older
-                                Users</a></h4>
-                        <hr>
-                        <ul class="blog-meta">
-                            <li>
-                                <i class="far fa-calendar-alt"></i>
-                                <span>February 18, 2023</span>
-                            </li>
-                            <li>
-                                <i class="far fa-comments"></i>
-                                <a href="#">Comment (5)</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                </div>  
+                {% endfor %}
             </div>
         </div>
         <div class="bg-lines">
@@ -817,51 +661,14 @@
                 </div>
             </div>
             <div class="client-logo-wrap-two">
-                <a class="client-logo-item wow fadeInUp delay-0-2s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six1.png'%}" alt="Client Logo">
+                {% for partner in partner %}
+
+                <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
+                    <img src="{{ partner.image.url }}" alt="Client Logo">
                 </a>
-                <a class="client-logo-item wow fadeInUp delay-0-3s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six2.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-4s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six3.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-5s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six4.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-6s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six5.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-2s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six6.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-3s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six7.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-4s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six8.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-5s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six9.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-6s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six10.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-2s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six6.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-3s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six7.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-4s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six8.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-5s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six9.png'%}" alt="Client Logo">
-                </a>
-                <a class="client-logo-item wow fadeInUp delay-0-6s" href="contact.html">
-                    <img src="{% static 'frontend/assets/images/client-logos/client-logo-six10.png'%}" alt="Client Logo">
-                </a>
+
+                {% endfor %}
+
             </div>
 
         </div>
@@ -877,5 +684,15 @@
 
 {% endblock %}
 {% block script %} 
+<script>
+    // Initialize star ratings
+    const starRatings = document.querySelectorAll('.star-rating');
+    starRatings.forEach(function(starRating) {
+        const rating = parseFloat(starRating.getAttribute('data-rating'));
+        const widthPercentage = (rating / 5) * 100;
+        starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
+    });
+</script>
+
 <script>new WOW().init();</script>
 {% endblock %}
