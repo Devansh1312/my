@@ -14,6 +14,8 @@ class Inquire(models.Model):
     email = models.EmailField()
     message = models.TextField()  
 
+    class Meta:
+        db_table = 'futurestar_app_inquire'
     
 # Role Model
 class Role(models.Model):
@@ -22,7 +24,8 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name_en
-
+    class Meta:
+        db_table = 'futurestar_app_role'
 
 # User Category Model
 class Category(models.Model):
@@ -32,6 +35,8 @@ class Category(models.Model):
     def __str__(self):
         return self.name_en
 
+    class Meta:
+        db_table = 'futurestar_app_category'
 
 # Custom User Manager
 class UserManager(BaseUserManager):
@@ -79,6 +84,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+    
+    class Meta:
+        db_table = 'futurestar_app_user'
 
 
 # System Settings Model
@@ -107,6 +115,9 @@ class SystemSettings(models.Model):
 
     def __str__(self):
         return self.website_name_english
+    
+    class Meta:
+        db_table = 'futurestar_app_systemsettings'
 
 
 # gender Model
@@ -115,14 +126,10 @@ class UserGender(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        db_table = 'futurestar_app_gender'
 
-
-# # Game Type  Model
-# class GameType(models.Model):
-#     name = models.CharField(max_length=100)
-
-#     def __str__(self):
-#         return self.name
 
 
 # Field Capacity  Model
@@ -132,6 +139,8 @@ class FieldCapacity(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = 'futurestar_app_fieldcapacity'
 
 # Ground Materials Model
 class GroundMaterial(models.Model):
@@ -141,6 +150,9 @@ class GroundMaterial(models.Model):
 
     def __str__(self):
         return self.name_en
+    
+    class Meta:
+        db_table = 'futurestar_app_groundmaterial'
 
 
 # Tournamebt Style Model
@@ -152,6 +164,8 @@ class TournamentStyle(models.Model):
     def __str__(self):
         return self.name_en
 
+    class Meta:
+        db_table = 'futurestar_app_tournamentstyle'
 
 # Event Types Model
 class EventType(models.Model):
@@ -161,6 +175,11 @@ class EventType(models.Model):
 
     def __str__(self):
         return self.name_en
+    
+    class Meta:
+        db_table = 'futurestar_app_eventtype'
+
+
 
 
 #User Profile
@@ -223,6 +242,9 @@ class Player_Profile(models.Model):
     
     def __str__(self):
         return self.fullname if self.fullname else 'Player Profile'
+    
+    class Meta:
+        db_table = 'futurestar_app_player_profile'
 
 #News Blog Management        
 class News(models.Model):
@@ -235,6 +257,9 @@ class News(models.Model):
 
     def __str__(self):
         return self.title_en
+    
+    class Meta:
+        db_table = 'futurestar_app_news'
 
 # Partners Blog Management
 class Partners(models.Model):
@@ -242,7 +267,10 @@ class Partners(models.Model):
     image = models.ImageField(upload_to='partners/', blank=True, null=True)
 
     def __str__(self):
-        return self.title        
+        return self.title 
+    
+    class Meta:
+        db_table = 'futurestar_app_partners'       
 
 # Global Clients Blog Management
 class Global_Clients(models.Model):
@@ -250,7 +278,10 @@ class Global_Clients(models.Model):
     image = models.ImageField(upload_to='global_clients/', blank=True, null=True)
 
     def __str__(self):
-        return self.title        
+        return self.title
+    
+    class Meta:
+        db_table = 'futurestar_app_global_clients'        
 
 # Tryout Club Blog Management    
 class Tryout_Club(models.Model):
@@ -259,6 +290,10 @@ class Tryout_Club(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        db_table = 'futurestar_app_tryout_club'
+
 
 # Tryout Club Blog Management    
 class Testimonial(models.Model):
@@ -274,6 +309,10 @@ class Testimonial(models.Model):
     def __str__(self):
         return self.name_en
     
+    class Meta:
+        db_table = 'futurestar_app_testimonial'
+
+    
 #Team Members    
 class Team_Members(models.Model):
     name_en = models.CharField(max_length=255)
@@ -284,6 +323,10 @@ class Team_Members(models.Model):
 
     def __str__(self):
         return self.name_en
+    
+    class Meta:
+        db_table = 'futurestar_app_team_members'
+
 
 #App_Feature Members    
 class App_Feature(models.Model):
@@ -295,6 +338,9 @@ class App_Feature(models.Model):
     
     def __str__(self):
         return self.title_en
+    
+    class Meta:
+        db_table = 'futurestar_app_app_feature'
 
 # Slider Content Model
 class Slider_Content(models.Model):
@@ -302,6 +348,9 @@ class Slider_Content(models.Model):
     content_ar = models.CharField(max_length=100,null=True,blank=True)
     def __str__(self):
         return self.content_en
+    
+    class Meta:
+        db_table = 'futurestar_app_slider_content'
 
 
 #cmspages
@@ -479,6 +528,9 @@ class cms_pages(models.Model):
     
     def __str__(self):
         return self.heading_en
+    
+    class Meta:
+        db_table = 'futurestar_app_cms_pages'
 
 class cms_dicovery_dynamic_view(models.Model):
     
@@ -486,8 +538,8 @@ class cms_dicovery_dynamic_view(models.Model):
     title = models.CharField(max_length=255,blank=True,null=True)
     content = models.TextField(blank=True,null=True)
     
-    
-    
-
     def __str__(self):
         return self.title
+    
+    class Meta:
+        db_table = 'futurestar_app_cms_dicovery_dynamic_view'
