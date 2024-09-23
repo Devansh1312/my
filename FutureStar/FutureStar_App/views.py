@@ -2100,9 +2100,16 @@ class cms_newsPage(LoginRequiredMixin, View):
 
     def get(self, request):
         
+        dataFilter = cms_pages.objects.get(id = "4")
+        
+        context = {
+            'data':dataFilter
+        }
+
         return render(
             request,
             self.template_name,
+            context
             
         )
               
@@ -2116,9 +2123,62 @@ def savenewspage(request):
                 #heading_section_video  = request.FILES['heading_section_video']
                 heading_content_en  = request.POST.get('heading_content_en')
                 heading_content_ar  = request.POST.get('heading_content_ar')
-                heading_banner = request.FILES['heading_banner']
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
                 
-               
+                
+                               
+                dom = "Done"
+                imageName = []
+                
+                try:
+                    savenews = cms_pages.objects.get(id = "4")
+
+
+                    if 'heading_banner' in request.FILES:
+                        
+                        heading_banner = request.FILES.get('heading_banner',None)
+                        if heading_banner:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_banner.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in heading_banner.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(heading_banner.name)
+                                        savenews.heading_banner = heading_banner
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass   
+                    
+                    savenews.heading_title_en = heading_title_en
+                    savenews.heading_title_ar = heading_title_ar
+                    savenews.heading_content_en = heading_content_en
+                    savenews.heading_content_ar = heading_content_ar
+                    savenews.meta_title_en = seo_title_en
+                    savenews.meta_title_ar = seo_title_ar
+                    savenews.meta_content_en = seo_content_en
+                    savenews.meta_content_ar = seo_content_ar
+
+                    savenews.save()
+                    
+                    dom = "True"
+                    
+                    messages.success(request, "News Page Updated Successfully")
+                               
+                except Exception as e:
+                    messages.error(request,str(e))    
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'heading_title_en': dom
+                }
                 
                 return JsonResponse(response_data)
 
@@ -2263,7 +2323,6 @@ def savetermconditionpage(request):
                 seo_title_ar  = request.POST.get('meta-title-ar')
                 seo_content_en  = request.POST.get('meta-content-en')
                 seo_content_ar  = request.POST.get('meta-content-ar')
-                
                 try:
                     termcondition = cms_pages.objects.get(name_en = "Terms & Condition")
                     termcondition.heading_title_en = tc_title_en
@@ -2277,13 +2336,12 @@ def savetermconditionpage(request):
                      
                     termcondition.save()
 
-                    response_data = {
-                        'status': 'success',
-                        'message': 'Data uploaded successfully',
-                        }
-                    return JsonResponse(response_data)
+                    messages.success(request, "Term and Condition Page Updated Successfully")
+
 
                 except Exception as e:
+                    messages.error(request, str(e))
+
                     saving_error = str(e)
                     
             
@@ -2335,7 +2393,7 @@ def saveprivacypolicypage(request):
                 seo_content_en  = request.POST.get('meta-content-en')
                 seo_content_ar  = request.POST.get('meta-content-ar')
                 try:
-                    privacypolicy = cms_pages.objects.get(name_en = "Privacy Policy")
+                    privacypolicy = cms_pages.objects.get(id = "10")
                     privacypolicy.heading_title_en = pp_title_en
                     privacypolicy.heading_title_ar = pp_title_ar
                     privacypolicy.heading_content_en = pp_content_en
@@ -2347,15 +2405,11 @@ def saveprivacypolicypage(request):
                      
                     privacypolicy.save()
 
-                    response_data = {
-                        'status': 'success',
-                        'message': 'Data uploaded successfully',
-                        'data':privacypolicy.heading_title_en,
-                        }
-                    return JsonResponse(response_data)
+                    messages.success(request, "Privacy Policy Page Updated Successfully")
 
                 except Exception as e:
-                    saving_error = str(e)
+                    print(str(e))
+                    messages.error(request,str(e))
                     
             
                     response_data = {
@@ -2401,7 +2455,8 @@ def savetermservicepage(request):
         try:
             if request.method == "POST":
                 saving_error = "None"
-                
+                dom = "Done"
+
                 #text
                 ts_title_en  = request.POST.get('ts-title-en')
                 ts_title_ar  = request.POST.get('ts-title-ar')
@@ -2424,14 +2479,12 @@ def savetermservicepage(request):
                      
                     termservice.save()
 
-                    response_data = {
-                        'status': 'success',
-                        'message': 'Data uploaded successfully',
-                        'data':termservice.heading_title_en,
-                        }
-                    return JsonResponse(response_data)
+                    dom = "True"
+
+                    messages.success(request, "Term and service Page Updated Successfully")
 
                 except Exception as e:
+                    messages.error(request,str(e))
                     saving_error = str(e)
                     
             
@@ -2457,12 +2510,97 @@ class cms_newsdetail(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/newsdetail.html"
 
     def get(self, request):
+        dataFilter = cms_pages.objects.get(id="5")
         
+        context = {
+            'data':dataFilter
+        }
         return render(
             request,
             self.template_name,
+            context
             
     )   
+        
+#cms news detail  
+@csrf_exempt
+def savenewsdetail(request):
+        try:
+            if request.method == "POST":
+                #text
+                heading_title_en  = request.POST.get('nd_title_en')
+                heading_title_ar  = request.POST.get('nd_title_ar')
+                #heading_section_video  = request.FILES['heading_section_video']
+                heading_content_en  = request.POST.get('nd_content_en')
+                heading_content_ar  = request.POST.get('nd_content_ar')
+                seo_title_en  = request.POST.get('seo_title_en')
+                seo_title_ar  = request.POST.get('seo_title_ar')
+                seo_content_en  = request.POST.get('seo_content_en')
+                seo_content_ar  = request.POST.get('seo_content_ar')
+                
+                dom = "Done"
+                imageName = []
+                
+                try:
+                    savenewsdetail = cms_pages.objects.get(id = "5")
+
+
+                    if 'heading_banner' in request.FILES:
+                        
+                        heading_banner = request.FILES.get('heading_banner',None)
+                        if heading_banner:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_banner.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in heading_banner.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(heading_banner.name)
+                                        savenewsdetail.heading_banner = heading_banner
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass   
+                    
+                    savenewsdetail.section_2_title_en = heading_title_en
+                    savenewsdetail.section_2_title_ar = heading_title_ar
+                    savenewsdetail.section_2_content_en = heading_content_en
+                    savenewsdetail.section_2_content_ar = heading_content_ar
+                    savenewsdetail.meta_title_en = seo_title_en
+                    savenewsdetail.meta_title_ar = seo_title_ar
+                    savenewsdetail.meta_content_en = seo_content_en
+                    savenewsdetail.meta_content_ar = seo_content_ar
+
+                    savenewsdetail.save()
+                    
+                    dom = "True"
+                    
+                    messages.success(request, "News Detail Page Updated Successfully")
+                               
+                except Exception as e:
+                    messages.error(request,str(e))    
+                      
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'heading_title_en': dom
+                }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+
+        
 #cms descovery page
 class cms_discoverypage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/discovery.html"

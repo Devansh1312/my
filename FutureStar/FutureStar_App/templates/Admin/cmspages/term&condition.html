@@ -139,7 +139,7 @@
                    
                 </div>
                 <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
                     <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
                 </div>
             </form>
@@ -147,46 +147,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="saveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Confirmation</h5>
-                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>-->
-            </div>
-            <div class="modal-body">
-                <p id="modalMessage"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick = "return savethedata()" data-dismiss="modal">Yes</button>
-                <button type="button" class="btn btn-secondary" onclick ="return closeConfirmationpopup()" data-dismiss="modal">Close</button>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="savesuccessmodel" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Confirmation</h5>
-                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>-->
-            </div>
-            <div class="modal-body">
-                <p id="modalMessagesuccess"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="background-color:green" class="btn btn-secondary" onclick ="return SaveSuccessPopup()" data-dismiss="modal">Close</button>
-
-            </div>
-        </div>
-    </div>
-</div>
 
 
 
@@ -204,62 +164,7 @@
         return false
 
         
-    } 
-
-    function sendData(){
-        try{
-           
-            showModal()
-            return false
-        }
-        catch(err){
-
-            alert(err)
-            return false
-
-        }
     }
-     function showModal() {
-        document.getElementById("modalMessage").innerText = "Do you really want to save the Updates?"
-        $('#saveConfirmationModal').modal('show');
-    }
-
-   
-        
-        /*var heading_content_en = document.getElementById("heading-section-content-en")
-        var heading_content_ar = document.getElementById("heading-section-content-ar")
-        var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
-        var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
-        */
-
-        function  closeConfirmationpopup(){
-
-            document.getElementById("saveConfirmationModal")
-            $('#saveConfirmationModal').modal('hide');
-    
-    
-            return false
-        }
-        
-        
-
-    function showSuccessModel() {
-            document.getElementById("modalMessagesuccess").innerText = "Save Successfully!"
-            
-            $('#savesuccessmodel').modal('show');
-    }
-
-    
-    function  SaveSuccessPopup(){
-
-        document.getElementById("modalMessagesuccess")
-        $('#savesuccessmodel').modal('hide');
-
-
-        return false
-
-    }
-        
     
     function savethedata(){
         
@@ -280,7 +185,6 @@
                 var seo_content_ar = document.getElementById("meta-content-ar")
                 var top_error = document.getElementById('heading-warning')
                 var missing_text = document.getElementById('heading-error')
-
 
                 const form_data = [
 
@@ -307,13 +211,11 @@
                 for (const field of form_data) {
                         const input = document.getElementById(field.id);
                         const errorMsg = document.getElementById(`error-${field.id}`);
-                        document.getElementById("saveConfirmationModal")
     
                         if (!input.value.trim()) {
                             
                             errorMsg.innerText = `Please fill in ${field.name}.`;
                             errorMsg.style.display = 'block'; 
-                            $('#saveConfirmationModal').modal('hide');
                                 
                                 top_error.innerText = "There Should be no empty Field"
                                 top_error.style.color = "red"
@@ -326,7 +228,9 @@
                                 
                         }
                     }
+
                 if (sendData == 'true'){
+
                             const formData = new FormData();
                             //text
                             
@@ -339,7 +243,7 @@
                             formData.append('meta-content-en', seo_content_en.value );
                             formData.append('meta-content-ar', seo_content_ar.value );
                             
-                            
+
                             fetch("/savetermcondition/", {
                                 method: 'POST',
                                 body: formData,
@@ -349,13 +253,12 @@
                             })
                             .then(response => response.json())
                             .then(data => {
-                                console.log('Success:', data);
-                                $('#saveConfirmationModal').modal('hide');
-                                showSuccessModel()
+                                location.reload()
                                 return false
                             })
                             .catch((error) => {
-                                console.error('Error:', error);
+                                location.reload()
+
                             });
                         
                        

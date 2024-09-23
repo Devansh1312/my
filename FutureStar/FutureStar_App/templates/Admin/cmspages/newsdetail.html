@@ -24,13 +24,12 @@
                         <h1 style="font-size:25px">CMS News Detail Page Edit</h1>
                     </div>    
 
-                    <p id="heading-error"></p>
+                    <p class = "erro-heading" id="heading-error"></p>
 
-                    <br>
+                    <br>     
                     <div>
                         <p id = "heading-warning"></p>
                     </div>
-
                     <div class="row" style="margin-bottom: 10px;">
                         <h4>Heading Section</h4>
                     </div>
@@ -46,7 +45,7 @@
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-banner" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display:block; width: 200px; height: 50px;" />
 
                             </div>
                         </div>
@@ -64,16 +63,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="newsdetail-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="newsdetail-title-en" name="newsdetail_title" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="newsdetail-title-en" name="newsdetail_title" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-newsdetail-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="newsdetail-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="newsdetail-title-ar" name="newsdetail-title-ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="newsdetail-title-ar" name="newsdetail-title-ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-newsdetail-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -86,7 +87,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="newsdetail-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-en" name="newsdetail-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-en" name="newsdetail-content-en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-newsdetail-content-en"></p>
 
                             </div>
                         </div>
@@ -94,7 +96,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="newsdetail-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-ar" name="newsdetail-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-ar" name="newsdetail-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_2_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-newsdetail-content-ar"></p>
 
                             </div>
                         </div>
@@ -111,16 +114,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -129,7 +134,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
                         </div>
@@ -137,7 +143,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
                         </div>
@@ -149,7 +156,7 @@
                    
                 </div>
                 <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
                     <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
                 </div>
             </form>
@@ -174,108 +181,109 @@
         
     }
 
-    function checkValidation(){
-        var validationcheckpoint
+    
 
-        try{
-            var tc_title_en = document.getElementById("tc-title-en")
-            var tc_title_ar = document.getElementById("tc-title-ar")
-            var tc_content_en = document.getElementById("tc-content-en")
-            var tc_content_ar = document.getElementById("tc-content-ar")
-            var seo_title_en = document.getElementById("meta-title-en")
-            var seo_title_ar = document.getElementById("meta-title-ar")
-            var seo_content_en = document.getElementById("meta-content-en")
-            var seo_content_ar = document.getElementById("meta-content-ar")
-
-
-            if(tc_title_en.value == ""){
-            return validationcheckpoint = "error"
-            }
-            else if(tc_title_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_en.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(seo_title_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_title_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else{
-                return validationcheckpoint = "success"
-            }
-        }
-        catch(err){
-            alert(err)
-        }
-        
-        /*var heading_content_en = document.getElementById("heading-section-content-en")
-        var heading_content_ar = document.getElementById("heading-section-content-ar")
-        var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
-        var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
-        */
-
-        
-        
+    function savethedata(){
         
 
-
-    }
-
-    function sendData(){
-        var validation = checkValidation()
-        
-        
-            
-           
-        
-      
-        if(validation == "success"){
-
-        
             try{
 
                 //text
 
-                var tc_title_en = document.getElementById("tc-title-en")
-                var tc_title_ar = document.getElementById("tc-title-ar")
-                var tc_content_en = document.getElementById("tc-content-en")
-                var tc_content_ar = document.getElementById("tc-content-ar")
+                var nd_title_en = document.getElementById("newsdetail-title-en")
+                var nd_title_ar = document.getElementById("newsdetail-title-ar")
+                var nd_content_en = document.getElementById("newsdetail-content-en")
+                var nd_content_ar = document.getElementById("newsdetail-content-ar")
                 var seo_title_en = document.getElementById("meta-title-en")
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
                 var seo_content_ar = document.getElementById("meta-content-ar")
+                var top_error = document.getElementById('heading-warning')
                 var missing_text = document.getElementById('heading-error')
+                var heading_banner = document.getElementById("newsdetail-heading-section-banner")
+
+                //image
+                var heading_banner_1 = heading_banner.files[0]
+
+                const form_data = [
+                    { id: "newsdetail-title-en", name: "Title (English)" },
+                    { id: "newsdetail-title-ar", name: "Title (Arabic)" },
+                    { id: "newsdetail-content-en", name: "Content (English)" },
+                    { id: "newsdetail-content-ar", name: "Content (Arabic)" },
+                    { id: "meta-title-en", name: "Title (English)" },
+                    { id: "meta-title-ar", name: "Title (Arabic)" },
+                    { id: "meta-content-en", name: "Content (English)" },
+                    { id: "meta-content-ar", name: "Content (Arabic)" },
+
+                ];
+
+
+                document.querySelectorAll('.error-message').forEach((msg) => {
+                msg.style.display = 'none';
+                msg.innerText = '';
+                });
+
+                top_error.innerText =""
+
+                var sendData = "true"
 
                 try{
+                    for (const field of form_data) {
+                    const input = document.getElementById(field.id);
+                    const errorMsg = document.getElementById(`error-${field.id}`);
+                //document.getElementById("saveConfirmationModal")
+
+                        if (!input.value.trim()) {
+                            try{
+
+                            errorMsg.innerText = `Please fill in ${field.name}.`;
+                            errorMsg.style.display = 'block'; 
+                        //$('#saveConfirmationModal').modal('hide');
+                            
+                                top_error.innerText = "There Should be no empty Field"
+                                top_error.style.color = "red"
+
+                                document.documentElement.scrollTop = 0;
+                            //document.documentElement.scrollTop = 0
+
+                                sendData = "false"
+                                break;
+                        }
+                        catch(err){
+                            alert(err)
+                            return false
+                        }
+                            
+                    }
+                }
+
+                }
+                catch(err){
+                    alert(err)
+                    return false
+                }
+
+                if(sendData== "true"){
                     const formData = new FormData();
                     //text
-                    formData.append('tc_title_en', tc_title_en.value );
-                    formData.append('tc_title_ar', tc_title_ar.value );
-                    formData.append('tc_content_en', tc_content_en.value );
-                    formData.append('tc_content_ar', tc_content_ar.value );
+                    formData.append('nd_title_en', nd_title_en.value );
+                    formData.append('nd_title_ar', nd_title_ar.value );
+                    formData.append('nd_content_en', nd_content_en.value );
+                    formData.append('nd_content_ar', nd_content_ar.value );
                     formData.append('seo_title_en', seo_title_en.value );
                     formData.append('seo_title_ar', seo_title_ar.value );
                     formData.append('seo_content_en', seo_content_en.value );
                     formData.append('seo_content_ar', seo_content_ar.value );
 
+                    if (heading_banner.files.length > 0) {
+                        formData.append('heading_banner',heading_banner_1);
+                    } 
+                    else {
+                        console.log("already have image")
+                    }
 
 
-                    fetch("/savetermcondition/", {
+                    fetch("/savenewsdetail/", {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -285,17 +293,13 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
-
-                        if(missing_text.style.display != "none"){
-                            missing_text.style.display = "none"
-
-                        }
-
+                        location.reload()
                         
                         
                     })
                     .catch((error) => {
                         console.error('Error:', error);
+                        location.reload()
                     });
 
                     function getCookie(name) {
@@ -312,46 +316,22 @@
                         }
                         return cookieValue;
                     }
+                }
                 return false
 
                 
-
-                }
-                catch(err){
-                
-                    alert(err);
-                    return false
-
-                }
                 
                 //console.log(country_name_ar.value)
                 
-                return false;
             }
             catch(err){
 
-                var  warning = document.getElementById('heading-error')
-
-                warning.innerText = err
-                warning.style.color = "red"
-
-                return false;
+              alert(err)
+              return false
             }
                 
         }
-        else if(validation == "error"){
-
-            var missing_text = document.getElementById('heading-error')
-
-            
-            
-            
-            missing_text.style.display = 'block'
-            missing_text.innerText = "Fill the blank field!"
-            missing_text.style.color = "red"
-            window.scrollTo(0,0)
-            return false
-}
+   
             
             
             
@@ -359,7 +339,7 @@
         
     
         
-    }
+    
     function displayImageBanner(event) {
         try{
             const file = event.target.files[0];

@@ -107,7 +107,7 @@ urlpatterns = [
     
     path('FAQ/',cms_newsPage.as_view(),name="cms_newspage"),
     path('saveFAQedit/',savenewspage,name="savenewspage"),
-    
+
     path('successStory/',cms_successStory.as_view(),name="cms_successStorypage"),
     path('saveSuccessStory/',saveSucessStorypage,name = "saveSucessStorypage"),
     
@@ -124,6 +124,7 @@ urlpatterns = [
     
     #newsdetail
     path('cms_newsdetail/',cms_newsdetail.as_view(),name = "cms_newsdetail"),
+    path('savenewsdetail/',savenewsdetail,name = "savenewsdetail"),
 
     #cms_discoverypage
     path('cms_discoverypage/',cms_discoverypage.as_view(),name = "cms_discoverypage"),
