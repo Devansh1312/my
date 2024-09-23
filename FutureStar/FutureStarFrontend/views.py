@@ -118,18 +118,22 @@ class AdvertisePage(View):
 class AboutPage(View):
     
     def get(self, request, *args, **kwargs):
+        
         marquee = Slider_Content.objects.all()
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         global_clients = Global_Clients.objects.all()
         current_language = request.session.get('language', 'en')
-
+        try:
+            cmsdata = cms_pages.objects.get(id=7)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
 
         context = {
             "marquee": marquee,
             "testimonials": testimonials,
             "global_clients": global_clients,
             "current_language":current_language,
-
+            "cmsdata" : cmsdata,
 
         }
         return render(request, "about.html",context)
@@ -151,12 +155,11 @@ class ContactPage(View):
     
     def get(self, request, *args, **kwargs):
         try:
-            cmsdata = cms_pages.objects.get(name_en="Contacts")  # Use get() to fetch a single object
+            cmsdata = cms_pages.objects.get(id=8)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
 
         current_language = request.session.get('language', 'en')
-        print(cmsdata)  # This will print the single object to the console
 
         context = {
             "current_language": current_language,

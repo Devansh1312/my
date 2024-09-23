@@ -27,12 +27,16 @@
 {% block content %}
 
 <!-- Page Banner Section Start -->
-<section class="page-banner pt-150 pb-50 rel z-1" style="background-image: ('{% static 'frontend/assets/images/hero/hero-two-bg.png' %}')">
+<section class="page-banner pt-150 pb-50 rel z-1" style="background-image: url('/media/{{ cmsdata.heading_banner }}');">
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
                 <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
-                    Future Stars your gateway to millions of players                            
+                    {% if current_language == "ar" %}
+                    {{ cmsdata.heading_title_ar }}
+                    {% else %}
+                    {{ cmsdata.heading_title_en }}
+                    {% endif %}                             
                 </h1>
             </div>
         </div>
@@ -45,21 +49,31 @@
 <div class="video-area-two rel pb-50 z-1">
     <div class="container">
         <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
-            <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
-            <a href="https://www.youtube.com/watch?v=9Y7ma241N8k" class="mfp-iframe video-play"><i class="fas fa-play"></i></a>
+            <video id = "heading-video-id" height="500" width="1200" controls>
+                <source id="heading-section-video-src" src="/media/{{cmsdata.heading_video}}" type="video/mp4">
+
+            </video>
         </div>
     </div>
     <div class="container">
         <div class="row">
             <div class="col-lg-6 wow fadeInLeft delay-0-2s">
                 <div class="client-text text-lg-start text-center mt-40 pb-50">
-                    Sed ut perspiciatis unde omnis iste natus error sit voluptat emey accusantium doloremque laudantium totam aperiam eaque quabillo inventore veritatisey quasi architecto beatae dictasunt
+                    {% if current_language == "ar" %}
+                    {{ cmsdata.heading_content_ar }}
+                    {% else %}
+                    {{ cmsdata.heading_content_en }}
+                    {% endif %}                 
                 </div>
                
             </div>
             <div class="col-lg-6 wow fadeInRight delay-0-2s">
                 <div class="video-year text-lg-end text-center rel">
-                    1980
+                    {% if current_language == "ar" %}
+                    {{ cmsdata.heading_year_title_ar }}
+                    {% else %}
+                    {{ cmsdata.heading_year_title_en }}
+                    {% endif %} 
                     <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
                 </div>
             </div>
@@ -97,8 +111,20 @@
         <div class="row justify-content-center">
             <div class="col-lg-7">
                 <div class="section-title text-center mb-70 wow fadeInUp delay-0-2s">
-                    <span class="sub-title mb-15">Who We Are</span>
-                    <h2>We are Professional and Experience Team </h2>
+                    <span class="sub-title mb-15">
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.section_2_heading_ar }}
+                        {% else %}
+                        {{ cmsdata.section_2_heading_en }}
+                        {% endif %} 
+                    </span>
+                    <h2>
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.section_2_title_ar }}
+                        {% else %}
+                        {{ cmsdata.section_2_title_en }}
+                        {% endif %} 
+                    </h2>
                 </div>
             </div>
         </div>    
@@ -278,7 +304,13 @@
 <section class="client-logo-area pt-130 rpt-100 pb-100 rpb-70">
     <div class="container">
         <div class="section-title text-center mb-60">
-            <h4>We Have 1520+Global Clients</h4>
+            <h4>
+                {% if current_language == "ar" %}
+                {{ cmsdata.section_3_heading_ar }}
+                {% else %}
+                {{ cmsdata.section_3_heading_en }}
+                {% endif %} 
+            </h4>
         </div>
         <div class="client-logo-wrap">
 
