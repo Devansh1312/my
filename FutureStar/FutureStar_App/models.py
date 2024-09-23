@@ -532,7 +532,7 @@ class cms_pages(models.Model):
     
     
     def __str__(self):
-        return self.heading_en
+        return self.name_en
     
     class Meta:
         db_table = 'futurestar_app_cms_pages'

@@ -452,7 +452,13 @@
                     {% for marquee in marquee %}
                         <span class="marquee-item">
                             <i class="fas fa-star-of-life"></i>
-                            <b>{{ marquee.content_en }}</b>
+                            <b>
+                                {% if current_language == "ar" %}
+                                {{ marquee.content_ar }}
+                                {% else %}
+                                {{ marquee.content_en }}
+                                {% endif %} 
+                            </b>
                         </span>
                     {% endfor %}
                 </span>
@@ -486,8 +492,23 @@
                         <a href="{% url 'index' %}" class="project-btn"><i class="far fa-arrow-right"></i></a>
                     </div>
                     <div class="content">
-                        <a href="{% url 'index' %}" class="category">{{ app_feature.title_en }}</a>
-                        <h4><a href="{% url 'index' %}">{{ app_feature.sub_title_en }}</a></h4>
+                        <a href="{% url 'index' %}" class="category">
+                            {% if current_language == "ar" %}
+                            {{ app_feature.title_ar }}
+                            {% else %}
+                            {{ app_feature.title_en }}
+                            {% endif %} 
+                        </a>
+                        <h4>
+                            <a href="{% url 'index' %}">
+                                {% if current_language == "ar" %}
+                                {{ app_feature.sub_title_ar }}
+                                {% else %}
+                                {{ app_feature.sub_title_en }}
+                                {% endif %} 
+
+                            </a>
+                        </h4>
                     </div>
                 </div>
 
@@ -568,8 +589,14 @@
                             {% for testimonial in testimonials %}
                             <div class="testimonial-item">
                                 <div class="author-speech">
-                                    <p><span class="quote">“</span> {{ testimonial.content_en }} <span
-                                            class="quote right-quote">“</span></p>
+                                    <p><span class="quote">“</span>
+                                        {% if current_language == "ar" %}
+                                        {{ testimonial.content_ar }}
+                                        {% else %}
+                                        {{ testimonial.content_en }}
+                                        {% endif %}  
+                                        <span class="quote right-quote">“</span>
+                                    </p>
                                 </div>
                                 <hr>
                                 <div class="testimonial-footer">
@@ -578,8 +605,20 @@
                                             <img src="{{ testimonial.image.url }}" alt="Author Image">
                                         </div>
                                         <div class="author-info">
-                                            <h4>{{ testimonial.name_en }}</h4>
-                                            <span class="designation">{{ testimonial.designation_en}}</span>
+                                            <h4>
+                                                {% if current_language == "ar" %}
+                                                {{ testimonial.name_ar }}
+                                                {% else %}
+                                                {{ testimonial.name_en }}
+                                                {% endif %}    
+                                            </h4>
+                                            <span class="designation">
+                                                {% if current_language == "ar" %}
+                                                {{ testimonial.designation_ar }}
+                                                {% else %}
+                                                {{ testimonial.designation_en }}
+                                                {% endif %}  
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="ratting style-two">
@@ -624,7 +663,19 @@
                         <div class="image">
                             <img src="{{ news.image.url }}" alt="Blog">
                         </div>
-                        <h4><a href="">{{ news.title_en }}</a></h4>
+                        <h4>
+                            <a href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                                {% if current_language == "ar" %}
+                                {{ news.title_ar }}
+                                {% else %}
+                                {{ news.title_en }}
+                                {% endif %}
+                            </a>
+                            <form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ news.id }}">
+                            </form>
+                        </h4>
                         <hr>
                         <ul class="blog-meta">
                             <li>
@@ -693,6 +744,18 @@
         starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default language from localStorage or 'en' by default
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
 
+        // On language change, update localStorage
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
 <script>new WOW().init();</script>
 {% endblock %}

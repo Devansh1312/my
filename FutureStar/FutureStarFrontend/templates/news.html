@@ -52,9 +52,9 @@
                     <h4>
                         <a class="read-more" href="#" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                            {% if current_language == "ar" %}
-                           {{ news.description_ar }}
+                           {{ news.title_ar }}
                            {% else %}
-                           {{ news.description_en }}
+                           {{ news.title_en }}
                            {% endif %}
                         </a>
                     </h4>

@@ -95,11 +95,6 @@
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-banner">Heading banner </label>
                                 <input class="form-control btn-pill" id="heading-section-banner" name="heading_section_banner" type="file" value = "/media/{{data.heading_banner}}" onchange= "displayImageBanner(event)" accept="image/.jpg, .png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
-                                
-
                                 <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display: block; width: 200px; height: 50px;" />
 
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-banner"></p>
@@ -186,9 +181,7 @@
                                 <label class="form-label" for="sub-mail-icon">Mail Icon  </label>
                                 <input class="form-control btn-pill" id="sub-mail-icon" name="sub_mail_icon" type="file" onchange= "displayImageMail(event)" accept="image/.jpg,.png">
 
-                                <!--{% if system_settings.fav_icon %}-->
-                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
+                               
 
                                 <img id="selected-mail-icon" src = "/media/{{data.sub_section_2_1_icon}}" style="display: block; width: 35px; height: 35px;" />
                                   
@@ -202,9 +195,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="sub-phone-icon">Phone Icon </label>
                                 <input class="form-control btn-pill" id="sub-phone-icon" name="sub_phone_icon" type="file" onchange= "displayImagePhone(event)" accept="image/.jpg,.png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
+                                
                                 <img id="selected-phone-icon" src="/media/{{ data.sub_section_2_2_icon }}" style="display: block; width: 35px; height: 35px;" alt="Phone Icon" />
                                                               
                                 <p style="color: red; display: none;" class="error-message" id ="error-sub-phone-icon"></p>

@@ -22,6 +22,7 @@ class HomePage(View):
             "testimonials": testimonials,
             "news": news,
             "partner": partner,
+            "current_language":current_language,
         }
         return render(request, "home.html", context)
     def post(self, request, *args, **kwargs):
@@ -120,11 +121,15 @@ class AboutPage(View):
         marquee = Slider_Content.objects.all()
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         global_clients = Global_Clients.objects.all()
+        current_language = request.session.get('language', 'en')
+
 
         context = {
             "marquee": marquee,
             "testimonials": testimonials,
             "global_clients": global_clients,
+            "current_language":current_language,
+
 
         }
         return render(request, "about.html",context)
@@ -145,14 +150,30 @@ class RegisterPage(View):
 class ContactPage(View):
     
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "contact.html")
-    
+        try:
+            cmsdata = cms_pages.objects.get(name_en="Contacts")  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+
+        current_language = request.session.get('language', 'en')
+        print(cmsdata)  # This will print the single object to the console
+
+        context = {
+            "current_language": current_language,
+            "cmsdata": cmsdata,
+        } 
+                
+        return render(request, "contact.html", context)
+
+            
     def post(self, request):
+        cmsdata = cms_pages.objects.filter(name_en="Contacts")
         fullname = request.POST.get("fullname")
         phone = request.POST.get("phone")
         email = request.POST.get("email")
         message = request.POST.get("message")
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
 
         Inquire.objects.create(
             fullname=fullname,
@@ -160,6 +181,11 @@ class ContactPage(View):
             email=email,
             message=message,
         )
+        context = {
+            "current_language": selected_language,
+            "cmsdata":cmsdata,
+
+        }
         messages.success(request, "Inquire Submited successfully.")
-        return redirect("contact")
+        return redirect("contact",context)
 
