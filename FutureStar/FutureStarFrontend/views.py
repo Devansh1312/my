@@ -43,11 +43,27 @@ class SuccessStoriesPage(View):
     
     def get(self, request, *args, **kwargs):
         tryout_clubs = Tryout_Club.objects.all()
+        current_language = request.session.get('language', 'en')
+
+        try:
+            cmsdata = cms_pages.objects.get(id=3)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         context = {
             "tryout_clubs": tryout_clubs,
+            "cmsdata":cmsdata,                        
+            "current_language": current_language,
+
         }
         
         return render(request, "success-stories.html",context)
+    def post(self, request, *args, **kwargs):
+        # Update the language based on the user's selection and store it in the session
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Redirect to the same page after changing the language
+        return redirect('success-stories')  # Replace 'news-page' with the correct view name if different
 
 class NewsPage(View):
     
@@ -137,6 +153,13 @@ class AboutPage(View):
 
         }
         return render(request, "about.html",context)
+    def post(self, request, *args, **kwargs):
+        # Update the language based on the user's selection and store it in the session
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Redirect to the same page after changing the language
+        return redirect('about')  # Replace 'news-page' with the correct view name if different
 
 class LoginPage(View):
     
