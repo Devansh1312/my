@@ -192,3 +192,30 @@ class ContactPage(View):
         messages.success(request, "Inquire Submited successfully.")
         return redirect("contact",context)
 
+
+class PrivacyPolicyPage(View):
+    
+    def get(self, request, *args, **kwargs):
+        
+        return render(request, "privacy-policy.html")
+    def post(self, request, *args, **kwargs):
+        # Update the language based on the user's selection and store it in the session
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Redirect to the same page after changing the language
+        return redirect('privacy-policy')  # Replace 'news-page' with the correct view name if different
+    
+
+class TermsofServicesPage(View):
+    
+    def get(self, request, *args, **kwargs):
+        
+        return render(request, "terms-of-services.html")
+    def post(self, request, *args, **kwargs):
+        # Update the language based on the user's selection and store it in the session
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Redirect to the same page after changing the language
+        return redirect('terms-of-services')  # Replace 'news-page' with the correct view name if different
