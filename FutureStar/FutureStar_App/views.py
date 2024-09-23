@@ -1959,11 +1959,17 @@ def savecontactpage(request):
 class cms_aboutpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/aboutus.html"
 
+    
     def get(self, request):
-        
+        dataFilter = cms_pages.objects.get(id="7")
+
+        context = {
+            'data':dataFilter
+        }
         return render(
             request,
             self.template_name,
+            context
             
         )
         
@@ -1985,21 +1991,97 @@ def saveAboutUspage(request):
                 whoweare_title_ar  = request.POST.get('whoweare_title_ar')
                 global_client_heading_en  = request.POST.get('global_client_heading_en')
                 global_client_heading_ar  = request.POST.get('global_client_heading_ar')
+                seo_title_en  = request.POST.get('seo_title_en')
+                seo_title_ar  = request.POST.get('seo_title_ar')
+                seo_content_en  = request.POST.get('seo_content_en')
+                seo_content_ar  = request.POST.get('seo_content_ar')
+                #images
+                dom = "Done"
+                imageName = []
+                
+                
+                try:
+                    aboutussave = cms_pages.objects.get(id = "7")
+
+
+                    if 'heading_video' in request.FILES:
+                        
+                        heading_video = request.FILES.get('heading_video',None)
+                        if heading_video:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_video.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in heading_video.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(heading_video.name)
+                                        aboutussave.heading_video = heading_video
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass   
+                    
+                    if 'testi_icon' in request.FILES:
+                        
+                        testi_icon = request.FILES.get('testi_icon',None)
+                        if testi_icon:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', testi_icon.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in testi_icon.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(testi_icon.name)
+                                        aboutussave.section_3_feature_icons = testi_icon
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass  
+                    #section1
+                    aboutussave.heading_title_en = heading_title_en
+                    aboutussave.heading_title_ar = heading_content_ar
+                    aboutussave.heading_content_en = heading_content_en
+                    aboutussave.heading_content_ar = heading_content_ar
+                    aboutussave.heading_year_title_en =heading_year_en
+                    aboutussave.heading_year_title_ar =heading_year_ar
+                    #section_2
+                    aboutussave.section_2_heading_en = sub_heading_en
+                    aboutussave.section_2_heading_ar = sub_heading_ar
+                    aboutussave.section_2_title_en = whoweare_title_en
+                    aboutussave.section_2_title_ar = whoweare_title_ar
+                    #section_3
+                    aboutussave.section_3_heading_en = global_client_heading_en
+                    aboutussave.section_3_heading_ar = global_client_heading_ar
+                    #meta section
+                    aboutussave.meta_title_en = seo_title_en
+                    aboutussave.meta_title_ar = seo_title_ar
+                    aboutussave.meta_content_ar = seo_content_en
+                    aboutussave.meta_content_en = seo_content_ar
+
+                    aboutussave.save()
+                    dom = "True"
+                    messages.success(request, "About Page Updated Successfully")
 
 
 
-
-
+                except Exception as e:
+                    messages.error(request,str(e))      
+                    
                 
 
-
-                
+                    
                 
                 response_data = {
                         'status': 'success',
                         'message': 'Data uploaded successfully',
-                        'heading_title_en': ''
-                    }
+                        'heading_title_en': dom
+                        }
                 
                 return JsonResponse(response_data)
 

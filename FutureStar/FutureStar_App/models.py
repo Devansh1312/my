@@ -374,8 +374,9 @@ class cms_pages(models.Model):
     heading_image_1 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
     heading_image_2 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
     heading_image_3 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
+    heading_year_title_en = models.CharField(max_length=100,blank=True,null=True)
+    heading_year_title_ar = models.CharField(max_length=100,blank=True,null=True)
     heading_year_title = models.CharField(max_length=100,blank=True,null=True)
-    
     #heading-section-2
     sub_heading_logo = models.ImageField(upload_to='cmspages/',blank =True,null = True)
     sub_heading_en = models.CharField(max_length=100,blank=True,null=True)

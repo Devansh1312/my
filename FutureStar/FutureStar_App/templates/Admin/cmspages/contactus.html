@@ -595,7 +595,6 @@
                 if (!input.value.trim()) {
                     try{
 
-                    alert("helo")
                     errorMsg.innerText = `Please fill in ${field.name}.`;
                     errorMsg.style.display = 'block'; 
                     //$('#saveConfirmationModal').modal('hide');
@@ -649,8 +648,8 @@
 
                 //images
                 //formData.append('banner',banner);
-                formData.append('mailicon',mailicon);
-                formData.append('phoneicon',phoneicon);
+                //formData.append('mailicon',mailicon);
+                //formData.append('phoneicon',phoneicon);
                 if (heading_banner .files.length > 0) {
                         formData.append('banner', banner);
                 } 
@@ -689,6 +688,9 @@
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                    location.reload()
+
+                    alert("error")
                     return false
 
                 });
