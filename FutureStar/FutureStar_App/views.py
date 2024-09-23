@@ -2137,10 +2137,16 @@ class cms_successStory(LoginRequiredMixin, View):
 
     def get(self, request):
         
+        dataFilter = cms_pages.objects.get(id="3")
+        
+        context = {
+            'data':dataFilter
+        }
+        
         return render(
             request,
             self.template_name,
-            
+            context
     )
         
 @csrf_exempt
@@ -2153,15 +2159,64 @@ def saveSucessStorypage(request):
                 #heading_section_video  = request.FILES['heading_section_video']
                 heading_content_en  = request.POST.get('heading_content_en')
                 heading_content_ar  = request.POST.get('heading_content_ar')
-                tryoutclubs_title_en  = request.POST.get('tryoutclubs-title-en')
-                tryoutclubs_title_ar  = request.POST.get('tryoutclubs-title-ar')
+                tryoutclubs_title_en  = request.POST.get('tryoutclubs_title_en')
+                tryoutclubs_title_ar  = request.POST.get('tryoutclubs_title_ar')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                
+                dom = "Done"
+                imageName = []
+                
+                try:
+                    successstorysave = cms_pages.objects.get(id = "3")
 
-                
-                
+
+                    if 'heading_banner' in request.FILES:
+                        
+                        heading_banner = request.FILES.get('heading_banner',None)
+                        if heading_banner:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_banner.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in heading_banner.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(heading_banner.name)
+                                        successstorysave.heading_banner = heading_banner
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass   
+                    
+                    successstorysave.heading_title_en = heading_title_en
+                    successstorysave.heading_title_ar = heading_title_ar
+                    successstorysave.heading_content_en = heading_content_en
+                    successstorysave.heading_content_ar = heading_content_ar
+                    successstorysave.section_2_title_en = tryoutclubs_title_en
+                    successstorysave.section_2_title_ar = tryoutclubs_title_ar
+                    successstorysave.meta_title_en = seo_title_en
+                    successstorysave.meta_title_ar = seo_title_ar
+                    successstorysave.meta_content_en = seo_content_en
+                    successstorysave.meta_content_ar = seo_content_ar
+
+                    successstorysave.save()
+                    
+                    dom = "True"
+                    
+                    messages.success(request, "Success Story Page Updated Successfully")
+                               
+                except Exception as e:
+                    messages.error(request,str(e))    
+                      
                 response_data = {
                         'status': 'success',
                         'message': 'Data uploaded successfully',
-                        'heading_title_en': ''
+                        'heading_title_en': dom
                 }
                 
                 return JsonResponse(response_data)

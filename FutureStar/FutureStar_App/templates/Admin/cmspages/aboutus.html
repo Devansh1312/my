@@ -89,7 +89,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading_section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-ar"></p>
 
                             </div>
@@ -442,7 +442,7 @@
                     formData.append('seo_content_en', seo_content_en.value );
                     formData.append('seo_content_ar', seo_content_ar.value );
 
-
+                    
                     //images
 
                     if (heading_video .files.length > 0) {

@@ -24,9 +24,9 @@
                         <h1 style="font-size:25px">CMS Success Story Page Edit</h1>
                     </div>    
 
-                    <p id="heading-error"></p>
+                    <p class = "erro-heading" id="heading-error"></p>
 
-                    <br>
+                    <br>     
                     <div>
                         <p id = "heading-warning"></p>
                     </div>
@@ -41,16 +41,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="1" placeholder="Heading Title (English)">
-                               
+                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="{{data.heading_title_en}}" placeholder="Heading Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="1" placeholder="Heading Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="{{data.heading_title_ar}}" placeholder="Heading Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -63,7 +65,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-content">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content_ar" type="text" placeholder="Heading content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content_ar" type="text" placeholder="Heading content (Arabic)">{{data.heading_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-en"></p>
 
                             </div>
                         </div>
@@ -71,7 +74,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-ar"></p>
 
                             </div>
                         </div>
@@ -84,7 +88,7 @@
                                 <input class="form-control btn-pill" id="heading-section-banner" name="heading_section_banner" type="file"  onchange= "displaybanner(event)" accept="image/*">
                                 
 
-                                <img id="selected-banner" style="display: none; width: 300px; height: 50px;" />
+                                <img id="selected-banner"src = "/media/{{data.heading_banner}}" style="display:block; width: 300px; height: 50px;" />
 
                             </div>
                         </div>
@@ -100,16 +104,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="tryoutclubs-title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="tryoutclubs-title-en" name="tryoutclubs_title_en" type="text" value="1" placeholder="Heading Title (English)">
-                               
+                                <input class="form-control btn-pill " id="tryoutclubs-title-en" name="tryoutclubs_title_en" type="text" value="{{data.section_2_title_en}}" placeholder="Heading Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-tryoutclubs-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="tryoutclubs-title_ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="tryoutclubs-title-ar" name="tryoutclubs_title_ar" type="text" value="1" placeholder="Heading Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="tryoutclubs-title-ar" name="tryoutclubs_title_ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Heading Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-tryoutclubs-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -122,16 +128,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -140,7 +148,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
                         </div>
@@ -148,7 +157,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
                         </div>
@@ -159,7 +169,7 @@
                    
                 </div>
                 <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
                     <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
                 </div>
             </form>
@@ -170,63 +180,6 @@
 <!--javascript-->
 <script>
 
-    function displayImageMail(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-mail-icon');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('icon-warning')
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
-    }
-
-    function displayImagePhone(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-phone-icon');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('icon-warning')
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
-    }
 
     function displaybanner(event) {
         try{
@@ -268,52 +221,12 @@
 
         
     }
-    function checkValidation(){
-        var validationcheckpoint
 
-        var heading_title_en = document.getElementById("heading-section-title-en")
-        var heading_title_ar = document.getElementById("heading-section-title-ar")
-        var heading_content_en = document.getElementById("heading-section-content-en")
-        var heading_content_ar = document.getElementById("heading-section-content-ar")
-        var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
-        var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
-
-
-        if(heading_title_en.value == ""){
-            return validationcheckpoint = "error"
-        }
-        else if(heading_title_ar.value == ""){
-            return validationcheckpoint = "error"
-
-        }
-        else if(heading_content_en.value == ""){
-            return validationcheckpoint = "error"
-
-        }
-        else if(heading_content_ar.value == ""){
-            return validationcheckpoint = "error"
-
-        }
-        else if(tryoutclubs_title_en.value == ""){
-            return validationcheckpoint = "error"
-        }
-        else if(tryoutclubs_title_ar.value == ""){
-            return validationcheckpoint = "error"
-        }
-        else{
-            return validationcheckpoint = "success"
-        }
+    
+   
+    function savethedata(){
         
-
-
-    }
-    function sendData(){
-
-        var validation = checkValidation()
-        if(validation == "success"){
-
-        
-            try{
+    try{
 
                 //text
                 var heading_title_en = document.getElementById("heading-section-title-en")
@@ -323,24 +236,104 @@
                 var heading_banner = document.getElementById("heading-section-banner")
                 var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
                 var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
-
+                var seo_title_en = document.getElementById("meta-title-en")
+                var seo_title_ar = document.getElementById("meta-title-ar")
+                var seo_content_en = document.getElementById("meta-content-en")
+                var seo_content_ar = document.getElementById("meta-content-ar")
+                var top_error = document.getElementById('heading-warning')
+                var missing_text = document.getElementById('heading-error')
 
                 //Image
-                var heading_banner= heading_banner.files[0]
+                var banner= heading_banner.files[0]
+
+                const form_data = [
+                    { id: "heading-section-title-en", name: "Title (English)" },
+                    { id: "heading-section-title-ar", name: "Title (Arabic)" },
+                    { id: "heading-section-content-en", name: "Content (English)" },
+                    { id: "heading-section-content-ar", name: "Content (Arabic)" },
+                    { id: "tryoutclubs-title-en", name: "Title (English)" },
+                    { id: "tryoutclubs-title-ar", name: "Title (Arabic)" },
+                    { id: "meta-title-en", name: "Title (English)" },
+                    { id: "meta-title-ar", name: "Title (Arabic)" },
+                    { id: "meta-content-en", name: "Content (English)" },
+                    { id: "meta-content-ar", name: "Content (Arabic)" },
+
+
+                ];
+
+
+                document.querySelectorAll('.error-message').forEach((msg) => {
+                msg.style.display = 'none';
+                msg.innerText = '';
+            });
+
+            top_error.innerText =""
+
+            var sendData = "true"
+
 
                 try{
+                    for (const field of form_data) {
+                    const input = document.getElementById(field.id);
+                    const errorMsg = document.getElementById(`error-${field.id}`);
+                //document.getElementById("saveConfirmationModal")
+
+                        if (!input.value.trim()) {
+                            try{
+
+                            errorMsg.innerText = `Please fill in ${field.name}.`;
+                            errorMsg.style.display = 'block'; 
+                        //$('#saveConfirmationModal').modal('hide');
+                            
+                                top_error.innerText = "There Should be no empty Field"
+                                top_error.style.color = "red"
+
+                                document.documentElement.scrollTop = 0;
+                            //document.documentElement.scrollTop = 0
+
+                                sendData = "false"
+                                break;
+                        }
+                        catch(err){
+                            alert(err)
+                            return false
+                        }
+                            
+                    }
+                }
+
+                }
+                catch(err){
+                    alert(err)
+                    return false
+                }
+
+                if(sendData == 'true'){
                     const formData = new FormData();
+
+
+                                        
+                   
                     //text
                     formData.append('heading_title_en', heading_title_en.value );
                     formData.append('heading_title_ar', heading_title_ar.value );
                     //formData.append('heading_section_video', heading_section_video);
                     formData.append('heading_content_en', heading_content_en.value );
                     formData.append('heading_content_ar', heading_content_ar.value );
-                    formData.append('tryoutclubs_title_ar', tryoutclubs_title_ar.value );
                     formData.append('tryoutclubs_title_en', tryoutclubs_title_en.value );
+                    formData.append('tryoutclubs_title_ar', tryoutclubs_title_ar.value );
 
+                    formData.append('meta-title-en', seo_title_en.value );
+                    formData.append('meta-title-ar', seo_title_ar.value );
+                    formData.append('meta-content-en', seo_content_en.value );
+                    formData.append('meta-content-ar', seo_content_ar.value );
 
-
+                    if (heading_banner.files.length > 0) {
+                        formData.append('heading_banner', banner);
+                     } 
+                    else {
+                        console.log("already have image")
+                    }
                     //images
                     //formData.append('banner',banner);
 
@@ -355,9 +348,13 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
+                        location.reload()
+
                     })
                     .catch((error) => {
                         console.error('Error:', error);
+                        location.reload()
+
                     });
 
                     function getCookie(name) {
@@ -374,42 +371,29 @@
                         }
                         return cookieValue;
                     }
+                }
+
                 return false
 
-                }
-                catch(err){
                 
-                    alert(err);
-                    return false
-
-                }
+               
+            
                 
                 //console.log(country_name_ar.value)
                 
-                return false;
+               
 
             }
             catch(err){
-                var  warning = document.getElementById('heading-error')
-
-                warning.innerText = err
-                warning.style.color = "red"
+                alert("1: "+err)
+                return false;
 
                 return false;
             }
         }
-        else if(validation == "error"){
-
-            var missing_text = document.getElementById('heading-error')
-            
-            missing_text.innerText = "Fill the blank field!"
-            missing_text.style.color = "red"
-            window.scrollTo(0,0)
-            return false
-        }
     
         
-    }
+    
 
     
 </script>
