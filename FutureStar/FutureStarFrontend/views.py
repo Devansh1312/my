@@ -14,6 +14,7 @@ class HomePage(View):
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         news = News.objects.all().order_by('-id')[:4]
         partner = Partners.objects.all()
+        current_language = request.session.get('language', 'en')
 
         context = {
             "marquee": marquee,
@@ -23,6 +24,13 @@ class HomePage(View):
             "partner": partner,
         }
         return render(request, "home.html", context)
+    def post(self, request, *args, **kwargs):
+        # Update the language based on the user's selection and store it in the session
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Redirect to the same page after changing the language
+        return redirect('index')  # Replace 'news-page' with the correct view name if different
 
 class DiscoverPage(View):
     
@@ -43,8 +51,12 @@ class SuccessStoriesPage(View):
 class NewsPage(View):
     
     def get(self, request, *args, **kwargs):
-        news_list = News.objects.all().order_by('-id')
+        # Get the selected language from the session, default to 'en'
+        current_language = request.session.get('language', 'en')
         
+        # Get the list of news
+        news_list = News.objects.all().order_by('-id')
+
         # Pagination
         page = request.GET.get('page', 1)
         paginator = Paginator(news_list, 6)  # Display 6 items per page
@@ -56,23 +68,43 @@ class NewsPage(View):
         except EmptyPage:
             news = paginator.page(paginator.num_pages)
 
+        # Pass the current language and news to the template
         context = {
             "news": news,
+            "current_language": current_language,
         }
         return render(request, "news.html", context)
 
+    def post(self, request, *args, **kwargs):
+        # Update the language based on the user's selection and store it in the session
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Redirect to the same page after changing the language
+        return redirect('news')  # Replace 'news-page' with the correct view name if different
+
 class NewsDetailPage(View):
     def get(self, request, *args, **kwargs):
-        return render(request, "news.html")
+        # Get the selected language from the session, default to 'en'
+        current_language = request.session.get('language', 'en')
+        # Pass the current language and news to the template
+        context = {
+            "current_language": current_language,
+        }
+        return render(request, "news.html",context)
 
     def post(self, request):
+        # Retrieve the news ID from the hidden input
         id = request.POST.get("id")
-        
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
         # Find the news with the matching id or raise 404 if not found
         news = get_object_or_404(News, id=id)
-        
+
         context = {
             "news": news,
+            "current_language": selected_language,
         }
         return render(request, "news-details.html", context)
 

@@ -1,0 +1,1651 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+
+{% endblock %}
+<meta name="description" content="{% block meta_description %}Default description{% endblock %}">
+
+{% block title %}Advertise Page Edit{% endblock %}
+
+{% block content %}
+{% include "components/loader.html" %}
+
+<div class="page-body">
+    <div class="container-fluid">
+        {% include "layouts/breadcrumb.html" %}
+        <div class="card">
+            <form class="form theme-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div>
+                        <h1 style="font-size:25px">CMS Advertise Page Edit</h1>
+                    </div>    
+
+                    <p id="heading-error"></p>
+
+                    <br>
+                    <div>
+                        <p id = "heading-warning"></p>
+                    </div>
+
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Heading Section</h4>
+                    </div>
+
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="advertise-heading-title">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="advertise-heading-title-en" name="advertise_heading_title" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="advertise-heading-title-arabic">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="advertise-heading-title-ar" name="advertise_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--heading content-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="advertise-heading-content-en">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-en" name="advertise_heading_content_en" type="text" placeholder="content (English)">1</textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="advertise-heading-content-ar">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-ar" name="advertise_heading_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label" for="advertise-heading-section-banner">Heading banner </label>
+                                <input class="form-control btn-pill" id="advertise-heading-section-banner" name="advertise_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
+                                <!--{% if system_settings.fav_icon %}-->
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                <!--{% endif %}-->
+
+                                <img id="selected-advertise-banner" style="display: none; width: 200px; height: 50px;" />
+
+                            </div>
+                        </div>
+                        <p id = "banner-advertise-warning"></p>
+                    </div>
+                    <br>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Section - 2</h4>
+                    </div>
+                    <div id="form-container">
+                    <div id="dynamic-section-1">
+                        <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                    
+                    <!--heading-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-title-en">Title (English)</label>
+                                <input class="form-control btn-pill " id="section-2-title-en" name="section_2_title_en" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="section-2-title-ar" name="section_2_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    
+                    <!--heading content-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-content-en">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en" name="section-2-content-en" type="text" placeholder="content (English)">1</textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-content-ar">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar" name="section-2-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    
+                       
+
+
+                        
+                        
+                    
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="section-2-image-1">Image-1 </label>
+                                        <input class="form-control btn-pill" id="section-2-banner-1" name="section_2_banner_1" type="file"  onchange= "displaysection2Image(event,count=1)" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+        
+                                        <img id="selected-section-2-image-1" style="display: none; width: 100px; height: 100px;" />
+        
+                                    </div>
+                                </div>
+                                <p id = "section-2-warning-1"></p>
+                            </div>
+                        </div>
+                        
+                        
+                    <div>
+                        <br>
+
+                        <div id="dynamic-section-2-field">
+                            <div class="col-12  text-end " >
+                                <button id="add-row" onclick ="return add_content()" class="btn btn-success">+</button>
+
+                            </div>   
+                        </div>
+                    <br>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Partnership with Future Star</h4>
+                    </div>
+
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    
+                    <!--heading-->
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="partnership-heading-name-en-1">Heading Name  (English)</label>
+                                <input class="form-control btn-pill " id="partnership-heading-name-en-1" name="partnership_heading_name_en_1" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="partnership-heading-name-arabic-1">Heading Name (Arabic)</label>
+                                <input class="form-control btn-pill" id="partnership-heading-name-ar-1" name="partnership_heading_name_ar_1" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="partnership-heading-title-en-1">Heading Title  (English)</label>
+                                <input class="form-control btn-pill " id="partnership-heading-title-en-1" name="partnership_heading_title_en_1" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="partnership-heading-title-arabic-1">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="partnership-heading-title-ar-1" name="partnership_heading_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="form-partnership-container">
+                        <div id="dynamic-partnership-section-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+                        </div>
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+    
+                        
+                        <!--heading-->
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="partnership-title-en">Title (English)</label>
+                                    <input class="form-control btn-pill " id="partnership-title-en" name="partnership_title_en" type="text" value="1" placeholder="Title (English)">
+                                   
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="partnership-title-ar" name="partnership_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                   
+                                </div>
+                            </div>
+                        </div>
+    
+                       
+                        
+                        <!--heading content-->
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="partnership-content-en">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en" name="partnership-content-en" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="partnership-content-ar">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        
+                           
+    
+    
+                            
+                            
+                        
+                            <div id="img-container">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="partnership-image-1">Icon-1 </label>
+                                            <input class="form-control btn-pill" id="partnership-banner-1" name="partnership_banner_1" type="file"  onchange= "displaypartnershipImage(event,count=1)" accept="image/*">
+                                            <!--{% if system_settings.fav_icon %}-->
+                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                            <!--{% endif %}-->
+            
+                                            <img id="selected-partnership-image-1" style="display: none; width: 100px; height: 100px;" />
+            
+                                        </div>
+                                    </div>
+                                    <p id = "partnership-warning-1"></p>
+                                </div>
+                            </div>
+                            
+                            
+                        <div>
+
+                            <br>
+
+                        <div id="dynamic-partnership-field">
+                            <div class="col-12  text-end " >
+                                <button id="add-row" onclick ="return add_partnership_content()" class="btn btn-success">+</button>
+
+                            </div>   
+                        </div>
+
+
+                    
+
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Apps Ads</h4>
+                    </div>
+
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="ads-heading-name-en">Heading Name (English)</label>
+                                <input class="form-control btn-pill " id="ads-heading-name-en" name="ads_heading_name_en" type="text" value="1" placeholder="Heading Name (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="ads-heading-name-arabic">Heading Name (Arabic)</label>
+                                <input class="form-control btn-pill" id="ads-heading-name-ar" name="ads_heading_name_ar" type="text" value="1" placeholder="Heading Name (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="ads-heading-title-en">Heading Title (English)</label>
+                                <input class="form-control btn-pill " id="ads-heading-title-en" name="ads-heading_title_en" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="ads-heading-title-arabic">Heading Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="ads-heading-title-ar" name="ads_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <br>
+                    <div id="form-container-ads">
+                        <div id="dynamic-ads-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Image-1</h1>
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+                        
+                        <div class="row" id = "ads-image-section-1">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="ads-image-1">Image-1 </label>
+                                    <input class="form-control btn-pill" id="ads-image-1" name="ads_image_1" type="file"  onchange= "displayImageads(event,count=1)" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-ads-image-1" style="display: none; width: 100px; height: 100px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "ads-warning-1"></p>
+                        </div> 
+
+                        
+
+
+                        
+                    <div>
+                        <br>
+
+                        <div id="dynamic-ads-image-field">
+                            <div class="col-12  text-end " >
+                                <button id="add-row" onclick ="return add_dynamic_ads_image()" class="btn btn-success">+</button>
+
+                            </div>   
+                        </div>
+                   
+                          
+
+                        <!--Premium Features-->
+                        <div class="row" style="margin-bottom: 10px;">
+                            <h4>Premium Features</h4>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-en">Title (English)</label>
+                                    <input class="form-control btn-pill " id="premium-title-en" name="premium_title_en" type="text" value="1" placeholder="Title (English)">
+                                   
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-arabic">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="premium-title-ar" name="premium_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                   
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div id="form-container">
+                        <div id="dynamic-Premium-section-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Features-Section-1</h1>
+                        </div>
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+    
+                        
+                        <!--heading-->
+                            
+                       
+                       
+                        
+                        <!--heading content-->
+
+                        
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="premium-image-1">Premium Icon </label>
+                                        <input class="form-control btn-pill" id="premium-banner-1" name="premium_banner_1" type="file"  onchange= "return displaypremiumFeatures(event,count=1)" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+        
+                                        <img id="selected-premium-image-1" style="display: none; width: 100px; height: 100px;" />
+        
+                                    </div>
+                                </div>
+                                <p id = "premium-warning-1"></p>
+                            </div>
+                        </div>
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-en-1">Premium Title (English)</label>
+                                    <input class="form-control btn-pill" id="premium-title-en-1" name="premium_title_en-1" type="text" value="1" placeholder="Title (English)">
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-ar-1">Premium Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="premium-title-ar-1" name="premium_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
+    
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        
+                           
+    
+    
+                            
+                            
+                        
+                            
+                            
+                        <div>
+                            <br>
+    
+                            <div id="dynamic-premium-field">
+                                <div class="col-12  text-end " >
+                                    <button id="add-row" onclick ="return add_premium_content()" class="btn btn-success">+</button>
+    
+                                </div>   
+                            </div>
+                        <br>
+
+                        <div class="row" style="margin-bottom: 10px;">
+                            <h4>Future Star Social Media Section </h4>
+                        </div>
+    
+                        <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+    
+    
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-title">Title (English)</label>
+                                    <input class="form-control btn-pill " id="social-media-title-en" name="social_media_title_en" type="text" value="1" placeholder="Title (English)">
+                                   
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-title-arabic">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="social-media-title-ar" name="social_media_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                   
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!--heading content-->
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-en-1">Content-1 (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_1" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-ar-1">Content-1 (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-1" name="social_media_content_ar_1" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-en-2">Content-2 (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_2" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-ar-2">Content-2 (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-2" name="social_media_content_ar_2" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-en-3">Content-3 (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-3" name="social_media_content_en_3" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-ar-3">Content-3 (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-3" name="social_media_content_ar_3" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-en-4">Content-4 (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-4" name="social_media_content_en_4" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-ar-4">Content-4 (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-4" name="social_media_content_ar_4" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-en-5">Content-5 (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-5" name="social_media_content_en_5" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-ar-5">Content-5 (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-5" name="social_media_content_ar_5" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-en-6">Content-6 (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-6" name="social_media_content_en_6" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-content-ar-3">Content-6 (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-6" name="social_media_content_ar_6" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-section-image">Image </label>
+                                    <input class="form-control btn-pill" id="social-media-section-image" name="social_media_section_image" type="file"  onchange= "displaySocialMediaImg(event)" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-social-media-img" style="display: none; width: 200px; height: 50px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "social-media-image-warning"></p>
+                        </div>    
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="social-media-section-back-image">background Image </label>
+                                    <input class="form-control btn-pill" id="social-media-section-back-image" name="social_media_section_back_image" type="file"  onchange= "displaySocialMediaBackgroundImg(event)" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-social-media-back-img" style="display: none; width: 200px; height: 50px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "social-media-background-image-warning"></p>
+                        </div>    
+
+                        <div class="row" style="margin-bottom: 10px;">
+                            <h4>Future Star Competition Section</h4>
+                        </div>
+    
+                        <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+    
+    
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="competition-section-title-en">Title (English)</label>
+                                    <input class="form-control btn-pill " id="competition-section-title-en" name="competition_section_title_en" type="text" value="1" placeholder="Title (English)">
+                                   
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="competition-section-title-ar">Heading Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="competition-section-title-ar" name="competition_section_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                   
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!--heading content-->
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="competition-section-content-en">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-en" name="competition_section_content_en" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="competition-section-content-ar">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-ar" name="competition_section_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="competition-section-section-image">Image </label>
+                                    <input class="form-control btn-pill" id="competition-section-section-image" name="competition_section_section_image" type="file"  onchange= "displayCompetitionImage(event)" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-competition-image" style="display: none; width: 200px; height: 50px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "competition-section-image-warning"></p>
+                        </div>
+                    <!--section 2-->
+                    <br>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>SEO Section</h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title-en">SEO Title (English)</label>
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-en">SEO Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    
+                   
+                </div>
+                <div class="card-footer text-end">
+                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!--javascript-->
+<script>
+
+    function  backtolist(){
+
+        url = "{% url 'cmspages_urls' %}";
+        
+
+        window.location.href = url
+        return false
+
+        
+    }
+
+    function checkValidation(){
+        var validationcheckpoint
+
+        try{
+            var tc_title_en = document.getElementById("tc-title-en")
+            var tc_title_ar = document.getElementById("tc-title-ar")
+            var tc_content_en = document.getElementById("tc-content-en")
+            var tc_content_ar = document.getElementById("tc-content-ar")
+            var seo_title_en = document.getElementById("meta-title-en")
+            var seo_title_ar = document.getElementById("meta-title-ar")
+            var seo_content_en = document.getElementById("meta-content-en")
+            var seo_content_ar = document.getElementById("meta-content-ar")
+
+
+            if(tc_title_en.value == ""){
+            return validationcheckpoint = "error"
+            }
+            else if(tc_title_ar.value == ""){
+                return validationcheckpoint = "error"
+
+            }
+            else if(tc_content_en.value == ""){
+                return validationcheckpoint = "error"
+
+            }
+            else if(tc_content_ar.value == ""){
+                return validationcheckpoint = "error"
+
+            }
+            else if(seo_title_en.value == ""){
+                return validationcheckpoint = "error"
+            }
+            else if(seo_title_ar.value == ""){
+                return validationcheckpoint = "error"
+            }
+            else if(seo_content_en.value == ""){
+                return validationcheckpoint = "error"
+            }
+            else if(seo_content_ar.value == ""){
+                return validationcheckpoint = "error"
+            }
+            else{
+                return validationcheckpoint = "success"
+            }
+        }
+        catch(err){
+            alert(err)
+        }
+        
+        /*var heading_content_en = document.getElementById("heading-section-content-en")
+        var heading_content_ar = document.getElementById("heading-section-content-ar")
+        var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
+        var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
+        */
+
+        
+        
+        
+
+
+    }
+
+    function sendData(){
+        var validation = checkValidation()
+        
+        
+            
+           
+        
+      
+        if(validation == "success"){
+
+        
+            try{
+
+                //text
+
+                var tc_title_en = document.getElementById("tc-title-en")
+                var tc_title_ar = document.getElementById("tc-title-ar")
+                var tc_content_en = document.getElementById("tc-content-en")
+                var tc_content_ar = document.getElementById("tc-content-ar")
+                var seo_title_en = document.getElementById("meta-title-en")
+                var seo_title_ar = document.getElementById("meta-title-ar")
+                var seo_content_en = document.getElementById("meta-content-en")
+                var seo_content_ar = document.getElementById("meta-content-ar")
+                var missing_text = document.getElementById('heading-error')
+
+                try{
+                    const formData = new FormData();
+                    //text
+                    formData.append('tc_title_en', tc_title_en.value );
+                    formData.append('tc_title_ar', tc_title_ar.value );
+                    formData.append('tc_content_en', tc_content_en.value );
+                    formData.append('tc_content_ar', tc_content_ar.value );
+                    formData.append('seo_title_en', seo_title_en.value );
+                    formData.append('seo_title_ar', seo_title_ar.value );
+                    formData.append('seo_content_en', seo_content_en.value );
+                    formData.append('seo_content_ar', seo_content_ar.value );
+
+
+
+                    fetch("/savetermcondition/", {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken') 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+
+                        if(missing_text.style.display != "none"){
+                            missing_text.style.display = "none"
+
+                        }
+
+                        
+                        
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+
+                    function getCookie(name) {
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                            const cookies = document.cookie.split(';');
+                            for (let i = 0; i < cookies.length; i++) {
+                                const cookie = cookies[i].trim();
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                return false
+
+                
+
+                }
+                catch(err){
+                
+                    alert(err);
+                    return false
+
+                }
+                
+                //console.log(country_name_ar.value)
+                
+                return false;
+            }
+            catch(err){
+
+                var  warning = document.getElementById('heading-error')
+
+                warning.innerText = err
+                warning.style.color = "red"
+
+                return false;
+            }
+                
+        }
+        else if(validation == "error"){
+
+            var missing_text = document.getElementById('heading-error')
+
+            
+            
+            
+            missing_text.style.display = 'block'
+            missing_text.innerText = "Fill the blank field!"
+            missing_text.style.color = "red"
+            window.scrollTo(0,0)
+            return false
+}
+            
+            
+            
+        
+        
+    
+        
+    }
+
+    function displayImagewhychooseus(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-why-choose-us-image');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('banner-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+    /*function displayImageBanner(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-banner');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('banner-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }*/
+
+    function displayImageads(event,count) {
+
+        try{
+            const file = event.target.files[0];
+            const imgElement = document.getElementById(`selected-ads-image-${count}`);
+
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+
+            var icon_warning = document.getElementById(`ads-warning-${adscount}`)
+
+            icon_warning.innerText = err
+
+            icon_warning.style.color = "red";
+
+        }
+
+        }
+    function displaysection2Image(event,count) {
+
+        try{
+            const file = event.target.files[0];
+            const imgElement = document.getElementById(`selected-section-2-image-${count}`);
+
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+
+            var icon_warning = document.getElementById(`section-2-warning-${count}`)
+
+            icon_warning.innerText = err
+
+            icon_warning.style.color = "red";
+
+        }
+
+        }
+    function displayImageBanner(event) {
+
+        try{
+            const file = event.target.files[0];
+            const imgElement = document.getElementById('selected-advertise-banner');
+
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            alert(err)
+
+            var icon_warning = document.getElementById(`banner-advertise-warning`)
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    function displaypartnershipImage(event,count) {
+
+        try{
+            const file = event.target.files[0];
+            const imgElement = document.getElementById(`selected-partnership-image-${count}`);
+
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            alert(err)
+
+            var icon_warning = document.getElementById(`partnership-warning-${count}`)
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+
+}
+
+
+function displaypremiumFeatures(event,count) {
+
+    try{
+        const file = event.target.files[0];
+        const imgElement = document.getElementById(`selected-premium-image-${count}`);
+
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+    }
+    }
+    catch(err){
+        alert(err)
+
+        var icon_warning = document.getElementById(`premium-warning-${count}`)
+
+        icon_warning.innerText = err
+
+        icon_warning.style.color = "red";
+
+    }
+
+}
+
+//social media background image
+function displaySocialMediaBackgroundImg(event) {
+
+    try{
+        const file = event.target.files[0];
+        const imgElement = document.getElementById(`selected-social-media-back-img`);
+
+    if (file) {
+
+
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
+        }
+        
+        reader.readAsDataURL(file);
+        
+          
+        
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+    }
+    }
+    catch(err){
+        alert(err)
+
+        var icon_warning = document.getElementById(`social-media-background-image-warning`)
+
+        icon_warning.innerText = err
+
+        icon_warning.style.color = "red";
+
+    }
+
+}
+
+//social media  image
+function displaySocialMediaImg(event) {
+
+    try{
+        const file = event.target.files[0];
+        const imgElement = document.getElementById(`selected-social-media-img`);
+
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+    }
+    }
+    catch(err){
+        alert(err)
+
+        var icon_warning = document.getElementById(`social-media-image-warning`)
+
+        icon_warning.innerText = err
+
+        icon_warning.style.color = "red";
+
+    }
+
+}
+
+
+
+    
+    let partnership_count= 1;
+    
+
+    function add_partnership_content(){
+
+            try{
+            partnership_count++;
+            let newRow = `
+            <div id="dynamic-partnership-section-${partnership_count}">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${partnership_count}</h1>
+                        </div>
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+    
+                        
+                        <!--heading-->
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="partnership-title-en-${partnership_count}">Title (English)</label>
+                                    <input class="form-control btn-pill " id="partnership-title-en-${partnership_count}" name="partnership_title_en_${partnership_count}" type="text" value="1" placeholder="Title (English)">
+                                   
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="section-2-title-arabic-${partnership_count}">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="partnership-title-ar-${partnership_count}" name="partnership_title_ar_${partnership_count}" type="text" value="1" placeholder="Title (Arabic)">
+                                   
+                                </div>
+                            </div>
+                        </div>
+    
+                       
+                        
+                        <!--heading content-->
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="partnership-content-en-${partnership_count}">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en-${partnership_count}" name="partnership_content_en_${partnership_count}" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="partnership-content-ar-${partnership_count}">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar-${partnership_count}" name="partnership_content_ar_${partnership_count}" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        
+                           
+    
+    
+                            
+                            
+                        
+                            <div id="img-container">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="partnership-image-${partnership_count}">Icon-${partnership_count} </label>
+                                            <input class="form-control btn-pill" id="partnership-banner-${partnership_count}" name="partnership_banner_${partnership_count}" type="file"  onchange= "displaypartnershipImage(event,${partnership_count})" accept="image/*">
+                                            <!--{% if system_settings.fav_icon %}-->
+                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                            <!--{% endif %}-->
+            
+                                            <img id="selected-partnership-image-${partnership_count}" style="display: none; width: 100px; height: 100px;" />
+            
+                                        </div>
+                                    </div>
+                                    <p id = "partnership-warning-${partnership_count}"></p>
+                                </div>
+                            </div>
+                            
+                            
+                        <div>
+
+                             <div class="col-12  text-end " >
+
+                                <button id="delete-row" class="btn btn-danger">-</button>
+                </div>  
+
+            <br>`;
+            
+            document.getElementById('dynamic-partnership-field').insertAdjacentHTML('beforebegin', newRow);
+
+            return false;
+        }
+        catch(err){
+            alert(err)
+
+            return false
+        }
+    }
+
+    let count = 1;
+    
+
+    function add_content(){
+
+            try{
+            count++;
+            console.log(count)
+            let newRow = `
+            <div id=dynamic-section-${count}">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${count}</h1>
+             </div>
+            <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+            <div class="row" id="row-${count}">
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="section-2-title-en-${count}">Heading Title (English)</label>
+                        <input class="form-control btn-pill" id="section-2-title-en-${count}" name="section_2_title_en_${count}" type="text" placeholder="Title (English)">
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="section-2-title-ar-${count}">Heading Title (Arabic)</label>
+                        <input class="form-control btn-pill" id="section-2-title-ar-${count}" name="section_2_title_ar_${count}" type="text" placeholder="Title (Arabic)">
+                    </div>
+                </div>
+
+                <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="section-2-content-en-${count}">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en-${count}" name="section_2_content_en_${count}" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="section-2-content-ar-${count}">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar-${count}" name="section_2_content_ar_${count}" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="section-2-image-${count}">Image-${count} </label>
+                                        <input class="form-control btn-pill" id="section-2-banner-${count}" name="section_2_banner_${count}" type="file"  onchange= "displaysection2Image(event,${count})" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+        
+                                        <img id="selected-section-2-image-${count}" style="display: none; width: 100px; height: 100px;" />
+        
+                                    </div>
+                                </div>
+                                <p id = "section-2-warning-${count}"></p>
+                            </div>
+                        </div>
+                <div class="col-12  text-end " >
+
+                                <button id="delete-row" class="btn btn-danger">-</button>
+                </div>  
+            </div>
+            <br>`;
+            
+            document.getElementById('dynamic-section-2-field').insertAdjacentHTML('beforebegin', newRow);
+
+            return false;
+        }
+        catch(err){
+            alert(err)
+
+            return false
+        }
+    }
+
+    let adscount = 1
+
+    function add_dynamic_ads_image(){
+
+        try{
+        adscount++;
+
+        let newRow = `
+        <div class="row" id = "ads-image-section-${adscount}">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="ads-image-${adscount}">Image-${adscount} </label>
+                                    <input class="form-control btn-pill" id="ads-image-${adscount}" name="ads_image_${adscount}" type="file"  onchange= "displayImageads(event,count=${adscount})" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-ads-image-${adscount}" style="display: none; width: 100px; height: 100px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "ads-warning-${adscount}"></p>
+                        </div> 
+       
+        <br>
+        `;
+
+        document.getElementById('dynamic-ads-image-field').insertAdjacentHTML('beforebegin', newRow);
+
+        return false;
+        }
+        catch(err){
+        alert(err)
+
+        return false
+        }
+        }
+    let imgcount = 1
+
+    function add_image(){
+
+        try{
+        imgcount++;
+
+        let newRow = `
+         <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="game-section-image-${imgcount}">Image-${imgcount} </label>
+                                    <input class="form-control btn-pill" id="game-section-banner-${imgcount}" name="game_section_banner_${imgcount}" type="file"  onchange= "displaygameImage(event,${imgcount})" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-game-image-${imgcount}" style="display: none; width: 100px; height: 100px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "game-image-warning-${imgcount}"></p>
+        </div>
+
+        <div class="col-12  text-end " >
+
+                                <button id="delete-row" class="btn btn-danger">-</button>
+                </div>  
+        <br>
+        `;
+
+        document.getElementById('dynamic-image-field').insertAdjacentHTML('beforebegin', newRow);
+
+        return false;
+        }
+        catch(err){
+        alert(err)
+
+        return false
+        }
+        }
+
+        //premiumFunction
+        premiumCount = 1 
+        function add_premium_content(){
+
+            try{
+            premiumCount++;
+    
+            let newRow = `
+            <div id="dynamic-Premium-section-${premiumCount}">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Features-Section-${premiumCount}</h1>
+                        </div>
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+    
+                        
+                        <!--heading-->
+                            
+                       
+                       
+                        
+                        <!--heading content-->
+
+                        
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="premium-image-${premiumCount}">Premium Icon </label>
+                                        <input class="form-control btn-pill" id="premium-banner-${premiumCount}" name="premium_banner_${premiumCount}" type="file"  onchange= "return displaypremiumFeatures(event,count=${premiumCount})" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+        
+                                        <img id="selected-premium-image-${premiumCount}" style="display: none; width: 100px; height: 100px;" />
+        
+                                    </div>
+                                </div>
+                                <p id = "premium-warning-${premiumCount}"></p>
+                            </div>
+                        </div>
+                            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-en-${premiumCount}">Premium Title (English)</label>
+                                    <input class="form-control btn-pill" id="premium-title-en-${premiumCount}" name="premium_title_en_${premiumCount}" type="text" value="1" placeholder="Title (English)">
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-ar-${premiumCount}">Premium Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="premium-title-ar-${premiumCount}" name="premium_title_ar_${premiumCount}" type="text" value="1" placeholder="Title (Arabic)">
+    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12  text-end " >
+
+                                <button id="delete-row" class="btn btn-danger">-</button>
+                        </div>
+             
+            <br>
+            `;
+    
+            document.getElementById('dynamic-premium-field').insertAdjacentHTML('beforebegin', newRow);
+    
+            return false;
+            }
+            catch(err){
+            alert(err)
+    
+            return false
+            }
+            }
+            
+    
+    
+    
+
+    //Competition section image
+    function displayCompetitionImage(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-competition-image');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('competition-section-image-warnin')
+
+            icon_warning.inneTtext = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    
+</script>
+{% endblock %}
+

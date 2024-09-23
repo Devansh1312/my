@@ -160,6 +160,47 @@
                         </div>
                     </div>
                     <br>
+                    <div id="form-container"></div>
+                        <div id="dynamic-who-content-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Image-1</h1>
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+                        
+                    
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="game-section-image-1">Image-1 </label>
+                                        <input class="form-control btn-pill" id="game-section-banner-1" name="game_section_banner_1" type="file"  onchange= "displaygameImage(event,count=1)" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+        
+                                        <img id="selected-game-image-1" style="display: none; width: 100px; height: 100px;" />
+        
+                                    </div>
+                                </div>
+                                <p id = "game-image-warning-1"></p>
+                            </div>
+                        </div>
+                        
+
+
+                        
+                    <div>
+                        <br>
+
+                        <div id="dynamic-image-field">
+                            <div class="col-12  text-end " >
+                                <button id="add-row" onclick ="return add_image()" class="btn btn-success">+</button>
+
+                            </div>   
+                        </div>
+                    <br>
                     <div class="row" style="margin-bottom: 10px;">
                         <h4>Training</h4>
                     </div>
@@ -269,7 +310,7 @@
                                 <label class="form-label" for="training-section-image">Heading banner </label>
                                 <input class="form-control btn-pill" id="training-section-image" name="training_section_image" type="file"  onchange= "displayImagetraining_section2(event)" accept="image/*">
                                 <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 50px;">
                                 <!--{% endif %}-->
 
                                 <img id="selected-section-2-image" style="display: none; width: 200px; height: 50px;" />
@@ -282,6 +323,7 @@
                     <div class="row" style="margin-bottom: 10px;">
                         <h4>Why Choose Us</h4>
                     </div>
+
                     <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
                     
                     <div class="row">
@@ -323,29 +365,78 @@
 
                     <br>
                     <div id="form-container">
+                        <div id="dynamic-who-content-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-heading-title-en"> Title (English)</label>
-                                    <input class="form-control btn-pill " id="why-choose-us-heading-title-en" name="why_choose_us_heading_title_en" type="text" value="1" placeholder="Title (English)">
+                                    <label class="form-label" for="why-choose-us-heading-title-en-1"> Title (English)</label>
+                                    <input class="form-control btn-pill " id="why-choose-us-heading-title-en-1" name="why_choose_us_heading_title_en_1" type="text" value="1" placeholder="Title (English)">
                                 </div>
                             </div>
 
                             <div class="col-6">
                                 <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-heading-title-arabic">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="why-choose-us-heading-title-ar" name="why_choose_us_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                    <label class="form-label" for="why-choose-us-heading-title-arabic-1">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="why-choose-us-heading-title-ar-1" name="why_choose_us_heading_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
                                 
                                 </div>
                             </div>
-                            <div class="col-12  text-end " >
-                                <button id="add-row" class="btn btn-success">+</button>
-
-                                <button id="delete-row" class="btn btn-danger">-</button>
-                            </div>    
+                            
                         </div>
+                    
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="why-choose-us-content-en-1">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-1" name="why_choose_us_content_en_1" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="why-choose-us-content-ar-1">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-1" name="why_choose_us_content_ar_1" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                        
+
+
+                        
                     <div>
+                        <br>
+
+                        <div id="dynamic-field">
+                            <div class="col-12  text-end " >
+                                <button id="add-row" onclick ="return add_content()" class="btn btn-success">+</button>
+
+                            </div>   
+                        </div>
                    
+                        <div class="row" id = "image-section">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="why-choose-us-section-image">Banner </label>
+                                    <input class="form-control btn-pill" id="why-choose-us-section-image" name="why_choose_us_section_image" type="file"  onchange= "displayImagewhychooseus(event)" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-why-choose-us-image" style="display: none; width: 100px; height: 100px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "section-1-image-warning"></p>
+                        </div>   
 
 
 
@@ -409,7 +500,6 @@
 
 <!--javascript-->
 <script>
-
 
     function  backtolist(){
 
@@ -608,6 +698,35 @@
     
         
     }
+
+    function displayImagewhychooseus(event) {
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById('selected-why-choose-us-image');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            var icon_warning = document.getElementById('banner-warning')
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
     function displayImageBanner(event) {
         try{
             const file = event.target.files[0];
@@ -636,6 +755,145 @@
         }
         
     }
+
+    function displaygameImage(event,count) {
+
+        try{
+            const file = event.target.files[0];
+        const imgElement = document.getElementById(`selected-game-image-${count}`);
+        console.log(count)
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imgElement.src = e.target.result;
+                imgElement.style.display = 'block'; // Show the selected image
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+        }
+        }
+        catch(err){
+            alert(err)
+            var icon_warning = document.getElementById(`game-image-warning-1${count}`)
+
+            icon_warning.value = err
+
+            icon_warning.style.color = "red";
+
+        }
+        
+    }
+
+    
+    let count = 1;
+    
+
+    function add_content(){
+
+            try{
+            count++;
+
+            let newRow = `
+            <div id="dynamic-who-content-${count}">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${count}</h1>
+             </div>
+            <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+            <div class="row" id="row-${count}">
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="why-choose-us-heading-title-en-${count}">Heading Title (English)</label>
+                        <input class="form-control btn-pill" id="why-choose-us-heading-title-en-${count}" name="why_choose_us_heading_title_en_${count}" type="text" placeholder="Title (English)">
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="why-choose-us-heading-title-ar-${count}">Heading Title (Arabic)</label>
+                        <input class="form-control btn-pill" id="why-choose-us-heading-title-ar-${count}" name="why_choose_us_heading_title_ar_${count}" type="text" placeholder="Title (Arabic)">
+                    </div>
+                </div>
+
+                <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="why-choose-us-content-en-${count}">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-${count}" name="why_choose_us_content_en_${count}" type="text" placeholder="content (English)">1</textarea>
+    
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="why-choose-us-content-ar-${count}">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-${count}" name="why_choose_us_content_ar_${count}" type="text"  placeholder="content (Arabic)">1</textarea>
+    
+                                </div>
+                            </div>
+                        </div>
+                <div class="col-12  text-end " >
+
+                                <button id="delete-row" class="btn btn-danger">-</button>
+                </div>  
+            </div>
+            <br>`;
+            
+            document.getElementById('dynamic-field').insertAdjacentHTML('beforebegin', newRow);
+
+            return false;
+        }
+        catch(err){
+            alert(err)
+
+            return false
+        }
+    }
+    let imgcount = 1
+
+    function add_image(){
+
+        try{
+        imgcount++;
+
+        let newRow = `
+         <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="game-section-image-${imgcount}">Image-${imgcount} </label>
+                                    <input class="form-control btn-pill" id="game-section-banner-${imgcount}" name="game_section_banner_${imgcount}" type="file"  onchange= "displaygameImage(event,${imgcount})" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-game-image-${imgcount}" style="display: none; width: 100px; height: 100px;" />
+    
+                                </div>
+                            </div>
+                            <p id = "game-image-warning-${imgcount}"></p>
+        </div>
+
+        <div class="col-12  text-end " >
+
+                                <button id="delete-row" class="btn btn-danger">-</button>
+                </div>  
+        <br>
+        `;
+
+        document.getElementById('dynamic-image-field').insertAdjacentHTML('beforebegin', newRow);
+
+        return false;
+        }
+        catch(err){
+        alert(err)
+
+        return false
+        }
+        }
+    
+    
 
     function displayImagetraining_section1(event) {
         try{
@@ -694,6 +952,7 @@
         }
         
     }
+
     
 </script>
 {% endblock %}

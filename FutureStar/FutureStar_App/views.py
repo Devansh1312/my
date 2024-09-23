@@ -39,7 +39,7 @@ def LoginFormView(request):
             password = form.cleaned_data.get("password")
             user = authenticate(
                 request, email=email, password=password
-            )  # Authenticate with email
+            )  
 
             if user is not None:
                 if user.is_active:  # Check if the user is active
@@ -1776,15 +1776,22 @@ class cms_contactpage(LoginRequiredMixin, View):
 
     def get(self, request):
         
+        dataFilter = cms_pages.objects.get(name_en = "Contacts")
+        
+        context = {
+            'data':dataFilter,
+        }
+        
         return render(
             request,
             self.template_name,
-            
+            context
         )
         
 @csrf_exempt
 def savecontactpage(request):
         try:
+            
             if request.method == "POST":
                 #text
                 heading_title_en  = request.POST.get('heading_title_en')
@@ -1800,19 +1807,141 @@ def savecontactpage(request):
                 sub_heading_name_en= request.POST.get('sub_heading_name_en')
                 sub_heading_name_ar= request.POST.get('sub_heading_name_ar')
                 sub_heading_title_2_en = request.POST.get('sub_heading_title_2_en')
-                sub_heading_title_2_ar = request.POST.get('sub_heading_title_2_ar')
+                sub_heading_title_2_ar = request.POST.get('sub_heading_title_2_ar') 
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                
+                #images
+                dom = "Done"
+                imageName = []
 
 
                 
+                try:
+                    contactussave = cms_pages.objects.get(name_en = "Contacts")
 
 
+                    if 'banner' in request.FILES:
+                        print("yes")
+                        
+                        heading_banner = request.FILES.get('banner',None)
+                        if heading_banner:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_banner.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in heading_banner.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(heading_banner.name)
+                                        contactussave.heading_banner = heading_banner
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass            
+                               
+                    if 'mailicon' in request.FILES:
+                        
+
+                            try:
+                                mailicon = request.FILES.get('mailicon',None)
+
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', mailicon.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in  mailicon.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(mailicon.name)
+                                        contactussave.sub_section_2_1_icon = mailicon
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass               
+                    
+                    
+                    
+                    
                 
+                    
+                     
+                    
+                    if 'phoneicon' in request.FILES:
+
+                        try:
+                            phoneicon = request.FILES.get('phoneicon',None)
+
+                            save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', phoneicon.name)
+                            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                            # Save the file
+                            with open(save_path, 'wb+') as destination:
+                                for chunk in phoneicon.chunks():
+                                    destination.write(chunk)
+                                    imageName.append(phoneicon.name)
+                                    contactussave.sub_section_2_2_icon = phoneicon
+                        except Exception as e:
+                            dom = str(e)   
+                    else:
+                        pass                    
+                            
+                        
+                        #section 1
+                    contactussave.heading_title_en = heading_title_en
+                    contactussave.heading_title_ar = heading_title_ar
+                    contactussave.heading_content_en = heading_content_en
+                    contactussave.heading_content_ar = heading_content_ar
+                    #contactussave.heading_banner = heading_banner
+                        
+                        #section 2 
+                    contactussave.section_2_heading_en = sub_heading_title_en
+                    contactussave.section_2_heading_ar = sub_heading_title_ar
+                    contactussave.section_2_title_en = sub_heading_sub_title_en
+                    contactussave.section_2_title_ar = sub_heading_sub_title_ar
+                        #section 2 country_name
+                    contactussave.section_2_country_name_en = country_name_en
+                    contactussave.section_2_country_name_ar = country_name_ar
+
+                        #section 2 mailicon and phoneicon
+                    #contactussave.sub_section_2_1_icon = mailicon
+                    #contactussave.sub_section_2_2_icon = phoneicon
+
+                        #section 3 
+                    contactussave.section_3_heading_en = sub_heading_name_en
+                    contactussave.section_3_heading_ar = sub_heading_name_ar
+                    contactussave.section_3_title_en  = sub_heading_title_2_en
+                    contactussave.section_3_title_ar = sub_heading_title_2_ar
+                        
+                        #seo data
+                    contactussave.meta_title_en = seo_title_en
+                    contactussave.meta_title_ar = seo_title_ar
+                    contactussave.meta_content_en = seo_content_en
+                    contactussave.meta_content_ar = seo_content_ar
+                        
+                    contactussave.save()
+                    dom = "True"
+                    
+                    messages.success(request, "Contact Page Updated Successfully")
+                    #return redirect("cms_contactpage")
                 
+                except Exception as e:
+                    messages.error(request,"Error Saving!")      
+                        
+                    
+                    
+                      
+                        
+                        
                 response_data = {
                         'status': 'success',
                         'message': 'Data and uploaded successfully',
-                        'heading_title_en': ''
-                    }
+                        'heading_title_en': dom                    }
                 
                 return JsonResponse(response_data)
 
@@ -1884,8 +2013,8 @@ def saveAboutUspage(request):
                return JsonResponse(response_data) 
 
 #cms_about_page     
-class cms_FAQPage(LoginRequiredMixin, View):
-    template_name = "Admin/cmspages/FAQ.html"
+class cms_newsPage(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/news.html"
 
     def get(self, request):
         
@@ -1896,7 +2025,7 @@ class cms_FAQPage(LoginRequiredMixin, View):
         )
               
 @csrf_exempt
-def saveFAQpage(request):
+def savenewspage(request):
         try:
             if request.method == "POST":
                 #text
@@ -1970,9 +2099,16 @@ class cms_termcondition(LoginRequiredMixin, View):
 
     def get(self, request):
         
+        dataFilter = cms_pages.objects.get(name_en = "Terms & Condition")
+        
+        context = {
+            'data':dataFilter
+        }
+        
         return render(
             request,
             self.template_name,
+            context
             
     )
         
@@ -1982,17 +2118,17 @@ def savetermconditionpage(request):
             if request.method == "POST":
                 saving_error = "None"
                 #text
-                tc_title_en  = request.POST.get('tc_title_en')
-                tc_title_ar  = request.POST.get('tc_title_ar')
-                tc_content_en  = request.POST.get('tc_content_en')
-                tc_content_ar  = request.POST.get('tc_content_ar')
-                seo_title_en  = request.POST.get('seo_title_en')
-                seo_title_ar  = request.POST.get('seo_title_ar')
-                seo_content_en  = request.POST.get('seo_content_en')
-                seo_content_ar  = request.POST.get('seo_content_ar')
+                tc_title_en  = request.POST.get('tc-title-en')
+                tc_title_ar  = request.POST.get('tc-title-ar')
+                tc_content_en  = request.POST.get('tc-content-en')
+                tc_content_ar  = request.POST.get('tc-content-ar')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
                 
                 try:
-                    termcondition = cms_pages.objects.get(id='11')
+                    termcondition = cms_pages.objects.get(name_en = "Terms & Condition")
                     termcondition.heading_title_en = tc_title_en
                     termcondition.heading_title_ar = tc_title_ar
                     termcondition.heading_content_en = tc_content_en
@@ -2035,24 +2171,149 @@ class cms_privacypolicy(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/privacypolicy.html"
 
     def get(self, request):
+        dataFilter = cms_pages.objects.get(name_en="Privacy Policy")
         
+        context ={
+            'data': dataFilter
+        }
         return render(
             request,
             self.template_name,
+            context
             
     )
+@csrf_exempt
+def saveprivacypolicypage(request):
+        
+        try:
+            if request.method == "POST":
+                saving_error = "None"
+                #text
+                pp_title_en  = request.POST.get('tc-title-en')
+                pp_title_ar  = request.POST.get('tc-title-ar')
+                pp_content_en  = request.POST.get('tc-content-en')
+                pp_content_ar  = request.POST.get('tc-content-ar')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                try:
+                    privacypolicy = cms_pages.objects.get(name_en = "Privacy Policy")
+                    privacypolicy.heading_title_en = pp_title_en
+                    privacypolicy.heading_title_ar = pp_title_ar
+                    privacypolicy.heading_content_en = pp_content_en
+                    privacypolicy.heading_content_ar = pp_content_ar
+                    privacypolicy.meta_title_en = seo_title_en
+                    privacypolicy.meta_title_ar = seo_title_ar
+                    privacypolicy.meta_content_en = seo_content_en
+                    privacypolicy.meta_content_ar = seo_content_ar
+                     
+                    privacypolicy.save()
 
+                    response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'data':privacypolicy.heading_title_en,
+                        }
+                    return JsonResponse(response_data)
+
+                except Exception as e:
+                    saving_error = str(e)
+                    
+            
+                    response_data = {
+                            'status': 'success',
+                            'message': saving_error,
+                    }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+               
 #cms term and service  
 class cms_termandserice(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/term&service.html"
 
     def get(self, request):
         
+        dataFilter = cms_pages.objects.get(name_en='Terms of Services')
+        
+        context = {
+            'data':dataFilter,
+        }
+        dataFilter.meta_title_en
+        print(dataFilter.heading_title_en)
         return render(
             request,
             self.template_name,
+            context
             
-    )    
+    ) 
+        
+#save term and condition        
+@csrf_exempt
+def savetermservicepage(request):
+        
+        try:
+            if request.method == "POST":
+                saving_error = "None"
+                
+                #text
+                ts_title_en  = request.POST.get('ts-title-en')
+                ts_title_ar  = request.POST.get('ts-title-ar')
+                ts_content_en  = request.POST.get('ts-content-en')
+                ts_content_ar  = request.POST.get('ts-content-ar')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                try:
+                    termservice = cms_pages.objects.get(name_en = "Terms of Services")
+                    termservice.heading_title_en = ts_title_en
+                    termservice.heading_title_ar = ts_title_ar
+                    termservice.heading_content_en = ts_content_en
+                    termservice.heading_content_ar = ts_content_ar
+                    termservice.meta_title_en = seo_title_en
+                    termservice.meta_title_ar = seo_title_ar
+                    termservice.meta_content_en = seo_content_en
+                    termservice.meta_content_ar = seo_content_ar
+                     
+                    termservice.save()
+
+                    response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'data':termservice.heading_title_en,
+                        }
+                    return JsonResponse(response_data)
+
+                except Exception as e:
+                    saving_error = str(e)
+                    
+            
+                    response_data = {
+                            'status': 'success',
+                            'message': saving_error,
+                    }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+                   
         
 #cms news detail  
 class cms_newsdetail(LoginRequiredMixin, View):
@@ -2065,7 +2326,7 @@ class cms_newsdetail(LoginRequiredMixin, View):
             self.template_name,
             
     )   
-#cms descovery page 
+#cms descovery page
 class cms_discoverypage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/discovery.html"
 
@@ -2075,4 +2336,27 @@ class cms_discoverypage(LoginRequiredMixin, View):
             request,
             self.template_name,
             
-    )                     
+    )  
+#cms Advertise page
+class cms_advertisepage(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/advertise.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )                                 
+
+#home page
+class cms_homepage(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/home.html"
+
+    def get(self, request):
+        
+        return render(
+            request,
+            self.template_name,
+            
+    )              

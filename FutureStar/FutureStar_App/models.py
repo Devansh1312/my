@@ -403,9 +403,14 @@ class cms_pages(models.Model):
     section_2_title_ar = models.CharField(max_length=100,blank=True,null=True)
     section_2_content_en = models.TextField(max_length=100,blank=True,null=True)
     section_2_content_ar = models.TextField(max_length=100,blank=True,null=True)
-    section_2_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    section_2_logo = models.CharField(max_length=100,blank=True,null=True)
+
+    #section_2_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     section_2_images = models.CharField(max_length=255,blank=True,null=True)
     
+    section_2_country_name_en = models.CharField(max_length=100,blank=True,null=True)
+    section_2_country_name_ar = models.CharField(max_length=100,blank=True,null=True)
+
     sub_section_2_title_1_en = models.CharField(max_length=100,blank=True,null=True)
     sub_section_2_title_1_ar = models.CharField(max_length=100,blank=True,null=True)
     sub_section_2_content_1_en = models.TextField(blank =True,null=True)
@@ -538,8 +543,26 @@ class cms_dicovery_dynamic_view(models.Model):
     title = models.CharField(max_length=255,blank=True,null=True)
     content = models.TextField(blank=True,null=True)
     
+    
+    
+
     def __str__(self):
         return self.title
     
-    class Meta:
-        db_table = 'futurestar_app_cms_dicovery_dynamic_view'
+class cms_dicovery_dynamic_image(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
+    def __str__(self):
+        return self.images   
+
+class cms_advertise_dynamic_field(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255,blank=True,null=True)
+    content = models.TextField(blank=True,null=True)
+    images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
+    class Meta():
+        db_table = "futureStar_app_cms_advertise_dynamic_field"      

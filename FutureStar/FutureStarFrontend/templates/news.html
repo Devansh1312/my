@@ -7,7 +7,9 @@
 
 <!-- Plugins css Ends-->
 {% endblock %}
+
 {% block title %} Future Star || News{% endblock %}
+
 {% block content %}
 
 <!-- Page Banner Start -->
@@ -21,6 +23,15 @@
 </section>
 <!-- Page Banner End -->
 
+<!-- Language Switcher -->
+<!-- <form id="language-form" method="POST" action="">
+    {% csrf_token %}
+    <select id="language-selector" name="language">
+        <option style="color: black;" value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
+        <option style="color: black;" value="ar" {% if current_language == 'ar' %}selected{% endif %}>Arabic</option>
+    </select>
+    <button type="submit" id="change-language-btn">Change Language</button>
+</form> -->
 
 <!-- Blog Page Area start -->
 <section class="blog-page-area py-130 rpy-100 rel z-1">
@@ -34,11 +45,19 @@
                     </div>
                     <ul class="blog-meta">
                         <li>
-                            <i class="far fa-calendar-alt"></i>                                    
+                            <i class="far fa-calendar-alt"></i>                                 
                             <span>{{ news.news_date }}</span>
                         </li>
                     </ul>
-                    <h4><a class="read-more" href="#" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">{{ news.title_en }}</a></h4>
+                    <h4>
+                        <a class="read-more" href="#" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                           {% if current_language == "ar" %}
+                           {{ news.description_ar }}
+                           {% else %}
+                           {{ news.description_en }}
+                           {% endif %}
+                        </a>
+                    </h4>
                     <a class="read-more" href="#" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                         Read More <i class="far fa-arrow-right"></i>
                     </a>
@@ -98,8 +117,21 @@
 {% endblock %}
 
 {% block scriptcontent %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default language from localStorage or 'en' by default
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
 
+        // On language change, update localStorage
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
 {% endblock %}
+
 {% block script %} 
 <script>new WOW().init();</script>
 {% endblock %}

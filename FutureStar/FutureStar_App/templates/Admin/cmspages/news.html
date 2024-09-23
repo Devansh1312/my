@@ -8,7 +8,7 @@
 <!-- Plugins css Ends-->
 
 {% endblock %}
-{% block title %}FAQ Page Edit{% endblock %}
+{% block title %}News Page Edit{% endblock %}
 
 {% block content %}
 {% include "components/loader.html" %}
@@ -21,7 +21,7 @@
                 {% csrf_token %}
                 <div class="card-body">
                     <div>
-                        <h1 style="font-size:25px">CMS FAQ Page Edit</h1>
+                        <h1 style="font-size:25px">CMS News Page Edit</h1>
                     </div>    
 
                     <p id="heading-error"></p>
@@ -90,8 +90,47 @@
                         </div>
                         <p id = "banner-warning"></p>
                     </div>
+<br>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>SEO Section</h4>
+                    </div>
 
-                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title-en">SEO Title (English)</label>
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
+                               
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                               
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-en">SEO Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+
+                            </div>
+                        </div>
+                    </div>
+
                    
                 </div>
                 <div class="card-footer text-end">
@@ -266,7 +305,7 @@
                     formData.append('heading_banner',heading_banner_1);
 
 
-                    fetch("/saveFAQedit/", {
+                    fetch("/savenewsedit/", {
                         method: 'POST',
                         body: formData,
                         headers: {

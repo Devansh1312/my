@@ -57,7 +57,7 @@
 
 <!-- Bootstrap JS (for dropdown functionality) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Player List{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends--> {% endblock %} {% block title %}CMS Page List{% endblock %} {% block content %} <div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
@@ -158,128 +158,13 @@
    </div>
 </div>
 <!-- Delete User Modal -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title" id="deleteUserModalLabel">Delete Player</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body">
-            <form method="post" id="deleteUserForm"> {% csrf_token %} <input type="hidden" id="deleteUserId" name="id">
-               <p>Are you sure you want to delete this user?</p>
-               <button type="submit" class="btn btn-danger">Delete User</button>
-            </form>
-         </div>
-      </div>
-   </div>
+
 </div> {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <!-- Plugins JS Ends-->
-<script>
-   document.addEventListener('DOMContentLoaded', function() {
-      // Edit button click handler
-      document.querySelectorAll('.edit').forEach(function(button) {
-         button.addEventListener('click', function(e) {
-            e.preventDefault();
-            var userId = this.getAttribute('data-id');
-            // Fetch user details
-            fetch('/users/' + userId + '/edit/').then(response => response.json()).then(data => {
-               document.getElementById('user_id').value = data.id;
-               document.getElementById('first_name').value = data.first_name;
-               document.getElementById('last_name').value = data.last_name;
-               document.getElementById('email').value = data.email;
-               document.getElementById('phone').value = data.phone;
-               // Set selected role
-               var roleSelect = document.getElementById('role');
-               roleSelect.value = data.role || '';
-               // Show modal using Bootstrap
-               $('#editUserModal').modal('show');
-            });
-         });
-      });
-      // Edit user form submit with validation error handling
-      document.getElementById('editUserForm').addEventListener('submit', function(e) {
-         e.preventDefault();
-         var formData = new FormData(this);
-         fetch('/users/' + document.getElementById('user_id').value + '/update/', {
-            method: 'POST',
-            body: formData
-         }).then(response => response.json()).then(data => {
-            if (data.success) {
-               location.reload(); // Reload the page to see changes
-            } else {
-               // Clear previous errors
-               document.querySelectorAll('.text-danger').forEach(function(el) {
-                  el.textContent = '';
-               });
-               // Display errors
-               if (data.errors.first_name) {
-                  document.getElementById('first_name_error').textContent = data.errors.first_name;
-               }
-               if (data.errors.last_name) {
-                  document.getElementById('last_name_error').textContent = data.errors.last_name;
-               }
-               if (data.errors.email) {
-                  document.getElementById('email_error').textContent = data.errors.email;
-               }
-               if (data.errors.phone) {
-                  document.getElementById('phone_error').textContent = data.errors.phone;
-               }
-               if (data.errors.role) {
-                  document.getElementById('role_error').textContent = data.errors.role;
-               }
-            }
-         });
-      });
-      // Delete button click handler
-      document.querySelectorAll('.delete').forEach(function(button) {
-         button.addEventListener('click', function(e) {
-            e.preventDefault();
-            var userId = this.getAttribute('data-id');
-            document.getElementById('deleteUserId').value = userId;
-            $('#deleteUserModal').modal('show');
-         });
-      });
-      // Delete user form submit
-      document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
-         e.preventDefault();
-         var formData = new FormData(this);
-         fetch('/users/' + document.getElementById('deleteUserId').value + '/delete/', {
-            method: 'POST',
-            body: formData
-         }).then(response => {
-            location.reload(); // Reload the page after deletion
-         });
-      });
-      // Toggle User Status
-      document.querySelectorAll('.toggle-status').forEach(function(button) {
-         button.addEventListener('click', function() {
-            var userId = button.getAttribute('data-user-id');
-            var status = button.getAttribute('data-status');
-            var url = "{% url 'user_toggle_status' pk='0' %}".replace('0', userId);
-            var form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
-            var csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = 'csrfmiddlewaretoken';
-            csrfToken.value = '{{ csrf_token }}';
-            form.appendChild(csrfToken);
-            var statusInput = document.createElement('input');
-            statusInput.type = 'hidden';
-            statusInput.name = 'status';
-            statusInput.value = status;
-            form.appendChild(statusInput);
-            document.body.appendChild(form);
-            form.submit();
-         });
-      });
-   });
-</script>
 <script>
    document.addEventListener('DOMContentLoaded', function() {
       // Toggle the visibility of the action card
@@ -337,7 +222,7 @@
    
    function cmsEditPage(name){
       if(name == "News"){
-         var  url = "{%url 'cms_faqpage' %}"
+         var  url = "{%url 'cms_newspage' %}"
 
 
          window.location.href = url;
@@ -362,7 +247,9 @@
       }
       else if(name == "Home"){
          
-         alert("empty")
+         var url = "{%url 'cms_homepage' %}"
+
+         window.location.href = url
       }
       else if(name == "Discover"){
          var url = "{%url 'cms_discoverypage' %}"
@@ -375,7 +262,9 @@
          window.location.href = url;
       }
       else if(name == "Advertise"){
-         alert("empty")
+         var url = "{%url 'cms_advertisepage' %}"
+
+         window.location.href = url;
       }
       else if(name == "Terms of Services"){
          var url = "{%url 'cms_termandservicepage' %}"

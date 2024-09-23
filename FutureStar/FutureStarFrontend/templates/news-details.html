@@ -30,7 +30,12 @@
                             <a href="#">Comment (5)</a>
                         </li>
                     </ul>
-                    <h2 class="page-title wow fadeInUp delay-0-3s">{{ news.title_en }}</h2>
+                    <h2 class="page-title wow fadeInUp delay-0-3s">{% if current_language == "ar" %}
+                        {{ news.title_ar }}
+                        {% else %}
+                        {{ news.title_en }}
+                        {% endif %}
+                    </h2>
                 </div>
             </div>
         </div>
@@ -38,7 +43,16 @@
 </section>
 <!-- Page Banner End -->
 
-
+<!-- Language Switcher
+<form id="language-form" method="POST" action="">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{ news.id }}">
+    <select id="language-selector" name="language">
+        <option style="color: black;" value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
+        <option style="color: black;" value="ar" {% if current_language == 'ar' %}selected{% endif %}>Arabic</option>
+    </select>
+    <button type="submit" id="change-language-btn">Change Language</button>
+</form> -->
 <!-- Blog Details Page Area start -->
 <section class="blog-details-page py-130 rpy-100 rel z-1">
     <div class="container container-1290">
@@ -48,7 +62,11 @@
                     <div class="image wow fadeInUp delay-0-2s">
                         <img class="news-details-img" src="{{ news.image.url }}" alt="News Details">
                     </div>
-                    <p class="big-first-letter">{{ news.description_en }}</p>
+                    <p class="big-first-letter">{% if current_language == "ar" %}
+                        {{ news.title_ar }}
+                        {% else %}
+                        {{ news.title_en }}
+                        {% endif %}</p>
                     <div class="row mt-50 pb-20">
                         <div class="col-md-6">
                             <div class="image mb-30 wow fadeInUp delay-0-2s">
@@ -72,7 +90,19 @@
 {% endblock %}
 
 {% block scriptcontent %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default language from localStorage or 'en' by default
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
 
+        // On language change, update localStorage
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
 {% endblock %}
 {% block script %} 
 <script>new WOW().init();</script>
