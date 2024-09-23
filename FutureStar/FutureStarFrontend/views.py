@@ -219,8 +219,19 @@ class ContactPage(View):
 class PrivacyPolicyPage(View):
     
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "privacy-policy.html")
+        try:
+            cmsdata = cms_pages.objects.get(id=10)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+
+        current_language = request.session.get('language', 'en')
+
+        context = {
+            "current_language": current_language,
+            "cmsdata": cmsdata,
+        } 
+        return render(request, "privacy-policy.html",context)
+    
     def post(self, request, *args, **kwargs):
         # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
@@ -234,7 +245,20 @@ class TermsofServicesPage(View):
     
     def get(self, request, *args, **kwargs):
         
-        return render(request, "terms-of-services.html")
+        try:
+            cmsdata = cms_pages.objects.get(id=9)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+            
+        current_language = request.session.get('language', 'en')
+
+        context = {
+            "current_language": current_language,
+            "cmsdata": cmsdata,
+        } 
+
+        return render(request, "terms-of-services.html",context)
+    
     def post(self, request, *args, **kwargs):
         # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
