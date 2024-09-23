@@ -7,13 +7,17 @@
 
 
 {% endblock %}
-<meta name="description" content="{% block meta_description %}Default description{% endblock %}">
+<meta name="{{data.meta_title_en}}" content="{% block meta_description %}{{data.meta_content_en}}{% endblock %}">
 
 {% block title %}Privacy Policy page Edit{% endblock %}
 
 {% block content %}
 {% include "components/loader.html" %}
-
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>  
 <div class="page-body">
     <div class="container-fluid">
         {% include "layouts/breadcrumb.html" %}
@@ -25,8 +29,13 @@
                         <h1 style="font-size:25px">CMS  Privacy Policy Page Edit</h1>
                     </div>    
 
-                    <p id="heading-error"></p>
+                    <p class = "erro-heading" id="heading-error"></p>
+                    <br>
 
+                    <div>
+                        <p id = "heading-warning"></p>
+                    </div>
+                    <br>
                     <br>
                     <div>
                         <p id = "heading-warning"></p>
@@ -42,16 +51,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="tc-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="tc-title-en" name="tc_title" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="tc-title-en" name="tc_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="tc-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="tc-title-ar" name="tc-title-ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="tc-title-ar" name="tc-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -64,7 +75,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="tc-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="tc-content-en" name="tc-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="tc-content-en" name="tc-content-en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-content-en"></p>
 
                             </div>
                         </div>
@@ -72,7 +84,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="tc-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="tc-content-ar" name="tc-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="tc-content-ar" name="tc-content-ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-content-ar"></p>
 
                             </div>
                         </div>
@@ -89,16 +102,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -107,7 +122,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_title_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
                         </div>
@@ -115,7 +131,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
                         </div>
@@ -134,7 +151,46 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="saveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Confirmation</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick = "return savethedata()" data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-secondary" onclick ="return closeConfirmationpopup()" data-dismiss="modal">Close</button>
 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="savesuccessmodel" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Confirmation</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body">
+                <p id="modalMessagesuccess"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="background-color:green" class="btn btn-secondary" onclick ="return SaveSuccessPopup()" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--javascript-->
 <script>
@@ -148,191 +204,177 @@
         window.location.href = url
         return false
 
-        
     }
-
-    function checkValidation(){
-        var validationcheckpoint
-
+    function sendData(){
         try{
-            var tc_title_en = document.getElementById("tc-title-en")
-            var tc_title_ar = document.getElementById("tc-title-ar")
-            var tc_content_en = document.getElementById("tc-content-en")
-            var tc_content_ar = document.getElementById("tc-content-ar")
-            var seo_title_en = document.getElementById("meta-title-en")
-            var seo_title_ar = document.getElementById("meta-title-ar")
-            var seo_content_en = document.getElementById("meta-content-en")
-            var seo_content_ar = document.getElementById("meta-content-ar")
-
-
-            if(tc_title_en.value == ""){
-            return validationcheckpoint = "error"
-            }
-            else if(tc_title_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_en.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(seo_title_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_title_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else{
-                return validationcheckpoint = "success"
-            }
+           
+            showModal()
+            return false
         }
         catch(err){
+
             alert(err)
+            return false
+
         }
-        
-        /*var heading_content_en = document.getElementById("heading-section-content-en")
-        var heading_content_ar = document.getElementById("heading-section-content-ar")
-        var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
-        var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
-        */
+    }
+    
 
+    function showModal() {
+        document.getElementById("modalMessage").innerText = "Do you really want to save the Updates?"
+        $('#saveConfirmationModal').modal('show');
+    }
+    
+    //success popup
+    function showSuccessModel() {
+        document.getElementById("modalMessagesuccess").innerText = "Save Successfully!"
         
-        
-        
+        $('#savesuccessmodel').modal('show');
+    }
+    
+
+    function  closeConfirmationpopup(){
+
+        document.getElementById("saveConfirmationModal")
+        $('#saveConfirmationModal').modal('hide');
 
 
+        return false
     }
 
-    function sendData(){
-        var validation = checkValidation()
-        
-        
-            
-           
-        
-      
-        if(validation == "success"){
+    function  SaveSuccessPopup(){
 
+        document.getElementById("modalMessagesuccess")
+        $('#savesuccessmodel').modal('hide');
+
+
+        return false
+
+    }
         
-            try{
 
-                //text
 
-                var tc_title_en = document.getElementById("tc-title-en")
-                var tc_title_ar = document.getElementById("tc-title-ar")
-                var tc_content_en = document.getElementById("tc-content-en")
-                var tc_content_ar = document.getElementById("tc-content-ar")
-                var seo_title_en = document.getElementById("meta-title-en")
-                var seo_title_ar = document.getElementById("meta-title-ar")
-                var seo_content_en = document.getElementById("meta-content-en")
-                var seo_content_ar = document.getElementById("meta-content-ar")
-                var missing_text = document.getElementById('heading-error')
+    
 
+    function savethedata(){
+ 
+              
                 try{
-                    const formData = new FormData();
-                    //text
-                    formData.append('tc_title_en', tc_title_en.value );
-                    formData.append('tc_title_ar', tc_title_ar.value );
-                    formData.append('tc_content_en', tc_content_en.value );
-                    formData.append('tc_content_ar', tc_content_ar.value );
-                    formData.append('seo_title_en', seo_title_en.value );
-                    formData.append('seo_title_ar', seo_title_ar.value );
-                    formData.append('seo_content_en', seo_content_en.value );
-                    formData.append('seo_content_ar', seo_content_ar.value );
+                    var tc_title_en = document.getElementById("tc-title-en")
+                    var tc_title_ar = document.getElementById("tc-title-ar")
+                    var tc_content_en = document.getElementById("tc-content-en")
+                    var tc_content_ar = document.getElementById("tc-content-ar")
+                    var seo_title_en = document.getElementById("meta-title-en")
+                    var seo_title_ar = document.getElementById("meta-title-ar")
+                    var seo_content_en = document.getElementById("meta-content-en")
+                    var seo_content_ar = document.getElementById("meta-content-ar")
+                    var missing_text = document.getElementById('heading-error')
 
-
-
-                    fetch("/savetermcondition/", {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': getCookie('csrftoken') 
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-
-                        if(missing_text.style.display != "none"){
-                            missing_text.style.display = "none"
-
-                        }
-
-                        
-                        
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
+                    var missing_text = document.getElementById('heading-error')
+                    var top_error = document.getElementById('heading-warning')
+    
+                    const form_data = [
+    
+                        { id: "tc-title-en", name: "Title (English)" },
+                        { id: "tc-title-ar", name: "Title (Arabic)" },
+                        { id: "tc-content-en", name: "Content (English)" },
+                        { id: "tc-content-ar", name: "Content (Arabic)" },
+                        { id: "meta-title-en", name: "SEO Title (English)" },
+                        { id: "meta-title-ar", name: "SEO Title (Arabic)" },
+                        { id: "meta-content-en", name: "SEO Content (English)" },
+                        { id: "meta-content-ar", name: "SEO Content (Arabic)" }
+    
+    
+                    ];
+    
+                    document.querySelectorAll('.error-message').forEach((msg) => {
+                        msg.style.display = 'none';
+                        msg.innerText = '';
                     });
+    
+                    top_error.innerText =""
+                    var sendData = "true"
 
-                    function getCookie(name) {
-                        let cookieValue = null;
-                        if (document.cookie && document.cookie !== '') {
-                            const cookies = document.cookie.split(';');
-                            for (let i = 0; i < cookies.length; i++) {
-                                const cookie = cookies[i].trim();
-                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                    break;
+                    for (const field of form_data) {
+                        const input = document.getElementById(field.id);
+                        const errorMsg = document.getElementById(`error-${field.id}`);
+                        document.getElementById("saveConfirmationModal")
+    
+                        if (!input.value.trim()) {
+                            
+                            errorMsg.innerText = `Please fill in ${field.name}.`;
+                            errorMsg.style.display = 'block'; 
+                            $('#saveConfirmationModal').modal('hide');
+                                
+                                top_error.innerText = "There Should be no empty Field"
+                                top_error.style.color = "red"
+    
+                                document.documentElement.scrollTop = 0
+                                sendData = "false"
+                                break;
+    
+                                
+                        }
+                       
+                    }
+
+                    if(sendData == "true"){
+                        const formData = new FormData();
+                        //text
+                       
+                        formData.append('tc-title-en', tc_title_en.value );
+                        formData.append('tc-title-ar', tc_title_ar.value );
+                        formData.append('tc-content-en', tc_content_en.value );
+                        formData.append('tc-content-ar', tc_content_ar.value );
+                        formData.append('meta-title-en', seo_title_en.value );
+                        formData.append('meta-title-ar', seo_title_ar.value );
+                        formData.append('meta-content-en', seo_content_en.value );
+                        formData.append('meta-content-ar', seo_content_ar.value );
+                        
+                        
+                        fetch("/saveprivacypolicypage/", {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')  // Include CSRF token
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Success:', data);
+                            $('#saveConfirmationModal').modal('hide');
+                            showSuccessModel()
+                            return false
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                    
+                   
+                        function getCookie(name) {
+                            let cookieValue = null;
+                            if (document.cookie && document.cookie !== '') {
+                                const cookies = document.cookie.split(';');
+                                for (let i = 0; i < cookies.length; i++) {
+                                    const cookie = cookies[i].trim();
+                                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                        break;
+                                    }
                                 }
                             }
+                            return cookieValue;
                         }
-                        return cookieValue;
+
+
                     }
-                return false
-
-                
-
                 }
                 catch(err){
-                
-                    alert(err);
-                    return false
-
-                }
-                
-                //console.log(country_name_ar.value)
-                
-                return false;
-            }
-            catch(err){
-
-                var  warning = document.getElementById('heading-error')
-
-                warning.innerText = err
-                warning.style.color = "red"
-
-                return false;
-            }
-                
-        }
-        else if(validation == "error"){
-
-            var missing_text = document.getElementById('heading-error')
-
-            
-            
-            
-            missing_text.style.display = 'block'
-            missing_text.innerText = "Fill the blank field!"
-            missing_text.style.color = "red"
-            window.scrollTo(0,0)
-            return false
-}
-            
-
-    }
-
+                                    alert("1:"+err);
+                                    return false
+                                }
+                            }
+     
     
 </script>
 {% endblock %}

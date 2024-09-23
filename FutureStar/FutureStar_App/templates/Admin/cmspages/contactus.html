@@ -8,6 +8,8 @@
 <!-- Plugins css Ends-->
 
 {% endblock %}
+<meta name="{{data.meta_title_en}}" content="{% block meta_description %}{{data.meta_content_en}}{% endblock %}">
+
 {% block title %}Contact Page Edit{% endblock %}
 
     
@@ -15,7 +17,11 @@
 {% block content %}
 
 {% include "components/loader.html" %}
-
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head> 
 <div class="page-body">
     <div class="container-fluid">
         {% include "layouts/breadcrumb.html" %}
@@ -27,6 +33,10 @@
                         <h1 style="font-size:25px">CMS Contact Page Edit</h1>
                     </div>    
                     <br>
+                    <p class = "erro-heading" id="heading-error"></p>
+
+
+                    <br>
                     <div>
                         <p id = "heading-warning"></p>
                     </div>
@@ -35,21 +45,24 @@
                     </div>
                     <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
                     <!--heading-->
-                        
+                    <input type="hidden" id="editRoleId" name="id">
+
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="" placeholder="Heading Title (English)">
-                               
+                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="{{data.heading_title_en }}" placeholder="Heading Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="" placeholder="Heading Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="{{data.heading_title_ar }}" placeholder="Heading Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -59,15 +72,17 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-content">Heading content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content" type="text" value="" placeholder="Heading content (English)"></textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content" type="text" value="{{data.heading_content_en}}" placeholder="Heading content (English)">{{data.heading_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-content-arabic">Heading content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text" value="" placeholder="Heading content (Arabic)"></textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text" value="{{data.heading_content_ar}}" placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-ar"></p>
 
 
                                
@@ -79,19 +94,25 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-banner">Heading banner </label>
-                                <input class="form-control btn-pill" id="heading-section-banner" name="heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="heading-section-banner" name="heading_section_banner" type="file" value = "/media/{{data.heading_banner}}" onchange= "displayImageBanner(event)" accept="image/.jpg, .png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
+                                
 
-                                <img id="selected-banner" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display: block; width: 200px; height: 50px;" />
+
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-banner"></p>
 
                             </div>
+
                         </div>
+
                         <p id = "banner-warning"></p>
                     </div>
+                    <br>
                     <div class="row" style="margin-bottom: 10px;">
-                        <h4>Sub Section - 1</h4>
+                        <h4>Contact Us</h4>
                     </div>
                     <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>                    
                     <!-- sub section heading title-->
@@ -99,7 +120,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="sub-heading-title-en" name="sub_heading_title_en" type="text" value="" placeholder="Heading Title (English)">
+                                <input class="form-control btn-pill " id="sub-heading-title-en" name="sub_heading_title_en" type="text" value="{{data.section_2_heading_en}}" placeholder="Heading Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-title-en"></p>
 
                             </div>
                         </div>
@@ -107,7 +129,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-title-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill " id="sub-heading-title-ar" name="sub-heading_title_ar" type="text" value="" placeholder="Heading Title (English)">
+                                <input class="form-control btn-pill " id="sub-heading-title-ar" name="sub-heading_title_ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Heading Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-title-ar"></p>
 
 
                                
@@ -119,7 +142,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-sub-title-en">Sub Title (English)</label>
-                                <input class="form-control btn-pill " id="sub-heading-sub-title-en" name="sub_heading_sub_title_en" type="text" value="" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="sub-heading-sub-title-en" name="sub_heading_sub_title_en" type="text" value="{{data.section_2_title_en }}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-sub-title-en"></p>
 
                             </div>
                         </div>
@@ -127,7 +151,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-sub-title-ar">Sub Title (Arabic)</label>
-                                <input class="form-control btn-pill " id="sub-heading-sub-title-ar" name="sub-heading_sub_title_ar" type="text" value="" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="sub-heading-sub-title-ar" name="sub-heading_sub_title_ar" type="text" value="{{data.section_2_title_ar }}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-sub-title-ar"></p>
 
 
                                
@@ -139,7 +164,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-country-name-en">Country Name (English) </label>
-                                <input class="form-control btn-pill " id="sub-country-name-en" name="sub-country-name-en" type="text" value="" placeholder="Name (English)">
+                                <input class="form-control btn-pill " id="sub-country-name-en" name="sub-country-name-en" type="text" value="{{data.section_2_country_name_en}}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-country-name-en"></p>
 
                             </div>
                         </div>
@@ -147,7 +173,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-country-name-ar">Country Name (Arabic) </label>
-                                <input class="form-control btn-pill " id="sub-country-name-ar" name="sub-country-name-ar" type="text" value="" placeholder="Name (arabic)">
+                                <input class="form-control btn-pill " id="sub-country-name-ar" name="sub-country-name-ar" type="text" value="{{data.section_2_country_name_ar}}" placeholder="Name (arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-country-name-ar"></p>
 
                             </div>
                         </div>
@@ -157,13 +184,16 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-mail-icon">Mail Icon  </label>
-                                <input class="form-control btn-pill" id="sub-mail-icon" name="sub_mail_icon" type="file" onchange= "displayImageMail(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="sub-mail-icon" name="sub_mail_icon" type="file" onchange= "displayImageMail(event)" accept="image/.jpg,.png">
 
                                 <!--{% if system_settings.fav_icon %}-->
                                 <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-mail-icon" style="display: none; width: 35px; height: 35px;" />
+                                <img id="selected-mail-icon" src = "/media/{{data.sub_section_2_1_icon}}" style="display: block; width: 35px; height: 35px;" />
+                                  
+                                   
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-mail-icon"></p>
 
                             </div>
                         </div>
@@ -171,29 +201,31 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-phone-icon">Phone Icon </label>
-                                <input class="form-control btn-pill" id="sub-phone-icon" name="sub_phone_icon" type="file" onchange= "displayImagePhone(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="sub-phone-icon" name="sub_phone_icon" type="file" onchange= "displayImagePhone(event)" accept="image/.jpg,.png">
                                 <!--{% if system_settings.fav_icon %}-->
                                 <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
-
-                                <img id="selected-phone-icon" style="display: none; width: 35px; height: 35px;" />
+                                <img id="selected-phone-icon" src="/media/{{ data.sub_section_2_2_icon }}" style="display: block; width: 35px; height: 35px;" alt="Phone Icon" />
+                                                              
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-phone-icon"></p>
 
                             </div>
                         </div>
                         <p id = "icon-warning"></p>
 
                     </div>
-
+<br>
                     <!--sub-section-2-->
                     <div class="row" style="margin-bottom: 10px;">
-                        <h4>Sub Section - 2</h4>
+                        <h4>Get Free Quote</h4>
                     </div>
                     <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>                    
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-name-2">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="sub-heading-name-2-en" name="sub_heading_name_2" type="text" value="" placeholder="Heading Name (English)">
+                                <input class="form-control btn-pill " id="sub-heading-name-2-en" name="sub_heading_name_2" type="text" value="{{data.section_3_heading_en}}" placeholder="Heading Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-name-2-en"></p>
 
                                
                             </div>
@@ -202,7 +234,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-name-2-ar">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill " id="sub-heading-name-2-ar" name="sub_heading_name_2_ar" type="text" value="" placeholder="Heading name (Arabic)">
+                                <input class="form-control btn-pill " id="sub-heading-name-2-ar" name="sub_heading_name_2_ar" type="text" value="{{data.section_3_heading_ar}}" placeholder="Heading name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-name-2-ar"></p>
 
                     
                             </div>
@@ -213,7 +246,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-title-2">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="sub-heading-title-2-en" name="sub_heading_title_2" type="text" value="" placeholder="Heading Title (English)">
+                                <input class="form-control btn-pill " id="sub-heading-title-2-en" name="sub_heading_title_2" type="text" value="{{data.section_3_title_en }}" placeholder="Heading Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-title-2-en"></p>
 
                                
                             </div>
@@ -222,24 +256,113 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-title-2-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill " id="sub-heading-title-2-ar" name="sub_heading_title_2_ar" type="text" value="" placeholder="Heading Title (Arabic)">
+                                <input class="form-control btn-pill " id="sub-heading-title-2-ar" name="sub_heading_title_2_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Heading Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-title-2-ar"></p>
 
                     
                             </div>
                         </div>
                     </div>
+<br>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>SEO Section</h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title-en">SEO Title (English)</label>
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-en">SEO Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
 
                     
                    
                 </div>
                 <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
                     <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<!--<div class="modal fade" id="saveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Confirmation</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick = "return savethedata()" data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-secondary" onclick ="return closeConfirmationpopup()" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="savesuccessmodel" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Confirmation</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessagesuccess"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="background-color:green" class="btn btn-secondary" onclick ="return SaveSuccessPopup()" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>-->
+
 
 <!--javascript-->
 <script>
@@ -344,6 +467,58 @@
 
     function sendData(){
         try{
+           
+            showModal()
+            return false
+        }
+        catch(err){
+
+            alert(err)
+            return false
+
+        }
+    }
+    /*function showModal() {
+        document.getElementById("modalMessage").innerText = "Do you really want to save the Updates?"
+        $('#saveConfirmationModal').modal('show');
+    }
+
+
+        function  closeConfirmationpopup(){
+
+            document.getElementById("saveConfirmationModal")
+            $('#saveConfirmationModal').modal('hide');
+    
+    
+            return false
+        }*/
+        
+        
+
+    /*function showSuccessModel() {
+            document.getElementById("modalMessagesuccess").innerText = "Save Successfully!"
+            document.getElementById("modalMessagesuccess").style.color  = "green"
+            $('#savesuccessmodel').modal('show');
+    }
+
+    function showErrorModel() {
+        document.getElementById("modalMessagesuccess").innerText = "Error Occur!"
+        document.getElementById("modalMessagesuccess").style.color  = "red"
+        $('#savesuccessmodel').modal('show');
+}*/
+    
+    /*function  SaveSuccessPopup(){
+
+        document.getElementById("modalMessagesuccess")
+        $('#savesuccessmodel').modal('hide');
+
+
+        return false
+
+    }*/
+    function savethedata(){
+        try{
+
             //text
             var heading_title_en  = document.getElementById("heading-section-title-en")
             var heading_title_ar = document.getElementById("heading-section-title-ar")
@@ -360,19 +535,96 @@
             var sub_heading_name_ar  = document.getElementById("sub-heading-name-2-ar")
             var sub_heading_title_2_en  = document.getElementById("sub-heading-title-2-en")
             var sub_heading_title_2_ar  = document.getElementById("sub-heading-title-2-ar")
-
-
-
+            var seo_title_en = document.getElementById("meta-title-en")
+            var seo_title_ar = document.getElementById("meta-title-ar")
+            var seo_content_en = document.getElementById("meta-content-en")
+            var seo_content_ar = document.getElementById("meta-content-ar")
+            var top_error = document.getElementById('heading-warning')
+            var missing_text = document.getElementById('heading-error')
             //image
             var heading_banner = document.getElementById("heading-section-banner")
             var mail_icon = document.getElementById("sub-mail-icon")
             var phone_icon = document.getElementById("sub-phone-icon")
 
+            //existing banner image
+            var exisiting_heading_banner = document.getElementById("selected-banner")
+
             var banner = heading_banner.files[0]
             var mailicon = mail_icon.files[0]
             var phoneicon = phone_icon.files[0]
 
+            
+
+            const form_data = [
+            { id: "heading-section-title-en", name: "Title (English)" },
+            { id: "heading-section-title-ar", name: "Title (Arabic)" },
+            { id: "heading-section-content-en", name: "Content (English)" },
+            { id: "heading-section-content-ar", name: "Content (Arabic)" },
+            { id: "sub-heading-title-en", name: "Title (English)" },
+            { id: "sub-heading-title-ar", name: "Title (Arabic)" },
+            { id: "sub-heading-sub-title-en", name: "Title (English)" },
+            { id: "sub-heading-sub-title-ar", name: "Title (Arabic)" },
+            { id: "sub-country-name-en", name: "Country  (English)" },
+            { id: "sub-country-name-ar", name: "Country  (Arabic)" },
+            { id: "sub-heading-name-2-en", name: "Heading (English)" },
+            { id: "sub-heading-name-2-ar", name: "Heading (Arabic)" },
+            { id: "sub-heading-title-2-en", name: "Title (English)" },
+            { id: "sub-heading-title-2-ar", name: "Title (Arabic)" },
+            { id: "meta-title-en", name: "SEO Title (English)" },
+            { id: "meta-title-ar", name: "SEO Title (Arabic)" },
+            { id: "meta-content-en", name: "SEO Content (English)" },
+            { id: "meta-content-ar", name: "SEO Content (Arabic)" }
+
+            ];
+
+
+                document.querySelectorAll('.error-message').forEach((msg) => {
+                msg.style.display = 'none';
+                msg.innerText = '';
+            });
+
+            top_error.innerText =""
+
+            var sendData = "true"
             try{
+                for (const field of form_data) {
+                const input = document.getElementById(field.id);
+                const errorMsg = document.getElementById(`error-${field.id}`);
+                //document.getElementById("saveConfirmationModal")
+
+                if (!input.value.trim()) {
+                    try{
+
+                    alert("helo")
+                    errorMsg.innerText = `Please fill in ${field.name}.`;
+                    errorMsg.style.display = 'block'; 
+                    //$('#saveConfirmationModal').modal('hide');
+                        
+                        top_error.innerText = "There Should be no empty Field"
+                        top_error.style.color = "red"
+
+                        document.documentElement.scrollTop = 0;
+                        //document.documentElement.scrollTop = 0
+
+                        sendData = "false"
+                        break;
+                    }
+                    catch(err){
+                        alert(err)
+                        return false
+                    }
+                        
+                }
+            }
+
+            }
+            catch(err){
+                alert(err)
+                return false
+            }
+            
+
+            if(sendData == 'true'){
                 const formData = new FormData();
                 //text
                 formData.append('heading_title_en', heading_title_en.value );
@@ -390,12 +642,38 @@
                 formData.append('sub_heading_name_ar',sub_heading_name_ar.value);
                 formData.append('sub_heading_title_2_en',sub_heading_title_2_en.value);
                 formData.append('sub_heading_title_2_ar',sub_heading_title_2_ar.value);
+                formData.append('meta-title-en',seo_title_en.value);
+                formData.append('meta-title-ar',seo_title_ar.value);
+                formData.append('meta-content-en',seo_content_en.value);
+                formData.append('meta-content-ar',seo_content_ar.value);
 
                 //images
-                console.log(banner)
-                formData.append('banner',banner);
+                //formData.append('banner',banner);
+                formData.append('mailicon',mailicon);
+                formData.append('phoneicon',phoneicon);
+                if (heading_banner .files.length > 0) {
+                        formData.append('banner', banner);
+                } 
+                    else {
+                        console.log("already have image")
+                    }
 
+                if (mail_icon .files.length > 0) {
+                        formData.append('mailicon', mailicon);
+                } 
+                else {
+                        console.log("already have image")
+                }    
 
+                if (phone_icon .files.length > 0) {
+                        formData.append('phoneicon', phoneicon);
+                } 
+                else {
+                        console.log("already have image")
+                }    
+
+                
+                    
                 fetch("/savecontactedit/", {
                     method: 'POST',
                     body: formData,
@@ -406,9 +684,13 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
+                    location.reload()
+                    return false
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                    return false
+
                 });
 
                 function getCookie(name) {
@@ -426,25 +708,15 @@
                     return cookieValue;
                 }
 
-                return false
             }
-            catch(err){
-            
-                alert(err);
-                return false
-
-            }
+        
             
             //console.log(country_name_ar.value)
-            
-            return false;
+            return false
 
         }
         catch(err){
-            var  warning = document.getElementById('heading-warning')
-
-            warning.value = err
-
+            alert("1: "+err)
             return false;
         }
         

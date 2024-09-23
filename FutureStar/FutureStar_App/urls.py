@@ -105,17 +105,22 @@ urlpatterns = [
     path('aboutus/',cms_aboutpage.as_view(),name="cms_aboutpage"),
     path('saveaboutusedit/',saveAboutUspage,name="saveaboutuspage"),
     
-    path('FAQ/',cms_FAQPage.as_view(),name="cms_faqpage"),
-    path('saveFAQedit/',saveFAQpage,name="savefaqpage"),
+    path('FAQ/',cms_newsPage.as_view(),name="cms_newspage"),
+    path('saveFAQedit/',savenewspage,name="savenewspage"),
     
     path('successStory/',cms_successStory.as_view(),name="cms_successStorypage"),
     path('saveSuccessStory/',saveSucessStorypage,name = "saveSucessStorypage"),
     
     #privacypolicy
     path('privacypolicy/',cms_privacypolicy.as_view(),name = "cms_privacypolicypage"),
-    
+    path('saveprivacypolicypage/',saveprivacypolicypage,name = "saveprivacypolicypage"),
+
     #termandservice
     path('termandservice/',cms_termandserice.as_view(),name = "cms_termandservicepage"),
+    path('savetermservicepage/',savetermservicepage,name="cms_saveterservicepage"),
+    #termconditionpage
+    path('termcondition/',cms_termcondition.as_view(),name="termcondition"),
+    path('savetermcondition/',savetermconditionpage,name="savetermconditionpage"),
     
     #newsdetail
     path('cms_newsdetail/',cms_newsdetail.as_view(),name = "cms_newsdetail"),
@@ -126,6 +131,8 @@ urlpatterns = [
     #cms_advertisepage
     path('cms_advertisepage/',cms_advertisepage.as_view(),name = "cms_advertisepage"),
 
+    #cms home page
+    path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
     #News List URL
     path('news_list/', NewsListView.as_view(), name='news_list'),
     path('news_list/create/', NewsCreateView.as_view(), name='news_create'),
@@ -177,8 +184,6 @@ urlpatterns = [
     path('slider_content/update/<int:pk>/', Slider_ContentUpdateView.as_view(), name='slider_content_update'),
     path('slider_content/delete/<int:pk>/', Slider_ContentDeleteView.as_view(), name='slider_content_delete'),
 
-    path('termcondition/',cms_termcondition.as_view(),name="termcondition"),
-    path('savetermcondition/',savetermconditionpage,name="savetermconditionpage"),
-    
+   
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
