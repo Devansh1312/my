@@ -23,13 +23,15 @@
                     <div>
                         <h1 style="font-size:25px">CMS About-Us Page Edit</h1>
                     </div>    
+                    <br>
+                    <p class = "erro-heading" id="heading-error"></p>
 
-                    <p id="heading-error"></p>
 
                     <br>
                     <div>
                         <p id = "heading-warning"></p>
                     </div>
+                    
                     <div class="row" style="margin-bottom: 10px;">
                         <h4>Heading Section</h4>
                     </div>
@@ -40,7 +42,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="1" placeholder="Heading Title (English)">
+                                <input class="form-control btn-pill " id="heading-section-title-en" name="heading_section_title" type="text" value="{{data.heading_title_en}}" placeholder="Heading Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-title-en"></p>
 
                             </div>
@@ -49,7 +51,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="1" placeholder="Heading Title (Arabic)">
+                                <input class="form-control btn-pill" id="heading-section-title-ar" name="heading_section_title" type="text" value="{{data.heading_title_ar}}" placeholder="Heading Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-title-ar"></p>
 
                             </div>
@@ -60,11 +62,11 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label" for="heading-section-video">Heading Video (English)</label>
+                                <label class="form-label" for="heading-section-video">Heading Video </label>
                                 <input class="form-control btn-pill" id="heading-section-video" name="heading_section_video" type="file"  onchange= "displayVideo(event)" accept="Video/*">
 
                                 <video id = "heading-video-id" height="100" width="300" controls>
-                                    <source id="heading-section-video-src" type="video/mp4">
+                                    <source id="heading-section-video-src" src="/media/{{data.heading_video}}" type="video/mp4">
 
                                 </video>
                             </div>
@@ -78,7 +80,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-content">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content_ar" type="text" placeholder="Heading content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-en" name="heading_section_content_ar" type="text" placeholder="Heading content (Arabic)">{{data.heading_content_en}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-en"></p>
 
                             </div>
@@ -87,7 +89,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-ar"></p>
 
                             </div>
@@ -98,7 +100,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-year">Heading Year (English)</label>
-                                <input class="form-control btn-pill " id="heading-section-year-en" name="heading_section_year_en" type="text" value="1" placeholder="Year (English)">
+                                <input class="form-control btn-pill " id="heading-section-year-en" name="heading_section_year_en" type="text" value="{{data.heading_year_title_en}}" placeholder="Year (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-year-en"></p>
 
                             </div>
@@ -107,7 +109,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-year">Heading Year (Arabic)</label>
-                                <input class="form-control btn-pill " id="heading-section-year-ar" name="heading_section_year_ar" type="text" value="1" placeholder="Year (Arabic)">
+                                <input class="form-control btn-pill " id="heading-section-year-ar" name="heading_section_year_ar" type="text" value="{{data.heading_year_title_ar}}" placeholder="Year (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-year-ar"></p>
 
                             </div>
@@ -123,7 +125,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-en">Heading  (English)</label>
-                                <input class="form-control btn-pill " id="sub-heading-en" name="sub_heading_en" type="text" value="1" placeholder="Heading  (English)">
+                                <input class="form-control btn-pill " id="sub-heading-en" name="sub_heading_en" type="text" value="{{data.section_2_heading_en}}" placeholder="Heading  (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-en"></p>
 
                             </div>
@@ -132,7 +134,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="sub-heading-ar">Heading (Arabic)</label>
-                                <input class="form-control btn-pill " id="sub-heading-ar" name="sub-heading_ar" type="text" value="1" placeholder="Heading  (Arabic)">
+                                <input class="form-control btn-pill " id="sub-heading-ar" name="sub-heading_ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Heading  (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-sub-heading-ar"></p>
 
 
@@ -145,7 +147,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="section-title-en" name="section-title-en" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="section-title-en" name="section-title-en" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-section-title-en"></p>
 
                             </div>
@@ -154,7 +156,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill " id="section-title-ar" name="section-title-ar" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill " id="section-title-ar" name="section-title-ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-section-title-ar"></p>
 
 
@@ -180,7 +182,7 @@
                                 <input class="form-control btn-pill" id="testimonal-image" name="testimonal_image" type="file" onchange="return displayImageTestimonial(event)" accept="image/*">
                                
 
-                                <img id="selected-testimonal-image" style="display: none; width: 200px; height: 200px;" />
+                                <img id="selected-testimonal-image" src ="/media/{{data.section_3_feature_icons}}" style="display: block; width: 200px; height: 200px;" />
                                 
                             </div>
                         </div>
@@ -196,8 +198,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="global-section-title-en">Section Title (English) </label>
-                                <input class="form-control btn-pill" id="global-section-title-en" name="section_title_en" type="text"  value="1" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="global-section-title-en"></p>
+                                <input class="form-control btn-pill" id="global-section-title-en" name="section_title_en" type="text"  value="{{data.section_3_heading_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-global-section-title-en"></p>
 
 
                             </div>
@@ -206,8 +208,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="global-section-title-ar">Section Title (Arabic) </label>
-                                <input class="form-control btn-pill" id="global-section-title-ar" name="section_title_ar" type="text"  value="1" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="global-section-title-ar"></p>
+                                <input class="form-control btn-pill" id="global-section-title-ar" name="error-section_title_ar" type="text"  value="{{data.section_3_heading_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-global-section-title-ar"></p>
 
 
                             </div>
@@ -225,8 +227,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="global-meta-title-en"></p>
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
 
                             </div>
                         </div>
@@ -234,8 +236,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="global-meta-title-ar"></p>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
 
                             </div>
                         </div>
@@ -245,8 +247,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="global-meta-content-en"></p>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
                         </div>
@@ -254,8 +256,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="global-meta-content-ar"></p>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
                         </div>
@@ -281,64 +283,7 @@
 <!--javascript-->
 <script>
 
-    function displayImageMail(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-mail-icon');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('icon-warning')
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
-    }
-
-    function displayImagePhone(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-phone-icon');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('icon-warning')
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
-    }
-
+   
     function displayImageTestimonial(event) {
         try{
             const file = event.target.files[0];
@@ -380,11 +325,7 @@
         
     }
 
-    function sendthedata(){
-
-        if(validation == "success"){
-
-        
+    function sendthedata(){        
             try{
 
                 //text
@@ -402,20 +343,90 @@
                 var Testi_icon = document.getElementById('testimonal-image')
                 var global_client_heading_en = document.getElementById('global-section-title-en')
                 var global_client_heading_ar = document.getElementById('global-section-title-ar')
-
+                var seo_title_en = document.getElementById("meta-title-en")
+                var seo_title_ar = document.getElementById("meta-title-ar")
+                var seo_content_en = document.getElementById("meta-content-en")
+                var seo_content_ar = document.getElementById("meta-content-ar")
+                var top_error = document.getElementById('heading-warning')
+                var missing_text = document.getElementById('heading-error')
                 //Image
+
+
                 var testimonal_image = Testi_icon.files[0]
 
 
                 //Video File
                 var heading_section_video = heading_video.files[0]
+                const form_data = [
+                    { id: "heading-section-title-en", name: "Title (English)" },
+                    { id: "heading-section-title-ar", name: "Title (arabic)" },
+                    { id: "heading-section-content-en", name: "Content (English)" },
+                    { id: "heading-section-content-ar", name: "Content (Arabic)" },
+                    { id: "heading-section-year-en", name: "Year (English)" },
+                    { id: "heading-section-year-ar", name: "Year (Arabic)" },
+                    { id: "sub-heading-en", name: "Heading (English)" },
+                    { id: "sub-heading-ar", name: "Heading (Arabic)" },
+                    { id: "section-title-en", name: "Title (English)" },
+                    { id: "section-title-ar", name: "Title (Arabic)" },
+                    { id: "global-section-title-en", name: "Title (English)" },
+                    { id: "global-section-title-ar", name: "Title (Arabic)" },
+                    { id: "meta-title-en", name: "SEO Title (English)" },
+                    { id: "meta-title-ar", name: "SEO Title (Arabic)" },
+                    { id: "meta-content-en", name: "SEO Content (English)" },
+                    { id: "meta-content-ar", name: "SEO Content (Arabic)" }
+
+                ];
+
+                document.querySelectorAll('.error-message').forEach((msg) => {
+                    msg.style.display = 'none';
+                    msg.innerText = '';
+                    });
+
+                top_error.innerText =""
+                var sendData = "true"
 
                 try{
+                for (const field of form_data) {
+                const input = document.getElementById(field.id);
+                const errorMsg = document.getElementById(`error-${field.id}`);
+                //document.getElementById("saveConfirmationModal")
+
+                if (!input.value.trim()) {
+                    try{
+
+                    errorMsg.innerText = `Please fill in ${field.name}.`;
+                    errorMsg.style.display = 'block'; 
+                    //$('#saveConfirmationModal').modal('hide');
+                        
+                        top_error.innerText = "There Should be no empty Field"
+                        top_error.style.color = "red"
+
+                        document.documentElement.scrollTop = 0;
+                        //document.documentElement.scrollTop = 0
+
+                        sendData = "false"
+                        break;
+                    }
+                    catch(err){
+                        alert(err)
+                        return false
+                    }
+                        
+                }
+            }
+
+            }
+            catch(err){
+                alert(err)
+                return false
+            }
+
+            if(sendData == 'true'){
+
                     const formData = new FormData();
                     //text
                     formData.append('heading_title_en', heading_title_en.value );
-                    formData.append('heading_title_ar', heading_title_ar.value );
-                    //formData.append('heading_section_video', heading_section_video);
+                    formData.append('heading_title_ar', heading_title_ar.value );                    
                     formData.append('heading_content_en', heading_content_en.value );
                     formData.append('heading_content_ar', heading_content_ar.value );
                     formData.append('heading_year_en', heading_year_en.value );
@@ -424,14 +435,30 @@
                     formData.append('sub_heading_ar', sub_heading_ar.value );
                     formData.append('whoweare_title_en', whoweare_title_en.value );
                     formData.append('whoweare_title_ar', whoweare_title_ar.value );
-                    //formData.append('testimonal_image', testimonal_image );
                     formData.append('global_client_heading_en', global_client_heading_en.value );
                     formData.append('global_client_heading_ar', global_client_heading_ar.value );
-
-
+                    formData.append('seo_title_en', seo_title_en.value );
+                    formData.append('seo_title_ar', seo_title_ar.value );
+                    formData.append('seo_content_en', seo_content_en.value );
+                    formData.append('seo_content_ar', seo_content_ar.value );
 
 
                     //images
+
+                    if (heading_video .files.length > 0) {
+                        formData.append('heading_video', heading_section_video);
+                } 
+                    else {
+                        console.log("already have image")
+                    }
+
+                    if (Testi_icon.files.length > 0) {
+                        formData.append('testi_icon', testimonal_image);
+                } 
+                    else {
+                        console.log("already have image")
+                    }
+
                     //formData.append('banner',banner);
 
 
@@ -445,9 +472,14 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
+                        location.reload()
+
                     })
                     .catch((error) => {
                         console.error('Error:', error);
+                        location.reload()
+                        return false
+
                     });
 
                     function getCookie(name) {
@@ -464,43 +496,22 @@
                         }
                         return cookieValue;
                     }
+
+                    
+                }
+        
                 return false
-
-                }
-                catch(err){
-                
-                    alert(err);
-                    return false
-
-                }
-                
-                //console.log(country_name_ar.value)
-                
-                return false;
-
             }
-            catch(err){
-                var  warning = document.getElementById('heading-error')
-
-                warning.innerText = err
-                warning.style.color = "red"
-
-                return false;
-            }
+        catch(err){
+            alert("1: "+err)
+            return false;
         }
-        else if(validation == "error"){
-
-            var missing_text = document.getElementById('heading-error')
-            
-            missing_text.innerText = "Fill the blank field!"
-            missing_text.style.color = "red"
-            window.scrollTo(0,0)
-            return false
-        }
+        
+    }    
+       
     
         
-    }
-
+    
     function displayVideo(event){
         
         try{
