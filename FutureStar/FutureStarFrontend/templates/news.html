@@ -13,11 +13,22 @@
 {% block content %}
 
 <!-- Page Banner Start -->
-<section class="page-banner-area overlay pt-220 rpt-150 pb-170 rpb-100 rel z-1 bgs-cover text-center" style="background-image: url('{% static 'frontend/assets/images/banner/banner-bg.jpg' %}');">
+<section class="page-banner-area overlay pt-220 rpt-150 pb-170 rpb-100 rel z-1 bgs-cover text-center" style="background-image: url('/media/{{ cmsdata.heading_banner }}');">
     <div class="container">
         <div class="banner-inner rpt-10">
-            <h2 class="page-title wow fadeInUp delay-0-2s">Explore Our Latest News</h2>
-            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>                    
+            <h2 class="page-title wow fadeInUp delay-0-2s">
+                {% if current_language == "ar" %}
+                {{ cmsdata.heading_title_ar }}
+                {% else %}
+                {{ cmsdata.heading_title_en }}
+                {% endif %}   
+            </h2>
+            <p>{% if current_language == "ar" %}
+                {{ cmsdata.heading_content_ar }}
+                {% else %}
+                {{ cmsdata.heading_content_en }}
+                {% endif %}
+            </p>        
         </div>
     </div>
 </section>

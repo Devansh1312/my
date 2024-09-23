@@ -70,7 +70,10 @@ class NewsPage(View):
     def get(self, request, *args, **kwargs):
         # Get the selected language from the session, default to 'en'
         current_language = request.session.get('language', 'en')
-        
+        try:
+            cmsdata = cms_pages.objects.get(id=4)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         # Get the list of news
         news_list = News.objects.all().order_by('-id')
 
@@ -89,6 +92,7 @@ class NewsPage(View):
         context = {
             "news": news,
             "current_language": current_language,
+            "cmsdata" : cmsdata,
         }
         return render(request, "news.html", context)
 
