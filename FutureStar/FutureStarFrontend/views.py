@@ -106,11 +106,16 @@ class NewsPage(View):
 
 class NewsDetailPage(View):
     def get(self, request, *args, **kwargs):
+        try:
+            cmsdata = cms_pages.objects.get(id=5)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         # Get the selected language from the session, default to 'en'
         current_language = request.session.get('language', 'en')
         # Pass the current language and news to the template
         context = {
             "current_language": current_language,
+            "cmsdata" : cmsdata,
         }
         return render(request, "news.html",context)
 
@@ -119,13 +124,18 @@ class NewsDetailPage(View):
         id = request.POST.get("id")
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
-
+        try:
+            cmsdata = cms_pages.objects.get(id=5)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         # Find the news with the matching id or raise 404 if not found
         news = get_object_or_404(News, id=id)
 
         context = {
             "news": news,
             "current_language": selected_language,
+            "cmsdata" : cmsdata,
+
         }
         return render(request, "news-details.html", context)
 
