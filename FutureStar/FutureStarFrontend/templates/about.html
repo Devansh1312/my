@@ -130,56 +130,39 @@
                     </h2>
                 </div>
             </div>
-        </div>    
+        </div>
+        
+        
         <div class="row row-cols-md-4 row-cols-sm-3 row-cols-1">
-            <div class="col">
-                <div class="team-member wow fadeInUp delay-0-2s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
-                    </div>
-                    <div class="content">
-                        <h4>Patrick V. Schroeder</h4>
-                        <span>Head Coach</span>
-                    </div>
-                   
-                </div>
-            </div>
-            <div class="col">
-                <div class="team-member wow fadeInUp delay-0-3s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
-                    </div>
-                    <div class="content">
-                        <h4>Michael A. Braun</h4>
-                        <span>Head Coach</span>
-                    </div>
+
+            {% for team_member in team_members %}
+                <div class="col">
+                    <div class="team-member wow fadeInUp delay-0-2s">
+                        <div class="image">
+                            <img src="{{ team_member.image.url }}" alt="Team Member">
+                        </div>
+                        <div class="content">
+                            <h4>
+                                {% if current_language == "ar" %}
+                                {{ team_member.name_ar }}
+                                {% else %}
+                                {{ team_member.name_en }}
+                                {% endif %} 
+                            </h4>
+                            <span>
+                                {% if current_language == "ar" %}
+                                {{ team_member.designations_ar }}
+                                {% else %}
+                                {{ team_member.designations_en }}
+                                {% endif %} 
+                            </span>
+                        </div>
                     
+                    </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="team-member wow fadeInUp delay-0-4s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
-                    </div>
-                    <div class="content">
-                        <h4>James V. Decastro</h4>
-                        <span>Head Coach</span>
-                    </div>
-                   
-                </div>
-            </div>
-            <div class="col">
-                <div class="team-member wow fadeInUp delay-0-5s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/team.jpg' %}" alt="Team Member">
-                    </div>
-                    <div class="content">
-                        <h4>Troy V. Richardson</h4>
-                        <span>Head Coach</span>
-                    </div>
-                   
-                </div>
-            </div>
+            {% endfor %}
+
+            
             
         </div>            
     </div>

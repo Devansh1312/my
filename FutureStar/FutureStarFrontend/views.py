@@ -7,6 +7,8 @@ from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
+##############################################   HomePage   ########################################################
+
 class HomePage(View):
     def get(self, request, *args, **kwargs):
         marquee = Slider_Content.objects.all()
@@ -14,6 +16,8 @@ class HomePage(View):
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         news = News.objects.all().order_by('-id')[:4]
         partner = Partners.objects.all()
+        team_members = Team_Members.objects.all().order_by('id')
+
         current_language = request.session.get('language', 'en')
 
         context = {
@@ -22,22 +26,39 @@ class HomePage(View):
             "testimonials": testimonials,
             "news": news,
             "partner": partner,
+            "team_members": team_members,
             "current_language":current_language,
         }
         return render(request, "home.html", context)
+    
     def post(self, request, *args, **kwargs):
-        # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
 
-        # Redirect to the same page after changing the language
-        return redirect('index')  # Replace 'news-page' with the correct view name if different
+        return redirect('index')
+
+
+
+
+##############################################   DiscoverPage   ########################################################
 
 class DiscoverPage(View):
     
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "discover.html")
+        current_language = request.session.get('language', 'en')
+        context = {
+            "current_language":current_language,
+        }
+        return render(request, "discover.html",context)
+    
+    def post(self, request, *args, **kwargs):
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+        return redirect('discover')  
+
+
+
+##############################################   SuccessStoriesPage   ########################################################
 
 class SuccessStoriesPage(View):
     
@@ -55,15 +76,16 @@ class SuccessStoriesPage(View):
             "current_language": current_language,
 
         }
-        
         return render(request, "success-stories.html",context)
+    
     def post(self, request, *args, **kwargs):
-        # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
 
-        # Redirect to the same page after changing the language
-        return redirect('success-stories')  # Replace 'news-page' with the correct view name if different
+        return redirect('success-stories')
+    
+
+##############################################   NewsPage   ########################################################
 
 class NewsPage(View):
     
@@ -95,24 +117,23 @@ class NewsPage(View):
             "cmsdata" : cmsdata,
         }
         return render(request, "news.html", context)
-
+    
     def post(self, request, *args, **kwargs):
-        # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
 
-        # Redirect to the same page after changing the language
-        return redirect('news')  # Replace 'news-page' with the correct view name if different
+        return redirect('news')
+    
+
+##############################################   NewsDetailPage   ########################################################
 
 class NewsDetailPage(View):
     def get(self, request, *args, **kwargs):
         try:
             cmsdata = cms_pages.objects.get(id=5)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
-        # Get the selected language from the session, default to 'en'
+            cmsdata = None  
         current_language = request.session.get('language', 'en')
-        # Pass the current language and news to the template
         context = {
             "current_language": current_language,
             "cmsdata" : cmsdata,
@@ -120,15 +141,13 @@ class NewsDetailPage(View):
         return render(request, "news.html",context)
 
     def post(self, request):
-        # Retrieve the news ID from the hidden input
         id = request.POST.get("id")
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
         try:
-            cmsdata = cms_pages.objects.get(id=5)  # Use get() to fetch a single object
+            cmsdata = cms_pages.objects.get(id=5)  
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
-        # Find the news with the matching id or raise 404 if not found
+            cmsdata = None  
         news = get_object_or_404(News, id=id)
 
         context = {
@@ -139,11 +158,26 @@ class NewsDetailPage(View):
         }
         return render(request, "news-details.html", context)
 
+
+
+##############################################   AdvertisePage   ########################################################
+
 class AdvertisePage(View):
     
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "advertise.html")
+        current_language = request.session.get('language', 'en')
+        context = {
+            "current_language":current_language,
+        }
+        return render(request, "advertise.html",context)
+    
+    def post(self, request, *args, **kwargs):
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        return redirect('advertise')
+
+##############################################   AboutPage   ########################################################
 
 class AboutPage(View):
     
@@ -152,6 +186,7 @@ class AboutPage(View):
         marquee = Slider_Content.objects.all()
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         global_clients = Global_Clients.objects.all()
+        team_members = Team_Members.objects.all().order_by('id')
         current_language = request.session.get('language', 'en')
         try:
             cmsdata = cms_pages.objects.get(id=7)  # Use get() to fetch a single object
@@ -164,29 +199,43 @@ class AboutPage(View):
             "global_clients": global_clients,
             "current_language":current_language,
             "cmsdata" : cmsdata,
+            "team_members" : team_members,
 
         }
         return render(request, "about.html",context)
+    
     def post(self, request, *args, **kwargs):
-        # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
 
-        # Redirect to the same page after changing the language
-        return redirect('about')  # Replace 'news-page' with the correct view name if different
+        return redirect('about')
+
+
+##############################################   LoginPage   ########################################################
 
 class LoginPage(View):
     
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "login.html")
+        current_language = request.session.get('language', 'en')
+        context = {
+            "current_language":current_language,
+        }
+        return render(request, "login.html",context)
 
 class RegisterPage(View):
     
     def get(self, request, *args, **kwargs):
-        
-        return render(request, "register.html")
+        current_language = request.session.get('language', 'en')
+        context = {
+            "current_language":current_language,
+        }
+        return render(request, "register.html",context)
 
+
+
+
+
+##############################################   ContactPage   ########################################################
 
 class ContactPage(View):
     
@@ -207,7 +256,10 @@ class ContactPage(View):
 
             
     def post(self, request):
-        cmsdata = cms_pages.objects.filter(name_en="Contacts")
+        # try:
+        #     cmsdata = cms_pages.objects.get(id=8)  # Use get() to fetch a single object
+        # except cms_pages.DoesNotExist:
+        #     cmsdata = None  # Handle the case where the object does not exist
         fullname = request.POST.get("fullname")
         phone = request.POST.get("phone")
         email = request.POST.get("email")
@@ -221,14 +273,16 @@ class ContactPage(View):
             email=email,
             message=message,
         )
-        context = {
-            "current_language": selected_language,
-            "cmsdata":cmsdata,
+        # context = {
+        #     "cmsdata":cmsdata,
+        # }
+        messages.success(request, "Inquiry submitted successfully.")
+        return redirect("contact")  # No need to pass context here
 
-        }
-        messages.success(request, "Inquire Submited successfully.")
-        return redirect("contact",context)
 
+
+
+##############################################   DiscoverPage   ########################################################
 
 class PrivacyPolicyPage(View):
     
@@ -247,13 +301,13 @@ class PrivacyPolicyPage(View):
         return render(request, "privacy-policy.html",context)
     
     def post(self, request, *args, **kwargs):
-        # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
 
-        # Redirect to the same page after changing the language
-        return redirect('privacy-policy')  # Replace 'news-page' with the correct view name if different
+        return redirect('privacy-policy')
     
+
+##############################################   DiscoverPage   ########################################################
 
 class TermsofServicesPage(View):
     
@@ -274,9 +328,6 @@ class TermsofServicesPage(View):
         return render(request, "terms-of-services.html",context)
     
     def post(self, request, *args, **kwargs):
-        # Update the language based on the user's selection and store it in the session
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
-
-        # Redirect to the same page after changing the language
-        return redirect('terms-of-services')  # Replace 'news-page' with the correct view name if different
+        return redirect('terms-of-services')  
