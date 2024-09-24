@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'FutureStar_App',
     'FutureStarFrontend',
-    'rest_framework',
+    'rest_framework',  # Add this for DRF
+    'rest_framework_simplejwt',  # Add this for JWT Authentication
+    'FutureStarAPI',  # Add your app where User model is defined
     'sass_processor',
     'widget_tweaks',
 ]
@@ -163,8 +166,30 @@ DEFAULT_FROM_EMAIL = 'sohamghayal02@gmail.com'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Use JWT for authentication
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',  # Default permission to authenticated users
+    # ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',  # Use JSON for parsing
+    ],
+}
 
-
+# JWT Configuration
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=180),  # Token validity period
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=4),  # Refresh token validity period
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,     
+    'AUTH_HEADER_TYPES': ('Bearer',),  # Use Bearer tokens for authorization
+}
+APPEND_SLASH=False
 ######################   Server Config ######################
 
 

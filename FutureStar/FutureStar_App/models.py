@@ -70,6 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     card_header = models.ImageField(upload_to="card_header/", null=True, blank=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
+    otp = models.CharField(max_length=6, null=True, blank=True)  # Add this field for OTP
     password = models.CharField(max_length=255)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     remember_token = models.CharField(max_length=255,null=True, blank=True)
