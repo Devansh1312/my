@@ -11,7 +11,7 @@
 {% block content %}
 
 <!-- Page Banner Start -->
-<section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url('/media/{{ cmsdata.heading_banner }}');">
+<section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url(assets/images/banner/banner-bg-two.jpg);">
     <div class="container">
         <div class="banner-inner">
             <div class="row">
@@ -30,12 +30,13 @@
                             <a href="#">Comment (5)</a>
                         </li>
                     </ul>
-                    <h2 class="page-title wow fadeInUp delay-0-3s">{% if current_language == "ar" %}
+                    <h1 class="page-title wow fadeInUp delay-0-3s">
+                        {% if current_language == "ar" %}
                         {{ news.title_ar }}
                         {% else %}
                         {{ news.title_en }}
                         {% endif %}
-                    </h2>
+                    </h1>
                 </div>
             </div>
         </div>
@@ -53,47 +54,44 @@
     </select>
     <button type="submit" id="change-language-btn">Change Language</button>
 </form> -->
+
 <!-- Blog Details Page Area start -->
-<section class="blog-details-page py-130 rpy-100 rel z-1">
-    <div class="container container-1290">
-        <div class="row gap-60">
-            <div class="col">
+<section class="blog-details-page py-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-5">
                 <div class="blog-single-content">
-                    <div class="image wow fadeInUp delay-0-2s">
+                    <div class="image wow fadeInLeft delay-0-2s">
                         <img class="news-details-img" src="{{ news.image.url }}" alt="News Details">
                     </div>
-                    <p class="big-first-letter">{% if current_language == "ar" %}
+                </div>
+            </div>
+            <div class="col-xl-7">
+                <div class="blog-single-content wow fadeInRight delay-0-2s">
+                    <p class="big-first-letter">
+                        {% if current_language == "ar" %}
                         {{ news.title_ar }}
                         {% else %}
                         {{ news.title_en }}
-                        {% endif %}</p>
-                    <div class="row mt-50 pb-20">
-                        <div class="col-md-6">
-                            <div class="image mb-30 wow fadeInUp delay-0-2s">
-                                <img src="assets/images/blog/blog-middle1.jpg" alt="">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="image mb-30 wow fadeInUp delay-0-4s">
-                                <img src="assets/images/blog/blog-middle2.jpg" alt="">
-                            </div>
-                        </div>
-                    </div>
-                    <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_2_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_2_title_en }}
-                        {% endif %}   
-                    </h3>
-                    <p>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_2_content_ar }}
-                        {% else %}
-                        {{ cmsdata.section_2_content_en }}
-                        {% endif %}   
+                        {% endif %}
                     </p>
                 </div>
+            </div>
+            <div class="col wow fadeInUp delay-0-2s">
+                <h3>
+                    {% if current_language == "ar" %}
+                    {{ cmsdata.section_2_title_ar }}
+                    {% else %}
+                    {{ cmsdata.section_2_title_en }}
+                    {% endif %}   
+                </h3>
+                <p>
+                    {% if current_language == "ar" %}
+                    {{ cmsdata.section_2_content_ar }}
+                    {% else %}
+                    {{ cmsdata.section_2_content_en }}
+                    {% endif %}   
+                </p>
             </div>
         </div>
     </div>

@@ -12,19 +12,25 @@
 <!-- Page Banner Start -->
 <section class="success-stories-page-banner common-banner text-center" style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37,67,0,1) 100%), url('/media/{{ cmsdata.heading_banner }}');">
     <div class="container">
-        <div class="banner-inner rpt-10">
-            <h2 class="page-title wow fadeInUp delay-0-2s">{% if current_language == "ar" %}
-                {{ cmsdata.heading_title_ar }}
-                {% else %}
-                {{ cmsdata.heading_title_en }}
-                {% endif %}   
-            </h2>
-            <p>{% if current_language == "ar" %}
-                {{ cmsdata.heading_content_ar }}
-                {% else %}
-                {{ cmsdata.heading_content_en }}
-                {% endif %}
-            </p>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="banner-inner">
+                    <h1 class="page-title wow fadeInUp delay-0-2s">
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.heading_title_ar }}
+                        {% else %}
+                        {{ cmsdata.heading_title_en }}
+                        {% endif %}   
+                    </h1>
+                    <p>
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.heading_content_ar }}
+                        {% else %}
+                        {{ cmsdata.heading_content_en }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -34,7 +40,7 @@
 <section class="success-players">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3">
+            <div class="col-lg-3 col-sm-6 custome-alignment">
                 <div class="item-wrapper wow fadeInUp delay-0-3s animated">
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt=""></div>
                     <h5 class="player-name">Mark Jones</h5>
@@ -58,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-3 col-sm-6 custome-alignment">
                 <div class="item-wrapper wow fadeInUp delay-0-5s animated">
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-2.jpg' %}" class="img-fluid" alt=""></div>
                     <h5 class="player-name">Mark Jones</h5>
@@ -82,7 +88,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-3 col-sm-6 custome-alignment">
                 <div class="item-wrapper wow fadeInUp delay-0-7s animated">
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt=""></div>
                     <h5 class="player-name">Mark Jones</h5>
@@ -106,7 +112,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-3 col-sm-6 custome-alignment">
                 <div class="item-wrapper wow fadeInUp delay-0-9s animated">
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-2.jpg' %}" class="img-fluid" alt=""></div>
                     <h5 class="player-name">Mark Jones</h5>
@@ -147,13 +153,23 @@
                 {% endif %}
             </h2>
         </div>
-        <div class="row">
+        <div class="tryouts-slider">
             {% for tryout_club in tryout_clubs %}
-            <div class="col-lg-2 wow fadeInUp delay-0-1s animated">
-                <div class="img-wrapper"><img src="{{ tryout_club.image.url }}" class="img-fluid" alt=""></div>
+            <div class="wow fadeInUp delay-{{ forloop.counter|add:0.1 }}s animated">
+                <div class="img-wrapper">
+                    <img src="{{ tryout_club.image.url }}" class="img-fluid" alt="">
+                </div>
             </div>
             {% endfor %}
-
+        </div>
+        <div class="work-gallery-controls">
+            <button class="tryouts-slider-prev">
+                <i class="far fa-chevron-left"></i>
+            </button>
+            <div class="tryouts-slider-dots"></div>
+            <button class="tryouts-slider-next">
+                <i class="far fa-chevron-right"></i>
+            </button>
         </div>
     </div>
 </section>

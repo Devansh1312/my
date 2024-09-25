@@ -10,79 +10,72 @@
 {% block title %} Future Star - Conatct {% endblock %}
 {% block content %}
 <!-- Page Banner Start -->
-<section class="page-banner-area overlay pt-220 rpt-150 pb-170 rpb-100 rel z-1 bgs-cover text-center" style="background-image: url('/media/{{ cmsdata.heading_banner }}');">
+<section class="page-banner-area common-banner-two text-center" style="background-image: url({% static 'frontend/assets/images/banner/banner-bg.jpg' %});">
     <div class="container">
-        <div class="banner-inner rpt-10">
-            <h2 class="page-title wow fadeInUp delay-0-2s">{% if current_language == "ar" %}
-                {{ cmsdata.heading_title_ar }}
-                {% else %}
-                {{ cmsdata.heading_title_en }}
-                {% endif %} 
-            </h2>
-            <p>{% if current_language == "ar" %}
-                {{ cmsdata.heading_content_ar }}
-                {% else %}
-                {{ cmsdata.heading_content_en }}
-                {% endif %} 
-            </p>                    
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="banner-inner">
+                    <h1 class="page-title wow fadeInUp delay-0-2s">
+                        {% if current_language == "ar" %}
+                            {{ cmsdata.heading_title_ar }}
+                        {% else %}
+                            {{ cmsdata.heading_title_en }}
+                        {% endif %}
+                    </h1>
+                    <p>
+                        {% if current_language == "ar" %}
+                            {{ cmsdata.heading_content_ar }}
+                        {% else %}
+                            {{ cmsdata.heading_content_en }}
+                        {% endif %}
+                    </p>                    
+                </div>
+            </div>
         </div>
     </div>
 </section>
 <!-- Page Banner End -->
 
-<!-- Language Switcher -->
-<!-- <form id="language-form" method="POST" action="">
-    {% csrf_token %}
-    <select id="language-selector" name="language">
-        <option style="color: black;" value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
-        <option style="color: black;" value="ar" {% if current_language == 'ar' %}selected{% endif %}>Arabic</option>
-    </select>
-    <button type="submit" id="change-language-btn">Change Language</button>
-</form> -->
-
-
 <!-- Contact Form Area start -->
-<section class="services-area-six pt-100 pb-100 rel z-1 bgs-cover">
+<section class="services-area-six pt-100 pb-60">
     <div class="container">
        <div class="row justify-content-between">
-            <div class="col-lg-6">
+            <div class="col-md-6">
                 <div class="our-location-part rmb-55 wow fadeInUp delay-0-2s">
                     <div class="row">
                         <div class="col-xl-10">
                             <div class="section-title mb-60">
-                                <span class="sub-title mb-15"> {% if current_language == "ar" %}
-                                    {{ cmsdata.section_2_heading_ar }}
+                                <span class="sub-title">
+                                    {% if current_language == "ar" %}
+                                        {{ cmsdata.section_2_heading_ar }}
                                     {% else %}
-                                    {{ cmsdata.section_2_heading_en }}
-                                    {% endif %} 
-                                </span>
-                                <h2>{% if current_language == "ar" %}
-                                    {{ cmsdata.section_2_title_ar }}
-                                    {% else %}
-                                    {{ cmsdata.section_2_title_en }}
-                                    {% endif %} 
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row gap-80 pb-30">
-                        <div class="col-sm-6">
-                            <div class="our-location-address mb-40">
-                                <h5>{% if current_language == "ar" %}
-                                    {{ cmsdata.section_2_country_name_ar }}
-                                    {% else %}
-                                    {{ cmsdata.section_2_country_name_en }}
+                                        {{ cmsdata.section_2_heading_en }}
                                     {% endif %}
-                                </h5>
-                                <p>{{ system_settings.address }}</p>
-                                <a class="callto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a><br><br>
-                                <a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a>
+                                </span>
+                                <h3>
+                                    {% if current_language == "ar" %}
+                                        {{ cmsdata.section_2_title_ar }}
+                                    {% else %}
+                                        {{ cmsdata.section_2_title_en }}
+                                    {% endif %}
+                                </h3>
                             </div>
                         </div>
-                      
                     </div>
-                    <h4>Follow Us</h4>
-                    <div class="social-style-two pt-15">
+                    <div class="our-location-address">
+                        <h4>
+                            {% if current_language == "ar" %}
+                                {{ cmsdata.section_2_country_name_ar }}
+                            {% else %}
+                                {{ cmsdata.section_2_country_name_en }}
+                            {% endif %}
+                        </h4>
+                        <p>{{ system_settings.address }}</p>
+                        <div><a class="callto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a></div>
+                        <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a></div>
+                    </div>
+                    <h5>Follow Us</h5>
+                    <div class="social-style-two pt-5">
                         <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
                         <a href="{{ system_settings.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
                         <a href="{{ system_settings.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
@@ -90,43 +83,45 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-5 col-lg-6">
+            <div class="col-xl-5 col-md-6">
                 <div class="contact-page-form form-style-one wow fadeInUp delay-0-2s">
-                    <div class="section-title mb-35">
-                        <span class="sub-title mb-15">{% if current_language == "ar" %}
-                            {{ cmsdata.section_3_heading_ar }}
+                    <div class="section-title mb-15">
+                        <span class="sub-title">
+                            {% if current_language == "ar" %}
+                                {{ cmsdata.section_3_heading_ar }}
                             {% else %}
-                            {{ cmsdata.section_3_heading_en }}
+                                {{ cmsdata.section_3_heading_en }}
                             {% endif %}
                         </span>
-                        <h3>{% if current_language == "ar" %}
-                            {{ cmsdata.section_3_title_ar }}
+                        <h4>
+                            {% if current_language == "ar" %}
+                                {{ cmsdata.section_3_title_ar }}
                             {% else %}
-                            {{ cmsdata.section_3_title_en }}
+                                {{ cmsdata.section_3_title_en }}
                             {% endif %}
-                        </h3>
+                        </h4>
                     </div>
-                    <form id="contactForm" class="contactForm"  action="{% url 'contact' %}" name="contactForm" method="post">
+                    <form id="contactForm" class="contactForm" action="{% url 'contact' %}" name="contactForm" method="post">
                         {% csrf_token %}
                         <div class="row gap-60 pt-15">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="fullname">Full Name</label>
-                                    <input type="text" id="fullname" name="fullname" class="form-control" value="" placeholder="" required data-error="Please enter your name">
+                                    <input type="text" id="fullname" name="fullname" class="form-control" placeholder="" required data-error="Please enter your name">
                                     <div class="help-block with-errors"></div>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="phone">Phone Number</label>
-                                    <input type="text" id="phone" name="phone" class="form-control" value="" placeholder="" required data-error="Please enter your Number">
+                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="" required data-error="Please enter your Number">
                                     <div class="help-block with-errors"></div>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Email Address</label>
-                                    <input type="email" id="email" name="email" class="form-control" value="" placeholder="" required data-error="Please enter your Email Address">
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="" required data-error="Please enter your Email Address">
                                     <div class="help-block with-errors"></div>
                                 </div>
                             </div>
@@ -152,9 +147,8 @@
 </section>
 <!-- Contact Form Area end -->
 
-
 <!-- Location Map Area Start -->
-<div class="contact-page-map mb-120 rpb-90 wow fadeInUp delay-0-2s">
+<div class="contact-page-map pb-100 wow fadeInUp delay-0-2s">
     <div class="container">
         <div class="our-location">
             <iframe src="https://maps.google.com/maps?q={{ system_settings.address|urlencode }}&output=embed" style="border:0; width: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>

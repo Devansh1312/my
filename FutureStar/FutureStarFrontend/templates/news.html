@@ -13,22 +13,28 @@
 {% block content %}
 
 <!-- Page Banner Start -->
-<section class="page-banner-area overlay pt-220 rpt-150 pb-170 rpb-100 rel z-1 bgs-cover text-center" style="background-image: url('/media/{{ cmsdata.heading_banner }}');">
+<section class="page-banner-area common-banner-two text-center"
+    style="background-image: url('/media/{{ cmsdata.heading_banner }}');">
     <div class="container">
-        <div class="banner-inner rpt-10">
-            <h2 class="page-title wow fadeInUp delay-0-2s">
-                {% if current_language == "ar" %}
-                {{ cmsdata.heading_title_ar }}
-                {% else %}
-                {{ cmsdata.heading_title_en }}
-                {% endif %}   
-            </h2>
-            <p>{% if current_language == "ar" %}
-                {{ cmsdata.heading_content_ar }}
-                {% else %}
-                {{ cmsdata.heading_content_en }}
-                {% endif %}
-            </p>        
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="banner-inner">
+                    <h1 class="page-title wow fadeInUp delay-0-2s">
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.heading_title_ar }}
+                        {% else %}
+                        {{ cmsdata.heading_title_en }}
+                        {% endif %}   
+                    </h1>
+                    <p>
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.heading_content_ar }}
+                        {% else %}
+                        {{ cmsdata.heading_content_en }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>        
         </div>
     </div>
 </section>
@@ -45,11 +51,11 @@
 </form> -->
 
 <!-- Blog Page Area start -->
-<section class="blog-page-area py-130 rpy-100 rel z-1">
-    <div class="container container-1290">
+<section class="blog-page-area py-100 rel">
+    <div class="container">
         <div class="row">
             {% for news in news %}
-            <div class="col-xl-4 col-md-6">
+            <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="blog-item wow fadeInUp delay-0-2s">
                     <div class="image" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                         <img src="{{ news.image.url }}" alt="Blog">
@@ -60,15 +66,13 @@
                             <span>{{ news.news_date }}</span>
                         </li>
                     </ul>
-                    <h4>
-                        <a class="read-more" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                    <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                            {% if current_language == "ar" %}
                            {{ news.title_ar }}
                            {% else %}
                            {{ news.title_en }}
                            {% endif %}
-                        </a>
-                    </h4>
+                    </a>
                     <a class="read-more" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                         Read More <i class="far fa-arrow-right"></i>
                     </a>
