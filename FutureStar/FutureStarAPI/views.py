@@ -12,6 +12,8 @@ from FutureStar_App.models import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
 from django.db import IntegrityError
+from django.utils import timezone
+
 
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
@@ -70,6 +72,7 @@ class LoginAPIView(APIView):
                     if user.is_active:
                         user.device_type = device_type
                         user.device_token = device_token
+                        user.last_login = timezone.now()
                         user.save()
 
                         refresh = RefreshToken.for_user(user)
@@ -111,6 +114,8 @@ class LoginAPIView(APIView):
                     if user.is_active:
                         user.device_type = device_type
                         user.device_token = device_token
+                        user.last_login = timezone.now()
+
                         user.save()
 
                         refresh = RefreshToken.for_user(user)
@@ -146,6 +151,7 @@ class LoginAPIView(APIView):
                     )
                     user.device_type = device_type
                     user.device_token = device_token
+                    user.last_login = timezone.now()
                     user.save()
 
                     refresh = RefreshToken.for_user(user)

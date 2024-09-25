@@ -27,10 +27,13 @@ msgid "Account is inactive"
 msgstr "الحساب غير نشط"
 
 msgid "Invalid credentials"
-msgstr "بيانات اعتماد غير صالحة"
+msgstr "بيانات الاعتماد غير صحيحة"
 
 msgid "Invalid data"
-msgstr "بيانات غير صالحة"
+msgstr "بيانات غير صحيحة"
+
+msgid "User created and login successful"
+msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
 
 msgid "Logout successful"
 msgstr "تم تسجيل الخروج بنجاح"
@@ -39,19 +42,40 @@ msgid "Logout failed"
 msgstr "فشل تسجيل الخروج"
 
 msgid "OTP sent to your phone."
-msgstr "تم إرسال OTP إلى هاتفك."
+msgstr "تم إرسال رمز التحقق إلى هاتفك."
 
 msgid "User with this phone number does not exist."
-msgstr "المستخدم برقم الهاتف هذا غير موجود."
+msgstr "لا يوجد مستخدم بهذا الرقم."
 
 msgid "OTP verified successfully."
-msgstr "تم التحقق من OTP بنجاح."
+msgstr "تم التحقق من رمز التحقق بنجاح."
 
 msgid "Invalid OTP."
-msgstr "OTP غير صالح."
+msgstr "رمز التحقق غير صحيح."
 
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
 
 msgid "User not found."
 msgstr "المستخدم غير موجود."
+
+msgid "Old password is incorrect."
+msgstr "كلمة المرور القديمة غير صحيحة."
+
+msgid "New password must be at least 8 characters long."
+msgstr "يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل."
+
+msgid "Language"
+msgstr "اللغة"
+
+msgid "Device type"
+msgstr "نوع الجهاز"
+
+msgid "Device token"
+msgstr "رمز الجهاز"
+
+msgid "Phone number"
+msgstr "رقم الهاتف"
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
