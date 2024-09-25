@@ -120,7 +120,7 @@ class RegisterAPIView(APIView):
                 alphabet = string.ascii_letters + string.digits
                 random_password = ''.join(secrets.choice(alphabet) for _ in range(8))
                 # If the user doesn't exist, create a new user
-                random_password = User.objects.make_random_password()
+                random_password = random_password,
                 user = User.objects.create_user(
                     username=email.split('@')[0],
                     email=email,
@@ -257,7 +257,7 @@ class LoginAPIView(APIView):
                     alphabet = string.ascii_letters + string.digits
                     random_password = ''.join(secrets.choice(alphabet) for _ in range(8))
                     # Create new user with random password if email doesn't exist
-                    random_password = User.objects.make_random_password()
+                    random_password = random_password,
                     user = User.objects.create_user(
                         username=email.split('@')[0],
                         email=email,
