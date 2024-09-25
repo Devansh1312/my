@@ -13,7 +13,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
 from django.db import IntegrityError
 from django.utils import timezone
-
+import secrets , string
 
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
@@ -116,6 +116,9 @@ class RegisterAPIView(APIView):
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             else:
+                # Generate a random password manually
+                alphabet = string.ascii_letters + string.digits
+                random_password = ''.join(secrets.choice(alphabet) for _ in range(8))
                 # If the user doesn't exist, create a new user
                 random_password = User.objects.make_random_password()
                 user = User.objects.create_user(
@@ -250,6 +253,9 @@ class LoginAPIView(APIView):
                             'message': _('Account is inactive'),
                         }, status=status.HTTP_400_BAD_REQUEST)
                 else:
+                    # Generate a random password manually
+                    alphabet = string.ascii_letters + string.digits
+                    random_password = ''.join(secrets.choice(alphabet) for _ in range(8))
                     # Create new user with random password if email doesn't exist
                     random_password = User.objects.make_random_password()
                     user = User.objects.create_user(
