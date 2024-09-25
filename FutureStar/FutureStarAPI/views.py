@@ -191,9 +191,9 @@ class LogoutAPIView(APIView):
             user.save()
 
             # Blacklist the token or any other token management action if required
-            token = request.auth
-            if token:
-                token.blacklist()  # If using token blacklisting
+            # token = request.auth
+            # if token:
+            #     token.blacklist()  # If using token blacklisting
             
             return Response({
                 'status': 1,
