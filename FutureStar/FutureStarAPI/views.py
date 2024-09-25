@@ -24,24 +24,133 @@ class RegisterAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                user = serializer.save()
-                return Response({
-                    'status': 1,
-                    'message': _('User registered successfully'),
-                }, status=status.HTTP_201_CREATED)
-            except IntegrityError as e:
+        # Get the registration type (1 for normal, 2 or 3 for email-based)
+        registration_type = request.data.get('type')
+        device_type = request.data.get('device_type')
+        device_token = request.data.get('device_token')
+
+        if registration_type == 1:
+            # Normal registration with username, phone, and password
+            serializer = RegisterSerializer(data=request.data)
+            if serializer.is_valid():
+                try:
+                    user = serializer.save()
+                    user.device_type = device_type
+                    user.device_token = device_token
+                    user.last_login = timezone.now()
+                    user.save()
+
+                    # Automatically log in the user by generating a token
+                    refresh = RefreshToken.for_user(user)
+
+                    return Response({
+                        'status': 1,
+                        'message': _('User registered and logged in successfully'),
+                        'data': {
+                            'refresh_token': str(refresh),
+                            'access_token': str(refresh.access_token),
+                            'user': {
+                                'id': user.id,
+                                'username': user.username,
+                                'phone': user.phone,
+                                'email': user.email,
+                                'device_type': user.device_type,
+                                'device_token': user.device_token,
+                            }
+                        }
+                    }, status=status.HTTP_201_CREATED)
+
+                except IntegrityError as e:
+                    return Response({
+                        'status': 0,
+                        'message': _('User registration failed due to duplicate data'),
+                        'errors': str(e)
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({
+                'status': 0,
+                'message': _('User registration failed'),
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        elif registration_type in [2, 3]:
+            # Email registration (no password provided)
+            email = request.data.get('email')
+            if not email:
                 return Response({
                     'status': 0,
-                    'message': _('User registration failed due to duplicate data'),
-                    'errors': str(e)
+                    'message': _('Email is required for registration')
                 }, status=status.HTTP_400_BAD_REQUEST)
+
+            user = User.objects.filter(email=email).first()
+
+            if user:
+                # If the user exists, log them in
+                if user.is_active:
+                    user.device_type = device_type
+                    user.device_token = device_token
+                    user.last_login = timezone.now()
+                    user.save()
+
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        'status': 1,
+                        'message': _('User logged in successfully'),
+                        'data': {
+                            'refresh_token': str(refresh),
+                            'access_token': str(refresh.access_token),
+                            'user': {
+                                'id': user.id,
+                                'username': user.username,
+                                'phone': user.phone,
+                                'email': user.email,
+                                'device_type': user.device_type,
+                                'device_token': user.device_token,
+                            }
+                        }
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        'status': 0,
+                        'message': _('Account is inactive')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            else:
+                # If the user doesn't exist, create a new user
+                random_password = User.objects.make_random_password()
+                user = User.objects.create_user(
+                    username=email.split('@')[0],
+                    email=email,
+                    password=random_password,
+                    is_active=True  # Adjust this if you need email verification
+                )
+                user.device_type = device_type
+                user.device_token = device_token
+                user.last_login = timezone.now()
+                user.save()
+
+                refresh = RefreshToken.for_user(user)
+
+                return Response({
+                    'status': 1,
+                    'message': _('User created and logged in successfully'),
+                    'data': {
+                        'refresh_token': str(refresh),
+                        'access_token': str(refresh.access_token),
+                        'user': {
+                            'id': user.id,
+                            'username': user.username,
+                            'phone': user.phone,
+                            'email': user.email,
+                            'device_type': user.device_type,
+                            'device_token': user.device_token,
+                        }
+                    }
+                }, status=status.HTTP_201_CREATED)
+
         return Response({
             'status': 0,
-            'message': _('User registration failed'),
-            'errors': serializer.errors
+            'message': _('Invalid registration type')
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -80,8 +189,8 @@ class LoginAPIView(APIView):
                             'status': 1,
                             'message': _('Login successful'),
                             'data': {
-                                'refresh': str(refresh),
-                                'access': str(refresh.access_token),
+                                'refresh_token': str(refresh),
+                                'access_token': str(refresh.access_token),
                                 'user': {
                                     'id': user.id,
                                     'username': user.username,
@@ -123,8 +232,8 @@ class LoginAPIView(APIView):
                             'status': 1,
                             'message': _('Login successful'),
                             'data': {
-                                'refresh': str(refresh),
-                                'access': str(refresh.access_token),
+                                'refresh_token': str(refresh),
+                                'access_token': str(refresh.access_token),
                                 'user': {
                                     'id': user.id,
                                     'username': user.username,
@@ -159,8 +268,8 @@ class LoginAPIView(APIView):
                         'status': 1,
                         'message': _('User created and login successful'),
                         'data': {
-                            'refresh': str(refresh),
-                            'access': str(refresh.access_token),
+                            'refresh_token': str(refresh),
+                            'access_token': str(refresh.access_token),
                             'user': {
                                 'id': user.id,
                                 'username': user.username,

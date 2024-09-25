@@ -11,14 +11,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-msgid "User registered successfully"
-msgstr "تم تسجيل المستخدم بنجاح"
+msgid "User registered and logged in successfully"
+msgstr "تم تسجيل المستخدم وتسجيل الدخول بنجاح"
 
 msgid "User registration failed due to duplicate data"
-msgstr "فشل تسجيل المستخدم بسبب بيانات مكررة"
+msgstr "فشل تسجيل المستخدم بسبب وجود بيانات مكررة"
 
 msgid "User registration failed"
 msgstr "فشل تسجيل المستخدم"
+
+msgid "Email is required for registration"
+msgstr "البريد الإلكتروني مطلوب للتسجيل"
+
+msgid "User logged in successfully"
+msgstr "تم تسجيل الدخول بنجاح"
+
+msgid "User created and logged in successfully"
+msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
+
+msgid "Invalid registration type"
+msgstr "نوع التسجيل غير صالح"
 
 msgid "Login successful"
 msgstr "تم تسجيل الدخول بنجاح"

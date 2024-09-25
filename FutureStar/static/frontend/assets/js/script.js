@@ -255,9 +255,9 @@
         // ## Work Gallery Slider
         if ($('.work-gallery-active').length) {
             $('.work-gallery-active').slick({
-                slidesToShow: 3,
+                slidesToShow: 4,
                 slidesToScroll: 1,
-                infinite: false,
+                infinite: true,
                 speed: 400,
                 arrows: true,
                 dots: true,
@@ -271,11 +271,17 @@
                     {
                         breakpoint: 1200,
                         settings: {
-                            slidesToShow: 2,
+                            slidesToShow: 3,
                         }
                     },
                     {
                         breakpoint: 767,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 480,
                         settings: {
                             slidesToShow: 1,
                         }
@@ -322,7 +328,186 @@
                 ]
             });
         }
-        
+
+
+        // ## Games Slider
+        if ($('.games-slider').length) {
+            $('.games-slider').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                infinite: true,
+                speed: 400,
+                arrows: true,
+                dots: true,
+                focusOnSelect: true,
+                autoplay: false,
+                autoplaySpeed: 5000,
+                prevArrow: '.games-slider-prev',
+                nextArrow: '.games-slider-next',
+                appendDots: '.games-slider-dots',
+                responsive: [
+                    {
+                        breakpoint: 1400,
+                        settings: {
+                            slidesToShow: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 1200,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 767,
+                        settings: {
+                            slidesToShow: 1,
+                        }
+                    }
+                ]
+            });
+        }
+
+
+        // ## Tryouts Slider
+        if ($('.tryouts-slider').length) {
+            $('.tryouts-slider').slick({
+                slidesToShow: 6,
+                slidesToScroll: 1,
+                infinite: true,
+                speed: 400,
+                arrows: true,
+                dots: true,
+                focusOnSelect: true,
+                autoplay: false,
+                autoplaySpeed: 5000,
+                prevArrow: '.tryouts-slider-prev',
+                nextArrow: '.tryouts-slider-next',
+                appendDots: '.tryouts-slider-dots',
+                responsive: [
+                    {
+                        breakpoint: 1300,
+                        settings: {
+                            slidesToShow: 5,
+                        }
+                    },
+                    {
+                        breakpoint: 992,
+                        settings: {
+                            slidesToShow: 4,
+                        }
+                    },
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 481,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 376,
+                        settings: {
+                            slidesToShow: 1,
+                        }
+                    }
+                ]
+            });
+        }
+
+
+        // ## Apps Ads Slider
+        if ($('.apps-advertise-slider').length) {
+            $('.apps-advertise-slider').slick({
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                infinite: true,
+                speed: 400,
+                arrows: true,
+                dots: true,
+                focusOnSelect: true,
+                autoplay: false,
+                autoplaySpeed: 5000,
+                prevArrow: '.apps-advertise-slider-prev',
+                nextArrow: '.apps-advertise-slider-next',
+                appendDots: '.apps-advertise-slider-dots',
+                responsive: [
+                    {
+                        breakpoint: 1400,
+                        settings: {
+                            slidesToShow: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 1200,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 767,
+                        settings: {
+                            slidesToShow: 1,
+                        }
+                    }
+                ]
+            });
+        }
+
+
+        // ## Clients Logo Slider
+        if ($('.clients-logo-slider').length) {
+            $('.clients-logo-slider').slick({
+                slidesToShow: 6,
+                slidesToScroll: 1,
+                infinite: true,
+                speed: 400,
+                arrows: true,
+                dots: true,
+                focusOnSelect: true,
+                autoplay: false,
+                autoplaySpeed: 5000,
+                prevArrow: '.clients-logo-slider-prev',
+                nextArrow: '.clients-logo-slider-next',
+                appendDots: '.clients-logo-slider-dots',
+                responsive: [
+                    {
+                        breakpoint: 1300,
+                        settings: {
+                            slidesToShow: 5,
+                        }
+                    },
+                    {
+                        breakpoint: 992,
+                        settings: {
+                            slidesToShow: 4,
+                        }
+                    },
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 3,
+                        }
+                    },
+                    {
+                        breakpoint: 481,
+                        settings: {
+                            slidesToShow: 2,
+                        }
+                    },
+                    {
+                        breakpoint: 376,
+                        settings: {
+                            slidesToShow: 1,
+                        }
+                    }
+                ]
+            });
+        }
         
          /* ## Fact Counter + Text Count - Our Success */
         if ($('.counter-text-wrap').length) {

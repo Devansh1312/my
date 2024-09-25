@@ -10,9 +10,7 @@
                     <div class="footer-logo mb-20">
                         <a href="{% url 'index' %}"><img src="{{ footer_logo }}" alt="Logo"></a>
                     </div>
-                    <div class="text mb-25">Ut enim ad minima veniam nostrum exercitationem ullam corporise
-                    </div>
-
+                    <p class="des">Ut enim ad minima veniam nostrum exercitationem ullam corporise</p>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6">
@@ -52,10 +50,16 @@
                         <li><i class="far fa-phone"></i> <a href="callto:{{ system_settings.phone }}">{{ system_settings.phone }}</a>
                         </li>
                     </ul>
+                    <div class="social-style-two">
+                        <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ system_settings.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="{{ system_settings.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ system_settings.pinterest }}" target="_blank"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="copyright-area rel mt-25 pt-35 pb-25">
+        <div class="copyright-area rel">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="footer-copyright-text wow fadeInUp delay-0-2s">
@@ -64,12 +68,7 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
-                        <div class="social-style-two">
-                            <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                            <a href="{{ system_settings.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
-                            <a href="{{ system_settings.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
-                            <a href="{{ system_settings.pinterest }}" target="_blank"><i class="fab fa-pinterest-p"></i></a>
-                        </div>
+                        <p>Designed & Developed By <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a></p>
                     </div>
                 </div>
             </div>
