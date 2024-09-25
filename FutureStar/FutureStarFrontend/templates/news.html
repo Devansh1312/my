@@ -51,7 +51,7 @@
             {% for news in news %}
             <div class="col-xl-4 col-md-6">
                 <div class="blog-item wow fadeInUp delay-0-2s">
-                    <div class="image">
+                    <div class="image" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                         <img src="{{ news.image.url }}" alt="Blog">
                     </div>
                     <ul class="blog-meta">
@@ -61,7 +61,7 @@
                         </li>
                     </ul>
                     <h4>
-                        <a class="read-more" href="#" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                        <a class="read-more" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                            {% if current_language == "ar" %}
                            {{ news.title_ar }}
                            {% else %}
@@ -69,7 +69,7 @@
                            {% endif %}
                         </a>
                     </h4>
-                    <a class="read-more" href="#" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                    <a class="read-more" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                         Read More <i class="far fa-arrow-right"></i>
                     </a>
                     

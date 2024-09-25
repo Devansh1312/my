@@ -11,7 +11,17 @@
 {% block title %} Future Star || Privacy Policy{% endblock %}
 
 {% block content %}
-
+<!-- Conditional styles based on URL parameters -->
+{% if request.GET.reference == "app" %}
+<style>
+    .header-upper {
+        display: none;
+    }
+    .main-footer {
+        display: none;
+    }
+</style>
+{% endif %}
 
 
 <!-- Page Banner Start -->

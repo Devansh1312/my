@@ -4,15 +4,23 @@
 
 {% block css %}
 <!-- Plugins css start-->
-
 <!-- Plugins css Ends-->
 {% endblock %}
 
 {% block title %} Future Star || Terms of Services{% endblock %}
 
 {% block content %}
-
-
+<!-- Conditional styles based on URL parameters -->
+{% if request.GET.reference == "app" %}
+<style>
+    .header-upper {
+        display: none;
+    }
+    .main-footer {
+        display: none;
+    }
+</style>
+{% endif %}
 
 <!-- Page Banner Start -->
 <section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url(assets/images/banner/banner-bg-two.jpg);">
@@ -34,7 +42,6 @@
 </section>
 <!-- Page Banner End -->
 
-
 <!-- Blog Details Page Area start -->
 <section class="blog-details-page py-130 rpy-100 rel z-1">
     <div class="container container-1290">
@@ -55,17 +62,14 @@
 </section>
 <!-- Blog Details Page Area end -->
 
-
 {% endblock %}
 
 {% block scriptcontent %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Set default language from localStorage or 'en' by default
         const currentLanguage = localStorage.getItem('language') || 'en';
         document.getElementById('language-selector').value = currentLanguage;
 
-        // On language change, update localStorage
         document.getElementById('change-language-btn').addEventListener('click', function() {
             const selectedLanguage = document.getElementById('language-selector').value;
             localStorage.setItem('language', selectedLanguage);

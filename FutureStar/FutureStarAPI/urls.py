@@ -11,5 +11,9 @@ urlpatterns = [
         path('api/logout/', LogoutAPIView.as_view(), name='playerlogout'),  # Add logout endpoint
         path('api/forgot-password/', ForgotPasswordAPIView.as_view(), name='forgot-password'),
         path('api/verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
-        path('api/change-password/', ChangePasswordAPIView.as_view(), name='change-password'),
+        path('api/change-password-otp/', ChangePasswordOtpAPIView.as_view(), name='change-password-otp'),
+        
+        # For logged-in users
+        path('api/change-password/', ChangePasswordAPIView.as_view(), name='change-password'),                 
+
     ]

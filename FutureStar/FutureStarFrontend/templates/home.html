@@ -589,7 +589,7 @@
                 <div class="col-xl-3 col-md-4">
                     <div class="blog-item style-two wow fadeInUp delay-0-2s">
                         <div class="image">
-                            <img src="{{ news.image.url }}" alt="Blog">
+                            <img src="{{ news.image.url }}" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;" alt="Blog">
                         </div>
                         <h4>
                             <a href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
@@ -612,7 +612,7 @@
                             </li>
                             <li>
                                 <i class="far fa-comments"></i>
-                                <a href="#">Comment (5)</a>
+                                <a href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">Comment (5)</a>
                             </li>
                         </ul>
                     </div>

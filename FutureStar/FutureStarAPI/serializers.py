@@ -10,20 +10,48 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'phone', 'password']
 
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
+
+    def validate_phone(self, value):
+        if User.objects.filter(phone=value).exists():
+            raise serializers.ValidationError("A user with this phone number already exists.")
+        return value
+
     def create(self, validated_data):
         user = User(
             username=validated_data['username'],
             phone=validated_data['phone'],
-            role_id = 2
+            role_id=2,
+            register_type="App"
         )
-        user.set_password(validated_data['password'])  # Hashing password
+        user.set_password(validated_data['password'])
         user.save()
         return user
 
 
+
 class LoginSerializer(serializers.Serializer):
-    username_or_phone = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
+    type = serializers.IntegerField(required=True)  # Add type field to distinguish login types
+    username_or_phone = serializers.CharField(required=False)
+    password = serializers.CharField(required=False, write_only=True)
+    email = serializers.EmailField(required=False)  # Required for Type 2 or 3
+    device_type = serializers.CharField(required=True)
+    device_token = serializers.CharField(required=True)
+
+    def validate(self, data):
+        # For type 1, username_or_phone and password are required
+        if data['type'] == 1:
+            if not data.get('username_or_phone') or not data.get('password'):
+                raise serializers.ValidationError("Username or phone and password are required for normal login.")
+        # For type 2 or 3, email is required
+        elif data['type'] in [2, 3]:
+            if not data.get('email'):
+                raise serializers.ValidationError("Email is required for type 2 and type 3 login.")
+        return data
+
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
@@ -33,7 +61,6 @@ class OTPVerificationSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Same as above
     otp = serializers.CharField(max_length=6)      # Assuming OTP is a 6-digit code
 
-class ChangePasswordSerializer(serializers.Serializer):
+class ChangePasswordOtpSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Same as above
     new_password = serializers.CharField(min_length=8)  # Ensure a minimum length for security
-

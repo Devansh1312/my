@@ -307,7 +307,7 @@ class PrivacyPolicyPage(View):
         return redirect('privacy-policy')
     
 
-##############################################   DiscoverPage   ########################################################
+##############################################   TermsofServicesPage   ########################################################
 
 class TermsofServicesPage(View):
     
