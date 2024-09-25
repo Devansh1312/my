@@ -117,14 +117,10 @@ class RegisterAPIView(APIView):
 
             else:
                 # Generate a random password manually
-                alphabet = string.ascii_letters + string.digits
-                random_password = ''.join(secrets.choice(alphabet) for _ in range(8))
-                # If the user doesn't exist, create a new user
-                random_password = random_password,
                 user = User.objects.create_user(
                     username=email.split('@')[0],
                     email=email,
-                    password=random_password,
+                    password=email.split('@')[0],
                     is_active=True  # Adjust this if you need email verification
                 )
                 user.device_type = device_type
@@ -253,15 +249,11 @@ class LoginAPIView(APIView):
                             'message': _('Account is inactive'),
                         }, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    # Generate a random password manually
-                    alphabet = string.ascii_letters + string.digits
-                    random_password = ''.join(secrets.choice(alphabet) for _ in range(8))
                     # Create new user with random password if email doesn't exist
-                    random_password = random_password,
                     user = User.objects.create_user(
                         username=email.split('@')[0],
                         email=email,
-                        password=random_password,
+                        password=email.split('@')[0],
                         is_active=True  # You can adjust if you need email verification
                     )
                     user.device_type = device_type
