@@ -2629,9 +2629,676 @@ class cms_homepage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/home.html"
 
     def get(self, request):
+        features = cms_home_dynamic_field.objects.all()
+        features_data = cms_pages.objects.get(id="1")
+        
         
         return render(
             request,
             self.template_name,
+            {'features': features,'data':features_data}
             
-    )              
+    )  
+
+#new changes
+#cms home  
+@csrf_exempt
+def savehomedetail(request):
+        try:
+            if request.method == "POST":
+                #text
+                
+                heading_title_en = request.POST.get('home_heading_title_en')
+                heading_title_ar = request.POST.get('home_heading_title_ar')
+                heading_content_en = request.POST.get('home_heading_content_en')
+                heading_content_ar = request.POST.get('home_heading_content_ar')
+                sub_heading_1_name_en = request.POST.get('home_sub_heading_1_name_en')
+                sub_heading_1_name_ar = request.POST.get('home_sub_heading_1_name_ar')
+                sub_heading_1_title_en = request.POST.get('home_sub_heading_1_title_en')
+                sub_heading_1_title_ar = request.POST.get('home_sub_heading_1_title_ar')
+                sub_heading_section_2_title_en = request.POST.get('home_sub_heading_section_2_Title_en')
+                sub_heading_section_2_title_ar = request.POST.get('home_sub_heading_section_2_Title_ar')
+                sub_heading_section_2_content_en = request.POST.get('home_sub_heading_section_2_content_en')
+                sub_heading_section_2_content_ar = request.POST.get('home_sub_heading_section_2_content_ar')
+                sub_heading_section_2_title_1_en = request.POST.get('home_sub_heading_section_2_Title_1_en')
+                sub_heading_section_2_title_1_ar = request.POST.get('home_sub_heading_section_2_Title_1_ar')
+                sub_heading_section_2_content_1_en = request.POST.get('home_sub_heading_section_2_content_1_en')
+                sub_heading_section_2_content_1_ar = request.POST.get('home_sub_heading_section_2_content_1_ar')
+                empower_section_name_en = request.POST.get('empower_section_name_en')
+                empower_section_name_ar = request.POST.get('empower_section_name_ar')
+                empower_section_title_en = request.POST.get('empower_section_title_en')
+                empower_section_title_ar = request.POST.get('empower_section_title_ar')
+                empower_section_content_en = request.POST.get('empower_section_content_en')
+                empower_section_content_ar = request.POST.get('empower_section_content_ar')
+                features_section_name_en = request.POST.get('features_section_name_en')
+                features_section_name_ar = request.POST.get('features_section_name_ar')
+                features_section_title_en = request.POST.get('features_section_title_en')
+                features_section_title_ar = request.POST.get('features_section_title_ar')
+                features_section_content_en = request.POST.get('features_section_content_en')
+                features_section_content_ar = request.POST.get('features_section_content_ar')
+                features_section_form_title_en_1 = request.POST.get('features_section_form_title_en_1')
+                features_section_form_title_ar_1 = request.POST.get('features_section_form_title_ar_1')
+                features_section_form_content_en_1 = request.POST.get('features_section_form_content_en_1')
+                features_section_form_content_ar_1 = request.POST.get('features_section_form_content_ar_1')
+                spirit_section_title_en = request.POST.get('spirit_section_title_en')
+                spirit_section_title_ar = request.POST.get('spirit_section_title_ar')
+                spirit_section_content_en = request.POST.get('spirit_section_content_en')
+                spirit_section_content_ar = request.POST.get('spirit_section_content_ar')
+                team_name_en = request.POST.get('Team_name_en')
+                team_name_ar = request.POST.get('Team_name_ar')
+                team_title_en = request.POST.get('Team_title_en')
+                team_title_ar = request.POST.get('Team_title_ar')
+                achievements_heading_name_en = request.POST.get('achivements_heading_name_en')
+                achievements_heading_name_ar = request.POST.get('achivements_heading_name_ar')
+                achievements_heading_title_en = request.POST.get('achivements_heading_title_en')
+                achievements_heading_title_ar = request.POST.get('achivements_heading_title_ar')
+                explore_heading_name_en = request.POST.get('explore_heading_name_en')
+                explore_heading_name_ar = request.POST.get('explore_heading_name_ar')
+                explore_heading_title_en = request.POST.get('explore_heading_title_en')
+                explore_heading_title_ar = request.POST.get('explore_heading_title_ar')
+                blognews_heading_name_en = request.POST.get('blognews_heading_name_en')
+                blognews_heading_name_ar = request.POST.get('blognews_heading_name_ar')
+                blognews_heading_title_en = request.POST.get('blognews_sheading_title_en')
+                blognews_heading_title_ar = request.POST.get('blognews_sheading_title_ar')
+                partners_heading_name_en = request.POST.get('partners_heading_name_en')
+                partners_heading_name_ar = request.POST.get('partners_heading_name_ar')
+                partners_heading_title_en = request.POST.get('partners_heading_title_en')
+                partners_heading_title_ar = request.POST.get('partners_heading_title_ar')
+                seo_title_en = request.POST.get('seo_title_en')
+                seo_title_ar = request.POST.get('seo_title_ar')
+                seo_content_en = request.POST.get('seo_content_en')
+                seo_content_ar = request.POST.get('seo_content_ar')
+                
+                features = []
+                i = 1
+                while True:
+                    title_en = request.POST.get(f'features_section_form_title_en_{i}')
+                    title_ar = request.POST.get(f'features_section_form_title_ar_{i}')
+                    content_en = request.POST.get(f'features_section_form_content_en_{i}')
+                    content_ar = request.POST.get(f'features_section_form_content_ar_{i}')
+
+                    print(title_en)
+                    if title_en or title_ar or content_en or content_ar:
+                        features.append({
+                            'title_en': title_en,
+                            'title_ar': title_ar,
+                            'content_en': content_en,
+                            'content_ar': content_ar,
+                        })
+                        i += 1
+                    else:
+                        break
+                #dom = "Done"
+                #imageName = []
+                
+                try:
+                    #savenewsdetail = cms_pages.objects.get(id = "5")
+                    
+                    savehomedetail = cms_pages.objects.get(id="1")
+
+                    savehomedetail.heading_title_en = heading_title_en
+                    savehomedetail.heading_title_ar = heading_title_ar
+                    savehomedetail.heading_content_en = heading_content_en
+                    savehomedetail.heading_content_ar = heading_content_ar
+                    savehomedetail.sub_heading_name_en = sub_heading_1_name_en
+                    savehomedetail.sub_heading_name_ar = sub_heading_1_name_ar
+                    savehomedetail.sub_heading_title_en = sub_heading_1_title_en 
+                    savehomedetail.sub_heading_title_ar = sub_heading_1_title_ar 
+                    savehomedetail.sub_heading_logo_title_1_en = sub_heading_section_2_title_en  
+                    savehomedetail.sub_heading_logo_title_1_ar = sub_heading_section_2_title_ar  
+                    savehomedetail.sub_heading_logo_content_1_en = sub_heading_section_2_content_en 
+                    savehomedetail.sub_heading_logo_content_1_ar = sub_heading_section_2_content_ar 
+                    savehomedetail.sub_heading_logo_title_2_en  = sub_heading_section_2_title_1_en
+                    savehomedetail.sub_heading_logo_title_2_ar  = sub_heading_section_2_title_1_ar
+                    savehomedetail.sub_heading_logo_content_2_en  = sub_heading_section_2_content_1_en
+                    savehomedetail.sub_heading_logo_content_2_ar  = sub_heading_section_2_content_1_ar
+                    savehomedetail.section_2_heading_en   = empower_section_name_en
+                    savehomedetail.section_2_heading_ar   = empower_section_name_ar
+                    savehomedetail.section_2_title_en   = empower_section_title_en 
+                    savehomedetail.section_2_title_ar   = empower_section_title_ar
+                    savehomedetail.section_2_content_en   = empower_section_content_en
+                    savehomedetail.section_2_content_ar   = empower_section_content_ar
+                    savehomedetail.section_3_heading_en   = features_section_name_en
+                    savehomedetail.section_3_heading_ar   = features_section_name_ar
+                    savehomedetail.section_3_title_en   = features_section_title_en
+                    savehomedetail.section_3_title_ar   = features_section_title_ar
+                    savehomedetail.section_3_content_en   = features_section_content_en
+                    savehomedetail.section_3_content_ar   = features_section_content_ar
+                    savehomedetail.section_3_feature_title_en = features_section_form_title_en_1
+                    savehomedetail.section_3_feature_title_ar = features_section_form_title_ar_1
+                    savehomedetail.section_3_feature_short_content_en = features_section_form_content_en_1
+                    savehomedetail.section_3_feature_short_content_ar = features_section_form_content_ar_1
+                    savehomedetail.section_4_title_en = spirit_section_title_en
+                    savehomedetail.section_4_title_ar = spirit_section_title_ar
+                    savehomedetail.section_4_content_en = spirit_section_content_en 
+                    savehomedetail.section_4_content_ar = spirit_section_content_ar 
+                    savehomedetail.section_5_heading_en = team_name_en 
+                    savehomedetail.section_5_heading_ar = team_name_ar 
+                    savehomedetail.section_5_title_en = team_title_en 
+                    savehomedetail.section_5_title_ar = team_title_ar 
+                    savehomedetail.section_6_heading_en = achievements_heading_name_en
+                    savehomedetail.section_6_heading_ar = achievements_heading_name_ar
+                    savehomedetail.section_6_title_en  = achievements_heading_title_en
+                    savehomedetail.section_6_title_ar  = achievements_heading_title_ar
+                    savehomedetail.section_8_heading_en  = explore_heading_name_en
+                    savehomedetail.section_8_heading_ar  = explore_heading_name_ar
+                    savehomedetail.section_8_title_en  = explore_heading_title_en
+                    savehomedetail.section_8_title_ar  = explore_heading_title_ar
+                    savehomedetail.section_9_heading_en = blognews_heading_name_en
+                    savehomedetail.section_9_heading_ar = blognews_heading_name_ar
+                    savehomedetail.section_9_title_en = blognews_heading_title_en
+                    savehomedetail.section_9_title_ar = blognews_heading_title_ar
+                    savehomedetail.section_10_heading_en = partners_heading_name_en
+                    savehomedetail.section_10_heading_ar = partners_heading_name_ar
+                    savehomedetail.section_10_title_en  = partners_heading_title_en
+                    savehomedetail.section_10_title_ar  = partners_heading_title_ar
+                    savehomedetail.meta_title_en  = seo_title_en
+                    savehomedetail.meta_title_ar  = seo_title_ar
+                    savehomedetail.meta_content_en  = seo_content_en
+                    savehomedetail.meta_content_ar   = seo_content_ar
+
+                    '''if 'heading_banner' in request.FILES:
+                        
+                        heading_banner = request.FILES.get('heading_banner',None)
+                        if heading_banner:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_banner.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in heading_banner.chunks():
+                                        destination.write(chunk)
+                                        imageName.append(heading_banner.name)
+                                        savenewsdetail.heading_banner = heading_banner
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass'''
+                    
+                    '''savenewsdetail.section_2_title_en = heading_title_en
+                    savenewsdetail.section_2_title_ar = heading_title_ar
+                    savenewsdetail.section_2_content_en = heading_content_en
+                    savenewsdetail.section_2_content_ar = heading_content_ar
+                    savenewsdetail.meta_title_en = seo_title_en
+                    savenewsdetail.meta_title_ar = seo_title_ar
+                    savenewsdetail.meta_content_en = seo_content_en
+                    savenewsdetail.meta_content_ar = seo_content_ar
+
+                    savenewsdetail.save()'''
+                    
+                    
+                    feature_count = request.POST.get('features_passed')
+                    
+                    print("this is feature: "+str(feature_count))
+                    if feature_count:
+                        for i in range(int(feature_count)+1):
+                            
+                            dom = i+1
+                            image = 0
+                            print("loop: "+str(dom))
+                            feature_title_en = request.POST.get('features_section_form_title_en_{}'.format(str(dom)))
+                            feature_title_ar = request.POST.get('features_section_form_title_ar_{}'.format(str(dom)))
+                            feature_content_en = request.POST.get('features_section_form_content_en_{}'.format(str(dom)))
+                            feature_content_ar = request.POST.get('features_section_form_content_ar_{}'.format(str(dom)))
+                            feature_field = request.POST.get('id')
+                            unique_id = request.POST.get('uid_{}'.format(dom))
+                            print(unique_id)
+                            print("title_ar {}: ".format(dom)+str(feature_title_ar))
+                            
+                            existing_record = cms_home_dynamic_field.objects.filter(field_id=unique_id).first()
+                            print("exisiting: "+str(existing_record))
+                            
+                            if 'image_{}'.format(str(dom)) in request.FILES:
+                                
+                                image = request.FILES.get('image_{}'.format(str(dom)),None)
+                                print("image: "+str(image))
+                                
+                                if image:
+                                    try:
+                                        save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image.name)
+                                        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                        # Save the file
+                                        with open(save_path, 'wb+') as destination:
+                                            for chunk in image.chunks():
+                                                destination.write(chunk)
+                                                #imageName.append(heading_banner.name)
+                                                #savenewsdetail.heading_banner = heading_banner
+
+                                    except Exception as e:
+                                        dom = str(e)
+                                
+                            if existing_record:
+                                    # Update the existing record
+                                    existing_record.title_en = feature_title_en
+                                    existing_record.title_ar = feature_title_ar
+                                    existing_record.content_en = feature_content_en
+                                    existing_record.content_ar = feature_content_ar
+                                    
+                                    if image:  # Update the image if a new one is uploaded
+                                        existing_record.images = image
+
+                                    existing_record.save()  # Save the updated record
+                                    print("exsiting_title: "+str(existing_record.title_en))
+                            else:        
+                                savehomedynamcidetail = cms_home_dynamic_field(
+                                            field_id=unique_id,
+                                            title_en=feature_title_en,
+                                            title_ar=feature_title_ar,
+                                            content_en=feature_content_en,
+                                            content_ar=feature_content_ar,
+                                            images=image
+                                )
+                                savehomedynamcidetail.save()        
+                                
+                                print("last unique id: "+str(unique_id))
+                            delete_record = cms_home_dynamic_field.objects.filter(field_id = None)
+                            delete_record.delete()
+                            #savehomedynamcidetail.save() 
+                            '''print(feature_title_en)
+                            print("this is id: "+feature_field)
+                            if 'image_{}'.format(str(dom)) in request.FILES:
+                                
+                                image = request.FILES.get('image_{}'.format(str(dom)),None)
+                                print("image: "+str(image))
+                                
+                                if image:
+                                    try:
+                                        save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image.name)
+                                        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                        # Save the file
+                                        with open(save_path, 'wb+') as destination:
+                                            for chunk in image.chunks():
+                                                destination.write(chunk)
+                                                #imageName.append(heading_banner.name)
+                                                #savenewsdetail.heading_banner = heading_banner
+
+                                    except Exception as e:
+                                        dom = str(e)
+                                
+                                #savehomedynamcidetail = cms_home_dynamic_field(field_id = feature_field,title_en =feature_title_en,title_ar = feature_title_ar,content_en=feature_content_en,content_ar = feature_content_ar,images = image)
+                            existing_record = cms_home_dynamic_field.objects.filter(field_id=feature_field).first()
+                            print("exisiting: "+str(existing_record))
+                            if existing_record:
+                                    # Update the existing record
+                                    existing_record.title_en = feature_title_en
+                                    existing_record.title_ar = feature_title_ar
+                                    existing_record.content_en = feature_content_en
+                                    existing_record.content_ar = feature_content_ar
+                                    
+                                    if image:  # Update the image if a new one is uploaded
+                                        existing_record.images = image
+
+                                    existing_record.save()  # Save the updated record
+                                    print(existing_record.title_en)
+                            else:
+                                    # Create a new record if one doesn't exist
+                                    savehomedynamcidetail = cms_home_dynamic_field(
+                                        field_id=feature_field,
+                                        title_en=feature_title_en,
+                                        title_ar=feature_title_ar,
+                                        content_en=feature_content_en,
+                                        content_ar=feature_content_ar,
+                                        images=image
+                                    )
+                                    savehomedynamcidetail.save() 
+                                #savehomedynamcidetail.save()     '''    
+                        else:
+                                pass 
+                    savehomedetail.save()        
+                    
+                    deletedField = request.POST.get('deletedField')
+                    print(deletedField)
+                    
+                    if deletedField !=0:
+                        for i in range(int(deletedField)):
+                            
+                            deleted_id = request.POST.get('deleted_field_{}'.format(i))
+                            print(deleted_id)
+                            delete_the_record  = cms_home_dynamic_field.objects.filter(field_id = deleted_id ).delete()
+                    else:
+                        print("value is 0")        
+
+                        
+                    
+                    if 'home_heading_section_image_1' in request.FILES:
+                        
+                        image_1 = request.FILES.get('home_heading_section_image_1',None)
+                        
+                        if image_1:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_1.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_1.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        savehomedetail.heading_image_1 = image_1
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    
+                    if 'home_heading_section_image_2' in request.FILES:
+                        
+                        image_2 = request.FILES.get('home_heading_section_image_2',None)
+                        print("image: "+str(image_2))
+                        if image_2:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_2.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_2.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.heading_image_2 = image_2
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'home_heading_section_image_3' in request.FILES:
+                        
+                        image_3 = request.FILES.get('home_heading_section_image_3',None)
+                        print("image: "+str(image_3))
+                        if image_3:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_3.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_3.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.heading_image_3 = image_3
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'home_heading_section_icon' in request.FILES:
+                        
+                        image_4 = request.FILES.get('home_heading_section_icon',None)
+                        print("image: "+str(image_4))
+                        if image_4:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_4.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_4.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.sub_heading_logo = image_4
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                      
+                    if 'home_heading_section_2_icon_1' in request.FILES:
+                        
+                        image_5 = request.FILES.get('home_heading_section_2_icon_1',None)
+                        print("image: "+str(image_5))
+                        if image_5:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_5.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_5.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.sub_heading_icon_1 = image_5
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'home_heading_section_2_icon_2' in request.FILES:
+                        
+                        image_6 = request.FILES.get('home_heading_section_2_icon_2',None)
+                        print("image: "+str(image_6))
+                        if image_6:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_6.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_6.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.sub_heading_icon_2 = image_6
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'empower_section_icon' in request.FILES:
+                        
+                        image_7 = request.FILES.get('empower_section_icon',None)
+                        print("image: "+str(image_7))
+                        if image_7:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_7.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_7.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_2_logo = image_7
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'empower_section_background_image' in request.FILES:
+                        
+                        image_8 = request.FILES.get('empower_section_background_image',None)
+                        print("image: "+str(image_8))
+                        if image_8:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_8.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_8.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_2_background = image_8
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'feature_image_1' in request.FILES:
+                        
+                        image_9 = request.FILES.get('feature_image_1',None)
+                        print("image: "+str(image_9))
+                        if image_9:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_9.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_9.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_3_feature_icons = image_9
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'spirit_icon_e' in request.FILES:
+                        
+                        image_10 = request.FILES.get('spirit_icon_e',None)
+                        print("image: "+str(image_10))
+                        if image_10:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_10.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_10.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_4_image = image_10
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass 
+                    
+                    if 'spirit_background_image' in request.FILES:
+                        
+                        image_11 = request.FILES.get('spirit_background_image',None)
+                        print("image: "+str(image_11))
+                        if image_11:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_11.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_11.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_4_background = image_11
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass
+                    
+                    if 'achivements_image_e' in request.FILES:
+                        
+                        image_12 = request.FILES.get('achivements_image_e',None)
+                        print("image: "+str(image_12))
+                        if image_12:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_12.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_12.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_5_image = image_12
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass  
+                    
+                    if 'testomonial_icon' in request.FILES:
+                        
+                        image_13 = request.FILES.get('testomonial_icon',None)
+                        print("image: "+str(image_13))
+                        if image_13:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_13.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_13.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_7_logo = image_13
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass  
+                    
+                    if 'testomonial_image_1' in request.FILES:
+                        
+                        image_14 = request.FILES.get('testomonial_image_1',None)
+                        print("image 14: "+str(image_14))
+                        if image_14:
+                            try:
+                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image_14.name)
+                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                # Save the file
+                                with open(save_path, 'wb+') as destination:
+                                    for chunk in image_14.chunks():
+                                        destination.write(chunk)
+                                        #imageName.append(heading_banner.name)
+                                        #savenewsdetail.heading_banner = heading_banner
+                                        savehomedetail.section_7_image = image_14
+
+                            except Exception as e:
+                                dom = str(e)
+                    else:
+                        pass  
+                    #dom = "True"
+                    savehomedetail.save()
+                    messages.success(request, "Home Page Updated Successfully")
+                               
+                except Exception as e:
+                    print(str(e))
+                    messages.error(request,str(e))    
+                      
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                        'heading_title_en': "hell"
+                }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+            
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+
+
+def get_feature_template(request):
+    counter = request.GET.get('counter')
+    return render(request, 'feature_section.html', {'counter': counter})           

@@ -134,6 +134,7 @@ urlpatterns = [
 
     #cms home page
     path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
+    path('savehomepage/',savehomedetail,name="savehomepage"),
     #News List URL
     path('news_list/', NewsListView.as_view(), name='news_list'),
     path('news_list/create/', NewsCreateView.as_view(), name='news_create'),

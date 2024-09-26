@@ -571,3 +571,20 @@ class cms_advertise_dynamic_field(models.Model):
 
     class Meta():
         db_table = "futureStar_app_cms_advertise_dynamic_field"      
+#changes   
+class cms_home_dynamic_field(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    field_id = models.CharField(max_length=255,blank=True,null=True)
+
+    title_en = models.CharField(max_length=255,blank=True,null=True)
+    title_ar = models.CharField(max_length=255,blank=True,null=True)
+
+    content_en = models.TextField(blank=True,null=True)
+    content_ar = models.TextField(blank=True,null=True)
+
+    images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
+    class Meta():
+        db_table = "futureStar_app_cms_home_dynamic_field"      
+                        

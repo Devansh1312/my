@@ -24,7 +24,8 @@
                         <h1 style="font-size:25px">CMS Home  Page Edit</h1>
                     </div>    
 
-                    <p id="heading-error"></p>
+                    <p class = "erro-heading" id="heading-error"></p>
+
 
                     <br>
                     <div>
@@ -42,16 +43,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-heading-title-en" name="home_heading_title" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="home-heading-title-en" name="home_heading_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-heading-title-ar" name="home_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="home-heading-title-ar" name="home_heading_title_ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -62,7 +65,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-en" name="home_heading_content_en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-en" name="home_heading_content_en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-content-en"></p>
 
                             </div>
                         </div>
@@ -70,7 +74,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-ar" name="home_heading_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-ar" name="home_heading_content_ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-content-ar"></p>
 
                             </div>
                         </div>
@@ -81,12 +86,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-section-image-1">Heading image-1 </label>
-                                <input class="form-control btn-pill" id="home-heading-section-image-1" name="home_heading_section_image_1" type="file"  onchange= "displayheadingImage1(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="home-heading-section-image-1" name="home_heading_section_image_1" type="file"  onchange= "displayheadingImage1(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-home-image-1" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-home-image-1" src = "/media/{{data.heading_image_1}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -97,12 +102,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-section-image-2">Heading image-2 </label>
-                                <input class="form-control btn-pill" id="home-heading-section-image-2" name="home_heading_section_image_2" type="file"  onchange= "displayheadingImage2(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="home-heading-section-image-2" name="home_heading_section_image_2" type="file"  onchange= "displayheadingImage2(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-home-image-2" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-home-image-2" src = "/media/{{data.heading_image_2}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -113,12 +118,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-section-image-3">Heading image-3 </label>
-                                <input class="form-control btn-pill" id="home-heading-section-image-3" name="home_heading_section_image_3" type="file"  onchange= "displayheadingImage3(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="home-heading-section-image-3" name="home_heading_section_image_3" type="file"  onchange= "displayheadingImage3(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-home-image-3" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-home-image-3" src = "/media/{{data.heading_image_3}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -139,16 +144,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-1-name-en">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-1-name-en" name="home_sub_heading_1_name_en" type="text" value="1" placeholder="Name (English)">
-                               
+                                <input class="form-control btn-pill " id="home-sub-heading-1-name-en" name="home_sub_heading_1_name_en" type="text" value="{{data.sub_heading_name_en}}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-name-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-1-name-ar">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-1-name-ar" name="home_sub_heading_1_name_en" type="text" value="1" placeholder="Name (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="home-sub-heading-1-name-ar" name="home_sub_heading_1_name_en" type="text" value="{{data.sub_heading_name_ar}}" placeholder="Name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -157,16 +164,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-1-title_en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-1-title-en" name="home_sub_heading_1_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="home-sub-heading-1-title-en" name="home_sub_heading_1_title_en" type="text" value="{{data.sub_heading_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-1-title_ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-1-title-ar" name="home_sub_heading_1_title_en" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="home-sub-heading-1-title-ar" name="home_sub_heading_1_title_en" type="text" value="{{data.sub_heading_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -179,12 +188,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-section-icon">Heading Icon </label>
-                                <input class="form-control btn-pill" id="home-heading-section-icon" name="home_heading_section_icon" type="file"  onchange= "displayheadingicon(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="home-heading-section-icon" name="home_heading_section_icon" type="file"  onchange= "displayheadingicon(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-home-icon" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-home-icon"  src = "/media/{{data.sub_heading_logo}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -207,12 +216,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-section-2-icon-1">Heading Icon </label>
-                                <input class="form-control btn-pill" id="home-heading-section-2-icon-1" name="home_heading_section_2_icon_1" type="file"  onchange= "displayheadingsection2icon1(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="home-heading-section-2-icon-1" name="home_heading_section_2_icon_1" type="file"  onchange= "displayheadingsection2icon1(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-section-2-icon-1" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-section-2-icon-1" src = "/media/{{data.sub_heading_icon_1}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -222,16 +231,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-Title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-section-2-Title-en" name="home_sub_heading_section_2_Title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="home-sub-heading-section-2-Title-en" name="home_sub_heading_section_2_Title_en" type="text" value="{{data.sub_heading_logo_title_1_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-Title-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-section-2-Title-ar" name="home_sub_heading_section_2_Title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="home-sub-heading-section-2-Title-ar" name="home_sub_heading_section_2_Title_ar" type="text" value="{{data.sub_heading_logo_title_1_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -240,16 +251,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-content-en">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-en" name="home_sub_heading_section_2_content_en" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-en" name="home_sub_heading_section_2_content_en" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_1_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-content-ar">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-ar" name="home_sub_heading_section_2_content_ar" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-ar" name="home_sub_heading_section_2_content_ar" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_1_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -264,12 +277,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="home-heading-section-2-icon-2">Heading Icon </label>
-                                <input class="form-control btn-pill" id="home-heading-section-2-icon-2" name="home_heading_section_2_icon_2" type="file"  onchange= "displayheadingsection2icon2(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="home-heading-section-2-icon-2" name="home_heading_section_2_icon_2" type="file"  onchange= "displayheadingsection2icon2(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-section-2-icon-2" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-section-2-icon-2" src = "/media/{{data.sub_heading_icon_2}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -279,16 +292,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-Title-1-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-section-2-Title-1-en" name="home_sub_heading_section_2_Title_1_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="home-sub-heading-section-2-Title-1-en" name="home_sub_heading_section_2_Title_1_en" type="text" value="{{data.sub_heading_logo_title_2_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-1-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-Title-1-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-section-2-Title-1-ar" name="home_sub_heading_section_2_Title_1_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="home-sub-heading-section-2-Title-1-ar" name="home_sub_heading_section_2_Title_1_ar" type="text" value="{{data.sub_heading_logo_title_2_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-1-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -297,16 +312,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-content-1-en">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-en" name="home_sub_heading_section_2_content_1_en" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-en" name="home_sub_heading_section_2_content_1_en" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_2_en }}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-1-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="home-sub-heading-section-2-content-1-ar">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-ar" name="home_sub_heading_section_2_content_1_ar" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-ar" name="home_sub_heading_section_2_content_1_ar" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_2_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-1-ar"></p>
+
                             </div>
                         </div>
                     </div>                        
@@ -323,16 +340,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-name-en">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="empower-section-name-en" name="empower_section_name_en" type="text" value="1" placeholder="Name (English)">
-                               
+                                <input class="form-control btn-pill " id="empower-section-name-en" name="empower_section_name_ar" type="text" value="{{data.section_2_heading_en}}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-name-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-name-ar">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="empower-section-name-ar" name="empower_section_name_en" type="text" value="1" placeholder="Name (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="empower-section-name-ar" name="empower_section_name_ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -341,16 +360,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="empower-section-title-en" name="empower_section_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="empower-section-title-en" name="empower_section_title_en" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-title-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="empower-section-title-ar" name="empower_section_title_en" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="empower-section-title-ar" name="empower_section_title_en" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -359,16 +380,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-content-en">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="hempower-section-content-en" name="empower_section_content_en" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-en" name="empower_section_content_en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-content-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-content-ar">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-ar" name="empower-section-content-ar" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-ar" name="empower-section-content-ar" type="text" placeholder="content (English)">{{data.section_2_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-content-ar"></p>
+
                             </div>
                         </div>
                     </div>     
@@ -377,12 +400,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-icon">Icon </label>
-                                <input class="form-control btn-pill" id="empower-section-icon" name="empower_section_icon" type="file"  onchange= "displayheadingempowericon(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="empower-section-icon" name="empower_section_icon" type="file"  onchange= "displayheadingempowericon(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-empower-section-icon" style="display: none; width: 100px; height: 100px;" />
+                                <img id="selected-empower-section-icon" src = "/media/{{data.section_2_logo}}" style="display: block; width: 100px; height: 100px;" />
 
                             </div>
                         </div>
@@ -393,12 +416,12 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label class="form-label" for="empower-section-background-image">Background Image </label>
-                                <input class="form-control btn-pill" id="empower-section-background-image" name="empower_section_background_image" type="file"  onchange= "displayheadingempowerbackimage(event)" accept="image/*">
+                                <input class="form-control btn-pill" id="empower-section-background-image" name="empower_section_background_image" type="file"  onchange= "displayheadingempowerbackimage(event)" accept="image/jpeg,image/png">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-empower-section-background-image" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-empower-section-background-image" src ="/media/{{data.section_2_background}}" style="display: block; width: 200px; height: 50px;" />
 
                             </div>
                         </div>
@@ -414,16 +437,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="features-section-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="features-section-name-en" name="features_section_name_en" type="text" value="1" placeholder="Name (English)">
-                               
+                                <input class="form-control btn-pill " id="features-section-name-en" name="features_section_name_en" type="text" value="{{data.section_3_heading_en }}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-name-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="features-section-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="features-section-name-ar" name="features_section_name_ar" type="text" value="1" placeholder="Name (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="features-section-name-ar" name="features_section_name_ar" type="text" value="{{data.section_3_heading_ar}}" placeholder="Name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -432,16 +457,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="features-section-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="features-section-title-en" name="features_section_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="features-section-title-en" name="features_section_title_en" type="text" value="{{data.section_3_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="features-section-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="features-section-title-ar" name="features_section_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="features-section-title-ar" name="features_section_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -450,43 +477,52 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="features-section-content-en">Section Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-en" name="features_section_content_en" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-en" name="features_section_content_en" type="text" placeholder="content (English)">{{data.section_3_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-content-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="features-section-content-ar">Section Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-ar" name="features-section-content-ar" type="text" placeholder="content (English)">1</textarea>
-                               
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-ar" name="features-section-content-ar" type="text" placeholder="content (English)">{{data.section_3_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-content-ar"></p>
+
                             </div>
                         </div>
                     </div>  
+                        
                     
                     <div id="form-container-features">
+
                         <div id="dynamic-features-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Features Section-1</h1>
+                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-1">Features Section-1</h1>
+
                         </div>
 
                         <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
 
                         <br>
 
+
+
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-title-en-1">Title (English)</label>
-                                    <input class="form-control btn-pill " id="features-section-form-title-en-1" name="features_section_form_title_en_1" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <input class="form-control btn-pill " id="features-section-form-title-en-1" name="features_section_form_title_en_1" type="text" value="{{data.section_3_feature_title_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-en-1"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-title-ar-1">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="features-section-form-title-ar-1" name="features_section_form_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <input class="form-control btn-pill" id="features-section-form-title-ar-1" name="features_section_form_title_ar_1" type="text" value="{{data.section_3_feature_title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-ar-1"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -495,16 +531,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-content-en-1">Section Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-1" name="features_section_form_content_en_1" type="text" placeholder="content (English)">1</textarea>
-                                   
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-1" name="features_section_form_content_en_1" type="text" placeholder="content (English)">{{data.section_3_feature_short_content_en}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-en-1"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-content-ar-1">Section Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-1" name="features_section_form_content_ar_1" type="text" placeholder="content (English)">1</textarea>
-                                   
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-1" name="features_section_form_content_ar_1" type="text" placeholder="content (English)">{{data.section_3_feature_short_content_ar}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-ar-1"></p>
+
                                 </div>
                             </div>
                         </div>  
@@ -513,13 +551,14 @@
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label" for="feature-image-1">Icon </label>
-                                    <input class="form-control btn-pill" id="feature-image-1" name="feature_image_1" type="file"  onchange= "displayImagefeatureicon(event,count=1)" accept="image/*">
+                                    <input class="form-control btn-pill" id="feature-image-1" name="feature_image_1" type="file"  onchange= "displayImagefeatureicon(event,count=1)" accept="image/jpeg,image/png">
                                     <!--{% if system_settings.fav_icon %}-->
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-feature-icon-1" style="display: none; width: 100px; height: 100px;" />
-    
+                                    <img id="selected-feature-icon-1" src= "/media/{{data.section_3_feature_icons}}"   style="display: block; width: 100px; height: 100px;" />
+                                    <input type="hidden" class="last-feature-field-id" value="1"/>
+
                                 </div>
                             </div>
                             <p id = "feature-icon-warning-1"></p>
@@ -532,12 +571,111 @@
                     <div>
                         <br>
 
-                        <div id="dynamic-feature-section-field">
-                            <div class="col-12  text-end " >
-                                <button id="add-row" onclick ="return add_dynamic_features()" class="btn btn-success">+</button>
 
-                            </div>   
+                        
+
+                        {% if features %}
+
+
+                    <div id="form-container-features">
+                        {% for feature in features %}
+                        <div id = "section-{{feature.field_id}}">
+                        <div id="dynamic-features-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-2">Features Section-{{ forloop.counter|add:"1" }}</h1>
+                            <p id="field-id" style='display:none'>{{feature.field_id}}</p>
+                            <p id="field-roll-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{feature.field_id}}</p>
+
                         </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+
+
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="features-section-form-title-en-{{ forloop.counter|add:'1' }}">Title (English)</label>
+                                    <input class="form-control btn-pill " id="features-section-form-title-en-{{ forloop.counter|add:'1' }}" name="features_section_form_title_en_{{feature.field_id}}" type="text" value="{{feature.title_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-en-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="features-section-form-title-ar-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="features-section-form-title-ar-{{ forloop.counter|add:'1' }}" name="features_section_form_title_ar_{{ forloop.counter|add:'1' }}" type="text" value="{{feature.title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-ar-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="features-section-form-content-en-{{ forloop.counter|add:'1' }}">Section Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-{{ forloop.counter|add:'1' }}" name="features_section_form_content_en_{{feature.field_id}}" type="text" placeholder="content (English)">{{feature.content_en}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-en-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="features-section-form-content-ar-{{ forloop.counter|add:'1' }}">Section Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-{{ forloop.counter|add:'1' }}" name="features_section_form_content_ar_{{feature.field_id}}" type="text" placeholder="content (English)">{{feature.content_ar}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-ar-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+                        </div>  
+                        
+                        <div class="row" id = "feature-icon-section-1">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="feature-image-1">Icon </label>
+                                    <input class="form-control btn-pill" id="feature-image-{{ forloop.counter|add:'1' }}" name="feature_image_{{ forloop.counter|add:'1' }}" type="file"  onchange= "displayImagefeatureicon(event,count=`{{ forloop.counter|add:'1' }}`)" accept="image/jpeg,image/png">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-feature-icon-{{ forloop.counter|add:'1' }}"  src = "/media/{{feature.images}}" style="display: block; width: 100px; height: 100px;" />
+                                    <p style="color: red; display: none;" class="error-message" id ="error-selected-feature-icon-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+                            <p id = "feature-icon-warning-1"></p>
+                        </div> 
+                        {% if forloop.last %}
+                            <input type="hidden" class="last-feature-field-id" value="{{ forloop.counter|add:'1' }}"/>
+                         {% endif %}
+                        <div class="col-12  text-end " >
+
+                                        <button id="delete-row" onclick ="return deleteTheRow(`{{feature.field_id}}`)" class="btn btn-danger">-</button>
+                        </div> 
+
+
+                        
+
+                    </div>
+                        
+
+                   
+                        <br>
+                    {% endfor %}   
+                {% else %}
+                    <p></p>
+                {% endif %}     
+                <div id="dynamic-feature-section-field">
+                    <div class="col-12  text-end " >
+                        <button id="add-row" onclick ="return add_dynamic_features()" class="btn btn-success">+</button>
+
+                    </div>   
+                </div>
+                <br>
 <br>
                         <div class="row" style="margin-bottom: 10px;">
                             <h4> Features Star Spirit</h4>
@@ -549,16 +687,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="spirit-section-title-en">Section Title (English)</label>
-                                    <input class="form-control btn-pill " id="spirit-section-title-en" name="spirit_section_title_en" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <input class="form-control btn-pill " id="spirit-section-title-en" name="spirit_section_title_en" type="text" value="{{data.section_4_title_en }}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-title-en"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="spirit-section-title-ar">Section Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="spirit-section-title-ar" name="spirit_section_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <input class="form-control btn-pill" id="spirit-section-title-ar" name="spirit_section_title_ar" type="text" value="{{data.section_4_title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -567,16 +707,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="spirit-section-content-en">Section Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-en" name="spirit_section_content_en" type="text" placeholder="content (English)">1</textarea>
-                                   
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-en" name="spirit_section_content_en" type="text" placeholder="content (English)">{{data.section_4_content_en}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-content-en"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="spirit-section-content-ar">Section Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-ar" name="spirit_section_content_ar" type="text" placeholder="content (English)">1</textarea>
-                                   
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-ar" name="spirit_section_content_ar" type="text" placeholder="content (English)">{{data.section_4_content_ar}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-content-ar"></p>
+
                                 </div>
                             </div>
                         </div>  
@@ -586,12 +728,12 @@
                                 <div class="col-12">
                                     <div class="mb-3">
                                         <label class="form-label" for="spirit-icon">Icon </label>
-                                        <input class="form-control btn-pill" id="spirit-icon" name="spirit_icon" type="file"  onchange= "displayspiriticon(event)" accept="image/*">
+                                        <input class="form-control btn-pill" id="spirit-icon" name="spirit_icon" type="file"  onchange= "displayspiriticon(event)" accept="image/jpeg,image/png">
                                         <!--{% if system_settings.fav_icon %}-->
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
         
-                                        <img id="selected-spirit-icon" style="display: none; width: 100px; height: 100px;" />
+                                        <img id="selected-spirit-icon" src ="/media/{{data.section_4_image}}" style="display: block; width: 100px; height: 100px;" />
         
                                     </div>
                                 </div>
@@ -604,12 +746,12 @@
                                 <div class="col-12">
                                     <div class="mb-3">
                                         <label class="form-label" for="spirit-background-image">Background Image </label>
-                                        <input class="form-control btn-pill" id="spirit-background-image" name="spirit_background_image" type="file"  onchange= "displayspiritbackgroundimage(event)" accept="image/*">
+                                        <input class="form-control btn-pill" id="spirit-background-image" name="spirit_background_image" type="file"  onchange= "displayspiritbackgroundimage(event)" accept="image/jpeg,image/png">
                                         <!--{% if system_settings.fav_icon %}-->
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
         
-                                        <img id="selected-spirit-background-image" style="display: none; width: 200px; height: 50px;" />
+                                        <img id="selected-spirit-background-image" src ="/media/{{data.section_4_background}}" style="display: block; width: 200px; height: 50px;" />
         
                                     </div>
                                 </div>
@@ -628,16 +770,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="Team-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="Team-name-en" name="Team_name_en" type="text" value="1" placeholder="Name (English)">
-                               
+                                <input class="form-control btn-pill " id="Team-name-en" name="Team_name_en" type="text" value="{{data.section_5_heading_en}}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-Team-name-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="Team-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="Team-name-ar" name="Team_name_ar" type="text" value="1" placeholder="Name (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="Team-name-ar" name="Team_name_ar" type="text" value="{{data.section_5_heading_ar}}" placeholder="Name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-Team-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -646,16 +790,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="Team-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="Team-title-en" name="Team_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="Team-title-en" name="Team_title_en" type="text" value="{{data.section_5_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-Team-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="Team-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="Team-title-ar" name="Team_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="Team-title-ar" name="Team_title_ar" type="text" value="{{data.section_5_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-Team-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -670,16 +816,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="achivements-heading-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="achivements-heading-name-en" name="achivements_heading_name_en" type="text" value="1" placeholder="Name (English)">
-                               
+                                <input class="form-control btn-pill " id="achivements-heading-name-en" name="achivements_heading_name_en" type="text" value="{{data.section_6_heading_en}}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-name-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="achivements-heading-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="achivements-heading-name-ar" name="achivements_heading_name_ar" type="text" value="1" placeholder="Name (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="achivements-heading-name-ar" name="achivements_heading_name_ar" type="text" value="{{data.section_6_heading_ar}}" placeholder="Name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -688,16 +836,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="achivements-heading-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="achivements-heading-title-en" name="achivements_heading_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="achivements-heading-title-en" name="achivements_heading_title_en" type="text" value="{{data.section_6_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="achivements-heading-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="achivements-heading-title-ar" name="achivements-heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="achivements-heading-title-ar" name="achivements-heading_title_ar" type="text" value="{{data.section_6_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -707,12 +857,12 @@
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label" for="achivements-image">Image </label>
-                                    <input class="form-control btn-pill" id="achivements-image" name="achivements-image" type="file"  onchange= "displayachivementsimage(event)" accept="image/*">
+                                    <input class="form-control btn-pill" id="achivements-image" name="achivements-image" type="file"  onchange= "displayachivementsimage(event)" accept="image/jpeg,image/png">
                                     <!--{% if system_settings.fav_icon %}-->
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-achivements-image" style="display: none; width: 100px; height: 100px;" />
+                                    <img id="selected-achivements-image" src ="/media/{{data.section_5_image }}" style="display: block; width: 100px; height: 100px;" />
     
                                 </div>
                             </div>
@@ -730,16 +880,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="explore-heading-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="explore-heading-name-en" name="explore_heading_name_en" type="text" value="1" placeholder="Name (English)">
-                            
+                                <input class="form-control btn-pill " id="explore-heading-name-en" name="explore_heading_name_en" type="text" value="{{data.section_8_heading_en}}" placeholder="Name (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-name-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="explore-heading-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="explore-heading-name-ar" name="explore_heading_name_ar" type="text" value="1" placeholder="Name (Arabic)">
-                            
+                                <input class="form-control btn-pill" id="explore-heading-name-ar" name="explore_heading_name_ar" type="text" value="{{data.section_8_heading_ar}}" placeholder="Name (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -748,16 +900,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="explore-heading-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="explore-heading-title-en" name="explore_heading_title_en" type="text" value="1" placeholder="Title (English)">
-                            
+                                <input class="form-control btn-pill " id="explore-heading-title-en" name="explore_heading_title_en" type="text" value="{{data.section_8_title_en }}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="explore-heading-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="explore-heading-title-ar" name="explore_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                            
+                                <input class="form-control btn-pill" id="explore-heading-title-ar" name="explore_heading_title_ar" type="text" value="{{data.section_8_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -771,12 +925,12 @@
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label" for="testomonial-icon">Icon </label>
-                                    <input class="form-control btn-pill" id="testomonial-icon" name="testomonial_icon" type="file"  onchange= "displaytestomonialicon(event)" accept="image/*">
+                                    <input class="form-control btn-pill" id="testomonial-icon" name="testomonial_icon" type="file"  onchange= "displaytestomonialicon(event)" accept="image/jpeg,image/png">
                                     <!--{% if system_settings.fav_icon %}-->
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-testomonial-icon" style="display: none; width: 100px; height: 100px;" />
+                                    <img id="selected-testomonial-icon" src ="/media/{{data.section_7_logo}}" style="display: block; width: 100px; height: 100px;" />
     
                                 </div>
                             </div>
@@ -790,12 +944,12 @@
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label" for="testomonial-image">Image </label>
-                                    <input class="form-control btn-pill" id="testomonial-image" name="testomonial_image" type="file"  onchange= "displaytestomonialimage(event)" accept="image/*">
+                                    <input class="form-control btn-pill" id="testomonial-image" name="testomonial_image" type="file"  onchange= "displaytestomonialimage(event)" accept="image/jpeg,image/png">
                                     <!--{% if system_settings.fav_icon %}-->
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-testomonial-image" style="display: none; width: 100px; height: 100px;" />
+                                    <img id="selected-testomonial-image" src="/media/{{data.section_7_image}}" style="display: block; width: 100px; height: 100px;" />
     
                                 </div>
                             </div>
@@ -810,16 +964,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="blognews-heading-name-en">Section Name (English)</label>
-                                    <input class="form-control btn-pill " id="blognews-heading-name-en" name="blognews_heading_name_en" type="text" value="1" placeholder="Name (English)">
-                                
+                                    <input class="form-control btn-pill " id="blognews-heading-name-en" name="blognews_heading_name_en" type="text" value="{{data.section_9_heading_en}}" placeholder="Name (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-name-en"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="blognews-heading-name-ar">Section Name (Arabic)</label>
-                                    <input class="form-control btn-pill" id="blognews-heading-name-ar" name="blognews_heading_name_ar" type="text" value="1" placeholder="Name (Arabic)">
-                                
+                                    <input class="form-control btn-pill" id="blognews-heading-name-ar" name="blognews_heading_name_ar" type="text" value="{{data.section_9_heading_ar}}" placeholder="Name (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-name-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -828,16 +984,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="blognews-heading-title-en">Section Title (English)</label>
-                                    <input class="form-control btn-pill " id="blognews-heading-title-en" name="blognews_heading_title_en" type="text" value="1" placeholder="Title (English)">
-                                
+                                    <input class="form-control btn-pill " id="blognews-heading-title-en" name="blognews_heading_title_en" type="text" value="{{data.section_9_title_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-title-en"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="blognews-heading-title-ar">Section Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="blognews-heading-title-ar" name="blognews_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                
+                                    <input class="form-control btn-pill" id="blognews-heading-title-ar" name="blognews_heading_title_ar" type="text" value="{{data.section_9_title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -850,16 +1008,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partners-heading-name-en">Section Name (English)</label>
-                                    <input class="form-control btn-pill " id="partners-heading-name-en" name="partners_heading_name_en" type="text" value="1" placeholder="Name (English)">
-                                
+                                    <input class="form-control btn-pill " id="partners-heading-name-en" name="partners_heading_name_en" type="text" value="{{data.section_10_heading_en}}" placeholder="Name (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-name-en"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partners-heading-name-ar">Section Name (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partners-heading-name-ar" name="partners_heading_name_ar" type="text" value="1" placeholder="Name (Arabic)">
-                                
+                                    <input class="form-control btn-pill" id="partners-heading-name-ar" name="partners_heading_name_ar" type="text" value="{{data.section_10_heading_ar}}" placeholder="Name (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-name-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -868,16 +1028,18 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partners-heading-title-en">Section Title (English)</label>
-                                    <input class="form-control btn-pill " id="partners-heading-title-en" name="partners_heading_title_en" type="text" value="1" placeholder="Title (English)">
-                                
+                                    <input class="form-control btn-pill " id="partners-heading-title-en" name="partners_heading_title_en" type="text" value="{{data.section_10_title_en }}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-title-en"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partners-heading-title-ar">Section Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partners-heading-title-ar" name="partners_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                
+                                    <input class="form-control btn-pill" id="partners-heading-title-ar" name="partners_heading_title_ar" type="text" value="{{data.section_10_title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -893,16 +1055,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -911,7 +1075,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
                         </div>
@@ -919,7 +1084,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
                         </div>
@@ -931,7 +1097,7 @@
                    
                 </div>
                 <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return sendData()">Save</button>
+                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
                     <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
                 </div>
             </form>
@@ -943,7 +1109,8 @@
 
 <!--javascript-->
 <script>
-
+    //featureCount =0 
+    let counter = 0
     function  backtolist(){
 
         url = "{% url 'cmspages_urls' %}";
@@ -955,108 +1122,593 @@
         
     }
 
-    function checkValidation(){
-        var validationcheckpoint
 
-        try{
-            var tc_title_en = document.getElementById("tc-title-en")
-            var tc_title_ar = document.getElementById("tc-title-ar")
-            var tc_content_en = document.getElementById("tc-content-en")
-            var tc_content_ar = document.getElementById("tc-content-ar")
-            var seo_title_en = document.getElementById("meta-title-en")
-            var seo_title_ar = document.getElementById("meta-title-ar")
-            var seo_content_en = document.getElementById("meta-content-en")
-            var seo_content_ar = document.getElementById("meta-content-ar")
+       
 
-
-            if(tc_title_en.value == ""){
-            return validationcheckpoint = "error"
-            }
-            else if(tc_title_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_en.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(seo_title_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_title_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else{
-                return validationcheckpoint = "success"
-            }
-        }
-        catch(err){
-            alert(err)
-        }
-        
-        /*var heading_content_en = document.getElementById("heading-section-content-en")
-        var heading_content_ar = document.getElementById("heading-section-content-ar")
-        var  tryoutclubs_title_en = document.getElementById("tryoutclubs-title-en")
-        var  tryoutclubs_title_ar = document.getElementById("tryoutclubs-title-ar")
-        */
-
-        
-        
-        
-
-
-    }
-
-    function sendData(){
-        var validation = checkValidation()
-        
-        
-            
-           
-        
-      
-        if(validation == "success"){
-
+    function savethedata(){
         
             try{
 
                 //text
+                try{
+                var home_heading_title_en = document.getElementById("home-heading-title-en")
+                var home_heading_title_ar = document.getElementById("home-heading-title-ar")
+                var home_heading_content_en = document.getElementById("home-heading-content-en")
+                var home_heading_content_ar = document.getElementById("home-heading-content-ar")
+                var home_sub_heading_1_name_en = document.getElementById("home-sub-heading-1-name-en")
+                var home_sub_heading_1_name_ar = document.getElementById("home-sub-heading-1-name-ar")
+                var home_sub_heading_1_title_en = document.getElementById("home-sub-heading-1-title-en")
+                var home_sub_heading_1_title_ar = document.getElementById("home-sub-heading-1-title-ar")
+                var home_sub_heading_section_2_Title_en = document.getElementById("home-sub-heading-section-2-Title-en")
+                var home_sub_heading_section_2_Title_ar = document.getElementById("home-sub-heading-section-2-Title-ar")
+                var home_sub_heading_section_2_content_en = document.getElementById("home-sub-heading-section-2-content-en")
+                var home_sub_heading_section_2_content_ar = document.getElementById("home-sub-heading-section-2-content-ar")
+                var home_sub_heading_section_2_Title_1_en = document.getElementById("home-sub-heading-section-2-Title-1-en")
+                var home_sub_heading_section_2_Title_1_ar = document.getElementById("home-sub-heading-section-2-Title-1-ar")
+                var home_sub_heading_section_2_content_1_en = document.getElementById("home-sub-heading-section-2-content-1-en")
+                var home_sub_heading_section_2_content_1_ar = document.getElementById("home-sub-heading-section-2-content-1-ar")
+                var empower_section_name_en = document.getElementById("empower-section-name-en")
+                var empower_section_name_ar = document.getElementById("empower-section-name-ar")
+                var empower_section_title_en = document.getElementById("empower-section-title-en")
+                var empower_section_title_ar = document.getElementById("empower-section-title-ar")
+                var empower_section_content_en = document.getElementById("empower-section-content-en")
+                var empower_section_content_ar = document.getElementById("empower-section-content-ar")
+                var features_section_name_en = document.getElementById("features-section-name-en")
+                var features_section_name_ar = document.getElementById("features-section-name-ar")
+                var features_section_title_en = document.getElementById("features-section-title-en")
+                var features_section_title_ar = document.getElementById("features-section-title-ar")
+                var features_section_content_en = document.getElementById("features-section-content-en")
+                var features_section_content_ar = document.getElementById("features-section-content-ar")
+                var features_section_form_title_en_1 = document.getElementById("features-section-form-title-en-1")
+                var features_section_form_title_ar_1 = document.getElementById("features-section-form-title-ar-1")
+                var features_section_form_content_en_1 = document.getElementById("features-section-form-content-en-1")
+                var features_section_form_content_ar_1 = document.getElementById("features-section-form-content-ar-1")
+                var spirit_section_title_en = document.getElementById("spirit-section-title-en")
+                var spirit_section_title_ar = document.getElementById("spirit-section-title-ar")
+                var spirit_section_content_en = document.getElementById("spirit-section-content-en")
+                var spirit_section_content_ar = document.getElementById("spirit-section-content-ar")
+                var Team_name_en = document.getElementById("Team-name-en")
+                var Team_name_ar = document.getElementById("Team-name-ar")
+                var Team_title_en = document.getElementById("Team-title-en")
+                var Team_title_ar = document.getElementById("Team-title-ar")
+                var achivements_heading_name_en = document.getElementById("achivements-heading-name-en")
+                var achivements_heading_name_ar = document.getElementById("achivements-heading-name-ar")
+                var achivements_heading_title_en = document.getElementById("achivements-heading-title-en")
+                var achivements_heading_title_ar = document.getElementById("achivements-heading-title-ar")
+                var explore_heading_name_en = document.getElementById("explore-heading-name-en")
+                var explore_heading_name_ar = document.getElementById("explore-heading-name-ar")
+                var explore_heading_title_en = document.getElementById("explore-heading-title-en")
+                var explore_heading_title_ar = document.getElementById("explore-heading-title-ar")
 
-                var tc_title_en = document.getElementById("tc-title-en")
-                var tc_title_ar = document.getElementById("tc-title-ar")
-                var tc_content_en = document.getElementById("tc-content-en")
-                var tc_content_ar = document.getElementById("tc-content-ar")
+                var blognews_heading_name_en = document.getElementById("blognews-heading-name-en")
+                var blognews_heading_name_ar = document.getElementById("blognews-heading-name-ar")
+                var blognews_sheading_title_en = document.getElementById("blognews-heading-title-en")
+                var blognews_sheading_title_ar = document.getElementById("blognews-heading-title-ar")
+                var partners_heading_name_en = document.getElementById("partners-heading-name-en")
+                var partners_heading_name_ar = document.getElementById("partners-heading-name-ar")
+                var partners_heading_title_en = document.getElementById("partners-heading-title-en")
+                var partners_heading_title_ar = document.getElementById("partners-heading-title-ar")
+                //var partners_heading_title_ar = document.getElementById("partners-heading-title-ar")
+                
+              
+
+
+
                 var seo_title_en = document.getElementById("meta-title-en")
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
                 var seo_content_ar = document.getElementById("meta-content-ar")
+                var top_error = document.getElementById('heading-warning')
                 var missing_text = document.getElementById('heading-error')
 
+                //image
+                var home_heading_section_image_1_e = document.getElementById('home-heading-section-image-1')
+                var home_heading_section_image_2_e = document.getElementById('home-heading-section-image-2')
+                var home_heading_section_image_3_e = document.getElementById('home-heading-section-image-3')
+                var home_heading_section_icon_e = document.getElementById('home-heading-section-icon')
+                var home_heading_section_2_icon_1_e = document.getElementById('home-heading-section-2-icon-1')
+                var home_heading_section_2_icon_2_e = document.getElementById('home-heading-section-2-icon-2')
+                var empower_section_icon_e = document.getElementById('empower-section-icon')
+                var empower_section_background_image_e = document.getElementById('empower-section-background-image')
+                var feature_image_1_e = document.getElementById('feature-image-1')
+                var spirit_icon_e = document.getElementById('spirit-icon')
+                var spirit_background_image_e= document.getElementById('spirit-background-image')
+                var achivements_image_e= document.getElementById('achivements-image')
+                var testomonial_icon_e= document.getElementById('testomonial-icon')
+
+                var testomonial_image_e = document.getElementById('testomonial-image')
+
+                var home_heading_section_image_1 = home_heading_section_image_1_e.files[0];
+                var home_heading_section_image_2 = home_heading_section_image_2_e.files[0];
+                var home_heading_section_image_3 = home_heading_section_image_3_e.files[0];
+                var home_heading_section_icon = home_heading_section_icon_e.files[0];
+                var home_heading_section_2_icon_1 = home_heading_section_2_icon_1_e.files[0];
+                var home_heading_section_2_icon_2 = home_heading_section_2_icon_2_e.files[0];
+                var empower_section_icon = empower_section_icon_e.files[0];
+                var empower_section_background_image = empower_section_background_image_e.files[0];
+                var feature_image_1 = feature_image_1_e.files[0];
+                var spirit_icon = spirit_icon_e.files[0];
+                var spirit_background_image = spirit_background_image_e.files[0];
+                var achivements_image = achivements_image_e.files[0];
+                var testomonial_icon = testomonial_icon_e.files[0];
+                var testomonial_image = testomonial_image_e.files[0];
+
+            }
+                catch(err){
+                    alert("1: "+err)
+                    return false
+
+
+                }
+                const home_data = [
+                        { id: "home-heading-title-en", name: "Home Heading Title (English)" },
+                        { id: "home-heading-title-ar", name: "Home Heading Title (Arabic)" },
+                        { id: "home-heading-content-en", name: "Home Heading Content (English)" },
+                        { id: "home-heading-content-ar", name: "Home Heading Content (Arabic)" },
+                        { id: "home-sub-heading-1-name-en", name: "Home Sub Heading 1 Name (English)" },
+                        { id: "home-sub-heading-1-name-ar", name: "Home Sub Heading 1 Name (Arabic)" },
+                        { id: "home-sub-heading-1-title-en", name: "Home Sub Heading 1 Title (English)" },
+                        { id: "home-sub-heading-1-title-ar", name: "Home Sub Heading 1 Title (Arabic)" },
+                        { id: "home-sub-heading-section-2-Title-en", name: "Home Sub Heading Section 2 Title (English)" },
+                        { id: "home-sub-heading-section-2-Title-ar", name: "Home Sub Heading Section 2 Title (Arabic)" },
+                        { id: "home-sub-heading-section-2-content-en", name: "Home Sub Heading Section 2 Content (English)" },
+                        { id: "home-sub-heading-section-2-content-ar", name: "Home Sub Heading Section 2 Content (Arabic)" },
+                        { id: "home-sub-heading-section-2-Title-1-en", name: "Home Sub Heading Section 2 Title 1 (English)" },
+                        { id: "home-sub-heading-section-2-Title-1-ar", name: "Home Sub Heading Section 2 Title 1 (Arabic)" },
+                        { id: "home-sub-heading-section-2-content-1-en", name: "Home Sub Heading Section 2 Content 1 (English)" },
+                        { id: "home-sub-heading-section-2-content-1-ar", name: "Home Sub Heading Section 2 Content 1 (Arabic)" },
+                        { id: "empower-section-name-en", name: "Empower Section Name (English)" },
+                        { id: "empower-section-name-ar", name: "Empower Section Name (Arabic)" },
+                        { id: "empower-section-title-en", name: "Empower Section Title (English)" },
+                        { id: "empower-section-title-ar", name: "Empower Section Title (Arabic)" },
+                        { id: "empower-section-content-en", name: "Empower Section Content (English)" },
+                        { id: "empower-section-content-ar", name: "Empower Section Content (Arabic)" },
+                        { id: "features-section-name-en", name: "Features Section Name (English)" },
+                        { id: "features-section-name-ar", name: "Features Section Name (Arabic)" },
+                        { id: "features-section-title-en", name: "Features Section Title (English)" },
+                        { id: "features-section-title-ar", name: "Features Section Title (Arabic)" },
+                        { id: "features-section-content-en", name: "Features Section Content (English)" },
+                        { id: "features-section-content-ar", name: "Features Section Content (Arabic)" },
+                        { id: "features-section-form-title-en-1", name: "Features Section Form Title 1 (English)" },
+                        { id: "features-section-form-title-ar-1", name: "Features Section Form Title 1 (Arabic)" },
+                        { id: "features-section-form-content-en-1", name: "Features Section Form Content 1 (English)" },
+                        { id: "features-section-form-content-ar-1", name: "Features Section Form Content 1 (Arabic)" },
+                        { id: "spirit-section-title-en", name: "Spirit Section Title (English)" },
+                        { id: "spirit-section-title-ar", name: "Spirit Section Title (Arabic)" },
+                        { id: "spirit-section-content-en", name: "Spirit Section Content (English)" },
+                        { id: "spirit-section-content-ar", name: "Spirit Section Content (Arabic)" },
+                        { id: "Team-name-en", name: "Team Name (English)" },
+                        { id: "Team-name-ar", name: "Team Name (Arabic)" },
+                        { id: "Team-title-en", name: "Team Title (English)" },
+                        { id: "Team-title-ar", name: "Team Title (Arabic)" },
+                        { id: "achivements-heading-name-en", name: "Achievements Heading Name (English)" },
+                        { id: "achivements-heading-name-ar", name: "Achievements Heading Name (Arabic)" },
+                        { id: "achivements-heading-title-en", name: "Achievements Heading Title (English)" },
+                        { id: "achivements-heading-title-ar", name: "Achievements Heading Title (Arabic)" },
+                        { id: "explore-heading-name-en", name: "Explore Heading Name (English)" },
+                        { id: "explore-heading-name-ar", name: "Explore Heading Name (Arabic)" },
+                        { id: "explore-heading-title-en", name: "Explore Heading Title (English)" },
+                        { id: "explore-heading-title-ar", name: "Explore Heading Title (Arabic)" },
+                        { id: "blognews-heading-name-en", name: "Blog/News Heading Name (English)" },
+                        { id: "blognews-heading-name-ar", name: "Blog/News Heading Name (Arabic)" },
+                        { id: "blognews-heading-title-en", name: "Blog/News Heading Title (English)" },
+                        { id: "blognews-heading-title-ar", name: "Blog/News Heading Title (Arabic)" },
+                        { id: "partners-heading-name-en", name: "Partners Heading Name (English)" },
+                        { id: "partners-heading-name-ar", name: "Partners Heading Name (Arabic)" },
+                        { id: "partners-heading-title-en", name: "Partners Heading Title (English)" },
+                        { id: "partners-heading-title-ar", name: "Partners Heading Title (Arabic)" },
+                        { id: "meta-title-en", name: "SEO Title (English)" },
+                        { id: "meta-title-ar", name: "SEO Title (Arabic)" },
+                        { id: "meta-content-en", name: "SEO Content (English)" },
+                        { id: "meta-content-ar", name: "SEO Content (Arabic)" }
+                    ];
+
+                    document.querySelectorAll('.error-message').forEach((msg) => {
+                        msg.style.display = 'none';
+                        msg.innerText = '';
+                    });
+    
+                    top_error.innerText =""
+    
+                    var sendData = "true"
+
+                    try{
+
+                    
+                    for (const field of home_data) {
+                        const input = document.getElementById(field.id);
+                        const errorMsg = document.getElementById(`error-${field.id}`);
+    
+                        if (!input.value.trim()) {
+                            
+                            errorMsg.innerText = `Please fill in ${field.name}.`;
+                            errorMsg.style.display = 'block'; 
+                                
+                                top_error.innerText = "There Should be no empty Field"
+                                top_error.style.color = "red"
+    
+                                //document.documentElement.scrollTop = 0
+                                errorMsg.scrollIntoView();
+
+                                sendData = "false"
+                                break;
+    
+                                
+                        }
+                    }
+                }
+                catch(err)
+                {
+                    console.log(err)
+                    return false
+                }
+
+
+
                 try{
+
+                if(typeof featureCount !== "undefined"){
+                for (let i = 1; i <= featureCount; i++) {
+
+                    const dynamicTitleEn = document.getElementById(`features-section-form-title-en-${i}`);
+                    const dynamicTitleAr = document.getElementById(`features-section-form-title-ar-${i}`);
+                    const dynamicContentEn = document.getElementById(`features-section-form-content-en-${i}`);
+                    const dynamicContentAr = document.getElementById(`features-section-form-content-ar-${i}`);
+                    const dynamicErrorMsgTitleEn = document.getElementById(`error-features-section-form-title-en-${i}`);
+                    const dynamicErrorMsgTitleAr = document.getElementById(`error-features-section-form-title-ar-${i}`);
+                    const dynamicErrorMsgContentEn = document.getElementById(`error-features-section-form-content-en-${i}`);
+                    const dynamicErrorMsgContentAr = document.getElementById(`error-features-section-form-content-ar-${i}`);
+                    if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                        {
+                        dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                        dynamicErrorMsgTitleEn.style.display = 'block';
+                        dynamicErrorMsgTitleEn.scrollIntoView();
+
+                        sendData = "false";
+
+                    }
+
+            
+                    if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                        dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                        dynamicErrorMsgTitleAr.style.display = 'block';
+                        dynamicErrorMsgTitleAr.scrollIntoView();
+
+                        sendData = "false";
+
+                    }
+            
+                    if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+                        dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
+                        dynamicErrorMsgContentEn.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        sendData = "false";
+
+                    }
+            
+                    if (dynamicContentAr && !dynamicContentAr.value.trim()){
+                        dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
+                        dynamicErrorMsgContentAr.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        sendData = "false";
+
+
+                    }
+                }
+
+
+            }
+        }
+    }
+    
+            catch(err){
+                alert("1: "+err)
+                return false
+            }
+        
+
+        
+            if(sendData == 'true'){
+
                     const formData = new FormData();
-                    //text
-                    formData.append('tc_title_en', tc_title_en.value );
-                    formData.append('tc_title_ar', tc_title_ar.value );
-                    formData.append('tc_content_en', tc_content_en.value );
-                    formData.append('tc_content_ar', tc_content_ar.value );
-                    formData.append('seo_title_en', seo_title_en.value );
-                    formData.append('seo_title_ar', seo_title_ar.value );
-                    formData.append('seo_content_en', seo_content_en.value );
-                    formData.append('seo_content_ar', seo_content_ar.value );
+                    
+
+                    formData.append('home_heading_title_en', home_heading_title_en.value );                    
+                    formData.append('home_heading_title_ar', home_heading_title_ar.value );
+                    formData.append('home_heading_content_en',home_heading_content_en.value );
+                    formData.append('home_heading_content_ar',home_heading_content_ar.value );
+                    formData.append('home_sub_heading_1_name_en',home_sub_heading_1_name_en.value );
+                    formData.append('home_sub_heading_1_name_ar',home_sub_heading_1_name_ar.value );
+                    formData.append('home_sub_heading_1_title_en',home_sub_heading_1_title_en.value );
+                    formData.append('home_sub_heading_1_title_ar',home_sub_heading_1_title_ar.value );                    
+                    formData.append('home_sub_heading_section_2_Title_en',home_sub_heading_section_2_Title_en.value );
+                    formData.append('home_sub_heading_section_2_Title_ar',home_sub_heading_section_2_Title_ar.value );
+                    formData.append('home_sub_heading_section_2_content_en',home_sub_heading_section_2_content_en.value );
+                    formData.append('home_sub_heading_section_2_content_ar',home_sub_heading_section_2_content_ar.value );
+                    formData.append('home_sub_heading_section_2_Title_1_en',home_sub_heading_section_2_Title_1_en.value );
+                    formData.append('home_sub_heading_section_2_Title_1_ar',home_sub_heading_section_2_Title_1_ar.value );
+                    formData.append('home_sub_heading_section_2_content_1_en',home_sub_heading_section_2_content_1_en.value );
+                    formData.append('home_sub_heading_section_2_content_1_ar',home_sub_heading_section_2_content_1_ar.value );
+                    formData.append('empower_section_name_en',empower_section_name_en.value );
+                    formData.append('empower_section_name_ar',empower_section_name_ar.value );
+                    formData.append('empower_section_title_en',empower_section_title_en.value );
+                    formData.append('empower_section_title_ar',empower_section_title_ar.value );
+                    formData.append('empower_section_content_en',empower_section_content_en.value );
+                    formData.append('empower_section_content_ar',empower_section_content_ar.value );
+                    formData.append('features_section_name_en',features_section_name_en.value );
+                    formData.append('features_section_name_ar',features_section_name_ar.value );
+                    formData.append('features_section_title_en',features_section_title_en.value );
+                    formData.append('features_section_title_ar',features_section_title_ar.value );
+                    formData.append('features_section_content_en',features_section_content_en.value );
+                    formData.append('features_section_content_ar',features_section_content_ar.value );
+                    formData.append('features_section_form_title_en_1',features_section_form_title_en_1.value );
+                    formData.append('features_section_form_title_ar_1',features_section_form_title_ar_1.value );
+                    formData.append('features_section_form_content_en_1',features_section_form_content_en_1.value );
+                    formData.append('features_section_form_content_ar_1',features_section_form_content_ar_1.value );
+                    formData.append('spirit_section_title_en',spirit_section_title_en.value );
+                    formData.append('spirit_section_title_ar',spirit_section_title_ar.value );
+                    formData.append('spirit_section_content_en',spirit_section_content_en.value );
+                    formData.append('spirit_section_content_ar',spirit_section_content_ar.value );
+                    formData.append('Team_name_en',Team_name_en.value );
+                    formData.append('Team_name_ar',Team_name_ar.value );
+                    formData.append('Team_title_en',Team_title_en.value );
+                    formData.append('Team_title_ar',Team_title_ar.value );
+                    formData.append('achivements_heading_name_en',achivements_heading_name_en.value );
+                    formData.append('achivements_heading_name_ar',achivements_heading_name_ar.value );
+                    formData.append('achivements_heading_title_en',achivements_heading_title_en.value );
+                    formData.append('achivements_heading_title_ar',achivements_heading_title_ar.value );
+                    formData.append('explore_heading_name_en',explore_heading_name_en.value );
+                    formData.append('explore_heading_name_ar',explore_heading_name_ar.value );
+                    formData.append('explore_heading_title_en',explore_heading_title_en.value );
+                    formData.append('explore_heading_title_ar',explore_heading_title_ar.value );
+                    formData.append('blognews_heading_name_en',blognews_heading_name_en.value );
+                    formData.append('blognews_heading_name_ar',blognews_heading_name_ar.value );
+                    formData.append('blognews_sheading_title_en',blognews_sheading_title_en.value );
+                    formData.append('blognews_sheading_title_ar',blognews_sheading_title_ar.value );
+                    formData.append('partners_heading_name_en',partners_heading_name_en.value );
+                    formData.append('partners_heading_name_ar',partners_heading_name_ar.value );
+                    formData.append('partners_heading_title_en',partners_heading_title_en.value );
+                    formData.append('partners_heading_title_ar',partners_heading_title_ar.value );
+                    formData.append('seo_title_en',seo_title_en.value );
+                    formData.append('seo_title_ar',seo_title_ar.value );
+                    formData.append('seo_content_en',seo_content_en.value );
+                    formData.append('seo_content_ar',seo_content_ar.value );
+                    
+                    //const featureCount = getDynamicFeatureCount(); // Function to get the number of dynamic features
+
+
+                    if(typeof featureCount === "undefined" ){
+                        alert("yes")
+                        return false
+                        featureCount = document.getElementById('last-feature-field-id').value;
+
+                    }
+                    /*else{
+                        
+                        IntCount = parseInt(last_value,10)
+                        counter = IntCount + dynamic_numFuntion.length
+                        console.log("counter: "+counter)
+                    }*/
+                    if(featureCount >=2){
+
+                        try{
+
+                    let ufid = 0
+                    for (let i = 2; i <= featureCount;i++) {
+
+                        console.log("number: "+i)
+                        formData.append('features_passed',featureCount)
+
+                        const titleEn = document.getElementById(`features-section-form-title-en-${i}`);
+                        const titleAr = document.getElementById(`features-section-form-title-ar-${i}`);
+                        const contentEn = document.getElementById(`features-section-form-content-en-${i}`);
+                        const contentAr = document.getElementById(`features-section-form-content-ar-${i}`);
+                        const image = document.getElementById(`feature-image-${i}`);
+                        //const feature_field = document.getElementById(`feature-section-field-${i}`)
+                        
+                        //const feature_image = image.files[0];
+
+                        /*
+                        if (image) { // check if image exists before trying to access its files property
+                // ...
+            } else {
+                console.log("Image not found for section " + i);
+            } */        try{
+
+            
+                            const feature_image = image.files[0];
+                        }
+                        catch(err){
+                            console.log(err)
+                        }
+                        const unique_field = document.getElementById(`field-roll-id-${i}`)
+                        //let unique = document.getElementById(`section-${i}`)
+                        console.log("this is uni: "+unique_field.innerText)
+                        //const feature_field = document.querySelector(`#section-${i} .field-id`)
+                        if (titleEn) {
+                            formData.append(`features_section_form_title_en_${i}`, titleEn.value);
+                        }
+                        if (titleAr) {
+                            formData.append(`features_section_form_title_ar_${i}`, titleAr.value);
+                        }
+                        if (contentEn) {
+                            formData.append(`features_section_form_content_en_${i}`, contentEn.value);
+                        }
+                        if (contentAr) {
+                            formData.append(`features_section_form_content_ar_${i}`, contentAr.value);
+                        }
+                        if(image && image.files && image.files.length > 0) {
+                            const feature_image = image.files[0];
+                            formData.append(`image_${i}`, feature_image);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        if(unique_field){
+                            formData.append(`uid_${i}`,unique_field.innerText)
+                            ufid = unique_field.innerText
+                            console.log(unique_field.innerText)
+                        }
+                        //console.log(feature_field.innerText)
+                        //console.log(feature_field.innerText)
+                        //formData.append(`id`,feature_field.innerText)
+                        formData.append(`id`, i);
+
+                    }
+                
+                    
+                    
+                    console.log(ufid)
+
+                }
+                catch(err){
+                    console.log("1: "+featureCount)
+                    console.log(err)
+                    return false
+                }
+                }
+                console.log("last number: "+featureCount)
+
+
+                        if (home_heading_section_image_1_e.files.length > 0) {
+                            formData.append('home_heading_section_image_1', home_heading_section_image_1);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (home_heading_section_image_2_e.files.length > 0) {
+                            formData.append('home_heading_section_image_2', home_heading_section_image_2);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        if (home_heading_section_image_3_e.files.length > 0) {
+                            formData.append('home_heading_section_image_3', home_heading_section_image_3);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        if (home_heading_section_icon_e.files.length > 0) {
+                            formData.append('home_heading_section_icon', home_heading_section_icon);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        if (home_heading_section_2_icon_1_e.files.length > 0) {
+                            formData.append('home_heading_section_2_icon_1', home_heading_section_2_icon_1);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        if (home_heading_section_2_icon_2_e.files.length > 0) {
+                            formData.append('home_heading_section_2_icon_2', home_heading_section_2_icon_2);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (empower_section_icon_e.files.length > 0) {
+                            formData.append('empower_section_icon', empower_section_icon);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (empower_section_background_image_e.files.length > 0) {
+                            formData.append('empower_section_background_image', empower_section_background_image);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        if (feature_image_1_e.files.length > 0) {
+                            formData.append('feature_image_1', feature_image_1);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (spirit_icon_e.files.length > 0) {
+                            formData.append('spirit_icon_e', spirit_icon);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }  
+                        if (spirit_background_image_e.files.length > 0) {
+                            formData.append('spirit_background_image', spirit_background_image);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }     
+                        
+                        if (achivements_image_e.files.length > 0) {
+                            formData.append('achivements_image_e', achivements_image);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        } 
+                    
+                        if (testomonial_icon_e.files.length > 0) {
+                            formData.append('testomonial_icon', testomonial_icon);
+                                                    
+                    } 
+                        else {
+                            console.log("already have image")
+                        } 
+
+                        if (testomonial_image_e.files.length > 0) {
+                            formData.append('testomonial_image_1',testomonial_image);
+
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        } 
+
+                        
+                    try{
+                    if(deleted_function.length !== 0){
+
+                        for(let i =0;i<=deleted_function.length;i++){
+                            formData.append(`deleted_field_${i}`,deleted_function[i])
+                        }
+                        formData.append('deletedField',deleted_function.length)
+
+                    }
+                    else{
+                        let deleted_field_null = 0
+                        formData.append('deletedField',deleted_field_null)
+
+                        console.log("No function is deleted!")
+                    }
+                }
+                catch(err){
+                    alert(err)
+                }
+                
+                    
+                    
 
 
 
-                    fetch("/savetermcondition/", {
+
+
+                    fetch("/savehomepage/", {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -1066,17 +1718,16 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
-
-                        if(missing_text.style.display != "none"){
-                            missing_text.style.display = "none"
-
-                        }
+                        location.reload()
+                       return false
 
                         
                         
                     })
                     .catch((error) => {
                         console.error('Error:', error);
+                        location.reload()
+                        return false
                     });
 
                     function getCookie(name) {
@@ -1093,46 +1744,32 @@
                         }
                         return cookieValue;
                     }
-                return false
 
                 
 
                 }
-                catch(err){
-                
-                    alert(err);
-                    return false
-
-                }
-                
+           
                 //console.log(country_name_ar.value)
                 
-                return false;
-            }
-            catch(err){
+           
+    
 
-                var  warning = document.getElementById('heading-error')
-
-                warning.innerText = err
-                warning.style.color = "red"
-
-                return false;
-            }
                 
-        }
-        else if(validation == "error"){
+            }
+        
+    
+           catch(err){
+                    
 
-            var missing_text = document.getElementById('heading-error')
+                    alert(err)
+                    return false
+                }
 
+                return false
+            }            
             
-            
-            
-            missing_text.style.display = 'block'
-            missing_text.innerText = "Fill the blank field!"
-            missing_text.style.color = "red"
-            window.scrollTo(0,0)
-            return false
-}
+                    
+
             
             
             
@@ -1140,7 +1777,7 @@
         
     
         
-    }
+    
 
     function displayImagewhychooseus(event) {
         try{
@@ -1431,358 +2068,155 @@ function displaySocialMediaImg(event) {
 
 
     
-    let partnership_count= 1;
     
-
-    function add_partnership_content(){
-
-            try{
-            partnership_count++;
-            let newRow = `
-            <div id="dynamic-partnership-section-${partnership_count}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${partnership_count}</h1>
-                        </div>
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-    
-                        
-                        <!--heading-->
-                            
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partnership-title-en-${partnership_count}">Title (English)</label>
-                                    <input class="form-control btn-pill " id="partnership-title-en-${partnership_count}" name="partnership_title_en_${partnership_count}" type="text" value="1" placeholder="Title (English)">
-                                   
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="section-2-title-arabic-${partnership_count}">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partnership-title-ar-${partnership_count}" name="partnership_title_ar_${partnership_count}" type="text" value="1" placeholder="Title (Arabic)">
-                                   
-                                </div>
-                            </div>
-                        </div>
-    
-                       
-                        
-                        <!--heading content-->
-                            
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partnership-content-en-${partnership_count}">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en-${partnership_count}" name="partnership_content_en_${partnership_count}" type="text" placeholder="content (English)">1</textarea>
-    
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partnership-content-ar-${partnership_count}">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar-${partnership_count}" name="partnership_content_ar_${partnership_count}" type="text"  placeholder="content (Arabic)">1</textarea>
-    
-                                </div>
-                            </div>
-                        </div>
-                        <br>
-                        
-                           
-    
-    
-                            
-                            
-                        
-                            <div id="img-container">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="mb-3">
-                                            <label class="form-label" for="partnership-image-${partnership_count}">Icon-${partnership_count} </label>
-                                            <input class="form-control btn-pill" id="partnership-banner-${partnership_count}" name="partnership_banner_${partnership_count}" type="file"  onchange= "displaypartnershipImage(event,${partnership_count})" accept="image/*">
-                                            <!--{% if system_settings.fav_icon %}-->
-                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                            <!--{% endif %}-->
-            
-                                            <img id="selected-partnership-image-${partnership_count}" style="display: none; width: 100px; height: 100px;" />
-            
-                                        </div>
-                                    </div>
-                                    <p id = "partnership-warning-${partnership_count}"></p>
-                                </div>
-                            </div>
-                            
-                            
-                        <div>
-
-                             <div class="col-12  text-end " >
-
-                                <button id="delete-row" class="btn btn-danger">-</button>
-                </div>  
-
-            <br>`;
-            
-            document.getElementById('dynamic-partnership-field').insertAdjacentHTML('beforebegin', newRow);
-
-            return false;
-        }
-        catch(err){
-            alert(err)
-
-            return false
-        }
-    }
-
-    let count = 1;
-    
-
-    function add_content(){
-
-            try{
-            count++;
-            console.log(count)
-            let newRow = `
-            <div id=dynamic-section-${count}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${count}</h1>
-             </div>
-            <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-            <div class="row" id="row-${count}">
-                <div class="col-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="section-2-title-en-${count}">Heading Title (English)</label>
-                        <input class="form-control btn-pill" id="section-2-title-en-${count}" name="section_2_title_en_${count}" type="text" placeholder="Title (English)">
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="section-2-title-ar-${count}">Heading Title (Arabic)</label>
-                        <input class="form-control btn-pill" id="section-2-title-ar-${count}" name="section_2_title_ar_${count}" type="text" placeholder="Title (Arabic)">
-                    </div>
-                </div>
-
-                <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="section-2-content-en-${count}">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en-${count}" name="section_2_content_en_${count}" type="text" placeholder="content (English)">1</textarea>
-    
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="section-2-content-ar-${count}">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar-${count}" name="section_2_content_ar_${count}" type="text"  placeholder="content (Arabic)">1</textarea>
-    
-                                </div>
-                            </div>
-                        </div>
-                        <br>
-
-                        <div id="img-container">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label class="form-label" for="section-2-image-${count}">Image-${count} </label>
-                                        <input class="form-control btn-pill" id="section-2-banner-${count}" name="section_2_banner_${count}" type="file"  onchange= "displaysection2Image(event,${count})" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
-        
-                                        <img id="selected-section-2-image-${count}" style="display: none; width: 100px; height: 100px;" />
-        
-                                    </div>
-                                </div>
-                                <p id = "section-2-warning-${count}"></p>
-                            </div>
-                        </div>
-                <div class="col-12  text-end " >
-
-                                <button id="delete-row" class="btn btn-danger">-</button>
-                </div>  
-            </div>
-            <br>`;
-            
-            document.getElementById('dynamic-section-2-field').insertAdjacentHTML('beforebegin', newRow);
-
-            return false;
-        }
-        catch(err){
-            alert(err)
-
-            return false
-        }
-    }
-
-    let adscount = 1
-
-    function add_dynamic_ads_image(){
-
-        try{
-        adscount++;
-
-        let newRow = `
-        <div class="row" id = "ads-image-section-${adscount}">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="ads-image-${adscount}">Image-${adscount} </label>
-                                    <input class="form-control btn-pill" id="ads-image-${adscount}" name="ads_image_${adscount}" type="file"  onchange= "displayImageads(event,count=${adscount})" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
-    
-                                    <img id="selected-ads-image-${adscount}" style="display: none; width: 100px; height: 100px;" />
-    
-                                </div>
-                            </div>
-                            <p id = "ads-warning-${adscount}"></p>
-                        </div> 
-       
-        <br>
-        `;
-
-        document.getElementById('dynamic-ads-image-field').insertAdjacentHTML('beforebegin', newRow);
-
-        return false;
-        }
-        catch(err){
-        alert(err)
-
-        return false
-        }
-        }
-    let imgcount = 1
-
-    function add_image(){
-
-        try{
-        imgcount++;
-
-        let newRow = `
-         <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="game-section-image-${imgcount}">Image-${imgcount} </label>
-                                    <input class="form-control btn-pill" id="game-section-banner-${imgcount}" name="game_section_banner_${imgcount}" type="file"  onchange= "displaygameImage(event,${imgcount})" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
-    
-                                    <img id="selected-game-image-${imgcount}" style="display: none; width: 100px; height: 100px;" />
-    
-                                </div>
-                            </div>
-                            <p id = "game-image-warning-${imgcount}"></p>
-        </div>
-
-        <div class="col-12  text-end " >
-
-                                <button id="delete-row" class="btn btn-danger">-</button>
-                </div>  
-        <br>
-        `;
-
-        document.getElementById('dynamic-image-field').insertAdjacentHTML('beforebegin', newRow);
-
-        return false;
-        }
-        catch(err){
-        alert(err)
-
-        return false
-        }
-        }
-
-        //premiumFunction
-        premiumCount = 1 
-        function add_premium_content(){
-
-            try{
-            premiumCount++;
-    
-            let newRow = `
-            <div id="dynamic-Premium-section-${premiumCount}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Features-Section-${premiumCount}</h1>
-                        </div>
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-    
-                        
-                        <!--heading-->
-                            
-                       
-                       
-                        
-                        <!--heading content-->
-
-                        
-                        <div id="img-container">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label class="form-label" for="premium-image-${premiumCount}">Premium Icon </label>
-                                        <input class="form-control btn-pill" id="premium-banner-${premiumCount}" name="premium_banner_${premiumCount}" type="file"  onchange= "return displaypremiumFeatures(event,count=${premiumCount})" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
-        
-                                        <img id="selected-premium-image-${premiumCount}" style="display: none; width: 100px; height: 100px;" />
-        
-                                    </div>
-                                </div>
-                                <p id = "premium-warning-${premiumCount}"></p>
-                            </div>
-                        </div>
-                            
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="premium-title-en-${premiumCount}">Premium Title (English)</label>
-                                    <input class="form-control btn-pill" id="premium-title-en-${premiumCount}" name="premium_title_en_${premiumCount}" type="text" value="1" placeholder="Title (English)">
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="premium-title-ar-${premiumCount}">Premium Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="premium-title-ar-${premiumCount}" name="premium_title_ar_${premiumCount}" type="text" value="1" placeholder="Title (Arabic)">
-    
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12  text-end " >
-
-                                <button id="delete-row" class="btn btn-danger">-</button>
-                        </div>
+ 
+            //feature section add
              
-            <br>
-            `;
-    
-            document.getElementById('dynamic-premium-field').insertAdjacentHTML('beforebegin', newRow);
-    
-            return false;
+            
+            let featureCount
+            try{
+                const lastfeaturefield = document.querySelectorAll('.last-feature-field-id');
+                
+                //console.log(lastfeaturefield.length)
+                //last_value = 
+                //console.log("last feature field: "+last_value)
+                //last_unie_field = document.getElementById('field-id')
+                //console.log("last unique field: "+last_unie_field.innerText)
+                featureCount = lastfeaturefield[lastfeaturefield.length -1].value;
+
+                /*if(last_value !== last_unie_field.innerText){
+                    console.log("hell")
+                    featureCount = last_unie_field.innerText
+                }
+                else if(last_value === last_unie_field.innerText){
+
+                }*/
+                //featureCount = document.getElementById('field-roll-id').innerText
+                console.log("featureCOunt Value: "+featureCount)
             }
             catch(err){
-            alert(err)
-    
-            return false
+                alert("1: "+err)
+                
             }
-            }
+            console.log(featureCount)
 
-            //feature section add
+            
 
-            featureCount = 1
-            function add_dynamic_features(){
 
-                try{
-                featureCount++;
         
+            let cunt = 0
+            let dynamic_numFuntion = [] 
+
+            function add_dynamic_features(){
+                dom = "true"
+         
+                console.log("value:"+featureCount)
+
+                if(featureCount > 1){
+                    try{
+                const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-features-section-form-title-en-${featureCount}`);
+                const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-features-section-form-title-ar-${featureCount}`);
+                const reset_dynamicErrorMsgContentEn = document.getElementById(`error-features-section-form-content-en-${featureCount}`);
+                const reset_dynamicErrorMsgContentAr = document.getElementById(`error-features-section-form-content-ar-${featureCount}`);
+                const reset_dynamicimage = document.getElementById(`error-selected-feature-icon-${featureCount}`);
+
+
+                reset_dynamicErrorMsgTitleEn.innerText = ""
+                reset_dynamicErrorMsgTitleAr.innerText = ""
+                reset_dynamicErrorMsgContentEn.innerText = ""
+                reset_dynamicErrorMsgContentAr.innerText = ""
+                reset_dynamicimage.innerText = ""
+
+                if(featureCount > 1){
+                    
+                    const dynamicTitleEn = document.getElementById(`features-section-form-title-en-${featureCount}`);
+                    const dynamicTitleAr = document.getElementById(`features-section-form-title-ar-${featureCount}`);
+                    const dynamicContentEn = document.getElementById(`features-section-form-content-en-${featureCount}`);
+                    const dynamicContentAr = document.getElementById(`features-section-form-content-ar-${featureCount}`);
+                    const image = document.getElementById(`feature-image-${featureCount}`);
+                    const imagesrc = document.getElementById(`selected-feature-icon-${featureCount}`)
+                    const dynamicErrorMsgTitleEn = document.getElementById(`error-features-section-form-title-en-${featureCount}`);
+                    const dynamicErrorMsgTitleAr = document.getElementById(`error-features-section-form-title-ar-${featureCount}`);
+                    const dynamicErrorMsgContentEn = document.getElementById(`error-features-section-form-content-en-${featureCount}`);
+                    const dynamicErrorMsgContentAr = document.getElementById(`error-features-section-form-content-ar-${featureCount}`);
+                    const reset_dynamicimage = document.getElementById(`error-selected-feature-icon-${featureCount}`);
+
+                    console.log("value of: "+dynamicTitleEn.innerText)
+
+                    if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                        
+                        dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                        dynamicErrorMsgTitleEn.style.display = 'block';
+                        dynamicErrorMsgTitleEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+
+            
+                    if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                        dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                        dynamicErrorMsgTitleAr.style.display = 'block';
+                        dynamicErrorMsgTitleAr.scrollIntoView();
+
+                        dom = "false";
+                        console.log(dom)
+
+
+                    }
+            
+                    if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+                        dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
+                        dynamicErrorMsgContentEn.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+            
+                    if (dynamicContentAr && !dynamicContentAr.value.trim()){
+                        dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
+                        dynamicErrorMsgContentAr.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        dom = "false";
+
+
+                    }
+
+                    if(image.files.length == 0 && imagesrc.src == "" ){
+                        reset_dynamicimage.innerText = "Please insert image."
+                        reset_dynamicimage.style.display = 'block';
+
+                        dom = "false"
+                    }   
+                }
+            } 
+        
+        catch(err){
+            console.log("error: "+err)
+            return false
+        }  
+                }
+           
+        
+        if(dom == "true"){
+                try{
+
+
+                featureCount++;
+                console.log(featureCount)
+                var id = "id" + Math.random().toString(16).slice(2)
+                
+                dynamic_numFuntion.push(featureCount)
+                console.log(dynamic_numFuntion)
                 let newRow = `
+                <div id="section-${featureCount}">
                 <div id="dynamic-features-${featureCount}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Features Section-${featureCount}</h1>
+                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-${featureCount}" >Fill Features Section</h1>
+                            <p class="field-roll-id" style='display:none'>${id}</p>
+                            <p id="field-roll-id-${featureCount}" style='display:none'>${id}</p>
+
                         </div>
 
                         <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
@@ -1793,16 +2227,18 @@ function displaySocialMediaImg(event) {
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-title-en-${featureCount}">Title (English)</label>
-                                    <input class="form-control btn-pill " id="features-section-form-title-en-${featureCount}" name="features_section_form_title_en_${featureCount}" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <input class="form-control btn-pill " id="features-section-form-title-en-${featureCount}" name="features_section_form_title_en_${featureCount}" type="text" value="" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-en-${featureCount}"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-title-ar-${featureCount}">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="features-section-form-title-ar-${featureCount}" name="features_section_form_title_ar_${featureCount}" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <input class="form-control btn-pill" id="features-section-form-title-ar-${featureCount}" name="features_section_form_title_ar_${featureCount}" type="text" value="" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-ar-${featureCount}"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -1811,61 +2247,118 @@ function displaySocialMediaImg(event) {
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-content-en-${featureCount}">Section Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-${featureCount}" name="features_section_form_content_en_${featureCount}" type="text" placeholder="content (English)">1</textarea>
-                                   
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-${featureCount}" name="features_section_form_content_en_${featureCount}" type="text" placeholder="content (English)"></textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-en-${featureCount}"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="features-section-form-content-ar-${featureCount}">Section Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-${featureCount}" name="features_section_form_content_ar_${featureCount}" type="text" placeholder="content (English)">1</textarea>
-                                   
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-${featureCount}" name="features_section_form_content_ar_${featureCount}" type="text" placeholder="content (English)"></textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-ar-${featureCount}"></p>
+
                                 </div>
                             </div>
                         </div>  
                         
-                        <div class="row" id = "feature-icon-section-${featureCount}">
+                        <div class="row" id = "feature-icon-section-${featureCount-1}">
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label" for="feature-image-${featureCount}">Icon </label>
-                                    <input class="form-control btn-pill" id="feature-image-1" name="feature_image_1" type="file"  onchange= "displayImagefeatureicon(event,count=${featureCount})" accept="image/*">
+                                    <input class="form-control btn-pill" id="feature-image-${featureCount}" name="feature_image_1" type="file"  onchange= "displayImagefeatureicon(event,count=${featureCount})" accept="image/jpeg , image/png">
                                     <!--{% if system_settings.fav_icon %}-->
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
                                     <img id="selected-feature-icon-${featureCount}" style="display: none; width: 100px; height: 100px;" />
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-selected-feature-icon-${featureCount}"></p>
+
                                 </div>
                             </div>
                             <p id = "feature-icon-warning-${featureCount}"></p>
-                        </div> 
+                        </div>
+                        
+                          <div class="col-12  text-end " >
+
+                                <button id="delete-row" onclick = "return deletefield(${featureCount})" class="btn btn-danger">-</button>
+                </div>  
+                </div>
                
                  
                 <br>
                 `;
-        
+                
+                
                 document.getElementById('dynamic-feature-section-field').insertAdjacentHTML('beforebegin', newRow);
         
                 return false;
                 }
                 catch(err){
                 alert(err)
+
         
                 return false
                 }
                 }
+                else{
+                    console.log("please fill the detail")
+                    return false
+                }
+                console.log(dynamic_numFuntion[0])
+            }
+        
+            
                 
             
+    function deletefield(id){
+        alert(id)
+        try {
+        let deletingField = document.getElementById(`section-${id}`);
+        console.log(deletingField)
+        if (deletingField) {
+            //deletingField.innerHTML = `form ${id} has been deleted`;
+            deletingField.remove()
+            featureCount--
+           
+        }
+        } catch (err) {
+            console.log(err)
+            return false
+
+        }
+           
+    }
+
+    let deleted_function = []
     
-    
+    function deleteTheRow(id){
+        try{
+        
+        deleted_function.push(id)
+
+        document.getElementById(`section-${id}`).style.display = "none"
+        //alert(id)
+        //featureCount--
+        console.log(deleted_function)
+        return false
+        }
+        catch(err){
+            console.log(err)
+            return false
+        }
+    }
+
+
+   
     
 
     //Competition section image
     function displayCompetitionImage(event) {
         try{
             const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-competition-image');
+            const imgElement = document.getElementById('selected-competition-image');
         
         if (file) {
             const reader = new FileReader();
