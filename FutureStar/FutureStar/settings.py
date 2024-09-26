@@ -125,6 +125,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
+
+#language Settibgs
 LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = [
@@ -135,6 +137,20 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',  # Or wherever you have your locale files
 ]
+
+########################################### Social Login ####################################
+
+# from dotenv import load_dotenv
+
+# # Load environment variables from the .env file
+# load_dotenv()
+
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = "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"
+APPLE_CLIENT_ID = os.getenv('APPLE_CLIENT_ID')
+APPLE_REDIRECT_URI = os.getenv('APPLE_REDIRECT_URI')
+SOCIAL_AUTH_STATE_STRING = os.getenv('SOCIAL_AUTH_STATE_STRING')
+
 
 TIME_ZONE = 'UTC'
 

@@ -1,48 +1,34 @@
 {% extends 'base1.html' %}
-
 {% load static %}
 
-{% block css %}
-<!-- Plugins css start-->
-
-<!-- Plugins css Ends-->
-{% endblock %}
-{% block title %} Future Star || Login{% endblock %}
+{% block title %} Future Star || Login {% endblock %}
 {% block content %}
 
-<!-- Page Banner Start -->
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-12">
                 <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
-                    <h2>Sign in into <br> Future Stars Platform</h2>
+                    <h2>Sign in to <br> Future Stars Platform</h2>
                 </div>
             </div>
             <div class="col-xl-6 col-lg-4">
-                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s"  action="#" name="teamForm" method="post">
+                <form id="teamForm" name="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" method="post">
                     {% csrf_token %}
+                    <input name="login_type" id="login_type" type="hidden" value="1">
+                    
+                    <!-- Username or Phone Login -->
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="name">Username or Phone</label>
-                                <input type="text" id="name" name="name" class="form-control" value="" placeholder="" required>
-                            </div>
-                        </div>                               
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="phone">Password</label>
-                                <input type="password" id="phone" name="phone" class="form-control" value="" placeholder="">
+                                <label for="username_or_phone">Username or Phone</label>
+                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control" placeholder="" required>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="d-flex mb-30 justify-content-between">
-                            <label>
-                                <input type="checkbox" /> Remember Me
-                            </label>
-                            <a href="#">
-                              Forgott Password?  
-                            </a>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" placeholder="">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -58,8 +44,8 @@
                                 <div class="or"><span>OR</span></div>
                             </div>
                             <div class="continue-with-social text-center">
-                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-google.png'%}" class="img-fluid" alt="" /></span> Sign With Google</button>
-                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png'%}" class="img-fluid" alt="" /></span> Sign With Apple</button>
+                                <button id="googleLoginBtn" class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-google.png'%}" class="img-fluid" alt="" /></span> Sign In With Google</button>
+                                <button id="appleLoginBtn" class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png'%}" class="img-fluid" alt="" /></span> Sign In With Apple</button>
                             </div>
                         </div>
                     </div>
@@ -68,13 +54,48 @@
         </div>
     </div>
 </section>
-<!-- Page Banner End -->
 
 {% endblock %}
 
-{% block scriptcontent %}
+{% block script %}
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 
-{% endblock %}
-{% block script %} 
-<script>new WOW().init();</script>
+<script>
+    // Google Login
+    function handleCredentialResponse(response) {
+        const googleToken = response.credential;
+        console.log("Google Token Received:", googleToken);  // Debugging log
+        document.getElementById('login_type').value = 2;  
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'google_token';
+        input.value = googleToken;
+        document.getElementById('loginForm').appendChild(input);
+        document.getElementById('loginForm').submit();
+    }
+
+    window.onload = function () {
+        google.accounts.id.initialize({
+            client_id: "383301504241-ldk6vs8db27e4ec0culn07a58cjt90jp.apps.googleusercontent.com",  // Dynamically passed from settings.py
+            callback: handleCredentialResponse
+        });
+
+        google.accounts.id.renderButton(
+            document.getElementById('googleLoginBtn'),
+            { theme: 'outline', size: 'large' }
+        );
+    };
+
+    // Apple Login
+    document.getElementById('appleLoginBtn').addEventListener('click', function () {
+        AppleID.auth.init({
+            clientId: '{{ apple_client_id }}',
+            scope: 'name email',
+            redirectURI: '{{ apple_redirect_uri }}',
+            state: '{{ social_auth_state_string }}',
+            usePopup: true
+        });
+    });
+</script>
 {% endblock %}

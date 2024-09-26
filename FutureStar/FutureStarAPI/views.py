@@ -335,7 +335,7 @@ class ForgotPasswordAPIView(APIView):
             user = User.objects.filter(phone=phone).first()
 
             if user:
-                otp = str(random.randint(100000, 999999))
+                otp = str(random.randint(1000, 9999))
                 user.otp = otp
                 user.save()
 

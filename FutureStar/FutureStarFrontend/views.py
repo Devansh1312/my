@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django import views
-# from .forms import *
 from django.contrib import messages
 from FutureStar_App.models import *
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
+from django.contrib import messages
+from django.utils.translation import activate
+from django.contrib.auth import authenticate, login
+import json
+import requests
+from django.conf import settings
+from jwt import decode, exceptions  # For Apple JWT decoding
 
 
 ##############################################   HomePage   ########################################################
@@ -214,13 +221,119 @@ class AboutPage(View):
 ##############################################   LoginPage   ########################################################
 
 class LoginPage(View):
-    
+
     def get(self, request, *args, **kwargs):
-        current_language = request.session.get('language', 'en')
+        # current_language = request.session.get('language', 'en')
+        current_language = "en",
+
         context = {
-            "current_language":current_language,
+            "current_language": current_language,
+            "google_client_id": settings.GOOGLE_CLIENT_ID,
+            "apple_client_id": settings.APPLE_CLIENT_ID,
+            "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
+            "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
         }
-        return render(request, "login.html",context)
+        return render(request, "login.html", context)
+
+    def post(self, request, *args, **kwargs):
+        login_type = int(request.POST.get('login_type', 1))
+
+        if login_type == 1:
+            username_or_phone = request.POST.get('username_or_phone')
+            password = request.POST.get('password')
+
+            user = authenticate(request, username=username_or_phone, password=password)
+
+            if user:
+                if user.is_active:
+                    login(request, user)
+                    user.device_type = "Website"
+                    user.last_login = timezone.now()
+                    user.save()
+                    messages.success(request, "Login successful!")
+                    return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
+                messages.error(request, "Account is inactive.")
+            else:
+                messages.error(request, "Invalid credentials.")
+            return redirect('login')
+
+    #     elif login_type == 2:
+    #         google_token = request.POST.get('google_token')
+    #         if google_token:
+    #             google_user_info = self.verify_google_token(google_token)
+    #             if google_user_info:
+    #                 return self.handle_social_login(request, google_user_info, login_type='google')
+
+    #         messages.error(request, "Failed to authenticate with Google.")
+    #         return redirect('login')
+
+    #     elif login_type == 3:
+    #         apple_token = request.POST.get('apple_token')
+    #         if apple_token:
+    #             apple_user_info = self.verify_apple_token(apple_token)
+    #             if apple_user_info:
+    #                 return self.handle_social_login(request, apple_user_info, login_type='apple')
+
+    #         messages.error(request, "Failed to authenticate with Apple.")
+    #         return redirect('login')
+
+    #     messages.error(request, "Invalid login type.")
+    #     return redirect('login')
+
+    # def verify_google_token(self, token):
+    #     try:
+    #         response = requests.get(f'https://oauth2.googleapis.com/tokeninfo?id_token={token}')
+    #         if response.status_code == 200:
+    #             return response.json()
+    #     except Exception as e:
+    #         print(f"Error verifying Google token: {e}")
+    #     return None
+
+    # def verify_apple_token(self, token):
+    #     try:
+    #         apple_public_keys = requests.get('https://appleid.apple.com/auth/keys').json()
+    #         key = apple_public_keys['keys'][0]
+    #         decoded_token = decode(token, key, algorithms=['RS256'], audience=settings.APPLE_CLIENT_ID)
+    #         return decoded_token
+    #     except exceptions.InvalidTokenError as e:
+    #         print(f"Error verifying Apple token: {e}")
+    #     return None
+
+    # def handle_social_login(self, request, user_info, login_type):
+    #     email = user_info.get('email')
+    #     if not email:
+    #         messages.error(request, f"Unable to retrieve email for {login_type} login.")
+    #         return redirect('login')
+
+    #     user = User.objects.filter(email=email).first()
+
+    #     if user:
+    #         if user.is_active:
+    #             login(request, user)
+    #             user.device_type = "Website"
+    #             user.last_login = timezone.now()
+    #             user.save()
+    #             messages.success(request, f"Login successful via {login_type.capitalize()}!")
+    #             return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
+    #         else:
+    #             messages.error(request, "Account is inactive.")
+    #             return redirect('login')
+    #     else:
+    #         username = email.split('@')[0]
+    #         user = User.objects.create_user(
+    #             username=username,
+    #             email=email,
+    #             password=None,
+    #             role_id=2,
+    #             is_active=True,
+    #         )
+    #         login(request, user)
+    #         user.device_type = "Website"
+    #         user.last_login = timezone.now()
+    #         user.save()
+    #         messages.success(request, f"User created and login successful via {login_type.capitalize()}!")
+    #         return redirect('player-dashboard')
+
 
 class RegisterPage(View):
     
@@ -331,3 +444,28 @@ class TermsofServicesPage(View):
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
         return redirect('terms-of-services')  
+
+
+
+##############################################   PlayerDashboardPage   ########################################################
+
+class PlayerDashboardPage(LoginRequiredMixin,View):
+    
+    def get(self, request, *args, **kwargs):
+    
+        current_language = request.session.get('language', 'en')
+
+        context = {
+            "current_language": current_language,
+            # "cmsdata": cmsdata,
+        } 
+
+        return render(request, "PlayerDashboard.html",context)
+    
+    def post(self, request, *args, **kwargs):
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+        return redirect('player-dashboard')  
+
+
+

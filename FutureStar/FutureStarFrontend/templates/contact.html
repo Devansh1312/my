@@ -62,17 +62,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="our-location-address">
-                        <h4>
-                            {% if current_language == "ar" %}
-                                {{ cmsdata.section_2_country_name_ar }}
-                            {% else %}
-                                {{ cmsdata.section_2_country_name_en }}
-                            {% endif %}
-                        </h4>
-                        <p>{{ system_settings.address }}</p>
-                        <div><a class="callto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a></div>
-                        <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a></div>
+                    <div>
+                        <div class="our-location-address">
+                            <h4>
+                                {% if current_language == "ar" %}
+                                    {{ cmsdata.section_2_country_name_ar }}
+                                {% else %}
+                                    {{ cmsdata.section_2_country_name_en }}
+                                {% endif %}
+                            </h4>
+                            <p>{{ system_settings.address }}</p>
+                            <div><a class="mailto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a></div>
+                            <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a></div>
+                        </div>
                     </div>
                     <h5>Follow Us</h5>
                     <div class="social-style-two pt-5">
@@ -101,7 +103,7 @@
                             {% endif %}
                         </h4>
                     </div>
-                    <form id="contactForm" class="contactForm" action="{% url 'contact' %}" name="contactForm" method="post">
+                    <form id="contactForm" class="contactForm"  action="{% url 'contact' %}" name="contactForm" method="post">
                         {% csrf_token %}
                         <div class="row gap-60 pt-15">
                             <div class="col-md-12">

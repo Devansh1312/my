@@ -1,8 +1,4 @@
-{% extends 'base1.html' %}
-
-{% load static %}
-
-{% block css %}
+{% extends 'base1.html' %} {% load static %} {% block css %}
 <!-- Plugins css start-->
 <style>
     .star-rating {
@@ -11,6 +7,7 @@
         color: lightgray;
         position: relative;
     }
+
     .star-rating .filled-stars {
         color: rgb(17, 167, 12);
         position: absolute;
@@ -21,581 +18,506 @@
         width: 0%;
     }
 </style>
-
-<!-- Plugins css Ends-->
-{% endblock %}
-{% block title %} FutureStar{% endblock %}
-{% block content %}
-    <!-- Hero Section Start -->
-    <section class="hero-area-six pt-150 pb-80 rel z-1">
-        <div class="container">
-            <div class="hero-six-wrapper">
-
-                <div class="row no-gap">
-                    <div class="col-xl-3">                        
-                        <div class="left-image">
-                            <img src="{% static 'frontend/assets/images/hero/hero-six1.png'%}" alt="Hero">
-                        </div>
-                    </div>
-                    <div class="col-xl-6">
-                        <div class="hero-six-content">
-                            <h1>Tradition Pride & future</h1>
-                            <p>Sed ut perspiciatis unde omnis iste natus error voluptatem accusantium doloremque
-                                laudantium totam aperiam eaque</p>
-                            <a href="services.html" class="theme-btn style-two">Read More <i
-                                    class="far fa-arrow-right"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 align-self-end">
-                        <div class="right-image">
-                            <img src="{% static 'frontend/assets/images/hero/hero-six2.png'%}" alt="Hero">
-                        </div>
+<!-- Plugins css Ends--> {% endblock %} {% block title %} FutureStar{% endblock %} {% block content %}
+<!-- Hero Section Start -->
+<section class="hero-area-six pt-150 pb-80 rel z-1">
+    <div class="container">
+        <div class="hero-six-wrapper">
+            <div class="row no-gap">
+                <div class="col-xl-3">
+                    <div class="left-image">
+                        <img src="{% static 'frontend/assets/images/hero/hero-six1.png'%}" alt="Hero">
                     </div>
                 </div>
-
-            </div>
-        </div>
-        <div class="bg-lines">
-            <span></span><span></span>
-            <span></span><span></span>
-        </div>
-    </section>
-    <!-- Hero Section End -->
-
-    <!-- About Us Area start -->
-    <section class="about-area-six pb-80 rel z-1">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-xl-4 col-md-6">
-                    <div class="about-content-six mb-40 wow fadeInUp delay-0-2s">
-                        <div class="about-logo mb-50">
-                            <img src="{% static 'frontend/assets/images/about/circle-text-six.svg'%}" alt="Logo">
-                        </div>
-                        <div class="section-title">
-                            <span class="sub-title">About Company</span>
-                            <h3>Futur Stars is your ultimate Platform.</h3>
-                        </div>
+                <div class="col-xl-6">
+                    <div class="hero-six-content">
+                        <h1>Tradition Pride & future</h1>
+                        <p>Sed ut perspiciatis unde omnis iste natus error voluptatem accusantium doloremque laudantium totam aperiam eaque</p>
+                        <a href="services.html" class="theme-btn style-two">Read More <i class="far fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="col-xl-4 col-md-6">
-                    <div class="about-image-six wow fadeInUp delay-0-4s">
-                        <img src="{% static 'frontend/assets/images/about/about-six.jpg'%}" alt="About">
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6">
-                    <div class="about-features wow fadeInUp delay-0-4s">
-                        <div class="feature-six-item">
-                            <div class="icon">
-                                <i class="far fa-rocket-launch"></i>
-                            </div>
-                            <div class="content">
-                                <h5>Company Mission</h5>
-                                <p>Our mission is to empower businesses with cutting-edge digital solutions</p>
-                            </div>
-                        </div>
-                        <div class="feature-six-item">
-                            <div class="icon">
-                                <i class="far fa-bullseye-arrow"></i>
-                            </div>
-                            <div class="content">
-                                <h5>Company Vision & Goals</h5>
-                                <p>We are dedicated to crafting digitals experiences that seamlessly</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="bg-lines">
-            <span></span><span></span>
-            <span></span><span></span>
-        </div>
-    </section>
-    <!-- About Us Area end -->
-
-    <!-- Video Area start -->
-    <div class="video-area-six py-100 bgs-cover"
-        style="background-image: url(assets/images/background/video-bg1.jpg);">
-        <div class="container">
-            <div class="video-six-content wow fadeInUp delay-0-2s">
-                <span class="video-title mb-20">Empower Your</span>
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-xl-12">
-                        <span class="video-text text-center">Future Stars Journey</span>
-                    </div>
-                    <div class="col-xl-2 col-lg-3 text-center">
-                        <a href="https://www.youtube.com/watch?v=9Y7ma241N8k"
-                            class="mfp-iframe video-play mt-35"><img src="{% static 'frontend/assets/images/icons/play-icon.png'%}"
-                                alt="Play"></a>
-                    </div>
-                    <div class="col-xl-10 col-lg-9">
-                        <p class="mt-35 mb-0">dedicated to nurturing and growing football talents we believe in
-                            unlocking the full potential of aspiring football stars. Our passion lies in fostering
-                            an environment where dedication, skills, and ambition converge to shape the future of
-                            football. Whether you're a budding player or a seasoned enthusiast, we are here to fuel
-                            your journey to greatness</p>
+                <div class="col-xl-3 align-self-end">
+                    <div class="right-image">
+                        <img src="{% static 'frontend/assets/images/hero/hero-six2.png'%}" alt="Hero">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Video Area end -->
-
-    <!-- Services Area start -->
-    <section class="services-area-six py-100 rel z-1">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-7 col-lg-9 col-md-11">
-                    <div class="section-title text-center mb-60 rmb-50 wow fadeInUp delay-0-2s">
-                        <span class="sub-title">Features</span>
-                        <h3>Amazing Features</h3>
-                        <p>Nam et sagittis diam. Sed tempor augue sit amet egestas scelerisque. Orci varius natoque
-                            penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+    <div class="bg-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</section>
+<!-- Hero Section End -->
+<!-- About Us Area start -->
+<section class="about-area-six pb-80 rel z-1">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-xl-4 col-md-6">
+                <div class="about-content-six mb-40 wow fadeInUp delay-0-2s">
+                    <div class="about-logo mb-50">
+                        <img src="{% static 'frontend/assets/images/about/circle-text-six.svg'%}" alt="Logo">
+                    </div>
+                    <div class="section-title">
+                        <span class="sub-title">About Company</span>
+                        <h3>Futur Stars is your ultimate Platform.</h3>
                     </div>
                 </div>
             </div>
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="service-six-item wow fadeInUp delay-0-2s">
-                        <div class="icon"><i class="fal fa-bezier-curve"></i></div>
-                        <div class="content">
-                            <h5><a href=" ">User Friendly</a></h5>
-                            <p>Lorem ipsum dolor sit amet consect etur adipisicing elited do eiusmod tempor incidi
-                                dout labore magna.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="service-six-item wow fadeInUp delay-0-4s">
-                        <div class="icon"><i class="fal fa-telescope"></i></div>
-                        <div class="content">
-                            <h5><a href=" ">Super Fast Speed</a></h5>
-                            <p>We denounce with righteous indignation</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="service-six-item wow fadeInUp delay-0-2s">
-                        <div class="icon"><i class="fal fa-telescope"></i></div>
-                        <div class="content">
-                            <h5><a href=" ">Award Winning</a></h5>
-                            <p>We denounce with righteous indignation</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="service-six-item wow fadeInUp delay-0-4s">
-                        <div class="icon"><i class="fal fa-laptop-code"></i></div>
-                        <div class="content">
-                            <h5><a href=" ">Unlimited Posibility</a></h5>
-                            <p>We denounce with righteous indignation</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="service-six-item wow fadeInUp delay-0-2s">
-                        <div class="icon"><i class="fal fa-mail-bulk"></i></div>
-                        <div class="content">
-                            <h5><a href=" ">Very Fast Support</a></h5>
-                            <p>We denounce with righteous indignation</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="service-six-item wow fadeInUp delay-0-4s">
-                        <div class="icon"><i class="fal fa-file-contract"></i></div>
-                        <div class="content">
-                            <h5><a href=" ">Design & Branding</a></h5>
-                            <p>We denounce with righteous indignation</p>
-                        </div>
-                    </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="about-image-six wow fadeInUp delay-0-4s">
+                    <img src="{% static 'frontend/assets/images/about/about-six.jpg'%}" alt="About">
                 </div>
             </div>
-        </div>
-        <div class="bg-lines">
-            <span></span><span></span>
-            <span></span><span></span>
-        </div>
-    </section>
-    <!-- Services Area end -->
-
-    <!-- Video Area start -->
-    <div class="video-area-six py-100" style="background-image: url(assets/images/background/video-bg.jpg);">
-        <div class="container">
-            <div class="video-six-content wow fadeInUp delay-0-2s">
-                <span class="video-title mb-20 rmb-0">Future Stars Spirit</span>
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-xl-2 col-lg-3 text-center">
-                        <a href="https://www.youtube.com/watch?v=9Y7ma241N8k"
-                            class="mfp-iframe video-play mt-35"><img src="assets/images/icons/play-icon.png"
-                                alt="Play"></a>
+            <div class="col-xl-4 col-md-6">
+                <div class="about-features wow fadeInUp delay-0-4s">
+                    <div class="feature-six-item">
+                        <div class="icon">
+                            <i class="far fa-rocket-launch"></i>
+                        </div>
+                        <div class="content">
+                            <h5>Company Mission</h5>
+                            <p>Our mission is to empower businesses with cutting-edge digital solutions</p>
+                        </div>
                     </div>
-                    <div class="col-xl-10 col-lg-9">
-                        <p class="mt-35 mb-0"> dedicated to nurturing and growing football talents we believe in
-                            unlocking the full potential of aspiring football stars. Our passion lies in fostering
-                            an environment where dedication, skills, and ambition converge to shape the future of
-                            football. Whether you're a budding player or a seasoned enthusiast, we are here to fuel
-                            your journey to greatness </p>
+                    <div class="feature-six-item">
+                        <div class="icon">
+                            <i class="far fa-bullseye-arrow"></i>
+                        </div>
+                        <div class="content">
+                            <h5>Company Vision & Goals</h5>
+                            <p>We are dedicated to crafting digitals experiences that seamlessly</p>
+                        </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
     </div>
-    <!-- Video Area end -->
-
-    <!-- Team Area start -->
-    <section id="team" class="team-area services-area-six rel py-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-7 col-lg-9 col-md-11">
-                    <div class="section-title text-center mb-55 wow fadeInUp delay-0-2s">
-                        <span class="sub-title">Team Members</span>
-                        <h3>Meet Our Professionals Team</h3>
-                    </div>
+    <div class="bg-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</section>
+<!-- About Us Area end -->
+<!-- Video Area start -->
+<div class="video-area-six py-100 bgs-cover" style="background-image: url(assets/images/background/video-bg1.jpg);">
+    <div class="container">
+        <div class="video-six-content wow fadeInUp delay-0-2s">
+            <span class="video-title mb-20">Empower Your</span>
+            <div class="row align-items-center justify-content-center">
+                <div class="col-xl-12">
+                    <span class="video-text text-center">Future Stars Journey</span>
                 </div>
-            </div>
-        </div>
-        <div class="container">
-            <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 justify-content-center">
-                {% for team_member in team_members %}
-                    <div class="col">
-                        <div class="team-member wow fadeInUp delay-0-2s">
-                            <div class="image">
-                                <img src="{{ team_member.image.url }}" alt="Team Member">
-                                <div class="bg-img"></div>
-                            </div>
-                            <div class="content text-center">
-                                <h4>
-                                    {% if current_language == "ar" %}
-                                    {{ team_member.name_ar }}
-                                    {% else %}
-                                    {{ team_member.name_en }}
-                                    {% endif %} 
-                                </h4>
-                                <span>
-                                    {% if current_language == "ar" %}
-                                    {{ team_member.designations_ar }}
-                                    {% else %}
-                                    {{ team_member.designations_en }}
-                                    {% endif %} 
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    <!-- Team Area end -->
-
-    <!-- Our Awards Area start -->
-    <section id="awards" class="our-awards-area pb-100">
-        <div class="container">
-            <div class="row align-items-end pb-35">
-                <div class="col-lg-12">
-                    <div class="section-title mb-30 wow fadeInUp delay-0-2s">
-                        <span class="sub-title">My Achievement</span>
-                        <h3>Lot’s Of Awards & Trophy</h3>
-                    </div>
+                <div class="col-xl-2 col-lg-3 col-md-2 text-center">
+                    <a href="https://www.youtube.com/watch?v=9Y7ma241N8k" class="mfp-iframe video-play mt-45">
+                        <img src="{% static 'frontend/assets/images/icons/play-icon.png'%}" alt="Play">
+                    </a>
                 </div>
-            </div>
-            <div class="row align-items-center justify-content-between">
-                <div class="col-xl-5 col-md-5">
-                    <div class="awards-tab-content rmb-75 rel wow fadeInLeft delay-0-2s">
-                        <div class="tab-content">
-                            <div class="tab-pane fade show active" id="awards-tab-one">
-                                <div class="award-image">
-                                    <img src="{% static 'frontend/assets/images/about/award.png'%}" alt="Awards">
-                                </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-6 col-md-7">
-                        <div class="awards-tabs nav flex-column nav-pills wow fadeInRight delay-0-2s">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#awards-tab-one">
-                                <span class="left">
-                                    <h5 class="award-head">Lorem Ipsum Dummy text</h5>
-                                    <span class="award-type">Future Stars</span>
-                                </span>
-                                <span class="details-btn"><i class="fal fa-long-arrow-right"></i></span>
-                            </button>
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#awards-tab-two">
-                                <span class="left">
-                                    <h5 class="award-head">Lorem Ipsum Dummy text</h5>
-                                    <span class="award-type">Future Stars</span>
-                                </span>
-                                <span class="details-btn"><i class="fal fa-long-arrow-right"></i></span>
-                            </button>
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#awards-tab-three">
-                                <span class="left">
-                                    <h5 class="award-head">Lorem Ipsum Dummy text</h5>
-                                    <span class="award-type">Future Stars</span>
-                                </span>
-                                <span class="details-btn"><i class="fal fa-long-arrow-right"></i></span>
-                            </button>
-                            <button class="nav-link mb-0" data-bs-toggle="tab" data-bs-target="#awards-tab-four">
-                                <span class="left">
-                                    <h5 class="award-head">Lorem Ipsum Dummy text</h5>
-                                    <span class="award-type">Future Stars</span>
-                                </span>
-                                <span class="details-btn"><i class="fal fa-long-arrow-right"></i></span>
-                            </button>
-                        </div>
-                    </div>
+                <div class="col-xl-10 col-lg-9 col-md-10">
+                    <p class="mt-35 mb-0">dedicated to nurturing and growing football talents we believe in unlocking the full potential of aspiring football stars. Our passion lies in fostering an environment where dedication, skills, and ambition converge to shape the future of football. Whether you're a budding player or a seasoned enthusiast, we are here to fuel your journey to greatness</p>
                 </div>
-            </div>
-        </div>
-    </section>
-    <!-- Our Awards Area end -->
-
-    <!-- Headline area start -->
-    <div class="headline-area style-two bgc-primary">
-        <div class="container-fluid">
-            <div class="headline-wrap marquee">
-                <span>
-                    {% for marquee in marquee %}
-                        <span class="marquee-item">
-                            <i class="fas fa-star-of-life"></i>
-                            <b>
-                                {% if current_language == "ar" %}
-                                {{ marquee.content_ar }}
-                                {% else %}
-                                {{ marquee.content_en }}
-                                {% endif %} 
-                            </b>
-                        </span>
-                    {% endfor %}
-                </span>
             </div>
         </div>
     </div>
-<!-- Headline Area end -->
-
-    <!-- Work Gallery Area start -->
-    <section id="projects" class="work-gallery-area py-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-7 col-lg-9 col-md-11">
-                    <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
-                        <span class="sub-title">Future Stars</span>
-                        <h3>Explore the App Features</h3>
-                    </div>
+</div>
+<!-- Video Area end -->
+<!-- Services Area start -->
+<section class="services-area-six py-100 rel z-1">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title text-center mb-60 rmb-50 wow fadeInUp delay-0-2s">
+                    <span class="sub-title">Features</span>
+                    <h3>Amazing Features</h3>
+                    <p>Nam et sagittis diam. Sed tempor augue sit amet egestas scelerisque. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
                 </div>
             </div>
         </div>
-        <div class="container-fluid">
-            <div class="work-gallery-active">
-
-                {% for app_feature in app_features %}
-
-                <div class="project-item style-four wow fadeInUp delay-0-2s">
-                    <div class="image">
-                        <img src="{{ app_feature.image.url }}" alt="Work Gallery">
-                        <a href="{% url 'index' %}" class="project-btn"><i class="far fa-arrow-right"></i></a>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="service-six-item wow fadeInUp delay-0-2s">
+                    <div class="icon">
+                        <i class="fal fa-bezier-curve"></i>
                     </div>
                     <div class="content">
-                        <a href="{% url 'index' %}" class="category">
-                            {% if current_language == "ar" %}
-                            {{ app_feature.title_ar }}
-                            {% else %}
-                            {{ app_feature.title_en }}
-                            {% endif %} 
-                        </a>
-                        <h4>
-                            <a href="{% url 'index' %}">
-                                {% if current_language == "ar" %}
-                                {{ app_feature.sub_title_ar }}
-                                {% else %}
-                                {{ app_feature.sub_title_en }}
-                                {% endif %} 
-
-                            </a>
-                        </h4>
-                    </div>
-                </div>
-
-                {% endfor %}
-
-            </div>
-            <div class="work-gallery-controls">
-                <button class="work-gallery-prev">
-                    <i class="far fa-chevron-left"></i>
-                </button>
-                <div class="work-gallery-dots"></div>
-                <button class="work-gallery-next">
-                    <i class="far fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-    </section>
-    <!-- Work Gallery Area end -->
-
-    <!-- Statistics Area start -->
-    <div class="statistics-area pb-50 rel">
-        <div class="container">
-            <div class="row justify-content-between">
-                <div class="col-md-3 col-6">
-                    <div class="counter-item counter-text-wrap wow fadeInUp delay-0-2s">
-                        <i class="fal fa-check-circle"></i>
-                        <span class="count-text" data-speed="3000" data-stop="{{ system_settings.happy_user }}">0</span>
-                        <span class="counter-title">Happy User</span>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
-                        <i class="fal fa-check-circle"></i>
-                        <span class="count-text k" data-speed="3000" data-stop="{{ system_settings.line_of_code }}">0</span>
-                        <span class="counter-title">Line of Code</span>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
-                        <i class="fal fa-check-circle"></i>
-                        <span class="count-text" data-speed="3000" data-stop="{{ system_settings.downloads }}">0</span>
-                        <span class="counter-title">Downloads</span>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
-                        <i class="fal fa-check-circle"></i>
-                        <span class="count-text" data-speed="3000" data-stop="{{ system_settings.app_rate }}">0</span>
-                        <span class="counter-title">App Rates</span>
+                        <h5>
+                            <a href="service-details.html">User Friendly</a>
+                        </h5>
+                        <p>Lorem ipsum dolor sit amet consect etur adipisicing elited do eiusmod tempor incidi dout labore magna.</p>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="bg-lines">
-            <span></span><span></span>
-            <span></span><span></span>
+            <div class="col-lg-6">
+                <div class="service-six-item wow fadeInUp delay-0-4s">
+                    <div class="icon">
+                        <i class="fal fa-telescope"></i>
+                    </div>
+                    <div class="content">
+                        <h5>
+                            <a href="service-details.html">Super Fast Speed</a>
+                        </h5>
+                        <p>We denounce with righteous indignation</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="service-six-item wow fadeInUp delay-0-2s">
+                    <div class="icon">
+                        <i class="fal fa-telescope"></i>
+                    </div>
+                    <div class="content">
+                        <h5>
+                            <a href="service-details.html">Award Winning</a>
+                        </h5>
+                        <p>We denounce with righteous indignation</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="service-six-item wow fadeInUp delay-0-4s">
+                    <div class="icon">
+                        <i class="fal fa-laptop-code"></i>
+                    </div>
+                    <div class="content">
+                        <h5>
+                            <a href="service-details.html">Unlimited Posibility</a>
+                        </h5>
+                        <p>We denounce with righteous indignation</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="service-six-item wow fadeInUp delay-0-2s">
+                    <div class="icon">
+                        <i class="fal fa-mail-bulk"></i>
+                    </div>
+                    <div class="content">
+                        <h5>
+                            <a href="service-details.html">Very Fast Support</a>
+                        </h5>
+                        <p>We denounce with righteous indignation</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="service-six-item wow fadeInUp delay-0-4s">
+                    <div class="icon">
+                        <i class="fal fa-file-contract"></i>
+                    </div>
+                    <div class="content">
+                        <h5>
+                            <a href="service-details.html">Design & Branding</a>
+                        </h5>
+                        <p>We denounce with righteous indignation</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Statistics Area end -->
-
-    <!-- Testimonial Area start -->
-    <section class="testimonial-section-five rel">
-        <div class="container-fluid px-0">
-            <div class="row no-gap">
-                <div class="col-lg-6 col-md-5 wow fadeInRight delay-0-2s">
-                    <div class="testimonial-five-image" style="background-image: url('{% static 'frontend/assets/images/testimonials/testimonials-five.jpg' %}');"></div>
+    <div class="bg-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</section>
+<!-- Services Area end -->
+<!-- Video Area start -->
+<div class="video-area-six py-100" style="background-image: url('{% static 'frontend/assets/images/background/video-bg.jpg' % }''); ">
+    <div class="container">
+        <div class="video-six-content wow fadeInUp delay-0-2s">
+            <span class="video-title mb-20 rmb-0">Future Stars Spirit</span>
+            <div class="row align-items-center justify-content-center">
+                <div class="col-xl-2 col-lg-3 col-md-2 text-center">
+                    <a href="https://www.youtube.com/watch?v=9Y7ma241N8k" class="mfp-iframe video-play mt-45">
+                        <img src="{% static 'frontend/assets/images/icons/play-icon.png'%}" alt="Play">
+                    </a>
                 </div>
-                <div class="col-lg-6 col-md-7 align-self-center">
-                    <div class="testimonial-five-right wow fadeInLeft delay-0-2s">
-                        <div class="circle-logo-text">
-                            <img src="{% static 'frontend/assets/images/about/circle-text.svg'%}" alt="Circle Text">
+                <div class="col-xl-10 col-lg-9 col-md-10">
+                    <p class="mt-35 mb-0"> dedicated to nurturing and growing football talents we believe in unlocking the full potential of aspiring football stars. Our passion lies in fostering an environment where dedication, skills, and ambition converge to shape the future of football. Whether you're a budding player or a seasoned enthusiast, we are here to fuel your journey to greatness </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Video Area end -->
+<!-- Team Area start -->
+<section id="team" class="team-area services-area-six rel py-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title text-center mb-55 wow fadeInUp delay-0-2s">
+                    <span class="sub-title">Team Members</span>
+                    <h3>Meet Our Professionals Team</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 justify-content-center"> {% for team_member in team_members %} <div class="col">
+                <div class="team-member wow fadeInUp delay-0-2s">
+                    <div class="bg-wrapper">
+                        <img class="team-member-images" src="{{ team_member.image.url }}" alt="Team Member">
+                    </div>
+                    <div class="content text-center">
+                        <h4> {% if current_language == "ar" %} {{ team_member.name_ar }} {% else %} {{ team_member.name_en }} {% endif %} </h4>
+                        <span> {% if current_language == "ar" %} {{ team_member.designations_ar }} {% else %} {{ team_member.designations_en }} {% endif %} </span>
+                    </div>
+                </div>
+            </div> {% endfor %} </div>
+    </div>
+</section>
+<!-- Team Area end -->
+<!-- Our Awards Area start -->
+<section id="awards" class="our-awards-area pb-100">
+    <div class="container">
+        <div class="row align-items-end pb-35">
+            <div class="col-lg-12">
+                <div class="section-title mb-30 wow fadeInUp delay-0-2s">
+                    <span class="sub-title">My Achievement</span>
+                    <h3>Lot’s Of Awards & Trophy</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row align-items-center justify-content-between">
+            <div class="col-xl-5 col-md-5">
+                <div class="awards-tab-content rmb-75 rel wow fadeInLeft delay-0-2s">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="awards-tab-one">
+                            <div class="award-image">
+                                <img src="{% static 'frontend/assets/images/about/award.png'%}" alt="Awards">
+                            </div>
                         </div>
-                        <div class="testimonials-active">
-
-                            {% for testimonial in testimonials %}
-                            <div class="testimonial-item">
-                                <div class="author-speech">
-                                    <p><span class="quote">“</span>
-                                        {% if current_language == "ar" %}
-                                        {{ testimonial.content_ar }}
-                                        {% else %}
-                                        {{ testimonial.content_en }}
-                                        {% endif %}  
-                                        <span class="quote right-quote">“</span></p>
-                                </div>
-                                <hr>
-                                <div class="testimonial-footer">
-                                    <div class="testimonial-author">
-                                        <div class="author-image">
-                                            <img src="{{ testimonial.image.url }}" alt="Author Image">
-                                        </div>
-                                        <div class="author-info">
-                                            <h4>
-                                                {% if current_language == "ar" %}
-                                                {{ testimonial.name_ar }}
-                                                {% else %}
-                                                {{ testimonial.name_en }}
-                                                {% endif %}    
-                                            </h4>
-                                            <span class="designation">
-                                                {% if current_language == "ar" %}
-                                                {{ testimonial.designation_ar }}
-                                                {% else %}
-                                                {{ testimonial.designation_en }}
-                                                {% endif %}  
-                                            </span>
-                                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-md-7">
+                <div class="awards-tabs nav flex-column nav-pills wow fadeInRight delay-0-2s">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#awards-tab-one">
+                        <span class="left">
+                            <h5 class="award-head">Lorem Ipsum Dummy text</h5>
+                            <span class="award-type">Future Stars</span>
+                        </span>
+                        <span class="details-btn">
+                            <i class="fal fa-long-arrow-right"></i>
+                        </span>
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#awards-tab-two">
+                        <span class="left">
+                            <h5 class="award-head">Lorem Ipsum Dummy text</h5>
+                            <span class="award-type">Future Stars</span>
+                        </span>
+                        <span class="details-btn">
+                            <i class="fal fa-long-arrow-right"></i>
+                        </span>
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#awards-tab-three">
+                        <span class="left">
+                            <h5 class="award-head">Lorem Ipsum Dummy text</h5>
+                            <span class="award-type">Future Stars</span>
+                        </span>
+                        <span class="details-btn">
+                            <i class="fal fa-long-arrow-right"></i>
+                        </span>
+                    </button>
+                    <button class="nav-link mb-0" data-bs-toggle="tab" data-bs-target="#awards-tab-four">
+                        <span class="left">
+                            <h5 class="award-head">Lorem Ipsum Dummy text</h5>
+                            <span class="award-type">Future Stars</span>
+                        </span>
+                        <span class="details-btn">
+                            <i class="fal fa-long-arrow-right"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Our Awards Area end -->
+<!-- Headline area start -->
+<div class="headline-area style-two bgc-primary">
+    <div class="container-fluid">
+        <div class="headline-wrap marquee">
+            <span> {% for marquee in marquee %} <span class="marquee-item">
+                    <i class="fas fa-star-of-life"></i>
+                    <b> {% if current_language == "ar" %} {{ marquee.content_ar }} {% else %} {{ marquee.content_en }} {% endif %} </b>
+                </span> {% endfor %} </span>
+        </div>
+    </div>
+</div>
+<!-- Headline Area end -->
+<!-- Work Gallery Area start -->
+<section id="projects" class="work-gallery-area py-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
+                    <span class="sub-title">Future Stars</span>
+                    <h3>Explore the App Features</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="work-gallery-active"> {% for app_feature in app_features %} <div class="project-item style-four wow fadeInUp delay-0-2s">
+                <div class="image">
+                    <img src="{{ app_feature.image.url }}" alt="Work Gallery">
+                    <a href="{% url 'index' %}" class="project-btn">
+                        <i class="far fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="content">
+                    <a href="{% url 'index' %}" class="category"> {% if current_language == "ar" %} {{ app_feature.title_ar }} {% else %} {{ app_feature.title_en }} {% endif %} </a>
+                    <a class="head" href="{% url 'index' %}"> {% if current_language == "ar" %} {{ app_feature.sub_title_ar }} {% else %} {{ app_feature.sub_title_en }} {% endif %} </a>
+                </div>
+            </div> {% endfor %} </div>
+        <div class="work-gallery-controls">
+            <button class="work-gallery-prev">
+                <i class="far fa-chevron-left"></i>
+            </button>
+            <div class="work-gallery-dots"></div>
+            <button class="work-gallery-next">
+                <i class="far fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+<!-- Work Gallery Area end -->
+<!-- Statistics Area start -->
+<div class="statistics-area pb-50 rel">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-md-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInUp delay-0-2s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.happy_user }}">0</span>
+                    <span class="counter-title">Happy User</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text k" data-speed="3000" data-stop="{{ system_settings.line_of_code }}">0</span>
+                    <span class="counter-title">Line of Code</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.downloads }}">0</span>
+                    <span class="counter-title">Downloads</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
+                    <i class="fal fa-check-circle"></i>
+                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.app_rate }}">0</span>
+                    <span class="counter-title">App Rates</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bg-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+<!-- Statistics Area end -->
+<!-- Testimonial Area start -->
+<section class="testimonial-section-five rel">
+    <div class="container-fluid px-0">
+        <div class="row no-gap">
+            <div class="col-lg-6 col-md-5 wow fadeInRight delay-0-2s">
+                <div class="testimonial-five-image" style="background-image: url('{% static 'frontend/assets/images/testimonials/testimonials-five.jpg' %}');"></div>
+            </div>
+            <div class="col-lg-6 col-md-7 align-self-center">
+                <div class="testimonial-five-right wow fadeInLeft delay-0-2s">
+                    <div class="circle-logo-text">
+                        <img src="{% static 'frontend/assets/images/about/circle-text.svg'%}" alt="Circle Text">
+                    </div>
+                    <div class="testimonials-active"> {% for testimonial in testimonials %} <div class="testimonial-item">
+                            <div class="author-speech">
+                                <p>
+                                    <span class="quote">“</span> {% if current_language == "ar" %} {{ testimonial.content_ar }} {% else %} {{ testimonial.content_en }} {% endif %} <span class="quote right-quote">“</span>
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="testimonial-footer">
+                                <div class="testimonial-author">
+                                    <div class="author-image">
+                                        <img src="{{ testimonial.image.url }}" alt="Author Image">
                                     </div>
-                                    <div class="ratting style-two">
-                                        <div class="star-rating" data-rating="{{ testimonial.rattings }}">
-                                            <div class="filled-stars">★★★★★</div>
-                                            ★★★★★
-                                        </div>
+                                    <div class="author-info">
+                                        <h4> {% if current_language == "ar" %} {{ testimonial.name_ar }} {% else %} {{ testimonial.name_en }} {% endif %} </h4>
+                                        <span class="designation"> {% if current_language == "ar" %} {{ testimonial.designation_ar }} {% else %} {{ testimonial.designation_en }} {% endif %} </span>
+                                    </div>
+                                </div>
+                                <div class="ratting style-two">
+                                    <div class="star-rating" data-rating="{{ testimonial.rattings }}">
+                                        <div class="filled-stars">★★★★★</div> ★★★★★
                                     </div>
                                 </div>
                             </div>
-                            {% endfor %}
-                        </div>
-                        <div class="testimonial-controls">
-                            <div class="testimonial-dots mx-0"></div>
-                        </div>
+                        </div> {% endfor %} </div>
+                    <div class="testimonial-controls">
+                        <div class="testimonial-dots mx-0"></div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Testimonial Area end -->
-
-     <!-- Blog Style Two start -->
-     <section class="blog-area-two services-area-six pt-100 pb-50 rel" style="overflow:hidden;">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-7 col-lg-9 col-md-11">
-                    <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
-                        <span class="sub-title">Blog & News</span>
-                        <h3>Read Our Latest News & Blog Get Every Updates</h3>
-                    </div>
+    </div>
+</section>
+<!-- Testimonial Area end -->
+<!-- Blog Style Two start -->
+<section class="blog-area-two services-area-six pt-100 pb-50 rel">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
+                    <span class="sub-title">Blog & News</span>
+                    <h3>Read Our Latest News & Blog Get Every Updates</h3>
                 </div>
             </div>
-            <div class="row justify-content-center">
-                {% for news in news %}
-                <div class="col-xl-3 col-lg-4 col-sm-6">
-                    <div class="blog-item style-two wow fadeInUp delay-0-2s">
-                        <div class="image">
-                            <img src="{{ news.image.url }}" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;" alt="Blog">
-                        </div>
-                        
-                        <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
-                            {% if current_language == "ar" %}
-                            {{ news.title_ar }}
-                            {% else %}
-                            {{ news.title_en }}
-                            {% endif %}
-                        </a>
-                        <form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;">
-                            {% csrf_token %}
-                            <input type="hidden" name="id" value="{{ news.id }}" />
-                        </form>
-                        <hr>
-                        <ul class="blog-meta">
-                            <li>
-                                <i class="far fa-calendar-alt"></i>
-                                <span>{{ news.news_date }}</span>
-                            </li>
-                            <li>
-                                <i class="far fa-comments"></i>
-                                <a href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">Comment (5)</a>
-                            </li>
-                        </ul>
+        </div>
+        <div class="row justify-content-center"> {% for news in news %} <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="blog-item style-two wow fadeInUp delay-0-2s">
+                    <div class="image">
+                        <img src="{{ news.image.url }}" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;" alt="Blog">
                     </div>
+                    <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;"> {% if current_language == "ar" %} {{ news.title_ar }} {% else %} {{ news.title_en }} {% endif %} </a>
+                    <form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;"> {% csrf_token %} <input type="hidden" name="id" value="{{ news.id }}" />
+                    </form>
+                    <hr>
+                    <ul class="blog-meta">
+                        <li>
+                            <i class="far fa-calendar-alt"></i>
+                            <span>{{ news.news_date|date:"F d, Y" }}</span>
+                        </li>
+                        <li>
+                            <i class="far fa-comments"></i>
+                            <a href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">Comment (5)</a>
+                        </li>
+                    </ul>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="bg-lines">
-            <span></span><span></span>
-            <span></span><span></span>
-        </div>
-    </section>
-    <!-- Blog Style Two end -->
-
-
+            </div> {% endfor %} </div>
+    </div>
+    <div class="bg-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</section>
+<!-- Blog Style Two end -->
 <!-- Client Logo Two start -->
 <div class="client-logo-area pb-80 rel">
     <div class="container">
@@ -606,32 +528,19 @@
                     <h3>And associating with key local & international stakeholders</h3>
                 </div>
             </div>
-        </div>            
-        <div class="client-logo-wrap-two">
-                {% for partner in partner %}
-
-                <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
-                    <img src="{{ partner.image.url }}" alt="Client Logo">
-                </a>
-
-                {% endfor %}
-
-            </div>
         </div>
-        <div class="bg-lines">
-            <span></span><span></span>
-            <span></span><span></span>
-        </div>
+        <div class="client-logo-wrap-two"> {% for partner in partner %} <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
+                <img src="{{ partner.image.url }}" alt="Client Logo">
+            </a> {% endfor %} </div>
+    </div>
+    <div class="bg-lines">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
 </div>
-    <!-- Client Logo Two end -->
-{% endblock %}
-
-{% block scriptcontent %}
-
-{% endblock %}
-{% block script %} 
-<script>
+<!-- Client Logo Two end --> {% endblock %} {% block scriptcontent %} {% endblock %} {% block script %} <script>
     // Initialize star ratings
     const starRatings = document.querySelectorAll('.star-rating');
     starRatings.forEach(function(starRating) {
@@ -645,7 +554,6 @@
         // Set default language from localStorage or 'en' by default
         const currentLanguage = localStorage.getItem('language') || 'en';
         document.getElementById('language-selector').value = currentLanguage;
-
         // On language change, update localStorage
         document.getElementById('change-language-btn').addEventListener('click', function() {
             const selectedLanguage = document.getElementById('language-selector').value;
@@ -653,5 +561,6 @@
         });
     });
 </script>
-<script>new WOW().init();</script>
-{% endblock %}
+<script>
+    new WOW().init();
+</script> {% endblock %}

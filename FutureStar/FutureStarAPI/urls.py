@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 urlpatterns = [
 
-        path('api/register/', RegisterAPIView.as_view(), name='register'),
+        path('api/register/', RegisterAPIView.as_view(), name='playerregister'),
         path('api/playerlogin/', LoginAPIView.as_view(), name='playerlogin'),
         path('api/logout/', LogoutAPIView.as_view(), name='playerlogout'),  # Add logout endpoint
         path('api/forgot-password/', ForgotPasswordAPIView.as_view(), name='forgot-password'),

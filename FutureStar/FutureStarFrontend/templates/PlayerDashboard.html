@@ -1,0 +1,603 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %} Future Star || Player-Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="services-area-six pt-150 pb-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
+                    <h2>Dashboard</h2>
+                    <h4>Loerm ispum dummy text here</h4>
+                </div>
+            </div>                
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="sidebar-wrapper wow fadeInUp delay-0-5s animated">
+                    <div class="user-info">
+                        <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png'%}" alt=""></div>
+                        <div>
+                            <h5 class="user-name">Mark Jones</h6>
+                            <p class="user-desi">Player</p>
+                        </div>
+                    </div>
+                    <ul>
+                        <li><a href="#" class="sidebar-link active"><span><i class="fas fa-th-large"></i></span> Dashboard</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="far fa-life-ring"></i></span> Players</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-users"></i></span> Team</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-user-secret"></i></span> Coach</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-running"></i></span> Referee</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-futbol"></i></span> Training</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-trophy"></i></span> Games</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-shield-alt"></i></span> Fields</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-calendar-check"></i></span> Events</a></li>
+                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-sign-out-alt"></i></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/play-football.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Training</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/tennis-ball.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Games</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/profile-fields.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Fields</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/passport-duotone.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Training</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/Mask group.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Training</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/people-team.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Training</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/coaches.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Training</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/referee.png'%}" class="img-fluid" alt=""></div>
+                                <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                            </div>
+                            <div>
+                                <h6 class="info-head">Total Training</h6>
+                                <h5 class="score">2500</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-three">
+                            <div>
+                                <h5 class="stats-head">Players Stats</h5>
+                                <div class="perticular-info">
+                                    <p class="des">Achievements</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Game Played</p>
+                                    <p class="score">20</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Minutes Played</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Win</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Lost</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Draw</p>
+                                    <p class="score">5</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Goal Scored</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Assist</p>
+                                    <p class="score">25</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Clean Sheet</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Yellow Card</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">2nd Yellow Card</p>
+                                    <p class="score">3</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Red Card</p>
+                                    <p class="score">8</p>
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated bg-three">
+                            <div>
+                                <h5 class="stats-head">Players Stats</h5>
+                                <div class="perticular-info">
+                                    <p class="des">Achievements</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Game Played</p>
+                                    <p class="score">20</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Minutes Played</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Win</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Lost</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Draw</p>
+                                    <p class="score">5</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Goal Scored</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Assist</p>
+                                    <p class="score">25</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Clean Sheet</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Yellow Card</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">2nd Yellow Card</p>
+                                    <p class="score">3</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Red Card</p>
+                                    <p class="score">8</p>
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated bg-three">
+                            <div>
+                                <h5 class="stats-head">Players Stats</h5>
+                                <div class="perticular-info">
+                                    <p class="des">Achievements</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Game Played</p>
+                                    <p class="score">20</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Minutes Played</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Win</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Lost</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Draw</p>
+                                    <p class="score">5</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Goal Scored</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Assist</p>
+                                    <p class="score">25</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Clean Sheet</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Yellow Card</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">2nd Yellow Card</p>
+                                    <p class="score">3</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Red Card</p>
+                                    <p class="score">8</p>
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated bg-three">
+                            <div>
+                                <h5 class="stats-head">Players Stats</h5>
+                                <div class="perticular-info">
+                                    <p class="des">Achievements</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Game Played</p>
+                                    <p class="score">20</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Minutes Played</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Win</p>
+                                    <p class="score">30</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Lost</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Draw</p>
+                                    <p class="score">5</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Goal Scored</p>
+                                    <p class="score">50</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Assist</p>
+                                    <p class="score">25</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Clean Sheet</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Yellow Card</p>
+                                    <p class="score">10</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">2nd Yellow Card</p>
+                                    <p class="score">3</p>
+                                </div>
+                                <div class="perticular-info">
+                                    <p class="des">Red Card</p>
+                                    <p class="score">8</p>
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <h5>Players Stats</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Club</th>
+                                    <th>Nationality</th>
+                                    <th>Stat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <h5>Team Stats</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Club</th>
+                                    <th>Nationality</th>
+                                    <th>Stat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Erling Haaland</td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/Erling Haaland.png'%}" class="img-fluid stats-img" alt="">
+                                            <span>Manchester City</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <img src="{% static 'frontend/assets/images/dashboard/flag.png'%}" class="img-fluid flag-img" alt="">
+                                            <span>Norway</span>
+                                        </div>
+                                    </td>
+                                    <td>7</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   </section>
+
+<!-- Blog Page Area end -->
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default language from localStorage or 'en' by default
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
+
+        // On language change, update localStorage
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}

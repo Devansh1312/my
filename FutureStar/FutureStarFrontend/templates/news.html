@@ -63,7 +63,7 @@
                     <ul class="blog-meta">
                         <li>
                             <i class="far fa-calendar-alt"></i>                                 
-                            <span>{{ news.news_date }}</span>
+                            <span>{{ news.news_date|date:"F d, Y" }}</span>
                         </li>
                     </ul>
                     <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">

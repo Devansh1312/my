@@ -27,85 +27,85 @@
 {% block content %}
 
 <!-- Page Banner Section Start -->
-<section class="page-banner pt-150" style="background-image: url(assets/images/hero/hero-two-bg.png)">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
-                    {% if current_language == "ar" %}
-                    {{ cmsdata.heading_title_ar }}
-                    {% else %}
-                    {{ cmsdata.heading_title_en }}
-                    {% endif %}                             
-                </h1>
+        <section class="page-banner pt-150" style="background-image: url(assets/images/hero/hero-two-bg.png)">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
+                            {% if current_language == "ar" %}
+                            {{ cmsdata.heading_title_ar }}
+                            {% else %}
+                            {{ cmsdata.heading_title_en }}
+                            {% endif %}
+                        </h1>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</section>
-<!-- Page Banner Section End -->
-
-<!-- Video Area start -->
-<div class="video-area-two pb-50">
-    <div class="container">
-        <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
-            <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
-            <a href="https://www.youtube.com/watch?v=9Y7ma241N8k" class="mfp-iframe video-play"><i class="fas fa-play"></i></a>
+        </section>
+        <!-- Page Banner Section End -->        
+        
+        <!-- Video Area start -->
+        <div class="video-area-two pb-50">
+            <div class="container">
+                <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
+                    <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
+                    <a href="https://www.youtube.com/watch?v=9Y7ma241N8k" class="mfp-iframe video-play"><i class="fas fa-play"></i></a>
 
             <!-- <video id = "heading-video-id" height="500" width="1200" controls>
                 <source id="heading-section-video-src" src="/media/{{cmsdata.heading_video}}" type="video/mp4">
 
             </video> -->
-        </div>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 wow fadeInLeft delay-0-2s">
-                <div class="client-text text-lg-start text-center mt-40 pb-50">
-                    {% if current_language == "ar" %}
-                    {{ cmsdata.heading_content_ar }}
-                    {% else %}
-                    {{ cmsdata.heading_content_en }}
-                    {% endif %}                 
-                </div>
-               
-            </div>
-            <div class="col-lg-6 wow fadeInRight delay-0-2s">
-                <div class="video-year text-lg-end text-center rel">
-                    {% if current_language == "ar" %}
-                    {{ cmsdata.heading_year_title_ar }}
-                    {% else %}
-                    {{ cmsdata.heading_year_title_en }}
-                    {% endif %} 
-                    <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<!-- Video Area end -->
-
- <!-- Headline area start -->
- <div class="headline-area bgc-primary">
-    <div class="container-fluid">
-        <div class="headline-wrap marquee">
-            <span>
-                {% for marquee in marquee %}
-                    <span class="marquee-item">
-                        <i class="fas fa-star-of-life"></i>
-                        <b>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 wow fadeInLeft delay-0-2s">
+                        <div class="client-text text-lg-start text-center mt-40 pb-50">
                             {% if current_language == "ar" %}
-                            {{ marquee.content_ar }}
+                            {{ cmsdata.heading_content_ar }}
                             {% else %}
-                            {{ marquee.content_en }}
+                            {{ cmsdata.heading_content_en }}
+                            {% endif %}  
+                        </div>
+                       
+                    </div>
+                    <div class="col-lg-6 wow fadeInRight delay-0-2s">
+                        <div class="video-year text-lg-end text-center rel">
+                            {% if current_language == "ar" %}
+                            {{ cmsdata.heading_year_title_ar }}
+                            {% else %}
+                            {{ cmsdata.heading_year_title_en }}
                             {% endif %} 
-                        </b>
-                    </span>
-                {% endfor %}
-            </span>
+                            <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-<!-- Headline Area end -->
+        <!-- Video Area end -->
+        
+         <!-- Headline area start -->
+         <div class="headline-area bgc-primary">
+            <div class="container-fluid">
+                <div class="headline-wrap marquee">
+                    <span>
+                        {% for marquee in marquee %}
+                        <span class="marquee-item">
+                            <i class="fas fa-star-of-life"></i>
+                            <b>
+                                {% if current_language == "ar" %}
+                                {{ marquee.content_ar }}
+                                {% else %}
+                                {{ marquee.content_en }}
+                                {% endif %}
+                            </b>
+                        </span>
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- Headline Area end -->
 
         <!-- Who We Are start -->
         <section class="who-we-are-area pt-100">
@@ -114,65 +114,54 @@
                     <div class="col-xl-7 col-lg-9 col-md-11">
                         <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
                             <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_2_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_2_heading_en }}
-                        {% endif %} 
-                    </span>
-                    <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_2_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_2_title_en }}
-                        {% endif %} 
-                    </h3>
-                </div>
-            </div>
-        </div>
-        
-        
-        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 justify-content-center">
-
-            {% for team_member in team_members %}
-                <div class="col">
-                    <div class="team-member wow fadeInUp delay-0-2s">
-                        <div class="image">
-                            <img src="{{ team_member.image.url }}" alt="Team Member">
-                        </div>
-                        <div class="content">
-                            <h4>
                                 {% if current_language == "ar" %}
-                                {{ team_member.name_ar }}
+                                {{ cmsdata.section_2_heading_ar }}
                                 {% else %}
-                                {{ team_member.name_en }}
-                                {% endif %} 
-                            </h4>
-                            <span>
-                                {% if current_language == "ar" %}
-                                {{ team_member.designations_ar }}
-                                {% else %}
-                                {{ team_member.designations_en }}
-                                {% endif %} 
+                                {{ cmsdata.section_2_heading_en }}
+                                {% endif %}         
                             </span>
+                            <h3>
+                                {% if current_language == "ar" %}
+                                {{ cmsdata.section_2_title_ar }}
+                                {% else %}
+                                {{ cmsdata.section_2_title_en }}
+                                {% endif %}
+                            </h3>
                         </div>
-                    
                     </div>
-                </div>
-            {% endfor %}
-
-            
-            
-        </div>            
-    </div>
-</section>
-<!-- Who We Are end -->
-
-
-
-
-
-
+                </div>    
+                <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 justify-content-center">
+                    {% for team_member in team_members %}
+                    <div class="col">
+                        <div class="team-member wow fadeInUp delay-0-2s">
+                            <div class="image">
+                                <img src="{{ team_member.image.url }}" alt="Team Member">
+                            </div>
+                            <div class="content">
+                                <h4>
+                                    {% if current_language == "ar" %}
+                                    {{ team_member.name_ar }}
+                                    {% else %}
+                                    {{ team_member.name_en }}
+                                    {% endif %}
+                                </h4>
+                                <span>
+                                    {% if current_language == "ar" %}
+                                    {{ team_member.designations_ar }}
+                                    {% else %}
+                                    {{ team_member.designations_en }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                           
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>            
+            </div>
+        </section>
+        <!-- Who We Are end -->
+        
 <!-- Statistics Area start -->
 <div class="statistics-area pt-50" style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg.png' %}')">
     <div class="container">
@@ -209,107 +198,115 @@
     </div>
 </div>
 <!-- Statistics Area end -->
-
-<!-- Testimonial Area start -->
-<section class="testimonial-section pt-80">
-    <div class="container container-1210">
-        <div class="row">
-            <div class="col-lg-6 col-md-4">
-               <div class="image-border-shape rmb-20 wow fadeInRight delay-0-2s">
-                   <img src="{% static 'frontend/assets/images/testimonials-four.png' %}" alt="Testimonial Left Image">
-                   <div class="bottom-border"></div>
-               </div>
-           </div>
-           <div class="col-lg-6 col-md-8">
-            <div class="testimonial-one-right-part wow fadeInLeft delay-0-2s">
-                    <div class="testimonials-active">
-                        {% for testimonial in testimonials %}
-                            <div class="testimonial-item">
-                                <div class="author-speech">
-                                    <p><span class="quote">“</span> {% if current_language == "ar" %}
-                                        {{ testimonial.content_ar }}
-                                        {% else %}
-                                        {{ testimonial.content_en }}
-                                        {% endif %}   
-                                        <span class="quote right-quote">“</span>
-                                    </p>
-                                </div>
-                                <div class="testimonial-footer">
-                                    <div class="testimonial-author">
-                                        <div class="author-image">
-                                            <img src="{{ testimonial.image.url }}" alt="Author Image">
+        
+        <!-- Testimonial Area start -->
+        <section class="testimonial-section pt-80">
+            <div class="container container-1210">
+                <div class="row">
+                   <div class="col-lg-6 col-md-4">
+                       <div class="image-border-shape rmb-20 wow fadeInRight delay-0-2s">
+                        <img src="{% static 'frontend/assets/images/testimonials-four.png' %}" alt="Testimonial Left Image">
+                        <div class="bottom-border"></div>
+                       </div>
+                   </div>
+                    <div class="col-lg-6 col-md-8">
+                        <div class="testimonial-one-right-part wow fadeInLeft delay-0-2s">
+                            <div class="testimonials-active">
+                                {% for testimonial in testimonials %}
+                                <div class="testimonial-item">
+                                    <div class="author-speech">
+                                        <p>
+                                            <span class="quote">“</span> 
+                                            {% if current_language == "ar" %}
+                                            {{ testimonial.content_ar }}
+                                            {% else %}
+                                            {{ testimonial.content_en }}
+                                            {% endif %}                                          
+                                            <span class="quote right-quote">“</span>
+                                        </p>
+                                    </div>
+                                    <div class="testimonial-footer">
+                                        <div class="testimonial-author">
+                                            <div class="author-image">
+                                                <img src="{{ testimonial.image.url }}" alt="Author Image">
+                                            </div>
+                                            <div class="author-info">
+                                                <h4>
+                                                    {% if current_language == "ar" %}
+                                                    {{ testimonial.name_ar }}
+                                                    {% else %}
+                                                    {{ testimonial.name_en }}
+                                                    {% endif %} 
+                                                </h4>
+                                                <span class="designation">
+                                                    {% if current_language == "ar" %}
+                                                    {{ testimonial.designation_ar }}
+                                                    {% else %}
+                                                    {{ testimonial.designation_en }}
+                                                    {% endif %} 
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div class="author-info">
-                                            <h4>
-                                                {% if current_language == "ar" %}
-                                                {{ testimonial.name_ar }}
-                                                {% else %}
-                                                {{ testimonial.name_en }}
-                                                {% endif %}    
-                                            </h4>
-                                            <span class="designation">
-                                                {% if current_language == "ar" %}
-                                                {{ testimonial.designation_ar }}
-                                                {% else %}
-                                                {{ testimonial.designation_en }}
-                                                {% endif %}  
-                                            </span>
+                                        <div class="ratting style-two">
+                                            <div class="star-rating" data-rating="{{ testimonial.rattings }}">
+                                                <div class="filled-stars">★★★★★</div>
+                                                ★★★★★
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="ratting style-two">
-                                        <div class="star-rating" data-rating="{{ testimonial.rattings }}">
-                                            <div class="filled-stars">★★★★★</div>
-                                            ★★★★★
-                                        </div>
-                                    </div>
                                 </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
-                    </div>
-                    <div class="testimonial-controls mt-75 rmt-40">
-                        <button class="testimonial-prev">
-                            <i class="far fa-chevron-left"></i>
-                        </button>
-                        <div class="testimonial-dots"></div>
-                        <button class="testimonial-next">
-                            <i class="far fa-chevron-right"></i>
-                        </button>
+                            <div class="testimonial-controls mt-75 rmt-40">
+                                <button class="testimonial-prev">
+                                    <i class="far fa-chevron-left"></i>
+                                </button>
+                                <div class="testimonial-dots"></div>
+                                <button class="testimonial-next">
+                                    <i class="far fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-<!-- Testimonial Area end -->
+        </section>
+        <!-- Testimonial Area end -->
+        
+        <!-- Client Logo Two start -->
+        <section class="client-logo-area py-100">
+            <div class="container">
+                <div class="section-title text-center mb-60">
+                    <h3>
+                        {% if current_language == "ar" %}
+                        {{ cmsdata.section_3_heading_ar }}
+                        {% else %}
+                        {{ cmsdata.section_3_heading_en }}
+                        {% endif %} 
+                    </h3>
+                </div>
+                <div class="clients-logo-slider">
+                    {% for global_client in global_clients %}
 
-<!-- Client Logo Two start -->
-<section class="client-logo-area py-100">
-    <div class="container">
-        <div class="section-title text-center mb-60">
-            <h4>
-                {% if current_language == "ar" %}
-                {{ cmsdata.section_3_heading_ar }}
-                {% else %}
-                {{ cmsdata.section_3_heading_en }}
-                {% endif %} 
-            </h4>
-        </div>
-        <div class="client-logo-wrap">
+                        <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
+                            <img src="{{ global_client.image.url }}" alt="Client Logo">
+                        </a>
+                    {% endfor %}
 
-            {% for global_client in global_clients %}
+                </div>
+                <div class="work-gallery-controls">
+                    <button class="clients-logo-slider-prev">
+                        <i class="far fa-chevron-left"></i>
+                    </button>
+                    <div class="clients-logo-slider-dots"></div>
+                    <button class="clients-logo-slider-next">
+                        <i class="far fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
 
-                <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
-                    <img src="{{ global_client.image.url }}" alt="Client Logo">
-                </a>
-
-            {% endfor %}
-            
-        </div>
-    </div>
-</section>
-<!-- Client Logo Two end -->
-
-{% endblock %}
 
 {% block scriptcontent %}
 <script>
