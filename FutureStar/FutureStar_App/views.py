@@ -549,8 +549,8 @@ class CategoryCreateView(LoginRequiredMixin, View):
         form = CategoryForm(request.POST)
         if form.is_valid():
             # Check for existing category with the same name
-            name = form.cleaned_data.get("name")
-            if Category.objects.filter(name=name).exists():
+            name_en = form.cleaned_data.get("name_en")
+            if Category.objects.filter(name_en=name_en).exists():
                 messages.error(request, "Category Type with this name already exists.")
                 return redirect(
                     "category_list"

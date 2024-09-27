@@ -70,6 +70,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     card_header = models.ImageField(upload_to="card_header/", null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=20)
+    fullname = models.CharField(max_length=150,null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    age = models.CharField(max_length=5,null=True, blank=True)
+    gender = models.CharField(max_length=10,null=True, blank=True)
+    country = models.CharField(max_length=150,null=True, blank=True)
+    city = models.CharField(max_length=150,null=True, blank=True)
+    nationality = models.CharField(max_length=150,null=True, blank=True)
+    weight = models.CharField(max_length=150,null=True, blank=True)
+    height = models.CharField(max_length=150,null=True, blank=True)
+    main_playing_position = models.CharField(max_length=150,null=True, blank=True)
+    secondary_playing_position = models.CharField(max_length=150,null=True, blank=True)
+    playing_foot = models.CharField(max_length=150,null=True, blank=True)
+    favourite_local_team = models.CharField(max_length=150,null=True, blank=True)
+    favourite_team = models.CharField(max_length=150,null=True, blank=True)
+    favourite_local_player = models.CharField(max_length=150,null=True, blank=True)
+    favourite_player = models.CharField(max_length=150,null=True, blank=True)
     otp = models.CharField(max_length=6, null=True, blank=True)  # Add this field for OTP
     device_type = models.CharField(max_length=255,null=True,blank=True)
     device_token = models.CharField(max_length=255,null=True,blank=True)
@@ -381,7 +398,12 @@ class cms_pages(models.Model):
     heading_year_title_en = models.CharField(max_length=100,blank=True,null=True)
     heading_year_title_ar = models.CharField(max_length=100,blank=True,null=True)
     heading_year_title = models.CharField(max_length=100,blank=True,null=True)
+    
+    
     #heading-section-2
+    sub_heading_name_en = models.CharField(max_length=100,blank=True,null=True)
+    sub_heading_name_ar = models.CharField(max_length=100,blank=True,null=True)
+
     sub_heading_logo = models.ImageField(upload_to='cmspages/',blank =True,null = True)
     sub_heading_en = models.CharField(max_length=100,blank=True,null=True)
     sub_heading_ar = models.CharField(max_length=100,blank=True,null=True)
@@ -408,9 +430,9 @@ class cms_pages(models.Model):
     section_2_title_ar = models.CharField(max_length=100,blank=True,null=True)
     section_2_content_en = models.TextField(max_length=100,blank=True,null=True)
     section_2_content_ar = models.TextField(max_length=100,blank=True,null=True)
-    section_2_logo = models.CharField(max_length=100,blank=True,null=True)
-
-    #section_2_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    #section_2_logo = models.CharField(max_length=100,blank=True,null=True)
+    section_2_background = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    section_2_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     section_2_images = models.CharField(max_length=255,blank=True,null=True)
     
     section_2_country_name_en = models.CharField(max_length=100,blank=True,null=True)
@@ -464,7 +486,8 @@ class cms_pages(models.Model):
     section_4_content_ar = models.TextField(blank=True,null=True)
     
     section_4_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
-    
+    section_4_background = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
     #for advertise
     section_4_info_1 = models.TextField(blank=-True,null=True)
     section_4_info_2 = models.TextField(blank=True,null=True)
@@ -527,6 +550,13 @@ class cms_pages(models.Model):
 
     section_9_title_en = models.CharField(max_length=100,blank =True,null=True)
     section_9_title_ar = models.CharField(max_length=100,blank =True,null=True)
+    
+    #section 10
+    section_10_heading_en = models.CharField(max_length=100,blank =True,null=True)
+    section_10_heading_ar = models.CharField(max_length=100,blank =True,null=True)
+
+    section_10_title_en = models.CharField(max_length=100,blank =True,null=True)
+    section_10_title_ar = models.CharField(max_length=100,blank =True,null=True)
     
     meta_title_en = models.CharField(max_length=100,blank = True,null =True)
     meta_title_ar = models.CharField(max_length=100,blank = True,null =True)

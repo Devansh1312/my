@@ -26,7 +26,6 @@
                               <th>Email</th>
                               <th>Phone</th>
                               <th>Status</th>
-                              <th>Role</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
@@ -40,11 +39,6 @@
                               <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}"  style="padding: 5px; margin-top: 10px; justify-self: center; justify-items: center;" >
                                  {% if user.is_active %}Active{% else %}Deactive{% endif %}
                              </td>
-                              {% if user.role %} 
-                              <td>{{ user.role.name }}</td> 
-                              {% else %} 
-                              <td>No Role Assigned</td> 
-                              {% endif %} 
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">

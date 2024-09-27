@@ -13,7 +13,9 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
 from django.db import IntegrityError
 from django.utils import timezone
-import secrets , string
+import os
+from django.conf import settings
+from django.core.files.storage import default_storage
 
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
@@ -467,4 +469,147 @@ class ChangePasswordAPIView(APIView):
         return Response({
             'status': 1,
             'message': _('Password changed successfully.'),
+        }, status=status.HTTP_200_OK)
+
+
+
+
+############################################### Create Profile API ###################################
+class EditProfileAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        user = request.user
+    
+        return Response({
+            'status': 1,
+            'message': _('Player Details.'),
+            'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'phone': user.phone,
+                        'email': user.email,
+                        'fullname': user.fullname,
+                        'bio': user.bio,
+                        'date_of_birth': user.date_of_birth,
+                        'age': user.age,
+                        'gender': user.gender,
+                        'country': user.country,
+                        'city': user.city,
+                        'nationality': user.nationality,
+                        'weight': user.weight,
+                        'height': user.height,
+                        'main_playing_position': user.main_playing_position,
+                        'secondary_playing_position': user.secondary_playing_position,
+                        'playing_foot': user.playing_foot,
+                        'favourite_local_team': user.favourite_local_team,
+                        'favourite_team': user.favourite_team,
+                        'favourite_local_player': user.favourite_local_player,
+                        'favourite_player': user.favourite_player,
+                        'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                        'cover_photo': user.card_header.url if user.card_header else None
+                    }
+        }, status=status.HTTP_200_OK)
+
+
+    ######## Post of Create API ######
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        user = request.user
+
+        # Get old profile picture and card header (before any changes)
+        old_profile_picture = user.profile_picture
+        old_card_header = user.card_header
+
+        # Update all fields from request data
+        user.fullname = request.data.get('fullname', user.fullname)
+        user.bio = request.data.get('bio', user.bio)
+        user.date_of_birth = request.data.get('date_of_birth', user.date_of_birth)
+        user.age = request.data.get('age', user.age)
+        user.gender = request.data.get('gender', user.gender)
+        user.country = request.data.get('country', user.country)
+        user.city = request.data.get('city', user.city)
+        user.nationality = request.data.get('nationality', user.nationality)
+        user.weight = request.data.get('weight', user.weight)
+        user.height = request.data.get('height', user.height)
+        user.main_playing_position = request.data.get('main_playing_position', user.main_playing_position)
+        user.secondary_playing_position = request.data.get('secondary_playing_position', user.secondary_playing_position)
+        user.playing_foot = request.data.get('playing_foot', user.playing_foot)
+        user.favourite_local_team = request.data.get('favourite_local_team', user.favourite_local_team)
+        user.favourite_team = request.data.get('favourite_team', user.favourite_team)
+        user.favourite_local_player = request.data.get('favourite_local_player', user.favourite_local_player)
+        user.favourite_player = request.data.get('favourite_player', user.favourite_player)
+
+        # Handle profile picture update
+        if "profile_picture" in request.FILES:
+            profile_picture = request.FILES["profile_picture"]
+
+            # Delete the old profile picture if it exists
+            if old_profile_picture and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture))):
+                os.remove(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture)))
+
+            # Save the new profile picture
+            file_extension = profile_picture.name.split('.')[-1]
+            file_name = f"profile_pics/{user.username}.{file_extension}"
+
+            path = default_storage.save(file_name, profile_picture)
+            user.profile_picture = path
+
+        # Handle card header update
+        if "cover_photo" in request.FILES:
+            card_header = request.FILES["cover_photo"]
+
+            # Delete the old card header if it exists
+            if old_card_header and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(old_card_header))):
+                os.remove(os.path.join(settings.MEDIA_ROOT, str(old_card_header)))
+
+            # Save the new card header
+            file_extension = card_header.name.split('.')[-1]
+            file_name = f"card_header/{user.username}.{file_extension}"
+
+            path = default_storage.save(file_name, card_header)
+            user.card_header = path
+
+        # Save user details
+        user.save()
+
+        return Response({
+            'status': 1,
+            'message': _('Profile updated successfully.'),
+            'data': {
+                'id': user.id,
+                'username': user.username,
+                'phone': user.phone,
+                'email': user.email,
+                'fullname': user.fullname,
+                'bio': user.bio,
+                'date_of_birth': user.date_of_birth,
+                'age': user.age,
+                'gender': user.gender,
+                'country': user.country,
+                'city': user.city,
+                'nationality': user.nationality,
+                'weight': user.weight,
+                'height': user.height,
+                'main_playing_position': user.main_playing_position,
+                'secondary_playing_position': user.secondary_playing_position,
+                'playing_foot': user.playing_foot,
+                'favourite_local_team': user.favourite_local_team,
+                'favourite_team': user.favourite_team,
+                'favourite_local_player': user.favourite_local_player,
+                'favourite_player': user.favourite_player,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                'cover_photo': user.card_header.url if user.card_header else None
+            }
         }, status=status.HTTP_200_OK)

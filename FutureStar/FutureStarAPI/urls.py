@@ -14,6 +14,11 @@ urlpatterns = [
         path('api/change-password-otp/', ChangePasswordOtpAPIView.as_view(), name='change-password-otp'),
         
         # For logged-in users
-        path('api/change-password/', ChangePasswordAPIView.as_view(), name='change-password'),                 
+        path('api/change-password/', ChangePasswordAPIView.as_view(), name='change-password'),   
+        
+        
+        # URL for CreateProfile API (GET for roles, POST for profile creation/update)
+        path('api/edit-profile/', EditProfileAPIView.as_view()),
+              
 
     ]
