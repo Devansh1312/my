@@ -631,21 +631,43 @@ class PostListAPIView(generics.ListAPIView):
 
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # Add parsers to handle form data and file uploads
 
     def post(self, request, *args, **kwargs):
         serializer = PostSerializer(data=request.data)
+
         if serializer.is_valid():
-            serializer.save(user=request.user)  # Associate the post with the logged-in user
+            post = serializer.save(user=request.user)
+
+            # Handle image upload
+            if "image" in request.FILES:
+                image = request.FILES["image"]
+
+                # If the post already has an image, delete the old one
+                if post.image and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(post.image))):
+                    os.remove(os.path.join(settings.MEDIA_ROOT, str(post.image)))
+
+                # Save the new image
+                file_extension = image.name.split('.')[-1]
+                file_name = f"post_images/{post.id}.{file_extension}"
+                path = default_storage.save(file_name, image)
+
+                # Update post with new image path
+                post.image = path
+                post.save()
+
             return Response({
                 'status': 1,
                 'message': 'Post created successfully',
-                'data': serializer.data
+                'data': PostSerializer(post).data
             }, status=status.HTTP_201_CREATED)
+
         return Response({
             'status': 0,
             'message': 'Invalid data',
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 ## Singal Post View

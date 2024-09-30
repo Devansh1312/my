@@ -8,6 +8,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -19,7 +20,7 @@ class Post(models.Model):
 class Post_comment(models.Model):
     user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE, default=0)
+    parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
