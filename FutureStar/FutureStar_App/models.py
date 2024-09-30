@@ -557,7 +557,14 @@ class cms_pages(models.Model):
 
     section_10_title_en = models.CharField(max_length=100,blank =True,null=True)
     section_10_title_ar = models.CharField(max_length=100,blank =True,null=True)
+
+    achivement_heading_en = models.CharField(max_length=255,blank=True,null=True)
+    achivement_heading_ar = models.CharField(max_length=255,blank=True,null=True)
     
+    achivement_title_en = models.CharField(max_length=255,blank=True,null=True)
+    achivement_title_ar = models.CharField(max_length=255,blank=True,null=True)
+
+
     meta_title_en = models.CharField(max_length=100,blank = True,null =True)
     meta_title_ar = models.CharField(max_length=100,blank = True,null =True)
     

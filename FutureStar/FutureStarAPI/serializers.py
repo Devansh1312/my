@@ -96,3 +96,37 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'user', 'title', 'description', 'image', 'date_created', 'comments']
+
+
+class FieldCapacitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FieldCapacity
+        fields = '__all__'
+
+class GroundMaterialSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GroundMaterial
+        fields = ['id', 'name']  # Only return id and the translated name
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate name based on the language
+        if language == 'ar':
+            return obj.name_ar
+        return obj.name_en
+    
+
+class FieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Field
+        fields = ['field_name', 'image', 'field_capacity', 'ground_type', 'country', 'city', 'location', 'additional_information']  # Exclude user_id
+
+    def create(self, validated_data):
+        # Automatically associate the field with the currently logged-in user
+        user = self.context['request'].user
+        return Field.objects.create(user_id=user, **validated_data)

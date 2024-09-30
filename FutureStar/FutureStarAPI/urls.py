@@ -28,5 +28,8 @@ urlpatterns = [
         path('api/comments/create/', CommentCreateAPIView.as_view(), name='comment-create'),
         path('api/posts/delete/', PostDeleteAPIView.as_view(), name='post-delete'),
 
+
+        path('api/fields/', FieldAPIView.as_view()),
+
         
     ]

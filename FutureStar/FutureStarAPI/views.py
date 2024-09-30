@@ -644,7 +644,7 @@ class PostListAPIView(generics.ListAPIView):
 
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -658,7 +658,15 @@ class PostCreateAPIView(APIView):
             # Handle image upload
             if "image" in request.FILES:
                 image = request.FILES["image"]
-                # Your existing image handling code here...
+
+                # Save new image with a structured filename
+                file_extension = image.name.split('.')[-1]
+                file_name = f"post_images/{post.id}_{request.user.username}.{file_extension}"
+
+                # Save the image and update the post instance
+                image_path = default_storage.save(file_name, image)
+                post.image = image_path
+                post.save()
 
             return Response({
                 'status': 1,
@@ -715,6 +723,7 @@ class CommentCreateAPIView(APIView):
         data = request.data
         post_id = data.get('post_id')
         comment_text = data.get('comment')
+        parent_id = data.get('parent_id')  # Retrieve parent_id if present
 
         if not post_id or not comment_text:
             return Response({
@@ -730,11 +739,23 @@ class CommentCreateAPIView(APIView):
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Create the comment
+        # Handle the parent comment (if it's a reply)
+        parent_comment = None
+        if parent_id:
+            try:
+                parent_comment = Post_comment.objects.get(id=parent_id)
+            except Post_comment.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Parent comment not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+        # Create the comment (or reply)
         comment = Post_comment.objects.create(
             user=request.user,
             post=post,
-            comment=comment_text
+            comment=comment_text,
+            parent=parent_comment  # Set the parent if this is a reply
         )
 
         return Response({
@@ -773,3 +794,65 @@ class PostDeleteAPIView(APIView):
             'status': 1,
             'message': _('Post deleted successfully.')
         }, status=status.HTTP_200_OK)
+    
+
+
+
+class FieldAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        # Fetch all field capacities and ground types
+        field_capacity = FieldCapacity.objects.all()
+        ground_type = GroundMaterial.objects.all()
+
+        # Serialize the data and pass the request context for language-based translation
+        field_capacity_serializer = FieldCapacitySerializer(field_capacity, many=True)
+        ground_type_serializer = GroundMaterialSerializer(ground_type, many=True, context={'request': request})
+        
+        return Response({
+            'status': 1,
+            'message': _('Fields retrieved successfully.'),
+            'data': {
+                'field_capacity': field_capacity_serializer.data,
+                'ground_type': ground_type_serializer.data
+            }
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        # Handle field creation with image upload
+        serializer = FieldSerializer(data=request.data, context={'request': request})
+        
+        if serializer.is_valid():
+            field_instance = serializer.save()
+
+            # Handle image upload
+            if 'image' in request.FILES:
+                image = request.FILES['image']
+                # Save the new image with a structured filename
+                file_extension = image.name.split('.')[-1]
+                file_name = f"fields_images/{field_instance.field_name}_{field_instance.id}.{file_extension}"
+
+                # Save the image and update the instance
+                image_path = default_storage.save(file_name, image)
+                field_instance.image = image_path
+                field_instance.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Field created successfully.'),
+                'data': FieldSerializer(field_instance).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Field creation failed.'),
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)

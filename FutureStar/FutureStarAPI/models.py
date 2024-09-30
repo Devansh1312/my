@@ -29,3 +29,22 @@ class Post_comment(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_post_comment'
+
+
+
+class Field(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    field_name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='fields_images/', blank=True, null=True)  # Add image field
+    field_capacity = models.ForeignKey(FieldCapacity, on_delete=models.CASCADE)
+    ground_type = models.ForeignKey(GroundMaterial, on_delete=models.CASCADE)
+    country = models.CharField(max_length=255)    
+    city = models.CharField(max_length=255)
+    location = models.CharField(max_length=500)
+    additional_information = models.TextField(max_length=255,blank=True, null=True)
+
+    def __str__(self):
+        return self.field_name
+
+    class Meta:
+        db_table = 'futurestar_app_field'
