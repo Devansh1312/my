@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from FutureStar_App.models import User
+from FutureStarAPI.models import *
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
@@ -64,3 +66,33 @@ class OTPVerificationSerializer(serializers.Serializer):
 class ChangePasswordOtpSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Same as above
     new_password = serializers.CharField(min_length=8)  # Ensure a minimum length for security
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']  # Customize as needed
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)  # Nested user details
+    parent = serializers.PrimaryKeyRelatedField(queryset=Post_comment.objects.all(), allow_null=True)
+
+    class Meta:
+        model = Post_comment
+        fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies']
+        # Changed 'post_id' to 'post' and 'parent_id' to 'parent' for better representation
+
+    def get_replies(self, obj):
+        # Fetch replies where the parent_id is the current comment's id
+        if obj.replies.exists():
+            return PostCommentSerializer(obj.replies.all(), many=True).data
+        return []
+
+class PostSerializer(serializers.ModelSerializer):
+    comments = PostCommentSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)  # Nested user details
+
+    class Meta:
+        model = Post
+        fields = ['id', 'user', 'title', 'description', 'date_created', 'comments']

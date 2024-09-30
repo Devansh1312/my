@@ -9,6 +9,7 @@ from .serializers import *
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from FutureStar_App.models import *
+from FutureStarAPI.models import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
 from django.db import IntegrityError
@@ -16,6 +17,8 @@ from django.utils import timezone
 import os
 from django.conf import settings
 from django.core.files.storage import default_storage
+from rest_framework import generics
+
 
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
@@ -613,3 +616,117 @@ class EditProfileAPIView(APIView):
                 'cover_photo': user.card_header.url if user.card_header else None
             }
         }, status=status.HTTP_200_OK)
+    
+
+
+
+####################### POST API ###############################################################################
+class PostListAPIView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only posts created by the logged-in user
+        return Post.objects.filter(user=self.request.user).order_by('-date_created')
+
+class PostCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # Associate the post with the logged-in user
+            return Response({
+                'status': 1,
+                'message': 'Post created successfully',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        return Response({
+            'status': 0,
+            'message': 'Invalid data',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+## Singal Post View
+class PostDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        post_id = data.get('post_id')  # Extract post_id from the body
+
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': 'post_id is required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = Post.objects.get(id=post_id, user=request.user)  # Ensure the user owns the post
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': 'Post not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize the post along with its comments and replies
+        serializer = PostSerializer(post)
+
+        return Response({
+            'status': 1,
+            'message': 'Post details fetched successfully',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+
+class CommentCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        post_id = data.get('post_id')
+        comment_text = data.get('comment')
+        parent_id = data.get('parent_id')  # Optional, for replies
+
+        if not post_id or not comment_text:
+            return Response({
+                'status': 0,
+                'message': 'post_id and comment are required.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': 'Post not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        parent_comment = None
+        if parent_id:
+            try:
+                parent_comment = Post_comment.objects.get(id=parent_id, post=post)
+            except Post_comment.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': 'Parent comment not found.'
+                }, status=status.HTTP_404_NOT_FOUND)
+
+        # Create the comment
+        comment = Post_comment.objects.create(
+            user=request.user,
+            post=post,
+            parent=parent_comment,
+            comment=comment_text
+        )
+
+        # Serialize the created comment
+        serializer = PostCommentSerializer(comment)
+
+        return Response({
+            'status': 1,
+            'message': 'Comment created successfully',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)

@@ -19,6 +19,14 @@ urlpatterns = [
         
         # URL for CreateProfile API (GET for roles, POST for profile creation/update)
         path('api/edit-profile/', EditProfileAPIView.as_view()),
+
+
+        ######## User Post API ###########
+        path('api/posts/', PostListAPIView.as_view(), name='post-list'),
+        path('api/posts/create/', PostCreateAPIView.as_view(), name='post-create'),
+        path('api/posts/details/', PostDetailAPIView.as_view(), name='post-detail-body'),
+        path('api/comments/create/', CommentCreateAPIView.as_view(), name='comment-create'),
+        
               
 
     ]
