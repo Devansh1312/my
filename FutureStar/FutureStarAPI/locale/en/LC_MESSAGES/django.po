@@ -12,39 +12,39 @@ msgstr ""
 "X-Generator: Poedit 3.5\n"
 
 msgid "User registered and logged in successfully"
-msgstr "User registered and logged in successfully"
+msgstr ""
 
 msgid "User registration failed due to duplicate data"
-msgstr "User registration failed due to duplicate data"
+msgstr ""
 
 msgid "User registration failed"
-msgstr "User registration failed"
+msgstr ""
 
 msgid "Email is required for registration"
-msgstr "Email is required for registration"
+msgstr ""
 
 msgid "User logged in successfully"
-msgstr "User logged in successfully"
-
-msgid "User created and logged in successfully"
-msgstr "User created and logged in successfully"
-
-msgid "Invalid registration type"
-msgstr "Invalid registration type"
-
-msgid "Login successful"
 msgstr ""
 
 msgid "Account is inactive"
 msgstr ""
 
+msgid "User created and logged in successfully"
+msgstr ""
+
+msgid "Invalid registration type"
+msgstr ""
+
+msgid "Login successful"
+msgstr ""
+
 msgid "Invalid credentials"
 msgstr ""
 
-msgid "Invalid data"
+msgid "User created and login successful"
 msgstr ""
 
-msgid "User created and login successful"
+msgid "Invalid data"
 msgstr ""
 
 msgid "Logout successful"
@@ -57,6 +57,9 @@ msgid "OTP sent to your phone."
 msgstr ""
 
 msgid "User with this phone number does not exist."
+msgstr ""
+
+msgid "Invalid data."
 msgstr ""
 
 msgid "OTP verified successfully."
@@ -77,17 +80,32 @@ msgstr ""
 msgid "New password must be at least 8 characters long."
 msgstr ""
 
-msgid "Language"
+msgid "Player Details."
 msgstr ""
 
-msgid "Device type"
+msgid "Profile updated successfully."
 msgstr ""
 
-msgid "Device token"
+msgid "Posts fetched successfully."
 msgstr ""
 
-msgid "Phone number"
+msgid "Post created successfully"
 msgstr ""
 
-msgid "Email"
+msgid "post_id is required."
+msgstr ""
+
+msgid "Post not found."
+msgstr ""
+
+msgid "Post details fetched successfully."
+msgstr ""
+
+msgid "post_id and comment are required."
+msgstr ""
+
+msgid "Comment created successfully."
+msgstr ""
+
+msgid "Post deleted successfully."
 msgstr ""

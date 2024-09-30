@@ -15,7 +15,7 @@ msgid "User registered and logged in successfully"
 msgstr "تم تسجيل المستخدم وتسجيل الدخول بنجاح"
 
 msgid "User registration failed due to duplicate data"
-msgstr "فشل تسجيل المستخدم بسبب وجود بيانات مكررة"
+msgstr "فشل تسجيل المستخدم بسبب بيانات مكررة"
 
 msgid "User registration failed"
 msgstr "فشل تسجيل المستخدم"
@@ -24,7 +24,10 @@ msgid "Email is required for registration"
 msgstr "البريد الإلكتروني مطلوب للتسجيل"
 
 msgid "User logged in successfully"
-msgstr "تم تسجيل الدخول بنجاح"
+msgstr "تم تسجيل دخول المستخدم بنجاح"
+
+msgid "Account is inactive"
+msgstr "الحساب غير نشط"
 
 msgid "User created and logged in successfully"
 msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
@@ -33,19 +36,16 @@ msgid "Invalid registration type"
 msgstr "نوع التسجيل غير صالح"
 
 msgid "Login successful"
-msgstr "تم تسجيل الدخول بنجاح"
-
-msgid "Account is inactive"
-msgstr "الحساب غير نشط"
+msgstr "تسجيل الدخول ناجح"
 
 msgid "Invalid credentials"
-msgstr "بيانات الاعتماد غير صحيحة"
-
-msgid "Invalid data"
-msgstr "بيانات غير صحيحة"
+msgstr "بيانات الاعتماد غير صالحة"
 
 msgid "User created and login successful"
 msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
+
+msgid "Invalid data"
+msgstr "بيانات غير صالحة"
 
 msgid "Logout successful"
 msgstr "تم تسجيل الخروج بنجاح"
@@ -54,40 +54,58 @@ msgid "Logout failed"
 msgstr "فشل تسجيل الخروج"
 
 msgid "OTP sent to your phone."
-msgstr "تم إرسال رمز التحقق إلى هاتفك."
+msgstr "تم إرسال OTP إلى هاتفك."
 
 msgid "User with this phone number does not exist."
-msgstr "لا يوجد مستخدم بهذا الرقم."
+msgstr "المستخدم بهذا الرقم الهاتفي غير موجود."
+
+msgid "Invalid data."
+msgstr "بيانات غير صالحة."
 
 msgid "OTP verified successfully."
-msgstr "تم التحقق من رمز التحقق بنجاح."
+msgstr "تم التحقق من OTP بنجاح."
 
 msgid "Invalid OTP."
-msgstr "رمز التحقق غير صحيح."
+msgstr "OTP غير صالح."
 
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
 
 msgid "User not found."
-msgstr "المستخدم غير موجود."
+msgstr "لم يتم العثور على المستخدم."
 
 msgid "Old password is incorrect."
 msgstr "كلمة المرور القديمة غير صحيحة."
 
 msgid "New password must be at least 8 characters long."
-msgstr "يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل."
+msgstr "يجب أن تكون كلمة المرور الجديدة مكونة من 8 أحرف على الأقل."
 
-msgid "Language"
-msgstr "اللغة"
+msgid "Player Details."
+msgstr "تفاصيل اللاعب."
 
-msgid "Device type"
-msgstr "نوع الجهاز"
+msgid "Profile updated successfully."
+msgstr "تم تحديث الملف الشخصي بنجاح."
 
-msgid "Device token"
-msgstr "رمز الجهاز"
+msgid "Posts fetched successfully."
+msgstr "تم جلب المشاركات بنجاح."
 
-msgid "Phone number"
-msgstr "رقم الهاتف"
+msgid "Post created successfully"
+msgstr "تم إنشاء المشاركة بنجاح"
 
-msgid "Email"
-msgstr "البريد الإلكتروني"
+msgid "post_id is required."
+msgstr "المعرف_المشاركة مطلوب."
+
+msgid "Post not found."
+msgstr "لم يتم العثور على المشاركة."
+
+msgid "Post details fetched successfully."
+msgstr "تم جلب تفاصيل المشاركة بنجاح."
+
+msgid "post_id and comment are required."
+msgstr "المعرف_المشاركة والتعليق مطلوبان."
+
+msgid "Comment created successfully."
+msgstr "تم إنشاء التعليق بنجاح."
+
+msgid "Post deleted successfully."
+msgstr "تم حذف المشاركة بنجاح."

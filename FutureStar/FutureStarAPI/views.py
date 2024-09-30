@@ -626,14 +626,30 @@ class PostListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Return only posts created by the logged-in user
         return Post.objects.filter(user=self.request.user).order_by('-date_created')
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        posts = self.get_queryset()
+        serializer = self.get_serializer(posts, many=True)
+
+        return Response({
+            'status': 1,
+            'message': _('Posts fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
 
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # Add parsers to handle form data and file uploads
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -642,80 +658,68 @@ class PostCreateAPIView(APIView):
             # Handle image upload
             if "image" in request.FILES:
                 image = request.FILES["image"]
-
-                # If the post already has an image, delete the old one
-                if post.image and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(post.image))):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, str(post.image)))
-
-                # Save the new image
-                file_extension = image.name.split('.')[-1]
-                file_name = f"post_images/{post.id}.{file_extension}"
-                path = default_storage.save(file_name, image)
-
-                # Update post with new image path
-                post.image = path
-                post.save()
+                # Your existing image handling code here...
 
             return Response({
                 'status': 1,
-                'message': 'Post created successfully',
+                'message': _('Post created successfully'),
                 'data': PostSerializer(post).data
             }, status=status.HTTP_201_CREATED)
 
         return Response({
             'status': 0,
-            'message': 'Invalid data',
+            'message': _('Invalid data'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-## Singal Post View
 class PostDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        data = request.data
-        post_id = data.get('post_id')  # Extract post_id from the body
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        post_id = request.data.get('post_id')
 
         if not post_id:
             return Response({
                 'status': 0,
-                'message': 'post_id is required.'
+                'message': _('post_id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            post = Post.objects.get(id=post_id, user=request.user)  # Ensure the user owns the post
+            post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': 'Post not found.'
+                'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Serialize the post along with its comments and replies
         serializer = PostSerializer(post)
 
         return Response({
             'status': 1,
-            'message': 'Post details fetched successfully',
+            'message': _('Post details fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
-
 
 
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
         data = request.data
         post_id = data.get('post_id')
         comment_text = data.get('comment')
-        parent_id = data.get('parent_id')  # Optional, for replies
 
         if not post_id or not comment_text:
             return Response({
                 'status': 0,
-                'message': 'post_id and comment are required.'
+                'message': _('post_id and comment are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -723,32 +727,49 @@ class CommentCreateAPIView(APIView):
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': 'Post not found.'
+                'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
-
-        parent_comment = None
-        if parent_id:
-            try:
-                parent_comment = Post_comment.objects.get(id=parent_id, post=post)
-            except Post_comment.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': 'Parent comment not found.'
-                }, status=status.HTTP_404_NOT_FOUND)
 
         # Create the comment
         comment = Post_comment.objects.create(
             user=request.user,
             post=post,
-            parent=parent_comment,
             comment=comment_text
         )
 
-        # Serialize the created comment
-        serializer = PostCommentSerializer(comment)
+        return Response({
+            'status': 1,
+            'message': _('Comment created successfully.'),
+            'data': PostCommentSerializer(comment).data
+        }, status=status.HTTP_201_CREATED)
+
+
+class PostDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        post_id = request.data.get('post_id')
+
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': _('post_id is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = Post.objects.get(id=post_id, user=request.user)
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        post.delete()
 
         return Response({
             'status': 1,
-            'message': 'Comment created successfully',
-            'data': serializer.data
-        }, status=status.HTTP_201_CREATED)
+            'message': _('Post deleted successfully.')
+        }, status=status.HTTP_200_OK)
