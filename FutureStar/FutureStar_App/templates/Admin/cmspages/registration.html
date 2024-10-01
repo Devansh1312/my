@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+
+{% endblock %}
+<meta name="{{data.meta_title_en}}" content="{% block meta_description %}{{data.meta_content_en}}{% endblock %}">
+
+{% block title %}Registration Page Edit{% endblock %}
+
+{% block content %}
+{% include "components/loader.html" %}
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>  
+<div class="page-body">
+    <div class="container-fluid">
+        {% include "layouts/breadcrumb.html" %}
+        <div class="card">
+            <form class="form theme-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div>
+                        <h1 style="font-size:25px">CMS Registration Page Edit</h1>
+                    </div>   
+                     
+                    <p class = "erro-heading" id="heading-error"></p>
+
+
+                    <br>
+                    <div>
+                        <p id = "heading-warning"></p>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Heading Section</h4>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="reg-title">Title (English)</label>
+                                <input class="form-control btn-pill " id="reg-title-en" name="reg_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-reg-title-en"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="reg-title-arabic">Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="reg-title-ar" name="reg-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-reg-title-ar"></p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    
+                    
+                        
+                    
+
+                    <!--section 2-->
+                    <br>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>SEO Section</h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title-en">SEO Title (English)</label>
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-en">SEO Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    
+                   
+                </div>
+                <div class="card-footer text-end">
+                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
+                    <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!--javascript-->
+<script>
+
+
+    function  backtolist(){
+
+        url = "{% url 'cmspages_urls' %}";
+        
+
+        window.location.href = url
+        return false
+
+        
+    }
+    
+    function savethedata(){
+        
+
+
+        
+            try{
+
+                //text
+
+                var reg_title_en = document.getElementById("reg-title-en")
+                var reg_title_ar = document.getElementById("reg-title-ar")
+                var seo_title_en = document.getElementById("meta-title-en")
+                var seo_title_ar = document.getElementById("meta-title-ar")
+                var seo_content_en = document.getElementById("meta-content-en")
+                var seo_content_ar = document.getElementById("meta-content-ar")
+                var top_error = document.getElementById('heading-warning')
+                var missing_text = document.getElementById('heading-error')
+
+                const form_data = [
+
+                { id: "reg-title-en", name: "Title (English)" },
+                { id: "reg-title-ar", name: "Title (Arabic)" },
+                { id: "meta-title-en", name: "SEO Title (English)" },
+                { id: "meta-title-ar", name: "SEO Title (Arabic)" },
+                { id: "meta-content-en", name: "SEO Content (English)" },
+                { id: "meta-content-ar", name: "SEO Content (Arabic)" }
+
+
+            ];
+                document.querySelectorAll('.error-message').forEach((msg) => {
+                    msg.style.display = 'none';
+                    msg.innerText = '';
+                });
+
+                top_error.innerText =""
+
+                var sendData = "true"
+
+                for (const field of form_data) {
+                        const input = document.getElementById(field.id);
+                        const errorMsg = document.getElementById(`error-${field.id}`);
+    
+                        if (!input.value.trim()) {
+                            
+                            errorMsg.innerText = `Please fill in ${field.name}.`;
+                            errorMsg.style.display = 'block'; 
+                                
+                                top_error.innerText = "There Should be no empty Field"
+                                top_error.style.color = "red"
+    
+                                document.documentElement.scrollTop = 0
+
+                                sendData = "false"
+                                break;
+    
+                                
+                        }
+                    }
+
+                if (sendData == 'true'){
+
+                            const formData = new FormData();
+                            //text
+                            
+                            formData.append('reg-title-en',reg_title_en.value );
+                            formData.append('reg-title-ar', reg_title_ar.value );
+                            formData.append('meta-title-en', seo_title_en.value );
+                            formData.append('meta-title-ar', seo_title_ar.value );
+                            formData.append('meta-content-en', seo_content_en.value );
+                            formData.append('meta-content-ar', seo_content_ar.value );
+                            
+
+                            fetch("/cms_regdetail/", {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRFToken': getCookie('csrftoken')  // Include CSRF token
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                location.reload()
+                                return false
+                            })
+                            .catch((error) => {
+                                location.reload()
+
+                            });
+                        
+                       
+                            function getCookie(name) {
+                                let cookieValue = null;
+                                if (document.cookie && document.cookie !== '') {
+                                    const cookies = document.cookie.split(';');
+                                    for (let i = 0; i < cookies.length; i++) {
+                                        const cookie = cookies[i].trim();
+                                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                            break;
+                                        }
+                                    }
+                                }
+                                return cookieValue;
+                            
+    
+                        }
+                        
+                        //errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+                    }
+        
+            
+                
+                //console.log(country_name_ar.value)
+                return false
+            }
+            catch(err){
+
+                alert(err)
+                return false
+            }
+                
+        }
+       
+
+    
+</script>
+{% endblock %}
+

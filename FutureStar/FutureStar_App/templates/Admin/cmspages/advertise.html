@@ -24,7 +24,8 @@
                         <h1 style="font-size:25px">CMS Advertise Page Edit</h1>
                     </div>    
 
-                    <p id="heading-error"></p>
+                    <p class = "erro-heading" id="heading-error"></p>
+
 
                     <br>
                     <div>
@@ -43,7 +44,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-title">Heading Title (English)</label>
                                 <input class="form-control btn-pill " id="advertise-heading-title-en" name="advertise_heading_title" type="text" value="1" placeholder="Title (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-title-en"></p>
+
                             </div>
                         </div>
 
@@ -51,7 +53,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-title-arabic">Heading Title (Arabic)</label>
                                 <input class="form-control btn-pill" id="advertise-heading-title-ar" name="advertise_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -63,6 +66,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-content-en">Content (English)</label>
                                 <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-en" name="advertise_heading_content_en" type="text" placeholder="content (English)">1</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-content-en"></p>
 
                             </div>
                         </div>
@@ -71,6 +75,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-content-ar">Content (Arabic)</label>
                                 <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-ar" name="advertise_heading_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-content-ar"></p>
 
                             </div>
                         </div>
@@ -87,6 +92,7 @@
                                 <!--{% endif %}-->
 
                                 <img id="selected-advertise-banner" style="display: none; width: 200px; height: 50px;" />
+                                <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-section-banner"></p>
 
                             </div>
                         </div>
@@ -110,7 +116,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-title-en">Title (English)</label>
                                 <input class="form-control btn-pill " id="section-2-title-en" name="section_2_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-en"></p>
+ 
                             </div>
                         </div>
 
@@ -118,7 +125,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
                                 <input class="form-control btn-pill" id="section-2-title-ar" name="section_2_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -132,6 +140,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-content-en">Content (English)</label>
                                 <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en" name="section-2-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-en"></p>
 
                             </div>
                         </div>
@@ -140,6 +149,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-content-ar">Content (Arabic)</label>
                                 <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar" name="section-2-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-ar"></p>
 
                             </div>
                         </div>
@@ -163,7 +173,8 @@
                                         <!--{% endif %}-->
         
                                         <img id="selected-section-2-image-1" style="display: none; width: 100px; height: 100px;" />
-        
+                                        <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-1"></p>
+
                                     </div>
                                 </div>
                                 <p id = "section-2-warning-1"></p>
@@ -194,7 +205,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-name-en-1">Heading Name  (English)</label>
                                 <input class="form-control btn-pill " id="partnership-heading-name-en-1" name="partnership_heading_name_en_1" type="text" value="1" placeholder="Title (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-name-en-1"></p>
+
                             </div>
                         </div>
 
@@ -202,7 +214,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-name-arabic-1">Heading Name (Arabic)</label>
                                 <input class="form-control btn-pill" id="partnership-heading-name-ar-1" name="partnership_heading_name_ar_1" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-name-ar-1"></p>
+
                             </div>
                         </div>
                     </div>
@@ -212,7 +225,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-title-en-1">Heading Title  (English)</label>
                                 <input class="form-control btn-pill " id="partnership-heading-title-en-1" name="partnership_heading_title_en_1" type="text" value="1" placeholder="Title (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-title-en-1"></p>
+
                             </div>
                         </div>
 
@@ -220,7 +234,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-title-arabic-1">Heading Title (Arabic)</label>
                                 <input class="form-control btn-pill" id="partnership-heading-title-ar-1" name="partnership_heading_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-title-ar-1"></p>
+
                             </div>
                         </div>
                     </div>
@@ -240,7 +255,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-title-en">Title (English)</label>
                                     <input class="form-control btn-pill " id="partnership-title-en" name="partnership_title_en" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-en"></p>
+
                                 </div>
                             </div>
     
@@ -248,7 +264,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
                                     <input class="form-control btn-pill" id="partnership-title-ar" name="partnership_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -262,7 +279,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-en">Content (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en" name="partnership-content-en" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-en"></p>
+
                                 </div>
                             </div>
     
@@ -270,7 +288,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-ar">Content (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -293,7 +312,8 @@
                                             <!--{% endif %}-->
             
                                             <img id="selected-partnership-image-1" style="display: none; width: 100px; height: 100px;" />
-            
+                                            <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-1"></p>
+
                                         </div>
                                     </div>
                                     <p id = "partnership-warning-1"></p>
@@ -326,7 +346,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-name-en">Heading Name (English)</label>
                                 <input class="form-control btn-pill " id="ads-heading-name-en" name="ads_heading_name_en" type="text" value="1" placeholder="Heading Name (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-name-en"></p>
+
                             </div>
                         </div>
 
@@ -334,7 +355,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-name-arabic">Heading Name (Arabic)</label>
                                 <input class="form-control btn-pill" id="ads-heading-name-ar" name="ads_heading_name_ar" type="text" value="1" placeholder="Heading Name (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-name-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -344,7 +366,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-title-en">Heading Title (English)</label>
                                 <input class="form-control btn-pill " id="ads-heading-title-en" name="ads-heading_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-title-en"></p>
+
                             </div>
                         </div>
 
@@ -352,7 +375,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-title-arabic">Heading Title (Arabic)</label>
                                 <input class="form-control btn-pill" id="ads-heading-title-ar" name="ads_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -378,7 +402,8 @@
                                     <!--{% endif %}-->
     
                                     <img id="selected-ads-image-1" style="display: none; width: 100px; height: 100px;" />
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-ads-image-1"></p>
+
                                 </div>
                             </div>
                             <p id = "ads-warning-1"></p>
@@ -410,7 +435,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-en">Title (English)</label>
                                     <input class="form-control btn-pill " id="premium-title-en" name="premium_title_en" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-en"></p>
+    
                                 </div>
                             </div>
     
@@ -418,7 +444,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-arabic">Title (Arabic)</label>
                                     <input class="form-control btn-pill" id="premium-title-ar" name="premium_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -449,7 +476,8 @@
                                         <!--{% endif %}-->
         
                                         <img id="selected-premium-image-1" style="display: none; width: 100px; height: 100px;" />
-        
+                                        <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-1"></p>
+
                                     </div>
                                 </div>
                                 <p id = "premium-warning-1"></p>
@@ -461,6 +489,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-en-1">Premium Title (English)</label>
                                     <input class="form-control btn-pill" id="premium-title-en-1" name="premium_title_en-1" type="text" value="1" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-en-1"></p>
 
                                 </div>
                             </div>
@@ -469,7 +498,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-ar-1">Premium Title (Arabic)</label>
                                     <input class="form-control btn-pill" id="premium-title-ar-1" name="premium_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-ar-1"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -506,7 +536,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-title">Title (English)</label>
                                     <input class="form-control btn-pill " id="social-media-title-en" name="social_media_title_en" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-title-en"></p>
+ 
                                 </div>
                             </div>
     
@@ -514,7 +545,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-title-arabic">Title (Arabic)</label>
                                     <input class="form-control btn-pill" id="social-media-title-ar" name="social_media_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -526,7 +558,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-1">Content-1 (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_1" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-1"></p>
+
                                 </div>
                             </div>
     
@@ -534,7 +567,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-1">Content-1 (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-1" name="social_media_content_ar_1" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-1"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -544,7 +578,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-2">Content-2 (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_2" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-1"></p>
+
                                 </div>
                             </div>
     
@@ -552,7 +587,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-2">Content-2 (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-2" name="social_media_content_ar_2" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-1"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -562,7 +598,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-3">Content-3 (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-3" name="social_media_content_en_3" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-3"></p>
+
                                 </div>
                             </div>
     
@@ -570,7 +607,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-3">Content-3 (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-3" name="social_media_content_ar_3" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-3"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -581,7 +619,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-4">Content-4 (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-4" name="social_media_content_en_4" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-4"></p>
+
                                 </div>
                             </div>
     
@@ -589,7 +628,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-4">Content-4 (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-4" name="social_media_content_ar_4" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-4"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -599,7 +639,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-5">Content-5 (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-5" name="social_media_content_en_5" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-5"></p>
+
                                 </div>
                             </div>
     
@@ -607,7 +648,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-5">Content-5 (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-5" name="social_media_content_ar_5" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-5"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -617,7 +659,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-6">Content-6 (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-6" name="social_media_content_en_6" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-6"></p>
+
                                 </div>
                             </div>
     
@@ -625,7 +668,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-3">Content-6 (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-6" name="social_media_content_ar_6" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-6"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -639,7 +683,8 @@
                                     <!--{% endif %}-->
     
                                     <img id="selected-social-media-img" style="display: none; width: 200px; height: 50px;" />
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-section-image"></p>
+
                                 </div>
                             </div>
                             <p id = "social-media-image-warning"></p>
@@ -655,7 +700,8 @@
                                     <!--{% endif %}-->
     
                                     <img id="selected-social-media-back-img" style="display: none; width: 200px; height: 50px;" />
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-social-media-section-back-image"></p>
+
                                 </div>
                             </div>
                             <p id = "social-media-background-image-warning"></p>
@@ -673,7 +719,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-title-en">Title (English)</label>
                                     <input class="form-control btn-pill " id="competition-section-title-en" name="competition_section_title_en" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-competition-section-title-en"></p>
+
                                 </div>
                             </div>
     
@@ -681,7 +728,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-title-ar">Heading Title (Arabic)</label>
                                     <input class="form-control btn-pill" id="competition-section-title-ar" name="competition_section_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-competition-section-title-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -693,7 +741,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-content-en">Content (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-en" name="competition_section_content_en" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-competition-section-content-en"></p>
+
                                 </div>
                             </div>
     
@@ -701,7 +750,8 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-content-ar">Content (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-ar" name="competition_section_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-competition-section-content-ar"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -717,7 +767,8 @@
                                     <!--{% endif %}-->
     
                                     <img id="selected-competition-image" style="display: none; width: 200px; height: 50px;" />
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-competition-section-section-image"></p>
+
                                 </div>
                             </div>
                             <p id = "competition-section-image-warning"></p>
@@ -733,7 +784,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
                                 <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+
                             </div>
                         </div>
 
@@ -741,7 +793,8 @@
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
                                 <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
-                               
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+
                             </div>
                         </div>
                     </div>
@@ -751,6 +804,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
                                 <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
                         </div>
@@ -759,6 +813,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
                                 <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
                         </div>
@@ -794,54 +849,7 @@
         
     }
 
-    function checkValidation(){
-        var validationcheckpoint
-
-        try{
-            var tc_title_en = document.getElementById("tc-title-en")
-            var tc_title_ar = document.getElementById("tc-title-ar")
-            var tc_content_en = document.getElementById("tc-content-en")
-            var tc_content_ar = document.getElementById("tc-content-ar")
-            var seo_title_en = document.getElementById("meta-title-en")
-            var seo_title_ar = document.getElementById("meta-title-ar")
-            var seo_content_en = document.getElementById("meta-content-en")
-            var seo_content_ar = document.getElementById("meta-content-ar")
-
-
-            if(tc_title_en.value == ""){
-            return validationcheckpoint = "error"
-            }
-            else if(tc_title_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_en.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(tc_content_ar.value == ""){
-                return validationcheckpoint = "error"
-
-            }
-            else if(seo_title_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_title_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_en.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else if(seo_content_ar.value == ""){
-                return validationcheckpoint = "error"
-            }
-            else{
-                return validationcheckpoint = "success"
-            }
-        }
-        catch(err){
-            alert(err)
-        }
+   
         
         /*var heading_content_en = document.getElementById("heading-section-content-en")
         var heading_content_ar = document.getElementById("heading-section-content-ar")
@@ -854,44 +862,55 @@
         
 
 
-    }
 
     function sendData(){
-        var validation = checkValidation()
         
         
             
            
         
       
-        if(validation == "success"){
 
         
             try{
 
                 //text
 
-                var tc_title_en = document.getElementById("tc-title-en")
-                var tc_title_ar = document.getElementById("tc-title-ar")
-                var tc_content_en = document.getElementById("tc-content-en")
-                var tc_content_ar = document.getElementById("tc-content-ar")
+                var advertise_heading_title_en = document.getElementById("advertise-heading-title-en")
+                var advertise_heading_title_ar = document.getElementById("advertise-heading-title-ar")
+                var advertise_heading_content_en = document.getElementById("advertise-heading-content-en")
+                var advertise_heading_content_ar = document.getElementById("advertise-heading-content-ar")
+
+
+                //meta
                 var seo_title_en = document.getElementById("meta-title-en")
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
                 var seo_content_ar = document.getElementById("meta-content-ar")
                 var missing_text = document.getElementById('heading-error')
 
+                //image
+                var heading_image_field = document.getElementById('advertise-heading-section-banner')
+                var heading_image = document.getElementById('selected-advertise-banner')
+
+
+
+
+                
+                return false
+
                 try{
                     const formData = new FormData();
                     //text
-                    formData.append('tc_title_en', tc_title_en.value );
-                    formData.append('tc_title_ar', tc_title_ar.value );
-                    formData.append('tc_content_en', tc_content_en.value );
-                    formData.append('tc_content_ar', tc_content_ar.value );
-                    formData.append('seo_title_en', seo_title_en.value );
-                    formData.append('seo_title_ar', seo_title_ar.value );
-                    formData.append('seo_content_en', seo_content_en.value );
-                    formData.append('seo_content_ar', seo_content_ar.value );
+                    formData.append('advertise-heading-title-en', advertise_heading_title_en.value);
+                    formData.append('advertise-heading-title-ar', advertise_heading_title_ar.value );
+                    formData.append('advertise-heading-content-en', advertise_heading_content_en.value );
+                    formData.append('advertise-heading-content-ar', advertise_heading_content_en.value );
+
+                    formData.append('seo_title_en', meta_title_en.value );
+                    formData.append('seo_title_ar', meta_title_ar.value );
+                    formData.append('seo_content_en', meta_content_en.value );
+                    formData.append('seo_content_ar', meta_content_ar.value );
 
 
 
@@ -959,19 +978,8 @@
             }
                 
         }
-        else if(validation == "error"){
+        
 
-            var missing_text = document.getElementById('heading-error')
-
-            
-            
-            
-            missing_text.style.display = 'block'
-            missing_text.innerText = "Fill the blank field!"
-            missing_text.style.color = "red"
-            window.scrollTo(0,0)
-            return false
-}
             
             
             
@@ -979,7 +987,7 @@
         
     
         
-    }
+    
 
     function displayImagewhychooseus(event) {
         try{

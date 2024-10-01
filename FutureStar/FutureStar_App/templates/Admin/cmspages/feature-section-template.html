@@ -1,0 +1,43 @@
+<div class="feature-section" id="feature-{{ feature.id|default:counter }}">
+    <span class="delete-feature" data-id="{{ feature.id|default:counter }}">&times;</span>
+    <h5>Feature Section {{ counter }}</h5>
+    <div class="row">
+        <div class="col-6">
+            <div class="mb-3">
+                <label>Title (English)</label>
+                <input type="text" class="form-control" name="feature_title_en_{{ feature.id|default:counter }}" value="{{ feature.title_en }}" required>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="mb-3">
+                <label>Title (Arabic)</label>
+                <input type="text" class="form-control" name="feature_title_ar_{{ feature.id|default:counter }}" value="{{ feature.title_ar }}" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="mb-3">
+                <label>Content (English)</label>
+                <textarea class="form-control" name="feature_content_en_{{ feature.id|default:counter }}" required>{{ feature.content_en }}</textarea>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="mb-3">
+                <label>Content (Arabic)</label>
+                <textarea class="form-control" name="feature_content_ar_{{ feature.id|default:counter }}" required>{{ feature.content_ar }}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="mb-3">
+                <label>Icon</label>
+                <input type="file" class="form-control" name="feature_icon_{{ feature.id|default:counter }}" accept="image/*">
+                {% if feature.icon %}
+                    <img src="{{ feature.icon.url }}" alt="Feature Icon" style="width: 100px; height: 100px;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

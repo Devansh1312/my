@@ -23,7 +23,7 @@ from django.core.mail import send_mail
 from datetime import timedelta
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
+import sys
 # Login Module
 def LoginFormView(request):
     # If the user is already logged in, redirect to the dashboard
@@ -549,6 +549,7 @@ class CategoryCreateView(LoginRequiredMixin, View):
         form = CategoryForm(request.POST)
         if form.is_valid():
             # Check for existing category with the same name
+            #changes will be done on server by this side 
             name_en = form.cleaned_data.get("name_en")
             if Category.objects.filter(name_en=name_en).exists():
                 messages.error(request, "Category Type with this name already exists.")
@@ -2604,14 +2605,185 @@ def savenewsdetail(request):
 #cms descovery page
 class cms_discoverypage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/discovery.html"
-
     def get(self, request):
-        
+        try:
+            whodetail= cms_dicovery_dynamic_view.objects.all()
+            heading_image = cms_dicovery_dynamic_image.objects.all()
+        except Exception as e:
+            with open("error.txt", "w") as f:
+                f.write(str(e))
+        dataFilter = cms_pages.objects.get(id='2')
+
+        context = {
+            'data':dataFilter, 
+            'who_detail':whodetail,
+            'heading_image':heading_image,
+            
+        }
         return render(
             request,
             self.template_name,
+            context
             
     )  
+        
+#cms discover
+@csrf_exempt
+def saveDiscoverdetail(request):
+        try:
+            if request.method == "POST":
+                #text
+                try:
+                    discover_heading_title_en = request.POST.get('discover_heading_title_en')
+                    discover_heading_title_ar = request.POST.get('discover_heading_title_ar')
+                    discover_title_en = request.POST.get('discover_title_en')
+                    discover_title_ar = request.POST.get('discover_title_ar')
+                    discover_content_en = request.POST.get('discover_content_en')
+                    discover_content_ar = request.POST.get('discover_content_ar')
+                    discover_game_title_en = request.POST.get('discover_game_title_en')
+                    discover_game_title_ar = request.POST.get('discover_game_title_ar')
+                    discover_game_content_en = request.POST.get('discover_game_content_en')
+                    discover_game_content_ar = request.POST.get('discover_game_content_ar')
+                    discover_training_sec_1_title_en = request.POST.get('discover_training_sec_1_title_en')
+                    discover_training_sec_1_title_ar = request.POST.get('discover_training_sec_1_title_ar')
+                    discover_training_sec_1_content_en = request.POST.get('discover_training_sec_1_content_en')
+                    discover_training_sec_1_content_ar = request.POST.get('discover_training_sec_1_content_ar')
+                    discover_training_sec_2_title_en = request.POST.get('discover_training_sec_2_title_en')
+                    discover_training_sec_2_title_ar = request.POST.get('discover_training_sec_2_title_ar')
+                    discover_training_sec_2_content_en = request.POST.get('discover_training_sec_2_content_en')
+                    discover_training_sec_2_content_ar = request.POST.get('discover_training_sec_2_content_ar')
+                    why_Choose_us_heading_en = request.POST.get('why_Choose_us_heading_en')
+                    why_Choose_us_heading_ar = request.POST.get('why_Choose_us_heading_ar')
+                    why_Choose_us_title_en = request.POST.get('why_Choose_us_title_en')
+                    why_Choose_us_title_ar = request.POST.get('why_Choose_us_title_ar')
+                    why_Choose_us_form_title_en = request.POST.get('why_Choose_us_form_title_en')
+                    why_Choose_us_form_title_ar = request.POST.get('why_Choose_us_form_title_ar')
+
+                    why_Choose_us_form_content_en = request.POST.get('why_Choose_us_form_content_en')
+                    why_Choose_us_form_content_ar = request.POST.get('why_Choose_us_form_content_ar')
+                    seo_title_en = request.POST.get('seo_title_en')
+                    seo_title_ar = request.POST.get('seo_title_ar')
+                    seo_content_en = request.POST.get('seo_content_en')
+                    seo_content_ar = request.POST.get('seo_content_ar')
+                    
+
+                    try:
+                   
+                        discover_page  = cms_pages.objects.get(id='2')
+                        
+                        discover_page.heading_en = discover_heading_title_en
+                        discover_page.heading_ar = discover_heading_title_ar
+                        discover_page.heading_title_en =discover_title_en
+                        discover_page.heading_title_ar =discover_title_ar
+                        discover_page.heading_content_en = discover_content_en
+                        discover_page.heading_content_ar = discover_content_ar
+                        discover_page.section_2_title_en = discover_game_title_en
+                        discover_page.section_2_title_ar = discover_game_title_ar
+
+                        discover_page.section_2_content_en = discover_game_content_en
+                        discover_page.section_2_content_ar = discover_game_content_ar
+                        discover_page.sub_section_2_title_1_en  = discover_training_sec_1_title_en
+                        discover_page.sub_section_2_title_1_ar  = discover_training_sec_1_title_ar
+
+                        discover_page.sub_section_2_content_1_en = discover_training_sec_1_content_en 
+                        discover_page.sub_section_2_content_1_ar = discover_training_sec_1_content_ar 
+                        discover_page.sub_section_2_title_2_en  = discover_training_sec_2_title_en 
+                        discover_page.sub_section_2_title_2_ar  = discover_training_sec_2_title_ar 
+                        discover_page.sub_section_2_content_2_en = discover_training_sec_2_content_en 
+                        discover_page.sub_section_2_content_2_ar = discover_training_sec_2_content_ar 
+                        discover_page.section_3_heading_en = why_Choose_us_heading_en 
+                        discover_page.section_3_heading_ar = why_Choose_us_heading_ar 
+                        discover_page.section_3_title_en = why_Choose_us_title_en 
+                        discover_page.section_3_title_ar = why_Choose_us_title_ar 
+                        discover_page.section_3_sub_title_en = why_Choose_us_form_title_en
+                        discover_page.section_3_sub_title_ar = why_Choose_us_form_title_ar
+                        discover_page.section_3_sub_content_en = why_Choose_us_form_content_en 
+                        discover_page.section_3_sub_content_ar = why_Choose_us_form_content_ar 
+                        discover_page.meta_title_en = seo_title_en
+                        discover_page.meta_title_ar = seo_title_ar
+                        discover_page.meta_content_en = seo_content_en
+                        discover_page.meta_content_ar = seo_content_ar
+
+
+                        who_count = request.POST.get('who_passed')
+
+                        print("this is whoCount: "+str(who_count))
+                        if who_count:
+                                for i in range(int(who_count)+1):
+                                    print("loop calue:"+str(i))
+                                    dom = i+2
+                                    print("loop: "+str(dom))
+                                    who_title_en = request.POST.get('why_choose_us_heading_title_en_{}'.format(str(dom)))
+                                    who_title_ar = request.POST.get('why_choose_us_heading_title_ar_{}'.format(str(dom)))
+                                    who_content_en = request.POST.get('why_choose_us_content_en_{}'.format(str(dom)))
+                                    who_content_ar = request.POST.get('why_choose_us_content_ar_{}'.format(str(dom)))
+                                    who_field = request.POST.get('id')
+                                    unique_id = request.POST.get('uwid_{}'.format(dom))
+                                    
+                                    print("title_ar {}: ".format(dom)+str(who_title_en))
+                                    print("USER_Id: ",unique_id)
+                                    existing_who_record = cms_dicovery_dynamic_view.objects.filter(field_id=unique_id).first()
+                                    print("exisiting: "+str(existing_who_record))
+                                    
+                                
+                                    if existing_who_record:
+                                            # Update the existing record
+                                            existing_who_record.title_en = who_title_en
+                                            existing_who_record.title_ar = who_title_ar
+                                            existing_who_record.content_en = who_content_en
+                                            existing_who_record.content_ar = who_content_ar
+                                            
+                                            
+                                            existing_who_record.save()  # Save the updated record
+                                            print("exsiting_title: "+str(existing_who_record.title_en))
+                                            
+                                    else:        
+                                        savediscoverdynamcidetail = cms_dicovery_dynamic_view(
+                                                    field_id=unique_id,
+                                                    title_en=who_title_en,
+                                                    title_ar=who_title_ar,
+                                                    content_en=who_content_en,
+                                                    content_ar=who_content_ar,
+                                        )
+                                        savediscoverdynamcidetail.save()    
+                                        with open("hell.txt","a") as f:
+                                            f.write(str(who_title_en)+" ")    
+                                        
+                                        print("last unique id: "+str(unique_id))
+                                    #delete_record = cms_home_dynamic_field.objects.filter(field_id = None)
+                                    #delete_record.delete()
+
+                        
+                        discover_page.save()
+                        messages.success(request, "Discovery Page Updated Successfully")
+                    except Exception as e:
+                        print(sys.exc_info)
+                        print(str(e))
+                        messages.error(request,str(e))    
+
+                except Exception as e:
+                    print(str(e))
+                    print(sys.exc_info)
+
+                    messages.error(request,str(e))    
+                
+
+                               
+                
+              
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+            
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+        
 #cms Advertise page
 class cms_advertisepage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/advertise.html"
@@ -2632,15 +2804,15 @@ class cms_homepage(LoginRequiredMixin, View):
         features = cms_home_dynamic_field.objects.all()
         features_data = cms_pages.objects.get(id="1")
         
+        achivements = cms_home_dynamic_achivements_field.objects.all()
+        
         
         return render(
             request,
             self.template_name,
-            {'features': features,'data':features_data}
-            
+            {'features': features,'data':features_data,'achivements':achivements}        
     )  
 
-#new changes
 #cms home  
 @csrf_exempt
 def savehomedetail(request):
@@ -2689,6 +2861,12 @@ def savehomedetail(request):
                 team_title_en = request.POST.get('Team_title_en')
                 team_title_ar = request.POST.get('Team_title_ar')
                 achievements_heading_name_en = request.POST.get('achivements_heading_name_en')
+                achivement_sec_1_heading_en = request.POST.get('achivement_heading_title_en')
+                achivement_sec_1_heading_ar = request.POST.get('achivement_heading_title_ar')
+                achivement_sec_1_title_en = request.POST.get('achivement_sec_title_en')
+                achivement_sec_1_title_ar = request.POST.get('achivement_sec_title_ar')
+
+
                 achievements_heading_name_ar = request.POST.get('achivements_heading_name_ar')
                 achievements_heading_title_en = request.POST.get('achivements_heading_title_en')
                 achievements_heading_title_ar = request.POST.get('achivements_heading_title_ar')
@@ -2792,6 +2970,12 @@ def savehomedetail(request):
                     savehomedetail.section_10_heading_ar = partners_heading_name_ar
                     savehomedetail.section_10_title_en  = partners_heading_title_en
                     savehomedetail.section_10_title_ar  = partners_heading_title_ar
+                    
+                    savehomedetail.achivement_heading_en = achivement_sec_1_heading_en
+                    savehomedetail.achivement_heading_ar = achivement_sec_1_heading_ar
+                    savehomedetail.achivement_title_en= achivement_sec_1_title_en 
+                    savehomedetail.achivement_title_ar= achivement_sec_1_title_ar
+
                     savehomedetail.meta_title_en  = seo_title_en
                     savehomedetail.meta_title_ar  = seo_title_ar
                     savehomedetail.meta_content_en  = seo_content_en
@@ -2896,6 +3080,55 @@ def savehomedetail(request):
                                 print("last unique id: "+str(unique_id))
                             delete_record = cms_home_dynamic_field.objects.filter(field_id = None)
                             delete_record.delete()
+                            
+                             #achivement section
+                    achive_count = request.POST.get('achive_passed')
+                    
+                    print("this is achive: "+str(achive_count))
+                    if achive_count:
+                        for i in range(int(achive_count)+1):
+                            
+                            dom = i+1
+                            image = 0
+                            print("loop: "+str(dom))
+                            achive_title_en = request.POST.get('achive_section_form_htitle_en_{}'.format(str(dom)))
+                            achive_title_ar = request.POST.get('achive_section_form_htitle_ar_{}'.format(str(dom)))
+                            achive_content_en = request.POST.get('achive_section_form_title_en_{}'.format(str(dom)))
+                            achive_content_ar = request.POST.get('achive_section_form_title_ar_{}'.format(str(dom)))
+                            achive_field = request.POST.get('aid')
+                            achive_unique_id = request.POST.get('uaid_{}'.format(dom))
+                            print(achive_unique_id)
+                            print("title_ar {}: ".format(dom)+str(achive_title_ar))
+                            
+                            existing_achive_record = cms_home_dynamic_achivements_field.objects.filter(field_id=achive_unique_id).first()
+                            print("exisiting: "+str(existing_achive_record))
+
+                            if existing_achive_record:
+                                    # Update the existing record
+                                    existing_achive_record.heading_en = achive_title_en
+                                    existing_achive_record.heading_ar = achive_title_ar
+                                    existing_achive_record.title_en = achive_content_en
+                                    existing_achive_record.title_ar = achive_content_ar
+                                    
+                                
+
+                                    existing_achive_record.save()  # Save the updated record
+                                    print("exsiting_title: "+str(existing_achive_record.title_en))
+                            else:        
+                                savehomeachivedynamic = cms_home_dynamic_achivements_field(
+                                            field_id=achive_unique_id,
+                                            heading_en=achive_title_en,
+                                            heading_ar=achive_title_ar,
+                                            title_en=achive_content_en,
+                                            title_ar=achive_content_ar,
+                                )
+                                savehomeachivedynamic.save()        
+                                
+                                print("last unique id: "+str(unique_id))
+                            delete_record = cms_home_dynamic_achivements_field.objects.filter(field_id = None)
+                            delete_record.delete()        
+
+                        
                             #savehomedynamcidetail.save() 
                             '''print(feature_title_en)
                             print("this is id: "+feature_field)
@@ -2960,9 +3193,20 @@ def savehomedetail(request):
                             print(deleted_id)
                             delete_the_record  = cms_home_dynamic_field.objects.filter(field_id = deleted_id ).delete()
                     else:
-                        print("value is 0")        
+                        print("value is 0")    
 
-                        
+                    achivedeletedField = request.POST.get('deletedachiveField')
+                    print(achivedeletedField)
+                    
+                    if achivedeletedField !=0:
+                        for i in range(int(achivedeletedField)):
+                            
+                            achivedeleted_id = request.POST.get('deleted_achivefield_{}'.format(i))
+                            print(achivedeleted_id)
+                            achviedelete_the_record  = cms_home_dynamic_achivements_field.objects.filter(field_id = achivedeleted_id ).delete()
+                    else:
+                        print("value is 0")    
+                   
                     
                     if 'home_heading_section_image_1' in request.FILES:
                         
@@ -3298,7 +3542,216 @@ def savehomedetail(request):
 
                return JsonResponse(response_data) 
 
+class cms_Login(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/login.html"
 
-def get_feature_template(request):
-    counter = request.GET.get('counter')
-    return render(request, 'feature_section.html', {'counter': counter})           
+    def get(self, request):
+        
+        dataFilter = cms_pages.objects.get(id='12')
+        
+        context = {
+            'data':dataFilter,
+        }
+        dataFilter.meta_title_en
+        return render(
+            request,
+            self.template_name,
+            context
+            
+    ) 
+        
+#cms Login 
+@csrf_exempt
+def savelogindetail(request):
+        try:
+            if request.method == "POST":
+                print("hello")
+                #text
+                heading_title_en  = request.POST.get('login-title-en')
+                heading_title_ar  = request.POST.get('login-title-ar')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                
+                dom = "Done"
+                
+                try:
+                    savelogindetail = cms_pages.objects.get(id = "12")
+
+                    savelogindetail.heading_title_en = heading_title_en
+                    savelogindetail.heading_title_ar = heading_title_ar
+                    savelogindetail.meta_title_en = seo_title_en
+                    savelogindetail.meta_title_ar = seo_title_ar
+                    savelogindetail.meta_content_en = seo_content_en
+                    savelogindetail.meta_content_ar = seo_content_ar
+
+                    savelogindetail.save()
+                    
+                    dom = "True"
+                    
+                    messages.success(request, "Login Page Updated Successfully")
+                               
+                except Exception as e:
+                    messages.error(request,str(e))    
+                      
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+           
+class cms_registration(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/registration.html"
+
+    def get(self, request):
+        
+        dataFilter = cms_pages.objects.get(id='13')
+        
+        context = {
+            'data':dataFilter,
+        }
+        return render(
+            request,
+            self.template_name,
+            context
+            
+    ) 
+        
+#cms Login 
+@csrf_exempt
+def saveregdetail(request):
+        try:
+            if request.method == "POST":
+                print("hello")
+                #text
+                heading_title_en  = request.POST.get('reg-title-en')
+                heading_title_ar  = request.POST.get('reg-title-ar')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                
+                dom = "Done"
+                
+                try:
+                    saveregdetail = cms_pages.objects.get(id = "13")
+
+                    saveregdetail.heading_title_en = heading_title_en
+                    saveregdetail.heading_title_ar = heading_title_ar
+                    saveregdetail.meta_title_en = seo_title_en
+                    saveregdetail.meta_title_ar = seo_title_ar
+                    saveregdetail.meta_content_en = seo_content_en
+                    saveregdetail.meta_content_ar = seo_content_ar
+
+                    saveregdetail.save()
+                    
+                    dom = "True"
+                    
+                    messages.success(request, "Registration Page Updated Successfully")
+                               
+                except Exception as e:
+                    messages.error(request,str(e))    
+                      
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+class cms_dashboard(LoginRequiredMixin, View):
+    template_name = "Admin/cmspages/dashboard.html"
+
+    def get(self, request):
+        
+        dataFilter = cms_pages.objects.get(id='14')
+        
+        context = {
+            'data':dataFilter,
+        }
+        return render(
+            request,
+            self.template_name,
+            context
+            
+    ) 
+        
+#cms Login 
+@csrf_exempt
+def savedashdetail(request):
+        try:
+            if request.method == "POST":
+                print("hello")
+                #text
+                heading_en  = request.POST.get('dash-title-en')
+                heading_ar  = request.POST.get('dash-title-ar')
+                heading_title_en  = request.POST.get('dash-title-en-1')
+                heading_title_ar  = request.POST.get('dash-title-ar-1')
+                seo_title_en  = request.POST.get('meta-title-en')
+                seo_title_ar  = request.POST.get('meta-title-ar')
+                seo_content_en  = request.POST.get('meta-content-en')
+                seo_content_ar  = request.POST.get('meta-content-ar')
+                
+                dom = "Done"
+                
+                try:
+                    savedashdetail = cms_pages.objects.get(id = "14")
+                    
+                    savedashdetail.heading_en = heading_en
+                    savedashdetail.heading_ar = heading_ar
+                    savedashdetail.heading_title_en = heading_title_en
+                    savedashdetail.heading_title_ar = heading_title_ar
+                    savedashdetail.meta_title_en = seo_title_en
+                    savedashdetail.meta_title_ar = seo_title_ar
+                    savedashdetail.meta_content_en = seo_content_en
+                    savedashdetail.meta_content_ar = seo_content_ar
+
+                    savedashdetail.save()
+                    
+                    dom = "True"
+                    
+                    messages.success(request, "Dashboard Page Updated Successfully")
+                               
+                except Exception as e:
+                    messages.error(request,str(e))    
+                      
+                response_data = {
+                        'status': 'success',
+                        'message': 'Data uploaded successfully',
+                }
+                
+                return JsonResponse(response_data)
+
+            else:
+                response_data = {'status': 'error', 'message': 'Missing data or image file'}
+
+                return JsonResponse(response_data)
+        except Exception as e:
+               response_data = {'status': 'error', 'message': str(e)}
+
+               return JsonResponse(response_data) 
+        
+                      
+        
+           
+        
+

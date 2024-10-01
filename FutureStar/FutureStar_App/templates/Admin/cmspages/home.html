@@ -526,7 +526,8 @@
                                 </div>
                             </div>
                         </div>
-    
+
+
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
@@ -563,7 +564,9 @@
                             </div>
                             <p id = "feature-icon-warning-1"></p>
                         </div> 
-
+    
+                        
+                      
                         
 
 
@@ -869,6 +872,148 @@
                             <p id = "achivements-image-warning"></p>
                         </div>
                     </div>
+                    <br>
+
+                    <div id="form-container-features"></div>
+                         <div id="section-achive-1">
+
+                        <div id="dynamic-features-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-1">Achivements Section-1</h1>
+
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+
+
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-en-1">Heading Name (English)</label>
+                                    <input class="form-control btn-pill " id="achive-section-form-htitle-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_heading_en }}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-1"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-ar-1">Heading Name (Arabic)</label>
+                                    <input class="form-control btn-pill" id="achive-section-form-htitle-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_heading_ar }}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-1"></p>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-en-1">Title (English)</label>
+                                    <input class="form-control btn-pill " id="achive-section-form-title-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_title_en }}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-1"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-ar-1">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="achive-section-form-title-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-1"></p>
+
+                                </div>
+                            </div>
+                        </div>
+                     
+                        <input type="hidden" class="last-achive-field-id" value="1"/>
+
+                         
+                        
+
+
+                        
+                        {% if achivements %}
+
+                        <div id="form-container-achive">
+                        {%for achive in achivements %}
+                        <div id = "section-achive-{{achive.field_id}}">
+                        <div id="dynamic-achive-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="achive-section-field-2">Achivements Section-{{ forloop.counter|add:"1" }}</h1>
+                            <p id="field-achive-id" style='display:none'>{{achive.field_id}}</p>
+                            <p id="field-achive-roll-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{achive.field_id}}</p>
+
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+
+
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-en-{{ forloop.counter|add:'1' }}">Heading Name (English)</label>
+                                    <input class="form-control btn-pill " id="achive-section-form-htitle-en-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_en_1" type="text" value="{{achive.heading_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-en-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}">Heading Name (Arabic)</label>
+                                    <input class="form-control btn-pill" id="achive-section-form-htitle-ar-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_ar_1" type="text" value="{{achive.heading_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-ar-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-en-{{ forloop.counter|add:'1' }}">Title (English)</label>
+                                    <input class="form-control btn-pill " id="achive-section-form-title-en-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_en_1" type="text" value="{{achive.title_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_ar_1" type="text" value="{{achive.heading_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-{{ forloop.counter|add:'1' }}"></p>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% if forloop.last %}
+                        <input type="hidden" class="last-achive-field-id" value="{{ forloop.counter|add:'1' }}"/>
+                        {% endif %}
+                        <div class="col-12  text-end " >
+
+                                        <button id="delete-row" onclick ="return deleteachiveTheRow(`{{achive.field_id}}`)" class="btn btn-danger">-</button>
+                        </div> 
+                        </div>
+                        <br>
+                        {% endfor %}
+                        {% else %}
+                        <p></p>
+                    {% endif %}  
+
+
+                        <div id="dynamic-achive-section-field">
+                            <div class="col-12  text-end " >
+                                <button id="add-row" onclick ="return add_dynamic_achivements()" class="btn btn-success">+</button>
+        
+                            </div>   
+                        </div>
+                    <br>
 <br>
                     <div class="row" style="margin-bottom: 10px;">
                         <h4>Explore App Feature</h4>
@@ -1189,6 +1334,12 @@
                 var partners_heading_title_en = document.getElementById("partners-heading-title-en")
                 var partners_heading_title_ar = document.getElementById("partners-heading-title-ar")
                 //var partners_heading_title_ar = document.getElementById("partners-heading-title-ar")
+
+                var achivement_heading_en = document.getElementById("achive-section-form-htitle-en-1")
+                var achivement_heading_ar = document.getElementById("achive-section-form-htitle-ar-1")
+                var achivement_title_en = document.getElementById("achive-section-form-title-en-1")
+                var achivement_title_ar = document.getElementById("achive-section-form-title-ar-1")
+
                 
               
 
@@ -1297,6 +1448,11 @@
                         { id: "partners-heading-name-ar", name: "Partners Heading Name (Arabic)" },
                         { id: "partners-heading-title-en", name: "Partners Heading Title (English)" },
                         { id: "partners-heading-title-ar", name: "Partners Heading Title (Arabic)" },
+                        { id: "achive-section-form-htitle-en-1", name: "achivement Heading Title (English)" },
+                        { id: "achive-section-form-htitle-ar-1", name: "achivement Heading Title (Arabic)" },
+                        { id: "achive-section-form-title-en-1", name: "achivement Title (English)" },
+                        { id: "achive-section-form-title-ar-1", name: "achivement Title (Arabic)" },
+
                         { id: "meta-title-en", name: "SEO Title (English)" },
                         { id: "meta-title-ar", name: "SEO Title (Arabic)" },
                         { id: "meta-content-en", name: "SEO Content (English)" },
@@ -1408,6 +1564,69 @@
                 return false
             }
         
+            try{
+
+            if(typeof achiveCount !== "undefined"){
+            for (let i = 1; i <= achiveCount; i++) {
+
+                const dynamicTitleEn = document.getElementById(`achive-section-form-htitle-en-${i}`);
+                const dynamicTitleAr = document.getElementById(`achive-section-form-htitle-ar-${i}`);
+                const dynamicContentEn = document.getElementById(`achive-section-form-title-en-${i}`);
+                const dynamicContentAr = document.getElementById(`achive-section-form-title-ar-${i}`);
+                const dynamicErrorMsgTitleEn = document.getElementById(`error-achive-section-form-htitle-en-${i}`);
+                const dynamicErrorMsgTitleAr = document.getElementById(`error-achive-section-form-htitle-ar-${i}`);
+                const dynamicErrorMsgContentEn = document.getElementById(`error-achive-section-form-title-en-${i}`);
+                const dynamicErrorMsgContentAr = document.getElementById(`error-achive-section-form-title-ar-${i}`);
+                if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                    {
+                    dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                    dynamicErrorMsgTitleEn.style.display = 'block';
+                    dynamicErrorMsgTitleEn.scrollIntoView();
+
+                    sendData = "false";
+
+                }
+
+
+                if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                    dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                    dynamicErrorMsgTitleAr.style.display = 'block';
+                    dynamicErrorMsgTitleAr.scrollIntoView();
+
+                    sendData = "false";
+
+                }
+
+                if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+                    dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
+                    dynamicErrorMsgContentEn.style.display = 'block';
+                    dynamicErrorMsgContentEn.scrollIntoView();
+
+                    sendData = "false";
+
+                }
+
+                if (dynamicContentAr && !dynamicContentAr.value.trim()){
+                    dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
+                    dynamicErrorMsgContentAr.style.display = 'block';
+                    dynamicErrorMsgContentEn.scrollIntoView();
+
+                    sendData = "false";
+
+
+                }
+            }
+
+
+            }
+            }
+            }
+
+            catch(err){
+            alert("1: "+err)
+            return false
+            }
+
 
         
             if(sendData == 'true'){
@@ -1471,6 +1690,11 @@
                     formData.append('partners_heading_name_ar',partners_heading_name_ar.value );
                     formData.append('partners_heading_title_en',partners_heading_title_en.value );
                     formData.append('partners_heading_title_ar',partners_heading_title_ar.value );
+                    formData.append('achivement_heading_title_en',achivement_heading_en.value );
+                    formData.append('achivement_heading_title_ar',achivement_heading_ar.value );
+                    formData.append('achivement_sec_title_en',achivement_title_en.value );
+                    formData.append('achivement_sec_title_ar',achivement_title_ar.value );
+
                     formData.append('seo_title_en',seo_title_en.value );
                     formData.append('seo_title_ar',seo_title_ar.value );
                     formData.append('seo_content_en',seo_content_en.value );
@@ -1570,7 +1794,88 @@
                     return false
                 }
                 }
-                console.log("last number: "+featureCount)
+                //achivement section
+                if(typeof achiveCount === "undefined" ){
+                        alert("yes")
+                        return false
+                        achiveCount = document.getElementById('last-achive-field-id').value;
+
+                    }
+                    /*else{
+                        
+                        IntCount = parseInt(last_value,10)
+                        counter = IntCount + dynamic_numFuntion.length
+                        console.log("counter: "+counter)
+                    }*/
+                    if(achiveCount >=2){
+
+                        try{
+
+                    let uaid = 0
+                    for (let i = 2; i <= achiveCount ;i++) {
+
+                        console.log("number: "+i)
+                        formData.append('achive_passed',achiveCount )
+
+                        const titleEn = document.getElementById(`achive-section-form-htitle-en-${i}`);
+                        const titleAr = document.getElementById(`achive-section-form-htitle-ar-${i}`);
+                        const contentEn = document.getElementById(`achive-section-form-title-en-${i}`);
+                        const contentAr = document.getElementById(`achive-section-form-title-ar-${i}`);
+                        //const feature_field = document.getElementById(`feature-section-field-${i}`)
+                        
+                        //const feature_image = image.files[0];
+
+                        /*
+                        if (image) { // check if image exists before trying to access its files property
+                // ...
+            } else {
+                console.log("Image not found for section " + i);
+            } */        
+                        const unique_afield = document.getElementById(`field-achive-roll-id-${i}`)
+                        //let unique = document.getElementById(`section-${i}`)
+                        console.log("this is uni: "+unique_afield.innerText)
+                        //const feature_field = document.querySelector(`#section-${i} .field-id`)
+                        if (titleEn) {
+                            formData.append(`achive_section_form_htitle_en_${i}`, titleEn.value);
+                        }
+                        if (titleAr) {
+                            formData.append(`achive_section_form_htitle_ar_${i}`, titleAr.value);
+                        }
+                        if (contentEn) {
+                            formData.append(`achive_section_form_title_en_${i}`, contentEn.value);
+                        }
+                        if (contentAr) {
+                            formData.append(`achive_section_form_title_ar_${i}`, contentAr.value);
+                        }
+                        
+                        else {
+                            console.log("already have image")
+                        }
+                        if(unique_afield){
+                            formData.append(`uaid_${i}`,unique_afield.innerText)
+                            uaid = unique_afield.innerText
+                            console.log(unique_afield.innerText)
+                        }
+                        //console.log(feature_field.innerText)
+                        //console.log(feature_field.innerText)
+                        //formData.append(`id`,feature_field.innerText)
+                        formData.append(`aid`, i);
+
+                    }
+                
+                    
+                    
+                    console.log(uaid)
+
+                }
+                catch(err){
+                    console.log("1: "+achiveCount)
+                    console.log("this: "+err)
+                    return false
+                }
+                
+                }
+                console.log("last number: "+achiveCount)
 
 
                         if (home_heading_section_image_1_e.files.length > 0) {
@@ -1700,6 +2005,26 @@
                 catch(err){
                     alert(err)
                 }
+
+                try{
+                    if(deleted_achivement_function.length !== 0){
+
+                        for(let i =0;i<=deleted_achivement_function.length;i++){
+                            formData.append(`deleted_achivefield_${i}`,deleted_achivement_function[i])
+                        }
+                        formData.append('deletedachiveField',deleted_achivement_function.length)
+
+                    }
+                    else{
+                        let deleted_achive_field_null = 0
+                        formData.append('deletedachiveField',deleted_achive_field_null)
+
+                        console.log("No function is deleted!")
+                    }
+                }
+                catch(err){
+                    alert(err)
+                }
                 
                     
                     
@@ -1761,7 +2086,7 @@
            catch(err){
                     
 
-                    alert(err)
+                    alert("this is error:"+err)
                     return false
                 }
 
@@ -2077,21 +2402,12 @@ function displaySocialMediaImg(event) {
             try{
                 const lastfeaturefield = document.querySelectorAll('.last-feature-field-id');
                 
-                //console.log(lastfeaturefield.length)
-                //last_value = 
-                //console.log("last feature field: "+last_value)
-                //last_unie_field = document.getElementById('field-id')
-                //console.log("last unique field: "+last_unie_field.innerText)
                 featureCount = lastfeaturefield[lastfeaturefield.length -1].value;
 
-                /*if(last_value !== last_unie_field.innerText){
-                    console.log("hell")
-                    featureCount = last_unie_field.innerText
-                }
-                else if(last_value === last_unie_field.innerText){
+               
 
-                }*/
-                //featureCount = document.getElementById('field-roll-id').innerText
+             
+               
                 console.log("featureCOunt Value: "+featureCount)
             }
             catch(err){
@@ -2313,7 +2629,6 @@ function displaySocialMediaImg(event) {
                 
             
     function deletefield(id){
-        alert(id)
         try {
         let deletingField = document.getElementById(`section-${id}`);
         console.log(deletingField)
@@ -2342,6 +2657,245 @@ function displaySocialMediaImg(event) {
         //alert(id)
         //featureCount--
         console.log(deleted_function)
+        return false
+        }
+        catch(err){
+            console.log(err)
+            return false
+        }
+    }
+
+    let achiveCount
+    try{
+                const lastachivefield = document.querySelectorAll('.last-achive-field-id');
+                achiveCount = lastachivefield[lastachivefield.length -1].value;
+
+               
+                console.log("achiveCount Value: "+achiveCount)
+        }
+    catch(err){
+                alert("1: "+err)
+                
+    }
+    console.log(achiveCount)
+
+    let dynamic_achivenumFuntion = [] 
+
+    function add_dynamic_achivements(){
+        dom = "true"
+
+
+        console.log("value:"+achiveCount)
+
+        if(achiveCount> 1){
+            try{
+                console.log(achiveCount)
+        const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-achive-section-form-htitle-en-${achiveCount}`);
+        const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-achive-section-form-htitle-ar-${achiveCount}`);
+        const reset_dynamicErrorMsgContentEn = document.getElementById(`error-achive-section-form-title-en-${achiveCount}`);
+        const reset_dynamicErrorMsgContentAr = document.getElementById(`error-achive-section-form-title-ar-${achiveCount}`);
+
+        reset_dynamicErrorMsgTitleEn.innerText = ""
+        reset_dynamicErrorMsgTitleAr.innerText = ""
+        reset_dynamicErrorMsgContentEn.innerText = ""
+        reset_dynamicErrorMsgContentAr.innerText = ""
+        if(achiveCount> 1){
+            
+            const dynamicTitleEn = document.getElementById(`achive-section-form-htitle-en-${achiveCount}`);
+            const dynamicTitleAr = document.getElementById(`achive-section-form-htitle-ar-${achiveCount}`);
+            const dynamicContentEn = document.getElementById(`achive-section-form-title-en-${achiveCount}`);
+            const dynamicContentAr = document.getElementById(`achive-section-form-title-ar-${achiveCount}`);
+            const dynamicErrorMsgTitleEn = document.getElementById(`error-achive-section-form-htitle-en-${achiveCount}`);
+            const dynamicErrorMsgTitleAr = document.getElementById(`error-achive-section-form-htitle-ar-${achiveCount}`);
+            const dynamicErrorMsgContentEn = document.getElementById(`error-achive-section-form-title-en-${achiveCount}`);
+            const dynamicErrorMsgContentAr = document.getElementById(`error-achive-section-form-title-ar-${achiveCount}`);
+
+            console.log("value of: "+dynamicTitleEn.innerText)
+
+            if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                
+                dynamicErrorMsgTitleEn.innerText = "Please fill in the Heading Name (English).";
+                dynamicErrorMsgTitleEn.style.display = 'block';
+                dynamicErrorMsgTitleEn.scrollIntoView();
+
+                dom = "false";
+
+            }
+
+
+            if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                dynamicErrorMsgTitleAr.innerText = "Please fill in the Heading Name (Arabic).";
+                dynamicErrorMsgTitleAr.style.display = 'block';
+                dynamicErrorMsgTitleAr.scrollIntoView();
+
+                dom = "false";
+                console.log(dom)
+
+
+            }
+
+            if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+                dynamicErrorMsgContentEn.innerText = "Please fill in the Title (English).";
+                dynamicErrorMsgContentEn.style.display = 'block';
+                dynamicErrorMsgContentEn.scrollIntoView();
+
+                dom = "false";
+
+            }
+
+            if (dynamicContentAr && !dynamicContentAr.value.trim()){
+                dynamicErrorMsgContentAr.innerText = "Please fill in the Title(Arabic).";
+                dynamicErrorMsgContentAr.style.display = 'block';
+                dynamicErrorMsgContentEn.scrollIntoView();
+
+                dom = "false";
+
+
+            }
+
+        }
+    } 
+
+    catch(err){
+    console.log("error: "+err)
+    return false
+    }  
+        }
+
+    console.log(dom)
+    if(dom == "true"){
+        try{
+
+
+        achiveCount++;
+        console.log(achiveCount)
+        var new_id = "id" + Math.random().toString(16).slice(2)
+        
+        dynamic_achivenumFuntion.push(achiveCount)
+        console.log(dynamic_achivenumFuntion)
+        let newRow = `
+          <div id="section-achive-${achiveCount}">
+
+                        <div id="dynamic-achive-${achiveCount}">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="achive-section-field-1">Achivements Section-${achiveCount}</h1>
+                            <p class="field-achive-roll-id" style='display:none'>${new_id}</p>
+                            <p id="field-achive-roll-id-${achiveCount}" style='display:none'>${new_id}</p>
+
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+
+
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-en-${achiveCount}">Heading Name (English)</label>
+                                    <input class="form-control btn-pill " id="achive-section-form-htitle-en-${achiveCount}" name="achive_section_form_title_en_${achiveCount}" type="text" value="" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-en-${achiveCount}"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-ar-${achiveCount}">Heading Name (Arabic)</label>
+                                    <input class="form-control btn-pill" id="achive-section-form-htitle-ar-${achiveCount}" name="achive_section_form_title_ar_${achiveCount}" type="text" value="" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-ar-${achiveCount}"></p>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-en-${achiveCount}">Title (English)</label>
+                                    <input class="form-control btn-pill " id="achive-section-form-title-en-${achiveCount}" name="achive_section_form_title_en_${achiveCount}" type="text" value="" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-${achiveCount}"></p>
+
+                                </div>
+                            </div>
+    
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="achive-section-form-title-ar-${achiveCount}">Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="achive-section-form-title-ar-${achiveCount}" name="achive_section_form_title_ar_${achiveCount}" type="text" value="" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-${achiveCount}"></p>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12  text-end " >
+
+                                        <button id="delete-row" onclick ="return deleteachiveTheRow_achivetemp(${achiveCount})" class="btn btn-danger">-</button>
+                        </div> 
+
+                        
+                     
+    
+        
+        <br>
+        `;
+        
+        
+        document.getElementById('dynamic-achive-section-field').insertAdjacentHTML('beforebegin', newRow);
+
+        return false;
+        }
+        catch(err){
+        alert(err)
+
+
+        return false
+        }
+        }
+        else{
+            console.log("please fill the detail")
+            return false
+        }
+        console.log(dynamic_achivenumFuntion[0])
+
+        return false
+    }
+
+
+
+        
+
+    function deleteachiveTheRow_achivetemp(id){
+    try {
+    let deletingachiveField = document.getElementById(`section-achive-${id}`);
+    console.log(deletingachiveField)
+    if (deletingachiveField) {
+    //deletingField.innerHTML = `form ${id} has been deleted`;
+    deletingachiveField.remove()
+    achiveCount--
+
+    }
+    } catch (err) {
+    console.log(err)
+    return false
+
+    }
+
+    }
+
+    
+    let deleted_achivement_function = []
+    
+    
+    function deleteachiveTheRow(id){
+        try{
+        console.log(id)
+        deleted_achivement_function.push(id)
+        document.getElementById(`section-achive-${id}`).style.display = "none"
+        //alert(id)
+        //featureCount--
+        console.log(deleted_achivement_function)
         return false
         }
         catch(err){

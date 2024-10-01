@@ -624,4 +624,20 @@ class cms_home_dynamic_field(models.Model):
 
     class Meta():
         db_table = "futureStar_app_cms_home_dynamic_field"      
-                        
+
+class cms_home_dynamic_achivements_field(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    field_id = models.CharField(max_length=255,blank=True,null=True)
+
+    heading_en = models.CharField(max_length=255,blank=True,null=True)
+    heading_ar = models.CharField(max_length=255,blank=True,null=True)
+    
+    title_en = models.CharField(max_length=255,blank=True,null=True)
+    title_ar = models.CharField(max_length=255,blank=True,null=True)
+
+
+
+    class Meta():
+        db_table = "futureStar_app_cms_home_achivements_dynamic_field"           
+                                        
