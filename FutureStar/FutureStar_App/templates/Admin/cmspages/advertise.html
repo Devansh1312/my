@@ -43,7 +43,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="advertise-heading-title-en" name="advertise_heading_title" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="advertise-heading-title-en" name="advertise_heading_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-title-en"></p>
 
                             </div>
@@ -52,7 +52,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="advertise-heading-title-ar" name="advertise_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="advertise-heading-title-ar" name="advertise_heading_title_ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-title-ar"></p>
 
                             </div>
@@ -65,7 +65,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-en" name="advertise_heading_content_en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-en" name="advertise_heading_content_en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-content-en"></p>
 
                             </div>
@@ -74,7 +74,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-ar" name="advertise_heading_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="advertise-heading-content-ar" name="advertise_heading_content_ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-content-ar"></p>
 
                             </div>
@@ -91,7 +91,7 @@
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-advertise-banner" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-advertise-banner" src = "/media/{{data.heading_image_1}}" style="display: block; width: 200px; height: 50px;" />
                                 <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-section-banner"></p>
 
                             </div>
@@ -115,7 +115,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-title-en">Title (English)</label>
-                                <input class="form-control btn-pill " id="section-2-title-en" name="section_2_title_en" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="section-2-title-en" name="section_2_title_en" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-en"></p>
  
                             </div>
@@ -124,7 +124,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="section-2-title-ar" name="section_2_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="section-2-title-ar" name="section_2_title_ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-ar"></p>
 
                             </div>
@@ -139,7 +139,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en" name="section-2-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en" name="section-2-content-en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-en"></p>
 
                             </div>
@@ -148,7 +148,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar" name="section-2-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar" name="section-2-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_2_content_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-ar"></p>
 
                             </div>
@@ -171,8 +171,8 @@
                                         <!--{% if system_settings.fav_icon %}-->
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
-        
-                                        <img id="selected-section-2-image-1" style="display: none; width: 100px; height: 100px;" />
+                                
+                                        <img id="selected-section-2-image-1" src = "/media/{{data.section_2_images}}" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-1"></p>
 
                                     </div>
@@ -204,7 +204,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-name-en-1">Heading Name  (English)</label>
-                                <input class="form-control btn-pill " id="partnership-heading-name-en-1" name="partnership_heading_name_en_1" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="partnership-heading-name-en-1" name="partnership_heading_name_en_1" type="text" value="{{data.section_3_heading_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-name-en-1"></p>
 
                             </div>
@@ -213,7 +213,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-name-arabic-1">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="partnership-heading-name-ar-1" name="partnership_heading_name_ar_1" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="partnership-heading-name-ar-1" name="partnership_heading_name_ar_1" type="text" value="{{data.section_3_heading_en}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-name-ar-1"></p>
 
                             </div>
@@ -224,7 +224,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-title-en-1">Heading Title  (English)</label>
-                                <input class="form-control btn-pill " id="partnership-heading-title-en-1" name="partnership_heading_title_en_1" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="partnership-heading-title-en-1" name="partnership_heading_title_en_1" type="text" value="{{data.section_3_titlee_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-title-en-1"></p>
 
                             </div>
@@ -233,7 +233,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-title-arabic-1">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="partnership-heading-title-ar-1" name="partnership_heading_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="partnership-heading-title-ar-1" name="partnership_heading_title_ar_1" type="text" value="{{data.section_3_titlee_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-title-ar-1"></p>
 
                             </div>
@@ -254,7 +254,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-title-en">Title (English)</label>
-                                    <input class="form-control btn-pill " id="partnership-title-en" name="partnership_title_en" type="text" value="1" placeholder="Title (English)">
+                                    <input class="form-control btn-pill " id="partnership-title-en" name="partnership_title_en" type="text" value="{{data.section_3_title_en}}" placeholder="Title (English)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-en"></p>
 
                                 </div>
@@ -263,7 +263,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partnership-title-ar" name="partnership_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                    <input class="form-control btn-pill" id="partnership-title-ar" name="partnership_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-ar"></p>
 
                                 </div>
@@ -278,7 +278,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-en">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en" name="partnership-content-en" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en" name="partnership-content-en" type="text" placeholder="content (English)">{{data.section_3_content_en}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-en"></p>
 
                                 </div>
@@ -287,7 +287,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-ar">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_3_content_ar}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-ar"></p>
 
                                 </div>
@@ -310,10 +310,8 @@
                                             <!--{% if system_settings.fav_icon %}-->
                                                 <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                             <!--{% endif %}-->
-            
-                                            <img id="selected-partnership-image-1" style="display: none; width: 100px; height: 100px;" />
+                                            <img id="selected-partnership-image-1" src = "/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
                                             <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-1"></p>
-
                                         </div>
                                     </div>
                                     <p id = "partnership-warning-1"></p>
@@ -345,7 +343,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-name-en">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="ads-heading-name-en" name="ads_heading_name_en" type="text" value="1" placeholder="Heading Name (English)">
+                                <input class="form-control btn-pill " id="ads-heading-name-en" name="ads_heading_name_en" type="text" value="{{data.section_4_heading_en}}" placeholder="Heading Name (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-name-en"></p>
 
                             </div>
@@ -354,7 +352,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-name-arabic">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="ads-heading-name-ar" name="ads_heading_name_ar" type="text" value="1" placeholder="Heading Name (Arabic)">
+                                <input class="form-control btn-pill" id="ads-heading-name-ar" name="ads_heading_name_ar" type="text" value="{{data.section_4_heading_ar}}" placeholder="Heading Name (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-name-ar"></p>
 
                             </div>
@@ -365,7 +363,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="ads-heading-title-en" name="ads-heading_title_en" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="ads-heading-title-en" name="ads-heading_title_en" type="text" value="{{data.section_4_title_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-title-en"></p>
 
                             </div>
@@ -374,7 +372,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="ads-heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="ads-heading-title-ar" name="ads_heading_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="ads-heading-title-ar" name="ads_heading_title_ar" type="text" value="{{data.section_4_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-ads-heading-title-ar"></p>
 
                             </div>
@@ -401,7 +399,7 @@
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-ads-image-1" style="display: none; width: 100px; height: 100px;" />
+                                    <img id="selected-ads-image-1" src = "/media/{{data.section_4_image}}" style="display: block; width: 100px; height: 100px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-ads-image-1"></p>
 
                                 </div>
@@ -434,7 +432,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-en">Title (English)</label>
-                                    <input class="form-control btn-pill " id="premium-title-en" name="premium_title_en" type="text" value="1" placeholder="Title (English)">
+                                    <input class="form-control btn-pill " id="premium-title-en" name="premium_title_en" type="text" value="{{data.section_5_heading_en}}" placeholder="Title (English)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-premium-title-en"></p>
     
                                 </div>
@@ -443,7 +441,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-arabic">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="premium-title-ar" name="premium_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                    <input class="form-control btn-pill" id="premium-title-ar" name="premium_title_ar" type="text" value="{{data.section_5_heading_ar}}" placeholder="Title (Arabic)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-premium-title-ar"></p>
 
                                 </div>
@@ -475,7 +473,7 @@
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
         
-                                        <img id="selected-premium-image-1" style="display: none; width: 100px; height: 100px;" />
+                                        <img id="selected-premium-image-1" src = "/media/{{data.section_5_image}}" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-1"></p>
 
                                     </div>
@@ -488,7 +486,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-en-1">Premium Title (English)</label>
-                                    <input class="form-control btn-pill" id="premium-title-en-1" name="premium_title_en-1" type="text" value="1" placeholder="Title (English)">
+                                    <input class="form-control btn-pill" id="premium-title-en-1" name="premium_title_en-1" type="text" value="{{data.section_5_title_en}}" placeholder="Title (English)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-premium-title-en-1"></p>
 
                                 </div>
@@ -497,7 +495,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-ar-1">Premium Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="premium-title-ar-1" name="premium_title_ar_1" type="text" value="1" placeholder="Title (Arabic)">
+                                    <input class="form-control btn-pill" id="premium-title-ar-1" name="premium_title_ar_1" type="text" value="{{data.section_5_title_ar}}" placeholder="Title (Arabic)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-premium-title-ar-1"></p>
 
                                 </div>
@@ -535,7 +533,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-title">Title (English)</label>
-                                    <input class="form-control btn-pill " id="social-media-title-en" name="social_media_title_en" type="text" value="1" placeholder="Title (English)">
+                                    <input class="form-control btn-pill " id="social-media-title-en" name="social_media_title_en" type="text" value="{{data.section_6_title_en}}" placeholder="Title (English)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-title-en"></p>
  
                                 </div>
@@ -544,7 +542,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-title-arabic">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="social-media-title-ar" name="social_media_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                    <input class="form-control btn-pill" id="social-media-title-ar" name="social_media_title_ar" type="text" value="{{data.section_6_title_ar}}" placeholder="Title (Arabic)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-title-ar"></p>
 
                                 </div>
@@ -557,7 +555,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-1">Content-1 (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_1" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_1" type="text" placeholder="content (English)">{{data.section_6_content_en_1}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-1"></p>
 
                                 </div>
@@ -566,7 +564,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-1">Content-1 (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-1" name="social_media_content_ar_1" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-1" name="social_media_content_ar_1" type="text"  placeholder="content (Arabic)">{{data.section_6_content_ar_1}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-1"></p>
 
                                 </div>
@@ -577,7 +575,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-2">Content-2 (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-1" name="social_media_content_en_2" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-2" name="social_media_content_en_2" type="text" placeholder="content (English)">{{data.section_6_content_en_2}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-1"></p>
 
                                 </div>
@@ -586,7 +584,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-2">Content-2 (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-2" name="social_media_content_ar_2" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-2" name="social_media_content_ar_2" type="text"  placeholder="content (Arabic)">{{data.section_6_content_ar_2}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-1"></p>
 
                                 </div>
@@ -597,7 +595,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-3">Content-3 (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-3" name="social_media_content_en_3" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-3" name="social_media_content_en_3" type="text" placeholder="content (English)">{{data.section_6_content_en_3}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-3"></p>
 
                                 </div>
@@ -606,7 +604,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-3">Content-3 (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-3" name="social_media_content_ar_3" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-3" name="social_media_content_ar_3" type="text"  placeholder="content (Arabic)">{{data.section_6_content_ar_3}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-3"></p>
 
                                 </div>
@@ -618,7 +616,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-4">Content-4 (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-4" name="social_media_content_en_4" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-4" name="social_media_content_en_4" type="text" placeholder="content (English)">{{data.section_6_content_en_4}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-4"></p>
 
                                 </div>
@@ -627,7 +625,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-4">Content-4 (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-4" name="social_media_content_ar_4" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-4" name="social_media_content_ar_4" type="text"  placeholder="content (Arabic)">{{data.section_6_content_ar_4}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-4"></p>
 
                                 </div>
@@ -638,7 +636,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-5">Content-5 (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-5" name="social_media_content_en_5" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-5" name="social_media_content_en_5" type="text" placeholder="content (English)">{{data.section_6_content_en_5}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-5"></p>
 
                                 </div>
@@ -647,7 +645,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-5">Content-5 (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-5" name="social_media_content_ar_5" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-5" name="social_media_content_ar_5" type="text"  placeholder="content (Arabic)">{{data.section_6_content_ar_5}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-5"></p>
 
                                 </div>
@@ -658,7 +656,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-en-6">Content-6 (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-6" name="social_media_content_en_6" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-en-6" name="social_media_content_en_6" type="text" placeholder="content (English)">{{data.section_6_content_en_6}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-en-6"></p>
 
                                 </div>
@@ -667,7 +665,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-content-ar-3">Content-6 (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-6" name="social_media_content_ar_6" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="social-media-content-ar-6" name="social_media_content_ar_6" type="text"  placeholder="content (Arabic)">{{data.section_6_content_ar_6}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-content-ar-6"></p>
 
                                 </div>
@@ -682,7 +680,7 @@
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-social-media-img" style="display: none; width: 200px; height: 50px;" />
+                                    <img id="selected-social-media-img" src = "/media/{{data.section_6_logo}}" style="display: block; width: 200px; height: 50px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-section-image"></p>
 
                                 </div>
@@ -699,7 +697,7 @@
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-social-media-back-img" style="display: none; width: 200px; height: 50px;" />
+                                    <img id="selected-social-media-back-img" src = "/media/{{data.section_6_image}}" style="display: block; width: 200px; height: 50px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-section-back-image"></p>
 
                                 </div>
@@ -718,7 +716,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-title-en">Title (English)</label>
-                                    <input class="form-control btn-pill " id="competition-section-title-en" name="competition_section_title_en" type="text" value="1" placeholder="Title (English)">
+                                    <input class="form-control btn-pill " id="competition-section-title-en" name="competition_section_title_en" type="text" value="{{data.section_9_heading_en }}" placeholder="Title (English)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-competition-section-title-en"></p>
 
                                 </div>
@@ -727,7 +725,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-title-ar">Heading Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="competition-section-title-ar" name="competition_section_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                    <input class="form-control btn-pill" id="competition-section-title-ar" name="competition_section_title_ar" type="text" value="{{data.section_9_heading_ar}}" placeholder="Title (Arabic)">
                                     <p style="color: red; display: none;" class="error-message" id ="error-competition-section-title-ar"></p>
 
                                 </div>
@@ -740,7 +738,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-content-en">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-en" name="competition_section_content_en" type="text" placeholder="content (English)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-en" name="competition_section_content_en" type="text" placeholder="content (English)">{{data.section_9_title_en}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-competition-section-content-en"></p>
 
                                 </div>
@@ -749,7 +747,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-content-ar">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-ar" name="competition_section_content_ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="competition-section-content-ar" name="competition_section_content_ar" type="text"  placeholder="content (Arabic)">{{data.section_9_title_ar}}</textarea>
                                     <p style="color: red; display: none;" class="error-message" id ="error-competition-section-content-ar"></p>
 
                                 </div>
@@ -766,7 +764,7 @@
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-competition-image" style="display: none; width: 200px; height: 50px;" />
+                                    <img id="selected-competition-image" src = "/media/{{data.section_9_image}}"  style="display: block; width: 200px; height: 50px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-competition-section-section-image"></p>
 
                                 </div>
@@ -783,7 +781,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="1" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
 
                             </div>
@@ -792,7 +790,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="1" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
 
                             </div>
@@ -803,7 +801,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
@@ -812,7 +810,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">1</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
@@ -881,6 +879,53 @@
                 var advertise_heading_content_en = document.getElementById("advertise-heading-content-en")
                 var advertise_heading_content_ar = document.getElementById("advertise-heading-content-ar")
 
+                var section_2_title_en = document.getElementById("section-2-title-en")
+                var section_2_title_ar = document.getElementById("section-2-title-ar")
+                var section_2_content_en = document.getElementById("section-2-content-en")
+                var section_2_content_ar = document.getElementById("section-2-content-ar")
+
+                var partnership_heading_name_en_1 = document.getElementById("partnership-heading-name-en-1")
+                var partnership_heading_name_ar_1 = document.getElementById("partnership-heading-name-ar-1")
+                var partnership_heading_title_en_1 = document.getElementById("partnership-heading-title-en-1")
+                var partnership_heading_title_ar_1 = document.getElementById("partnership-heading-title-ar-1")
+                var partnership_title_en = document.getElementById("partnership-title-en")
+                var partnership_title_ar = document.getElementById("partnership-title-ar")
+                var partnership_content_en = document.getElementById("partnership-content-en")
+                var partnership_content_ar = document.getElementById("partnership-content-ar")
+
+
+                var ads_heading_name_en= document.getElementById("ads-heading-name-en")
+                var ads_heading_name_ar= document.getElementById("ads-heading-name-ar")
+                var ads_heading_title_en= document.getElementById("ads-heading-title-en")
+                var ads_heading_title_ar= document.getElementById("ads-heading-title-ar")
+
+                var premium_title_en= document.getElementById("premium-title-en")
+                var premium_title_ar= document.getElementById("premium-title-ar")
+                var premium_title_en_1= document.getElementById("premium-title-en-1")
+                var premium_title_ar_1= document.getElementById("premium-title-ar-1")
+
+                var social_media_title_en= document.getElementById("social-media-title-en")
+                var social_media_title_ar= document.getElementById("social-media-title-ar")
+                var social_media_content_en_1= document.getElementById("social-media-content-en-1")
+                var social_media_content_ar_1= document.getElementById("social-media-content-ar-1")
+                var social_media_content_en_2= document.getElementById("social-media-content-en-2")
+                var social_media_content_ar_2= document.getElementById("social-media-content-ar-2")
+                var social_media_content_en_3= document.getElementById("social-media-content-en-3")
+                var social_media_content_ar_3= document.getElementById("social-media-content-ar-3")
+                var social_media_content_en_4= document.getElementById("social-media-content-en-4")
+                var social_media_content_ar_4= document.getElementById("social-media-content-ar-4")
+                var social_media_content_en_5= document.getElementById("social-media-content-en-5")
+                var social_media_content_ar_5= document.getElementById("social-media-content-ar-5")
+                var social_media_content_en_6= document.getElementById("social-media-content-en-6")
+                var social_media_content_ar_6= document.getElementById("social-media-content-ar-6")
+
+
+                var competition_section_title_en= document.getElementById("competition-section-title-en")
+                var competition_section_title_ar= document.getElementById("competition-section-title-ar")
+
+                var competition_section_content_en= document.getElementById("competition-section-content-en")
+                var competition_section_content_ar= document.getElementById("competition-section-content-ar")
+
 
                 //meta
                 var seo_title_en = document.getElementById("meta-title-en")
@@ -889,16 +934,298 @@
                 var seo_content_ar = document.getElementById("meta-content-ar")
                 var missing_text = document.getElementById('heading-error')
 
-                //image
+                //image-heading
                 var heading_image_field = document.getElementById('advertise-heading-section-banner')
                 var heading_image = document.getElementById('selected-advertise-banner')
 
+                //image-section-2
+                var section_2_image_field = document.getElementById('section-2-banner-1')
+                var section_2_image = document.getElementById('selected-section-2-image-1')
+
+                //partinership image
+                var partnership_banner_1_field = document.getElementById('partnership-banner-1')
+                var partnership_banner_1 = document.getElementById('selected-partnership-image-1')
+
+                //ads image
+                var ads_image_1_field= document.getElementById("ads-image-1")
+                var ads_image_1= document.getElementById("selected-ads-image-1")
+
+                //premium image
+                var premium_banner_1_field= document.getElementById("premium-banner-1")
+                var premium_banner_1= document.getElementById("selected-premium-image-1")
+
+                //futurestr social media 
+                var social_media_section_image_field= document.getElementById("social-media-section-image")
+                var social_media_section_image= document.getElementById("selected-social-media-img")
+                var social_media_section_back_image_field= document.getElementById("social-media-section-back-image")
+                var social_media_section_back_image= document.getElementById("selected-social-media-back-img")
+
+                //competitition
+                var competition_section_section_image_field= document.getElementById("competition-section-section-image")
+                var competition_section_section_image = document.getElementById("selected-competition-image")
+
+  
+                //error
+                var top_error = document.getElementById('heading-warning')
+                var missing_text = document.getElementById('heading-error')
 
 
+                const advertise_data = [
+                        { id: "advertise-heading-title-en", name: "Heading Title (English)" },
+                        { id: "advertise-heading-title-ar", name: "Heading Title (English)" },
+                        { id: "advertise-heading-content-en", name: "Heading Content (English)" },
+                        { id: "advertise-heading-content-ar", name: "Heading Content (English)" },
 
+                        { id: "section-2-title-en", name: "Section 2 Title (English)" },
+                        { id: "section-2-title-ar", name: "Section 2 Title (Arabic)" },
+                        { id: "section-2-content-en", name: "Section 2 Content (English)" },
+                        { id: "section-2-content-ar", name: "Section 2 Content (Arabic)" },
+
+                        { id: "partnership-heading-name-en-1", name: " Partnership Heading (English)" },
+                        { id: "partnership-heading-name-ar-1", name: "Partnership Heading (Arabic)" },
+                        { id: "partnership-heading-title-en-1", name: "Partnership Title (English)" },
+                        { id: "partnership-heading-title-ar-1", name: "Partnership Title (Arabic)" },
+                        { id: "partnership-title-en", name: "Partnership Title (English)" },
+                        { id: "partnership-title-ar", name: "Partnership Title (Arabic)" },
+                        { id: "partnership-content-en", name: "Partnership Content (English)" },
+                        { id: "partnership-content-ar", name: "Partnership Content (Arabic)" },
+                        
+                        { id: "ads-heading-name-en", name: "Heading Name (English)" },
+                        { id: "ads-heading-name-ar", name: "Heading Name (Arabic)" },
+                        { id: "ads-heading-title-en", name: "Title (English)" },
+                        { id: "ads-heading-title-ar", name: "Title (Arabic)" },
+
+                        { id: "premium-title-en", name: "Title (English)" },
+                        { id: "premium-title-ar", name: "Title (Arabic)" },
+                        { id: "premium-title-en-1", name: "Title (English)" },
+                        { id: "premium-title-ar-1", name: "Title (Arabic)" },
+
+                        { id: "social-media-title-en", name: "Title (English)" },
+                        { id: "social-media-title-en", name: "Title (Arabic)" },
+                        { id: "social-media-content-en-1", name: "Content (English)" },
+                        { id: "social-media-content-ar-1", name: "Content (Arabic)" },
+                        { id: "social-media-content-en-2", name: "Content (English)" },
+                        { id: "social-media-content-ar-2", name: "Content (Arabic)" },
+                        { id: "social-media-content-en-3", name: "Content (English)" },
+                        { id: "social-media-content-ar-3", name: "Content (Arabic)" },
+                        { id: "social-media-content-en-4", name: "Content (English)" },
+                        { id: "social-media-content-ar-4", name: "Content (Arabic)" },
+                        { id: "social-media-content-en-5", name: "Content (English)" },
+                        { id: "social-media-content-ar-5", name: "Content (Arabic)" },
+                        { id: "social-media-content-en-6", name: "Content (English)" },
+                        { id: "social-media-content-ar-6", name: "Content (Arabic)" },
+                       
+                        { id: "competition-section-title-en", name: "Title (English)" },
+                        { id: "competition-section-title-ar", name: "Title (Arabic)" },
+                        { id: "competition-section-content-en", name: "Content (English)" },
+                        { id: "competition-section-content-ar", name: "Content (Arabic)" },
+
+                        { id: "meta-title-en", name: "SEO Title (English)" },
+                        { id: "meta-title-ar", name: "SEO Title (Arabic)" },
+                        { id: "meta-content-en", name: "SEO Content (English)" },
+                        { id: "meta-content-ar", name: "SEO Content (Arabic)" }
+                    ];
+                    document.querySelectorAll('.error-message').forEach((msg) => {
+                        msg.style.display = 'none';
+                        msg.innerText = '';
+                    });
+    
+                    top_error.innerText =""
+    
+                    var sendData = "true"
+
+                    try{
+
+                    
+                    for (const field of advertise_data) {
+                        const input = document.getElementById(field.id);
+                        const errorMsg = document.getElementById(`error-${field.id}`);
+    
+                        if (!input.value.trim()) {
+                            
+                            errorMsg.innerText = `Please fill in ${field.name}.`;
+                            errorMsg.style.display = 'block'; 
+                                
+                                top_error.innerText = "There Should be no empty Field"
+                                top_error.style.color = "red"
+    
+                                //document.documentElement.scrollTop = 0
+                                errorMsg.scrollIntoView();
+
+                                sendData = "false"
+                                break;
+    
+                                
+                        }
+                    }
+                }
+                catch(err)
+                {
+                    console.log("error: "+err)
+                    return false
+                }
                 
-                return false
+                if(heading_image_field.value.length == 0 && heading_image.src== ""){
+                        const errorMsg = document.getElementById(`error-advertise-heading-section-banner`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
 
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+                
+                if(section_2_image_field.value.length == 0 && section_2_image.src== ""){
+                        const errorMsg = document.getElementById(`error-section-2-banner-1`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                if(partnership_banner_1_field.value.length == 0 && partnership_banner_1.src== ""){
+                        const errorMsg = document.getElementById(`error-partnership-banner-1`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                if(ads_image_1_field.value.length == 0 && ads_image_1.src== ""){
+                        const errorMsg = document.getElementById(`error-ads-image-1`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                if(premium_banner_1_field.value.length == 0 && premium_banner_1.src== ""){
+                        const errorMsg = document.getElementById(`error-premium-banner-1`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                if(social_media_section_image_field.files.length == 0 && social_media_section_image.src == ""){
+                        const errorMsg = document.getElementById(`error-social-media-section-image`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                if(social_media_section_back_image_field.files.length == 0 && social_media_section_back_image.src== ""){
+                        const errorMsg = document.getElementById(`error-social-media-section-back-image`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+
+                if(competition_section_section_image_field.files.length == 0 && competition_section_section_image.src== ""){
+                        const errorMsg = document.getElementById(`error-competition-section-section-image`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+                if(sendData == "true"){
                 try{
                     const formData = new FormData();
                     //text
@@ -906,15 +1233,115 @@
                     formData.append('advertise-heading-title-ar', advertise_heading_title_ar.value );
                     formData.append('advertise-heading-content-en', advertise_heading_content_en.value );
                     formData.append('advertise-heading-content-ar', advertise_heading_content_en.value );
+                    
+                    formData.append('section-2-title-en', section_2_title_en.value );
+                    formData.append('section-2-title-ar', section_2_title_ar.value );
+                    formData.append('section-2-content-en',section_2_content_en.value );
+                    formData.append('section-2-content-ar',section_2_content_ar.value );
 
-                    formData.append('seo_title_en', meta_title_en.value );
-                    formData.append('seo_title_ar', meta_title_ar.value );
-                    formData.append('seo_content_en', meta_content_en.value );
-                    formData.append('seo_content_ar', meta_content_ar.value );
+                    formData.append('partnership_heading_name_en_1',partnership_heading_name_en_1.value );
+                    formData.append('partnership_heading_name_ar_1',partnership_heading_name_ar_1.value );
+                    formData.append('partnership-heading-title-en-1',partnership_heading_title_en_1.value );
+                    formData.append('partnership-heading-title-ar-1',partnership_heading_title_ar_1.value );
+                    formData.append('partnership-title-en',partnership_title_en.value );
+                    formData.append('partnership-title-ar',partnership_title_ar.value );
+                    formData.append('partnership_content_en',partnership_content_en.value );
+                    formData.append('partnership_content_ar',partnership_content_ar.value );
+
+                    formData.append('ads-heading-name-en',ads_heading_name_en.value );
+                    formData.append('ads-heading-name-ar',ads_heading_name_ar.value );
+                    formData.append('ads-heading-title-en',ads_heading_title_en.value );
+                    formData.append('ads-heading-title-ar',ads_heading_title_ar.value );
+                                      
+                    formData.append('premium-title-en',premium_title_en.value );
+                    formData.append('premium-title-ar',premium_title_ar.value );
+                    formData.append('premium-title-en-1',premium_title_en_1.value );
+                    formData.append('premium-title-ar-1',premium_title_ar_1.value );
+
+                    formData.append('social-media-title-en',social_media_title_en.value );
+                    formData.append('social-media-title-ar',social_media_title_ar.value );
+                    
+                    formData.append('social-media-content-en-1',social_media_content_en_1.value );
+                    formData.append('social-media-content-ar-1',social_media_content_ar_1.value );
+                    formData.append('social-media-content-en-2',social_media_content_en_2.value );
+                    formData.append('social-media-content-ar-2',social_media_content_ar_2.value );
+                    formData.append('social-media-content-en-3',social_media_content_en_3.value );
+                    formData.append('social-media-content-ar-3',social_media_content_ar_3.value );
+                    formData.append('social-media-content-en-4',social_media_content_en_4.value );
+                    formData.append('social-media-content-ar-4',social_media_content_ar_4.value );
+                    formData.append('social-media-content-en-5',social_media_content_en_5.value );
+                    formData.append('social-media-content-ar-5',social_media_content_ar_5.value );
+                    formData.append('social-media-content-en-6',social_media_content_en_6.value );
+                    formData.append('social-media-content-ar-6',social_media_content_ar_6.value );
+
+                    formData.append('competition-section-title-en',competition_section_title_en.value );
+                    formData.append('competition-section-title-ar',competition_section_title_ar.value );
+                    formData.append('competition-section-content-en',competition_section_content_en.value );
+                    formData.append('competition-section-content-ar',competition_section_content_ar.value );
+
+                    formData.append('seo-title-en', seo_title_en.value );
+                    formData.append('seo-title-ar', seo_title_ar.value );
+                    formData.append('seo-content-en', seo_content_en.value );
+                    formData.append('seo-content-ar', seo_content_ar.value );
 
 
 
-                    fetch("/savetermcondition/", {
+                    if (heading_image_field.files.length > 0) {
+                            formData.append('heading_image_1', heading_image_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                    
+                    if (section_2_image_field.files.length > 0) {
+                            formData.append('section_2_image_field', section_2_image_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                    
+                    if (partnership_banner_1_field.files.length > 0) {
+                            formData.append('partnership_banner_1_field', partnership_banner_1_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                    
+                    if (ads_image_1_field.files.length > 0) {
+                            formData.append('ads_image_1', ads_image_1_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+                        
+                        if (premium_banner_1_field.files.length > 0) {
+                            formData.append('premium_banner_1_field', premium_banner_1_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }    
+
+
+                        if (social_media_section_image_field.files.length > 0) {
+                            formData.append('social-media-section-image-field', social_media_section_image_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }       
+                        if (social_media_section_back_image_field.files.length > 0) {
+                            formData.append('social-media-section-back-image-field', social_media_section_back_image_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }      
+                    
+                        if (competition_section_section_image_field.files.length > 0) {
+                            formData.append('competition-section-section-image-field', competition_section_section_image_field.files[0]);
+                    } 
+                        else {
+                            console.log("already have image")
+                        }      
+                    fetch("/saveadvertisedetail/", {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -925,16 +1352,14 @@
                     .then(data => {
                         console.log('Success:', data);
 
-                        if(missing_text.style.display != "none"){
-                            missing_text.style.display = "none"
-
-                        }
+                        location.reload()
 
                         
                         
                     })
                     .catch((error) => {
                         console.error('Error:', error);
+                        location.reload()
                     });
 
                     function getCookie(name) {
@@ -962,6 +1387,11 @@
                     return false
 
                 }
+            }
+            else{
+                console.log("sending is helded")
+                return false
+            }
                 
                 //console.log(country_name_ar.value)
                 
@@ -978,6 +1408,7 @@
             }
                 
         }
+    
         
 
             
