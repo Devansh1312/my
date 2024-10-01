@@ -30,6 +30,8 @@ urlpatterns = [
 
 
         path('api/fields/', FieldAPIView.as_view()),
+        path('api/tournament/', TournamentAPIView.as_view()),
+
 
         
     ]

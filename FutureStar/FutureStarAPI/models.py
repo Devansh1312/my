@@ -48,3 +48,24 @@ class Field(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_field'
+
+
+class Tournament(models.Model):
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    tournament_name = models.CharField(max_length=255,blank=True,null=True)
+    tournament_starting_date = models.DateField(blank=True,null=True)
+    tournament_final_date = models.DateField(blank=True,null=True)
+    number_of_team = models.CharField(max_length=255,blank=True,null=True)
+    tournament_name = models.CharField(max_length=255,blank=True,null=True)
+    age_group = models.CharField(max_length=255,blank=True,null=True)
+    country = models.CharField(max_length=255,blank=True,null=True)
+    city = models.CharField(max_length=255,blank=True,null=True)
+    tournament_fields = models.ForeignKey(Field,blank=True,null=True,on_delete=models.CASCADE)
+    logo = models.ImageField(upload_to='tournament_logo/', blank=True, null=True)  # Add image field
+    tournament_joining_cost = models.CharField(max_length=255,blank=True,null=True)
+
+    def __str__(self):
+        return self.tournament_name
+
+    class Meta:
+        db_table = 'futurestar_app_tournament'

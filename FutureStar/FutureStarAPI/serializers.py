@@ -130,3 +130,26 @@ class FieldSerializer(serializers.ModelSerializer):
         # Automatically associate the field with the currently logged-in user
         user = self.context['request'].user
         return Field.objects.create(user_id=user, **validated_data)
+    
+
+
+class TournamentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tournament
+        fields = [
+            'tournament_name',
+            'tournament_starting_date',
+            'tournament_final_date',
+            'number_of_team',
+            'age_group',
+            'country',
+            'city',
+            'tournament_fields',
+            'logo',
+            'tournament_joining_cost',
+        ]  # Exclude user_id
+
+    def create(self, validated_data):
+        # Automatically associate the tournament with the currently logged-in user
+        user = self.context['request'].user
+        return Tournament.objects.create(user_id=user, **validated_data)
