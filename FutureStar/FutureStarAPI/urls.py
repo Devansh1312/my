@@ -33,5 +33,9 @@ urlpatterns = [
         path('api/tournament/', TournamentAPIView.as_view()),
 
 
+        path('api/tournament/', TeamViewAPI.as_view()),
+
+
+
         
     ]

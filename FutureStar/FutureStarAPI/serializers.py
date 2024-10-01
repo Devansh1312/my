@@ -37,20 +37,20 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     type = serializers.IntegerField(required=True)  # Add type field to distinguish login types
-    username_or_phone = serializers.CharField(required=False)
+    username = serializers.CharField(required=False)
     password = serializers.CharField(required=False, write_only=True)
-    email = serializers.EmailField(required=False)  # Required for Type 2 or 3
+    # username = serializers.EmailField(required=False)  # Required for Type 2 or 3
     device_type = serializers.CharField(required=True)
     device_token = serializers.CharField(required=True)
 
     def validate(self, data):
         # For type 1, username_or_phone and password are required
         if data['type'] == 1:
-            if not data.get('username_or_phone') or not data.get('password'):
+            if not data.get('username') or not data.get('password'):
                 raise serializers.ValidationError("Username or phone and password are required for normal login.")
         # For type 2 or 3, email is required
         elif data['type'] in [2, 3]:
-            if not data.get('email'):
+            if not data.get('username'):
                 raise serializers.ValidationError("Email is required for type 2 and type 3 login.")
         return data
 

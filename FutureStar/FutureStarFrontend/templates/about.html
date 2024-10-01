@@ -25,6 +25,16 @@
 {% endblock %}
 {% block title %} Future Star || About{% endblock %}
 {% block content %}
+{% if request.GET.reference == "app" %}
+<style>
+    .header-upper {
+        display: none;
+    }
+    .main-footer {
+        display: none;
+    }
+</style>
+{% endif %}
 
 <!-- Page Banner Section Start -->
         <section class="page-banner pt-150" style="background-image: url(assets/images/hero/hero-two-bg.png)">

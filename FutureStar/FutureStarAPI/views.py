@@ -54,14 +54,31 @@ class RegisterAPIView(APIView):
                         'data': {
                             'refresh_token': str(refresh),
                             'access_token': str(refresh.access_token),
-                            'user': {
-                                'id': user.id,
-                                'username': user.username,
-                                'phone': user.phone,
-                                'email': user.email,
-                                'device_type': user.device_type,
-                                'device_token': user.device_token,
-                            }
+                            'id': user.id,
+                            'username': user.username,
+                            'phone': user.phone,
+                            'email': user.email,
+                            'fullname': user.fullname,
+                            'bio': user.bio,
+                            'date_of_birth': user.date_of_birth,
+                            'age': user.age,
+                            'gender': user.gender,
+                            'country': user.country,
+                            'city': user.city,
+                            'nationality': user.nationality,
+                            'weight': user.weight,
+                            'height': user.height,
+                            'main_playing_position': user.main_playing_position,
+                            'secondary_playing_position': user.secondary_playing_position,
+                            'playing_foot': user.playing_foot,
+                            'favourite_local_team': user.favourite_local_team,
+                            'favourite_team': user.favourite_team,
+                            'favourite_local_player': user.favourite_local_player,
+                            'favourite_player': user.favourite_player,
+                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                            'cover_photo': user.card_header.url if user.card_header else None,
+                            'device_type': user.device_type,
+                            'device_token': user.device_token,
                         }
                     }, status=status.HTTP_201_CREATED)
 
@@ -80,7 +97,7 @@ class RegisterAPIView(APIView):
 
         elif registration_type in [2, 3]:
             # Email registration (no password provided)
-            email = request.data.get('email')
+            email = request.data.get('username')
             if not email:
                 return Response({
                     'status': 0,
@@ -104,14 +121,31 @@ class RegisterAPIView(APIView):
                         'data': {
                             'refresh_token': str(refresh),
                             'access_token': str(refresh.access_token),
-                            'user': {
-                                'id': user.id,
-                                'username': user.username,
-                                'phone': user.phone,
-                                'email': user.email,
-                                'device_type': user.device_type,
-                                'device_token': user.device_token,
-                            }
+                            'id': user.id,
+                            'username': user.username,
+                            'phone': user.phone,
+                            'email': user.email,
+                            'fullname': user.fullname,
+                            'bio': user.bio,
+                            'date_of_birth': user.date_of_birth,
+                            'age': user.age,
+                            'gender': user.gender,
+                            'country': user.country,
+                            'city': user.city,
+                            'nationality': user.nationality,
+                            'weight': user.weight,
+                            'height': user.height,
+                            'main_playing_position': user.main_playing_position,
+                            'secondary_playing_position': user.secondary_playing_position,
+                            'playing_foot': user.playing_foot,
+                            'favourite_local_team': user.favourite_local_team,
+                            'favourite_team': user.favourite_team,
+                            'favourite_local_player': user.favourite_local_player,
+                            'favourite_player': user.favourite_player,
+                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                            'cover_photo': user.card_header.url if user.card_header else None,
+                            'device_type': user.device_type,
+                            'device_token': user.device_token, 
                         }
                     }, status=status.HTTP_200_OK)
                 else:
@@ -141,11 +175,30 @@ class RegisterAPIView(APIView):
                     'data': {
                         'refresh_token': str(refresh),
                         'access_token': str(refresh.access_token),
-                        'user': {
+                        'data': {
                             'id': user.id,
                             'username': user.username,
                             'phone': user.phone,
                             'email': user.email,
+                            'fullname': user.fullname,
+                            'bio': user.bio,
+                            'date_of_birth': user.date_of_birth,
+                            'age': user.age,
+                            'gender': user.gender,
+                            'country': user.country,
+                            'city': user.city,
+                            'nationality': user.nationality,
+                            'weight': user.weight,
+                            'height': user.height,
+                            'main_playing_position': user.main_playing_position,
+                            'secondary_playing_position': user.secondary_playing_position,
+                            'playing_foot': user.playing_foot,
+                            'favourite_local_team': user.favourite_local_team,
+                            'favourite_team': user.favourite_team,
+                            'favourite_local_player': user.favourite_local_player,
+                            'favourite_player': user.favourite_player,
+                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                            'cover_photo': user.card_header.url if user.card_header else None,
                             'device_type': user.device_type,
                             'device_token': user.device_token,
                         }
@@ -175,7 +228,7 @@ class LoginAPIView(APIView):
 
             if login_type == 1:
                 # Normal login with username_or_phone and password
-                username_or_phone = serializer.validated_data['username_or_phone']
+                username_or_phone = serializer.validated_data['username']
                 password = serializer.validated_data['password']
 
                 user = User.objects.filter(username=username_or_phone).first() or \
@@ -200,6 +253,25 @@ class LoginAPIView(APIView):
                                     'username': user.username,
                                     'phone': user.phone,
                                     'email': user.email,
+                                    'fullname': user.fullname,
+                                    'bio': user.bio,
+                                    'date_of_birth': user.date_of_birth,
+                                    'age': user.age,
+                                    'gender': user.gender,
+                                    'country': user.country,
+                                    'city': user.city,
+                                    'nationality': user.nationality,
+                                    'weight': user.weight,
+                                    'height': user.height,
+                                    'main_playing_position': user.main_playing_position,
+                                    'secondary_playing_position': user.secondary_playing_position,
+                                    'playing_foot': user.playing_foot,
+                                    'favourite_local_team': user.favourite_local_team,
+                                    'favourite_team': user.favourite_team,
+                                    'favourite_local_player': user.favourite_local_player,
+                                    'favourite_player': user.favourite_player,
+                                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                                    'cover_photo': user.card_header.url if user.card_header else None,
                                     'device_type': user.device_type,
                                     'device_token': user.device_token,
                                 }
@@ -218,7 +290,7 @@ class LoginAPIView(APIView):
 
             elif login_type in [2, 3]:
                 # Login with email, no password provided
-                email = serializer.validated_data['email']
+                email = serializer.validated_data['username']
 
                 user = User.objects.filter(email=email).first()
 
@@ -243,6 +315,25 @@ class LoginAPIView(APIView):
                                     'username': user.username,
                                     'phone': user.phone,
                                     'email': user.email,
+                                    'fullname': user.fullname,
+                                    'bio': user.bio,
+                                    'date_of_birth': user.date_of_birth,
+                                    'age': user.age,
+                                    'gender': user.gender,
+                                    'country': user.country,
+                                    'city': user.city,
+                                    'nationality': user.nationality,
+                                    'weight': user.weight,
+                                    'height': user.height,
+                                    'main_playing_position': user.main_playing_position,
+                                    'secondary_playing_position': user.secondary_playing_position,
+                                    'playing_foot': user.playing_foot,
+                                    'favourite_local_team': user.favourite_local_team,
+                                    'favourite_team': user.favourite_team,
+                                    'favourite_local_player': user.favourite_local_player,
+                                    'favourite_player': user.favourite_player,
+                                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                                    'cover_photo': user.card_header.url if user.card_header else None,
                                     'device_type': user.device_type,
                                     'device_token': user.device_token,
                                 }
@@ -273,11 +364,30 @@ class LoginAPIView(APIView):
                         'data': {
                             'refresh_token': str(refresh),
                             'access_token': str(refresh.access_token),
-                            'user': {
+                            'data': {
                                 'id': user.id,
                                 'username': user.username,
                                 'phone': user.phone,
                                 'email': user.email,
+                                'fullname': user.fullname,
+                                'bio': user.bio,
+                                'date_of_birth': user.date_of_birth,
+                                'age': user.age,
+                                'gender': user.gender,
+                                'country': user.country,
+                                'city': user.city,
+                                'nationality': user.nationality,
+                                'weight': user.weight,
+                                'height': user.height,
+                                'main_playing_position': user.main_playing_position,
+                                'secondary_playing_position': user.secondary_playing_position,
+                                'playing_foot': user.playing_foot,
+                                'favourite_local_team': user.favourite_local_team,
+                                'favourite_team': user.favourite_team,
+                                'favourite_local_player': user.favourite_local_player,
+                                'favourite_player': user.favourite_player,
+                                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                                'cover_photo': user.card_header.url if user.card_header else None,
                                 'device_type': user.device_type,
                                 'device_token': user.device_token,
                             }
@@ -912,3 +1022,24 @@ class TournamentAPIView(APIView):
                 'message': _('Tournament creation failed.'),
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TeamViewAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        # Fetch all fields for the current user
+        category = Category.objects.filter(user_id=request.user)
+
+        # Construct the response data manually
+        type_data = [{'id': category.id, 'type_name': category.type_name} for category in category]
+
+        return Response({
+            'status': 1,
+            'message': _('Types retrieved successfully.'),
+            'data': type_data
+        }, status=status.HTTP_200_OK)
