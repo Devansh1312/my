@@ -437,7 +437,7 @@ class LogoutAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('Logout successful'),
-            }, status=status.HTTP_201_RESET_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({
@@ -470,7 +470,7 @@ class ForgotPasswordAPIView(APIView):
                 return Response({
                     'status': 1,
                     'message': _('OTP sent to your phone.'),
-                    'otp': otp,
+                    'data': otp,
                 }, status=status.HTTP_200_OK)
 
             return Response({
