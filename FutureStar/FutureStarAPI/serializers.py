@@ -48,20 +48,35 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         login_type = data.get('type')
 
+        # Initialize an empty list for collecting error messages
+        errors = []
+
         # For type 1, username_or_phone and password are required
         if login_type == 1:
-            if not data.get('username') or not data.get('password'):
-                raise serializers.ValidationError({
-                    "username": "Username or phone is required for normal login.",
-                    "password": "Password is required for normal login."
-                })
-        
+            if not data.get('username'):
+                errors.append("Username or phone is required for normal login.")
+            if not data.get('password'):
+                errors.append("Password is required for normal login.")
+            
+            # Check if there are any errors to report
+            if errors:
+                # Combine errors into a single message
+                raise serializers.ValidationError(" ".join(errors))
+            
+            # Check if the user exists with the provided username or phone
+            user = User.objects.filter(username=data['username']).first() or User.objects.filter(phone=data['username']).first()
+            if user is None:
+                raise serializers.ValidationError("User with this username or phone does not exist.")
+            
+            # Check if the password is correct
+            if not user.check_password(data['password']):
+                raise serializers.ValidationError("Invalid password.")
+
         # For type 2 or 3, only username (email) is required
         elif login_type in [2, 3]:
             if not data.get('username'):
-                raise serializers.ValidationError({
-                    "username": "Email is required for type 2 and type 3 login."
-                })
+                errors.append("Email is required for type 2 and type 3 login.")
+                raise serializers.ValidationError(" ".join(errors))
 
         return data
 

@@ -401,10 +401,10 @@ class LoginAPIView(APIView):
         # Custom error handling
         error_message = serializer.errors.get('non_field_errors')
         if error_message:
-            return Response({
-                'status': 0,
-                'message': _(error_message[0])  # Ensures translation is applied
-            }, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'status': 0,
+                    'message': _(error_message[0])  # Ensures translation is applied
+                }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
                 'status': 0,
@@ -661,7 +661,18 @@ class EditProfileAPIView(APIView):
         user.bio = request.data.get('bio', user.bio)
         user.date_of_birth = request.data.get('date_of_birth', user.date_of_birth)
         user.age = request.data.get('age', user.age)
-        user.gender = request.data.get('gender', user.gender)
+        
+        # Assign gender by fetching the corresponding UserGender instance
+        gender_id = request.data.get('gender')
+        if gender_id:
+            try:
+                user.gender = UserGender.objects.get(id=gender_id)  # Fetch UserGender instance
+            except UserGender.DoesNotExist:
+                return Response({
+                    'status': 2,
+                    'message': _('Invalid gender specified.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
         user.country = request.data.get('country', user.country)
         user.city = request.data.get('city', user.city)
         user.nationality = request.data.get('nationality', user.nationality)
@@ -720,7 +731,7 @@ class EditProfileAPIView(APIView):
                 'bio': user.bio,
                 'date_of_birth': user.date_of_birth,
                 'age': user.age,
-                'gender': user.gender,
+                'gender': user.gender.id if user.gender else None,  # Return the ID of the gender
                 'country': user.country,
                 'city': user.city,
                 'nationality': user.nationality,
@@ -737,7 +748,6 @@ class EditProfileAPIView(APIView):
                 'cover_photo': user.card_header.url if user.card_header else None
             }
         }, status=status.HTTP_200_OK)
-    
 
 
 
