@@ -78,27 +78,41 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PostCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
-    user = UserSerializer(read_only=True)  # Nested user details
+    user = UserSerializer(read_only=True)
     parent = serializers.PrimaryKeyRelatedField(queryset=Post_comment.objects.all(), allow_null=True)
 
     class Meta:
         model = Post_comment
-        fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies']
-        # Changed 'post_id' to 'post' and 'parent_id' to 'parent' for better representation
+        fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies', 'team_id']
 
     def get_replies(self, obj):
-        # Fetch replies where the parent_id is the current comment's id
         if obj.replies.exists():
             return PostCommentSerializer(obj.replies.all(), many=True).data
         return []
 
+
 class PostSerializer(serializers.ModelSerializer):
     comments = PostCommentSerializer(many=True, read_only=True)
     user = UserSerializer(read_only=True)  # Nested user details
+    team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), allow_null=True, required=False)
 
     class Meta:
         model = Post
-        fields = ['id', 'user', 'title', 'description', 'image', 'date_created', 'comments']
+        fields = ['id', 'user', 'team_id', 'title', 'description', 'image', 'date_created', 'comments']
+
+    def create(self, validated_data):
+        team_id = validated_data.pop('team_id', None)
+        post = Post.objects.create(**validated_data, team_id=team_id)
+        return post
+
+    def update(self, instance, validated_data):
+        team_id = validated_data.get('team_id', instance.team_id)
+        instance.team_id = team_id
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.image = validated_data.get('image', instance.image)
+        instance.save()
+        return instance
 
 
 class FieldCapacitySerializer(serializers.ModelSerializer):

@@ -398,18 +398,18 @@ class LoginAPIView(APIView):
                         }
                     }, status=status.HTTP_201_CREATED)
 
-        # Custom error handling
-        error_message = serializer.errors.get('non_field_errors')
-        if error_message:
-            return Response({
-                'status': 0,
-                'message': _(error_message[0])  # Ensures translation is applied
-            }, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({
-                'status': 0,
-                'message': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+            # Custom error handling
+            error_message = serializer.errors.get('non_field_errors')
+            if error_message:
+                return Response({
+                    'status': 0,
+                    'message': _(error_message[0])  # Ensures translation is applied
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({
+                    'status': 0,
+                    'message': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutAPIView(APIView):
@@ -747,7 +747,12 @@ class PostListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Post.objects.filter(user=self.request.user).order_by('-date_created')
+        team_id = self.request.headers.get('Team-ID')  # Optional Team-ID from headers
+
+        if team_id:
+            return Post.objects.filter(team_id=team_id).order_by('-date_created')  # Filter posts by team
+        else:
+            return Post.objects.filter(user=self.request.user).order_by('-date_created')  # Filter posts by user
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -762,7 +767,6 @@ class PostListAPIView(generics.ListAPIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
@@ -771,10 +775,24 @@ class PostCreateAPIView(APIView):
         language = request.headers.get('Language', 'en')
         activate(language)
 
+        team_id = request.data.get('team_id')  # Optional team_id from request data
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
-            post = serializer.save(user=request.user)
+            if team_id:
+                try:
+                    team = Team.objects.get(id=team_id)
+                except Team.DoesNotExist:
+                    return Response({
+                        'status': 0,
+                        'message': _('Team not found.')
+                    }, status=status.HTTP_404_NOT_FOUND)
+                
+                # Save the post with a team
+                post = serializer.save(user=request.user, team_id=team)
+            else:
+                # Save the post for the user without a team
+                post = serializer.save(user=request.user)
 
             # Handle image upload
             if "image" in request.FILES:
@@ -801,7 +819,6 @@ class PostCreateAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PostDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -810,6 +827,7 @@ class PostDetailAPIView(APIView):
         activate(language)
 
         post_id = request.data.get('post_id')
+        team_id = request.data.get('team_id')  # Optional team_id
 
         if not post_id:
             return Response({
@@ -818,7 +836,10 @@ class PostDetailAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            post = Post.objects.get(id=post_id, user=request.user)
+            if team_id:
+                post = Post.objects.get(id=post_id, team_id=team_id)
+            else:
+                post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
@@ -833,7 +854,6 @@ class PostDetailAPIView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -843,8 +863,9 @@ class CommentCreateAPIView(APIView):
 
         data = request.data
         post_id = data.get('post_id')
+        team_id = data.get('team_id')  # Optional team_id
         comment_text = data.get('comment')
-        parent_id = data.get('parent_id')  # Retrieve parent_id if present
+        parent_id = data.get('parent_id')
 
         if not post_id or not comment_text:
             return Response({
@@ -853,14 +874,17 @@ class CommentCreateAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            post = Post.objects.get(id=post_id)
+            if team_id:
+                post = Post.objects.get(id=post_id, team_id=team_id)
+            else:
+                post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Handle the parent comment (if it's a reply)
+        # Handle parent comment (if it's a reply)
         parent_comment = None
         if parent_id:
             try:
@@ -871,12 +895,13 @@ class CommentCreateAPIView(APIView):
                     'message': _('Parent comment not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
-        # Create the comment (or reply)
+        # Create the comment
         comment = Post_comment.objects.create(
             user=request.user,
             post=post,
             comment=comment_text,
-            parent=parent_comment  # Set the parent if this is a reply
+            parent=parent_comment,
+            team_id=team_id  # Set the team_id if provided
         )
 
         return Response({
@@ -884,7 +909,6 @@ class CommentCreateAPIView(APIView):
             'message': _('Comment created successfully.'),
             'data': PostCommentSerializer(comment).data
         }, status=status.HTTP_201_CREATED)
-
 
 class PostDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -894,6 +918,7 @@ class PostDeleteAPIView(APIView):
         activate(language)
 
         post_id = request.data.get('post_id')
+        team_id = request.data.get('team_id')  # Optional team_id
 
         if not post_id:
             return Response({
@@ -902,7 +927,10 @@ class PostDeleteAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            post = Post.objects.get(id=post_id, user=request.user)
+            if team_id:
+                post = Post.objects.get(id=post_id, team_id=team_id)
+            else:
+                post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
@@ -915,10 +943,8 @@ class PostDeleteAPIView(APIView):
             'status': 1,
             'message': _('Post deleted successfully.')
         }, status=status.HTTP_200_OK)
-    
 
-
-
+################################################ Field API View #################################
 class FieldAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]  # To handle file uploads

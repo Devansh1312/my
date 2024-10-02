@@ -17,8 +17,34 @@ class Post(models.Model):
     class Meta:
         db_table = 'futurestar_app_post'
 
+class Team(models.Model):
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    team_name = models.CharField(max_length=255,blank=True,null=True)
+    team_type = models.ForeignKey(Category,on_delete=models.CASCADE)
+    bio = models.TextField(null=True,blank=True)
+    team_establishment_date = models.DateField(blank=True,null=True)
+    team_president = models.CharField(max_length=255,blank=True,null=True)
+    location = models.CharField(max_length=500,blank=True,null=True)
+    country = models.CharField(max_length=255,blank=True,null=True)
+    city = models.CharField(max_length=255,blank=True,null=True)
+    phone = models.CharField(max_length=255,blank=True,null=True)
+    email = models.EmailField(max_length=255,blank=True,null=True)
+    age_group = models.CharField(max_length=255,blank=True,null=True)
+    entry_fees = models.CharField(max_length=255,blank=True,null=True)
+    branches = models.CharField(max_length=500,blank=True,null=True)
+    team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)  # Add image field
+    team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)  # Add image field
+    team_uniform = models.ImageField(upload_to='team/team_uniform/', blank=True, null=True)  # Add image field
+
+    def __str__(self):
+        return self.team_name
+
+    class Meta:
+        db_table = 'futurestar_app_team'
+
 class Post_comment(models.Model):
     user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
+    team_id = models.ForeignKey(Team ,null=True,blank=True, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
@@ -71,27 +97,3 @@ class Tournament(models.Model):
         db_table = 'futurestar_app_tournament'
     
 
-class Team(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
-    team_name = models.CharField(max_length=255,blank=True,null=True)
-    team_type = models.ForeignKey(Category,on_delete=models.CASCADE)
-    bio = models.TextField(null=True,blank=True)
-    team_establishment_date = models.DateField(blank=True,null=True)
-    team_president = models.CharField(max_length=255,blank=True,null=True)
-    location = models.CharField(max_length=500,blank=True,null=True)
-    country = models.CharField(max_length=255,blank=True,null=True)
-    city = models.CharField(max_length=255,blank=True,null=True)
-    phone = models.CharField(max_length=255,blank=True,null=True)
-    email = models.EmailField(max_length=255,blank=True,null=True)
-    age_group = models.CharField(max_length=255,blank=True,null=True)
-    entry_fees = models.CharField(max_length=255,blank=True,null=True)
-    branches = models.CharField(max_length=500,blank=True,null=True)
-    team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)  # Add image field
-    team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)  # Add image field
-    team_uniform = models.ImageField(upload_to='team/team_uniform/', blank=True, null=True)  # Add image field
-
-    def __str__(self):
-        return self.team_name
-
-    class Meta:
-        db_table = 'futurestar_app_team'
