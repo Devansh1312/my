@@ -29,13 +29,11 @@ class RegisterAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Get the registration type (1 for normal, 2 or 3 for email-based)
         registration_type = request.data.get('type')
         device_type = request.data.get('device_type')
         device_token = request.data.get('device_token')
 
         if registration_type == 1:
-            # Normal registration with username, phone, and password
             serializer = RegisterSerializer(data=request.data)
             if serializer.is_valid():
                 try:
@@ -45,7 +43,6 @@ class RegisterAPIView(APIView):
                     user.last_login = timezone.now()
                     user.save()
 
-                    # Automatically log in the user by generating a token
                     refresh = RefreshToken.for_user(user)
 
                     return Response({
@@ -89,11 +86,18 @@ class RegisterAPIView(APIView):
                         'errors': str(e)
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({
-                'status': 0,
-                'message': _('User registration failed'),
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+            # Custom handling for validation errors to ensure the message is returned as desired
+            error_message = serializer.errors.get('non_field_errors')
+            if error_message:
+                return Response({
+                    'status': 0,
+                    'message': _(error_message[0])  # Ensures translation is applied
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({
+                    'status': 0,
+                    'message': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         elif registration_type in [2, 3]:
             # Email registration (no password provided)
@@ -393,12 +397,19 @@ class LoginAPIView(APIView):
                             }
                         }
                     }, status=status.HTTP_201_CREATED)
-        return Response({
-            'status': 0,
-            'message': _('Invalid data'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Custom error handling
+        error_message = serializer.errors.get('non_field_errors')
+        if error_message:
+            return Response({
+                'status': 0,
+                'message': _(error_message[0])  # Ensures translation is applied
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'status': 0,
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutAPIView(APIView):
@@ -426,7 +437,7 @@ class LogoutAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('Logout successful'),
-            }, status=status.HTTP_205_RESET_CONTENT)
+            }, status=status.HTTP_201_RESET_CONTENT)
 
         except Exception as e:
             return Response({
@@ -602,7 +613,7 @@ class EditProfileAPIView(APIView):
         return Response({
             'status': 1,
             'message': _('Player Details.'),
-            'user': {
+            'data': {
                         'id': user.id,
                         'username': user.username,
                         'phone': user.phone,
@@ -1023,7 +1034,6 @@ class TournamentAPIView(APIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
 class TeamViewAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
@@ -1032,14 +1042,195 @@ class TeamViewAPI(APIView):
         language = request.headers.get('Language', 'en')
         activate(language)
 
-        # Fetch all fields for the current user
-        category = Category.objects.filter(user_id=request.user)
+        # Fetch all categories
+        categories = Category.objects.all()
 
-        # Construct the response data manually
-        type_data = [{'id': category.id, 'type_name': category.type_name} for category in category]
+        # Construct the response data with language-specific names
+        type_data = []
+        for category in categories:
+            if language == 'ar':
+                type_name = category.name_ar
+            else:
+                type_name = category.name_en
+            type_data.append({
+                'id': category.id,
+                'type_name': type_name
+            })
 
         return Response({
             'status': 1,
             'message': _('Types retrieved successfully.'),
             'data': type_data
+        }, status=status.HTTP_200_OK)
+    
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        # Fetch the team type (category) by its ID from the request
+        try:
+            team_type_id = request.data.get('team_type')
+            team_type_instance = Category.objects.get(id=team_type_id)
+        except Category.DoesNotExist:
+            return Response({'status': 0, 'message': _('Invalid team type provided.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a new team instance
+        team_instance = Team(
+            user_id=user,
+            team_name=request.data.get('team_name'),
+            team_type=team_type_instance,  # Assign the Category instance
+            bio=request.data.get('bio'),
+            team_establishment_date=request.data.get('team_establishment_date'),
+            team_president=request.data.get('team_president'),
+            location=request.data.get('location'),
+            country=request.data.get('country'),
+            city=request.data.get('city'),
+            phone=request.data.get('phone'),
+            email=request.data.get('email'),
+            age_group=request.data.get('age_group'),
+            entry_fees=request.data.get('entry_fees'),
+            branches=request.data.get('branches'),
+        )
+
+        # Handle file uploads (same as your existing logic)
+        if 'team_logo' in request.FILES:
+            logo = request.FILES['team_logo']
+            file_extension = logo.name.split('.')[-1]
+            file_name = f"team/team_logo/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            logo_path = default_storage.save(file_name, logo)
+            team_instance.team_logo = logo_path
+
+        if 'team_background_image' in request.FILES:
+            background_image = request.FILES['team_background_image']
+            file_extension = background_image.name.split('.')[-1]
+            file_name = f"team/team_background_image/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            background_image_path = default_storage.save(file_name, background_image)
+            team_instance.team_background_image = background_image_path
+
+        if 'team_uniform' in request.FILES:
+            uniform_image = request.FILES['team_uniform']
+            file_extension = uniform_image.name.split('.')[-1]
+            file_name = f"team/team_uniform/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            uniform_image_path = default_storage.save(file_name, uniform_image)
+            team_instance.team_uniform = uniform_image_path
+
+        # Save the team instance
+        team_instance.save()
+
+        # Construct response data
+        response_data = {
+            'id': team_instance.id,
+            'user_id': user.id,
+            'username': user.username,
+            'team_name': team_instance.team_name,
+            'team_type': team_instance.team_type.id,  # Return the category ID
+            'bio': team_instance.bio,
+            'team_establishment_date': team_instance.team_establishment_date,
+            'team_president': team_instance.team_president,
+            'location': team_instance.location,
+            'country': team_instance.country,
+            'city': team_instance.city,
+            'phone': team_instance.phone,
+            'email': team_instance.email,
+            'age_group': team_instance.age_group,
+            'entry_fees': team_instance.entry_fees,
+            'branches': team_instance.branches,
+            'team_logo': team_instance.team_logo.url if team_instance.team_logo else None,
+            'team_background_image': team_instance.team_background_image.url if team_instance.team_background_image else None,
+            'team_uniform': team_instance.team_uniform.url if team_instance.team_uniform else None
+        }
+
+        return Response({
+            'status': 1,
+            'message': _('Team created successfully.'),
+            'data': response_data
+        }, status=status.HTTP_201_CREATED)
+    
+    def put(self, request, *args, **kwargs):
+        team_id = request.data.get('team_id')
+        user = request.user
+
+        if not team_id:
+            return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            team_instance = Team.objects.get(id=team_id, user_id=request.user)
+        except Team.DoesNotExist:
+            return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
+
+        # Fetch the team type (category) by its ID, if provided
+        team_type_id = request.data.get('team_type')
+        if team_type_id:
+            try:
+                team_type_instance = Category.objects.get(id=team_type_id)
+                team_instance.team_type = team_type_instance  # Assign the Category instance
+            except Category.DoesNotExist:
+                return Response({'status': 0, 'message': _('Invalid team type provided.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update other fields from the request data (same as your logic)
+        team_instance.team_name = request.data.get('team_name', team_instance.team_name)
+        team_instance.bio = request.data.get('bio', team_instance.bio)
+        team_instance.team_establishment_date = request.data.get('team_establishment_date', team_instance.team_establishment_date)
+        team_instance.team_president = request.data.get('team_president', team_instance.team_president)
+        team_instance.location = request.data.get('location', team_instance.location)
+        team_instance.country = request.data.get('country', team_instance.country)
+        team_instance.city = request.data.get('city', team_instance.city)
+        team_instance.phone = request.data.get('phone', team_instance.phone)
+        team_instance.email = request.data.get('email', team_instance.email)
+        team_instance.age_group = request.data.get('age_group', team_instance.age_group)
+        team_instance.entry_fees = request.data.get('entry_fees', team_instance.entry_fees)
+        team_instance.branches = request.data.get('branches', team_instance.branches)
+
+        # Handle file uploads (same as before)
+        if 'team_logo' in request.FILES:
+            logo = request.FILES['team_logo']
+            file_extension = logo.name.split('.')[-1]
+            file_name = f"team/team_logo/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            logo_path = default_storage.save(file_name, logo)
+            team_instance.team_logo = logo_path
+
+        if 'team_background_image' in request.FILES:
+            background_image = request.FILES['team_background_image']
+            file_extension = background_image.name.split('.')[-1]
+            file_name = f"team/team_background_image/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            background_image_path = default_storage.save(file_name, background_image)
+            team_instance.team_background_image = background_image_path
+
+        if 'team_uniform' in request.FILES:
+            uniform_image = request.FILES['team_uniform']
+            file_extension = uniform_image.name.split('.')[-1]
+            file_name = f"team/team_uniform/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            uniform_image_path = default_storage.save(file_name, uniform_image)
+            team_instance.team_uniform = uniform_image_path
+
+        # Save the updated team instance
+        team_instance.save()
+
+        # Construct response data (same as before)
+        response_data = {
+            'id': team_instance.id,
+            'user_id': user.id,
+            'username': user.username,
+            'team_name': team_instance.team_name,
+            'team_type': team_instance.team_type.id,
+            'bio': team_instance.bio,
+            'team_establishment_date': team_instance.team_establishment_date,
+            'team_president': team_instance.team_president,
+            'location': team_instance.location,
+            'country': team_instance.country,
+            'city': team_instance.city,
+            'phone': team_instance.phone,
+            'email': team_instance.email,
+            'age_group': team_instance.age_group,
+            'entry_fees': team_instance.entry_fees,
+            'branches': team_instance.branches,
+            'team_logo': team_instance.team_logo.url if team_instance.team_logo else None,
+            'team_background_image': team_instance.team_background_image.url if team_instance.team_background_image else None,
+            'team_uniform': team_instance.team_uniform.url if team_instance.team_uniform else None
+        }
+
+        return Response({
+            'status': 1,
+            'message': _('Team updated successfully.'),
+            'data': response_data
         }, status=status.HTTP_200_OK)

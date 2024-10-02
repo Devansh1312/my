@@ -12,15 +12,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'phone', 'password']
 
-    def validate_username(self, value):
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("A user with this username already exists.")
-        return value
+    def validate(self, data):
+        username_exists = User.objects.filter(username=data['username']).exists()
+        phone_exists = User.objects.filter(phone=data['phone']).exists()
 
-    def validate_phone(self, value):
-        if User.objects.filter(phone=value).exists():
-            raise serializers.ValidationError("A user with this phone number already exists.")
-        return value
+        if username_exists and phone_exists:
+            raise serializers.ValidationError("Username and phone number already exist.")
+        elif username_exists:
+            raise serializers.ValidationError("Username already exists.")
+        elif phone_exists:
+            raise serializers.ValidationError("Phone number already exists.")
+        
+        return data
 
     def create(self, validated_data):
         user = User(

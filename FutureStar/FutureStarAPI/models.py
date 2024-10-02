@@ -74,6 +74,7 @@ class Tournament(models.Model):
 class Team(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE)
     team_name = models.CharField(max_length=255,blank=True,null=True)
+    team_type = models.ForeignKey(Category,on_delete=models.CASCADE)
     bio = models.TextField(null=True,blank=True)
     team_establishment_date = models.DateField(blank=True,null=True)
     team_president = models.CharField(max_length=255,blank=True,null=True)
