@@ -41,22 +41,29 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     type = serializers.IntegerField(required=True)  # Add type field to distinguish login types
     username = serializers.CharField(required=False)
-    password = serializers.CharField(required=False, write_only=True)
-    # username = serializers.EmailField(required=False)  # Required for Type 2 or 3
+    password = serializers.CharField(required=False, allow_blank=True, write_only=True)
     device_type = serializers.CharField(required=True)
     device_token = serializers.CharField(required=True)
 
     def validate(self, data):
-        # For type 1, username_or_phone and password are required
-        if data['type'] == 1:
-            if not data.get('username') or not data.get('password'):
-                raise serializers.ValidationError("Username or phone and password are required for normal login.")
-        # For type 2 or 3, email is required
-        elif data['type'] in [2, 3]:
-            if not data.get('username'):
-                raise serializers.ValidationError("Email is required for type 2 and type 3 login.")
-        return data
+        login_type = data.get('type')
 
+        # For type 1, username_or_phone and password are required
+        if login_type == 1:
+            if not data.get('username') or not data.get('password'):
+                raise serializers.ValidationError({
+                    "username": "Username or phone is required for normal login.",
+                    "password": "Password is required for normal login."
+                })
+        
+        # For type 2 or 3, only username (email) is required
+        elif login_type in [2, 3]:
+            if not data.get('username'):
+                raise serializers.ValidationError({
+                    "username": "Email is required for type 2 and type 3 login."
+                })
+
+        return data
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
@@ -170,3 +177,22 @@ class TournamentSerializer(serializers.ModelSerializer):
         # Automatically associate the tournament with the currently logged-in user
         user = self.context['request'].user
         return Tournament.objects.create(user_id=user, **validated_data)
+    
+
+
+class UserGenderSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserGender
+        fields = ['id', 'name']  # Only return id and the translated name
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate name based on the language
+        if language == 'ar':
+            return obj.name_ar
+        return obj.name_en

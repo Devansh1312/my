@@ -398,18 +398,18 @@ class LoginAPIView(APIView):
                         }
                     }, status=status.HTTP_201_CREATED)
 
-            # Custom error handling
-            error_message = serializer.errors.get('non_field_errors')
-            if error_message:
-                return Response({
-                    'status': 0,
-                    'message': _(error_message[0])  # Ensures translation is applied
-                }, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({
-                    'status': 0,
-                    'message': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
+        # Custom error handling
+        error_message = serializer.errors.get('non_field_errors')
+        if error_message:
+            return Response({
+                'status': 0,
+                'message': _(error_message[0])  # Ensures translation is applied
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'status': 0,
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutAPIView(APIView):
@@ -1259,4 +1259,22 @@ class TeamViewAPI(APIView):
             'status': 1,
             'message': _('Team updated successfully.'),
             'data': response_data
+        }, status=status.HTTP_200_OK)
+
+
+class UserGenderListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = UserGender.objects.all()
+    serializer_class = UserGenderSerializer
+
+    def get(self, request, *args, **kwargs):
+        # Get all genders
+        user_genders = self.get_queryset()
+        serializer = self.get_serializer(user_genders, many=True)
+
+        # Prepare the response with genders directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('Gender retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)

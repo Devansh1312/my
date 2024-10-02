@@ -713,12 +713,12 @@ class RoleListView(LoginRequiredMixin, View):
 #     template_name = "forms/gender_form.html"
 
 #     def get(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
+#         gender = get_object_or_404(Gender, pk=pk)
 #         form = GenderForm(instance=gender)
 #         return render(request, self.template_name, {"form": form})
 
 #     def post(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
+#         gender = get_object_or_404(Gender, pk=pk)
 #         form = GenderForm(request.POST, instance=gender)
 #         if form.is_valid():
 #             form.save()
@@ -733,13 +733,13 @@ class RoleListView(LoginRequiredMixin, View):
 
 # class GenderDeleteView(LoginRequiredMixin, View):
 #     def get(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
+#         gender = get_object_or_404(Gender, pk=pk)
 #         gender.delete()
 #         messages.success(request, "Gender was successfully deleted.")
 #         return redirect("gender_list")
 
 #     def post(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
+#         gender = get_object_or_404(Gender, pk=pk)
 #         gender.delete()
 #         messages.success(request, "Gender was successfully deleted.")
 #         return redirect("gender_list")
@@ -749,7 +749,7 @@ class RoleListView(LoginRequiredMixin, View):
 #     template_name = "Admin/General_Settings/Gender.html"
 
 #     def get(self, request):
-#         genders = UserGender.objects.all()
+#         genders = Gender.objects.all()
 #         return render(
 #             request,
 #             self.template_name,

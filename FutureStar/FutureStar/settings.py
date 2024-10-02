@@ -56,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'FutureStarAPI.middleware.MiddlewareToken',
+
 ]
 
 ROOT_URLCONF = 'FutureStar.urls'
@@ -206,7 +208,7 @@ REST_FRAMEWORK = {
 
 # JWT Configuration
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=180),  # Token validity period
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Token validity period
     'REFRESH_TOKEN_LIFETIME': timedelta(days=4),  # Refresh token validity period
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,

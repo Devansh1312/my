@@ -35,6 +35,8 @@ urlpatterns = [
 
         path('api/team/', TeamViewAPI.as_view()),
 
+        path('api/genders/', UserGenderListAPIView.as_view()),
+
 
 
         

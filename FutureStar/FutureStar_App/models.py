@@ -38,6 +38,19 @@ class Category(models.Model):
     class Meta:
         db_table = 'futurestar_app_category'
 
+# gender Model
+class UserGender(models.Model):
+    name_en = models.CharField(max_length=100,null=True,blank=True)
+    name_ar = models.CharField(max_length=100,null=True,blank=True)
+
+
+    def __str__(self):
+        return self.name_en
+    
+    class Meta:
+        db_table = 'futurestar_app_gender'
+
+
 # Custom User Manager
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -74,7 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     age = models.CharField(max_length=5,null=True, blank=True)
-    gender = models.CharField(max_length=10,null=True, blank=True)
+    gender = models.ForeignKey(UserGender,max_length=10,null=True, blank=True,on_delete=models.CASCADE)
     country = models.CharField(max_length=150,null=True, blank=True)
     city = models.CharField(max_length=150,null=True, blank=True)
     nationality = models.CharField(max_length=150,null=True, blank=True)
@@ -141,15 +154,7 @@ class SystemSettings(models.Model):
         db_table = 'futurestar_app_systemsettings'
 
 
-# gender Model
-class UserGender(models.Model):
-    name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        db_table = 'futurestar_app_gender'
 
 
 

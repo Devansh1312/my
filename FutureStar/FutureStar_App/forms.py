@@ -68,14 +68,14 @@ class RoleForm(forms.ModelForm):
         }
 
 
-# Gender Form
-class GenderForm(forms.ModelForm):
-    class Meta:
-        model = UserGender
-        fields = ["name"]
-        widgets = {
-            "name": forms.TextInput(attrs={"placeholder": "Enter UserGender"}),
-        }
+# # Gender Form
+# class GenderForm(forms.ModelForm):
+#     class Meta:
+#         model = Gender
+#         fields = ["name_en"]
+#         widgets = {
+#             "name": forms.TextInput(attrs={"placeholder": "Enter Gender"}),
+#         }
 
 
 # # GameType Form
