@@ -96,7 +96,7 @@ urlpatterns = [
     path('eventtype/update/<int:pk>/', EventTypeUpdateView.as_view(), name='eventtype_update'),
     path('eventtype/delete/<int:pk>/', EventTypeDeleteView.as_view(), name='eventtype_delete'),
     
-    # CMS Pages URLS
+   # CMS Pages URLS
     path('cmspages/',CMSPages.as_view(),name = "cmspages_urls"),
     #cms_pages
     path('contactus/',cms_contactpage.as_view(),name="cms_contactpage"),
@@ -128,13 +128,32 @@ urlpatterns = [
 
     #cms_discoverypage
     path('cms_discoverypage/',cms_discoverypage.as_view(),name = "cms_discoverypage"),
-
+    path('saveDiscoverdetail/',saveDiscoverdetail,name="saveDiscoverdetail"),
     #cms_advertisepage
     path('cms_advertisepage/',cms_advertisepage.as_view(),name = "cms_advertisepage"),
+    path('saveadvertisedetail/',saveadvertisedetail,name = "advertisedetail"),
 
     #cms home page
     path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
     path('savehomepage/',savehomedetail,name="savehomepage"),
+    
+    #cms_loginpage
+    path('cms-login/',cms_Login.as_view(),name="cms_login"),
+    path('cms_logindetail/',savelogindetail,name="savelogindetail"),
+
+    #Registration 
+    path('cms-regpage/',cms_registration.as_view(),name="cms_reg"),
+    path('cms_regdetail/',saveregdetail,name="saveregdetail"),
+
+    #dashboard 
+    path('cms-dashboardpage/',cms_dashboard.as_view(),name="cms_dashboard"),
+    path('cms_dashboarddetail/',savedashdetail,name="savedashdetail"),
+
+
+    #cms home page
+    path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
+    path('savehomepage/',savehomedetail,name="savehomepage"),
+    
     #News List URL
     path('news_list/', NewsListView.as_view(), name='news_list'),
     path('news_list/create/', NewsCreateView.as_view(), name='news_create'),

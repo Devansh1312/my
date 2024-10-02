@@ -433,7 +433,7 @@ class cms_pages(models.Model):
     #section_2_logo = models.CharField(max_length=100,blank=True,null=True)
     section_2_background = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     section_2_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
-    section_2_images = models.CharField(max_length=255,blank=True,null=True)
+    section_2_images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     
     section_2_country_name_en = models.CharField(max_length=100,blank=True,null=True)
     section_2_country_name_ar = models.CharField(max_length=100,blank=True,null=True)
@@ -460,6 +460,9 @@ class cms_pages(models.Model):
     
     section_3_content_en = models.TextField(blank=True,null=True)
     section_3_content_ar = models.TextField(blank=True,null=True)
+    
+    section_3_titlee_en = models.CharField(max_length=100,blank=True,null=True)
+    section_3_titlee_ar = models.CharField(max_length=100,blank=True,null=True)
     
     section_3_feature_icons = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     section_3_feature_title_en = models.CharField(max_length=100,blank=True,null=True)
@@ -531,7 +534,23 @@ class cms_pages(models.Model):
 
     section_6_title_en = models.CharField(max_length=100,blank =True,null=True)
     section_6_title_ar = models.CharField(max_length=100,blank =True,null=True)
-
+    
+    section_6_content_en_1 = models.TextField(blank = True,null =True)
+    section_6_content_ar_1 = models.TextField(blank = True,null =True)
+    section_6_content_en_2 = models.TextField(blank = True,null =True)
+    section_6_content_ar_2 = models.TextField(blank = True,null =True)
+    section_6_content_en_3 = models.TextField(blank = True,null =True)
+    section_6_content_ar_3 = models.TextField(blank = True,null =True)
+    section_6_content_en_4 = models.TextField(blank = True,null =True)
+    section_6_content_ar_4 = models.TextField(blank = True,null =True)
+    section_6_content_en_5 = models.TextField(blank = True,null =True)
+    section_6_content_ar_5 = models.TextField(blank = True,null =True)
+    section_6_content_en_6 = models.TextField(blank = True,null =True)
+    section_6_content_ar_6 = models.TextField(blank = True,null =True)
+    
+    section_6_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    section_6_image  = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    
     #section 7
     section_7_logo = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     section_7_image  = models.ImageField(upload_to='cmspages/',blank=True,null=True)
@@ -550,7 +569,8 @@ class cms_pages(models.Model):
 
     section_9_title_en = models.CharField(max_length=100,blank =True,null=True)
     section_9_title_ar = models.CharField(max_length=100,blank =True,null=True)
-    
+    section_9_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+
     #section 10
     section_10_heading_en = models.CharField(max_length=100,blank =True,null=True)
     section_10_heading_ar = models.CharField(max_length=100,blank =True,null=True)
