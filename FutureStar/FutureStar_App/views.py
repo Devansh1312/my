@@ -713,12 +713,12 @@ class RoleListView(LoginRequiredMixin, View):
 #     template_name = "forms/gender_form.html"
 
 #     def get(self, request, pk):
-#         gender = get_object_or_404(Gender, pk=pk)
+#         gender = get_object_or_404(UserGender, pk=pk)
 #         form = GenderForm(instance=gender)
 #         return render(request, self.template_name, {"form": form})
 
 #     def post(self, request, pk):
-#         gender = get_object_or_404(Gender, pk=pk)
+#         gender = get_object_or_404(UserGender, pk=pk)
 #         form = GenderForm(request.POST, instance=gender)
 #         if form.is_valid():
 #             form.save()
@@ -733,13 +733,13 @@ class RoleListView(LoginRequiredMixin, View):
 
 # class GenderDeleteView(LoginRequiredMixin, View):
 #     def get(self, request, pk):
-#         gender = get_object_or_404(Gender, pk=pk)
+#         gender = get_object_or_404(UserGender, pk=pk)
 #         gender.delete()
 #         messages.success(request, "Gender was successfully deleted.")
 #         return redirect("gender_list")
 
 #     def post(self, request, pk):
-#         gender = get_object_or_404(Gender, pk=pk)
+#         gender = get_object_or_404(UserGender, pk=pk)
 #         gender.delete()
 #         messages.success(request, "Gender was successfully deleted.")
 #         return redirect("gender_list")
@@ -749,7 +749,7 @@ class RoleListView(LoginRequiredMixin, View):
 #     template_name = "Admin/General_Settings/Gender.html"
 
 #     def get(self, request):
-#         genders = Gender.objects.all()
+#         genders = UserGender.objects.all()
 #         return render(
 #             request,
 #             self.template_name,
@@ -2608,7 +2608,7 @@ class cms_discoverypage(LoginRequiredMixin, View):
     def get(self, request):
         try:
             whodetail= cms_dicovery_dynamic_view.objects.all()
-            heading_image = cms_dicovery_dynamic_image.objects.all()
+            game_image = cms_dicovery_dynamic_image.objects.all()
         except Exception as e:
             with open("error.txt", "w") as f:
                 f.write(str(e))
@@ -2617,7 +2617,7 @@ class cms_discoverypage(LoginRequiredMixin, View):
         context = {
             'data':dataFilter, 
             'who_detail':whodetail,
-            'heading_image':heading_image,
+            'game_image':game_image,
             
         }
         return render(
@@ -2706,9 +2706,76 @@ def saveDiscoverdetail(request):
 
 
                         who_count = request.POST.get('who_passed')
+                        who_deleted_field = request.POST.get('deleted_who_field')
+                        print(who_deleted_field)
+                        
+                        if 'deleted_who_field' in request.POST:
+                            print("yes")
+                            if ',' in who_deleted_field:
+                                deleted_who_list = who_deleted_field.split(',')
+                            else:
+                                deleted_who_list = ['{}'.format(who_deleted_field)]  # Treat single value as list
+                                deleted_who_list = [int(item) for item in deleted_who_list]
+
+                        else:
+                            print("no")
+                            deleted_who_list = []
+                        # Convert strings to integers
+
+                        print(deleted_who_list)
+                                
 
                         print("this is whoCount: "+str(who_count))
-                        if who_count:
+                        for i in range(2,int(who_count)+1):
+                            
+                            if str(i) in deleted_who_list:
+                                print("its in field ",i)
+                            else:
+                                '''if 'field-roll-image-id-{}'.format(i) in request.POST: 
+                                    unique_id = request.POST.get('ugid_{}'.format(i))
+                                
+                                    print("exisiting: "+str(existing_record))'''
+                                            
+  
+                                    
+                                unique_id = request.POST.get('uwid_{}'.format(i))
+                                if unique_id != "":
+                                   
+                                    who_title_en = request.POST.get('why_choose_us_heading_title_en_{}'.format(str(i)))
+                                    who_title_ar = request.POST.get('why_choose_us_heading_title_ar_{}'.format(str(i)))
+                                    who_content_en = request.POST.get('why_choose_us_content_en_{}'.format(str(i)))
+                                    who_content_ar = request.POST.get('why_choose_us_content_ar_{}'.format(str(i)))
+                                    existing_who_record = cms_dicovery_dynamic_view.objects.filter(field_id=unique_id).first()
+
+
+                                                
+                                            
+                                    
+                                    if existing_who_record:
+                                                    # Update the existing record
+                                                    
+                                                    
+                                                        existing_who_record.title_en = who_title_en
+                                                        existing_who_record.title_ar = who_title_ar
+                                                        existing_who_record.content_en = who_content_en
+                                                        existing_who_record.content_ar = who_content_ar
+                                                                
+                                                        
+                                                        existing_who_record.save() 
+                                    else:        
+                                                    savediscoveryview= cms_dicovery_dynamic_view(
+                                                                field_id=unique_id,
+                                                                title_en=who_title_en,
+                                                                title_ar=who_title_ar,
+                                                                content_en=who_content_en,
+                                                                content_ar=who_content_ar,
+                                                            
+                                                                
+                                                    )
+                                                    savediscoveryview.save()
+                                                    
+                                                    
+                        '''if who_count:
                                 for i in range(int(who_count)+1):
                                     print("loop calue:"+str(i))
                                     dom = i+2
@@ -2717,7 +2784,6 @@ def saveDiscoverdetail(request):
                                     who_title_ar = request.POST.get('why_choose_us_heading_title_ar_{}'.format(str(dom)))
                                     who_content_en = request.POST.get('why_choose_us_content_en_{}'.format(str(dom)))
                                     who_content_ar = request.POST.get('why_choose_us_content_ar_{}'.format(str(dom)))
-                                    who_field = request.POST.get('id')
                                     unique_id = request.POST.get('uwid_{}'.format(dom))
                                     
                                     print("title_ar {}: ".format(dom)+str(who_title_en))
@@ -2751,15 +2817,301 @@ def saveDiscoverdetail(request):
                                         
                                         print("last unique id: "+str(unique_id))
                                     #delete_record = cms_home_dynamic_field.objects.filter(field_id = None)
-                                    #delete_record.delete()
+                                    #delete_record.delete()'''
 
+                                
+                        game_image = request.POST.get('header_image')
+                        image_deleted_field = request.POST.get('deleted_image_field')
                         
+                        
+                        if 'deleted_image_field' in request.POST:
+                            print("yes")
+                            if ',' in image_deleted_field:
+                                deleted_image_list = image_deleted_field.split(',')
+                            else:
+                                deleted_image_list = [image_deleted_field]  # Treat single value as list
+                                deleted_image_list = [int(item) for item in deleted_image_list]
+
+                        else:
+                            print("no")
+                            deleted_image_list = []
+                        # Convert strings to integers
+
+                        print(deleted_image_list)
+                                
+                        print("this is game imgaes: "+str(game_image))
+                        
+                        if game_image != None:
+                            for i in range(2,int(game_image)+1):
+                                
+                                if i in deleted_image_list:
+                                    print("its in field ",i)
+                                else:
+                                    '''if 'field-roll-image-id-{}'.format(i) in request.POST: 
+                                        unique_id = request.POST.get('ugid_{}'.format(i))
+                                    
+                                        print("exisiting: "+str(existing_record))'''
+                                                
+    
+                                    if 'image_{}'.format(str(i)) in request.FILES:
+                                        
+                                                unique_id = request.POST.get('ugid_{}'.format(i))
+                                                existing_record = cms_dicovery_dynamic_image.objects.filter(field_id=unique_id).first()
+
+
+                                                image = request.FILES.get('image_{}'.format(str(i)),None)
+                                                
+                                                if image:
+                                                    try:
+                                                        save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image.name)
+                                                        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                                        # Save the file
+                                                        with open(save_path, 'wb+') as destination:
+                                                            for chunk in image.chunks():
+                                                                destination.write(chunk)
+                                                                #imageName.append(heading_banner.name)
+                                                                #savenewsdetail.heading_banner = heading_banner
+
+                                                    except Exception as e:
+                                                        dom = str(e)
+                                    
+                                                if existing_record:
+                                                    # Update the existing record
+                                                    
+                                                    
+                                                    if image:  # Update the image if a new one is uploaded
+                                                        existing_record.images = image
+
+                                                    existing_record.save()  # Save the updated record
+                                                else:        
+                                                    savediscoveryimage_view= cms_dicovery_dynamic_image(
+                                                                field_id=unique_id,
+                                                            
+                                                                images=image
+                                                    )
+                                                    savediscoveryimage_view.save()
+                                                
+                        '''if game_image:
+                            for i in range(2,int(game_image)+1):
+                                        
+                                        #dom = i+1
+                                        #image = 0
+                                        #print("loop: "+str(dom))
+                
+                                        unique_id = request.POST.get('ugid_{}'.format(i))
+                                        print(unique_id)
+                                        
+                                        existing_record = cms_dicovery_dynamic_image.objects.filter(field_id=unique_id).first()
+                                        print("exisiting: "+str(existing_record))
+                                        
+                                        if 'image_{}'.format(str(i)) in request.FILES:
+                                            print("yes")
+                                            image = request.FILES.get('image_{}'.format(str(i)),None)
+                                            
+                                            if image:
+                                                try:
+                                                    save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image.name)
+                                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                                    # Save the file
+                                                    with open(save_path, 'wb+') as destination:
+                                                        for chunk in image.chunks():
+                                                            destination.write(chunk)
+                                                            #imageName.append(heading_banner.name)
+                                                            #savenewsdetail.heading_banner = heading_banner
+
+                                                except Exception as e:
+                                                    dom = str(e)
+                                            
+                                        if existing_record:
+                                                # Update the existing record
+                                                
+                                                
+                                                if image:  # Update the image if a new one is uploaded
+                                                    existing_record.images = image
+
+                                                existing_record.save()  # Save the updated record
+                                        else:        
+                                            savediscoveryimage_view= cms_dicovery_dynamic_image(
+                                                        field_id=unique_id,
+                                                       
+                                                        images=image
+                                            )
+                                            savediscoveryimage_view.save()'''
+                        if 'discovery_game_image' in request.FILES:
+                            print("yes")
+                            
+                            
+                            game_image = request.FILES.get('discovery_game_image',None)
+                            
+                            if game_image:
+                                try:
+                                    save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', game_image.name)
+                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                    # Save the file
+                                    with open(save_path, 'wb+') as destination:
+                                        for chunk in game_image.chunks():
+                                            destination.write(chunk)
+                                            #imageName.append(heading_banner.name)
+                                            discover_page.section_2_images = game_image
+                                            print("image_saved")
+
+                                except Exception as e:
+                                        messages.error(request,str(e))    
+
+                        else:
+                            pass  
+                        
+                        if 'discover_heading_image' in request.FILES:
+                            print("yes")
+                            
+                            
+                            heading_image = request.FILES.get('discover_heading_image',None)
+                            
+                            if heading_image:
+                                try:
+                                    save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_image.name)
+                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                    # Save the file
+                                    with open(save_path, 'wb+') as destination:
+                                        for chunk in heading_image.chunks():
+                                            destination.write(chunk)
+                                            #imageName.append(heading_banner.name)
+                                            discover_page.heading_banner = heading_image
+                                            print("image_saved")
+
+                                except Exception as e:
+                                        messages.error(request,str(e))    
+
+                        else:
+                            pass  
+                       
+                        if 'discover_training_sec_1_image_field' in request.FILES:
+                            print("yes")
+                            
+                            
+                            training_1_image = request.FILES.get('discover_training_sec_1_image_field',None)
+                            
+                            if training_1_image:
+                                try:
+                                    save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', training_1_image.name)
+                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                    # Save the file
+                                    with open(save_path, 'wb+') as destination:
+                                        for chunk in training_1_image.chunks():
+                                            destination.write(chunk)
+                                            #imageName.append(heading_banner.name)
+                                            discover_page.sub_section_2_1_icon = training_1_image 
+                                            print("image_saved")
+
+                                except Exception as e:
+                                        messages.error(request,str(e))    
+
+                        else:
+                            pass 
+                        
+                        if 'discover_training_sec_2_image_field' in request.FILES:
+                            print("yes")
+                            
+                            
+                            training_2_image = request.FILES.get('discover_training_sec_2_image_field',None)
+                            
+                            if training_2_image:
+                                try:
+                                    save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', training_2_image.name)
+                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                    # Save the file
+                                    with open(save_path, 'wb+') as destination:
+                                        for chunk in training_2_image.chunks():
+                                            destination.write(chunk)
+                                            #imageName.append(heading_banner.name)
+                                            discover_page.sub_section_2_2_icon = training_2_image
+                                            print("image_saved")
+
+                                except Exception as e:
+                                        messages.error(request,str(e))    
+
+                        else:
+                            pass 
+                        
+                        if 'why_Choose_us_image_field' in request.FILES:
+                            print("yes")
+                            
+                            
+                            who_image = request.FILES.get('why_Choose_us_image_field',None)
+                            
+                            if who_image:
+                                try:
+                                    save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', who_image.name)
+                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                    # Save the file
+                                    with open(save_path, 'wb+') as destination:
+                                        for chunk in who_image.chunks():
+                                            destination.write(chunk)
+                                            #imageName.append(heading_banner.name)
+                                            discover_page.section_3_image = who_image
+                                            print("image_saved")
+
+                                except Exception as e:
+                                        messages.error(request,str(e))    
+
+                        else:
+                            pass 
+                                        
                         discover_page.save()
+                        
+                        
+                        if "dyanmic_deleted_field" in request.POST:
+                            
+                            try:
+                                dynamic_data = request.POST.get('dyanmic_deleted_field')
+                                dynamic_deleted_list = dynamic_data.split(',')
+                                print(dynamic_deleted_list)
+                                
+                                for i in range(len(dynamic_deleted_list)):
+                                    
+                                    
+                                    deletingimagefrom_data = cms_dicovery_dynamic_image.objects.filter(field_id = dynamic_deleted_list[i]).delete()
+
+                                
+                            except Exception as e:
+                                print(e)    
+
+                                messages.error(request, str(e))
+                        
+                        if "dyanmic_deleted_who_field" in request.POST:
+                            
+                            try:
+                                dynamic_who_data = request.POST.get('dyanmic_deleted_who_field')
+                                dynamic_deleted_who_list = dynamic_who_data.split(',')
+                                print(dynamic_deleted_who_list)
+                                
+                                for i in range(len(dynamic_deleted_who_list)):
+                                    
+                                    
+                                    deletingviewfrom_data = cms_dicovery_dynamic_view.objects.filter(field_id = dynamic_deleted_who_list[i]).delete()
+
+                                
+                            except Exception as e:
+                                print(e)    
+
+                                messages.error(request, str(e))        
+
+                    
                         messages.success(request, "Discovery Page Updated Successfully")
+                        
+                        
                     except Exception as e:
                         print(sys.exc_info)
                         print(str(e))
                         messages.error(request,str(e))    
+                        
 
                 except Exception as e:
                     print(str(e))
@@ -2854,7 +3206,6 @@ def saveadvertisedetail(request):
                 social_media_content_ar_5 = request.POST.get('social-media-content-ar-5')
                 social_media_content_en_6 = request.POST.get('social-media-content-en-6')
                 social_media_content_ar_6 = request.POST.get('social-media-content-ar-6')
-
 
                 competition_section_title_en = request.POST.get('competition-section-title-en')
                 competition_section_title_ar = request.POST.get('competition-section-title-ar')

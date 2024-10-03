@@ -38,19 +38,6 @@ class Category(models.Model):
     class Meta:
         db_table = 'futurestar_app_category'
 
-# gender Model
-class UserGender(models.Model):
-    name_en = models.CharField(max_length=100,null=True,blank=True)
-    name_ar = models.CharField(max_length=100,null=True,blank=True)
-
-
-    def __str__(self):
-        return self.name_en
-    
-    class Meta:
-        db_table = 'futurestar_app_gender'
-
-
 # Custom User Manager
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -87,7 +74,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     age = models.CharField(max_length=5,null=True, blank=True)
-    gender = models.ForeignKey(UserGender,max_length=10,null=True, blank=True,on_delete=models.CASCADE)
+    gender = models.CharField(max_length=10,null=True, blank=True)
     country = models.CharField(max_length=150,null=True, blank=True)
     city = models.CharField(max_length=150,null=True, blank=True)
     nationality = models.CharField(max_length=150,null=True, blank=True)
@@ -154,7 +141,15 @@ class SystemSettings(models.Model):
         db_table = 'futurestar_app_systemsettings'
 
 
+# gender Model
+class UserGender(models.Model):
+    name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        db_table = 'futurestar_app_gender'
 
 
 
@@ -455,7 +450,7 @@ class cms_pages(models.Model):
 
     sub_section_2_1_icon = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     sub_section_2_2_icon = models.ImageField(upload_to='cmspages/',blank=True,null=True)
-
+    
     #section-3
     section_3_heading_en = models.CharField(max_length=100,blank=True,null=True)
     section_3_heading_ar = models.CharField(max_length=100,blank=True,null=True)
@@ -476,12 +471,18 @@ class cms_pages(models.Model):
     section_3_feature_short_content_en = models.TextField(blank=True,null=True)
     section_3_feature_short_content_ar = models.TextField(blank=True,null=True)
     
+    
+    
     #for discovery page
     section_3_long_title_en = models.TextField(blank=True,null=True)
     section_3_long_title_ar = models.TextField(blank=True,null=True)
+    
+    section_3_sub_title_en = models.CharField(max_length=100,blank=True,null=True)
+    section_3_sub_title_ar = models.CharField(max_length=100,blank=True,null=True)
+    section_3_sub_content_en = models.TextField(blank=True,null=True)
+    section_3_sub_content_ar = models.TextField(blank=True,null=True)
     section_3_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
-    
-    
+
     #section-4
     
     section_4_heading_en = models.CharField(max_length=100,blank=True,null=True)
@@ -607,9 +608,13 @@ class cms_pages(models.Model):
 class cms_dicovery_dynamic_view(models.Model):
     
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255,blank=True,null=True)
-    content = models.TextField(blank=True,null=True)
-    
+    title_en = models.CharField(max_length=255,blank=True,null=True)
+    title_ar = models.CharField(max_length=255,blank=True,null=True)
+
+    content_en = models.TextField(blank=True,null=True)
+    content_ar = models.TextField(blank=True,null=True)
+    field_id = models.CharField(max_length=255,blank=True,null=True)
+
     
     
 
@@ -619,6 +624,8 @@ class cms_dicovery_dynamic_view(models.Model):
 class cms_dicovery_dynamic_image(models.Model):
     
     id = models.AutoField(primary_key=True)
+    field_id = models.CharField(max_length=255,blank=True,null=True)
+
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
 
     def __str__(self):

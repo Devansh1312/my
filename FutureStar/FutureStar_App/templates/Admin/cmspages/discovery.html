@@ -113,7 +113,7 @@
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-banner" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display: block; width: 200px; height: 50px;" />
 
                             </div>
                         </div>
@@ -193,7 +193,7 @@
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
         
-                                        <img id="selected-game-image-1" style="display: none; width: 100px; height: 100px;" />
+                                        <img id="selected-game-image-1" src = "/media/{{data.section_2_images}}" style="display: block; width: 100px; height: 100px;" />
         
                                     </div>
                                 </div>
@@ -210,8 +210,8 @@
 
 
                         
-                        {% if heading_image %}
-                        {% for image in heading_image %}
+                        {% if game_image %}
+                        {% for image in game_image %}
                         <div id = "section-heading-photo-{{image.field_id}}">
                             <div id="img-container">
                                 <div class="row">
@@ -225,7 +225,7 @@
                                                 <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                             <!--{% endif %}-->
             
-                                            <img id="selected-game-image-{{ forloop.counter| add:'1' }}" style="display: none; width: 100px; height: 100px;" />
+                                            <img id="selected-game-image-{{ forloop.counter| add:'1' }}" src = "/media/{{image.images}}" style="display: block; width: 100px; height: 100px;" />
             
                                         </div>
                                     </div>
@@ -234,7 +234,7 @@
                                     {% endif %}
                                     <div class="col-12  text-end " >
 
-                                        <button id="delete-row" onclick ="return deleteheaderimage_finalrow(`{{image.field_id}}`)" class="btn btn-danger">-</button>
+                                        <button id="delete-row" onclick ="return deleteheaderimage_finalrow(`{{image.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
                                     </div> 
 
                                     <p style="color: red; display: none;" class="error-message" id ="error-game-section-banner-{{ forloop.counter| add:'1' }}"></p>
@@ -315,7 +315,7 @@
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-section-1-image" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-section-1-image"  src ="/media/{{data.sub_section_2_1_icon}}"style="display: block; width: 200px; height: 50px;" />
 
                             </div>
                         </div>
@@ -373,17 +373,17 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label" for="training-section-image">Heading banner </label>
-                                <input class="form-control btn-pill" id="training-section-image" name="training_section_image" type="file"  onchange= "displayImagetraining_section2(event)" accept="image/*">
+                                <label class="form-label" for="training-section-2-image">Heading banner </label>
+                                <input class="form-control btn-pill" id="training-section-2-image" name="training-section-2-image" type="file"  onchange= "displayImagetraining_section2(event)" accept="image/*">
                                 <!--{% if system_settings.fav_icon %}-->
                                     <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 50px;">
                                 <!--{% endif %}-->
 
-                                <img id="selected-section-2-image" style="display: none; width: 200px; height: 50px;" />
+                                <img id="selected-section-2-image" src = "/media/{{data.sub_section_2_2_icon}}" style="display: block; width: 200px; height: 50px;" />
 
                             </div>
                         </div>
-                        <p style="color: red; display: none;" class="error-message" id ="error-training-section-image"></p>
+                        <p style="color: red; display: none;" class="error-message" id ="error-training-section-2-image"></p>
 
                         <p id = "section-1-image-warning"></p>
                     </div>
@@ -555,7 +555,7 @@
                          {% endif %}
                         <div class="col-12  text-end " >
 
-                            <button id="delete-row" onclick ="return deletewhorow(`{{whodetail.field_id}}`)" class="btn btn-danger">-</button>
+                            <button id="delete-row" onclick ="return deletewhorow(`{{whodetail.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
                         </div> 
 
                         </div>
@@ -580,7 +580,7 @@
                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
                                     <!--{% endif %}-->
     
-                                    <img id="selected-why-choose-us-image" style="display: none; width: 100px; height: 100px;" />
+                                    <img id="selected-why-choose-us-image" src="/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
     
                                 </div>
                             </div>
@@ -719,10 +719,13 @@
 
                 //images
                 var discover_heading_image = document.getElementById("discovery-heading-section-banner")
+                var discover_heading_image_field = document.getElementById("selected-banner")
+
                 var discover_game_image = document.getElementById("game-section-banner-1")
-                var discover_training_sec_1_image  = document.getElementById("training-section-1-image")
-                var discover_training_sec_2_image  = document.getElementById("training-section-2-image")
-                var why_Choose_us_image = document.getElementById("why-choose-us-section-image")
+                
+           
+                
+                
                 var heading_image_1 = document.getElementById('selected-game-image-1')
 
                 
@@ -814,6 +817,101 @@
                     error_image.scrollIntoView()
                     return false
                 }
+
+              
+
+
+                if(discover_heading_image.value.length == 0 && discover_heading_image_field.src.endsWith("/media/")){
+                    const errorMsg = document.getElementById(`error-discovery-heading-section-banner`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                            return false
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+                var discover_training_sec_1_image_field  = document.getElementById("training-section-1-image")
+                var discover_training_sec_1_image = document.getElementById("selected-section-1-image")
+
+                if(discover_training_sec_1_image_field.value.length == 0 && discover_training_sec_1_image.src.endsWith("/media/")){
+                    const errorMsg = document.getElementById(`error-training-section-1-image`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                            return false
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                var discover_training_sec_2_image_field  = document.getElementById("training-section-2-image")
+                var discover_training_sec_2_image  = document.getElementById("selected-section-2-image")
+                
+                if(discover_training_sec_2_image_field.value.length == 0 && discover_training_sec_2_image.src.endsWith("/media/")){
+                    const errorMsg = document.getElementById(`error-training-section-2-image`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                            return false
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+
+                var why_Choose_us_image_field = document.getElementById("why-choose-us-section-image")
+                var why_Choose_us_image = document.getElementById("selected-why-choose-us-image")
+                if(why_Choose_us_image_field.value.length == 0 && why_Choose_us_image.src.endsWith("/media/")){
+                    const errorMsg = document.getElementById(`error-why-choose-us-section-image`);
+                        
+                        try{
+                            errorMsg.innerText = `Please Upload Image.`;
+                            errorMsg.style.display = 'block'; 
+                            top_error.innerText = "There Should be no empty Field"
+                            top_error.style.color = "red"
+    
+                            //document.documentElement.scrollTop = 0
+                            errorMsg.scrollIntoView();
+
+                            sendData = "false"
+                            return false
+                        }
+                        catch(err){
+                            console.log(err)
+                            return false
+                        }
+                }
+                
 
                 /*let errorimageFound                   
                 for (const field of discover_data) {
@@ -972,52 +1070,71 @@
                     let uwid = 0
                     for (let i = 2; i <= whoCount;i++) {
 
-                        console.log("number: "+i)
-                        formData.append('who_passed',whoCount)
+                        if(deleteing_who_field){
+                            var dump2 = deleteing_who_field.indexOf(i)
+                            if(dump2 == -1){
+                                console.log("number: "+i)
+                                formData.append('who_passed',whoCount)
 
-                        const titleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
-                        const titleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
-                        const contentEn = document.getElementById(`why-choose-us-content-en-${i}`);
-                        const contentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
-                        //const feature_field = document.getElementById(`feature-section-field-${i}`)
+                                const titleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
+                                const titleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
+                                const contentEn = document.getElementById(`why-choose-us-content-en-${i}`);
+                                const contentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
+                            
+                                const unique_field = document.getElementById(`field-roll-who-id-${i}`)
+                                console.log("this is uni: "+unique_field.innerText)
+                                if (titleEn) {
+                                    formData.append(`why_choose_us_heading_title_en_${i}`, titleEn.value);
+                                }
+                                if (titleAr) {
+                                    formData.append(`why_choose_us_heading_title_ar_${i}`, titleAr.value);
+                                }
+                                if (contentEn) {
+                                    formData.append(`why_choose_us_content_en_${i}`, contentEn.value);
+                                }
+                                if (contentAr) {
+                                    formData.append(`why_choose_us_content_ar_${i}`, contentAr.value);
+                                }
+                            
+                                if(unique_field){
+                                    formData.append(`uwid_${i}`,unique_field.innerText)
+                                    uwid = unique_field.innerText
+                                    console.log(unique_field.innerText)
+                                }
+                             
+                                formData.append(`id`, i);
+
+
+
+                        }
+                        else if(dump2 != -1){
+                            alert("it is there in deteting field")
+
+                        }
+                    }
+
+                    if(deleteing_who_field.length > 0){
+                        alert("yes")
+
+                                            
+                        formData.append(`deleted_who_field`,deleteing_who_field)
+                    }
+                    else{
+                        console.log("No value inside deleteing field")
+                    }
+
+
                         
-                        //const feature_image = image.files[0];
-
-                        /*
-                        if (image) { // check if image exists before trying to access its files property
-                // ...
-            } else {
-                console.log("Image not found for section " + i);
-            } */        
-                        const unique_field = document.getElementById(`field-roll-who-id-${i}`)
-                        //let unique = document.getElementById(`section-${i}`)
-                        console.log("this is uni: "+unique_field.innerText)
-                        //const feature_field = document.querySelector(`#section-${i} .field-id`)
-                        if (titleEn) {
-                            formData.append(`why_choose_us_heading_title_en_${i}`, titleEn.value);
-                        }
-                        if (titleAr) {
-                            formData.append(`why_choose_us_heading_title_ar_${i}`, titleAr.value);
-                        }
-                        if (contentEn) {
-                            formData.append(`why_choose_us_content_en_${i}`, contentEn.value);
-                        }
-                        if (contentAr) {
-                            formData.append(`why_choose_us_content_ar_${i}`, contentAr.value);
-                        }
-                       
-                        if(unique_field){
-                            formData.append(`uwid_${i}`,unique_field.innerText)
-                            uwid = unique_field.innerText
-                            console.log(unique_field.innerText)
-                        }
-                        //console.log(feature_field.innerText)
-                        //console.log(feature_field.innerText)
-                        //formData.append(`id`,feature_field.innerText)
-                        formData.append(`id`, i);
+                        
+                        
 
                     }
-                
+                    if(dynamic_deleted_who_field.length !== 0 ){
+                            formData.append("dyanmic_deleted_who_field",dynamic_deleted_who_field)
+                        }
+                        else{
+                            console.log("its zero")
+                        }    
                     
                     
                     console.log(uwid)
@@ -1029,8 +1146,137 @@
                     return false
                 }
                 }
-                    
 
+                if(typeof headerimageCount === "undefined" ){
+                        alert("yes")
+                        return false
+                        headerimageCount = document.getElementById('last-header-image-field-id').value;
+
+                    }
+
+                /*for(i=2;i<=headerimageCount;i++){
+
+                    if(deleteing_field != 0){
+                        if(deleteing_field[i] == )
+
+                    }
+                    
+                } */   
+
+                
+                
+                if(headerimageCount >=2){
+
+                        try{
+
+                        let uwid = 0
+                        alert("heading Count is: "+headerimageCount)
+                        for (let i = 2; i <= headerimageCount;i++) {
+                        
+                        if(deleteing_field){
+                            var dump1 = deleteing_field.indexOf(i)
+                            alert("field is "+i)
+                            if(dump1 == -1){
+                                console.log("number: "+i)
+                                formData.append('header_image',headerimageCount)
+
+                                const image = document.getElementById(`game-section-banner-${i}`);
+                       
+                                const unique_field = document.getElementById(`field-roll-image-id-${i}`)
+                                console.log("this is uni: "+unique_field.innerText)
+           
+                                    if(image && image.files && image.files.length > 0) {
+                                            const game_image = image.files[0];
+                                            formData.append(`image_${i}`, game_image);
+                                            formData.append(`ugid_${i}`,unique_field.innerText)
+
+                                    } 
+                                        else {
+                                            console.log("already have image")
+                                        }
+                           
+                      
+                                formData.append(`id`, i);
+
+                        }
+                        else if(dump1 !== -1){
+                                alert("it is there in deteting field")
+
+                            }
+                        }
+
+                        if(deleteing_field.length > 0){
+
+                        
+                            formData.append(`deleted_image_field`,deleteing_field)
+                        }
+                        else{
+                            console.log("No value inside deleteing field")
+                        }
+
+                        
+                        
+
+
+
+                        console.log(uwid)
+                            }
+                        if(dynamic_deleted_field.length !== 0 ){
+                            formData.append("dyanmic_deleted_field",dynamic_deleted_field)
+                        }
+                        else{
+                            console.log("its zero")
+                        }    
+                            
+                     
+
+                        }
+                    
+                        catch(err){
+                        console.log("1: "+headerimageCount)
+                        console.log(err)
+                        return false
+                        }
+                        }
+                        if (discover_game_image.files.length > 0) {
+                            formData.append('discovery_game_image', discover_game_image.files[0]);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        } 
+
+                        if (discover_heading_image.files.length > 0) {
+                            formData.append('discover_heading_image', discover_heading_image.files[0]);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (discover_training_sec_1_image_field.files.length > 0) {
+                            formData.append('discover_training_sec_1_image_field', discover_training_sec_1_image_field.files[0]);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (discover_training_sec_2_image_field.files.length > 0) {
+                            formData.append('discover_training_sec_2_image_field', discover_training_sec_2_image_field.files[0]);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
+
+                        if (why_Choose_us_image_field.files.length > 0) {
+                            formData.append('why_Choose_us_image_field',why_Choose_us_image_field.files[0]);
+
+                    } 
+                        else {
+                            console.log("already have image")
+                        }
 
 
                     fetch("/saveDiscoverdetail/", {
@@ -1207,7 +1453,7 @@
          
                 console.log("value:"+whoCount)
 
-                if(whoCount > 1){
+                if(whoCount >= 1){
                     try{
                     const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${whoCount}`);
                     const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${whoCount}`);
@@ -1221,7 +1467,7 @@
                 reset_dynamicErrorMsgContentEn.innerText = ""
                 reset_dynamicErrorMsgContentAr.innerText = ""
 
-                if(whoCount > 1){
+                if(whoCount >= 1){
                    
                     const dynamicTitleEn = document.getElementById(`why-choose-us-heading-title-en-${whoCount}`);
                     const dynamicTitleAr = document.getElementById(`why-choose-us-heading-title-ar-${whoCount}`);
@@ -1341,6 +1587,8 @@
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" class="last-who-field-id" value="${whoCount}"/>
+
                 <div class="col-12  text-end " >
 
                                 <button id="delete-row" onclick="return dedletethedynamicwho(${whoCount})" class="btn btn-danger">-</button>
@@ -1366,7 +1614,7 @@
                 }
     }
 
-
+    deleteing_who_field = []
     function dedletethedynamicwho(id){
 
         try {
@@ -1374,8 +1622,13 @@
         if (deletingField) {
             //deletingField.innerHTML = `form ${id} has been deleted`;
             deletingField.remove()
-            whoCount--
-           
+            deleteing_who_field.push(id)
+            //whoCount--
+            const lastwhofield = document.querySelectorAll('.last-who-field-id');
+                
+            whoCount = lastwhofield[lastwhofield.length -1].value;
+           alert(whoCount)
+           console.log(deleteing_who_field)
         }
         } catch (err) {
             console.log(err)
@@ -1384,20 +1637,24 @@
         }
 
     }
-    let deleted_who_function = []
+    //let deleted_who_function = []
+    dynamic_deleted_who_field = []
 
-    function deletewhorow(id){
+
+    function deletewhorow(id,counter){
 
     
         try{
         
-        deleted_who_function.push(id)
+        dynamic_deleted_who_field.push(id)
+        deleteing_who_field.push(counter)
 
         console.log(id)
 
         document.getElementById(`section-who-${id}`).style.display = "none"
-        console.log(deleted_who_function)
-
+        console.log(deleteing_who_field)
+        
+        console.log(dynamic_deleted_who_field)
         return false
         }
         catch(err){
@@ -1458,7 +1715,7 @@
                         reset_dynamicErrorMsgimage.innerText = "Please insert image."
                         reset_dynamicErrorMsgimage.style.display = 'block';
 
-                        dom = "false"
+                        dump = "false"
                     }   
                 }
                 
@@ -1474,7 +1731,9 @@
                 }
         else if(headerimageCount == 1){
             var heading_image_1 = document.getElementById('selected-game-image-1')
-            if( heading_image_1.src == ""){
+            var heading_image_1_field = document.getElementById('game-section-banner-1')
+
+            if( heading_image_1_field.files.length === 0 && heading_image_1.src.endsWith("/media/")  ){
 
                     error_image = document.getElementById('error-game-section-banner-1')
 
@@ -1544,16 +1803,27 @@
             return false
         }
     }
-
+        deleteing_field = []
         function deleteheadingimagerow(id){
             console.log(id)
             try {
+
                 let deletingimageField = document.getElementById(`section-heading-photo-${id}`);
                 console.log(deletingimageField)
             if (deletingimageField) {
                 deletingimageField.remove()
-                headerimageCount--
+                
+                
+                deleteing_field.push(id)
 
+
+                //headerimageCount--
+                const lasthimagefield = document.querySelectorAll('.last-header-image-field-id');
+                
+                headerimageCount = lasthimagefield[lasthimagefield.length -1].value;
+                alert(headerimageCount)
+                console.log(deleteing_field)
+                return false
             }
             } catch (err) {
                 console.log(err)
@@ -1562,17 +1832,17 @@
             }
         }
 
-        let deleted_headerimage = []
-
-        function deleteheaderimage_finalrow(id){
+        dynamic_deleted_field = []
+        function deleteheaderimage_finalrow(id,counter){
             console.log(id)
         try{
         console.log(id)
-        deleted_headerimage.push(id)
+        dynamic_deleted_field.push(id)
+        deleteing_field.push(counter)
         document.getElementById(`section-heading-photo-${id}`).style.display = "none"
         //alert(id)
         //featureCount--
-        console.log(deleted_headerimage)
+        console.log(dynamic_deleted_field)
         return false
         }
         catch(err){
