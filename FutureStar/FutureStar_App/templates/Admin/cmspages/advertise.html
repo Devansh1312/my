@@ -103,8 +103,14 @@
                         <h4>Section - 2</h4>
                     </div>
                     <div id="form-container">
+                    <div id="section-form-1">
+
                     <div id="dynamic-section-1">
                         <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+                        <p class="field-roll-id" style='display:none'>1</p>
+                        <p id="field-roll-form-1-id-1" style='display:none'>1</p>
+
+
                     </div>
                     <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
 
@@ -114,9 +120,9 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="section-2-title-en">Title (English)</label>
-                                <input class="form-control btn-pill " id="section-2-title-en" name="section_2_title_en" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-en"></p>
+                                <label class="form-label" for="section-2-title-en-1">Title (English)</label>
+                                <input class="form-control btn-pill " id="section-2-title-en-1" name="section_2_title_en_1" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-en-1"></p>
  
                             </div>
                         </div>
@@ -124,8 +130,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="section-2-title-ar" name="section_2_title_ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-ar"></p>
+                                <input class="form-control btn-pill" id="section-2-title-ar-1" name="section_2_title_ar_1" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-ar-1"></p>
 
                             </div>
                         </div>
@@ -138,18 +144,18 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="section-2-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en" name="section-2-content-en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-en"></p>
+                                <label class="form-label" for="section-2-content-en-1">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en-1" name="section-2-content-en-1" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-en-1"></p>
 
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="section-2-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar" name="section-2-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_2_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-ar"></p>
+                                <label class="form-label" for="section-2-content-ar-1">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar-1" name="section-2-content-ar-1" type="text"  placeholder="content (Arabic)">{{data.section_2_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-ar-1"></p>
 
                             </div>
                         </div>
@@ -177,11 +183,16 @@
 
                                     </div>
                                 </div>
+
                                 <p id = "section-2-warning-1"></p>
                             </div>
+                            <input type="hidden" class="last-form-1-field-id" value="1"/>
+
                         </div>
+
+
                         
-                        
+                    </div> 
                     <div>
                         <br>
 
@@ -1811,49 +1822,190 @@ function displaySocialMediaImg(event) {
         }
     }
 
-    let count = 1;
+    let section_field_1 = 1;
+    try{
+                const lastfield1field = document.querySelectorAll('.last-form-1-field-id');
+                
+                section_field_1  = lastfield1field[lastfield1field.length -1].value;
+
+               
+
+             
+               
+                console.log("section field 1 Value: "+section_field_1)
+            }
+    catch(err){
+                alert("1: "+err)
+                
+            }
+            console.log(section_field_1)
     
 
     function add_content(){
 
+
+
+        dom = "true"
+
+
+         
+                console.log("value:"+section_field_1)
+
+                if(section_field_1 >= 1){
+                    try{
+                    const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-section-2-title-en-${section_field_1}`);
+                    const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-section-2-title-ar-${section_field_1}`);
+
+                    const reset_dynamicErrorMsgContentEn = document.getElementById(`error-section-2-content-en-${section_field_1}`);
+
+                    const reset_dynamicErrorMsgContentAr = document.getElementById(`error-section-2-content-ar-${section_field_1}`)
+                    const reset_imageerror = document.getElementById(`error-section-2-banner-${section_field_1}`)
+                reset_dynamicErrorMsgTitleEn.innerText = ""
+                reset_dynamicErrorMsgTitleAr.innerText = ""
+                reset_dynamicErrorMsgContentEn.innerText = ""
+                reset_dynamicErrorMsgContentAr.innerText = ""
+                reset_imageerror.innerText = ""
+
+                if(section_field_1 >= 1){
+                   
+                    const dynamicTitleEn = document.getElementById(`section-2-title-en-${section_field_1}`);
+                    const dynamicTitleAr = document.getElementById(`section-2-title-ar-${section_field_1}`);
+                    const dynamicContentEn = document.getElementById(`section-2-content-en-${section_field_1}`);
+                    const dynamicContentAr = document.getElementById(`section-2-content-ar-${section_field_1}`);
+                    const dynamicimage = document.getElementById(`section-2-banner-${section_field_1}`)
+                    const dynamicimagesrc = document.getElementById(`selected-section-2-image-${section_field_1}`)
+                    const dynamicErrorMsgTitleEn = document.getElementById(`error-section-2-title-en-${section_field_1}`);
+                    const dynamicErrorMsgTitleAr = document.getElementById(`error-section-2-title-ar-${section_field_1}`);
+                    const dynamicErrorMsgContentEn = document.getElementById(`error-section-2-content-en-${section_field_1}`);
+                    const dynamicErrorMsgContentAr = document.getElementById(`error-error-section-2-content-ar-${section_field_1}`);
+                    const reset_imageerror = document.getElementById(`error-section-2-banner-${section_field_1}`)
+
+                
+
+                    if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                        
+                        dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                        dynamicErrorMsgTitleEn.style.display = 'block';
+                        dynamicErrorMsgTitleEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+
+            
+                    if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                        dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                        dynamicErrorMsgTitleAr.style.display = 'block';
+                        dynamicErrorMsgTitleAr.scrollIntoView();
+
+                        dom = "false";
+                        console.log(dom)
+
+
+                    }
+            
+                    if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+                        dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
+                        dynamicErrorMsgContentEn.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+            
+                    if (dynamicContentAr && !dynamicContentAr.value.trim()){
+                        dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
+                        dynamicErrorMsgContentAr.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        dom = "false";
+
+
+                    }
+                    if(section_field_1 == 1){
+                        if(dynamicimage.files.length == 0 && dynamicimagesrc.src.endsWith("/media/") ){
+                        reset_imageerror.innerText = "Please insert image."
+                        reset_imageerror.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+
+                        dom = "false"
+                    }  
+                    }
+                    else{
+                        if(dynamicimage.files.length == 0 && dynamicimagesrc.src == "" ){
+                        reset_imageerror.innerText = "Please insert image."
+                        reset_imageerror.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+
+                        dom = "false"
+                    }  
+
+                    }
+                  
+                    
+                }
+               
+            } 
+           
+        catch(err){
+            console.log("error: "+err)
+            return false
+        }  
+                }
+         
+            if(dom == "true"){
             try{
-            count++;
-            console.log(count)
+            section_field_1++;
+            console.log("increase value: "+section_field_1)
+            var section_field_1_id = "id" + Math.random().toString(16).slice(2)
+
             let newRow = `
-            <div id=dynamic-section-${count}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${count}</h1>
+            <div id="section-form-${section_field_1}">
+
+            <div id=dynamic-section-${section_field_1}">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${section_field_1}</h1>
+                            <p class="field-roll-id" style='display:none'>${section_field_1_id}</p>
+                        <p id="field-roll-form-1-id-${section_field_1}" style='display:none'>${section_field_1_id}</p>
              </div>
             <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
 
-            <div class="row" id="row-${count}">
+            <div class="row" id="row-${section_field_1}">
                 <div class="col-6">
                     <div class="mb-3">
-                        <label class="form-label" for="section-2-title-en-${count}">Heading Title (English)</label>
-                        <input class="form-control btn-pill" id="section-2-title-en-${count}" name="section_2_title_en_${count}" type="text" placeholder="Title (English)">
-                    </div>
+                        <label class="form-label" for="section-2-title-en-${section_field_1}">Heading Title (English)</label>
+                        <input class="form-control btn-pill" id="section-2-title-en-${section_field_1}" name="section_2_title_en_${section_field_1}" type="text" placeholder="Title (English)">
+                        <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-en-${section_field_1}"></p>
+
+                        </div>
                 </div>
 
                 <div class="col-6">
                     <div class="mb-3">
-                        <label class="form-label" for="section-2-title-ar-${count}">Heading Title (Arabic)</label>
-                        <input class="form-control btn-pill" id="section-2-title-ar-${count}" name="section_2_title_ar_${count}" type="text" placeholder="Title (Arabic)">
+                        <label class="form-label" for="section-2-title-ar-${section_field_1}">Heading Title (Arabic)</label>
+                        <input class="form-control btn-pill" id="section-2-title-ar-${section_field_1}" name="section_2_title_ar_${section_field_1}" type="text" placeholder="Title (Arabic)">
+                        <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-ar-${section_field_1}"></p>
+
                     </div>
                 </div>
 
                 <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
-                                    <label class="form-label" for="section-2-content-en-${count}">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en-${count}" name="section_2_content_en_${count}" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <label class="form-label" for="section-2-content-en-${section_field_1}">Content (English)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en-${section_field_1}" name="section_2_content_en_${section_field_1}" type="text" placeholder="content (English)">1</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-en-${section_field_1}"></p>
+
                                 </div>
                             </div>
     
                             <div class="col-6">
                                 <div class="mb-3">
-                                    <label class="form-label" for="section-2-content-ar-${count}">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar-${count}" name="section_2_content_ar_${count}" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <label class="form-label" for="section-2-content-ar-${section_field_1}">Content (Arabic)</label>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar-${section_field_1}" name="section_2_content_ar_${section_field_1}" type="text"  placeholder="content (Arabic)">1</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-ar-${section_field_1}"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -1863,23 +2015,27 @@ function displaySocialMediaImg(event) {
                             <div class="row">
                                 <div class="col-12">
                                     <div class="mb-3">
-                                        <label class="form-label" for="section-2-image-${count}">Image-${count} </label>
-                                        <input class="form-control btn-pill" id="section-2-banner-${count}" name="section_2_banner_${count}" type="file"  onchange= "displaysection2Image(event,${count})" accept="image/*">
+                                        <label class="form-label" for="section-2-image-${section_field_1}">Image-${section_field_1} </label>
+                                        <input class="form-control btn-pill" id="section-2-banner-${section_field_1}" name="section_2_banner_${section_field_1}" type="file"  onchange= "displaysection2Image(event,${section_field_1})" accept="image/*">
                                         <!--{% if system_settings.fav_icon %}-->
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
         
-                                        <img id="selected-section-2-image-${count}" style="display: none; width: 100px; height: 100px;" />
-        
+                                        <img id="selected-section-2-image-${section_field_1}"  style="display: none; width: 100px; height: 100px;" />
+                                        <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-${section_field_1}"></p>
+
                                     </div>
                                 </div>
-                                <p id = "section-2-warning-${count}"></p>
+                                <p id = "section-2-warning-${section_field_1}"></p>
                             </div>
                         </div>
+                        <input type="hidden" class="last-header-image-field-id-${section_field_1}" value="${headerimageCount}"/>
+
                 <div class="col-12  text-end " >
 
-                                <button id="delete-row" class="btn btn-danger">-</button>
+                                <button id="delete-row" onclick = "return deletesection2(${section_field_1})" class="btn btn-danger">-</button>
                 </div>  
+                </div>
             </div>
             <br>`;
             
@@ -1892,6 +2048,40 @@ function displaySocialMediaImg(event) {
 
             return false
         }
+    }
+    else{
+        console.log("please fill detial")
+        return false
+    }
+    }
+
+    deleteing_section2field = []
+    function deletesection2(id){
+        try {
+        let deletingsection2 = document.getElementById(`section-form-${id}`);
+        console.log(deleteing_section2field)
+        if (deletingsection2) {
+            //deletingField.innerHTML = `form ${id} has been deleted`;
+            deletingsection2.remove()
+            
+            deleteing_section2field.push(id)
+
+            const lastfield1field = document.querySelectorAll(`.last-form-1-field-id-${id}`);
+                
+            section_field_1  = lastfield1field[lastfield1field.length -1].value;
+            console.log(section_field_1)
+            console.log(deleteing_section2field)
+            return false
+               
+            
+           
+        }
+        } catch (err) {
+            console.log(err)
+            return false
+
+        }
+           
     }
 
     let adscount = 1

@@ -905,7 +905,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="achive-section-form-title-en-1">Heading Name (English)</label>
                                     <input class="form-control btn-pill " id="achive-section-form-htitle-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_heading_en }}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-en-1"></p>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-1"></p>
 
                                 </div>
                             </div>
@@ -914,7 +914,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="achive-section-form-title-ar-1">Heading Name (Arabic)</label>
                                     <input class="form-control btn-pill" id="achive-section-form-htitle-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_heading_ar }}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-ar-1"></p>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-1"></p>
 
                                 </div>
                             </div>
@@ -2835,9 +2835,6 @@ function displaySocialMediaImg(event) {
         }
     }
 
-
-
-
     let achiveCount
     try{
                 const lastachivefield = document.querySelectorAll('.last-achive-field-id');
@@ -2860,18 +2857,19 @@ function displaySocialMediaImg(event) {
 
         console.log("value:"+achiveCount)
 
-        if(achiveCount >= 1){
+        if(achiveCount> 1){
             try{
                 console.log(achiveCount)
         const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-achive-section-form-htitle-en-${achiveCount}`);
         const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-achive-section-form-htitle-ar-${achiveCount}`);
         const reset_dynamicErrorMsgContentEn = document.getElementById(`error-achive-section-form-title-en-${achiveCount}`);
         const reset_dynamicErrorMsgContentAr = document.getElementById(`error-achive-section-form-title-ar-${achiveCount}`);
+
         reset_dynamicErrorMsgTitleEn.innerText = ""
         reset_dynamicErrorMsgTitleAr.innerText = ""
         reset_dynamicErrorMsgContentEn.innerText = ""
         reset_dynamicErrorMsgContentAr.innerText = ""
-        if(achiveCount >= 1){
+        if(achiveCount> 1){
             
             const dynamicTitleEn = document.getElementById(`achive-section-form-htitle-en-${achiveCount}`);
             const dynamicTitleAr = document.getElementById(`achive-section-form-htitle-ar-${achiveCount}`);
