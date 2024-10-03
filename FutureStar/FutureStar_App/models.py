@@ -4,7 +4,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
-
+from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 
 # Inquire Blog Management    
@@ -67,6 +67,36 @@ class UserGender(models.Model):
     
     class Meta:
         db_table = 'futurestar_app_gender'
+class Country(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    code = models.CharField(max_length=2)
+    name = models.CharField(max_length=100)
+    zone_id = models.IntegerField(default=0)
+    country_code = models.IntegerField(null=True, blank=True)
+    status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'futurestar_app_country'
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    country= models.ForeignKey(Country, on_delete=models.CASCADE )
+    status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = 'futurestar_app_city'
+
+    def __str__(self):
+        return self.name
 
 # Custom User Model
 class User(AbstractBaseUser, PermissionsMixin):
@@ -84,8 +114,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField(null=True, blank=True)
     age = models.CharField(max_length=5,null=True, blank=True)
     gender = models.ForeignKey(UserGender,max_length=10,null=True, blank=True,on_delete=models.CASCADE)    
-    country = models.CharField(max_length=150,null=True, blank=True)
-    city = models.CharField(max_length=150,null=True, blank=True)
+    country = models.ForeignKey(Country,max_length=150,null=True, blank=True,on_delete=models.CASCADE)
+    city = models.ForeignKey(City,max_length=150,null=True, blank=True,on_delete=models.CASCADE)
     nationality = models.CharField(max_length=150,null=True, blank=True)
     weight = models.CharField(max_length=150,null=True, blank=True)
     height = models.CharField(max_length=150,null=True, blank=True)
