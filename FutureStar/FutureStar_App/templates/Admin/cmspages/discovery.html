@@ -265,11 +265,31 @@
                     <div class="row" style="margin-bottom: 10px;">
                         <h4 style="color:grey;font-size:16px;font-weight:bold">Training Section-1</h4>
                     </div>  
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="training-section-1-heading">Heading (English)</label>
+                                <input class="form-control btn-pill " id="training-section-1-heading-en" name="training_section_1_heading" type="text" value="{{data.sub_section_2_title_1_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-heading-en"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="training-title-arabic">Heading (Arabic)</label>
+                                <input class="form-control btn-pill" id="training-section-1-heading-ar" name="training-section-1-heading-ar" type="text" value="{{data.sub_section_2_title_1_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-heading-ar"></p>
+
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="training-section-1-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="training-section-1-title-en" name="training_section_1_title" type="text" value="{{data.sub_section_2_title_1_en}}" placeholder="Title (English)">
+                                <textarea class="form-control btn-pill " id="training-section-1-title-en" name="training_section_1_title" type="text"  placeholder="Title (English)">{{data.section_2_discover_title_en}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-title-en"></p>
 
                             </div>
@@ -278,7 +298,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="training-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="training-section-1-title-ar" name="training-section-1-title-ar" type="text" value="{{data.sub_section_2_title_1_ar}}" placeholder="Title (Arabic)">
+                                <textarea class="form-control btn-pill" id="training-section-1-title-ar" name="training-section-1-title-ar" type="text"  placeholder="Title (Arabic)">{{data.section_2_discover_title_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-title-ar"></p>
 
                             </div>
@@ -710,6 +730,12 @@
                 var why_Choose_us_form_content_en = document.getElementById("why-choose-us-content-en-1")
                 var why_Choose_us_form_content_ar = document.getElementById("why-choose-us-content-ar-1")
                 //left//
+
+                //training
+
+                var traning_heading_en =  document.getElementById("training-section-1-heading-en")
+                var traning_heading_ar =  document.getElementById("training-section-1-heading-ar")
+
                 var seo_title_en = document.getElementById("meta-title-en")
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
@@ -740,6 +766,12 @@
                     { id: "game-title-ar", name: "Title (Arabic)" },
                     { id: "newsdetail-content-en", name: "Content (English)" },
                     { id: "newsdetail-content-ar", name: "Content (Arabic)" },
+
+                    { id: "training-section-1-heading-en", name: "Heading (Arabic)" },
+                    { id: "training-section-1-heading-ar", name: "Heading (Arabic)" },
+
+
+
                     { id: "training-section-1-title-en", name: "Title (English)" },
                     { id: "training-section-1-title-ar", name: "Title (Arabic)" },
                     { id: "traning-section-1-content-en", name: "Content (English)" },
@@ -748,6 +780,7 @@
                     { id: "training-section-2-title-ar", name: "Title (Arabic)" },
                     { id: "training-section-2-content-en", name: "Content (English)" },
                     { id: "training-section-2-content-ar", name: "Content (Arabic)" },
+                    
                     { id: "why-choose-us-heading-name-title-en", name: "Heading Title (English)" },
                     { id: "why-choose-us-heading-name-title-ar", name: "Heading Title (Arabic)" },
                     { id: "why-choose-us-heading-title-en", name: "Title (English)" },
@@ -1028,6 +1061,11 @@
                     formData.append('discover_game_title_ar', discover_game_title_ar.value );
                     formData.append('discover_game_content_en', discover_game_content_en.value );
                     formData.append('discover_game_content_ar', discover_game_content_ar.value );
+                    
+                    formData.append('training_section_1_heading_en', traning_heading_en.value );
+                    formData.append('training_section_1_heading_ar', traning_heading_ar.value );
+
+                    
                     formData.append('discover_training_sec_1_title_en', discover_training_sec_1_title_en.value );
                     formData.append('discover_training_sec_1_title_ar', discover_training_sec_1_title_ar.value );
                     formData.append('discover_training_sec_1_content_en', discover_training_sec_1_content_en.value );

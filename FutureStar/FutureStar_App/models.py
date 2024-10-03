@@ -468,6 +468,8 @@ class cms_pages(models.Model):
     
     section_2_country_name_en = models.CharField(max_length=100,blank=True,null=True)
     section_2_country_name_ar = models.CharField(max_length=100,blank=True,null=True)
+    section_2_discover_title_en = models.TextField(blank=True,null=True)
+    section_2_discover_title_ar = models.TextField(blank=True,null=True)
 
     sub_section_2_title_1_en = models.CharField(max_length=100,blank=True,null=True)
     sub_section_2_title_1_ar = models.CharField(max_length=100,blank=True,null=True)

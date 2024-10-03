@@ -2644,6 +2644,8 @@ def saveDiscoverdetail(request):
                     discover_game_title_ar = request.POST.get('discover_game_title_ar')
                     discover_game_content_en = request.POST.get('discover_game_content_en')
                     discover_game_content_ar = request.POST.get('discover_game_content_ar')
+                    discover_training_heading_en = request.POST.get('training_section_1_heading_en')
+                    discover_training_heading_ar = request.POST.get('training_section_1_heading_ar')
                     discover_training_sec_1_title_en = request.POST.get('discover_training_sec_1_title_en')
                     discover_training_sec_1_title_ar = request.POST.get('discover_training_sec_1_title_ar')
                     discover_training_sec_1_content_en = request.POST.get('discover_training_sec_1_content_en')
@@ -2682,9 +2684,13 @@ def saveDiscoverdetail(request):
 
                         discover_page.section_2_content_en = discover_game_content_en
                         discover_page.section_2_content_ar = discover_game_content_ar
-                        discover_page.sub_section_2_title_1_en  = discover_training_sec_1_title_en
-                        discover_page.sub_section_2_title_1_ar  = discover_training_sec_1_title_ar
+                        
+                        discover_page.section_2_heading_en = discover_training_heading_en 
+                        discover_page.section_2_heading_ar = discover_training_heading_ar
 
+
+                        discover_page.section_2_discover_title_en  = discover_training_sec_1_title_en
+                        discover_page.section_2_discover_title_ar = discover_training_sec_1_title_ar
                         discover_page.sub_section_2_content_1_en = discover_training_sec_1_content_en 
                         discover_page.sub_section_2_content_1_ar = discover_training_sec_1_content_ar 
                         discover_page.sub_section_2_title_2_en  = discover_training_sec_2_title_en 
