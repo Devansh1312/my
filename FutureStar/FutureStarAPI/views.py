@@ -1288,3 +1288,38 @@ class UserGenderListAPIView(generics.ListAPIView):
             'message': _('Gender retrieved successfully.'),
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)
+
+
+class LocationAPIView(APIView):
+
+    def get(self, request):
+        country_id = request.query_params.get('country_id')
+
+        # If country_id is not provided, return all active countries
+        if not country_id:
+            countries = Country.objects.filter(status=True)
+            country_data = [{'id': country.id, 'name': country.name} for country in countries]
+
+            return Response({
+                'status': 1,
+                'message': 'Countries fetched successfully',
+                'data': country_data
+            }, status=status.HTTP_200_OK)
+
+        # If country_id is provided, return cities for that country
+        try:
+            country = Country.objects.get(id=country_id, status=True)
+        except Country.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': 'Country not found or inactive'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        cities = City.objects.filter(country=country, status=True)
+        city_data = [{'id': city.id, 'name': city.name} for city in cities]
+
+        return Response({
+            'status': 1,
+            'message': 'Cities fetched successfully',
+            'data': city_data
+        }, status=status.HTTP_200_OK)
