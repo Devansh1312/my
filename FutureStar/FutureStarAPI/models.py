@@ -1,5 +1,6 @@
 from django.db import models
 from FutureStar_App.models import *
+from django.utils import timezone
 
 
 # Create your models here.
@@ -96,4 +97,52 @@ class Tournament(models.Model):
     class Meta:
         db_table = 'futurestar_app_tournament'
     
+class Country(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    code = models.CharField(max_length=2)
+    name = models.CharField(max_length=100)
+    zone_id = models.IntegerField(default=0)
+    country_code = models.IntegerField(null=True, blank=True)
+    status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'futurestar_app_country'
+
+    def __str__(self):
+        return self.name
+
+
+class State(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'futurestar_app_state'
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    cost = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+    status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'futurestar_app_city'
+
+    def __str__(self):
+        return self.name
