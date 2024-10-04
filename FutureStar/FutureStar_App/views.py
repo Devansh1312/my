@@ -3148,9 +3148,12 @@ class cms_advertisepage(LoginRequiredMixin, View):
     
     def get(self, request):
         dataFilter = cms_pages.objects.get(id="6")
-
+        section_2_data = cms_advertise_section_2_dynamic_field.objects.all()
+        partnership_data = cms_advertise_Partnership_dynamic_field.objects.all()
         context = {
-            'data':dataFilter
+            'data':dataFilter,
+            'section_2':section_2_data,
+            'partnership':partnership_data
         }
         return render(
             request,
@@ -3455,6 +3458,192 @@ def saveadvertisedetail(request):
                             delete_the_record  = cms_home_dynamic_field.objects.filter(field_id = deleted_id ).delete()
                     else:
                         print("value is 0")''' 
+                        
+                    section_count = request.POST.get('section_field_passed')
+                    section_deleted_field = request.POST.get('deleteing_section2field')
+                    print(section_deleted_field)
+                        
+                    if 'deleteing_section2field' in request.POST:
+                            print("yes")
+                            if ',' in section_deleted_field:
+                                deleted_section_list = section_deleted_field.split(',')
+                            else:
+                                deleted_section_list = ['{}'.format(section_deleted_field)]  # Treat single value as list
+                                deleted_section_list = [int(item) for item in deleted_section_list]
+
+                    else:
+                            print("no")
+                            deleted_section_list = []
+                        # Convert strings to integers
+
+                    print(deleted_section_list)
+                                
+
+                    print("this is whoCount: "+str(section_count))
+                    for i in range(2,int(section_count)+1):
+                        
+                            
+                            if str(i) in deleted_section_list:
+                                print("its in field ",i)
+                            else:
+                                '''if 'field-roll-image-id-{}'.format(i) in request.POST: 
+                                    unique_id = request.POST.get('ugid_{}'.format(i))
+                                
+                                    print("exisiting: "+str(existing_record))'''
+                                            
+  
+                                    
+                                unique_id = request.POST.get('usid_{}'.format(i))
+                                if unique_id != "":
+                                   
+                                    section_title_en = request.POST.get('section_2_title_en_{}'.format(str(i)))
+                                    section_title_ar = request.POST.get('section_2_title_ar_{}'.format(str(i)))
+                                    section_content_en = request.POST.get('section_2_content_en_{}'.format(str(i)))
+                                    section_content_ar = request.POST.get('section_2_content_ar_{}'.format(str(i)))
+                                    existing_section_record = cms_advertise_section_2_dynamic_field.objects.filter(field_id=unique_id).first()
+
+
+                                    if 'image_{}'.format(str(i)) in request.FILES:
+                                
+                                        image = request.FILES.get('image_{}'.format(str(i)),None)
+                                        print("image: "+str(image))
+                                        
+                                        if image:
+                                            try:
+                                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image.name)
+                                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                                # Save the file
+                                                with open(save_path, 'wb+') as destination:
+                                                    for chunk in image.chunks():
+                                                        destination.write(chunk)
+                                                        #imageName.append(heading_banner.name)
+                                                        #savenewsdetail.heading_banner = heading_banner
+
+                                            except Exception as e:
+                                                dom = str(e)            
+                                            
+                                    
+                                    if existing_section_record:
+                                                    # Update the existing record
+                                                    
+                                                    
+                                                        existing_section_record.title_en = section_title_en
+                                                        existing_section_record.title_ar = section_title_ar
+                                                        existing_section_record.content_en = section_content_en
+                                                        existing_section_record.content_ar = section_content_ar
+                                                        try:        
+                                                            if image:
+                                                                existing_section_record.images = image
+                                                        except Exception as e:
+                                                            print(str(e))        
+                                                            
+                                                        existing_section_record.save() 
+                                    else:        
+                                                    savediscoveryview= cms_advertise_section_2_dynamic_field(
+                                                                field_id=unique_id,
+                                                                title_en=section_2_title_en,
+                                                                title_ar=section_2_title_ar,
+                                                                content_en=section_2_content_en,
+                                                                content_ar=section_2_content_ar,
+                                                                images = image
+                                                            
+                                                                
+                                                    )
+                                                    savediscoveryview.save() 
+                    
+                    partnership_count = request.POST.get('partnership_field_passed')
+                    partnership_deleted_field = request.POST.get('deleteing_partnershipfield')
+                    print(partnership_deleted_field)
+                        
+                    if 'partnership_deleted_field' in request.POST:
+                            print("yes")
+                            if ',' in partnership_deleted_field:
+                                deleted_partnership_list = partnership_deleted_field.split(',')
+                            else:
+                                deleted_partnership_list = ['{}'.format(deleted_partnership_list)]  # Treat single value as list
+                                deleted_partnership_list = [int(item) for item in deleted_partnership_list]
+
+                    else:
+                            print("no")
+                            deleted_partnership_list = []
+                        # Convert strings to integers
+
+                    print(deleted_partnership_list)
+                                
+
+                    print("this is Partnerhsip : "+str(partnership_count))
+                    for i in range(2,int(partnership_count)+1):
+                        
+                            
+                            if str(i) in  deleted_partnership_list:
+                                print("its in field ",i)
+                            else:
+                                '''if 'field-roll-image-id-{}'.format(i) in request.POST: 
+                                    unique_id = request.POST.get('ugid_{}'.format(i))
+                                
+                                    print("exisiting: "+str(existing_record))'''
+                                            
+  
+                                    
+                                unique_id = request.POST.get('usid_{}'.format(i))
+                                if unique_id != "":
+                                   
+                                    partnership_title_en = request.POST.get('partnership_title_en_{}'.format(str(i)))
+                                    partnership_title_ar = request.POST.get('partnership_title_ar_{}'.format(str(i)))
+                                    partnership_content_en = request.POST.get('partnership_content_en_{}'.format(str(i)))
+                                    partnership_content_ar = request.POST.get('partnership_content_ar_{}'.format(str(i)))
+                                    existing_partnership_record = cms_advertise_Partnership_dynamic_field.objects.filter(field_id=unique_id).first()
+
+
+                                    if 'image_{}'.format(str(i)) in request.FILES:
+                                
+                                        image = request.FILES.get('image_{}'.format(str(i)),None)
+                                        print("image: "+str(image))
+                                        
+                                        if image:
+                                            try:
+                                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', image.name)
+                                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                                                # Save the file
+                                                with open(save_path, 'wb+') as destination:
+                                                    for chunk in image.chunks():
+                                                        destination.write(chunk)
+                                                        #imageName.append(heading_banner.name)
+                                                        #savenewsdetail.heading_banner = heading_banner
+
+                                            except Exception as e:
+                                                dom = str(e)            
+                                            
+                                    
+                                    if existing_partnership_record:
+                                                    # Update the existing record
+                                                    
+                                                    
+                                                        existing_partnership_record.title_en = partnership_title_en
+                                                        existing_partnership_record.title_ar = partnership_title_ar
+                                                        existing_partnership_record.content_en = partnership_content_en
+                                                        existing_partnership_record.content_ar = partnership_content_ar
+                                                        try:        
+                                                            if image:
+                                                                existing_partnership_record.images = image
+                                                        except Exception as e:
+                                                            print(str(e))        
+                                                            
+                                                        existing_partnership_record.save() 
+                                    else:        
+                                                    savepdiscoveryview= cms_advertise_Partnership_dynamic_field(
+                                                                field_id=unique_id,
+                                                                title_en=partnership_title_en,
+                                                                title_ar=partnership_title_ar,
+                                                                content_en=partnership_content_en,
+                                                                content_ar=partnership_content_ar,
+                                                                images = image
+                                                            
+                                                                
+                                                    )
+                                                    savepdiscoveryview.save()                                      
 
                     if 'heading_image_1' in request.FILES:
                         print("yes")
@@ -3649,9 +3838,29 @@ def saveadvertisedetail(request):
                                     messages.error(request,str(e))    
 
                     else:
-                        pass    
+                        pass   
+                    
+                     
                     
                     saveadvertiseetail.save()
+                    
+                    if "dyanmic_deleted_section_field" in request.POST:
+                            
+                            try:
+                                dynamic_section_data = request.POST.get('dyanmic_deleted_section_field')
+                                dynamic_deleted_section_list = dynamic_section_data.split(',')
+                                print(dynamic_deleted_section_list)
+                                
+                                for i in range(len(dynamic_deleted_section_list)):
+                                    
+                                    
+                                    deletingviewfrom_data = cms_advertise_section_2_dynamic_field.objects.filter(field_id = dynamic_deleted_section_list[i]).delete()
+
+                                
+                            except Exception as e:
+                                print("error: "+e)    
+
+                                messages.error(request, str(e))  
 
                    
                     #dom = "True"

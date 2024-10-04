@@ -186,15 +186,118 @@
 
                                 <p id = "section-2-warning-1"></p>
                             </div>
-                            <input type="hidden" class="last-form-1-field-id" value="1"/>
+                            <input type="hidden" class="last-form-1-field-id-1" value="1"/>
 
                         </div>
 
 
                         
                     </div> 
-                    <div>
+                </div>
+                <br>
+
+                {% if section_2 %}
+
+                {% for fields in section_2 %}
+                <div id="section-form-{{fields.field_id}}">
+
+                    <div id="dynamic-section-1">
+                        <h1 style="font-weight:bold;font-size:16px;color:grey">Form-{{forloop.counter | add:'1'}}</h1>
+                        <p class="field-roll-id" style='display:none'>{{fields.field_id}}</p>
+                        <p id="field-roll-form-1-id-{{forloop.counter | add:'1'}}" style='display:none'>{{fields.field_id}}</p>
+
+
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                    
+                    <!--heading-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-title-en-{{forloop.counter | add:'1'}}">Title (English)</label>
+                                <input class="form-control btn-pill " id="section-2-title-en-{{forloop.counter | add:'1'}}" name="section_2_title_en_{{forloop.counter | add:'1'}}" type="text" value="{{fields.title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-en-{{forloop.counter | add:'1'}}"></p>
+ 
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="section-2-title-ar-{{forloop.counter | add:'1'}}" name="section_2_title_ar_{{forloop.counter | add:'1'}}" type="text" value="{{fields.title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-title-ar-{{forloop.counter | add:'1'}}"></p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    
+                    <!--heading content-->
+                        
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-content-en-{{forloop.counter | add:'1'}}">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-en-{{forloop.counter | add:'1'}}" name="section-2-content-en-{{forloop.counter | add:'1'}}" type="text" placeholder="content (English)">{{fields.content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-en-{{forloop.counter | add:'1'}}"></p>
+
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="section-2-content-ar-{{forloop.counter | add:'1'}}">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="section-2-content-ar-{{forloop.counter | add:'1'}}" name="section-2-content-ar-{{forloop.counter | add:'1'}}" type="text"  placeholder="content (Arabic)">{{fields.content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-section-2-content-ar-{{forloop.counter | add:'1'}}"></p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    
+                       
+
+
+                        
+                        
+                    
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="section-2-image-{{forloop.counter | add:'1'}}">Image-{{ forloop.counter| add:'1' }} </label>
+                                        <input class="form-control btn-pill" id="section-2-banner-{{forloop.counter | add:'1'}}" name="section_2_banner_{{forloop.counter | add:'1'}}" type="file"  onchange= "displaysection2Image(event,count=`{{forloop.counter | add:'1'}}`)" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+                                
+                                        <img id="selected-section-2-image-{{forloop.counter | add:'1'}}" src = "/media/{{fields.images}}" style="display: block; width: 100px; height: 100px;" />
+                                        <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-{{forloop.counter | add:'1'}}"></p>
+
+                                    </div>
+                                </div>
+
+                                <p id = "section-2-warning-{{forloop.counter | add:'1'}}"></p>
+                            </div>
+                            {% if forloop.last %}
+                            <input type="hidden" class="last-form-1-field-id-1" value="{{ forloop.counter|add:'1' }}"/>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12  text-end " >
+
+                                        <button id="delete-row" onclick ="return deletesectionrow(`{{fields.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
+                        </div>  
+
+
+                        
+                    </div> 
                         <br>
+                {% endfor %}
+                {% endif %}    
 
                         <div id="dynamic-section-2-field">
                             <div class="col-12  text-end " >
@@ -253,8 +356,12 @@
 
 
                     <div id="form-partnership-container">
+                        <div id="section-partnership-1">
+
                         <div id="dynamic-partnership-section-1">
                             <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+                            <p class="field-roll-id" style='display:none'>1</p>
+                            <p id="field-roll-partnership-id-1" style='display:none'>1</p>
                         </div>
                         <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
     
@@ -265,8 +372,8 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-title-en">Title (English)</label>
-                                    <input class="form-control btn-pill " id="partnership-title-en" name="partnership_title_en" type="text" value="{{data.section_3_title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-en"></p>
+                                    <input class="form-control btn-pill " id="partnership-title-en-1" name="partnership_title_en" type="text" value="{{data.section_3_title_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-en-1"></p>
 
                                 </div>
                             </div>
@@ -274,8 +381,8 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partnership-title-ar" name="partnership_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-ar"></p>
+                                    <input class="form-control btn-pill" id="partnership-title-ar-1" name="partnership_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-ar-1"></p>
 
                                 </div>
                             </div>
@@ -289,8 +396,8 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-en">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en" name="partnership-content-en" type="text" placeholder="content (English)">{{data.section_3_content_en}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-en"></p>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en-1" name="partnership-content-en" type="text" placeholder="content (English)">{{data.section_3_content_en}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-en-1"></p>
 
                                 </div>
                             </div>
@@ -298,8 +405,8 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-ar">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_3_content_ar}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-ar"></p>
+                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar-1" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_3_content_ar}}</textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-ar-1"></p>
 
                                 </div>
                             </div>
@@ -328,9 +435,12 @@
                                     <p id = "partnership-warning-1"></p>
                                 </div>
                             </div>
+                            <input type="hidden" class="last-partnership-field-id-1" value="1"/>
+
                             
                             
-                        <div>
+                        </div>
+                    </div>
 
                             <br>
 
@@ -890,10 +1000,10 @@
                 var advertise_heading_content_en = document.getElementById("advertise-heading-content-en")
                 var advertise_heading_content_ar = document.getElementById("advertise-heading-content-ar")
 
-                var section_2_title_en = document.getElementById("section-2-title-en")
-                var section_2_title_ar = document.getElementById("section-2-title-ar")
-                var section_2_content_en = document.getElementById("section-2-content-en")
-                var section_2_content_ar = document.getElementById("section-2-content-ar")
+                var section_2_title_en = document.getElementById("section-2-title-en-1")
+                var section_2_title_ar = document.getElementById("section-2-title-ar-1")
+                var section_2_content_en = document.getElementById("section-2-content-en-1")
+                var section_2_content_ar = document.getElementById("section-2-content-ar-1")
 
                 var partnership_heading_name_en_1 = document.getElementById("partnership-heading-name-en-1")
                 var partnership_heading_name_ar_1 = document.getElementById("partnership-heading-name-ar-1")
@@ -980,6 +1090,7 @@
                 var top_error = document.getElementById('heading-warning')
                 var missing_text = document.getElementById('heading-error')
 
+              
 
                 const advertise_data = [
                         { id: "advertise-heading-title-en", name: "Heading Title (English)" },
@@ -987,10 +1098,10 @@
                         { id: "advertise-heading-content-en", name: "Heading Content (English)" },
                         { id: "advertise-heading-content-ar", name: "Heading Content (English)" },
 
-                        { id: "section-2-title-en", name: "Section 2 Title (English)" },
-                        { id: "section-2-title-ar", name: "Section 2 Title (Arabic)" },
-                        { id: "section-2-content-en", name: "Section 2 Content (English)" },
-                        { id: "section-2-content-ar", name: "Section 2 Content (Arabic)" },
+                        { id: "section-2-title-en-1", name: "Section 2 Title (English)" },
+                        { id: "section-2-title-ar-1", name: "Section 2 Title (Arabic)" },
+                        { id: "section-2-content-en-1", name: "Section 2 Content (English)" },
+                        { id: "section-2-content-ar-1", name: "Section 2 Content (Arabic)" },
 
                         { id: "partnership-heading-name-en-1", name: " Partnership Heading (English)" },
                         { id: "partnership-heading-name-ar-1", name: "Partnership Heading (Arabic)" },
@@ -1049,7 +1160,9 @@
 
                     
                     for (const field of advertise_data) {
+                        console.log(field)
                         const input = document.getElementById(field.id);
+                        console.log(input)
                         const errorMsg = document.getElementById(`error-${field.id}`);
     
                         if (!input.value.trim()) {
@@ -1076,7 +1189,7 @@
                     return false
                 }
                 
-                if(heading_image_field.value.length == 0 && heading_image.src== ""){
+                if(heading_image_field.value.length == 0 && heading_image.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-advertise-heading-section-banner`);
                         
                         try{
@@ -1096,7 +1209,7 @@
                         }
                 }
                 
-                if(section_2_image_field.value.length == 0 && section_2_image.src== ""){
+                if(section_2_image_field.value.length == 0 && section_2_image.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-section-2-banner-1`);
                         
                         try{
@@ -1116,7 +1229,7 @@
                         }
                 }
 
-                if(partnership_banner_1_field.value.length == 0 && partnership_banner_1.src== ""){
+                if(partnership_banner_1_field.value.length == 0 && partnership_banner_1.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-partnership-banner-1`);
                         
                         try{
@@ -1136,7 +1249,7 @@
                         }
                 }
 
-                if(ads_image_1_field.value.length == 0 && ads_image_1.src== ""){
+                if(ads_image_1_field.value.length == 0 && ads_image_1.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-ads-image-1`);
                         
                         try{
@@ -1156,7 +1269,7 @@
                         }
                 }
 
-                if(premium_banner_1_field.value.length == 0 && premium_banner_1.src== ""){
+                if(premium_banner_1_field.value.length == 0 && premium_banner_1.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-premium-banner-1`);
                         
                         try{
@@ -1176,7 +1289,7 @@
                         }
                 }
 
-                if(social_media_section_image_field.files.length == 0 && social_media_section_image.src == ""){
+                if(social_media_section_image_field.files.length == 0 && social_media_section_image.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-social-media-section-image`);
                         
                         try{
@@ -1196,7 +1309,7 @@
                         }
                 }
 
-                if(social_media_section_back_image_field.files.length == 0 && social_media_section_back_image.src== ""){
+                if(social_media_section_back_image_field.files.length == 0 && social_media_section_back_image.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-social-media-section-back-image`);
                         
                         try{
@@ -1217,7 +1330,7 @@
                 }
 
 
-                if(competition_section_section_image_field.files.length == 0 && competition_section_section_image.src== ""){
+                if(competition_section_section_image_field.files.length == 0 && competition_section_section_image.src.endsWith('/media/')){
                         const errorMsg = document.getElementById(`error-competition-section-section-image`);
                         
                         try{
@@ -1295,7 +1408,215 @@
                     formData.append('seo-content-en', seo_content_en.value );
                     formData.append('seo-content-ar', seo_content_ar.value );
 
+                    if(typeof section_field_1 === "undefined" ){
+                        alert("yes")
+                            section_field_1 = document.getElementById('last-who-field-id').value;
 
+                    }
+                    /*else{
+                        
+                        IntCount = parseInt(last_value,10)
+                        counter = IntCount + dynamic_numFuntion.length
+                        console.log("counter: "+counter)
+                    }*/
+                    if(section_field_1 >=2){
+
+                        try{
+
+                    let usid = 0
+                    for (let i = 2; i <= section_field_1;i++) {
+
+                        if(deleteing_section2field){
+                            var dump2 = deleteing_section2field.indexOf(i)
+                            if(dump2 == -1){
+                                console.log("number: "+i)
+                                formData.append('section_field_passed',section_field_1)
+                                
+                                const titleEn = document.getElementById(`section-2-title-en-${i}`);
+                                const titleAr = document.getElementById(`section-2-title-ar-${i}`);
+                                const contentEn = document.getElementById(`section-2-content-en-${i}`);
+                                const contentAr = document.getElementById(`section-2-content-ar-${i}`);
+                                const image = document.getElementById(`section-2-banner-${i}`);
+
+                                const unique_field = document.getElementById(`field-roll-form-1-id-${i}`)
+                                console.log("this is uni: "+unique_field.innerText)
+                                if (titleEn) {
+                                    formData.append(`section_2_title_en_${i}`, titleEn.value);
+                                }
+                                if (titleAr) {
+                                    formData.append(`section_2_title_ar_${i}`, titleAr.value);
+                                }
+                                if (contentEn) {
+                                    formData.append(`section_2_content_en_${i}`, contentEn.value);
+                                }
+                                if (contentAr) {
+                                    formData.append(`section_2_content_ar_${i}`, contentAr.value);
+                                }
+
+                                if(image && image.files && image.files.length > 0) {
+                                        const feature_image = image.files[0];
+                                        formData.append(`image_${i}`, feature_image);
+
+                                } 
+                            
+                                if(unique_field){
+                                    formData.append(`usid_${i}`,unique_field.innerText)
+                                    uwid = unique_field.innerText
+                                    console.log(unique_field.innerText)
+                                }
+                             
+                                formData.append(`id`, i);
+
+
+                            
+                        }
+                    
+                        else if(dump2 != -1){
+                            alert("it is there in deteting field")
+
+                        
+                        }
+                    }
+                    if(deleteing_section2field.length > 0){
+                        alert("yes")
+
+                                            
+                        formData.append(`deleteing_section2field`,deleteing_section2field)
+                    }
+                    else{
+                        console.log("No value inside deleteing field")
+                    }
+
+
+
+                        
+                        
+                        
+
+                    }
+                    if(dynamic_deleted_section_field.length !== 0 ){
+                            formData.append("dyanmic_deleted_section_field",dynamic_deleted_section_field)
+                        }
+                        else{
+                            console.log("its zero")
+                        }    
+                    
+                    
+                    console.log(uwid)
+                        
+                    }
+                    catch(err){
+                        console.log(err)
+                        return false
+                    }
+                }
+
+                if(typeof partnership_count === "undefined" ){
+                        alert("yes")
+                        partnership_count = document.getElementById('.last-partnership-field-id-1').value;
+
+                    }
+                    /*else{
+                        
+                        IntCount = parseInt(last_value,10)
+                        counter = IntCount + dynamic_numFuntion.length
+                        console.log("counter: "+counter)
+                    }*/
+                    if(partnership_count >=2){
+
+                        try{
+
+                    let upid = 0
+                    for (let i = 2; i <= partnership_count;i++) {
+
+                        if(deleteing_partnershipfield){
+                            var dump3 = deleteing_partnershipfield.indexOf(i)
+                            if(dump3 == -1){
+                                console.log("number: "+i)
+                                formData.append('partnership_field_passed',partnership_count)
+                                
+                                const titleEn = document.getElementById(`partnership-title-en-${i}`);
+                                const titleAr = document.getElementById(`partnership-title-ar-${i}`);
+                                const contentEn = document.getElementById(`partnership-content-en-${i}`);
+                                const contentAr = document.getElementById(`partnership-content-ar-${i}`);
+                                const image = document.getElementById(`partnership-banner-${i}`);
+
+                                const unique_field = document.getElementById(`field-roll-partnership-id-${i}`)
+                                console.log("this is uni: "+unique_field.innerText)
+                                if (titleEn) {
+                                    formData.append(`partnership_title_en_${i}`, titleEn.value);
+                                }
+                                if (titleAr) {
+                                    formData.append(`partnership_title_ar_${i}`, titleAr.value);
+                                }
+                                if (contentEn) {
+                                    formData.append(`partnership_content_en_${i}`, contentEn.value);
+                                }
+                                if (contentAr) {
+                                    formData.append(`partnership_content_ar_${i}`, contentAr.value);
+                                }
+
+                                if(image && image.files && image.files.length > 0) {
+                                        const feature_image = image.files[0];
+                                        formData.append(`image_${i}`, feature_image);
+
+                                } 
+                            
+                                if(unique_field){
+                                    formData.append(`upid_${i}`,unique_field.innerText)
+                                    uwid = unique_field.innerText
+                                    console.log(unique_field.innerText)
+                                }
+                             
+                                formData.append(`id`, i);
+
+
+                            
+                        }
+                    
+                        else if(dump3 != -1){
+                            alert("it is there in deteting field")
+
+                        
+                        }
+                    }
+                    if(deleteing_partnershipfield.length > 0){
+                        alert("yes")
+
+                                            
+                        formData.append(`deleteing_partnershipfield`,deleteing_partnershipfield)
+                    }
+                    else{
+                        console.log("No value inside deleteing field")
+                    }
+
+
+
+                        
+                        
+                        
+
+                    }
+                    /*if(dynamic_deleted_section_field.length !== 0 ){
+                            formData.append("dyanmic_deleted_section_field",dynamic_deleted_section_field)
+                        }
+                        else{
+                            console.log("its zero")
+                        }    */
+                    
+                    
+                    console.log(uwid)
+                        
+                    }
+                    catch(err){
+                        console.log(err)
+                        return false
+                    }
+                }
+
+
+                
+                
 
                     if (heading_image_field.files.length > 0) {
                             formData.append('heading_image_1', heading_image_field.files[0]);
@@ -1720,16 +2041,150 @@ function displaySocialMediaImg(event) {
 
 
     
-    let partnership_count= 1;
+    let partnership_count = 1;
+    try{
+                const lastpartnerfield = document.querySelectorAll('.last-partnership-field-id-1');
+                
+                partnership_count = lastpartnerfield [lastpartnerfield .length -1].value;
+
+               
+
+             
+               
+                console.log("partnership count Value: "+partnership_count)
+            }
+    catch(err){
+                alert("1: "+err)
+                
+            }
+            console.log(partnership_count)
     
 
     function add_partnership_content(){
 
+        dom = "true"
+
+
+         
+                console.log("value:"+partnership_count)
+
+                if(section_field_1 >= 1){
+                    try{
+                    const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-partnership-title-en-${partnership_count}`);
+                    const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-partnership-title-ar-${partnership_count}`);
+
+                    const reset_dynamicErrorMsgContentEn = document.getElementById(`error-partnership-content-en-${partnership_count}`);
+
+                    const reset_dynamicErrorMsgContentAr = document.getElementById(`error-partnership-content-ar-${partnership_count}`)
+                    const reset_imageerror = document.getElementById(`error-partnership-banner-${partnership_count}`)
+                reset_dynamicErrorMsgTitleEn.innerText = ""
+                reset_dynamicErrorMsgTitleAr.innerText = ""
+                reset_dynamicErrorMsgContentEn.innerText = ""
+                reset_dynamicErrorMsgContentAr.innerText = ""
+                reset_imageerror.innerText = ""
+
+                if(section_field_1 >= 1){
+                   
+                    const dynamicTitleEn = document.getElementById(`partnership-title-en-${partnership_count}`);
+                    const dynamicTitleAr = document.getElementById(`partnership-title-ar-${partnership_count}`);
+                    const dynamicContentEn = document.getElementById(`partnership-content-en-${partnership_count}`);
+                    const dynamicContentAr = document.getElementById(`partnership-content-ar-${partnership_count}`);
+                    const dynamicimage = document.getElementById(`partnership-banner-${partnership_count}`)
+                    const dynamicimagesrc = document.getElementById(`selected-partnership-image-${partnership_count}`)
+                    const dynamicErrorMsgTitleEn = document.getElementById(`error-partnership-title-en-${partnership_count}`);
+                    const dynamicErrorMsgTitleAr = document.getElementById(`error-partnership-title-ar-${partnership_count}`);
+                    const dynamicErrorMsgContentEn = document.getElementById(`error-partnership-content-en-${partnership_count}`);
+                    const dynamicErrorMsgContentAr = document.getElementById(`error-partnership-content-ar-${partnership_count}`);
+                    const reset_imageerror = document.getElementById(`error-partnership-banner-${partnership_count}`)
+
+                
+
+                    if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                        
+                        dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                        dynamicErrorMsgTitleEn.style.display = 'block';
+                        dynamicErrorMsgTitleEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+
+            
+                    if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                        dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                        dynamicErrorMsgTitleAr.style.display = 'block';
+                        dynamicErrorMsgTitleAr.scrollIntoView();
+
+                        dom = "false";
+                        console.log(dom)
+
+
+                    }
+            
+                    if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+                        dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
+                        dynamicErrorMsgContentEn.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+            
+                    if (dynamicContentAr && !dynamicContentAr.value.trim()){
+                        dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
+                        dynamicErrorMsgContentAr.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+                        dom = "false";
+
+
+                    }
+                    if(partnership_count == 1){
+                        if(dynamicimage.files.length == 0 && dynamicimagesrc.src.endsWith("/media/") ){
+                        reset_imageerror.innerText = "Please insert image."
+                        reset_imageerror.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+
+                        dom = "false"
+                    }  
+                    }
+                    else{
+                        if(dynamicimage.files.length == 0 && dynamicimagesrc.src == "" ){
+                        reset_imageerror.innerText = "Please insert image."
+                        reset_imageerror.style.display = 'block';
+                        dynamicErrorMsgContentEn.scrollIntoView();
+
+
+                        dom = "false"
+                    }  
+
+                    }
+                  
+                    
+                }
+               
+            } 
+           
+        catch(err){
+            console.log("error: "+err)
+            return false
+        }  
+                }
+
+            
+            if(dom == "true"){    
             try{
             partnership_count++;
+            console.log("increase value: "+partnership_count)
+            var Partnership_ID = "id" + Math.random().toString(16).slice(2)
             let newRow = `
+            <div id="section-partnership-${partnership_count}">
+
             <div id="dynamic-partnership-section-${partnership_count}">
                             <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${partnership_count}</h1>
+                            <p class="field-roll-id" style='display:none'>${Partnership_ID}</p>
+                        <p id="field-roll-partnership-id-${partnership_count}" style='display:none'>${Partnership_ID}</p>
                         </div>
                         <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
     
@@ -1741,7 +2196,8 @@ function displaySocialMediaImg(event) {
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-title-en-${partnership_count}">Title (English)</label>
                                     <input class="form-control btn-pill " id="partnership-title-en-${partnership_count}" name="partnership_title_en_${partnership_count}" type="text" value="1" placeholder="Title (English)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-en-${partnership_count}"></p>
+
                                 </div>
                             </div>
     
@@ -1749,7 +2205,8 @@ function displaySocialMediaImg(event) {
                                 <div class="mb-3">
                                     <label class="form-label" for="section-2-title-arabic-${partnership_count}">Title (Arabic)</label>
                                     <input class="form-control btn-pill" id="partnership-title-ar-${partnership_count}" name="partnership_title_ar_${partnership_count}" type="text" value="1" placeholder="Title (Arabic)">
-                                   
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-ar-${partnership_count}"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -1763,7 +2220,8 @@ function displaySocialMediaImg(event) {
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-en-${partnership_count}">Content (English)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en-${partnership_count}" name="partnership_content_en_${partnership_count}" type="text" placeholder="content (English)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-en-${partnership_count}"></p>
+
                                 </div>
                             </div>
     
@@ -1771,7 +2229,8 @@ function displaySocialMediaImg(event) {
                                 <div class="mb-3">
                                     <label class="form-label" for="partnership-content-ar-${partnership_count}">Content (Arabic)</label>
                                     <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar-${partnership_count}" name="partnership_content_ar_${partnership_count}" type="text"  placeholder="content (Arabic)">1</textarea>
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-ar-${partnership_count}"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -1794,7 +2253,8 @@ function displaySocialMediaImg(event) {
                                             <!--{% endif %}-->
             
                                             <img id="selected-partnership-image-${partnership_count}" style="display: none; width: 100px; height: 100px;" />
-            
+                                            <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-${partnership_count}"></p>
+
                                         </div>
                                     </div>
                                     <p id = "partnership-warning-${partnership_count}"></p>
@@ -1803,11 +2263,14 @@ function displaySocialMediaImg(event) {
                             
                             
                         <div>
+                        <input type="hidden" class="last-form-1-field-id-1" value="${partnership_count}"/>
+
 
                              <div class="col-12  text-end " >
 
-                                <button id="delete-row" class="btn btn-danger">-</button>
+                                <button id="delete-row" onclick = "return deletepartnershipsection(${partnership_count})" class="btn btn-danger">-</button>
                 </div>  
+            </div>    
 
             <br>`;
             
@@ -1821,10 +2284,67 @@ function displaySocialMediaImg(event) {
             return false
         }
     }
+    else{
+        console.log("some thing missing")
+        return false
+    }
+    }
+    deleteing_partnershipfield = []
+    function deletepartnershipsection(id){
+        try {
+            console.log(id)
+        let deletingPartnership = document.getElementById(`section-partnership-${id}`);
+        console.log( deleteing_partnershipfield)
+        if (deletingPartnership) {
+            //deletingField.innerHTML = `form ${id} has been deleted`;
+            deletingPartnership.remove()
+            
+            deleteing_partnershipfield.push(id)
+
+            const lastpartnerfield = document.querySelectorAll('.last-partnership-field-id-1');
+                
+            partnership_count = lastpartnerfield [lastpartnerfield .length -1].value;
+
+            console.log(partnership_count)
+            console.log(deleteing_partnershipfield)
+            
+               
+            
+           
+        }
+        } catch (err) {
+            console.log(err)
+            return false
+
+        }
+           
+    }
+
+
+    //dynamic_deleted_section_field = []
+
+    /*function deletesectionrow(id,counter){
+        console.log(id)
+        try{
+        console.log(id)
+        dynamic_deleted_section_field.push(id)
+        deleteing_section2field .push(counter)
+        document.getElementById(`section-form-${id}`).style.display = "none"
+        //alert(id)
+        //featureCount--
+        console.log( dynamic_deleted_section_field)
+        return false
+        }
+        catch(err){
+            console.log(err)
+            return false
+        }
+    }*/
+
 
     let section_field_1 = 1;
     try{
-                const lastfield1field = document.querySelectorAll('.last-form-1-field-id');
+                const lastfield1field = document.querySelectorAll('.last-form-1-field-id-1');
                 
                 section_field_1  = lastfield1field[lastfield1field.length -1].value;
 
@@ -2029,7 +2549,7 @@ function displaySocialMediaImg(event) {
                                 <p id = "section-2-warning-${section_field_1}"></p>
                             </div>
                         </div>
-                        <input type="hidden" class="last-header-image-field-id-${section_field_1}" value="${headerimageCount}"/>
+                        <input type="hidden" class="last-form-1-field-id-${section_field_1}" value="${section_field_1}"/>
 
                 <div class="col-12  text-end " >
 
@@ -2058,6 +2578,7 @@ function displaySocialMediaImg(event) {
     deleteing_section2field = []
     function deletesection2(id){
         try {
+            console.log(id)
         let deletingsection2 = document.getElementById(`section-form-${id}`);
         console.log(deleteing_section2field)
         if (deletingsection2) {
@@ -2066,12 +2587,12 @@ function displaySocialMediaImg(event) {
             
             deleteing_section2field.push(id)
 
-            const lastfield1field = document.querySelectorAll(`.last-form-1-field-id-${id}`);
+            const lastfield1field = document.querySelectorAll(`.last-form-1-field-id-1`);
                 
             section_field_1  = lastfield1field[lastfield1field.length -1].value;
             console.log(section_field_1)
             console.log(deleteing_section2field)
-            return false
+            
                
             
            
@@ -2082,6 +2603,25 @@ function displaySocialMediaImg(event) {
 
         }
            
+    }
+    dynamic_deleted_section_field = []
+
+    function deletesectionrow(id,counter){
+        console.log(id)
+        try{
+        console.log(id)
+        dynamic_deleted_section_field.push(id)
+        deleteing_section2field .push(counter)
+        document.getElementById(`section-form-${id}`).style.display = "none"
+        //alert(id)
+        //featureCount--
+        console.log( dynamic_deleted_section_field)
+        return false
+        }
+        catch(err){
+            console.log(err)
+            return false
+        }
     }
 
     let adscount = 1
