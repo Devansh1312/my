@@ -1,4 +1,4 @@
-{% extends 'base1.html' %} {% load static %} {% block css %}
+{% extends 'base1.html' %} {% load lang_filter %} {% load static %} {% block css %}
 <!-- Plugins css start-->
 <style>
     .star-rating {
@@ -31,20 +31,10 @@
                 </div>
                 <div class="col-xl-6">
                     <div class="hero-six-content">
-                        <h1>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.heading_title_ar }}
-                            {% else %}
-                            {{ cmsdata.heading_title_en }}
-                            {% endif %}
-                        </h1>
-                        <p>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.heading_content_ar }}
-                            {% else %}
-                            {{ cmsdata.heading_content_en }}
-                            {% endif %}
-                        </p>
+                        {% lang cmsdata current_language "heading_title" as heading_title %}
+                        <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
+                        {% lang cmsdata current_language "heading_content" as heading_content %}
+                        <p>{{ heading_content }}</p>
                         <a href="" class="theme-btn style-two">Read More <i class="far fa-arrow-right"></i>
                         </a>
                     </div>

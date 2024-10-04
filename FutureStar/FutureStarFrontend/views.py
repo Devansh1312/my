@@ -32,6 +32,7 @@ class HomePage(View):
             cmsdata = None  # Handle the case where the object does not exist
 
         current_language = request.session.get('language', 'en')
+        print("get" , current_language )
 
         context = {
             "marquee": marquee,
@@ -51,10 +52,36 @@ class HomePage(View):
     
     def post(self, request, *args, **kwargs):
         selected_language = request.POST.get('language', 'en')
-        request.session['language'] = selected_language
+        current_language = request.session['language'] = selected_language
+        marquee = Slider_Content.objects.all()
+        app_features = App_Feature.objects.all()
+        testimonials = Testimonial.objects.all().order_by('-id')[:3]
+        news = News.objects.all().order_by('-id')[:4]
+        partner = Partners.objects.all()
+        team_members = Team_Members.objects.all().order_by('id')
+        cmsfeatures = cms_home_dynamic_field.objects.all()
+        # print("post" , current_language )
+        cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all()
+        try:
+            cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+        
+        context = {
+            "marquee": marquee,
+            "app_features": app_features,
+            "testimonials": testimonials,
+            "news": news,
+            "partner": partner,
+            "team_members": team_members,
+            "cmsdata": cmsdata,
+            "current_language":current_language,
+            "cmsfeatures":cmsfeatures,
+            "cms_home_dynamic_achivements":cms_home_dynamic_achivements,
 
-        return redirect('index')
 
+        }
+        return render(request, "home.html", context)
 
 
 

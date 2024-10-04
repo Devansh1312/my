@@ -1,45 +1,54 @@
 {% extends 'base1.html' %}
 
 {% load static %}
+{% load lang_filter %} <!-- Loading your custom filter -->
 
 {% block css %}
-<!-- Plugins css start-->
-
-<!-- Plugins css Ends-->
+<!-- Add your CSS if needed -->
 {% endblock %}
-{% block title %} Future Star || Success-Stories  {% endblock %}
+
+{% block title %} Future Star || Success-Stories {% endblock %}
+
 {% block content %}
+
 <!-- Page Banner Start -->
-<section class="success-stories-page-banner common-banner text-center" style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37,67,0,1) 100%), url('/media/{{ cmsdata.heading_banner }}');">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="banner-inner">
-                    <h1 class="page-title wow fadeInUp delay-0-2s">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.heading_title_ar }}
-                        {% else %}
-                        {{ cmsdata.heading_title_en }}
-                        {% endif %}   
-                    </h1>
-                    <p>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.heading_content_ar }}
-                        {% else %}
-                        {{ cmsdata.heading_content_en }}
-                        {% endif %}
-                    </p>
+
+
+<section class="success-stories-page-banner common-banner text-center" 
+style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37,67,0,1) 100%), url('/media/{{ cmsdata.heading_banner }}');">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="banner-inner">
+                    <!-- <h1 class="page-title wow fadeInUp delay-0-2s"> -->
+                        {% lang cmsdata current_language "heading_title" as heading_title %}
+                        <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
+
+                       
+
+                    <!-- </h1> -->
+                    <!-- <p> -->
+                        {% lang cmsdata current_language "heading_content" as heading_content %}
+                        <p>{{ heading_content }}</p>
+                       
+                    
+                        
+
+                       
+                    <!-- </p> -->
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!-- Page Banner End -->       
-   
+<!-- Page Banner End -->
+
 <!-- Success Players Area Start -->
 <section class="success-players">
     <div class="container">
         <div class="row">
+            <!-- Example of static player cards -->
             <div class="col-lg-3 col-sm-6 custome-alignment">
                 <div class="item-wrapper wow fadeInUp delay-0-3s animated">
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt=""></div>
@@ -64,77 +73,149 @@
                     </div>
                 </div>
             </div>
+            <!-- Repeat similar player cards for more players -->
             <div class="col-lg-3 col-sm-6 custome-alignment">
+
                 <div class="item-wrapper wow fadeInUp delay-0-5s animated">
+
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-2.jpg' %}" class="img-fluid" alt=""></div>
+
                     <h5 class="player-name">Mark Jones</h5>
+
                     <p class="player-designation">Goalkeeper</p>
+
                     <div class="social-info-wrapper">
+
                         <div class="social-info-item">
+
                             <p class="number">10</p>
+
                             <p class="des">Post</p>
+
                         </div>
+
                         <div class="social-info-item">
+
                             <p class="number">20</p>
+
                             <p class="des">Following</p>
+
                         </div>
+
                         <div class="social-info-item">
+
                             <p class="number">30</p>
+
                             <p class="des">Followers</p>
+
                         </div>
+
                     </div>
+
                     <div>
+
                         <a class="theme-btn style-two" href="#">View Info <i class="far fa-arrow-right"></i></a>
+
                     </div>
+
                 </div>
+
             </div>
+
             <div class="col-lg-3 col-sm-6 custome-alignment">
+
                 <div class="item-wrapper wow fadeInUp delay-0-7s animated">
+
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt=""></div>
+
                     <h5 class="player-name">Mark Jones</h5>
+
                     <p class="player-designation">Goalkeeper</p>
+
                     <div class="social-info-wrapper">
+
                         <div class="social-info-item">
+
                             <p class="number">10</p>
+
                             <p class="des">Post</p>
+
                         </div>
+
                         <div class="social-info-item">
+
                             <p class="number">20</p>
+
                             <p class="des">Following</p>
+
                         </div>
+
                         <div class="social-info-item">
+
                             <p class="number">30</p>
+
                             <p class="des">Followers</p>
+
                         </div>
+
                     </div>
+
                     <div>
+
                         <a class="theme-btn style-two" href="#">View Info <i class="far fa-arrow-right"></i></a>
+
                     </div>
+
                 </div>
+
             </div>
+
             <div class="col-lg-3 col-sm-6 custome-alignment">
+
                 <div class="item-wrapper wow fadeInUp delay-0-9s animated">
+
                     <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-2.jpg' %}" class="img-fluid" alt=""></div>
+
                     <h5 class="player-name">Mark Jones</h5>
+
                     <p class="player-designation">Goalkeeper</p>
+
                     <div class="social-info-wrapper">
+
                         <div class="social-info-item">
+
                             <p class="number">10</p>
+
                             <p class="des">Post</p>
+
                         </div>
+
                         <div class="social-info-item">
+
                             <p class="number">20</p>
+
                             <p class="des">Following</p>
+
                         </div>
+
                         <div class="social-info-item">
+
                             <p class="number">30</p>
+
                             <p class="des">Followers</p>
+
                         </div>
+
                     </div>
+
                     <div>
+
                         <a class="theme-btn style-two" href="#">View Info <i class="far fa-arrow-right"></i></a>
+
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -145,13 +226,14 @@
 <section class="tryouts-club">
     <div class="container">
         <div class="section-title mb-60 text-center">
-            <h2>
-                {% if current_language == "ar" %}
-                {{ cmsdata.section_2_title_ar }}
-                {% else %}
-                {{ cmsdata.section_2_title_en }}
-                {% endif %}
-            </h2>
+            <!-- <h2> -->
+                {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                <h2>{{ section_2_title }}</h2>
+
+                
+
+                
+            <!-- </h2> -->
         </div>
         <div class="tryouts-slider">
             {% for tryout_club in tryout_clubs %}
@@ -174,23 +256,42 @@
     </div>
 </section>
 <!-- Tryouts Clubs Area End -->
+
 {% endblock %}
 
 {% block scriptcontent %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set default language from localStorage or 'en' by default
-        const currentLanguage = localStorage.getItem('language') || 'en';
-        document.getElementById('language-selector').value = currentLanguage;
 
-        // On language change, update localStorage
-        document.getElementById('change-language-btn').addEventListener('click', function() {
-            const selectedLanguage = document.getElementById('language-selector').value;
-            localStorage.setItem('language', selectedLanguage);
+{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Load the language from localStorage or default to English
+        const savedLanguage = localStorage.getItem('current_language') || 'en';
+        $('#language-selector').val(savedLanguage);
+
+        // Handle change event of language selector
+        $('#language-selector').on('change', function() {
+            const selectedLanguage = $(this).val();
+            localStorage.setItem('current_language', selectedLanguage); // Save to localStorage
+            $('#language-form').submit(); // Submit the form via POST to change language
         });
     });
 </script>
-{% endblock %}
-{% block script %} 
-<script>new WOW().init();</script>
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load the language from localStorage or default to English
+        const savedLanguage = localStorage.getItem('current_language') || 'en';
+        document.getElementById('language-selector').value = savedLanguage;
+    
+        // Change event for the language selector
+        document.getElementById('language-selector').addEventListener('change', function() {
+            const selectedLanguage = this.value;
+            localStorage.setItem('current_language', selectedLanguage); // Save to localStorage
+            location.reload(); // Reload the page to apply the new language
+        });
+    });
+    </script> -->
+<script>new WOW().init();</script> <!-- For animations -->
 {% endblock %}

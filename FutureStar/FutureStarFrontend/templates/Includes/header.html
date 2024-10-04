@@ -23,16 +23,22 @@
                                 </a>
                             </div>
                             <div class="menu-btns-mobile">
-                                        
-                                <!-- Select Language -->
+                                <!-- Form for language selection -->
+                                <form id="language-form" method="POST" action="">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="">
+                                </form>
+
+                                <!-- Language Select Dropdown -->
                                 <select class="selectLanguage">
-                                    <option value="ENG">En</option>
-                                    <option value="ARA">Ar</option>
-                                </select>
+                                    <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
+                                    <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
+                                </select>                                
+
 
                                 <!-- Profile Wrapper -->
                                 <a href="#" class="profile-wrapper">
-                                    <img src="assets/images/profile-pic.jpg" alt=""><span>Divyang Sadhu</span>
+                                    <img src="assets/images/profile-pic.jpg" alt=""><span>{{ user.username }}</span>
                                 </a>
                             </div>
                             <!-- Toggle Button -->
@@ -92,10 +98,15 @@
                         </a>
                     {% endif %}
 
-                    <!-- Select Language -->
-                    <select class="selectLanguage">
-                        <option value="ENG">En</option>
-                        <option value="ARA">Ar</option>
+                    <!-- Language Select Dropdown -->
+                    <!-- <select class="selectLanguage">
+                        <option value="en" {% if current_language == 'en' %} selected {% endif %}>English</option>
+                        <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Arabic</option>
+                    </select>     -->
+                     <!-- Select Language -->
+                     <select class="selectLanguage">
+                        <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
+                        <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
                     </select>
                     <!-- menu sidbar -->
                     <div class="menu-sidebar">
@@ -150,4 +161,18 @@
         </div>
     </div>
 </section>
+<!-- Add jQuery to handle form submission on change -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery for handling language selection -->
+<script>
+    $(document).ready(function() {
+        // Handle language change
+        $('.selectLanguage').change(function() {
+            var selectedLanguage = $(this).val();
+            $('input[name="language"]').val(selectedLanguage);
+            $('#language-form').submit();
+        });
+    });
+</script>
+
 <!--End Hidden Sidebar -->
