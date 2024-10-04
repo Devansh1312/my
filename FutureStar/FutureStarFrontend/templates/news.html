@@ -2,6 +2,7 @@
 
 {% load static %}
 
+{% load lang_filter %}
 {% block css %}
 <!-- Plugins css start-->
 
@@ -19,19 +20,17 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="banner-inner">
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                           
                     <h1 class="page-title wow fadeInUp delay-0-2s">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.heading_title_ar }}
-                        {% else %}
-                        {{ cmsdata.heading_title_en }}
-                        {% endif %}   
+                        {{heading_title}}
+                           
                     </h1>
+                    {% lang cmsdata current_language "heading_content" as heading_content %}
+                           
                     <p>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.heading_content_ar }}
-                        {% else %}
-                        {{ cmsdata.heading_content_en }}
-                        {% endif %}
+                        {{heading_content}}
+                       
                     </p>
                 </div>
             </div>        
@@ -66,12 +65,11 @@
                             <span>{{ news.news_date|date:"F d, Y" }}</span>
                         </li>
                     </ul>
+                    {% lang news current_language "title" as title %}
+                           
                     <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
-                           {% if current_language == "ar" %}
-                           {{ news.title_ar }}
-                           {% else %}
-                           {{ news.title_en }}
-                           {% endif %}
+                        {{title}}
+                          
                     </a>
                     <a class="read-more" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
                         Read More <i class="far fa-arrow-right"></i>

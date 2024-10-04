@@ -1,7 +1,7 @@
 {% extends 'base1.html' %}
 
 {% load static %}
-
+{% load lang_filter %}
 {% block css %}
 <!-- Plugins css start-->
 
@@ -30,12 +30,11 @@
                             <a href="#">Comment (5)</a>
                         </li>
                     </ul>
+                    {% lang news current_language "title" as title %}
+                           
                     <h1 class="page-title wow fadeInUp delay-0-3s">
-                        {% if current_language == "ar" %}
-                        {{ news.title_ar }}
-                        {% else %}
-                        {{ news.title_en }}
-                        {% endif %}
+                        {{title}}
+                      
                     </h1>
                 </div>
             </div>
@@ -44,16 +43,6 @@
 </section>
 <!-- Page Banner End -->
 
-<!-- Language Switcher
-<form id="language-form" method="POST" action="">
-    {% csrf_token %}
-    <input type="hidden" name="id" value="{{ news.id }}">
-    <select id="language-selector" name="language">
-        <option style="color: black;" value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
-        <option style="color: black;" value="ar" {% if current_language == 'ar' %}selected{% endif %}>Arabic</option>
-    </select>
-    <button type="submit" id="change-language-btn">Change Language</button>
-</form> -->
 
 <!-- Blog Details Page Area start -->
 <section class="blog-details-page py-100">
@@ -68,29 +57,26 @@
             </div>
             <div class="col-xl-7">
                 <div class="blog-single-content wow fadeInRight delay-0-2s">
+                    {% lang news current_language "title" as title %}
+                           
                     <p class="big-first-letter">
-                        {% if current_language == "ar" %}
-                        {{ news.title_ar }}
-                        {% else %}
-                        {{ news.title_en }}
-                        {% endif %}
+                        {{title}}
+                       
                     </p>
                 </div>
             </div>
             <div class="col wow fadeInUp delay-0-2s">
+                {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                           
                 <h3>
-                    {% if current_language == "ar" %}
-                    {{ cmsdata.section_2_title_ar }}
-                    {% else %}
-                    {{ cmsdata.section_2_title_en }}
-                    {% endif %}   
+                    {{section_2_title}}
+                   
                 </h3>
+                {% lang cmsdata current_language "section_2_content" as section_2_content %}
+                           
                 <p>
-                    {% if current_language == "ar" %}
-                    {{ cmsdata.section_2_content_ar }}
-                    {% else %}
-                    {{ cmsdata.section_2_content_en }}
-                    {% endif %}   
+                    {{section_2_content}}
+                      
                 </p>
             </div>
         </div>

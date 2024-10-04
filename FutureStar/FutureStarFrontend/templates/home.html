@@ -65,19 +65,17 @@
                         <img src="media/{{ cmsdata.sub_heading_logo }}" alt="Logo">
                     </div>
                     <div class="section-title">
+                        {% lang cmsdata current_language "sub_heading_name" as sub_heading_name %}
+                           
                         <span class="sub-title">
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.sub_heading_name_ar }}
-                            {% else %}
-                            {{ cmsdata.sub_heading_name_en }}
-                            {% endif %}
+                            {{sub_heading_name}}
+                          
                         </span>
+                        {% lang cmsdata current_language "sub_heading_title" as sub_heading_title %}
+                           
                         <h3> 
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.sub_heading_title_ar }}
-                            {% else %}
-                            {{ cmsdata.sub_heading_title_en }}
-                            {% endif %}
+                            {{sub_heading_title}}
+                           
                         </h3>
                     </div>
                 </div>
@@ -94,19 +92,18 @@
                             <img src="media/{{ cmsdata.sub_heading_icon_1 }}" alt="">
                         </div>
                         <div class="content">
+                            {% lang cmsdata current_language "sub_heading_logo_title_1" as sub_heading_logo_title_1 %}
+                           
+                            
                             <h5>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.sub_heading_logo_title_1_ar }}
-                            {% else %}
-                            {{ cmsdata.sub_heading_logo_title_1_en }}
-                            {% endif %}
+                                {{sub_heading_logo_title_1}}
+                           
                             </h5>
+                            {% lang cmsdata current_language "sub_heading_logo_content_1" as sub_heading_logo_content_1 %}
+                           
                             <p>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.sub_heading_logo_content_1_ar }}
-                            {% else %}
-                            {{ cmsdata.sub_heading_logo_content_1_en }}
-                            {% endif %}
+                                {{sub_heading_logo_content_1}}
+                           
                             </p>
                         </div>
                     </div>
@@ -115,19 +112,17 @@
                             <img src="media/{{ cmsdata.sub_heading_icon_2 }}" alt="About">
                         </div>
                         <div class="content">
+                            {% lang cmsdata current_language "sub_heading_logo_title_2" as sub_heading_logo_title_2 %}
+                           
                             <h5>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.sub_heading_logo_title_2_ar }}
-                            {% else %}
-                            {{ cmsdata.sub_heading_logo_title_2_en }}
-                            {% endif %}
+                                {{sub_heading_logo_title_2}}
+                           
                             </h5>
+                            {% lang cmsdata current_language "sub_heading_logo_content_2" as sub_heading_logo_content_2 %}
+                           
                             <p>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.sub_heading_logo_content_2_ar }}
-                            {% else %}
-                            {{ cmsdata.sub_heading_logo_content_2_en }}
-                            {% endif %}
+                                {{sub_heading_logo_content_2}}
+                           
                             </p>
                         </div>
                     </div>
@@ -147,21 +142,19 @@
 <div class="video-area-six py-100 bgs-cover" style="background-image:  url('media/{{ cmsdata.section_2_background }}');">
     <div class="container">
         <div class="video-six-content wow fadeInUp delay-0-2s">
+            {% lang cmsdata current_language "section_2_heading" as section_2_heading %}
+                           
             <span class="video-title mb-20">
-                {% if current_language == "ar" %}
-                {{ cmsdata.section_2_heading_ar }}
-                {% else %}
-                {{ cmsdata.section_2_heading_en }}
-                {% endif %}
+                {{section_2_heading}}
+              
             </span>
             <div class="row align-items-center justify-content-center">
                 <div class="col-xl-12">
+                    {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                           
                     <span class="video-text text-center">
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.section_2_title_ar }}
-                            {% else %}
-                            {{ cmsdata.section_2_title_en }}
-                            {% endif %}
+                        {{section_2_title}}
+                           
                     </span>
                 </div>
                 <div class="col-xl-2 col-lg-3 col-md-2 text-center">
@@ -170,12 +163,11 @@
                     </a>
                 </div>
                 <div class="col-xl-10 col-lg-9 col-md-10">
+                    {% lang cmsdata current_language "section_2_content" as section_2_content %}
+                           
                     <p class="mt-35 mb-0">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_2_content_ar }}
-                        {% else %}
-                        {{ cmsdata.section_2_content_en }}
-                        {% endif %}
+                        {{section_2_content}}
+                      
                     </p>
                 </div>
             </div>
@@ -189,26 +181,23 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title text-center mb-60 rmb-50 wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
+                           
                     <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_3_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_3_heading_en }}
-                        {% endif %}
+                        {{section_3_heading}}
+                      
                     </span>
+                    {% lang cmsdata current_language "section_3_title" as section_3_title %}
+                           
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_3_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_3_title_en }}
-                        {% endif %}
+                        {{section_3_title}}
+                      
                     </h3>
+                    {% lang cmsdata current_language "section_3_content" as section_3_content %}
+                           
                     <p>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_3_content_ar }}
-                        {% else %}
-                        {{ cmsdata.section_3_content_en }}
-                        {% endif %}
+                        {{section_3_content}}
+                       
                     </p>
                 </div>
             </div>
@@ -222,20 +211,18 @@
                     </div>
                     <div class="content">
                         <h5>
+                            {% lang cmsdata current_language "section_3_feature_title" as section_3_feature_title %}
+                           
                             <a href="">
-                                {% if current_language == "ar" %}
-                                {{ cmsdata.section_3_feature_title_ar }}
-                                {% else %}
-                                {{ cmsdata.section_3_feature_title_en }}
-                                {% endif %}
+                                {{section_3_feature_title}}
+                                
                             </a>
                         </h5>
+                        {% lang cmsdata current_language "section_3_feature_short_content" as section_3_feature_short_content %}
+                           
                         <p>
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.section_3_feature_short_content_ar }}
-                            {% else %}
-                            {{ cmsdata.section_3_feature_short_content_en }}
-                            {% endif %}
+                            {{section_3_feature_short_content}}
+                           
                         </p>
                     </div>
                 </div>
@@ -248,20 +235,18 @@
                     </div>
                     <div class="content">
                         <h5>
+                            {% lang cmsfeatures current_language "title" as title %}
+                           
                             <a href="">
-                                {% if current_language == "ar" %}
-                                {{ cmsfeatures.title_ar }}
-                                {% else %}
-                                {{ cmsfeatures.title_en }}
-                                {% endif %}
+                                {{title}}
+                               
                             </a>
                         </h5>
+                        {% lang cmsfeatures current_language "content" as content %}
+                           
                         <p>
-                            {% if current_language == "ar" %}
-                            {{ cmsfeatures.content_ar }}
-                            {% else %}
-                            {{ cmsfeatures.content_en }}
-                            {% endif %}
+                            {{content}}
+                          
                         </p>
                     </div>
                 </div>
@@ -282,12 +267,11 @@
 <div class="video-area-six py-100" style="background-image: url('media/{{ cmsdata.section_4_background }}');">
     <div class="container">
         <div class="video-six-content wow fadeInUp delay-0-2s">
+            {% lang cmsdata current_language "section_4_title" as section_4_title %}
+                           
             <span class="video-title mb-20 rmb-0">
-                {% if current_language == "ar" %}
-                {{ cmsdata.section_4_title_ar }}
-                {% else %}
-                {{ cmsdata.section_4_title_en }}
-                {% endif %}
+                {{section_4_title}}
+               
             </span>
             <div class="row align-items-center justify-content-center">
                 <div class="col-xl-2 col-lg-3 col-md-2 text-center">
@@ -296,12 +280,11 @@
                     </a>
                 </div>
                 <div class="col-xl-10 col-lg-9 col-md-10">
+                    {% lang cmsdata current_language "section_4_content" as section_4_content %}
+                           
                     <p class="mt-35 mb-0"> 
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_4_content_ar }}
-                        {% else %}
-                        {{ cmsdata.section_4_content_en }}
-                        {% endif %}
+                        {{section_4_content}}
+                      
                     </p>
                 </div>
             </div>
@@ -315,19 +298,17 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title text-center mb-55 wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "section_5_heading" as section_5_heading %}
+                           
                     <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_5_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_5_heading_en }}
-                        {% endif %}
+                        {{section_5_heading}}
+                       
                     </span>
+                    {% lang cmsdata current_language "section_5_title" as section_5_title %}
+                           
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_5_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_5_title_en }}
-                        {% endif %}
+                        {{section_5_title}}
+                       
                     </h3>
                 </div>
             </div>
@@ -340,8 +321,18 @@
                         <img class="team-member-images" src="{{ team_member.image.url }}" alt="Team Member">
                     </div>
                     <div class="content text-center">
-                        <h4> {% if current_language == "ar" %} {{ team_member.name_ar }} {% else %} {{ team_member.name_en }} {% endif %} </h4>
-                        <span> {% if current_language == "ar" %} {{ team_member.designations_ar }} {% else %} {{ team_member.designations_en }} {% endif %} </span>
+                        {% lang team_member current_language "name" as name %}
+                           
+                        <h4>
+                            {{name}}
+
+                        </h4>
+                        {% lang team_member current_language "designations" as designations %}
+                           
+                        <span>
+                            {{designations}}
+                             
+                        </span>
                     </div>
                 </div>
             </div> {% endfor %} </div>
@@ -354,19 +345,17 @@
         <div class="row align-items-end pb-35">
             <div class="col-lg-12">
                 <div class="section-title mb-30 wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "section_6_heading" as section_6_heading %}
+                           
                     <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_6_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_6_heading_en }}
-                        {% endif %}
+                        {{section_6_heading}}
+                      
                     </span>
+                    {% lang cmsdata current_language "section_6_title" as section_6_title %}
+                           
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_6_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_6_title_en }}
-                        {% endif %}
+                        {{section_6_title}}
+                       
                     </h3>
                 </div>
             </div>
@@ -388,19 +377,17 @@
 
                     <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#awards-tab-one">
                         <span class="left">
+                            {% lang cmsdata current_language "achivement_heading" as achivement_heading %}
+                           
                             <h5 class="award-head">
-                                {% if current_language == "ar" %}
-                                {{ cmsdata.achivement_heading_ar }}
-                                {% else %}
-                                {{ cmsdata.achivement_heading_en }}
-                                {% endif %}
+                                {{achivement_heading}}
+                                
                             </h5>
+                            {% lang cmsdata current_language "achivement_title" as achivement_title %}
+                           
                             <span class="award-type">
-                                {% if current_language == "ar" %}
-                                {{ cmsdata.achivement_title_ar }}
-                                {% else %}
-                                {{ cmsdata.achivement_title_en }}
-                                {% endif %}
+                                {{achivement_title}}
+                              
                             </span>
                         </span>
                         <span class="details-btn">
@@ -411,19 +398,17 @@
                     {% for cms_home_dynamic_achivements in cms_home_dynamic_achivements %}
                     <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#awards-tab-one">
                         <span class="left">
+                            {% lang cms_home_dynamic_achivements current_language "heading" as heading %}
+                           
                             <h5 class="award-head">
-                                {% if current_language == "ar" %}
-                                {{ cms_home_dynamic_achivements.heading_ar }}
-                                {% else %}
-                                {{ cms_home_dynamic_achivements.heading_en }}
-                                {% endif %}
+                                {{heading}}
+                               
                             </h5>
+                            {% lang cms_home_dynamic_achivements current_language "title" as title %}
+                           
                             <span class="award-type">
-                                {% if current_language == "ar" %}
-                                {{ cms_home_dynamic_achivements.title_ar }}
-                                {% else %}
-                                {{ cms_home_dynamic_achivements.title_en }}
-                                {% endif %}
+                                {{title}}
+                               
                             </span>
                         </span>
                         <span class="details-btn">
@@ -444,7 +429,11 @@
         <div class="headline-wrap marquee">
             <span> {% for marquee in marquee %} <span class="marquee-item">
                     <i class="fas fa-star-of-life"></i>
-                    <b> {% if current_language == "ar" %} {{ marquee.content_ar }} {% else %} {{ marquee.content_en }} {% endif %} </b>
+                    {% lang marquee current_language "content" as content %}
+                           
+                    <b> 
+                        {{content}}
+                     </b>
                 </span> {% endfor %} </span>
         </div>
     </div>
@@ -456,19 +445,17 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "section_8_heading" as section_8_heading %}
+                           
                     <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_8_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_8_heading_en }}
-                        {% endif %}
+                        {{section_8_heading}}
+                        
                     </span>
+                    {% lang cmsdata current_language "section_8_title" as section_8_title %}
+                           
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_8_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_8_title_en }}
-                        {% endif %}
+                        {{section_8_title}}
+                      
                     </h3>
                 </div>
             </div>
@@ -483,8 +470,19 @@
                     </a>
                 </div>
                 <div class="content">
-                    <a href="{% url 'index' %}" class="category"> {% if current_language == "ar" %} {{ app_feature.title_ar }} {% else %} {{ app_feature.title_en }} {% endif %} </a>
-                    <a class="head" href="{% url 'index' %}"> {% if current_language == "ar" %} {{ app_feature.sub_title_ar }} {% else %} {{ app_feature.sub_title_en }} {% endif %} </a>
+                    {% lang app_feature current_language "title" as title %}
+                           
+                    <a href="{% url 'index' %}" class="category">
+                        {{title}}
+                       
+                     </a>
+                     {% lang app_feature current_language "sub_title" as sub_title %}
+                           
+                     
+                     <a class="head" href="{% url 'index' %}"> 
+                        {{sub_title}}
+                      
+                    </a>
                 </div>
             </div> {% endfor %} </div>
         <div class="work-gallery-controls">
@@ -556,7 +554,12 @@
                     <div class="testimonials-active"> {% for testimonial in testimonials %} <div class="testimonial-item">
                             <div class="author-speech">
                                 <p>
-                                    <span class="quote">“</span> {% if current_language == "ar" %} {{ testimonial.content_ar }} {% else %} {{ testimonial.content_en }} {% endif %} <span class="quote right-quote">“</span>
+                                    {% lang testimonial current_language "content" as content %}
+                           
+                                    <span class="quote">“</span>
+                                    {{content}}
+                                    
+                                     <span class="quote right-quote">“</span>
                                 </p>
                             </div>
                             <hr>
@@ -566,8 +569,18 @@
                                         <img src="{{ testimonial.image.url }}" alt="Author Image">
                                     </div>
                                     <div class="author-info">
-                                        <h4> {% if current_language == "ar" %} {{ testimonial.name_ar }} {% else %} {{ testimonial.name_en }} {% endif %} </h4>
-                                        <span class="designation"> {% if current_language == "ar" %} {{ testimonial.designation_ar }} {% else %} {{ testimonial.designation_en }} {% endif %} </span>
+                                        {% lang testimonial current_language "name" as name %}
+                           
+                                        <h4>
+                                            {{name}}
+                                              
+                                            </h4>
+                                            {% lang testimonial current_language "designation" as designation %}
+                           
+                                            <span class="designation">
+                                            {{designation}}
+                                             
+                                            </span>
                                     </div>
                                 </div>
                                 <div class="ratting style-two">
@@ -592,19 +605,17 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "section_9_heading" as section_9_heading %}
+                           
                     <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_9_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_9_heading_en }}
-                        {% endif %}
+                        {{section_9_heading}}
+                       
                     </span>
+                    {% lang cmsdata current_language "section_9_title" as section_9_title %}
+                           
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_9_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_9_title_en }}
-                        {% endif %}
+                        {{section_9_title}}
+                       
                     </h3>
                 </div>
             </div>
@@ -645,19 +656,18 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s animated" style="visibility: visible; animation-name: fadeInUp;">
+                    {% lang cmsdata current_language "section_10_heading" as section_10_heading %}
+                           
                     <span class="sub-title">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_10_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_10_heading_en }}
-                        {% endif %}
+                        {{section_10_heading}}
+                        
+                        
                     </span>
+                    {% lang cmsdata current_language "section_10_title" as section_10_title %}
+                           
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_10_title_ar }}
-                        {% else %}
-                        {{ cmsdata.section_10_title_en }}
-                        {% endif %}
+                        {{section_10_title}}
+                       
                     </h3>
                 </div>
             </div>

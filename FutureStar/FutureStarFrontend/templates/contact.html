@@ -1,6 +1,8 @@
 {% extends 'base1.html' %}
 
 {% load static %}
+{% load lang_filter %} <!-- Loading your custom filter -->
+
 
 {% block css %}
 <!-- Plugins css start-->
@@ -15,19 +17,15 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="banner-inner">
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                 
                     <h1 class="page-title wow fadeInUp delay-0-2s">
-                        {% if current_language == "ar" %}
-                            {{ cmsdata.heading_title_ar }}
-                        {% else %}
-                            {{ cmsdata.heading_title_en }}
-                        {% endif %}
+                        {{heading_title}}
                     </h1>
+                    {% lang cmsdata current_language "heading_content" as heading_content %}
+
                     <p>
-                        {% if current_language == "ar" %}
-                            {{ cmsdata.heading_content_ar }}
-                        {% else %}
-                            {{ cmsdata.heading_content_en }}
-                        {% endif %}
+                      {{heading_content}}
                     </p>                    
                 </div>
             </div>
@@ -45,31 +43,26 @@
                     <div class="row">
                         <div class="col-xl-10">
                             <div class="section-title mb-60">
+                                {% lang cmsdata current_language "section_2_heading" as section_2_heading %}      
                                 <span class="sub-title">
-                                    {% if current_language == "ar" %}
-                                        {{ cmsdata.section_2_heading_ar }}
-                                    {% else %}
-                                        {{ cmsdata.section_2_heading_en }}
-                                    {% endif %}
+                                {{section_2_heading}}   
                                 </span>
-                                <h3>
-                                    {% if current_language == "ar" %}
-                                        {{ cmsdata.section_2_title_ar }}
-                                    {% else %}
-                                        {{ cmsdata.section_2_title_en }}
-                                    {% endif %}
-                                </h3>
+                               
+                                {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                            <h3>
+                                {{section_2_title}}
+                            </h3>
                             </div>
                         </div>
                     </div>
                     <div>
                         <div class="our-location-address">
+                            {% lang cmsdata current_language "section_2_country" as section_2_country %}
+                           
+                            
                             <h4>
-                                {% if current_language == "ar" %}
-                                    {{ cmsdata.section_2_country_name_ar }}
-                                {% else %}
-                                    {{ cmsdata.section_2_country_name_en }}
-                                {% endif %}
+                                {{section_2_country}}
+                             
                             </h4>
                             <p>{{ system_settings.address }}</p>
                             <div><a class="mailto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a></div>
@@ -88,19 +81,19 @@
             <div class="col-xl-5 col-md-6">
                 <div class="contact-page-form form-style-one wow fadeInUp delay-0-2s">
                     <div class="section-title mb-15">
+                        {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
+                           
+                        
                         <span class="sub-title">
-                            {% if current_language == "ar" %}
-                                {{ cmsdata.section_3_heading_ar }}
-                            {% else %}
-                                {{ cmsdata.section_3_heading_en }}
-                            {% endif %}
+                         
+                            {{section_3_heading}}
                         </span>
+                        {% lang cmsdata current_language "section_3_title" as section_3_title %}
+                           
+                        
                         <h4>
-                            {% if current_language == "ar" %}
-                                {{ cmsdata.section_3_title_ar }}
-                            {% else %}
-                                {{ cmsdata.section_3_title_en }}
-                            {% endif %}
+                            {{section_3_title}}
+                           
                         </h4>
                     </div>
                     <form id="contactForm" class="contactForm"  action="{% url 'contact' %}" name="contactForm" method="post">
