@@ -11,6 +11,10 @@
 {% block content %}
 
 <!-- Page Banner Start -->
+<form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{ news.id }}">
+</form>
 <section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url(assets/images/banner/banner-bg-two.jpg);">
     <div class="container">
         <div class="banner-inner">
@@ -86,32 +90,6 @@
 {% endblock %}
 
 {% block scriptcontent %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set default language from localStorage or 'en' by default
-        const currentLanguage = localStorage.getItem('language') || 'en';
-        document.getElementById('language-selector').value = currentLanguage;
-
-        // On language change, update localStorage
-        document.getElementById('change-language-btn').addEventListener('click', function() {
-            const selectedLanguage = document.getElementById('language-selector').value;
-            localStorage.setItem('language', selectedLanguage);
-        });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set default language from localStorage or 'en' by default
-        const currentLanguage = localStorage.getItem('language') || 'en';
-        document.getElementById('language-selector').value = currentLanguage;
-
-        // On language change, update localStorage
-        document.getElementById('change-language-btn').addEventListener('click', function() {
-            const selectedLanguage = document.getElementById('language-selector').value;
-            localStorage.setItem('language', selectedLanguage);
-        });
-    });
-</script>
 {% endblock %}
 {% block script %} 
 <script>new WOW().init();</script>

@@ -75,7 +75,7 @@
                         Read More <i class="far fa-arrow-right"></i>
                     </a>
                     
-                    <form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;">
+                    <form action="{% url 'news-detail' %}" method="post" style="display: none;">
                         {% csrf_token %}
                         <input type="hidden" name="id" value="{{ news.id }}">
                     </form>

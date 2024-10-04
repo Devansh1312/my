@@ -1,6 +1,7 @@
 {% extends 'base1.html' %}
 
 {% load static %}
+{% load lang_filter %}
 
 {% block css %}
 <!-- Plugins css start-->
@@ -16,40 +17,44 @@
         <div class="row justify-content-center">
              <div class="col-xl-12">
                  <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
-                     <h2>Create an account into <br> Future Stars Platform</h2>
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                    <h2>
+                        {{heading_title}}
+                    </h2>
                  </div>
              </div>
              <div class="col-xl-6 col-lg-4">
-                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s"  action="#" name="teamForm" method="post">
+                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" action="#" name="teamForm" method="post" onsubmit="return validateForm();">
+                    {% csrf_token %}
                      <div class="row">
                          <div class="col-md-12">
                              <div class="form-group">
-                                 <label for="name">Username</label>
-                                 <input type="text" id="name" name="name" class="form-control" value="" placeholder="" required>
+                                 <label for="username">Username</label>
+                                 <input type="text" id="username" name="username" class="form-control" value="" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group">
-                                 <label for="name">Phone Number</label>
-                                 <input type="text" id="name" name="name" class="form-control" value="" placeholder="" required>
+                                 <label for="phone">Phone Number</label>
+                                 <input type="text" id="phone" name="phone" class="form-control" value="" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group">
-                                 <label for="phone">Password</label>
-                                 <input type="password" id="phone" name="phone" class="form-control" value="" placeholder="">
+                                 <label for="password">Password</label>
+                                 <input type="password" id="password" name="password" class="form-control" value="" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group">
-                                 <label for="phone">Confirm Password</label>
-                                 <input type="password" id="phone" name="phone" class="form-control" value="" placeholder="">
+                                 <label for="confirmPassword">Confirm Password</label>
+                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" value="" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="d-flex mb-30 justify-content-between">
                              <label>
-                                 <input type="checkbox" /> You agree to our Terms and have read and acknowledge the Privacy Policy
+                                 <input type="checkbox" required /> You agree to our Terms and have read and acknowledge the Privacy Policy
                              </label>
                              
                              </div>
@@ -85,5 +90,18 @@
 
 {% endblock %}
 {% block script %} 
-<script>new WOW().init();</script>
+<script>
+    function validateForm() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return false; // Prevent form submission
+        }
+        return true; // Allow form submission
+    }
+
+    new WOW().init();
+</script>
 {% endblock %}

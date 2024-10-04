@@ -248,8 +248,13 @@ class LoginPage(View):
 
     def get(self, request, *args, **kwargs):
         current_language = request.session.get('language', 'en')
+        try:
+            cmsdata = cms_pages.objects.get(id=12)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         context = {
             "current_language": current_language,
+            "cmsdata": cmsdata,
             "google_client_id": settings.GOOGLE_CLIENT_ID,
             "apple_client_id": settings.APPLE_CLIENT_ID,
             "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
@@ -488,9 +493,14 @@ class PlayerDashboardPage(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
     
         current_language = request.session.get('language', 'en')
+        try:
+            cmsdata = cms_pages.objects.get(id=14)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
 
         context = {
             "current_language": current_language,
+            "cmsdata":cmsdata
             # "cmsdata": cmsdata,
         } 
 
@@ -508,8 +518,13 @@ class RegisterPage(View):
 
     def get(self, request, *args, **kwargs):
         current_language = request.session.get('language', 'en')
+        try:
+            cmsdata = cms_pages.objects.get(id=13)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         context = {
             "current_language": current_language,
+            "cmsdata":cmsdata,
         }
         return render(request, "register.html", context)
 
