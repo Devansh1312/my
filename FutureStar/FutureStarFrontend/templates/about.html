@@ -1,6 +1,7 @@
 {% extends 'base1.html' %}
 
 {% load static %}
+{% load lang_filter %} <!-- Loading your custom filter -->
 
 {% block css %}
 <!-- Plugins css start-->
@@ -41,12 +42,10 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
+                        {% lang cmsdata current_language "heading_title" as heading_title %}
                         <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.heading_title_ar }}
-                            {% else %}
-                            {{ cmsdata.heading_title_en }}
-                            {% endif %}
+                            {{ heading_title }}
+                          
                         </h1>
                     </div>
                 </div>
@@ -70,22 +69,17 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 wow fadeInLeft delay-0-2s">
-                        <div class="client-text text-lg-start text-center mt-40 pb-50">
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.heading_content_ar }}
-                            {% else %}
-                            {{ cmsdata.heading_content_en }}
-                            {% endif %}  
+                       
+                            {% lang cmsdata current_language "heading_content" as heading_content %}
+                            <div class="client-text text-lg-start text-center mt-40 pb-50">{{ heading_content }}
                         </div>
                        
                     </div>
                     <div class="col-lg-6 wow fadeInRight delay-0-2s">
+                        {% lang cmsdata current_language "heading_year_title" as heading_year_title %} 
                         <div class="video-year text-lg-end text-center rel">
-                            {% if current_language == "ar" %}
-                            {{ cmsdata.heading_year_title_ar }}
-                            {% else %}
-                            {{ cmsdata.heading_year_title_en }}
-                            {% endif %} 
+                            {{heading_year_title}}
+                           
                             <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
                         </div>
                     </div>
@@ -102,12 +96,9 @@
                         {% for marquee in marquee %}
                         <span class="marquee-item">
                             <i class="fas fa-star-of-life"></i>
+                            {% lang marquee current_language "content" as content %}
                             <b>
-                                {% if current_language == "ar" %}
-                                {{ marquee.content_ar }}
-                                {% else %}
-                                {{ marquee.content_en }}
-                                {% endif %}
+                                {{content}}
                             </b>
                         </span>
                         {% endfor %}
@@ -123,19 +114,14 @@
                 <div class="row justify-content-center">
                     <div class="col-xl-7 col-lg-9 col-md-11">
                         <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
+                            {% lang cmsdata current_language "section_2_heading" as section_2_heading %}      
                             <span class="sub-title">
-                                {% if current_language == "ar" %}
-                                {{ cmsdata.section_2_heading_ar }}
-                                {% else %}
-                                {{ cmsdata.section_2_heading_en }}
-                                {% endif %}         
+                            {{section_2_heading}}   
                             </span>
+                            
+                            {% lang cmsdata current_language "section_2_title" as section_2_title %}
                             <h3>
-                                {% if current_language == "ar" %}
-                                {{ cmsdata.section_2_title_ar }}
-                                {% else %}
-                                {{ cmsdata.section_2_title_en }}
-                                {% endif %}
+                                {{section_2_title}}
                             </h3>
                         </div>
                     </div>
@@ -148,19 +134,15 @@
                                 <img src="{{ team_member.image.url }}" alt="Team Member">
                             </div>
                             <div class="content">
+                                
+                                    {% lang team_member current_language "name" as name %}
                                 <h4>
-                                    {% if current_language == "ar" %}
-                                    {{ team_member.name_ar }}
-                                    {% else %}
-                                    {{ team_member.name_en }}
-                                    {% endif %}
+                                    {{name}}
                                 </h4>
+                                
+                            {% lang team_member current_language "designations" as designations %}
                                 <span>
-                                    {% if current_language == "ar" %}
-                                    {{ team_member.designations_ar }}
-                                    {% else %}
-                                    {{ team_member.designations_en }}
-                                    {% endif %}
+                                    {{designations}}
                                 </span>
                             </div>
                            
@@ -216,6 +198,7 @@
                    <div class="col-lg-6 col-md-4">
                        <div class="image-border-shape rmb-20 wow fadeInRight delay-0-2s">
                         <img src="media/{{ cmsdata.section_3_feature_icons }}" alt="Testimonial Left Image">
+
                         <div class="bottom-border"></div>
                        </div>
                    </div>
@@ -226,12 +209,10 @@
                                 <div class="testimonial-item">
                                     <div class="author-speech">
                                         <p>
+                                            {% lang testimonial current_language "content" as content %}
+                                                                                   
                                             <span class="quote">“</span> 
-                                            {% if current_language == "ar" %}
-                                            {{ testimonial.content_ar }}
-                                            {% else %}
-                                            {{ testimonial.content_en }}
-                                            {% endif %}                                          
+                                            {{content}}
                                             <span class="quote right-quote">“</span>
                                         </p>
                                     </div>
@@ -241,19 +222,13 @@
                                                 <img src="{{ testimonial.image.url }}" alt="Author Image">
                                             </div>
                                             <div class="author-info">
+                                                {% lang testimonial current_language "name" as name %}
                                                 <h4>
-                                                    {% if current_language == "ar" %}
-                                                    {{ testimonial.name_ar }}
-                                                    {% else %}
-                                                    {{ testimonial.name_en }}
-                                                    {% endif %} 
+                                                    {{name}}
                                                 </h4>
+                                                {% lang testimonial current_language "designations" as designations %}
                                                 <span class="designation">
-                                                    {% if current_language == "ar" %}
-                                                    {{ testimonial.designation_ar }}
-                                                    {% else %}
-                                                    {{ testimonial.designation_en }}
-                                                    {% endif %} 
+                                                {{designations}}    
                                                 </span>
                                             </div>
                                         </div>
@@ -287,12 +262,9 @@
         <section class="client-logo-area py-100">
             <div class="container">
                 <div class="section-title text-center mb-60">
+                    {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
                     <h3>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.section_3_heading_ar }}
-                        {% else %}
-                        {{ cmsdata.section_3_heading_en }}
-                        {% endif %} 
+                       {{section_3_heading}} 
                     </h3>
                 </div>
                 <div class="clients-logo-slider">
