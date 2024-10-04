@@ -270,7 +270,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="training-section-1-heading">Heading (English)</label>
-                                <input class="form-control btn-pill " id="training-section-1-heading-en" name="training_section_1_heading" type="text" value="{{data.sub_section_2_title_1_en}}" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="training-section-1-heading-en" name="training_section_1_heading" type="text" value="{{data.section_2_heading_en }}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-heading-en"></p>
 
                             </div>
@@ -279,7 +279,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="training-title-arabic">Heading (Arabic)</label>
-                                <input class="form-control btn-pill" id="training-section-1-heading-ar" name="training-section-1-heading-ar" type="text" value="{{data.sub_section_2_title_1_ar}}" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="training-section-1-heading-ar" name="training-section-1-heading-ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-heading-ar"></p>
 
                             </div>
@@ -521,7 +521,7 @@
                         <div id="dynamic-who-content-1">
                             <h1 style="font-weight:bold;font-size:16px;color:grey">Form-{{ forloop.counter| add:'1' }}</h1>
                             <p id="field-id" style='display:none'>{{whodetail.field_id}}</p>
-                            <p id="field-roll-who-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{who_detail.field_id}}</p>
+                            <p id="field-roll-who-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{whodetail.field_id}}</p>
                         </div>
 
                         <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
@@ -1113,8 +1113,11 @@
                             if(dump2 == -1){
                                 console.log("number: "+i)
                                 formData.append('who_passed',whoCount)
-
+                                
                                 const titleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
+                                
+                                
+                                
                                 const titleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
                                 const contentEn = document.getElementById(`why-choose-us-content-en-${i}`);
                                 const contentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
@@ -1150,6 +1153,7 @@
 
                         }
                     }
+
 
                     if(deleteing_who_field.length > 0){
                         alert("yes")
