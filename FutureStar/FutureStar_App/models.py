@@ -67,6 +67,8 @@ class UserGender(models.Model):
     
     class Meta:
         db_table = 'futurestar_app_gender'
+
+
 class Country(models.Model):
     id = models.BigAutoField(primary_key=True)
     code = models.CharField(max_length=2)
@@ -74,9 +76,7 @@ class Country(models.Model):
     zone_id = models.IntegerField(default=0)
     country_code = models.IntegerField(null=True, blank=True)
     status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
-    deleted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'futurestar_app_country'
@@ -113,9 +113,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     age = models.CharField(max_length=5,null=True, blank=True)
-    gender = models.ForeignKey(UserGender,max_length=10,null=True, blank=True,on_delete=models.CASCADE)    
-    country = models.ForeignKey(Country,max_length=150,null=True, blank=True,on_delete=models.CASCADE)
-    city = models.ForeignKey(City,max_length=150,null=True, blank=True,on_delete=models.CASCADE)
+    gender = models.ForeignKey(UserGender, null=True, blank=True, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     nationality = models.CharField(max_length=150,null=True, blank=True)
     weight = models.CharField(max_length=150,null=True, blank=True)
     height = models.CharField(max_length=150,null=True, blank=True)
@@ -701,7 +701,8 @@ class cms_home_dynamic_achivements_field(models.Model):
     title_en = models.CharField(max_length=255,blank=True,null=True)
     title_ar = models.CharField(max_length=255,blank=True,null=True)
 
-
+    def __str__(self):
+        return self.heading_en
 
     class Meta():
         db_table = "futureStar_app_cms_home_achivements_dynamic_field"           

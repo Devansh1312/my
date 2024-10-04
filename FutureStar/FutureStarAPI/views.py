@@ -641,7 +641,6 @@ class EditProfileAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-    ######## Post of Create API ######
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
@@ -673,8 +672,27 @@ class EditProfileAPIView(APIView):
                     'message': _('Invalid gender specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        user.country = request.data.get('country', user.country)
-        user.city = request.data.get('city', user.city)
+        # Handle country
+        country_id = request.data.get('country')
+        # if country_id:
+        #     try:
+        #         user.country = Country.objects.get(id=country_id)  # Fetch Country instance
+        #     except Country.DoesNotExist:
+        #         return Response({
+        #             'status': 2,
+        #             'message': _('Invalid country specified.')
+        #         }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Handle city
+        city_id = request.data.get('city')
+        if city_id:
+            try:
+                user.city = City.objects.get(id=city_id)  # Fetch City instance
+            except City.DoesNotExist:
+                return Response({
+                    'status': 2,
+                    'message': _('Invalid city specified.')
+                }, status=status.HTTP_400_BAD_REQUEST)
         user.nationality = request.data.get('nationality', user.nationality)
         user.weight = request.data.get('weight', user.weight)
         user.height = request.data.get('height', user.height)
@@ -1290,36 +1308,36 @@ class UserGenderListAPIView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 
-class LocationAPIView(APIView):
+# class LocationAPIView(APIView):
 
-    def get(self, request):
-        country_id = request.query_params.get('country_id')
+#     def get(self, request):
+#         country_id = request.query_params.get('country_id')
 
-        # If country_id is not provided, return all active countries
-        if not country_id:
-            countries = Country.objects.filter(status=True)
-            country_data = [{'id': country.id, 'name': country.name} for country in countries]
+#         # If country_id is not provided, return all active countries
+#         if not country_id:
+#             countries = Country.objects.filter(status=True)
+#             country_data = [{'id': country.id, 'name': country.name} for country in countries]
 
-            return Response({
-                'status': 1,
-                'message': 'Countries fetched successfully',
-                'data': country_data
-            }, status=status.HTTP_200_OK)
+#             return Response({
+#                 'status': 1,
+#                 'message': 'Countries fetched successfully',
+#                 'data': country_data
+#             }, status=status.HTTP_200_OK)
 
-        # If country_id is provided, return cities for that country
-        try:
-            country = Country.objects.get(id=country_id, status=True)
-        except Country.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': 'Country not found or inactive'
-            }, status=status.HTTP_404_NOT_FOUND)
+#         # If country_id is provided, return cities for that country
+#         try:
+#             country = Country.objects.get(id=country_id, status=True)
+#         except Country.DoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': 'Country not found or inactive'
+#             }, status=status.HTTP_404_NOT_FOUND)
 
-        cities = City.objects.filter(country=country, status=True)
-        city_data = [{'id': city.id, 'name': city.name} for city in cities]
+#         cities = City.objects.filter(country=country, status=True)
+#         city_data = [{'id': city.id, 'name': city.name} for city in cities]
 
-        return Response({
-            'status': 1,
-            'message': 'Cities fetched successfully',
-            'data': city_data
-        }, status=status.HTTP_200_OK)
+#         return Response({
+#             'status': 1,
+#             'message': 'Cities fetched successfully',
+#             'data': city_data
+#         }, status=status.HTTP_200_OK)

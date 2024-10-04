@@ -37,7 +37,7 @@ urlpatterns = [
 
         path('api/genders/', UserGenderListAPIView.as_view()),
 
-        path('api/locations/', LocationAPIView.as_view()),
+        # path('api/locations/', LocationAPIView.as_view()),
 
 
 

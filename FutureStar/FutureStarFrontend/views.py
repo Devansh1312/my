@@ -24,6 +24,12 @@ class HomePage(View):
         news = News.objects.all().order_by('-id')[:4]
         partner = Partners.objects.all()
         team_members = Team_Members.objects.all().order_by('id')
+        cmsfeatures = cms_home_dynamic_field.objects.all()
+        cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all()
+        try:
+            cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
 
         current_language = request.session.get('language', 'en')
 
@@ -34,7 +40,12 @@ class HomePage(View):
             "news": news,
             "partner": partner,
             "team_members": team_members,
+            "cmsdata": cmsdata,
             "current_language":current_language,
+            "cmsfeatures":cmsfeatures,
+            "cms_home_dynamic_achivements":cms_home_dynamic_achivements,
+
+
         }
         return render(request, "home.html", context)
     
