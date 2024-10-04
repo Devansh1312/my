@@ -173,7 +173,7 @@ class Dashboard(LoginRequiredMixin, View):
 # Logout Module
 def logout_view(request):
     logout(request)
-    return redirect("adminlogin")
+    return redirect("index")
 
 
 ##################################################### User Profile View ###############################################################

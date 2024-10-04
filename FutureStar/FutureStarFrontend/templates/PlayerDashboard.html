@@ -28,8 +28,8 @@
                     <div class="user-info">
                         <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png'%}" alt=""></div>
                         <div>
-                            <h5 class="user-name">Mark Jones</h6>
-                            <p class="user-desi">Player</p>
+                            <h5 class="user-name">{{ user.username }}</h6>
+                            <p class="user-desi">{{ user.role_name_en }}</p>
                         </div>
                     </div>
                     <ul>

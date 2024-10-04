@@ -12,6 +12,7 @@ import json
 import requests
 from django.conf import settings
 from jwt import decode, exceptions  # For Apple JWT decoding
+from django.core.exceptions import ValidationError
 
 
 ##############################################   HomePage   ########################################################
@@ -52,36 +53,8 @@ class HomePage(View):
     
     def post(self, request, *args, **kwargs):
         selected_language = request.POST.get('language', 'en')
-        current_language = request.session['language'] = selected_language
-        marquee = Slider_Content.objects.all()
-        app_features = App_Feature.objects.all()
-        testimonials = Testimonial.objects.all().order_by('-id')[:3]
-        news = News.objects.all().order_by('-id')[:4]
-        partner = Partners.objects.all()
-        team_members = Team_Members.objects.all().order_by('id')
-        cmsfeatures = cms_home_dynamic_field.objects.all()
-        # print("post" , current_language )
-        cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all()
-        try:
-            cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
-        except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
-        
-        context = {
-            "marquee": marquee,
-            "app_features": app_features,
-            "testimonials": testimonials,
-            "news": news,
-            "partner": partner,
-            "team_members": team_members,
-            "cmsdata": cmsdata,
-            "current_language":current_language,
-            "cmsfeatures":cmsfeatures,
-            "cms_home_dynamic_achivements":cms_home_dynamic_achivements,
-
-
-        }
-        return render(request, "home.html", context)
+        request.session['language'] = selected_language
+        return redirect('index')
 
 
 
@@ -126,7 +99,6 @@ class SuccessStoriesPage(View):
     def post(self, request, *args, **kwargs):
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
-
         return redirect('success-stories')
     
 
@@ -166,7 +138,6 @@ class NewsPage(View):
     def post(self, request, *args, **kwargs):
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
-
         return redirect('news')
     
 
@@ -174,34 +145,50 @@ class NewsPage(View):
 
 class NewsDetailPage(View):
     def get(self, request, *args, **kwargs):
-        try:
-            cmsdata = cms_pages.objects.get(id=5)  # Use get() to fetch a single object
-        except cms_pages.DoesNotExist:
-            cmsdata = None  
+        # Get the selected language from the session, default to 'en'
         current_language = request.session.get('language', 'en')
+        
+        # Get the news item based on the provided ID in the URL
+        news_id = kwargs.get('id')  # Assuming you're passing the ID via URL
+        news = get_object_or_404(News, id=news_id)
+
+        # Fetch CMS data
+        try:
+            cmsdata = cms_pages.objects.get(id=4)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+
+        # Pass the current language and news to the template
         context = {
+            "news": news,
             "current_language": current_language,
-            "cmsdata" : cmsdata,
+            "cmsdata": cmsdata,
         }
-        return render(request, "news.html",context)
+        return render(request, "news-details.html", context)
 
     def post(self, request):
-        id = request.POST.get("id")
+        # Handle language change
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
+
+        # Return to the same page but make sure to fetch the news item again
+        news_id = request.POST.get("id")  # Fetch the ID from POST data
+        news = get_object_or_404(News, id=news_id)
+
+        # Fetch CMS data
         try:
-            cmsdata = cms_pages.objects.get(id=5)  
+            cmsdata = cms_pages.objects.get(id=4)  # Fetch relevant CMS data
         except cms_pages.DoesNotExist:
             cmsdata = None  
-        news = get_object_or_404(News, id=id)
 
+        # Pass the current language and news to the template
         context = {
             "news": news,
             "current_language": selected_language,
-            "cmsdata" : cmsdata,
-
+            "cmsdata": cmsdata,
         }
         return render(request, "news-details.html", context)
+
 
 
 
@@ -219,7 +206,6 @@ class AdvertisePage(View):
     def post(self, request, *args, **kwargs):
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
-
         return redirect('advertise')
 
 ##############################################   AboutPage   ########################################################
@@ -261,9 +247,7 @@ class AboutPage(View):
 class LoginPage(View):
 
     def get(self, request, *args, **kwargs):
-        # current_language = request.session.get('language', 'en')
-        current_language = "en",
-
+        current_language = request.session.get('language', 'en')
         context = {
             "current_language": current_language,
             "google_client_id": settings.GOOGLE_CLIENT_ID,
@@ -274,12 +258,25 @@ class LoginPage(View):
         return render(request, "login.html", context)
 
     def post(self, request, *args, **kwargs):
+        # Handle language change
+        selected_language = request.POST.get('language', 'en')
+        current_language = request.session['language'] = selected_language
+        
+        # Fetch login type
         login_type = int(request.POST.get('login_type', 1))
+        username_or_phone = request.POST.get('username_or_phone')
+        password = request.POST.get('password')
+       # If only language is changed (no registration form fields are filled)
+        if not username_or_phone and not password and not password:
+            messages.success(request, "Language changed successfully!")
+            return redirect('login')
 
+        # Proceed with normal login process
         if login_type == 1:
             username_or_phone = request.POST.get('username_or_phone')
             password = request.POST.get('password')
 
+            # Authenticate user
             user = authenticate(request, username=username_or_phone, password=password)
 
             if user:
@@ -293,7 +290,8 @@ class LoginPage(View):
                 messages.error(request, "Account is inactive.")
             else:
                 messages.error(request, "Invalid credentials.")
-            return redirect('login')
+
+        return redirect('login')
 
     #     elif login_type == 2:
     #         google_token = request.POST.get('google_token')
@@ -373,18 +371,6 @@ class LoginPage(View):
     #         return redirect('player-dashboard')
 
 
-class RegisterPage(View):
-    
-    def get(self, request, *args, **kwargs):
-        current_language = request.session.get('language', 'en')
-        context = {
-            "current_language":current_language,
-        }
-        return render(request, "register.html",context)
-
-
-
-
 
 ##############################################   ContactPage   ########################################################
 
@@ -392,48 +378,59 @@ class ContactPage(View):
     
     def get(self, request, *args, **kwargs):
         try:
-            cmsdata = cms_pages.objects.get(id=8)  # Use get() to fetch a single object
+            cmsdata = cms_pages.objects.get(id=8)  # Fetch the CMS data
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
+            cmsdata = None  # Handle case where the CMS data doesn't exist
 
         current_language = request.session.get('language', 'en')
 
         context = {
             "current_language": current_language,
             "cmsdata": cmsdata,
-        } 
-                
+        }
         return render(request, "contact.html", context)
 
-            
     def post(self, request):
-        # try:
-        #     cmsdata = cms_pages.objects.get(id=8)  # Use get() to fetch a single object
-        # except cms_pages.DoesNotExist:
-        #     cmsdata = None  # Handle the case where the object does not exist
-        fullname = request.POST.get("fullname")
-        phone = request.POST.get("phone")
-        email = request.POST.get("email")
-        message = request.POST.get("message")
+        # Fetch form data
+        fullname = request.POST.get("fullname", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        email = request.POST.get("email", "").strip()
+        message = request.POST.get("message", "").strip()
         selected_language = request.POST.get('language', 'en')
-        request.session['language'] = selected_language
+        current_language = request.session['language'] = selected_language
 
+        try:
+            cmsdata = cms_pages.objects.get(id=8)  # Fetch CMS data again for context
+        except cms_pages.DoesNotExist:
+            cmsdata = None
+
+        # If no contact form fields are filled, assume the user is only changing the language
+        if not fullname and not phone and not email and not message:
+            messages.success(request, "Language changed successfully!")
+            return redirect('contact')  # Redirect after language change
+
+        # Validation: Ensure all fields are filled
+        if not fullname or not phone or not email or not message:
+            messages.error(request, "All fields are required for submitting an inquiry.")
+            context = {
+                "current_language": current_language,
+                "cmsdata": cmsdata,
+            }
+            return render(request, "contact.html", context)
+
+        # Save the inquiry
         Inquire.objects.create(
             fullname=fullname,
             phone=phone,
             email=email,
             message=message,
         )
-        # context = {
-        #     "cmsdata":cmsdata,
-        # }
+
+        # Success message and redirect after submission
         messages.success(request, "Inquiry submitted successfully.")
-        return redirect("contact")  # No need to pass context here
+        return redirect("contact")
 
-
-
-
-##############################################   DiscoverPage   ########################################################
+##############################################   PrivacyPolicyPage   ########################################################
 
 class PrivacyPolicyPage(View):
     
@@ -454,7 +451,6 @@ class PrivacyPolicyPage(View):
     def post(self, request, *args, **kwargs):
         selected_language = request.POST.get('language', 'en')
         request.session['language'] = selected_language
-
         return redirect('privacy-policy')
     
 
@@ -507,3 +503,69 @@ class PlayerDashboardPage(LoginRequiredMixin,View):
 
 
 
+########################################## Register Page #############################
+class RegisterPage(View):
+
+    def get(self, request, *args, **kwargs):
+        current_language = request.session.get('language', 'en')
+        context = {
+            "current_language": current_language,
+        }
+        return render(request, "register.html", context)
+
+    def post(self, request, *args, **kwargs):
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+
+        # Fetch data from the form
+        username = request.POST.get("username", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        password = request.POST.get("password", "").strip()
+
+        # If only language is changed (no registration form fields are filled)
+        if not username and not phone and not password:
+            messages.success(request, "Language changed successfully!")
+            return redirect('register')
+
+        # Validation for registration process
+        if not username or not phone or not password:
+            messages.error(request, "All fields are required for registration.")
+            context = {
+                "current_language": selected_language,
+            }
+            return render(request, "register.html", context)
+
+        # Check if username or phone already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            context = {
+                "current_language": selected_language,
+            }
+            return render(request, "register.html", context)
+
+        if User.objects.filter(phone=phone).exists():
+            messages.error(request, "Phone number already exists.")
+            context = {
+                "current_language": selected_language,
+            }
+            return render(request, "register.html", context)
+
+        # Create the user
+        try:
+            user = User(
+                username=username,
+                phone=phone,
+                role_id=2,  # Adjust as per your logic
+                register_type="Website",  # Adjust as necessary
+                device_type="web"
+            )
+            user.set_password(password)  # Hash the password before saving
+            user.save()
+            messages.success(request, "Registration successful!")
+            return redirect('login')  # Redirect to the login page after registration
+        except ValidationError as e:
+            messages.error(request, str(e))
+            context = {
+                "current_language": selected_language,
+            }
+            return render(request, "register.html", context)

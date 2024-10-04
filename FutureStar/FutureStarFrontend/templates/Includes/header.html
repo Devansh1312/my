@@ -35,11 +35,15 @@
                                     <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
                                 </select>                                
 
+                                {% if user.is_authenticated %}
 
                                 <!-- Profile Wrapper -->
-                                <a href="#" class="profile-wrapper">
+                                <a href="{% url 'player-dashboard' %}" class="profile-wrapper">
                                     <img src="assets/images/profile-pic.jpg" alt=""><span>{{ user.username }}</span>
                                 </a>
+
+                                {% endif %}
+
                             </div>
                             <!-- Toggle Button -->
                             <button type="button" class="navbar-toggle" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
@@ -69,8 +73,10 @@
                                 <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
                                     <a href="{% url 'contact' %}">Contacts</a>
                                 </li>
+                                {% if not user.is_authenticated %}
                                 <li class="menu-btns-mobile"><a class="theme-btn style-one" href="{% url 'login' %}">Login</a></li>
                                 <li class="menu-btns-mobile"><a class="theme-btn style-two" href="{% url 'register' %}">Register</a></li>
+                                {% endif %}
                             </ul>
                         </div>                        
                     </nav>
@@ -92,7 +98,7 @@
                         </a>
                     {% else %}
                         <!-- If user is logged in, show profile wrapper -->
-                        <a href="#" class="profile-wrapper">
+                        <a href="{% url 'player-dashboard' %}" class="profile-wrapper">
                             <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" alt="">
                             <span>{{ user.username }}</span>
                         </a>

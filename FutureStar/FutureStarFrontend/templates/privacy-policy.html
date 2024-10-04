@@ -1,6 +1,7 @@
 {% extends 'base1.html' %}
 
 {% load static %}
+{% load lang_filter %} <!-- Loading your custom filter -->
 
 {% block css %}
 <!-- Plugins css start-->
@@ -30,12 +31,9 @@
         <div class="banner-inner">
             <div class="row">
                 <div class="col-xl-12">
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
                     <h2 class="page-title wow fadeInUp delay-0-3s text-center">
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.heading_title_ar }}
-                        {% else %}
-                        {{ cmsdata.heading_title_en }}
-                        {% endif %}   
+                        {{heading_title}}   
                     </h2>
                 </div>
             </div>
@@ -51,12 +49,9 @@
         <div class="row gap-60">
             <div class="col">
                 <div class="blog-single-content">
+                    {% lang cmsdata current_language "heading_content" as heading_content %}
                     <p>
-                        {% if current_language == "ar" %}
-                        {{ cmsdata.heading_content_ar }}
-                        {% else %}
-                        {{ cmsdata.heading_content_en }}
-                        {% endif %}
+                    {{heading_content}}
                     </p>
                 </div>
             </div>
