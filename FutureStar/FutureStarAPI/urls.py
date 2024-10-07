@@ -37,8 +37,12 @@ urlpatterns = [
 
         path('api/genders/', UserGenderListAPIView.as_view()),
 
+        
+        
         # path('api/locations/', LocationAPIView.as_view()),
-
+        #new apis generation
+        
+        path("api/registration/",RegestrationAPI,name="user-registration")
 
 
         

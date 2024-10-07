@@ -3282,18 +3282,18 @@ def saveadvertisedetail(request):
                     saveadvertiseetail.section_6_title_en = social_media_title_en
                     saveadvertiseetail.section_6_title_ar = social_media_title_ar
 
-                    saveadvertiseetail.section_6_content_en_1 = social_media_content_en_1
-                    saveadvertiseetail.section_6_content_ar_1 = social_media_content_ar_1
-                    saveadvertiseetail.section_6_content_en_2 = social_media_content_en_2
-                    saveadvertiseetail.section_6_content_ar_2 = social_media_content_ar_2
-                    saveadvertiseetail.section_6_content_en_3 = social_media_content_en_3
-                    saveadvertiseetail.section_6_content_ar_3 = social_media_content_ar_3
-                    saveadvertiseetail.section_6_content_en_4 = social_media_content_en_4
-                    saveadvertiseetail.section_6_content_ar_4 = social_media_content_ar_4
-                    saveadvertiseetail.section_6_content_en_5 = social_media_content_en_5
-                    saveadvertiseetail.section_6_content_ar_5 = social_media_content_ar_5
-                    saveadvertiseetail.section_6_content_en_6 = social_media_content_en_6
-                    saveadvertiseetail.section_6_content_ar_6 = social_media_content_ar_6
+                    saveadvertiseetail.section_6_content_1_en = social_media_content_en_1
+                    saveadvertiseetail.section_6_content_1_ar = social_media_content_ar_1
+                    saveadvertiseetail.section_6_content_2_en = social_media_content_en_2
+                    saveadvertiseetail.section_6_content_2_ar = social_media_content_ar_2
+                    saveadvertiseetail.section_6_content_3_en = social_media_content_en_3
+                    saveadvertiseetail.section_6_content_3_ar = social_media_content_ar_3
+                    saveadvertiseetail.section_6_content_4_en = social_media_content_en_4
+                    saveadvertiseetail.section_6_content_4_ar = social_media_content_ar_4
+                    saveadvertiseetail.section_6_content_5_en = social_media_content_en_5
+                    saveadvertiseetail.section_6_content_5_ar= social_media_content_ar_5
+                    saveadvertiseetail.section_6_content_6_en= social_media_content_en_6
+                    saveadvertiseetail.section_6_content_6_ar= social_media_content_ar_6
                     
                     saveadvertiseetail.section_9_heading_en = competition_section_title_en
                     saveadvertiseetail.section_9_heading_ar = competition_section_title_ar

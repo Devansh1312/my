@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
 from django import views
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,7 +19,8 @@ import os
 from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework import generics
-
+import json 
+from django.views.decorators.csrf import  csrf_exempt 
 
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
@@ -1341,3 +1343,36 @@ class UserGenderListAPIView(generics.ListAPIView):
 #             'message': 'Cities fetched successfully',
 #             'data': city_data
 #         }, status=status.HTTP_200_OK)
+
+
+#registration
+@csrf_exempt
+def RegestrationAPI(request):
+    
+    
+    if request.method == "POST":
+        #in pending mode
+        header  = request.headers.get("Langauge")
+        print(header)
+        json_loads = json.loads(request.body)
+
+        try:
+            if json_loads:
+                try:
+                    reg_type = json_loads["type"]
+                    
+                    
+                    context = {
+                        "data":data
+                        
+                    }
+                    
+                    return  JsonResponse(context)
+                except Exception as e:
+                    return Response(str(e))
+        except  Exception as e:
+            return JsonResponse(str(e))        
+            
+        return JsonResponse("")
+            
+    
