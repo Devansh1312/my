@@ -3520,9 +3520,9 @@ def saveadvertisedetail(request):
                                         existing_section_record = cms_advertise_section_2_dynamic_field.objects.filter(field_id=unique_id).first()
 
 
-                                        if 'image_{}'.format(str(i)) in request.FILES:
+                                        if 'imagess_{}'.format(str(i)) in request.FILES:
                                     
-                                            image_1 = request.FILES.get('image_{}'.format(str(i)),None)
+                                            image_1 = request.FILES.get('imagess_{}'.format(str(i)),None)
                                             print("image: "+str(image_1))
                                             
                                             if image_1:
@@ -3698,13 +3698,13 @@ def saveadvertisedetail(request):
                                             print("exisiting: "+str(existing_record))'''
                                                     
         
-                                        if 'image_{}'.format(str(i)) in request.FILES:
+                                        if 'imageapp_{}'.format(str(i)) in request.FILES:
                                             
                                                     unique_id = request.POST.get('uaid_{}'.format(i))
                                                     existing_record = cms_advertise_ads_dynamic_field.objects.filter(field_id=unique_id).first()
 
 
-                                                    image_3 = request.FILES.get('image_{}'.format(str(i)),None)
+                                                    image_3 = request.FILES.get('imageapp_{}'.format(str(i)),None)
                                                     
                                                     if image_3:
                                                         try:
@@ -3764,14 +3764,16 @@ def saveadvertisedetail(request):
                             if str(i) in deleted_premium_list:
                                 print("its in field ", i)
                             else:
-                                unique_id = request.POST.get('usid_{}'.format(i))
+                                unique_id = request.POST.get('uppid_{}'.format(i))
+                                print("advertise unique field: ",unique_id)
                                 if unique_id != "":
                                     premium_title_en = request.POST.get('premium_title_en_{}'.format(str(i)))
                                     premium_title_ar = request.POST.get('premium_title_ar_{}'.format(str(i)))
                                     existing_premium_record = cms_advertise_premium_dynamic_field.objects.filter(field_id=unique_id).first()
 
-                                    if 'image_{}'.format(str(i)) in request.FILES:
-                                        image_4 = request.FILES.get('image_{}'.format(str(i)), None)
+                                    if 'imagepp_{}'.format(str(i)) in request.FILES:
+                                        image_4 = request.FILES.get('imagepp_{}'.format(str(i)), None)
+                                        print(image_4)
                                         print("image: " + str(image_4))
                                         if image_4:
                                             try:
@@ -3798,13 +3800,13 @@ def saveadvertisedetail(request):
 
                                         existing_premium_record.save()
                                     else:
-                                        savepdiscoveryview = cms_advertise_premium_dynamic_field(
+                                        saveadvertiseview = cms_advertise_premium_dynamic_field(
                                             field_id=unique_id,
                                             title_en=premium_title_en,
                                             title_ar=premium_title_ar,
                                             images=image_4
                                         )
-                                        savepdiscoveryview.save()
+                                        saveadvertiseview.save()
 
                     if 'heading_image_1' in request.FILES:
                         print("yes")

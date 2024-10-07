@@ -1679,7 +1679,7 @@
 
                                 if(image && image.files && image.files.length > 0) {
                                         const feature_image = image.files[0];
-                                        formData.append(`image_${i}`, feature_image);
+                                        formData.append(`imagess_${i}`, feature_image);
 
                                 } 
                             
@@ -1879,7 +1879,7 @@
            
                                     if(image && image.files && image.files.length > 0) {
                                             const game_image = image.files[0];
-                                            formData.append(`image_${i}`, game_image);
+                                            formData.append(`imageapp_${i}`, game_image);
                                             formData.append(`uaid_${i}`,unique_field.innerText)
 
                                     } 
@@ -1969,14 +1969,16 @@
                                
 
                                 if(image && image.files && image.files.length > 0) {
+
                                         const feature_image = image.files[0];
-                                        formData.append(`image_${i}`, feature_image);
+                                        formData.append(`imagepp_${i}`, feature_image);
 
                                 } 
                             
                                 if(unique_field){
                                     formData.append(`uppid_${i}`,unique_field.innerText)
                                     uwid = unique_field.innerText
+
                                     console.log(unique_field.innerText)
                                 }
                              
