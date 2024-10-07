@@ -606,8 +606,8 @@ class cms_pages(models.Model):
     section_9_heading_en = models.CharField(max_length=100,blank =True,null=True)
     section_9_heading_ar = models.CharField(max_length=100,blank =True,null=True)
 
-    section_9_title_en = models.CharField(max_length=100,blank =True,null=True)
-    section_9_title_ar = models.CharField(max_length=100,blank =True,null=True)
+    section_9_title_en = models.TextField(blank =True,null=True)
+    section_9_title_ar = models.TextField(blank =True,null=True)
     section_9_image = models.ImageField(upload_to='cmspages/',blank=True,null=True)
 
     #section 10
