@@ -672,7 +672,7 @@ class cms_dicovery_dynamic_image(models.Model):
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
 
     class Meta():
-        db_table = "futureStar_app_cms_advertise_dynamic_field"    '''
+        db_table = "futurestar_app_cms_advertise_dynamic_field"    '''
 class cms_advertise_section_2_dynamic_field(models.Model):
     
     id = models.AutoField(primary_key=True)
@@ -686,7 +686,7 @@ class cms_advertise_section_2_dynamic_field(models.Model):
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
     class Meta():
-        db_table = "futureStar_app_cms_advertise_section_2_dynamic_field"
+        db_table = "futurestar_app_cms_advertise_section_2_dynamic_field"
 
 class cms_advertise_Partnership_dynamic_field(models.Model):
     
@@ -701,7 +701,7 @@ class cms_advertise_Partnership_dynamic_field(models.Model):
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
     class Meta():
-        db_table = "futureStar_app_cms_advertise_Partnership_dynamic_field"      
+        db_table = "futurestar_app_cms_advertise_Partnership_dynamic_field"      
 
 class cms_advertise_ads_dynamic_field(models.Model):
     
@@ -711,7 +711,7 @@ class cms_advertise_ads_dynamic_field(models.Model):
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
     class Meta():
-        db_table = "futureStar_app_cms_advertise_ads_dynamic_field" 
+        db_table = "futurestar_app_cms_advertise_ads_dynamic_field" 
 
 class cms_advertise_premium_dynamic_field(models.Model):
     
@@ -723,7 +723,7 @@ class cms_advertise_premium_dynamic_field(models.Model):
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
     class Meta():
-        db_table = "futureStar_app_cms_advertise_premium_dynamic_field"                
+        db_table = "futurestar_app_cms_advertise_premium_dynamic_field"                
 #changes   
 class cms_home_dynamic_field(models.Model):
     
@@ -739,7 +739,7 @@ class cms_home_dynamic_field(models.Model):
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
 
     class Meta():
-        db_table = "futureStar_app_cms_home_dynamic_field"      
+        db_table = "futurestar_app_cms_home_dynamic_field"      
 
 class cms_home_dynamic_achivements_field(models.Model):
     
@@ -756,5 +756,5 @@ class cms_home_dynamic_achivements_field(models.Model):
         return self.heading_en
 
     class Meta():
-        db_table = "futureStar_app_cms_home_achivements_dynamic_field"           
+        db_table = "futurestar_app_cms_home_achivements_dynamic_field"           
                                         

@@ -1,4 +1,5 @@
-{% extends 'base1.html' %} {% load lang_filter %} {% load static %} {% block css %}
+{% extends 'base1.html' %} {% load lang_filter %} {% load static %} {% block css %}{% load i18n %}
+
 <!-- Plugins css start-->
 <style>
     .star-rating {
@@ -35,7 +36,7 @@
                         <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
                         {% lang cmsdata current_language "heading_content" as heading_content %}
                         <p>{{ heading_content }}</p>
-                        <a href="" class="theme-btn style-two">Read More <i class="far fa-arrow-right"></i>
+                        <a href="" class="theme-btn style-two">{% trans "Read More" %}<i class="far fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -227,22 +228,22 @@
                     </div>
                 </div>
             </div>
-            {% for cmsfeatures in cmsfeatures %}
+            {% for cmsfeature in cmsfeatures %}
             <div class="col-lg-6"></div>
                 <div class="service-six-item wow fadeInUp delay-0-2s">
                     <div class="icon">
-                        <img src="media/{{ cmsfeatures.images }}" alt="">
+                        <img src="media/{{ cmsfeature.images }}" alt="">
                     </div>
                     <div class="content">
                         <h5>
-                            {% lang cmsfeatures current_language "title" as title %}
+                            {% lang cmsfeature current_language "title" as title %}
                            
                             <a href="">
                                 {{title}}
                                
                             </a>
                         </h5>
-                        {% lang cmsfeatures current_language "content" as content %}
+                        {% lang cmsfeature current_language "content" as content %}
                            
                         <p>
                             {{content}}
@@ -620,14 +621,22 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center"> {% for news in news %} <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="row justify-content-center">
+            {% for news in news %}
+            <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="blog-item style-two wow fadeInUp delay-0-2s">
                     <div class="image">
-                        <img src="{{ news.image.url }}" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;" alt="Blog">
+                        <a href="{% url 'news-detail' news.id %}">
+                            <img src="{{ news.image.url }}" alt="Blog">
+                        </a>
                     </div>
-                    <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;"> {% if current_language == "ar" %} {{ news.title_ar }} {% else %} {{ news.title_en }} {% endif %} </a>
-                    <form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;"> {% csrf_token %} <input type="hidden" name="id" value="{{ news.id }}" />
-                    </form>
+                    <a class="blog-head" href="{% url 'news-detail' news.id %}">
+                        {% if current_language == "ar" %}
+                            {{ news.title_ar }}
+                        {% else %}
+                            {{ news.title_en }}
+                        {% endif %}
+                    </a>
                     <hr>
                     <ul class="blog-meta">
                         <li>
@@ -636,11 +645,13 @@
                         </li>
                         <li>
                             <i class="far fa-comments"></i>
-                            <a href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">Comment (5)</a>
+                            <a href="{% url 'news-detail' news.id %}">Comment (5)</a>
                         </li>
                     </ul>
                 </div>
-            </div> {% endfor %} </div>
+            </div>
+            {% endfor %}
+        </div>        
     </div>
     <div class="bg-lines">
         <span></span>

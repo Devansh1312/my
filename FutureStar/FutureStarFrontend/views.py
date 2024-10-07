@@ -25,8 +25,9 @@ class HomePage(View):
         news = News.objects.all().order_by('-id')[:4]
         partner = Partners.objects.all()
         team_members = Team_Members.objects.all().order_by('id')
-        cmsfeatures = cms_home_dynamic_field.objects.all()
-        cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all()
+        cmsfeatures = cms_home_dynamic_field.objects.all() or None
+        cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all() or None
+
         try:
             cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
@@ -64,8 +65,17 @@ class DiscoverPage(View):
     
     def get(self, request, *args, **kwargs):
         current_language = request.session.get('language', 'en')
+        dynamic = cms_dicovery_dynamic_image.objects.all()
+        whyus = cms_dicovery_dynamic_view.objects.all()
+        try:
+            cmsdata = cms_pages.objects.get(id=2)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         context = {
             "current_language":current_language,
+            "cmsdata" : cmsdata,
+            "dynamic":dynamic,
+            "whyus":whyus
         }
         return render(request, "discover.html",context)
     
@@ -144,17 +154,16 @@ class NewsPage(View):
 ##############################################   NewsDetailPage   ########################################################
 
 class NewsDetailPage(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, pk):
         # Get the selected language from the session, default to 'en'
         current_language = request.session.get('language', 'en')
-        
-        # Get the news item based on the provided ID in the URL
-        news_id = kwargs.get('id')  # Assuming you're passing the ID via URL
-        news = get_object_or_404(News, id=news_id)
+
+        # Get the news item based on the provided pk in the URL
+        news = get_object_or_404(News, id=pk)
 
         # Fetch CMS data
         try:
-            cmsdata = cms_pages.objects.get(id=4)  # Use get() to fetch a single object
+            cmsdata = cms_pages.objects.get(id=4)
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
 
@@ -165,30 +174,16 @@ class NewsDetailPage(View):
             "cmsdata": cmsdata,
         }
         return render(request, "news-details.html", context)
-
-    def post(self, request):
+    
+    def post(self, request, pk):
         # Handle language change
         selected_language = request.POST.get('language', 'en')
+
+        # Store the selected language in the session
         request.session['language'] = selected_language
 
-        # Return to the same page but make sure to fetch the news item again
-        news_id = request.POST.get("id")  # Fetch the ID from POST data
-        news = get_object_or_404(News, id=news_id)
-
-        # Fetch CMS data
-        try:
-            cmsdata = cms_pages.objects.get(id=4)  # Fetch relevant CMS data
-        except cms_pages.DoesNotExist:
-            cmsdata = None  
-
-        # Pass the current language and news to the template
-        context = {
-            "news": news,
-            "current_language": selected_language,
-            "cmsdata": cmsdata,
-        }
-        return render(request, "news-details.html", context)
-
+        # Redirect to the same news detail page with the correct pk
+        return redirect('news-detail', pk=pk)
 
 
 

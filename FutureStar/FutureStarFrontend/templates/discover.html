@@ -1,7 +1,7 @@
 {% extends 'base1.html' %}
 
 {% load static %}
-
+{% load lang_filter %}
 {% block css %}
 <!-- Plugins css start-->
 
@@ -12,12 +12,20 @@
 <!-- Page Banner Start -->
 <section class="discover-banner text-center">
     <div class="mian-img">
-        <img src="{% static 'frontend/assets/images/discover/banner-main.png'%}" alt="">
+        <img src="media/{{ cmsdata.heading_banner }}" alt="f">
         <div class="banner-inner">
-            <h1 class="page-title mb-3 wow fadeInUp delay-0-2s">Future Stars App</h1>
-            <h2 class="sub-title">Build Your Football CV</h2>
-            <p>A brief football portfolio of a player’s performance, playing behavior, previous teams, videos,
-                and information ready to be presented to scouts and clubs.</p>
+            <h1 class="page-title mb-3 wow fadeInUp delay-0-2s">
+                {% lang cmsdata current_language "heading" as heading %}
+                {{heading}}
+            </h1>
+            <h2 class="sub-title">
+                {% lang cmsdata current_language "heading_title" as heading_title %}
+                {{heading_title}}
+            </h2>
+            <p>
+                {% lang cmsdata current_language "heading_content" as heading_content %}
+                {{heading_content}}
+            </p>
         </div>
     </div>            
 </section>
@@ -29,48 +37,28 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
-                    <span class="sub-title">Games</span>
-                    <h3>Games feature through the app, football games and invite players from the app.</h3>
+                    <span class="sub-title">
+                        {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                        {{section_2_title}}
+                    </span>
+                    <h3>
+                        {% lang cmsdata current_language "section_2_content" as section_2_content %}
+                        {{section_2_content}}
+                    </h3>
                 </div>
             </div>
         </div>
 
         <div class="games-slider">
+            {% for dynamic in dynamic %} 
             <div class="games-item">
                 <div class="wow fadeInUp delay-0-2s">
                     <div class="image">
-                        <img src="{% static 'frontend/assets/images/discover/game-1.png'%}" alt="">
+                        <img src="media/{{ dynamic.images }}" alt="">
                     </div>
                 </div>
             </div>
-            <div class="games-item">
-                <div class="wow fadeInUp delay-0-3s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/discover/game-2.png'%}" alt="">
-                    </div>
-                </div>
-            </div>
-            <div class="games-item">
-                <div class="wow fadeInUp delay-0-4s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/discover/game-3.png'%}" alt="">
-                    </div>
-                </div>
-            </div>
-            <div class="games-item">
-                <div class="wow fadeInUp delay-0-5s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/discover/game-4.png'%}" alt="">
-                    </div>
-                </div>
-            </div>
-            <div class="games-item">
-                <div class="wow fadeInUp delay-0-2s">
-                    <div class="image">
-                        <img src="{% static 'frontend/assets/images/discover/game-1.png'%}" alt="">
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
         <div class="work-gallery-controls">
             <button class="games-slider-prev">
@@ -91,22 +79,23 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="section-title wow fadeInUp delay-0-2s">
-                    <span class="sub-title">Training</span>
-                    <h3>We provide this feature to increase the excitement  and competitiveness among players, and the players can decide which team  they want to join.</h3>
+                    <span class="sub-title">
+                        {% lang cmsdata current_language "section_2_heading" as section_2_heading %}
+                {{section_2_heading}}
+                    </span>
+                    <h3>{% lang cmsdata current_language "section_2_discover_title" as section_2_discover_title %}
+                        {{section_2_discover_title}}
+                    </h3>
                 </div>
-                <p>Whether you're looking to host local and regional tryouts, offer international football
-                    experiences, or access exclusive media content, our partnership opportunities provide
-                    unparalleled benefits.</p>
-                <p>Whether you're looking to host local and regional tryouts, offer international football
-                    experiences, or access exclusive media content, our partnership opportunities provide
-                    unparalleled benefits. Whether you're looking to host local and regional tryouts, offer
-                    international football experiences, or access exclusive media content, our partnership
-                    opportunities provide unparalleled benefits.</p>
+                <p>
+                    {% lang cmsdata current_language "sub_section_2_content_1" as sub_section_2_content_1 %}
+                {{sub_section_2_content_1}}
+                </p>
             </div>
             <div class="col-lg-6">
                 <div class="wow fadeInUp delay-0-3s">
                     <div class="main-image">
-                        <img src="{% static 'frontend/assets/images/discover/taining-1.png'%}" alt="">
+                        <img src="media/{{cmsdata.sub_section_2_1_icon}}" alt="">
                     </div>
                 </div>
             </div>
@@ -115,24 +104,20 @@
             <div class="col-lg-6 order-2 order-lg-1">
                 <div class="wow fadeInUp delay-0-3s">
                     <div class="main-image">
-                        <img src="{% static 'frontend/assets/images/discover/taining-2.png'%}" alt="">
+                        <img src="media/{{cmsdata.sub_section_2_2_icon}}" alt="">
                     </div>
                 </div>
             </div>
         
             <div class="col-lg-6 order-1 order-lg-2">
                 <div class="section-title wow fadeInUp delay-0-2s">
-                    <h3>Future Stars Competitions</h3>
+                    <h3>{% lang cmsdata current_language "sub_section_2_title_2" as sub_section_2_title_2 %}
+                        {{sub_section_2_title_2}}</h3>
                 </div>
-                <p>Make Name Your Competition personal and unique!</p>
-                <p>Add/Remove Challenges Have complete control over the challenges you want to include.</p>
-                <p>Our competition is open-ended with No Time Limits, so there are no constraints on when you
-                    can participate. Take your time to perfect your talent and share it with the world whenever
-                    you're ready.</p>
-                <p>Customize your own rules and requirements to suit your competition’s needs. Create a tailored
-                    experience that matches your vision.</p>
-                <p>Make Name Your Competition personal and unique!</p>
-                <p>Add/Remove Challenges Have complete control over the challenges you want to include.</p>
+                <p>
+                    {% lang cmsdata current_language "sub_section_2_content_2" as sub_section_2_content_2 %}
+                {{sub_section_2_content_2}}
+                </p>
             </div>
         </div>
     </div>
@@ -147,8 +132,14 @@
                 <div class="why-choose-us-content">
                     <div class="section-title mb-60 wow fadeInUp delay-0-2s animated"
                         style="visibility: visible; animation-name: fadeInUp;">
-                        <span class="sub-title">Why Choose Us</span>
-                        <h3>Future Stars That You Can Trust</h3>
+                        <span class="sub-title">
+                            {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
+                            {{section_3_heading}}
+                        </span>
+                        <h3>
+                            {% lang cmsdata current_language "section_3_title" as section_3_title %}
+                            {{section_3_title}}
+                        </h3>
                     </div>
                     <div class="row gap-60">
                         <div class="col-md-6">
@@ -156,48 +147,44 @@
                                 style="visibility: visible; animation-name: fadeInUp;">
                                 <div class="why-choose-header">
                                     <i class="far fa-chevron-right"></i>
-                                    <h6>Competitive rates</h6>
+                                    <h6> 
+                                        {% lang cmsdata current_language "section_3_sub_title" as section_3_sub_title %}
+                                        {{section_3_sub_title}}
+                                    </h6>
                                 </div>
-                                <p>We use strategic marketing tactics that have been proven programming</p>
+                                <p>
+                                    {% lang cmsdata current_language "section_3_sub_content" as section_3_sub_content %}
+                                        {{section_3_sub_content}}
+                                </p>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="why-choose-item wow fadeInUp delay-0-3s animated"
-                                style="visibility: visible; animation-name: fadeInUp;">
-                                <div class="why-choose-header">
-                                    <i class="far fa-chevron-right"></i>
-                                    <h6>Premium Development</h6>
-                                </div>
-                                <p>Sed perspiciatis unde omnie natue site voluptatem accusan doloremque</p>
-                            </div>
-                        </div>
+
+                        {% for whyus in whyus %} 
                         <div class="col-md-6">
                             <div class="why-choose-item wow fadeInUp delay-0-2s animated"
                                 style="visibility: visible; animation-name: fadeInUp;">
                                 <div class="why-choose-header">
                                     <i class="far fa-chevron-right"></i>
-                                    <h6>No contracts needed</h6>
+                                    <h6> 
+                                        {% lang whyus current_language "title" as title %}
+                                        {{title}}
+                                    </h6>
                                 </div>
-                                <p>You can increase, pause or stop our services at any time leaving</p>
+                                <p>
+                                    {% lang whyus current_language "content" as content %}
+                                        {{content}}
+                                </p>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="why-choose-item wow fadeInUp delay-0-3s animated"
-                                style="visibility: visible; animation-name: fadeInUp;">
-                                <div class="why-choose-header">
-                                    <i class="far fa-chevron-right"></i>
-                                    <h6>Retina Ready &amp; Flexible</h6>
-                                </div>
-                                <p>Devices show more pixels square inch resulting sharperes images Content</p>
-                            </div>
-                        </div>
+                        {% endfor %}
+
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="why-choose-right wow fadeInLeft delay-0-2s animated"
                     style="visibility: visible; animation-name: fadeInLeft;">
-                    <img src="{% static 'frontend/assets/images/services/quote-img.png'%}" alt="Why Choose Right">
+                    <img src="media/{{cmsdata.section_3_image}}" alt="Why Choose Right">
                 </div>
             </div>
         </div>

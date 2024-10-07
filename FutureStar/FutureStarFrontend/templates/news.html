@@ -56,8 +56,10 @@
             {% for news in news %}
             <div class="col-xl-3 col-lg-4 col-sm-6">
                 <div class="blog-item wow fadeInUp delay-0-2s">
-                    <div class="image" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
-                        <img src="{{ news.image.url }}" alt="Blog">
+                    <div class="image">
+                        <a href="{% url 'news-detail' news.id %}">
+                            <img src="{{ news.image.url }}" alt="Blog">
+                        </a>
                     </div>
                     <ul class="blog-meta">
                         <li>
@@ -67,18 +69,13 @@
                     </ul>
                     {% lang news current_language "title" as title %}
                            
-                    <a class="blog-head" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                    <a class="blog-head" href="{% url 'news-detail' news.id %}">
                         {{title}}
                           
                     </a>
-                    <a class="read-more" href="" onclick="document.getElementById('news-detail-form-{{ news.id }}').submit(); return false;">
+                    <a class="read-more" href="{% url 'news-detail' news.id %}">
                         Read More <i class="far fa-arrow-right"></i>
                     </a>
-                    
-                    <form action="{% url 'news-detail' %}" method="post" style="display: none;">
-                        {% csrf_token %}
-                        <input type="hidden" name="id" value="{{ news.id }}">
-                    </form>
                     
                 </div>
             </div>

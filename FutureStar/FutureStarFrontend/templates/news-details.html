@@ -10,11 +10,6 @@
 {% block title %} Future Star || News-Detail{% endblock %}
 {% block content %}
 
-<!-- Page Banner Start -->
-<form id="news-detail-form-{{ news.id }}" action="{% url 'news-detail' %}" method="post" style="display: none;">
-    {% csrf_token %}
-    <input type="hidden" name="id" value="{{ news.id }}">
-</form>
 <section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url(assets/images/banner/banner-bg-two.jpg);">
     <div class="container">
         <div class="banner-inner">
