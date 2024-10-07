@@ -24,6 +24,23 @@ from datetime import timedelta
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 import sys
+from functools import wraps
+
+
+
+def user_role_check(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        user = request.user
+        if user.is_authenticated and user.role_id != 1:
+            messages.error(request, "You do not have access to this site.")
+            return redirect("login")
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+
+
 # Login Module
 def LoginFormView(request):
     # If the user is already logged in, redirect to the dashboard
@@ -160,6 +177,7 @@ class ResetPasswordView(View):
         return render(request, self.template_name, {"token": token})
 
 
+@method_decorator(user_role_check, name='dispatch')
 # Dashboard View
 class Dashboard(LoginRequiredMixin, View):
     login_url = "/"
@@ -177,6 +195,7 @@ def logout_view(request):
 
 
 ##################################################### User Profile View ###############################################################
+@method_decorator(user_role_check, name='dispatch')
 class UserProfileView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
@@ -193,7 +212,7 @@ class UserProfileView(LoginRequiredMixin, View):
         return render(request, "Admin/User/user_profile.html", {"user": user})
 
 
-@method_decorator(login_required, name="dispatch")
+@method_decorator(user_role_check, name='dispatch')
 class UserUpdateProfileView(View):
     def get(self, request, *args, **kwargs):
         form = UserUpdateProfileForm(instance=request.user)
@@ -282,6 +301,7 @@ class UserUpdateProfileView(View):
 
 
 ################################## SytemSettings view #######################################################
+@method_decorator(user_role_check, name='dispatch')
 class System_Settings(LoginRequiredMixin, View):
     login_url = "/"
     redirect_field_name = "redirect_to"
@@ -438,6 +458,7 @@ class System_Settings(LoginRequiredMixin, View):
 #######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
 
 # User Active & Deactive Function
+@method_decorator(user_role_check, name='dispatch')
 class ToggleUserStatusView(View):
     def post(self, request, pk, *args, **kwargs):
         user = get_object_or_404(User, pk=pk)
@@ -482,6 +503,7 @@ class ToggleUserStatusView(View):
 
 
 # Player List View
+@method_decorator(user_role_check, name='dispatch')
 class PlayerListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Player_List.html"
 
@@ -501,6 +523,7 @@ class PlayerListView(LoginRequiredMixin, View):
 
 
 # Coach List View
+@method_decorator(user_role_check, name='dispatch')
 class CoachListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Coach_List.html"
 
@@ -520,6 +543,7 @@ class CoachListView(LoginRequiredMixin, View):
 
 
 # Refree List View
+@method_decorator(user_role_check, name='dispatch')
 class RefereeListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Referee_List.html"
 
@@ -540,6 +564,7 @@ class RefereeListView(LoginRequiredMixin, View):
 
 ##############################################  User Category Type Module  ################################################
 # Category CRUD Views
+@method_decorator(user_role_check, name='dispatch')
 class CategoryCreateView(LoginRequiredMixin, View):
     def get(self, request):
         form = CategoryForm()
@@ -566,7 +591,7 @@ class CategoryCreateView(LoginRequiredMixin, View):
             )
         return redirect("category_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class CategoryUpdateView(LoginRequiredMixin, View):
     template_name = "forms/category_form.html"
 
@@ -589,7 +614,7 @@ class CategoryUpdateView(LoginRequiredMixin, View):
             )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class CategoryDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         category = get_object_or_404(Category, pk=pk)
@@ -603,7 +628,7 @@ class CategoryDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Category Type Deleted Successfully.")
         return redirect("category_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class CategoryListView(LoginRequiredMixin, View):
     template_name = "Admin/Category_List.html"
 
@@ -620,6 +645,7 @@ class CategoryListView(LoginRequiredMixin, View):
 
 
 ################################################################# Role CRUD Views ###################################################
+@method_decorator(user_role_check, name='dispatch')
 class RoleCreateView(LoginRequiredMixin, View):
     template_name = "Admin/User_Role.html"
 
@@ -639,7 +665,7 @@ class RoleCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class RoleUpdateView(LoginRequiredMixin, View):
     template_name = "Admin/User_Role.html"  # Fixed template name
 
@@ -661,7 +687,7 @@ class RoleUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class RoleDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         role = get_object_or_404(Role, pk=pk)
@@ -675,7 +701,7 @@ class RoleDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Role Deleted Successfully.")
         return redirect("role_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class RoleListView(LoginRequiredMixin, View):
     template_name = "Admin/User_Role.html"
 
@@ -761,6 +787,7 @@ class RoleListView(LoginRequiredMixin, View):
 
 
 ####################################### fieldcapacity CRUD Views  ########################################################
+@method_decorator(user_role_check, name='dispatch')
 class FieldCapacityCreateView(LoginRequiredMixin, View):
     template_name = "forms/fieldcapacity_form.html"
 
@@ -780,7 +807,7 @@ class FieldCapacityCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class FieldCapacityUpdateView(LoginRequiredMixin, View):
     template_name = "forms/fieldcapacity_form.html"
 
@@ -802,7 +829,7 @@ class FieldCapacityUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class FieldCapacityDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         fieldcapacity = get_object_or_404(FieldCapacity, pk=pk)
@@ -816,7 +843,7 @@ class FieldCapacityDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Field Capacity Successfully Deleted.")
         return redirect("fieldcapacity_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class FieldCapacityListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/FieldCapacity.html"
 
@@ -833,6 +860,7 @@ class FieldCapacityListView(LoginRequiredMixin, View):
 
 
 ####################################################### Ground Materials CRUD Views  ###########################################
+@method_decorator(user_role_check, name='dispatch')
 class GroundMaterialCreateView(LoginRequiredMixin, View):
     template_name = "forms/groundmaterial_form.html"
 
@@ -852,7 +880,7 @@ class GroundMaterialCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class GroundMaterialUpdateView(LoginRequiredMixin, View):
     template_name = "forms/groundmaterial_form.html"
 
@@ -874,7 +902,7 @@ class GroundMaterialUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class GroundMaterialDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         groundmaterial = get_object_or_404(GroundMaterial, pk=pk)
@@ -888,7 +916,7 @@ class GroundMaterialDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Ground Material successfully deleted.")
         return redirect("groundmaterial_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class GroundMaterialListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/GroundMaterial.html"
 
@@ -908,6 +936,7 @@ class GroundMaterialListView(LoginRequiredMixin, View):
 
 
 ######################################  Tournament Style CRUD Views  #############################################################
+@method_decorator(user_role_check, name='dispatch')
 class TournamentStyleCreateView(LoginRequiredMixin, View):
     template_name = "forms/tournamentstyle_form.html"
 
@@ -927,7 +956,7 @@ class TournamentStyleCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class TournamentStyleUpdateView(LoginRequiredMixin, View):
     template_name = "forms/tournamentstyle_form.html"
 
@@ -949,7 +978,7 @@ class TournamentStyleUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class TournamentStyleDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         tournamentstyle = get_object_or_404(TournamentStyle, pk=pk)
@@ -963,7 +992,7 @@ class TournamentStyleDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Tournament Style successfully deleted.")
         return redirect("tournamentstyle_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class TournamentStyleListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/TournamentStyle.html"
 
@@ -980,6 +1009,7 @@ class TournamentStyleListView(LoginRequiredMixin, View):
 
 
 ################################################### Event Type CRUD Views #######################################################
+@method_decorator(user_role_check, name='dispatch')
 class EventTypeCreateView(LoginRequiredMixin, View):
     template_name = "forms/eventtype_form.html"
 
@@ -999,7 +1029,7 @@ class EventTypeCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class EventTypeUpdateView(LoginRequiredMixin, View):
     template_name = "forms/eventtype_form.html"
 
@@ -1021,7 +1051,7 @@ class EventTypeUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class EventTypeDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         eventtype = get_object_or_404(EventType, pk=pk)
@@ -1035,7 +1065,7 @@ class EventTypeDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Event Type successfully deleted.")
         return redirect("eventtype_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class EventTypeListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/EventType.html"
 
@@ -1052,6 +1082,7 @@ class EventTypeListView(LoginRequiredMixin, View):
 
 
 ######################################################### News Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class NewsListView(LoginRequiredMixin, View):
     template_name = "Admin/News_List.html"
 
@@ -1066,7 +1097,7 @@ class NewsListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class NewsCreateView(View):
     def post(self, request):
         title_en = request.POST.get("title_en")
@@ -1097,7 +1128,7 @@ class NewsCreateView(View):
         messages.success(request, "News created successfully.")
         return redirect("news_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class NewsEditView(View):
     template_name = "Admin/News_List.html"
 
@@ -1133,7 +1164,7 @@ class NewsEditView(View):
         messages.success(request, "News updated successfully.")
         return redirect("news_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class NewsDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         news = get_object_or_404(News, pk=pk)
@@ -1143,6 +1174,7 @@ class NewsDeleteView(LoginRequiredMixin, View):
 
 
 ############################################################## Partners Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class PartnersListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Partners_List.html"
 
@@ -1157,7 +1189,7 @@ class PartnersListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class PartnersCreateView(View):
     def post(self, request):
         title = request.POST.get("title")
@@ -1184,7 +1216,7 @@ class PartnersCreateView(View):
         messages.success(request, "Partners created successfully.")
         return redirect("partners_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class PartnersEditView(View):
     template_name = "Admin/General_Settings/Partners_List.html"
 
@@ -1215,7 +1247,7 @@ class PartnersEditView(View):
         messages.success(request, "Partners updated successfully.")
         return redirect("partners_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class PartnersDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         partners = get_object_or_404(Partners, pk=pk)
@@ -1225,6 +1257,7 @@ class PartnersDeleteView(LoginRequiredMixin, View):
 
 
 ############################################################ Global Clients Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class Global_ClientsListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Global_Clients_List.html"
 
@@ -1239,7 +1272,7 @@ class Global_ClientsListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Global_ClientsCreateView(View):
     def post(self, request):
         title = request.POST.get("title")
@@ -1266,7 +1299,7 @@ class Global_ClientsCreateView(View):
         messages.success(request, "Global Client created successfully.")
         return redirect("global_clients_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Global_ClientsEditView(View):
     template_name = "Admin/General_Settings/Global_Clients_List.html"
 
@@ -1297,7 +1330,7 @@ class Global_ClientsEditView(View):
         messages.success(request, "Global Client updated successfully.")
         return redirect("global_clients_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Global_ClientsDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         global_clients = get_object_or_404(Global_Clients, pk=pk)
@@ -1307,6 +1340,7 @@ class Global_ClientsDeleteView(LoginRequiredMixin, View):
 
 
 ################################################################# Tryout Club Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class Tryout_ClubListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Tryout_Club_List.html"
 
@@ -1321,7 +1355,7 @@ class Tryout_ClubListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Tryout_ClubCreateView(View):
     def post(self, request):
         title = request.POST.get("title")
@@ -1348,7 +1382,7 @@ class Tryout_ClubCreateView(View):
         messages.success(request, "Tryout Club created successfully.")
         return redirect("tryout_club_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Tryout_ClubEditView(View):
     template_name = "Admin/General_Settings/Tryout_Club_List.html"
 
@@ -1379,7 +1413,7 @@ class Tryout_ClubEditView(View):
         messages.success(request, "Tryout Club updated successfully.")
         return redirect("tryout_club_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Tryout_ClubDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         tryout_club = get_object_or_404(Tryout_Club, pk=pk)
@@ -1389,6 +1423,7 @@ class Tryout_ClubDeleteView(LoginRequiredMixin, View):
 
 
 #################################################################### Inquires Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class InquireListView(LoginRequiredMixin, View):
     template_name = "Admin/Inquire_List.html"
 
@@ -1406,6 +1441,7 @@ class InquireListView(LoginRequiredMixin, View):
 
 
 ################################################################ Testimonial Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class TestimonialListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Testimonial_List.html"
 
@@ -1420,7 +1456,7 @@ class TestimonialListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class TestimonialCreateView(View):
     def post(self, request):
         name_en = request.POST.get("name_en")
@@ -1455,7 +1491,7 @@ class TestimonialCreateView(View):
         messages.success(request, "Testimonial Created successfully.")
         return redirect("testimonial_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class TestimonialEditView(View):
     template_name = "Admin/General_Settings/Testimonial_List.html"
 
@@ -1494,7 +1530,7 @@ class TestimonialEditView(View):
         messages.success(request, "Testimonial updated successfully.")
         return redirect("testimonial_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class TestimonialDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         testimonial = get_object_or_404(Testimonial, pk=pk)
@@ -1504,6 +1540,7 @@ class TestimonialDeleteView(LoginRequiredMixin, View):
 
 
 ################################################################ Team_Members Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class Team_MembersListView(LoginRequiredMixin, View):
     template_name = "Admin/Team_Members_List.html"
 
@@ -1518,7 +1555,7 @@ class Team_MembersListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Team_MembersCreateView(View):
     def post(self, request):
         name_en = request.POST.get("name_en")
@@ -1547,7 +1584,7 @@ class Team_MembersCreateView(View):
         messages.success(request, "Team Member created successfully.")
         return redirect("team_members_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Team_MembersEditView(View):
     template_name = "Admin/Team_Members_List.html"
 
@@ -1581,7 +1618,7 @@ class Team_MembersEditView(View):
         messages.success(request, "Team Member updated successfully.")
         return redirect("team_members_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Team_MembersDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         team_members = get_object_or_404(Team_Members, pk=pk)
@@ -1591,6 +1628,7 @@ class Team_MembersDeleteView(LoginRequiredMixin, View):
 
 
 ################################################################ App_Feature Module ###############################################
+@method_decorator(user_role_check, name='dispatch')
 class App_FeatureListView(LoginRequiredMixin, View):
     template_name = "Admin/App_Feature_List.html"
 
@@ -1605,7 +1643,7 @@ class App_FeatureListView(LoginRequiredMixin, View):
             },
         )
 
-
+@method_decorator(user_role_check, name='dispatch')
 class App_FeatureCreateView(View):
     def post(self, request):
         title_en = request.POST.get("title_en")
@@ -1634,7 +1672,7 @@ class App_FeatureCreateView(View):
         messages.success(request, "App Feature created successfully.")
         return redirect("app_feature_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class App_FeatureEditView(View):
     template_name = "Admin/App_Feature_List.html"
 
@@ -1668,7 +1706,7 @@ class App_FeatureEditView(View):
         messages.success(request, "App Feature updated successfully.")
         return redirect("app_feature_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class App_FeatureDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         app_feature = get_object_or_404(App_Feature, pk=pk)
@@ -1678,6 +1716,7 @@ class App_FeatureDeleteView(LoginRequiredMixin, View):
 
 
 #################################################   Slider_Content CRUD Views  #######################################################
+@method_decorator(user_role_check, name='dispatch')
 class Slider_ContentCreateView(LoginRequiredMixin, View):
     template_name = "forms/slider_content_form.html"
 
@@ -1697,7 +1736,7 @@ class Slider_ContentCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Slider_ContentUpdateView(LoginRequiredMixin, View):
     template_name = "forms/slider_content_form.html"
 
@@ -1719,7 +1758,7 @@ class Slider_ContentUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Slider_ContentDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         slider_content = get_object_or_404(Slider_Content, pk=pk)
@@ -1733,7 +1772,7 @@ class Slider_ContentDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Slider Content Successfully Deleted.")
         return redirect("slider_content_list")
 
-
+@method_decorator(user_role_check, name='dispatch')
 class Slider_ContentListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Slider_Content.html"
 
@@ -1750,7 +1789,8 @@ class Slider_ContentListView(LoginRequiredMixin, View):
 
 
 
-########################## CMS PAGES #################################        
+########################## CMS PAGES #################################  
+@method_decorator(user_role_check, name='dispatch')      
 class CMSPages(LoginRequiredMixin, View):
     template_name = "Admin/cmspages.html"
     
@@ -1771,7 +1811,8 @@ class CMSPages(LoginRequiredMixin, View):
  
 
  
-######################################## cms_contact_page  ##############################################################      
+######################################## cms_contact_page  ############################################################## 
+@method_decorator(user_role_check, name='dispatch')     
 class cms_contactpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/contactus.html"
 
@@ -1790,6 +1831,7 @@ class cms_contactpage(LoginRequiredMixin, View):
         )
         
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def savecontactpage(request):
         try:
             
@@ -1956,7 +1998,8 @@ def savecontactpage(request):
             return JsonResponse(response_data) 
 
     
-#cms_about_page     
+#cms_about_page
+@method_decorator(user_role_check, name='dispatch')     
 class cms_aboutpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/aboutus.html"
 
@@ -1973,7 +2016,8 @@ class cms_aboutpage(LoginRequiredMixin, View):
             context
             
         )
-        
+
+@method_decorator(user_role_check, name='dispatch')        
 @csrf_exempt
 def saveAboutUspage(request):
         try:
@@ -2096,6 +2140,7 @@ def saveAboutUspage(request):
                return JsonResponse(response_data) 
 
 #cms_about_page     
+@method_decorator(user_role_check, name='dispatch')
 class cms_newsPage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/news.html"
 
@@ -2115,6 +2160,7 @@ class cms_newsPage(LoginRequiredMixin, View):
         )
               
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def savenewspage(request):
         try:
             if request.method == "POST":
@@ -2192,7 +2238,8 @@ def savenewspage(request):
 
                return JsonResponse(response_data) 
                    
-#cms_about_page     
+#cms_about_page 
+@method_decorator(user_role_check, name='dispatch')    
 class cms_successStory(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/successtory.html"
 
@@ -2211,6 +2258,7 @@ class cms_successStory(LoginRequiredMixin, View):
     )
         
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def saveSucessStorypage(request):
         try:
             if request.method == "POST":
@@ -2291,7 +2339,8 @@ def saveSucessStorypage(request):
 
                return JsonResponse(response_data) 
 
-#cms_about_page     
+#cms_about_page
+@method_decorator(user_role_check, name='dispatch')     
 class cms_termcondition(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/term&condition.html"
 
@@ -2311,6 +2360,7 @@ class cms_termcondition(LoginRequiredMixin, View):
     )
         
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def savetermconditionpage(request):
         try:
             if request.method == "POST":
@@ -2363,6 +2413,7 @@ def savetermconditionpage(request):
                return JsonResponse(response_data) 
         
 #cms privacy policy page     
+@method_decorator(user_role_check, name='dispatch')
 class cms_privacypolicy(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/privacypolicy.html"
 
@@ -2379,6 +2430,7 @@ class cms_privacypolicy(LoginRequiredMixin, View):
             
     )
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def saveprivacypolicypage(request):
         
         try:
@@ -2430,6 +2482,7 @@ def saveprivacypolicypage(request):
                return JsonResponse(response_data) 
                
 #cms term and service  
+@method_decorator(user_role_check, name='dispatch')
 class cms_termandserice(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/term&service.html"
 
@@ -2451,6 +2504,7 @@ class cms_termandserice(LoginRequiredMixin, View):
         
 #save term and condition        
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def savetermservicepage(request):
         
         try:
@@ -2507,6 +2561,7 @@ def savetermservicepage(request):
                    
         
 #cms news detail  
+@method_decorator(user_role_check, name='dispatch')
 class cms_newsdetail(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/newsdetail.html"
 
@@ -2525,6 +2580,7 @@ class cms_newsdetail(LoginRequiredMixin, View):
         
 #cms news detail  
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def savenewsdetail(request):
         try:
             if request.method == "POST":
@@ -2603,6 +2659,7 @@ def savenewsdetail(request):
 
         
 #cms descovery page
+@method_decorator(user_role_check, name='dispatch')
 class cms_discoverypage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/discovery.html"
     def get(self, request):
@@ -2633,6 +2690,7 @@ class cms_discoverypage(LoginRequiredMixin, View):
     #discover page
     #cms discover
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def saveDiscoverdetail(request):
         try:
             if request.method == "POST":
@@ -3151,6 +3209,7 @@ def saveDiscoverdetail(request):
         
     
 #cms Advertise page
+@method_decorator(user_role_check, name='dispatch')
 class cms_advertisepage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/advertise.html"
     
@@ -3173,7 +3232,8 @@ class cms_advertisepage(LoginRequiredMixin, View):
             context
             
     )     
-#cms advertise 
+#cms advertise
+@method_decorator(user_role_check, name='dispatch') 
 @csrf_exempt
 def saveadvertisedetail(request):
         try:
@@ -4106,6 +4166,7 @@ def saveadvertisedetail(request):
             
                
 #home page
+@method_decorator(user_role_check, name='dispatch')
 class cms_homepage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/home.html"
 
@@ -4122,7 +4183,8 @@ class cms_homepage(LoginRequiredMixin, View):
             {'features': features,'data':features_data,'achivements':achivements}        
     )  
 
-#cms home  
+#cms home
+@method_decorator(user_role_check, name='dispatch')  
 @csrf_exempt
 def savehomedetail(request):
         try:
@@ -4851,6 +4913,7 @@ def savehomedetail(request):
 
                return JsonResponse(response_data) 
 
+@method_decorator(user_role_check, name='dispatch')
 class cms_Login(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/login.html"
 
@@ -4871,6 +4934,7 @@ class cms_Login(LoginRequiredMixin, View):
         
 #cms Login 
 @csrf_exempt
+@method_decorator(user_role_check, name='dispatch')
 def savelogindetail(request):
         try:
             if request.method == "POST":
@@ -4919,7 +4983,8 @@ def savelogindetail(request):
                response_data = {'status': 'error', 'message': str(e)}
 
                return JsonResponse(response_data) 
-           
+
+@method_decorator(user_role_check, name='dispatch')           
 class cms_registration(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/registration.html"
 
@@ -4937,7 +5002,8 @@ class cms_registration(LoginRequiredMixin, View):
             
     ) 
         
-#cms Login 
+#cms Login
+@method_decorator(user_role_check, name='dispatch') 
 @csrf_exempt
 def saveregdetail(request):
         try:
@@ -4986,7 +5052,9 @@ def saveregdetail(request):
         except Exception as e:
                response_data = {'status': 'error', 'message': str(e)}
 
-               return JsonResponse(response_data) 
+               return JsonResponse(response_data)
+
+@method_decorator(user_role_check, name='dispatch')         
 class cms_dashboard(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/dashboard.html"
 
@@ -5004,7 +5072,8 @@ class cms_dashboard(LoginRequiredMixin, View):
             
     ) 
         
-#cms Login 
+#cms Login
+@method_decorator(user_role_check, name='dispatch') 
 @csrf_exempt
 def savedashdetail(request):
         try:
@@ -5059,8 +5128,3 @@ def savedashdetail(request):
 
                return JsonResponse(response_data) 
         
-                      
-        
-           
-        
-

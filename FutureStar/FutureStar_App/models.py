@@ -640,7 +640,7 @@ class cms_advertise_Partnership_dynamic_field(models.Model):
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
     class Meta():
-        db_table = "futurestar_app_cms_advertise_Partnership_dynamic_field"      
+        db_table = "futurestar_app_cms_advertise_partnership_dynamic_field"      
 
 class cms_advertise_ads_dynamic_field(models.Model):
     
