@@ -193,9 +193,24 @@ class AdvertisePage(View):
     
     def get(self, request, *args, **kwargs):
         current_language = request.session.get('language', 'en')
+        dynamic_field = cms_advertise_section_2_dynamic_field.objects.all()
+        partnership_dynamic_field = cms_advertise_Partnership_dynamic_field.objects.all()
+        ads_dynamic_field = cms_advertise_ads_dynamic_field.objects.all()
+        premium_dynamic_field = cms_advertise_premium_dynamic_field.objects.all()
+
+        try:
+            cmsdata = cms_pages.objects.get(id=6)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
         context = {
             "current_language":current_language,
+            "cmsdata" : cmsdata,
+            "dynamic_field":dynamic_field,
+            "partnership_dynamic_field":partnership_dynamic_field,
+            "ads_dynamic_field":ads_dynamic_field,
+            "premium_dynamic_field":premium_dynamic_field,
         }
+       
         return render(request, "advertise.html",context)
     
     def post(self, request, *args, **kwargs):

@@ -1,7 +1,7 @@
 {% extends 'base1.html' %}
 
 {% load static %}
-
+{% load lang_filter %}
 {% block css %}
 <!-- Plugins css start-->
 
@@ -17,10 +17,14 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="banner-inner">
-                    <h1 class="page-title wow fadeInUp delay-0-2s">Future Stars your gateway to millions of players</h1>
-                    <p>join us to Capture the attention and loyalty of ambitious young players. Connect with amateur
-                        players through our platform and elevate your brand with impactful campaigns and activations.
-                        Propel your business forward with Grintafy.</p>
+                    <h1 class="page-title wow fadeInUp delay-0-2s">
+                        {% lang cmsdata current_language "heading_title" as heading_title %}
+                        {{heading_title}}
+                    </h1>
+                    <p>
+                        {% lang cmsdata current_language "heading_content" as heading_content %}
+                        {{heading_content}}
+                    </p>
                 </div>
             </div>
         </div>
@@ -34,20 +38,32 @@
         <div class="row justify-content-between">
             <div class="col-md-6">
                 <div class="infowrapper wow fadeInUp delay-0-5s animated">
-                    <img src="{% static 'frontend/assets/images/advertise/audience-insights.png' %}" class="img-fluid" alt="">
-                    <h4 class="info-head">Audience Insights</h4>
-                    <p class="info-des">Our cards are open, it is your right to know the audience you’re
-                        targeting, through our insights feature.</p>
+                    <img src="/media/{{cmsdata.section_2_images}}" class="img-fluid" alt="">
+                    <h4 class="info-head">
+                        {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                        {{section_2_title}}
+                    </h4>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_2_content" as section_2_content %}
+                        {{section_2_content}}
+                    </p>
                 </div>
             </div>
+            {% for dynamic_field in dynamic_field %}
             <div class="col-md-6">
                 <div class="infowrapper wow fadeInUp delay-0-8s animated mb-0">
-                    <img src="{% static 'frontend/assets/images/advertise/audience-distribution.png' %}" class="img-fluid" alt="">
-                    <h4 class="info-head">Audience Distribution</h4>
-                    <p class="info-des">Our cards are open, it is your right to know the audience you’re
-                        targeting, through our insights feature.</p>
+                    <img src="/media/{{dynamic_field.images}}" class="img-fluid" alt="">
+                    <h4 class="info-head">
+                        {% lang dynamic_field current_language "title" as title %}
+                        {{title}}
+                    </h4>
+                    <p class="info-des">
+                        {% lang dynamic_field current_language "content" as content %}
+                        {{content}}
+                    </p>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -55,37 +71,53 @@
 
 <!-- Partnership With Us Area start -->
 <section class="partnership-with-us text-center py-100"
-style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg.png' %}');">
+style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title mb-60 wow fadeInUp delay-0-5s animated">
-                    <span class="sub-title">Partnership with Future Stars</span>
-                    <h3>Partner with Future Stars to revolutionize football talent scouting and development!</h3>
+                    <span class="sub-title">
+                        {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
+                        {{section_3_heading}}
+                    </span>
+                    <h3>
+                        {% lang cmsdata current_language "section_3_titlee" as section_3_titlee %}
+                        {{section_3_titlee}}
+                    </h3>
                 </div>
             </div>
         </div>
         <div class="row justify-content-between">
             <div class="col-md-6">
                 <div class="info-wrapper wow fadeInLeft delay-0-7s">
-                    <div class="img-wrapper"><img src="{% static 'frontend/assets/images/advertise/tshirt.jpg' %}" alt=""
+                    <div class="img-wrapper"><img src="/media/{{cmsdata.section_3_image}}" alt=""
                             class="img-fluid"></div>
-                    <h4 class="info-head">Hosting Tryouts</h4>
-                    <p class="info-des">Whether you're looking to host local and regional tryouts, offer
-                        international football experiences, or access exclusive media content, our partnership
-                        opportunities provide unparalleled benefits.</p>
+                    <h4 class="info-head">
+                        {% lang cmsdata current_language "section_3_title" as section_3_title %}
+                        {{section_3_title}}
+                    </h4>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_3_content" as section_3_content %}
+                        {{section_3_content}}
+                    </p>
                 </div>
             </div>
+            {% for partnership_dynamic_field in partnership_dynamic_field %}
             <div class="col-md-6">
-                <div class="info-wrapper mb-0 wow fadeInRight delay-0-7s">
-                    <div class="img-wrapper"><img src="{% static 'frontend/assets/images/advertise/content.jpg' %}" alt=""
+                <div class="info-wrapper wow fadeInLeft delay-0-7s">
+                    <div class="img-wrapper"><img src="/media/{{partnership_dynamic_field.images}}" alt=""
                             class="img-fluid"></div>
-                    <h4 class="info-head">Access to Exclusive Content</h4>
-                    <p class="info-des">Whether you're looking to host local and regional tryouts, offer
-                        international football experiences, or access exclusive media content, our partnership
-                        opportunities provide unparalleled benefits.</p>
+                    <h4 class="info-head">
+                        {% lang partnership_dynamic_field current_language "title" as title %}
+                        {{title}}
+                    </h4>
+                    <p class="info-des">
+                        {% lang partnership_dynamic_field current_language "content" as content %}
+                        {{content}}
+                    </p>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -98,28 +130,28 @@ style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-9 col-md-11">
                 <div class="section-title mb-60 wow fadeInUp delay-0-5s animated">
-                    <span class="sub-title">Future Stars  App Ads</span>
-                    <h3> In App Advertising Showcase Your Product And Promotion To Consumers In A Variety Of Display Ad Options.</h3>
+                    <span class="sub-title">
+                        {% lang cmsdata current_language "section_4_heading" as section_4_heading %}
+                        {{section_4_heading}}
+                    </span>
+                    <h3> 
+                        {% lang cmsdata current_language "section_4_title" as section_4_title %}
+                        {{section_4_title}}
+                    </h3>
                 </div>
             </div>
         </div>
 
         <div class="apps-advertise-slider">
+
             <div class="wow fadeInUp delay-0-2s animated">
-                <img src="{% static 'frontend/assets/images/advertise/apps-ads-img-1.png' %}" class="img-fluid" alt="">
+                <img src="/media/{{cmsdata.section_4_image}}" class="img-fluid" alt="">
             </div>
+            {% for ads_dynamic_field in ads_dynamic_field %}
             <div class="wow fadeInUp delay-0-4s animated">
-                <img src="{% static 'frontend/assets/images/advertise/apps-ads-img-2.png' %}" class="img-fluid" alt="">
+                <img src="/media/{{ads_dynamic_field.images}}" class="img-fluid" alt="">
             </div>
-            <div class="wow fadeInUp delay-0-6s animated">
-                <img src="{% static 'frontend/assets/images/advertise/apps-ads-img-3.png' %}" class="img-fluid" alt="">
-            </div>
-            <div class="wow fadeInUp delay-0-8s animated">
-                <img src="{% static 'frontend/assets/images/advertise/apps-ads-img-4.png' %}" class="img-fluid" alt="">
-            </div>
-            <div class="wow fadeInUp delay-0-4s animated">
-                <img src="{% static 'frontend/assets/images/advertise/apps-ads-img-2.png' %}" class="img-fluid" alt="">
-            </div>
+            {% endfor %}
         </div>
         <div class="work-gallery-controls">
             <button class="apps-advertise-slider-prev">
@@ -138,41 +170,30 @@ style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg
 <section class="premium-features py-100">
     <div class="container">
         <div class="section-title text-center mb-60 wow fadeInUp delay-0-5s animated">
-            <h2>Premium  Features</h2>
+            <h2>
+                {% lang cmsdata current_language "section_5_heading" as section_5_heading %}
+                        {{section_5_heading}}
+            </h2>
         </div>
         <div class="features-main-wrapper">
             <div class="features-wrapper wow fadeInUp delay-0-2s animated">
-                <img src="{% static 'frontend/assets/images/advertise/location.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Location targeting</h6>
+                <img src="/media/{{cmsdata.section_5_image}}" class="img-fluid" alt="">
+                <h6 class="info-head">
+                    {% lang cmsdata current_language "section_5_title" as section_5_title %}
+                        {{section_5_title}}
+                </h6>
             </div>
+
+            {% for premium_dynamic_field in premium_dynamic_field %}
             <div class="features-wrapper wow fadeInUp delay-0-3s animated">
-                <img src="{% static 'frontend/assets/images/advertise/age.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Age Targeting</h6>
+                <img src="/media/{{premium_dynamic_field.images}}" class="img-fluid" alt="">
+                <h6 class="info-head">
+                    {% lang premium_dynamic_field current_language "title" as title %}
+                        {{title}}
+                </h6>
             </div>
-            <div class="features-wrapper wow fadeInUp delay-0-4s animated">
-                <img src="{% static 'frontend/assets/images/advertise/campaign.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Campaign Timeline</h6>
-            </div>
-            <div class="features-wrapper wow fadeInUp delay-0-5s animated">
-                <img src="{% static 'frontend/assets/images/advertise/ads.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Ads Placements</h6>
-            </div>
-            <div class="features-wrapper wow fadeInUp delay-0-6s animated">
-                <img src="{% static 'frontend/assets/images/advertise/insight.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Campaign Insights</h6>
-            </div>
-            <div class="features-wrapper wow fadeInUp delay-0-7s animated">
-                <img src="{% static 'frontend/assets/images/advertise/tracking.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Campaign Tracking</h6>
-            </div>
-            <div class="features-wrapper wow fadeInUp delay-0-8s animated">
-                <img src="{% static 'frontend/assets/images/advertise/ctas.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Custom CTA’s</h6>
-            </div>
-            <div class="features-wrapper wow fadeInUp delay-0-9s animated">
-                <img src="{% static 'frontend/assets/images/advertise/video-ads.png' %}" class="img-fluid" alt="">
-                <h6 class="info-head">Video/Images Ads</h6>
-            </div>
+
+            {% endfor %}
         </div>
     </div>
  </section>
@@ -184,27 +205,48 @@ style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg
         <div class="row">
             <div class="col">
                 <div class="section-title mb-60 wow fadeInUp delay-0-5s animated">
-                    <h2>Future Stars  Social Media</h2>
+                    <h2>
+                        {% lang cmsdata current_language "section_6_title" as section_6_title %}
+                        {{section_6_title}}
+                    </h2>
                 </div>
             </div>
         </div>
         <div class="row align-items-center justify-content-between">
             <div class="col-md-4 order-md-2 wow fadeInUp delay-0-9s animated">
-                <img src="{% static 'frontend/assets/images/advertise/social-media-main.png' %}" class="img-fluid" alt="">
+                <img src="/media/{{cmsdata.section_6_image}}" class="img-fluid" alt="">
             </div>                
             <div class="col-md-4 order-md-1 wow fadeInLeft delay-0-6s animated">    
             <div class="info-wrapper right">
-                    <p class="info-des">Elevate your brand visibility with captivating daily content and stories.</p>
-                    <p class="info-des">Follow our journey and get regular, detailed updates on  TDC's advancements.</p>
-                    <p class="info-des">Join us in recognizing the top 25 TDC winners for their remarkable achievements.</p>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_6_content_1" as section_6_content_1 %}
+                        {{section_6_content_1}}
+                    </p>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_6_content_2" as section_6_content_2 %}
+                        {{section_6_content_2}}
+                    </p>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_6_content_3" as section_6_content_3 %}
+                        {{section_6_content_3}}
+                    </p>
                 </div>
             </div>
     
             <div class="col-md-4 order-md-3 wow fadeInRight delay-0-6s animated">
                 <div class="info-wrapper left">
-                    <p class="info-des">Elevate your brand visibility with captivating daily content and stories.</p>
-                    <p class="info-des">Follow our journey and get regular, detailed updates on  TDC's advancements.</p>
-                    <p class="info-des">Join us in recognizing the top 25 TDC winners for their remarkable achievements.</p>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_6_content_4" as section_6_content_4 %}
+                        {{section_6_content_4}}
+                    </p>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_6_content_5" as section_6_content_5 %}
+                        {{section_6_content_5}}
+                    </p>
+                    <p class="info-des">
+                        {% lang cmsdata current_language "section_6_content_6" as section_6_content_6 %}
+                        {{section_6_content_6}}
+                    </p>
                 </div>
             </div>
         </div>
@@ -218,19 +260,20 @@ style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg
         <div class="row">
             <div class="col-lg-6">
                 <div class="section-title wow fadeInUp delay-0-5s">
-                    <h3>Future Stars  Competitions</h3>
+                    <h3>
+                        {% lang cmsdata current_language "section_9_heading" as section_9_heading %}
+                        {{section_9_heading}}
+                    </h3>
                 </div>
-                <p>Make Name  Your Competition personal and unique!</p>
-                <p>Add/Remove Challenges Have complete control over the challenges you want to include.</p>
-                <p>Our competition is open-ended with No Time Limits, so there are no constraints on when you can participate. Take your time to perfect your talent and share it with the world  whenever you're ready.</p>
-                <p>Customize your own rules and requirements  to suit your competition’s needs. Create a tailored experience that matches your vision.</p>
-                <p>Make Name  Your Competition personal and unique!</p>
-                <p>Add/Remove Challenges Have complete control over the challenges you want to include.</p>
+                <p>
+                    {% lang cmsdata current_language "section_9_title" as section_9_title %}
+                    {{section_9_title}}
+                </p>
             </div>
             <div class="col-lg-6">
                 <div class="wow fadeInUp delay-0-3s">
                     <div class="main-image">
-                        <img src="{% static 'frontend/assets/images/discover/taining-2.png' %}" alt="">
+                        <img src="/media/{{cmsdata.section_9_image}}" alt="">
                     </div>
                 </div>
             </div>
