@@ -1556,7 +1556,7 @@
 
             }
                 catch(err){
-                    alert("1: "+err)
+                    console.log("1: "+err)
                     return false
 
 
@@ -1730,7 +1730,7 @@
     }
     
             catch(err){
-                alert("1: "+err)
+                console.log("1: "+err)
                 return false
             }
         
@@ -1793,7 +1793,7 @@
             }
 
             catch(err){
-            alert("1: "+err)
+                console.log("1: "+err)
             return false
             }
 
@@ -1874,7 +1874,7 @@
 
 
                     if(typeof featureCount === "undefined" ){
-                        alert("yes")
+                        console.log("yes")
                         return false
                         featureCount = document.getElementById('last-feature-field-id').value;
 
@@ -1966,7 +1966,7 @@
                 }
                 //achivement section
                 if(typeof achiveCount === "undefined" ){
-                        alert("yes")
+                    console.log("yes")
                         return false
                         achiveCount = document.getElementById('last-achive-field-id').value;
 
@@ -2173,7 +2173,7 @@
                     }
                 }
                 catch(err){
-                    alert(err)
+                    console.log(err)
                 }
 
                 try{
@@ -2193,7 +2193,7 @@
                     }
                 }
                 catch(err){
-                    alert(err)
+                    console.log(err)
                 }
                 
                     
@@ -2256,7 +2256,7 @@
            catch(err){
                     
 
-                    alert("this is error:"+err)
+            console.log("this is error:"+err)
                     return false
                 }
 
@@ -2411,7 +2411,7 @@
         }
         }
         catch(err){
-            alert(err)
+            console.log(err)
 
             var icon_warning = document.getElementById(`banner-advertise-warning`)
 
@@ -2443,7 +2443,7 @@
         }
         }
         catch(err){
-            alert(err)
+            console.log(err)
 
             var icon_warning = document.getElementById(`partnership-warning-${count}`)
 
@@ -2476,7 +2476,7 @@ function displaypremiumFeatures(event,count) {
     }
     }
     catch(err){
-        alert(err)
+        console.log(err)
 
         var icon_warning = document.getElementById(`premium-warning-${count}`)
 
@@ -2515,7 +2515,7 @@ function displaySocialMediaBackgroundImg(event) {
     }
     }
     catch(err){
-        alert(err)
+        console.log(err)
 
         var icon_warning = document.getElementById(`social-media-background-image-warning`)
 
@@ -2548,7 +2548,7 @@ function displaySocialMediaImg(event) {
     }
     }
     catch(err){
-        alert(err)
+        console.log(err)
 
         var icon_warning = document.getElementById(`social-media-image-warning`)
 
@@ -2581,7 +2581,7 @@ function displaySocialMediaImg(event) {
                 console.log("featureCOunt Value: "+featureCount)
             }
             catch(err){
-                alert("1: "+err)
+                console.log("1: "+err)
                 
             }
             console.log(featureCount)
@@ -2782,7 +2782,7 @@ function displaySocialMediaImg(event) {
                 return false;
                 }
                 catch(err){
-                alert(err)
+                    console.log(err)
 
         
                 return false
@@ -2847,7 +2847,7 @@ function displaySocialMediaImg(event) {
                 console.log("achiveCount Value: "+achiveCount)
         }
     catch(err){
-                alert("1: "+err)
+        console.log("1: "+err)
                 
     }
     console.log(achiveCount)
@@ -3019,7 +3019,7 @@ function displaySocialMediaImg(event) {
         return false;
         }
         catch(err){
-        alert(err)
+            console.log(err)
 
 
         return false

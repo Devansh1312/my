@@ -72,7 +72,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="discovery-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="discovery-title-ar" name="discovery-title-ar" type="text" value="{{data.heading_title_en}}" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="discovery-title-ar" name="discovery-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-discovery-title-ar"></p>
 
                             </div>
@@ -1044,7 +1044,7 @@
                         }
 
                         catch(err){
-                        alert("1: "+err)
+                            console.log("1: "+err)
                         return false
                         }
                 if(sendData == 'true'){
@@ -1090,7 +1090,7 @@
                     
 
                     if(typeof whoCount === "undefined" ){
-                        alert("yes")
+                        console.log("yes")
                         return false
                         whoCount = document.getElementById('last-who-field-id').value;
 
@@ -1149,14 +1149,14 @@
 
                         }
                         else if(dump2 != -1){
-                            alert("it is there in deteting field")
+                            console.log("it is there in deteting field")
 
                         }
                     }
 
 
                     if(deleteing_who_field.length > 0){
-                        alert("yes")
+                        console.log("yes")
 
                                             
                         formData.append(`deleted_who_field`,deleteing_who_field)
@@ -1190,8 +1190,7 @@
                 }
 
                 if(typeof headerimageCount === "undefined" ){
-                        alert("yes")
-                        return false
+                    console.log("yes")
                         headerimageCount = document.getElementById('last-header-image-field-id').value;
 
                     }
@@ -1212,12 +1211,12 @@
                         try{
 
                         let uwid = 0
-                        alert("heading Count is: "+headerimageCount)
+                        console.log("heading Count is: "+headerimageCount)
                         for (let i = 2; i <= headerimageCount;i++) {
                         
                         if(deleteing_field){
                             var dump1 = deleteing_field.indexOf(i)
-                            alert("field is "+i)
+                            console.log("field is "+i)
                             if(dump1 == -1){
                                 console.log("number: "+i)
                                 formData.append('header_image',headerimageCount)
@@ -1242,7 +1241,7 @@
 
                         }
                         else if(dump1 !== -1){
-                                alert("it is there in deteting field")
+                            console.log("it is there in deteting field")
 
                             }
                         }
@@ -1289,6 +1288,7 @@
                         } 
 
                         if (discover_heading_image.files.length > 0) {
+                            console.log(discover_heading_image.files[0])
                             formData.append('discover_heading_image', discover_heading_image.files[0]);
 
                     } 
@@ -1365,7 +1365,7 @@
         
             catch(err){
 
-                alert("this is error: "+err)
+                console.log("this is error: "+err)
 
                 return false;
             }
@@ -1455,7 +1455,7 @@
         }
         }
         catch(err){
-            alert(err)
+            console.log(err)
             var icon_warning = document.getElementById(`game-image-warning-1${count}`)
 
             icon_warning.value = err
@@ -1482,7 +1482,7 @@
                 console.log("whoCount Value: "+whoCount)
             }
             catch(err){
-                alert("1: "+err)
+                console.log("1: "+err)
                 
             }
             console.log(whoCount)
@@ -1645,7 +1645,7 @@
         }
         
         catch(err){
-            alert(err)
+            console.log(err)
 
             return false
         }
@@ -1669,7 +1669,7 @@
             const lastwhofield = document.querySelectorAll('.last-who-field-id');
                 
             whoCount = lastwhofield[lastwhofield.length -1].value;
-           alert(whoCount)
+            console.log(whoCount)
            console.log(deleteing_who_field)
         }
         } catch (err) {
@@ -1721,7 +1721,7 @@
                 console.log("imageCOunt Value: "+headerimageCount)
             }
             catch(err){
-                alert("1: "+err)
+                console.log("1: "+err)
                 
             }
             console.log(headerimageCount)
@@ -1836,7 +1836,7 @@
         return false;
         }
         catch(err){
-        alert(err)
+            console.log(err)
 
         return false
         }
@@ -1863,7 +1863,7 @@
                 const lasthimagefield = document.querySelectorAll('.last-header-image-field-id');
                 
                 headerimageCount = lasthimagefield[lasthimagefield.length -1].value;
-                alert(headerimageCount)
+                console.log(headerimageCount)
                 console.log(deleteing_field)
                 return false
             }
@@ -1882,7 +1882,6 @@
         dynamic_deleted_field.push(id)
         deleteing_field.push(counter)
         document.getElementById(`section-heading-photo-${id}`).style.display = "none"
-        //alert(id)
         //featureCount--
         console.log(dynamic_deleted_field)
         return false

@@ -327,7 +327,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="partnership-heading-name-arabic-1">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="partnership-heading-name-ar-1" name="partnership_heading_name_ar_1" type="text" value="{{data.section_3_heading_en}}" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="partnership-heading-name-ar-1" name="partnership_heading_name_ar_1" type="text" value="{{data.section_3_heading_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-partnership-heading-name-ar-1"></p>
 
                             </div>
@@ -443,7 +443,106 @@
                     </div>
 
                             <br>
+                    
+                    {% if partnership %}
+                    {% for fields in partnership %}
+                    
+                    <div id="section-partnership-{{ forloop.counter|add:'1' }}">
 
+                                <div id="dynamic-partnership-section-1">
+                                    <h1 style="font-weight:bold;font-size:16px;color:grey">Form-{{ forloop.counter|add:'1' }}</h1>
+                                    <p class="field-roll-id" style='display:none'>{{fields.field_id}}</p>
+                                    <p id="field-roll-partnership-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{fields.field_id}}</p>
+                                </div>
+                                <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+            
+                                
+                                <!--heading-->
+                                    
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="partnership-title-en">Title (English)</label>
+                                            <input class="form-control btn-pill " id="partnership-title-en-{{ forloop.counter|add:'1' }}" name="partnership_title_en" type="text" value="{{fields.title_en}}" placeholder="Title (English)">
+                                            <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-en-{{ forloop.counter|add:'1' }}"></p>
+        
+                                        </div>
+                                    </div>
+            
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="section-2-title-arabic">Title (Arabic)</label>
+                                            <input class="form-control btn-pill" id="partnership-title-ar-{{ forloop.counter|add:'1' }}" name="partnership_title_ar" type="text" value="{{fields.title_ar}}" placeholder="Title (Arabic)">
+                                            <p style="color: red; display: none;" class="error-message" id ="error-partnership-title-ar-{{ forloop.counter|add:'1' }}"></p>
+        
+                                        </div>
+                                    </div>
+                                </div>
+            
+                               
+                                
+                                <!--heading content-->
+                                    
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="partnership-content-en">Content (English)</label>
+                                            <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-en-{{ forloop.counter|add:'1' }}" name="partnership-content-en" type="text" placeholder="content (English)">{{fields.content_en}}</textarea>
+                                            <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-en-{{ forloop.counter|add:'1' }}"></p>
+        
+                                        </div>
+                                    </div>
+            
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="partnership-content-ar">Content (Arabic)</label>
+                                            <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="partnership-content-ar-{{ forloop.counter|add:'1' }}" name="partnership-content-ar" type="text"  placeholder="content (Arabic)">{{fields.content_ar}}</textarea>
+                                            <p style="color: red; display: none;" class="error-message" id ="error-partnership-content-ar-{{ forloop.counter|add:'1' }}"></p>
+        
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                
+                                   
+            
+            
+                                    
+                                    
+                                
+                                    <div id="img-container">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="partnership-image-1">Icon-1 </label>
+                                                    <input class="form-control btn-pill" id="partnership-banner-{{ forloop.counter|add:'1' }}" name="partnership_banner_{{ forloop.counter|add:'1' }}" type="file"  onchange= "displaypartnershipImage(event,count=`{{forloop.counter | add:'1'}}`)" accept="image/*">
+                                                    <!--{% if system_settings.fav_icon %}-->
+                                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                                    <!--{% endif %}-->
+                                                    <img id="selected-partnership-image-{{ forloop.counter|add:'1' }}" src = "/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
+                                                    <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-{{ forloop.counter|add:'1' }}"></p>
+                                                </div>
+                                            </div>
+                                            <p id = "partnership-warning-{{ forloop.counter|add:'1' }}"></p>
+                                        </div>
+                                    </div>
+                                    {% if forloop.last %}
+
+                                        <input type="hidden" class="last-partnership-field-id-{{ forloop.counter|add:'1' }}" value="{{ forloop.counter|add:'1' }}"/>
+                                    {% endif %}
+
+                                    <div class="col-12  text-end " >
+
+                                        <button id="delete-row" onclick ="return deleteTheapartnerRow(`{{fields.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
+                        </div> 
+
+                                    
+                                    
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+
+                                <br>
                         <div id="dynamic-partnership-field">
                             <div class="col-12  text-end " >
                                 <button id="add-row" onclick ="return add_partnership_content()" class="btn btn-success">+</button>
@@ -503,8 +602,11 @@
 
                     <br>
                     <div id="form-container-ads">
+                        <div id="dynamic-image-section-1">
                         <div id="dynamic-ads-1">
                             <h1 style="font-weight:bold;font-size:16px;color:grey">Image-1</h1>
+                            <p id="field-id" style='display:none'>1</p>
+                            <p id="field-roll-image-id-1" style='display:none'>1</p>
                         </div>
 
                         <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
@@ -526,13 +628,65 @@
                                 </div>
                             </div>
                             <p id = "ads-warning-1"></p>
+                            <input type="hidden" class="last-ads-field-id-1" value="1"/>
+
                         </div> 
 
                         
 
 
                         
-                    <div>
+                    </div>
+                        <br>
+                        {% if ads %}
+                        {% for fields in ads%}
+                        <div id="form-container-ads">
+                        <div id="dynamic-image-section-{{forloop.counter | add:'1'}}">
+                        <div id="dynamic-ads-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Image-{{forloop.counter | add:'1'}}</h1>
+                            <p id="field-id" style='display:none'>{{fields.field_id}} </p>
+                            <p id="field-roll-image-id-{{forloop.counter | add:'1'}}" style='display:none'>{{fields.field_id}}</p>
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
+                        
+                        <div class="row" id = "ads-image-section-{{forloop.counter |add:'1'}}">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="ads-image-{{forloop.counter |add:'1'}}">Image-{{forloop.counter |add:'1'}} </label>
+                                    <input class="form-control btn-pill" id="ads-image-{{forloop.counter |add:'1'}}" name="ads_image_{{forloop.counter |add:'1'}}" type="file"  onchange= "displayImageads(event,count=`{{forloop.counter |add:'1'}}`)" accept="image/*">
+                                    <!--{% if system_settings.fav_icon %}-->
+                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
+                                    <!--{% endif %}-->
+    
+                                    <img id="selected-ads-image-{{forloop.counter |add:'1'}}" src = "/media/{{fields.images}}" style="display: block; width: 100px; height: 100px;" />
+                                    <p style="color: red; display: none;" class="error-message" id ="error-ads-image-{{forloop.counter |add:'1'}}"></p>
+
+                                </div>
+                            </div>
+                            <p id = "ads-warning-1"></p>
+                            {% if forloop.last%}
+                                <input type="hidden" class="last-ads-field-id-1" value="{{forloop.counter |add:'1'}}"/>
+                            {% endif %}
+
+                            <div class="col-12  text-end " >
+
+                                <button id="delete-row" onclick ="return deleteheaderadsimage_finalrow(`{{fields.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
+                            </div> 
+
+                        </div> 
+
+                        
+
+
+                        
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+
                         <br>
 
                         <div id="dynamic-ads-image-field">
@@ -541,6 +695,8 @@
 
                             </div>   
                         </div>
+                    
+                        
                    
                           
 
@@ -582,9 +738,15 @@
                        
                         
                         <!--heading content-->
-
                         
                         <div id="img-container">
+                            <div id = "section-premium-1">
+
+                                <div id="dynamic-premium-content-1">
+                                    <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+                                    <p id="field-id" style='display:none'>1</p>
+                                    <p id="field-roll-premium-id-{{ forloop.counter|add:'1' }}" style='display:none'>1</p>
+                                </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="mb-3">
@@ -622,6 +784,9 @@
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" class="last-premium-field-id" value="1"/>
+
+                        </div>
                         <br>
                         
                            
@@ -629,10 +794,69 @@
     
                             
                             
+                        {% if premium %}
+                        {% for field in premium %}
+                            <div id = "section-premium-{{forloop.counter | add:'1'}}">
+
+                                <div id="dynamic-premium-content-1">
+                                    <h1 style="font-weight:bold;font-size:16px;color:grey">Form-{{ forloop.counter| add:'1' }}</h1>
+                                    <p id="field-id" style='display:none'>{{field.field_id}}</p>
+                                    <p id="field-roll-premium-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{field.field_id}}</p>
+                                </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="premium-image-{{ forloop.counter| add:'1' }}">Premium Icon </label>
+                                        <input class="form-control btn-pill" id="premium-banner-{{ forloop.counter| add:'1' }}" name="premium_banner_{{ forloop.counter| add:'1' }}" type="file"  onchange= "return displaypremiumFeatures(event,count=`{{ forloop.counter| add:'1' }}`)" accept="image/*">
+                                        <!--{% if system_settings.fav_icon %}-->
+                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
+                                        <!--{% endif %}-->
+        
+                                        <img id="selected-premium-image-{{ forloop.counter| add:'1' }}" src = "/media/{{field.images}}" style="display: block; width: 100px; height: 100px;" />
+                                        <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-{{ forloop.counter| add:'1' }}"></p>
+
+                                    </div>
+                                </div>
+                                <p id = "premium-warning-{{ forloop.counter| add:'1' }}"></p>
+                            </div>
                         
                             
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-en-{{ forloop.counter| add:'1' }}">Premium Title (English)</label>
+                                    <input class="form-control btn-pill" id="premium-title-en-{{ forloop.counter| add:'1' }}" name="premium_title_en-{{ forloop.counter| add:'1' }}" type="text" value="{{field.title_en}}" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-en-{{ forloop.counter| add:'1' }}"></p>
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label" for="premium-title-ar-1">Premium Title (Arabic)</label>
+                                    <input class="form-control btn-pill" id="premium-title-ar-{{ forloop.counter| add:'1' }}" name="premium_title_ar_{{ forloop.counter| add:'1' }}" type="text" value="{{field.title_ar}}" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-ar-{{ forloop.counter| add:'1' }}"></p>
+
+                                </div>
+                            </div>
+                        </div>  
+
+                        {% if forloop.last %}
+                            <input type="hidden" class="last-premium-field-id" value="{{ forloop.counter|add:'1' }}"/>
+                         {% endif %}
+
+                         <div class="col-12  text-end " >
+
+                            <button id="delete-row" onclick ="return deletepremiumrow(`{{field.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
+                        </div> 
+                    </div>
+
+
+                        {%  endfor %}
+                        {% endif %}  
                             
                         <div>
+
                             <br>
     
                             <div id="dynamic-premium-field">
@@ -1009,10 +1233,10 @@
                 var partnership_heading_name_ar_1 = document.getElementById("partnership-heading-name-ar-1")
                 var partnership_heading_title_en_1 = document.getElementById("partnership-heading-title-en-1")
                 var partnership_heading_title_ar_1 = document.getElementById("partnership-heading-title-ar-1")
-                var partnership_title_en = document.getElementById("partnership-title-en")
-                var partnership_title_ar = document.getElementById("partnership-title-ar")
-                var partnership_content_en = document.getElementById("partnership-content-en")
-                var partnership_content_ar = document.getElementById("partnership-content-ar")
+                var partnership_title_en = document.getElementById("partnership-title-en-1")
+                var partnership_title_ar = document.getElementById("partnership-title-ar-1")
+                var partnership_content_en = document.getElementById("partnership-content-en-1")
+                var partnership_content_ar = document.getElementById("partnership-content-ar-1")
 
 
                 var ads_heading_name_en= document.getElementById("ads-heading-name-en")
@@ -1107,10 +1331,10 @@
                         { id: "partnership-heading-name-ar-1", name: "Partnership Heading (Arabic)" },
                         { id: "partnership-heading-title-en-1", name: "Partnership Title (English)" },
                         { id: "partnership-heading-title-ar-1", name: "Partnership Title (Arabic)" },
-                        { id: "partnership-title-en", name: "Partnership Title (English)" },
-                        { id: "partnership-title-ar", name: "Partnership Title (Arabic)" },
-                        { id: "partnership-content-en", name: "Partnership Content (English)" },
-                        { id: "partnership-content-ar", name: "Partnership Content (Arabic)" },
+                        { id: "partnership-title-en-1", name: "Partnership Title (English)" },
+                        { id: "partnership-title-ar-1", name: "Partnership Title (Arabic)" },
+                        { id: "partnership-content-en-1", name: "Partnership Content (English)" },
+                        { id: "partnership-content-ar-1", name: "Partnership Content (Arabic)" },
                         
                         { id: "ads-heading-name-en", name: "Heading Name (English)" },
                         { id: "ads-heading-name-ar", name: "Heading Name (Arabic)" },
@@ -1356,7 +1580,7 @@
                     formData.append('advertise-heading-title-en', advertise_heading_title_en.value);
                     formData.append('advertise-heading-title-ar', advertise_heading_title_ar.value );
                     formData.append('advertise-heading-content-en', advertise_heading_content_en.value );
-                    formData.append('advertise-heading-content-ar', advertise_heading_content_en.value );
+                    formData.append('advertise-heading-content-ar', advertise_heading_content_ar.value );
                     
                     formData.append('section-2-title-en', section_2_title_en.value );
                     formData.append('section-2-title-ar', section_2_title_ar.value );
@@ -1409,7 +1633,7 @@
                     formData.append('seo-content-ar', seo_content_ar.value );
 
                     if(typeof section_field_1 === "undefined" ){
-                        alert("yes")
+                        console.log("yes")
                             section_field_1 = document.getElementById('last-who-field-id').value;
 
                     }
@@ -1472,13 +1696,13 @@
                         }
                     
                         else if(dump2 != -1){
-                            alert("it is there in deteting field")
+                            console.log("it is there in deteting field")
 
                         
                         }
                     }
                     if(deleteing_section2field.length > 0){
-                        alert("yes")
+                        console.log("yes")
 
                                             
                         formData.append(`deleteing_section2field`,deleteing_section2field)
@@ -1511,8 +1735,10 @@
                     }
                 }
 
+                console.log(section_field_1)
+
                 if(typeof partnership_count === "undefined" ){
-                        alert("yes")
+                    console.log("yes")
                         partnership_count = document.getElementById('.last-partnership-field-id-1').value;
 
                     }
@@ -1530,8 +1756,8 @@
                     for (let i = 2; i <= partnership_count;i++) {
 
                         if(deleteing_partnershipfield){
-                            var dump3 = deleteing_partnershipfield.indexOf(i)
-                            if(dump3 == -1){
+                            var dump4 = deleteing_partnershipfield.indexOf(i)
+                            if(dump4 == -1){
                                 console.log("number: "+i)
                                 formData.append('partnership_field_passed',partnership_count)
                                 
@@ -1574,14 +1800,14 @@
                             
                         }
                     
-                        else if(dump3 != -1){
-                            alert("it is there in deteting field")
+                        else if(dump4 != -1){
+                            console.log("it is there in deteting field")
 
                         
                         }
                     }
                     if(deleteing_partnershipfield.length > 0){
-                        alert("yes")
+                        console.log("yes")
 
                                             
                         formData.append(`deleteing_partnershipfield`,deleteing_partnershipfield)
@@ -1597,12 +1823,12 @@
                         
 
                     }
-                    /*if(dynamic_deleted_section_field.length !== 0 ){
-                            formData.append("dyanmic_deleted_section_field",dynamic_deleted_section_field)
+                    if( dynamic_deleted_partner_field .length !== 0 ){
+                            formData.append(" dynamic_deleted_partner_field", dynamic_deleted_partner_field )
                         }
                         else{
                             console.log("its zero")
-                        }    */
+                        }    
                     
                     
                     console.log(uwid)
@@ -1613,6 +1839,191 @@
                         return false
                     }
                 }
+
+                if(typeof adscount === "undefined" ){
+                    console.log("yes")
+                        adscount = document.getElementById('last-header-image-field-id').value;
+
+                    }
+
+                /*for(i=2;i<=headerimageCount;i++){
+
+                    if(deleteing_field != 0){
+                        if(deleteing_field[i] == )
+
+                    }
+                    
+                } */   
+
+                
+                
+                if(adscount >=2){
+
+                        try{
+
+                        let uwid = 0
+                        console.log("ads Count is: "+adscount)
+                        for (let i = 2; i <= adscount;i++) {
+                        
+                        if(deleteing_ads_field ){
+                            var dump5 = deleteing_ads_field .indexOf(i)
+                            console.log("field is "+i)
+                            if(dump5 == -1){
+                                console.log("number: "+i)
+                                formData.append('ads_image',adscount)
+
+                                const image = document.getElementById(`ads-image-${i}`);
+                       
+                                const unique_field = document.getElementById(`field-roll-image-id-${i}`)
+                                console.log("this is uni: "+unique_field.innerText)
+           
+                                    if(image && image.files && image.files.length > 0) {
+                                            const game_image = image.files[0];
+                                            formData.append(`image_${i}`, game_image);
+                                            formData.append(`uaid_${i}`,unique_field.innerText)
+
+                                    } 
+                                        else {
+                                            console.log("already have image")
+                                        }
+                           
+                      
+                                formData.append(`id`, i);
+
+                        }
+                        else if(dump5 !== -1){
+                            console.log("it is there in deteting field")
+
+                            }
+                        }
+
+                        if(deleteing_ads_field.length > 0){
+
+                        
+                            formData.append(`deleteing_ads_field`,deleteing_ads_field)
+                        }
+                        else{
+                            console.log("No value inside deleteing field")
+                        }
+
+                        
+                        
+
+
+
+                            }
+                        if(dynamic_deleted_ads_field.length !== 0 ){
+                            formData.append("dyanmic_deleted_ads_field",dynamic_deleted_ads_field)
+                        }
+                        else{
+                            console.log("its zero")
+                        }    
+                            
+                     
+
+                        }
+                    
+                        catch(err){
+                        console.log("1: "+adscount)
+                        console.log(err)
+                        return false
+                        }
+                        }
+                    
+                    if(typeof premiumCount === "undefined" ){
+                        console.log("yes")
+                        premiumCount = document.getElementById('.last-premium-field-id').value;
+
+                    }
+                    /*else{
+                        
+                        IntCount = parseInt(last_value,10)
+                        counter = IntCount + dynamic_numFuntion.length
+                        console.log("counter: "+counter)
+                    }*/
+                    if(premiumCount >=2){
+
+                        try{
+
+                    let upid = 0
+                    for (let i = 2; i <= premiumCount;i++) {
+
+                        if( deleteing_premium_field){
+                            var dump6 =  deleteing_premium_field.indexOf(i)
+                            if(dump6 == -1){
+                                console.log("number: "+i)
+                                formData.append('premium_field_passed',premiumCount)
+                                
+                                const titleEn = document.getElementById(`premium-title-en-${i}`);
+                                const titleAr = document.getElementById(`premium-title-ar-${i}`);
+                                const image = document.getElementById(`premium-banner-${i}`);
+
+                                const unique_field = document.getElementById(`field-roll-premium-id-${i}`)
+                                console.log("this is uni: "+unique_field.innerText)
+                                if (titleEn) {
+                                    formData.append(`premium_title_en_${i}`, titleEn.value);
+                                }
+                                if (titleAr) {
+                                    formData.append(`premium_title_ar_${i}`, titleAr.value);
+                                }
+                               
+
+                                if(image && image.files && image.files.length > 0) {
+                                        const feature_image = image.files[0];
+                                        formData.append(`image_${i}`, feature_image);
+
+                                } 
+                            
+                                if(unique_field){
+                                    formData.append(`uppid_${i}`,unique_field.innerText)
+                                    uwid = unique_field.innerText
+                                    console.log(unique_field.innerText)
+                                }
+                             
+                                formData.append(`id`, i);
+
+
+                            
+                        }
+                    
+                        else if(dump6 != -1){
+                            console.log("it is there in deteting field")
+
+                        
+                        }
+                    }
+                    if(deleteing_premium_field.length > 0){
+
+                        formData.append(`deleteing_premium_field`,deleteing_premium_field)
+                    }
+                    else{
+                        console.log("No value inside deleteing field")
+                    }
+
+
+
+                        
+                        
+                        
+
+                    }
+                    if( dynamic_deleted_premium_field.length !== 0 ){
+                            formData.append(" dynamic_deleted_premium_field", dynamic_deleted_premium_field)
+                        }
+                        else{
+                            console.log("its zero")
+                        }    
+                    
+                    
+                    console.log(uwid)
+                        
+                    }
+                    catch(err){
+                        console.log(err)
+                        return false
+                    }
+                }
+
 
 
                 
@@ -1715,7 +2126,7 @@
                 }
                 catch(err){
                 
-                    alert(err);
+                    console.log(err);
                     return false
 
                 }
@@ -1889,7 +2300,7 @@
         }
         }
         catch(err){
-            alert(err)
+            console.log(err)
 
             var icon_warning = document.getElementById(`banner-advertise-warning`)
 
@@ -1921,7 +2332,7 @@
         }
         }
         catch(err){
-            alert(err)
+            console.log(err)
 
             var icon_warning = document.getElementById(`partnership-warning-${count}`)
 
@@ -1954,7 +2365,7 @@ function displaypremiumFeatures(event,count) {
     }
     }
     catch(err){
-        alert(err)
+        console.log(err)
 
         var icon_warning = document.getElementById(`premium-warning-${count}`)
 
@@ -1993,7 +2404,7 @@ function displaySocialMediaBackgroundImg(event) {
     }
     }
     catch(err){
-        alert(err)
+        console.log(err)
 
         var icon_warning = document.getElementById(`social-media-background-image-warning`)
 
@@ -2026,7 +2437,7 @@ function displaySocialMediaImg(event) {
     }
     }
     catch(err){
-        alert(err)
+        console.log(err)
 
         var icon_warning = document.getElementById(`social-media-image-warning`)
 
@@ -2054,7 +2465,7 @@ function displaySocialMediaImg(event) {
                 console.log("partnership count Value: "+partnership_count)
             }
     catch(err){
-                alert("1: "+err)
+                console.log("1: "+err)
                 
             }
             console.log(partnership_count)
@@ -2279,7 +2690,7 @@ function displaySocialMediaImg(event) {
             return false;
         }
         catch(err){
-            alert(err)
+            console.log(err)
 
             return false
         }
@@ -2319,27 +2730,36 @@ function displaySocialMediaImg(event) {
         }
            
     }
+    dynamic_deleted_partner_field = []
+    function deleteTheapartnerRow(id,counter){
 
-
-    //dynamic_deleted_section_field = []
-
-    /*function deletesectionrow(id,counter){
-        console.log(id)
+            
         try{
+
+        dynamic_deleted_partner_field.push(id)
+        deleteing_partnershipfield.push(counter)
+
         console.log(id)
-        dynamic_deleted_section_field.push(id)
-        deleteing_section2field .push(counter)
-        document.getElementById(`section-form-${id}`).style.display = "none"
-        //alert(id)
-        //featureCount--
-        console.log( dynamic_deleted_section_field)
+
+        document.getElementById(`section-partnership-${counter}`).style.display = "none"
+        console.log(deleteing_partnershipfield)
+
+        console.log( dynamic_deleted_partner_field)
         return false
         }
         catch(err){
             console.log(err)
             return false
         }
-    }*/
+
+
+
+
+    }
+
+
+
+    
 
 
     let section_field_1 = 1;
@@ -2355,7 +2775,7 @@ function displaySocialMediaImg(event) {
                 console.log("section field 1 Value: "+section_field_1)
             }
     catch(err){
-                alert("1: "+err)
+                console.log("1: "+err)
                 
             }
             console.log(section_field_1)
@@ -2564,7 +2984,7 @@ function displaySocialMediaImg(event) {
             return false;
         }
         catch(err){
-            alert(err)
+            console.log(err)
 
             return false
         }
@@ -2613,8 +3033,6 @@ function displaySocialMediaImg(event) {
         dynamic_deleted_section_field.push(id)
         deleteing_section2field .push(counter)
         document.getElementById(`section-form-${id}`).style.display = "none"
-        //alert(id)
-        //featureCount--
         console.log( dynamic_deleted_section_field)
         return false
         }
@@ -2625,13 +3043,100 @@ function displaySocialMediaImg(event) {
     }
 
     let adscount = 1
+    try{
+                const lastfield1field = document.querySelectorAll('.last-ads-field-id-1');
+                
+                adscount = lastfield1field[lastfield1field.length -1].value;
+
+               
+
+             
+               
+                console.log("section field 1 Value: "+adscount)
+            }
+    catch(err){
+        console.log("1: "+err)
+                
+            }
+            console.log(adscount)
+    let dynamic_imagenumFuntion = [] 
 
     function add_dynamic_ads_image(){
+        dump = "true"
 
+
+console.log("value:"+adscount)
+
+if(adscount > 1){
+        try{
+            const reset_dynamicErrorMsgimage = document.getElementById(`error-ads-image-${adscount}`);
+
+
+            
+            reset_dynamicErrorMsgimage.innerText = ""
+
+            
+            
+            
+
+            if(adscount > 1){
+                const dynamicimage = document.getElementById(`ads-image-${adscount}`);
+                const dynamicimagesrc = document.getElementById(`selected-ads-image-${adscount}`)
+                const dynamicErrorMsgimage= document.getElementById(`error-ads-image-${adscount}`);
+                
+            
+                if(dynamicimage.files.length == 0 && dynamicimagesrc.src == "" ){
+                    reset_dynamicErrorMsgimage.innerText = "Please insert image."
+                    reset_dynamicErrorMsgimage.style.display = 'block';
+
+                    dump = "false"
+                }   
+            }
+            
+                
+            }
+            
+
+
+    catch(err){
+        console.log("error: "+err)
+    }  
+
+            }
+    else if(adscount == 1){
+        console.log("hello")
+        var heading_image_1 = document.getElementById('selected-ads-image-1')
+        var heading_image_1_field = document.getElementById('ads-image-1')
+
+        if( heading_image_1_field.files.length === 0 && heading_image_1.src.endsWith("/media/")  ){
+
+                error_image = document.getElementById('error-ads-image-1')
+
+                error_image.innerText = `Please fill in game image 1`;
+                error_image.style.display = 'block'; 
+                dump = "false"
+                return false
+        }
+        
+
+    }
+        if(dump == "true"){
         try{
         adscount++;
+        var image_id = "id" + Math.random().toString(16).slice(2)
+
 
         let newRow = `
+        <div id="dynamic-image-section-${adscount}">
+                        <div id="dynamic-ads-1">
+                            <h1 style="font-weight:bold;font-size:16px;color:grey">Image-${adscount}</h1>
+                            <p id="field-id" style='display:none'>${image_id}</p>
+                            <p id="field-roll-image-id-${adscount}" style='display:none'>${image_id}</p>
+                        </div>
+
+                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+                        <br>
         <div class="row" id = "ads-image-section-${adscount}">
                             <div class="col-12">
                                 <div class="mb-3">
@@ -2642,11 +3147,19 @@ function displaySocialMediaImg(event) {
                                     <!--{% endif %}-->
     
                                     <img id="selected-ads-image-${adscount}" style="display: none; width: 100px; height: 100px;" />
-    
+                                    <p style="color: red; display: none;" class="error-message" id ="error-ads-image-${adscount}"></p>
+
                                 </div>
                             </div>
                             <p id = "ads-warning-${adscount}"></p>
+                            <input type="hidden" class="last-ads-field-id-1" value="${adscount}"/>
+                                <div class="col-12  text-end " >
+
+                                    <button id="delete-row" onclick ="return deleteadsimagerow(${adscount})" class="btn btn-danger">-</button>
+                                </div> 
+
                         </div> 
+        </div>                
        
         <br>
         `;
@@ -2656,12 +3169,68 @@ function displaySocialMediaImg(event) {
         return false;
         }
         catch(err){
-        alert(err)
+            console.log(err)
 
         return false
         }
+        
+    }
+    else{
+            console.log("something maybe wrong")
+            return false
         }
+        }
+
+        deleteing_ads_field = []
+        function deleteadsimagerow(id){
+            try {
+
+                let deletingadsField = document.getElementById(`dynamic-image-section-${id}`);
+                console.log(deletingadsField)
+            if (deletingadsField) {
+                deletingadsField.remove()
+                
+                
+                deleteing_ads_field.push(id)
+
+
+                //headerimageCount--
+              
+                const lastfield1field = document.querySelectorAll('.last-ads-field-id-1');
+                
+                adscount = lastfield1field[lastfield1field.length -1].value;
+                return false
+            }
+            } catch (err) {
+                console.log(err)
+                return false
+
+            }
+        }
+        
+    dynamic_deleted_ads_field = []
+    function deleteheaderadsimage_finalrow(id,counter){
+        try{
+        
+        dynamic_deleted_ads_field.push(id)
+        deleteing_ads_field.push(counter)
+
+        console.log(id)
+
+        document.getElementById(`dynamic-image-section-${counter}`).style.display = "none"
+        console.log(deleteing_ads_field)
+        
+        console.log(dynamic_deleted_ads_field)
+        return false
+        }
+        catch(err){
+            console.log(err)
+            return false
+        }
+    
+    }
     let imgcount = 1
+    
 
     function add_image(){
 
@@ -2697,7 +3266,7 @@ function displaySocialMediaImg(event) {
         return false;
         }
         catch(err){
-        alert(err)
+            console.log(err)
 
         return false
         }
@@ -2705,27 +3274,130 @@ function displaySocialMediaImg(event) {
 
         //premiumFunction
         premiumCount = 1 
-        function add_premium_content(){
+        try{
+                const lastpartnerfield = document.querySelectorAll('.last-premium-field-id');
+                
+                premiumCount = lastpartnerfield [lastpartnerfield .length -1].value;
 
-            try{
+               
+
+             
+               
+                console.log("premiumCount count Value: "+premiumCount)
+            }
+        catch(err){
+            console.log("1: "+err)
+                    
+                }
+                console.log(premiumCount)
+    
+
+        function add_premium_content(){
+            dom = "true"
+
+
+         
+                console.log("value:"+premiumCount)
+
+                if(premiumCount >= 1){
+                    try{
+                    const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-premium-title-en-${premiumCount }`);
+                    const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-premium-title-ar-${premiumCount }`);
+
+
+                    const reset_imageerror = document.getElementById(`error-premium-banner-${premiumCount }`)
+                reset_dynamicErrorMsgTitleEn.innerText = ""
+                reset_dynamicErrorMsgTitleAr.innerText = ""
+                reset_imageerror.innerText = ""
+
+                if(premiumCount >= 1){
+                   
+                    const dynamicTitleEn = document.getElementById(`premium-title-en-${premiumCount }`);
+                    const dynamicTitleAr = document.getElementById(`premium-title-ar-${premiumCount }`);
+                    const dynamicimage = document.getElementById(`premium-banner-${premiumCount }`)
+                    const dynamicimagesrc = document.getElementById(`selected-premium-image-${premiumCount }`)
+                    const dynamicErrorMsgTitleEn = document.getElementById(`error-premium-title-en-${premiumCount }`);
+                    const dynamicErrorMsgTitleAr = document.getElementById(`error-premium-title-ar-${premiumCount }`);
+                    const reset_imageerror = document.getElementById(`error-premium-banner-${premiumCount }`)
+
+                
+
+                    if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                        
+                        dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                        dynamicErrorMsgTitleEn.style.display = 'block';
+                        dynamicErrorMsgTitleEn.scrollIntoView();
+
+                        dom = "false";
+
+                    }
+
+            
+                    if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                        dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                        dynamicErrorMsgTitleAr.style.display = 'block';
+                        dynamicErrorMsgTitleAr.scrollIntoView();
+
+                        dom = "false";
+                        console.log(dom)
+
+
+                    }
+            
+                   
+
+                    
+                    if(premiumCount == 1){
+                        if(dynamicimage.files.length == 0 && dynamicimagesrc.src.endsWith("/media/") ){
+                        reset_imageerror.innerText = "Please insert image."
+                        reset_imageerror.style.display = 'block';
+                        reset_imageerror.scrollIntoView();
+
+
+                        dom = "false"
+                    }  
+                    }
+                    else{
+                        if(dynamicimage.files.length == 0 && dynamicimagesrc.src == "" ){
+                        reset_imageerror.innerText = "Please insert image."
+                        reset_imageerror.style.display = 'block';
+                        reset_imageerror.scrollIntoView();
+
+
+                        dom = "false"
+                    }  
+
+                    }
+                  
+                    
+                }        
+               
+                    }
+        
+        
+        catch(err){
+            console.log("error: "+err)
+            return false
+        
+                }
+                }
+                   
+            
+
+            if(dom == "true"){
+                try{
             premiumCount++;
+            var premium_id = "id" + Math.random().toString(16).slice(2)
+
     
             let newRow = `
-            <div id="dynamic-Premium-section-${premiumCount}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Features-Section-${premiumCount}</h1>
-                        </div>
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-    
-                        
-                        <!--heading-->
-                            
-                       
-                       
-                        
-                        <!--heading content-->
+            <div id = "section-premium-${premiumCount}">
 
-                        
-                        <div id="img-container">
+                                <div id="dynamic-premium-content-${premiumCount}">
+                                    <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${premiumCount}</h1>
+                                    <p id="field-id" style='display:none'>${premium_id}</p>
+                                    <p id="field-roll-premium-id-${premiumCount}" style='display:none'>${premium_id}</p>
+                                </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="mb-3">
@@ -2735,19 +3407,21 @@ function displaySocialMediaImg(event) {
                                             <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                         <!--{% endif %}-->
         
-                                        <img id="selected-premium-image-${premiumCount}" style="display: none; width: 100px; height: 100px;" />
-        
+                                        <img id="selected-premium-image-${premiumCount}" src = "" style="display: block; width: 100px; height: 100px;" />
+                                        <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-${premiumCount}"></p>
+
                                     </div>
                                 </div>
                                 <p id = "premium-warning-${premiumCount}"></p>
                             </div>
-                        </div>
+                      
                             
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-en-${premiumCount}">Premium Title (English)</label>
-                                    <input class="form-control btn-pill" id="premium-title-en-${premiumCount}" name="premium_title_en_${premiumCount}" type="text" value="1" placeholder="Title (English)">
+                                    <input class="form-control btn-pill" id="premium-title-en-${premiumCount}" name="premium_title_en-${premiumCount}" type="text" value="" placeholder="Title (English)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-en-${premiumCount}"></p>
 
                                 </div>
                             </div>
@@ -2755,18 +3429,21 @@ function displaySocialMediaImg(event) {
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="premium-title-ar-${premiumCount}">Premium Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="premium-title-ar-${premiumCount}" name="premium_title_ar_${premiumCount}" type="text" value="1" placeholder="Title (Arabic)">
-    
+                                    <input class="form-control btn-pill" id="premium-title-ar-${premiumCount}" name="premium_title_ar_${premiumCount}" type="text" value="" placeholder="Title (Arabic)">
+                                    <p style="color: red; display: none;" class="error-message" id ="error-premium-title-ar-${premiumCount}"></p>
+
                                 </div>
                             </div>
                         </div>
-
+                        <input type="hidden" class="last-premium-field-id" value="${premiumCount}"/>
                         <div class="col-12  text-end " >
 
-                                <button id="delete-row" class="btn btn-danger">-</button>
-                        </div>
-             
-            <br>
+                            <button id="delete-row" onclick="return dedletethedynamicpremium(${premiumCount})" class="btn btn-danger">-</button>
+                        </div>  
+                    </div>    
+                        <br>
+
+                     </div>   
             `;
     
             document.getElementById('dynamic-premium-field').insertAdjacentHTML('beforebegin', newRow);
@@ -2774,11 +3451,62 @@ function displaySocialMediaImg(event) {
             return false;
             }
             catch(err){
-            alert(err)
+                console.log(err)
     
             return false
             }
+        }
+        else{
+            console.log("somtthing is wrong")
+            return false
+        }
             }
+
+    deleteing_premium_field = []
+    function dedletethedynamicpremium(id){
+
+        try {
+        let deletingpremiumField = document.getElementById(`section-premium-${id}`);
+        if (deletingpremiumField) {
+            //deletingField.innerHTML = `form ${id} has been deleted`;
+            deletingpremiumField.remove()
+            deleteing_premium_field.push(id)
+            //whoCount--
+            const lastpartnerfield = document.querySelectorAll('.last-premium-field-id');
+                
+            premiumCount = lastpartnerfield [lastpartnerfield .length -1].value;
+            console.log(premiumCount)
+          return false
+        }
+        } catch (err) {
+            console.log(err)
+            return false
+
+        }
+
+    }
+dynamic_deleted_premium_field = []
+
+function deletepremiumrow(id,counter){
+
+    
+        try{
+
+        dynamic_deleted_premium_field.push(id)
+        deleteing_premium_field.push(counter)
+
+        console.log(id)
+
+        document.getElementById(`section-premium-${counter}`).style.display = "none"
+
+        return false
+        }
+        catch(err){
+            console.log(err)
+            return false
+        }
+
+}
             
     
     

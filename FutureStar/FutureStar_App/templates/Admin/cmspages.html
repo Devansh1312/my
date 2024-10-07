@@ -281,6 +281,21 @@
 
          window.location.href = url;
       }
+      else if(name == "Login"){
+         var url = "{%url 'cms_login' %}"
+
+         window.location.href = url;
+      }
+      else if(name == "Register"){
+         var url = "{%url 'cms_reg' %}"
+
+         window.location.href = url;
+      }
+      else if(name == "Dashboard"){
+         var url = "{%url 'cms_dashboard' %}"
+
+         window.location.href = url;
+      }
       else{
          alert(name)
          return false;

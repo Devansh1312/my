@@ -6,7 +6,7 @@ from django.utils import timezone
 # Create your models here.
 # post  Model
 class Post(models.Model):
-    user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE,default=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
@@ -19,9 +19,9 @@ class Post(models.Model):
         db_table = 'futurestar_app_post'
 
 class Team(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
     team_name = models.CharField(max_length=255,blank=True,null=True)
-    team_type = models.ForeignKey(Category,on_delete=models.CASCADE)
+    team_type = models.ForeignKey(Category,on_delete=models.CASCADE,default=True)
     bio = models.TextField(null=True,blank=True)
     team_establishment_date = models.DateField(blank=True,null=True)
     team_president = models.CharField(max_length=255,blank=True,null=True)
@@ -44,9 +44,9 @@ class Team(models.Model):
         db_table = 'futurestar_app_team'
 
 class Post_comment(models.Model):
-    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE,default=True)
     team_id = models.ForeignKey(Team ,null=True,blank=True, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE,default=True)
     parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
@@ -60,11 +60,11 @@ class Post_comment(models.Model):
 
 
 class Field(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE,default=True)
     field_name = models.CharField(max_length=255)
     image = models.ImageField(upload_to='fields_images/', blank=True, null=True)  # Add image field
-    field_capacity = models.ForeignKey(FieldCapacity, on_delete=models.CASCADE)
-    ground_type = models.ForeignKey(GroundMaterial, on_delete=models.CASCADE)
+    field_capacity = models.ForeignKey(FieldCapacity, on_delete=models.CASCADE,default=True)
+    ground_type = models.ForeignKey(GroundMaterial, on_delete=models.CASCADE,default=True)
     country = models.CharField(max_length=255)    
     city = models.CharField(max_length=255)
     location = models.CharField(max_length=500)
@@ -78,7 +78,7 @@ class Field(models.Model):
 
 
 class Tournament(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
     tournament_name = models.CharField(max_length=255,blank=True,null=True)
     tournament_starting_date = models.DateField(blank=True,null=True)
     tournament_final_date = models.DateField(blank=True,null=True)
