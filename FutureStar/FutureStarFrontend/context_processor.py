@@ -34,15 +34,3 @@ def system_settings(request):
     }
 
 
-def discover(request):
-    try:
-        # Fetch only 'name_en' and 'name_ar' fields from cms_pages where id=2
-        discover_title = cms_pages.objects.filter(id=2).values('name_en', 'name_ar').first()
-    except cms_pages.DoesNotExist:
-        discover_title = None  # Handle the case where the object does not exist
-
-
-    return {
-        'discover_title': discover_title,
-    }
-

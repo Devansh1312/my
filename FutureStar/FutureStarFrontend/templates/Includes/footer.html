@@ -15,14 +15,69 @@
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-links wow fadeInUp delay-0-3s">
-                    <h5 class="footer-title">Explore</h5>
+                    <h5 class="footer-title">
+                        {% if current_language == 'en' %}
+                            Explore
+                        {% elif current_language == 'ar' %}
+                            استكشاف
+                        {% endif %}
+                    </h5>               
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
-                            <li><a href="{% url 'discover' %}">Discover</a></li>
-                                <li><a href="{% url 'success-stories' %}">Success Stories</a></li>
-                                <li><a href="{% url 'news' %}">News</a></li>
-                                <li><a href="{% url 'advertise' %}">Advertise</a></li>
-                                <li><a href="{% url 'contact' %}">Contacts</a></li>
+                            <li class="{% if request.resolver_match.url_name == 'discover' %}active{% endif %}">
+                                <a href="{% url 'discover' %}">
+                                    {% if current_language == 'en' %}
+                                    Discover
+                                    {% elif current_language == 'ar' %}
+                                    يكتشف
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="{% if request.resolver_match.url_name == 'success-stories' %}active{% endif %}">
+                                <a href="{% url 'success-stories' %}">
+                                    {% if current_language == 'en' %}
+                                    Success Stories
+                                    {% elif current_language == 'ar' %}
+                                    قصص النجاح
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="{% if request.resolver_match.url_name == 'news' %}active{% endif %}">
+                                <a href="{% url 'news' %}">
+                                    {% if current_language == 'en' %}
+                                    News
+                                    {% elif current_language == 'ar' %}
+                                    الأخبار
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="{% if request.resolver_match.url_name == 'advertise' %}active{% endif %}">
+                                <a href="{% url 'advertise' %}">
+                                    {% if current_language == 'en' %}
+                                    Advertise
+                                    {% elif current_language == 'ar' %}
+                                    إعلان
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                                <a href="{% url 'about' %}">
+                                    {% if current_language == 'en' %}
+                                    About
+                                    {% elif current_language == 'ar' %}
+                                    حول
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                                <a href="{% url 'contact' %}">
+                                    {% if current_language == 'en' %}
+                                    Contacts
+                                    {% elif current_language == 'ar' %}
+                                    جهات الاتصال
+                                    {% endif %}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -30,25 +85,54 @@
 
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-links wow fadeInUp delay-0-5s">
-                    <h5 class="footer-title">Supports</h5>
+                    <h5 class="footer-title">
+                        {% if current_language == 'en' %}
+                            Supports
+                        {% elif current_language == 'ar' %}
+                            الدعم
+                        {% endif %}
+                    </h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
-                            <li><a href="{% url 'terms-of-services' %}">Terms of Services</a></li>
-                            <li><a href="{% url 'privacy-policy' %}">Privacy Policy</a></li>
-                            <li><a href="">Video Tutorials</a></li>
+                            <li><a href="{% url 'terms-of-services' %}">
+                                {% if current_language == 'en' %}
+                                    Terms of Services
+                                {% elif current_language == 'ar' %}
+                                    شروط الخدمة
+                                {% endif %}
+                            </a></li>
+                            <li><a href="{% url 'privacy-policy' %}">
+                                {% if current_language == 'en' %}
+                                    Privacy Policy
+                                {% elif current_language == 'ar' %}
+                                    سياسة الخصوصية
+                                {% endif %}
+                            </a></li>
+                            <li><a href="">
+                                {% if current_language == 'en' %}
+                                    Video Tutorials
+                                {% elif current_language == 'ar' %}
+                                    دروس الفيديو
+                                {% endif %}
+                            </a></li>
                         </ul>
                     </div>
                 </div>
             </div>
+            
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-info wow fadeInUp delay-0-6s">
-                    <h5 class="footer-title">Contact</h5>
+                    <h5 class="footer-title">
+                        {% if current_language == 'en' %}
+                            Contact
+                        {% elif current_language == 'ar' %}
+                            جهات الاتصال
+                        {% endif %}
+                    </h5>
                     <ul class="list-style-two">
                         <li><i class="far fa-map-marker-alt"></i> <span>{{ system_settings.address }}</span></li>
-                        <li><i class="far fa-envelope"></i> <a
-                                href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a></li>
-                        <li><i class="far fa-phone"></i> <a href="callto:{{ system_settings.phone }}">{{ system_settings.phone }}</a>
-                        </li>
+                        <li><i class="far fa-envelope"></i> <a href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a></li>
+                        <li><i class="far fa-phone"></i> <a href="callto:{{ system_settings.phone }}">{{ system_settings.phone }}</a></li>
                     </ul>
                     <div class="social-style-two">
                         <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
@@ -58,25 +142,36 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="copyright-area rel">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="footer-copyright-text wow fadeInUp delay-0-2s">
-                        <p>Copyright @2024, <a href="{% url 'index' %}">Future Stars</a> All Rights Reserved</p>
+            
+            <div class="copyright-area rel">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="footer-copyright-text wow fadeInUp delay-0-2s">
+                            <p>
+                                {% if current_language == 'en' %}
+                                    Copyright @2024, <a href="{% url 'index' %}">Future Stars</a> All Rights Reserved
+                                {% elif current_language == 'ar' %}
+                                    حقوق النشر @2024، <a href="{% url 'index' %}">نجوم المستقبل</a> جميع الحقوق محفوظة
+                                {% endif %}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
-                        <p>Designed & Developed By <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a></p>
+                    <div class="col-lg-6">
+                        <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
+                            <p>
+                                {% if current_language == 'en' %}
+                                    Designed & Developed By <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
+                                {% elif current_language == 'ar' %}
+                                    صمم وطُور بواسطة <a href="https://redsparkinfo.com/" target="_blank">تقنيات ريد سبارك</a>
+                                {% endif %}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
-</footer>
-<!-- footer area end -->
-
-<!-- Scroll Top Button -->
-<button class="scroll-top scroll-to-target" data-target="html"><span class="fas fa-angle-double-up"></span></button>
+    </footer>
+    <!-- footer area end -->
+    
+    <!-- Scroll Top Button -->
+    <button class="scroll-top scroll-to-target" data-target="html"><span class="fas fa-angle-double-up"></span></button>
