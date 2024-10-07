@@ -12,7 +12,7 @@
 <!-- Page Banner Start -->
 <section class="discover-banner text-center">
     <div class="mian-img">
-        <img src="media/{{ cmsdata.heading_banner }}" alt="f">
+        <img src="/media/{{ cmsdata.heading_banner }}" alt="f">
         <div class="banner-inner">
             <h1 class="page-title mb-3 wow fadeInUp delay-0-2s">
                 {% lang cmsdata current_language "heading" as heading %}
@@ -48,13 +48,19 @@
                 </div>
             </div>
         </div>
-
         <div class="games-slider">
+            <div class="games-item">
+                <div class="wow fadeInUp delay-0-2s">
+                    <div class="image">
+                        <img src="/media/{{ cmsdata.section_2_images }}" alt="">
+                    </div>
+                </div>
+            </div>
             {% for dynamic in dynamic %} 
             <div class="games-item">
                 <div class="wow fadeInUp delay-0-2s">
                     <div class="image">
-                        <img src="media/{{ dynamic.images }}" alt="">
+                        <img src="/media/{{ dynamic.images }}" alt="">
                     </div>
                 </div>
             </div>
@@ -95,7 +101,7 @@
             <div class="col-lg-6">
                 <div class="wow fadeInUp delay-0-3s">
                     <div class="main-image">
-                        <img src="media/{{cmsdata.sub_section_2_1_icon}}" alt="">
+                        <img src="/media/{{cmsdata.sub_section_2_1_icon}}" alt="">
                     </div>
                 </div>
             </div>
@@ -104,7 +110,7 @@
             <div class="col-lg-6 order-2 order-lg-1">
                 <div class="wow fadeInUp delay-0-3s">
                     <div class="main-image">
-                        <img src="media/{{cmsdata.sub_section_2_2_icon}}" alt="">
+                        <img src="/media/{{cmsdata.sub_section_2_2_icon}}" alt="">
                     </div>
                 </div>
             </div>
@@ -184,7 +190,7 @@
             <div class="col-lg-6">
                 <div class="why-choose-right wow fadeInLeft delay-0-2s animated"
                     style="visibility: visible; animation-name: fadeInLeft;">
-                    <img src="media/{{cmsdata.section_3_image}}" alt="Why Choose Right">
+                    <img src="/media/{{cmsdata.section_3_image}}" alt="Why Choose Right">
                 </div>
             </div>
         </div>

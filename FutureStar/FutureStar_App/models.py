@@ -648,11 +648,13 @@ class cms_dicovery_dynamic_view(models.Model):
     content_ar = models.TextField(blank=True,null=True)
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
-    
-    
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        db_table = "futurestar_app_cms_dicovery_dynamic_view"
+
     
 class cms_dicovery_dynamic_image(models.Model):
     
