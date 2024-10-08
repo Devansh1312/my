@@ -1,0 +1,177 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+
+msgid "User registered and logged in successfully"
+msgstr "User registered and logged in successfully"
+
+msgid "User registration failed due to duplicate data"
+msgstr "User registration failed due to duplicate data"
+
+msgid "User registration failed"
+msgstr "User registration failed"
+
+msgid "Email is required for registration"
+msgstr "Email is required for registration"
+
+msgid "User logged in successfully"
+msgstr "User logged in successfully"
+
+msgid "Account is inactive"
+msgstr "Account is inactive"
+
+msgid "User created and logged in successfully"
+msgstr "User created and logged in successfully"
+
+msgid "Invalid registration type"
+msgstr "Invalid registration type"
+
+msgid "Login successful"
+msgstr "Login successful"
+
+msgid "Invalid credentials"
+msgstr "Invalid credentials"
+
+msgid "User created and login successful"
+msgstr "User created and login successful"
+
+msgid "Invalid data"
+msgstr "Invalid data"
+
+msgid "Logout successful"
+msgstr "Logout successful"
+
+msgid "Logout failed"
+msgstr "Logout failed"
+
+msgid "OTP sent to your phone."
+msgstr "OTP sent to your phone."
+
+msgid "User with this phone number does not exist."
+msgstr "User with this phone number does not exist."
+
+msgid "Invalid data."
+msgstr "Invalid data."
+
+msgid "OTP verified successfully."
+msgstr "OTP verified successfully."
+
+msgid "Invalid OTP."
+msgstr "Invalid OTP."
+
+msgid "Password changed successfully."
+msgstr "Password changed successfully."
+
+msgid "User not found."
+msgstr "User not found."
+
+msgid "Old password is incorrect."
+msgstr "Old password is incorrect."
+
+msgid "New password must be at least 8 characters long."
+msgstr "New password must be at least 8 characters long."
+
+msgid "Player Details."
+msgstr "Player Details."
+
+msgid "Profile updated successfully."
+msgstr "Profile updated successfully."
+
+msgid "Posts fetched successfully."
+msgstr "Posts fetched successfully."
+
+msgid "Post created successfully"
+msgstr "Post created successfully"
+
+msgid "post_id is required."
+msgstr "post_id is required."
+
+msgid "Post not found."
+msgstr "Post not found."
+
+msgid "Post details fetched successfully."
+msgstr "Post details fetched successfully."
+
+msgid "post_id and comment are required."
+msgstr "post_id and comment are required."
+
+msgid "Comment created successfully."
+msgstr "Comment created successfully."
+
+msgid "Post deleted successfully."
+msgstr "Post deleted successfully."
+
+msgid "Read More"
+msgstr "Read More"
+
+msgid "Years Of Experience"
+msgstr "Years Of Experience"
+
+msgid "Projects Completed"
+msgstr "Projects Completed"
+
+msgid "Professionals Team Member"
+msgstr "Professionals Team Member"
+
+msgid "Awards Winning"
+msgstr "Awards Winning"
+
+msgid "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
+msgstr "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
+
+msgid "Explore"
+msgstr "Explore"
+
+msgid "Discover"
+msgstr "Discover"
+
+msgid "Success Stories"
+msgstr "Success Stories"
+
+msgid "News"
+msgstr "News"
+
+msgid "Advertise"
+msgstr "Advertise"
+
+msgid "Contacts"
+msgstr "Contacts"
+
+msgid "Supports"
+msgstr "Supports"
+
+msgid "Terms of Services"
+msgstr "Terms of Services"
+
+msgid "Privacy Policy"
+msgstr "Privacy Policy"
+
+msgid "Video Tutorials"
+msgstr "Video Tutorials"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Copyright @2024, Future Stars All Rights Reserved"
+msgstr "Copyright @2024, Future Stars All Rights Reserved"
+
+msgid "Designed & Developed By Redspark Technologies"
+msgstr "Designed & Developed By Redspark Technologies"
+
+msgid "Contact Details"
+msgstr "Contact Details"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Register"
+msgstr "Register"

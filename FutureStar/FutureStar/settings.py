@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -69,6 +70,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.i18n',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -129,15 +131,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 #language Settibgs
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
+# Supported languages
 LANGUAGES = [
     ('en', 'English'),
-    ('ar', 'Arabic'),
+    ('ar', 'Arabic'),  # Add more languages as needed
 ]
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale',  # Or wherever you have your locale files
+    os.path.join(BASE_DIR, 'locale'),
 ]
 
 ########################################### Social Login ####################################
@@ -157,8 +160,7 @@ SOCIAL_AUTH_STATE_STRING = os.getenv('SOCIAL_AUTH_STATE_STRING')
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
-USE_TZ = True
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)

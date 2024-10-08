@@ -109,3 +109,90 @@ msgstr "تم إنشاء التعليق بنجاح."
 
 msgid "Post deleted successfully."
 msgstr "تم حذف المشاركة بنجاح."
+
+msgid "Read More"
+msgstr "اقرأ المزيد"
+
+# Translation for "Years Of Experience"
+msgid "Years Of Experience"
+msgstr "سنوات الخبرة"
+
+# Translation for "Projects Completed"
+msgid "Projects Completed"
+msgstr "المشاريع المكتملة"
+
+# Translation for "Professionals Team Member"
+msgid "Professionals Team Member"
+msgstr "أعضاء الفريق المهني"
+
+# Translation for "Awards Winning"
+msgid "Awards Winning"
+msgstr "الجوائز الفائزة"
+
+# Translation for "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
+msgid "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
+msgstr "للمزيد من التفاصيل، يمكننا أن نناقشها معًا."
+
+# Translation for "Explore"
+msgid "Explore"
+msgstr "استكشاف"
+
+# Translation for "Discover"
+msgid "Discover"
+msgstr "اكتشف"
+
+# Translation for "Success Stories"
+msgid "Success Stories"
+msgstr "قصص النجاح"
+
+# Translation for "News"
+msgid "News"
+msgstr "الأخبار"
+
+# Translation for "Advertise"
+msgid "Advertise"
+msgstr "الإعلانات"
+
+# Translation for "Contacts"
+msgid "Contacts"
+msgstr "جهات الاتصال"
+
+# Translation for "Supports"
+msgid "Supports"
+msgstr "الدعم"
+
+# Translation for "Terms of Services"
+msgid "Terms of Services"
+msgstr "شروط الخدمة"
+
+# Translation for "Privacy Policy"
+msgid "Privacy Policy"
+msgstr "سياسة الخصوصية"
+
+# Translation for "Video Tutorials"
+msgid "Video Tutorials"
+msgstr "دروس الفيديو"
+
+# Translation for "Contact"
+msgid "Contact"
+msgstr "تواصل"
+
+# Translation for "Copyright @2024, Future Stars All Rights Reserved"
+msgid "Copyright @2024, Future Stars All Rights Reserved"
+msgstr "حقوق الطبع والنشر @2024، جميع الحقوق محفوظة لفيوتشر ستارز"
+
+# Translation for "Designed & Developed By Redspark Technologies"
+msgid "Designed & Developed By Redspark Technologies"
+msgstr "تصميم وتطوير من قبل Redspark Technologies"
+
+# Translation for "Contact Details"
+msgid "Contact Details"
+msgstr "تفاصيل الاتصال"
+
+# Translation for "Login"
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+# Translation for "Register"
+msgid "Register"
+msgstr "تسجيل"

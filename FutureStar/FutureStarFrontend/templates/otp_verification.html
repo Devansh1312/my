@@ -1,0 +1,20 @@
+{% extends 'base1.html' %}
+{% block content %}
+<section class="services-area-six pt-150 pb-60 rel">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-8">
+                <h3>OTP Verification</h3>
+                <form method="post" action="{% url 'verify_otp' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="otp">Enter OTP</label>
+                        <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter the OTP sent to your phone" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify OTP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

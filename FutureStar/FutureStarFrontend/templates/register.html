@@ -1,16 +1,15 @@
 {% extends 'base1.html' %}
-
 {% load static %}
 {% load lang_filter %}
 
 {% block css %}
 <!-- Plugins css start-->
-
 <!-- Plugins css Ends-->
 {% endblock %}
-{% block title %} Future Star || Register{% endblock %}
-{% block content %}
 
+{% block title %} Future Star || Register {% endblock %}
+
+{% block content %}
 <!-- Page Banner Start -->
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
@@ -18,37 +17,35 @@
              <div class="col-xl-12">
                  <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
                     {% lang cmsdata current_language "heading_title" as heading_title %}
-                    <h2>
-                        {{heading_title}}
-                    </h2>
+                    <h2>{{heading_title}}</h2>
                  </div>
              </div>
              <div class="col-xl-6 col-lg-4">
-                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" action="#" name="teamForm" method="post" onsubmit="return validateForm();">
+                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" method="post" action="{% url 'register' %}">
                     {% csrf_token %}
                      <div class="row">
                          <div class="col-md-12">
                              <div class="form-group">
                                  <label for="username">Username</label>
-                                 <input type="text" id="username" name="username" class="form-control" value="" placeholder="" required>
+                                 <input type="text" id="username" name="username" class="form-control" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group">
                                  <label for="phone">Phone Number</label>
-                                 <input type="text" id="phone" name="phone" class="form-control" value="" placeholder="" required>
+                                 <input type="text" id="phone" name="phone" class="form-control" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group">
                                  <label for="password">Password</label>
-                                 <input type="password" id="password" name="password" class="form-control" value="" placeholder="" required>
+                                 <input type="password" id="password" name="password" class="form-control" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group">
                                  <label for="confirmPassword">Confirm Password</label>
-                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" value="" placeholder="" required>
+                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="" required>
                              </div>
                          </div>
                          <div class="col-md-12">
@@ -56,12 +53,11 @@
                              <label>
                                  <input type="checkbox" required /> You agree to our Terms and have read and acknowledge the Privacy Policy
                              </label>
-                             
                              </div>
                          </div>
                          <div class="col-md-12">
                              <div class="form-group pt-5 mb-60">
-                                 <button type="submit" class="theme-btn style-two w-100">Sign Up <i class="far fa-arrow-right"></i></button>
+                                 <button type="submit" class="theme-btn style-two w-100" id="submitBtn">Sign Up <i class="far fa-arrow-right"></i></button>
                              </div>
                              <div class="text-center">
                                  Already have an account? <a href="#">Sign In</a>
@@ -72,8 +68,8 @@
                                  <div class="or"><span>OR</span></div>
                              </div>
                              <div class="continue-with-social text-center">
-                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-google.png'%}" class="img-fluid" alt="" /></span> Signup With Google</button>
-                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png'%}" class="img-fluid" alt="" /></span> Signup With Apple</button>
+                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" /></span> Signup With Google</button>
+                                <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" /></span> Signup With Apple</button>
                             </div>
                          </div>
                      </div>
@@ -83,13 +79,9 @@
      </div>
 </section>
 <!-- Page Banner End -->
-
 {% endblock %}
 
-{% block scriptcontent %}
-
-{% endblock %}
-{% block script %} 
+{% block script %}
 <script>
     function validateForm() {
         const password = document.getElementById('password').value;
@@ -101,7 +93,5 @@
         }
         return true; // Allow form submission
     }
-
-    new WOW().init();
 </script>
 {% endblock %}

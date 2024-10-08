@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from FutureStar_App.models import *
+from FutureStarAPI.models import *
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,6 +14,10 @@ import requests
 from django.conf import settings
 from jwt import decode, exceptions  # For Apple JWT decoding
 from django.core.exceptions import ValidationError
+import random
+from django.db.models import Q
+from django.http import JsonResponse
+
 
 
 ##############################################   HomePage   ########################################################
@@ -523,74 +528,102 @@ class PlayerDashboardPage(LoginRequiredMixin,View):
 
 
 
-########################################## Register Page #############################
-class RegisterPage(View):
+# Generate a random 6-digit OTP
+def generate_otp():
+    return str(random.randint(100000, 999999))
 
+#################################### Register Page ##########################################
+class RegisterPage(View):
     def get(self, request, *args, **kwargs):
         current_language = request.session.get('language', 'en')
         try:
-            cmsdata = cms_pages.objects.get(id=13)  # Use get() to fetch a single object
+            cmsdata = cms_pages.objects.get(id=13)  # Fetch a specific CMS page
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
+            cmsdata = None  # Handle missing CMS data
+
         context = {
             "current_language": current_language,
-            "cmsdata":cmsdata,
+            "cmsdata": cmsdata,
         }
         return render(request, "register.html", context)
 
     def post(self, request, *args, **kwargs):
-        selected_language = request.POST.get('language', 'en')
-        request.session['language'] = selected_language
+        username = request.POST.get("username")
+        phone = request.POST.get("phone")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirmPassword")
 
-        # Fetch data from the form
-        username = request.POST.get("username", "").strip()
-        phone = request.POST.get("phone", "").strip()
-        password = request.POST.get("password", "").strip()
+        # Validate password match
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match!")
+            return redirect("register")
 
-        # If only language is changed (no registration form fields are filled)
-        if not username and not phone and not password:
-            messages.success(request, "Language changed successfully!")
-            return redirect('register')
+        # Check if username or phone already exists in the User table
+        if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
+            messages.error(request, "Username or phone number already exists.")
+            return redirect("register")
 
-        # Validation for registration process
-        if not username or not phone or not password:
-            messages.error(request, "All fields are required for registration.")
-            context = {
-                "current_language": selected_language,
-            }
-            return render(request, "register.html", context)
+        # If the same username or phone exists in OTPSave, delete the old record
+        OTPSave.objects.filter(Q(username=username) | Q(phone=phone)).delete()
 
-        # Check if username or phone already exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-            context = {
-                "current_language": selected_language,
-            }
-            return render(request, "register.html", context)
+        # Generate OTP and save user details in OTPSave table
+        otp = generate_otp()
 
-        if User.objects.filter(phone=phone).exists():
-            messages.error(request, "Phone number already exists.")
-            context = {
-                "current_language": selected_language,
-            }
-            return render(request, "register.html", context)
+        # Save the user details in OTPSave table
+        OTPSave.objects.create(
+            username=username,
+            phone=phone,
+            password=password,  # Store the raw password temporarily
+            OTP=otp,
+        )
 
-        # Create the user
+        # Log the OTP for development purposes (should be replaced with actual OTP sending logic)
+        print(f"OTP: {otp}")
+
+        # Store phone and username in the session to access in OTP verification
+        request.session['phone'] = phone
+        request.session['username'] = username
+
+        # Redirect to OTP verification page
+        return redirect("verify_otp")
+
+#################################### OTP Verification #######################################
+class OTPVerificationView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "otp_verification.html")  # Render a simple OTP form page
+
+    def post(self, request, *args, **kwargs):
+        otp_input = request.POST.get("otp")
+
+        # Retrieve the saved username and phone from the session
+        username = request.session.get('username')
+        phone = request.session.get('phone')
+
+        # Fetch user details from the OTPSave table using the OTP and phone number
         try:
-            user = User(
-                username=username,
-                phone=phone,
-                role_id=2,  # Adjust as per your logic
-                register_type="Website",  # Adjust as necessary
-                device_type="web"
-            )
-            user.set_password(password)  # Hash the password before saving
-            user.save()
-            messages.success(request, "Registration successful!")
-            return redirect('login')  # Redirect to the login page after registration
-        except ValidationError as e:
-            messages.error(request, str(e))
-            context = {
-                "current_language": selected_language,
-            }
-            return render(request, "register.html", context)
+            otp_record = OTPSave.objects.get(OTP=otp_input, phone=phone)
+        except OTPSave.DoesNotExist:
+            messages.error(request, "Invalid OTP. Please try again.")
+            return redirect("verify_otp")
+
+        # If OTP is valid, create a new user in the User table
+        user = User.objects.create(
+            username=otp_record.username,
+            phone=otp_record.phone,
+            password=otp_record.password,  # Store password but ensure to hash it below
+        )
+        user.set_password(otp_record.password)  # Hash the password before saving
+        user.save()
+
+        # Delete the OTP record now that the user is registered
+        otp_record.delete()
+
+        # Clear session data
+        request.session.pop('username', None)
+        request.session.pop('phone', None)
+
+        # Add success message
+        messages.success(request, "Registration successful! Please log in.")
+
+        # Redirect to login page
+        return redirect("login")

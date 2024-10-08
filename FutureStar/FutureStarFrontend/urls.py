@@ -21,6 +21,8 @@ urlpatterns = [
     path('privacy-policy/', PrivacyPolicyPage.as_view(),name="privacy-policy"),
     path('terms-of-services/', TermsofServicesPage.as_view(),name="terms-of-services"),
     path('player-dashboard/', PlayerDashboardPage.as_view(),name="player-dashboard"),
+    path('register/', RegisterPage.as_view(), name='register'),
+    path('verify-otp/', OTPVerificationView.as_view(), name='verify_otp'),
 
     ]
 
