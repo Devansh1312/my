@@ -96,4 +96,19 @@ class Tournament(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_tournament'
+        
+
+class OTPSave(models.Model):
+    id = models.AutoField(primary_key=True)
+    username = models.CharField(max_length=100,blank=True)
+    phone = models.CharField(max_length=100,blank=True)
+    password = models.CharField(max_length=100,blank=True)
+    OTP = models.CharField(max_length=100,blank=True)
+    email = models.EmailField(null=True, blank=True)
+    type = models.CharField(max_length=100,blank = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    
+    class Meta:
+        db_table = 'futurestar_app_otpsave'        
     
