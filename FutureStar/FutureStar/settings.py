@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'FutureStarAPI.middleware.MiddlewareToken',
+    'django.contrib.sessions.middleware.SessionMiddleware',
 
 ]
 
