@@ -1,7 +1,7 @@
 from django.db import models
 from FutureStar_App.models import *
 from django.utils import timezone
-
+import datetime
 
 # Create your models here.
 # post  Model
@@ -107,8 +107,16 @@ class OTPSave(models.Model):
     email = models.EmailField(null=True, blank=True)
     type = models.CharField(max_length=100,blank = True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    expires_at = models.DateTimeField(null=True)  
+
     
     class Meta:
-        db_table = 'futurestar_app_otpsave'        
-    
+        db_table = 'futurestar_app_otpsave'
+              
+
+    def save(self, *args, **kwargs):
+            self.expires_at = timezone.now() + datetime.timedelta(minutes=1)
+            super().save(*args, **kwargs)
+
+    def is_expired(self):
+            return timezone.now() > self.expires_at

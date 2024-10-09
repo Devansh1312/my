@@ -1,20 +1,94 @@
 {% extends 'base1.html' %}
+{% load static %}
+
+{% block title %} Future Star || OTP Verification {% endblock %}
+
 {% block content %}
+<!-- Page Banner Start -->
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-8">
-                <h3>OTP Verification</h3>
-                <form method="post" action="{% url 'verify_otp' %}">
+            <div class="col-xl-12">
+                <div class="section-title pb-50 text-center wow fadeInUp delay-0-2s">
+                    <h2>Authentication</h2>
+                    <p>Enter your One Time Password</p>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-4">
+                <form id="otpForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" action="{% url 'verify_otp' %}" method="post">
                     {% csrf_token %}
-                    <div class="form-group">
-                        <label for="otp">Enter OTP</label>
-                        <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter the OTP sent to your phone" required>
+                    <div class="row justify-content-center">
+                        <!-- Six OTP input fields -->
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp2')" id="otp1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp3')" id="otp2" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp4')" id="otp3" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp5')" id="otp4" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp6')" id="otp5" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" class="otp-input form-control text-center" maxlength="1" id="otp6" oninput="combineOTP()" required>
+                            </div>
+                        </div>
+                        <input type="hidden" id="otp" name="otp">
+                        <div class="col-md-12">
+                            <div class="form-group pt-5 mb-60">
+                                <button type="submit" class="theme-btn style-two w-100">Submit <i class="far fa-arrow-right"></i></button>
+                            </div>
+                            <div class="text-center">
+                                <a href="#">Haven't received the code?</a>
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Verify OTP</button>
                 </form>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    // Function to move to the next input field automatically
+    function moveToNext(current, nextFieldId) {
+        if (current.value.length == 1 && /^[0-9]$/.test(current.value)) {
+            document.getElementById(nextFieldId).focus();
+        }
+        combineOTP();
+    }
+
+    // Combine the values of all six fields and set it to the hidden input
+    function combineOTP() {
+        let otp = '';
+        for (let i = 1; i <= 6; i++) {
+            otp += document.getElementById('otp' + i).value;
+        }
+        document.getElementById('otp').value = otp;
+    }
+
+    // Restrict input to only numbers
+    document.querySelectorAll('.otp-input').forEach(function(input) {
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');  // Remove non-numeric characters
+        });
+    });
+</script>
+
 {% endblock %}

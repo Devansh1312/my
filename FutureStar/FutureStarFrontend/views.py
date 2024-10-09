@@ -270,10 +270,10 @@ class LoginPage(View):
         context = {
             "current_language": current_language,
             "cmsdata": cmsdata,
-            "google_client_id": settings.GOOGLE_CLIENT_ID,
-            "apple_client_id": settings.APPLE_CLIENT_ID,
-            "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
-            "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
+            # "google_client_id": settings.GOOGLE_CLIENT_ID,
+            # "apple_client_id": settings.APPLE_CLIENT_ID,
+            # "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
+            # "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
         }
         return render(request, "login.html", context)
 
@@ -536,10 +536,11 @@ def generate_otp():
 class RegisterPage(View):
     def get(self, request, *args, **kwargs):
         current_language = request.session.get('language', 'en')
+        # Fetching specific CMS data
         try:
-            cmsdata = cms_pages.objects.get(id=13)  # Fetch a specific CMS page
+            cmsdata = cms_pages.objects.get(id=13)
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle missing CMS data
+            cmsdata = None
 
         context = {
             "current_language": current_language,
@@ -548,6 +549,16 @@ class RegisterPage(View):
         return render(request, "register.html", context)
 
     def post(self, request, *args, **kwargs):
+        register_type = request.POST.get("register_type")
+        
+        if register_type == "1":  # Normal registration
+            return self.handle_normal_registration(request)
+        
+        else:  # Google or Apple sign-up
+            email = request.POST.get("email")  # Get email from OAuth
+            return self.handle_social_signup(email, register_type)
+
+    def handle_normal_registration(self, request):
         username = request.POST.get("username")
         phone = request.POST.get("phone")
         password = request.POST.get("password")
@@ -563,34 +574,64 @@ class RegisterPage(View):
             messages.error(request, "Username or phone number already exists.")
             return redirect("register")
 
-        # If the same username or phone exists in OTPSave, delete the old record
-        OTPSave.objects.filter(Q(username=username) | Q(phone=phone)).delete()
-
         # Generate OTP and save user details in OTPSave table
         otp = generate_otp()
+        # otp = 123456
+        OTPSave.objects.create(username=username, phone=phone, password=password, OTP=otp)
 
-        # Save the user details in OTPSave table
-        OTPSave.objects.create(
-            username=username,
-            phone=phone,
-            password=password,  # Store the raw password temporarily
-            OTP=otp,
-        )
-
-        # Log the OTP for development purposes (should be replaced with actual OTP sending logic)
+        # Log the OTP for development purposes
         print(f"OTP: {otp}")
 
         # Store phone and username in the session to access in OTP verification
         request.session['phone'] = phone
         request.session['username'] = username
+        messages.success(request, f"Your OTP is {otp}")
+        return redirect("verify_otp")
 
-        # Redirect to OTP verification page
+    def handle_social_signup(self, email, register_type):
+        # Redirect to the username and phone entry page
+        return redirect('social_signup', email=email, register_type=register_type)
+
+class SocialSignupView(View):
+    def get(self, request, *args, **kwargs):
+        email = request.GET.get('email')
+        register_type = request.GET.get('register_type')
+
+        context = {
+            'email': email,
+            'register_type': register_type,
+        }
+        return render(request, "social_signup.html", context)
+
+    def post(self, request, *args, **kwargs):
+        username = request.POST.get("username")
+        phone = request.POST.get("phone")
+        email = request.POST.get("email")
+        register_type = request.POST.get("register_type")
+
+        # Validate username and phone number
+        if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
+            messages.error(request, "Username or phone number already exists.")
+            return redirect("social_signup", email=email, register_type=register_type)
+
+        # Generate OTP and save user details in OTPSave table
+        otp = generate_otp()
+        OTPSave.objects.create(username=username, phone=phone, email=email, OTP=otp)
+
+        # Log the OTP for development purposes
+        print(f"OTP: {otp}")
+
+        # Store necessary data in the session
+        request.session['username'] = username
+        request.session['phone'] = phone
+        request.session['email'] = email
+
         return redirect("verify_otp")
 
 #################################### OTP Verification #######################################
 class OTPVerificationView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, "otp_verification.html")  # Render a simple OTP form page
+        return render(request, "otp_verification.html")
 
     def post(self, request, *args, **kwargs):
         otp_input = request.POST.get("otp")
@@ -599,7 +640,6 @@ class OTPVerificationView(View):
         username = request.session.get('username')
         phone = request.session.get('phone')
 
-        # Fetch user details from the OTPSave table using the OTP and phone number
         try:
             otp_record = OTPSave.objects.get(OTP=otp_input, phone=phone)
         except OTPSave.DoesNotExist:
@@ -607,12 +647,9 @@ class OTPVerificationView(View):
             return redirect("verify_otp")
 
         # If OTP is valid, create a new user in the User table
-        user = User.objects.create(
-            username=otp_record.username,
-            phone=otp_record.phone,
-            password=otp_record.password,  # Store password but ensure to hash it below
-        )
-        user.set_password(otp_record.password)  # Hash the password before saving
+        user = User.objects.create(username=otp_record.username, phone=otp_record.phone, email=otp_record.email,
+                                    role_id=5, device_type="web")
+        user.set_password(otp_record.password)
         user.save()
 
         # Delete the OTP record now that the user is registered
@@ -622,8 +659,52 @@ class OTPVerificationView(View):
         request.session.pop('username', None)
         request.session.pop('phone', None)
 
-        # Add success message
         messages.success(request, "Registration successful! Please log in.")
-
-        # Redirect to login page
         return redirect("login")
+    
+
+################################ google ###########################
+# class GoogleLoginView(View):
+#     def get(self, request):
+#         # Step 1: Redirect user to Google OAuth 2.0 URL
+#         google_auth_url = (
+#             f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}"
+#             f"&redirect_uri={settings.GOOGLE_REDIRECT_URI}&scope=email profile"
+#         )
+#         return redirect(google_auth_url)
+
+# class GoogleCallbackView(View):
+#     def get(self, request):
+#         # Step 2: Handle callback from Google
+#         code = request.GET.get('code')
+#         token_url = 'https://oauth2.googleapis.com/token'
+
+#         # Exchange authorization code for access token
+#         token_data = {
+#             'code': code,
+#             'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+#             'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+#             'redirect_uri': settings.GOOGLE_REDIRECT_URI,
+#             'grant_type': 'authorization_code'
+#         }
+#         token_r = requests.post(token_url, data=token_data)
+#         token_json = token_r.json()
+#         access_token = token_json.get('access_token')
+
+#         # Step 3: Retrieve user info from Google
+#         userinfo_url = 'https://www.googleapis.com/oauth2/v3/userinfo'
+#         headers = {'Authorization': f'Bearer {access_token}'}
+#         userinfo_r = requests.get(userinfo_url, headers=headers)
+#         user_info = userinfo_r.json()
+
+#         email = user_info.get('email')
+#         print(email)
+#         username = user_info.get('name')
+
+#         # Check if user already exists
+#         user= User.objects.get_or_create(
+#             username=username,
+#             defaults={'email': email, 'register_type': '2'}
+#         )
+
+#         return redirect('social_signup',user)  # Redirect to your desired page

@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block title %} Future Star || Player-Dashboard{% endblock %}
-
+{% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 
 <section class="services-area-six pt-150 pb-100">
@@ -36,7 +36,10 @@
                         <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png'%}" alt=""></div>
                         <div>
                             <h5 class="user-name">{{ user.username }}</h6>
-                            <p class="user-desi">{{ user.role_name_en }}</p>
+                            <p class="user-desi">
+                                {% lang user.role current_language "name" as name %} 
+                                {{name}}
+                            </p>
                         </div>
                     </div>
                     <ul>

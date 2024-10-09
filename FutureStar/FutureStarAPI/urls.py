@@ -40,9 +40,15 @@ urlpatterns = [
         
         
         # path('api/locations/', LocationAPIView.as_view()),
+        
+        
         #new apis generation
         
-        path("api/registration/",RegestrationAPI,name="user-registration")
+        path("api/validation/",RegistartionAPI.as_view(),name="regvalidation"),
+
+        path("api/otpverification/",RegistartionAPI.as_view(),name="otpVarification"),
+        path("api/googleuseregister/",RegistartionAPI.as_view(),name="googleregister"),
+        path("api/appleuseregister/",RegistartionAPI.as_view(),name="appleregister"),
 
 
         
