@@ -1831,7 +1831,7 @@ class cms_contactpage(LoginRequiredMixin, View):
         )
         
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def savecontactpage(request):
         try:
             
@@ -2160,7 +2160,7 @@ class cms_newsPage(LoginRequiredMixin, View):
         )
               
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def savenewspage(request):
         try:
             if request.method == "POST":
@@ -2258,7 +2258,7 @@ class cms_successStory(LoginRequiredMixin, View):
     )
         
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def saveSucessStorypage(request):
         try:
             if request.method == "POST":
@@ -2360,7 +2360,7 @@ class cms_termcondition(LoginRequiredMixin, View):
     )
         
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def savetermconditionpage(request):
         try:
             if request.method == "POST":
@@ -2430,7 +2430,7 @@ class cms_privacypolicy(LoginRequiredMixin, View):
             
     )
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def saveprivacypolicypage(request):
         
         try:
@@ -2504,7 +2504,7 @@ class cms_termandserice(LoginRequiredMixin, View):
         
 #save term and condition        
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def savetermservicepage(request):
         
         try:
@@ -2580,7 +2580,7 @@ class cms_newsdetail(LoginRequiredMixin, View):
         
 #cms news detail  
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def savenewsdetail(request):
         try:
             if request.method == "POST":
@@ -2690,7 +2690,7 @@ class cms_discoverypage(LoginRequiredMixin, View):
     #discover page
     #cms discover
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def saveDiscoverdetail(request):
         try:
             if request.method == "POST":
@@ -4934,7 +4934,7 @@ class cms_Login(LoginRequiredMixin, View):
         
 #cms Login 
 @csrf_exempt
-@method_decorator(user_role_check, name='dispatch')
+@user_role_check
 def savelogindetail(request):
         try:
             if request.method == "POST":

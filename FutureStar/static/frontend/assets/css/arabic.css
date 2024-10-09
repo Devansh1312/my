@@ -87,7 +87,10 @@ html[dir=rtl] {
         margin-left: 0px;
       
       }
-
+      .star-rating .filled-stars {
+        right: 0;
+       
+    }
       @media only screen and (max-width: 480px) {
       
         .main-menu .mobile-logo{
