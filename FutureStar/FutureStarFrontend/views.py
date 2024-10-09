@@ -663,7 +663,7 @@ class OTPVerificationView(View):
         return redirect("login")
     
 
-################################ google ###########################
+############################### google ###########################
 # class GoogleLoginView(View):
 #     def get(self, request):
 #         # Step 1: Redirect user to Google OAuth 2.0 URL
@@ -708,3 +708,65 @@ class OTPVerificationView(View):
 #         )
 
 #         return redirect('social_signup',user)  # Redirect to your desired page
+
+
+########################## Apple ###########################
+# class AppleLoginView(View):
+#     def get(self, request):
+#         # Step 1: Redirect to Apple Sign-In page
+#         apple_auth_url = (
+#             f"https://appleid.apple.com/auth/authorize?response_type=code&client_id={settings.SOCIAL_AUTH_APPLE_ID}"
+#             f"&redirect_uri={settings.APPLE_REDIRECT_URI}&scope=email%20name"
+#         )
+#         return redirect(apple_auth_url)
+    
+# class AppleCallbackView(View):
+#     def get(self, request):
+#         # Step 2: Handle the callback from Apple
+#         code = request.GET.get('code')
+#         token_url = 'https://appleid.apple.com/auth/token'
+
+#         # Exchange authorization code for access token
+#         token_data = {
+#             'code': code,
+#             'client_id': settings.SOCIAL_AUTH_APPLE_ID,
+#             'client_secret': settings.SOCIAL_AUTH_APPLE_SECRET,
+#             'redirect_uri': settings.APPLE_REDIRECT_URI,
+#             'grant_type': 'authorization_code'
+#         }
+#         token_r = requests.post(token_url, data=token_data)
+#         token_json = token_r.json()
+#         access_token = token_json.get('access_token')
+
+#         # Step 3: Retrieve user info from Apple
+#         userinfo_url = 'https://appleid.apple.com/auth/userinfo'
+#         headers = {'Authorization': f'Bearer {access_token}'}
+#         userinfo_r = requests.get(userinfo_url, headers=headers)
+#         user_info = userinfo_r.json()
+
+#         email = user_info.get('email')
+#         username = user_info.get('name')
+
+#         # Check if user already exists
+#         user = User.objects.filter(email=email).first()  # Fetch user based on email
+
+#         if user:
+#             # If the user already exists, prompt to log in
+#             messages.error(request, "This Apple ID is already registered. Please log in.")
+#             return redirect("login")  # Redirect to your login view
+
+#         # If not registered, proceed with OTP flow
+#         otp = generate_otp()  # Generate OTP as per your existing logic
+
+#         # Save user details in OTPSave table
+#         OTPSave.objects.create(username=username, phone=None, email=email, OTP=otp)
+
+#         # Log the OTP for development purposes
+#         print(f"OTP: {otp}")
+
+#         # Store necessary data in the session
+#         request.session['username'] = username
+#         request.session['email'] = email
+
+#         messages.success(request, f"An OTP has been sent to your registered email: {email}")
+#         return redirect("verify_otp")  # Redirect to the OTP verification page

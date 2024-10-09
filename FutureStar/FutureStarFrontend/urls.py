@@ -26,6 +26,8 @@ urlpatterns = [
     path('social_signup/', SocialSignupView.as_view(), name='social_signup'),
     # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
     # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
+    # path('apple/login/', AppleLoginView.as_view(), name='apple_login'),
+    # path('apple/callback/', AppleCallbackView.as_view(), name='apple_callback'),
         
         # Add your Google login view
     # path('apple/login/', YourAppleLoginView.as_view(), name='apple_login'),  # Add your Apple login view

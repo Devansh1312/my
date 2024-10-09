@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'FutureStarAPI',  # Add your app where User model is defined
     'sass_processor',
     'widget_tweaks',
+    'social_django',
+
 ]
 
 MIDDLEWARE = [
@@ -151,11 +153,6 @@ LOCALE_PATHS = [
 # # Load environment variables from the .env file
 # load_dotenv()
 
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = "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"
-APPLE_CLIENT_ID = os.getenv('APPLE_CLIENT_ID')
-APPLE_REDIRECT_URI = os.getenv('APPLE_REDIRECT_URI')
-SOCIAL_AUTH_STATE_STRING = os.getenv('SOCIAL_AUTH_STATE_STRING')
 
 
 TIME_ZONE = 'UTC'
@@ -183,8 +180,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTHENTICATION_BACKENDS = [
     'FutureStar_App.backends.EmailBackend',  # Add this line
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.apple.AppleIdAuth',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
