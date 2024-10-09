@@ -10,7 +10,13 @@
                     <div class="footer-logo mb-20">
                         <a href="{% url 'index' %}"><img src="{{ footer_logo }}" alt="Logo"></a>
                     </div>
-                    <p class="des">{% trans "Ut enim ad minima veniam nostrum exercitationem ullam corporise" %}</p>
+                    <p class="des">
+                    {% if current_language == 'en' %}
+                        Future Stars is your ultimate platform.
+                    {% elif current_language == 'ar' %}
+                        منصة Future Stars هي منصتك النهائية.
+                    {% endif %}
+                    </p>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6">
@@ -18,11 +24,39 @@
                     <h5 class="footer-title">{% trans "Explore" %}</h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
-                            <li><a href="{% url 'discover' %}">{% trans "Discover" %}</a></li>
-                            <li><a href="{% url 'success-stories' %}">{% trans "Success Stories" %}</a></li>
-                            <li><a href="{% url 'news' %}">{% trans "News" %}</a></li>
-                            <li><a href="{% url 'advertise' %}">{% trans "Advertise" %}</a></li>
-                            <li><a href="{% url 'contact' %}">{% trans "Contacts" %}</a></li>
+                            <li><a href="{% url 'discover' %}">
+                                {% if current_language == 'en' %}
+                                Discover
+                                {% elif current_language == 'ar' %}
+                                يكتشف
+                                {% endif %}</a></li>
+                            <li><a href="{% url 'success-stories' %}">
+                                {% if current_language == 'en' %}
+                                Success Stories
+                                {% elif current_language == 'ar' %}
+                                قصص النجاح
+                                {% endif %}
+                            </a></li>
+                            <li><a href="{% url 'news' %}">
+                                {% if current_language == 'en' %}
+                                News
+                                {% elif current_language == 'ar' %}
+                                الأخبار
+                                {% endif %}
+                            </a></li>
+                            <li><a href="{% url 'advertise' %}"> 
+                                {% if current_language == 'en' %}
+                                Advertise
+                                {% elif current_language == 'ar' %}
+                                إعلان
+                                {% endif %}</a></li>
+                            <li><a href="{% url 'contact' %}">
+                                {% if current_language == 'en' %}
+                                Contacts
+                                {% elif current_language == 'ar' %}
+                                جهات الاتصال
+                                {% endif %}
+                            </a></li>
                         </ul>
                     </div>
                 </div>
@@ -30,19 +64,49 @@
 
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-links wow fadeInUp delay-0-5s">
-                    <h5 class="footer-title">{% trans "Supports" %}</h5>
+                    <h5 class="footer-title">
+                        {% if current_language == 'en' %}
+                        Supports
+                        {% elif current_language == 'ar' %}
+                        يدعم                        
+                        {% endif %}
+                    </h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
-                            <li><a href="{% url 'terms-of-services' %}">{% trans "Terms of Services" %}</a></li>
-                            <li><a href="{% url 'privacy-policy' %}">{% trans "Privacy Policy" %}</a></li>
-                            <li><a href="">{% trans "Video Tutorials" %}</a></li>
+                            <li><a href="{% url 'terms-of-services' %}">
+                                {% if current_language == 'en' %}
+                                Terms of Services
+                                {% elif current_language == 'ar' %}
+                                شروط الخدمات                                        
+                                {% endif %}
+                            </a></li>
+                            <li><a href="{% url 'privacy-policy' %}">
+                                {% if current_language == 'en' %}
+                                    Privacy Policy
+                                {% elif current_language == 'ar' %}
+                                    سياسة الخصوصية
+                                {% endif %}
+                            </a></li>
+                            <li><a href="">
+                                {% if current_language == 'en' %}
+                                    Video Tutorials
+                                {% elif current_language == 'ar' %}
+                                    دروس الفيديو
+                                {% endif %}
+                            </a></li>
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-info wow fadeInUp delay-0-6s">
-                    <h5 class="footer-title">{% trans "Contact" %}</h5>
+                    <h5 class="footer-title">
+                        {% if current_language == 'en' %}
+                            Contact
+                        {% elif current_language == 'ar' %}
+                            اتصل بنا
+                        {% endif %}
+                    </h5>
                     <ul class="list-style-two">
                         <li><i class="far fa-map-marker-alt"></i> <span>{{ system_settings.address }}</span></li>
                         <li><i class="far fa-envelope"></i> <a href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a></li>
@@ -58,12 +122,24 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="footer-copyright-text wow fadeInUp delay-0-2s">
-                        <p>{% trans "Copyright @2024, Future Stars All Rights Reserved" %}</p>
+                        <p>
+                            {% if current_language == 'en' %}
+                                Copyright @2024, Future Stars All Rights Reserved
+                            {% elif current_language == 'ar' %}
+                                حقوق النشر @2024، جميع الحقوق محفوظة لـ Future Stars
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
-                        <p>{% trans "Designed & Developed By Redspark Technologies" %}</p>
+                        <p>
+                            {% if current_language == 'en' %}
+                                Designed & Developed By Redspark Technologies
+                            {% elif current_language == 'ar' %}
+                                تصميم وتطوير بواسطة Redspark Technologies
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
             </div>

@@ -4184,7 +4184,7 @@ class cms_homepage(LoginRequiredMixin, View):
     )  
 
 #cms home
-@method_decorator(user_role_check, name='dispatch')  
+@user_role_check
 @csrf_exempt
 def savehomedetail(request):
         try:
