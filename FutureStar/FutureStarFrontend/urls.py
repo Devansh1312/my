@@ -24,8 +24,8 @@ urlpatterns = [
     path('register/', RegisterPage.as_view(), name='register'),
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
     path('social_signup/', SocialSignupView.as_view(), name='social_signup'),
-    path('google/login/', GoogleLoginView.as_view(), name='google_login'),
-    path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
+    # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
+    # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
         
         # Add your Google login view
     # path('apple/login/', YourAppleLoginView.as_view(), name='apple_login'),  # Add your Apple login view
