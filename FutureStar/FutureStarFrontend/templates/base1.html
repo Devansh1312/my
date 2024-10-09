@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en"dir="{{Layout}}" >
-    <head>
+<html lang="en" {% if current_language == 'en' %} dir="ltr" {% elif current_language == 'ar' %} dir="rtl" {% endif %}>
+        <head>
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="description" content="">
@@ -31,6 +31,9 @@
         <link rel="stylesheet" href="{% static 'frontend/assets/css/slick.min.css'%}">
         <!-- Main Style -->
         <link rel="stylesheet" href="{% static 'frontend/assets/css/style.css'%}">
+        <!-- RTL -->
+        <link rel="stylesheet" href="{% static 'frontend/assets/css/arabic.css'%}">
+
         {% block css %} {% endblock %}
     </head>
 
