@@ -91,14 +91,14 @@
     };
 
     // Apple Login
-    document.getElementById('appleLoginBtn').addEventListener('click', function () {
-        AppleID.auth.init({
-            clientId: '{{ apple_client_id }}',
-            scope: 'name email',
-            redirectURI: '{{ apple_redirect_uri }}',
-            state: '{{ social_auth_state_string }}',
-            usePopup: true
-        });
-    });
+    // document.getElementById('appleLoginBtn').addEventListener('click', function () {
+    //     AppleID.auth.init({
+    //         clientId: '{{ apple_client_id }}',
+    //         scope: 'name email',
+    //         redirectURI: '{{ apple_redirect_uri }}',
+    //         state: '{{ social_auth_state_string }}',
+    //         usePopup: true
+    //     });
+    // });
 </script>
 {% endblock %}

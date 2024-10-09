@@ -257,141 +257,6 @@ class AboutPage(View):
         return redirect('about')
 
 
-##############################################   LoginPage   ########################################################
-
-class LoginPage(View):
-
-    def get(self, request, *args, **kwargs):
-        current_language = request.session.get('language', 'en')
-        try:
-            cmsdata = cms_pages.objects.get(id=12)  # Use get() to fetch a single object
-        except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
-        context = {
-            "current_language": current_language,
-            "cmsdata": cmsdata,
-            # "google_client_id": settings.GOOGLE_CLIENT_ID,
-            # "apple_client_id": settings.APPLE_CLIENT_ID,
-            # "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
-            # "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
-        }
-        return render(request, "login.html", context)
-
-    def post(self, request, *args, **kwargs):
-        # Handle language change
-        selected_language = request.POST.get('language', 'en')
-        current_language = request.session['language'] = selected_language
-        
-        # Fetch login type
-        login_type = int(request.POST.get('login_type', 1))
-        username_or_phone = request.POST.get('username_or_phone')
-        password = request.POST.get('password')
-       # If only language is changed (no registration form fields are filled)
-        if not username_or_phone and not password and not password:
-            messages.success(request, "Language changed successfully!")
-            return redirect('login')
-
-        # Proceed with normal login process
-        if login_type == 1:
-            username_or_phone = request.POST.get('username_or_phone')
-            password = request.POST.get('password')
-
-            # Authenticate user
-            user = authenticate(request, username=username_or_phone, password=password)
-
-            if user:
-                if user.is_active:
-                    login(request, user)
-                    user.device_type = "Website"
-                    user.last_login = timezone.now()
-                    user.save()
-                    messages.success(request, "Login successful!")
-                    return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
-                messages.error(request, "Account is inactive.")
-            else:
-                messages.error(request, "Invalid credentials.")
-
-        return redirect('login')
-
-    #     elif login_type == 2:
-    #         google_token = request.POST.get('google_token')
-    #         if google_token:
-    #             google_user_info = self.verify_google_token(google_token)
-    #             if google_user_info:
-    #                 return self.handle_social_login(request, google_user_info, login_type='google')
-
-    #         messages.error(request, "Failed to authenticate with Google.")
-    #         return redirect('login')
-
-    #     elif login_type == 3:
-    #         apple_token = request.POST.get('apple_token')
-    #         if apple_token:
-    #             apple_user_info = self.verify_apple_token(apple_token)
-    #             if apple_user_info:
-    #                 return self.handle_social_login(request, apple_user_info, login_type='apple')
-
-    #         messages.error(request, "Failed to authenticate with Apple.")
-    #         return redirect('login')
-
-    #     messages.error(request, "Invalid login type.")
-    #     return redirect('login')
-
-    # def verify_google_token(self, token):
-    #     try:
-    #         response = requests.get(f'https://oauth2.googleapis.com/tokeninfo?id_token={token}')
-    #         if response.status_code == 200:
-    #             return response.json()
-    #     except Exception as e:
-    #         print(f"Error verifying Google token: {e}")
-    #     return None
-
-    # def verify_apple_token(self, token):
-    #     try:
-    #         apple_public_keys = requests.get('https://appleid.apple.com/auth/keys').json()
-    #         key = apple_public_keys['keys'][0]
-    #         decoded_token = decode(token, key, algorithms=['RS256'], audience=settings.APPLE_CLIENT_ID)
-    #         return decoded_token
-    #     except exceptions.InvalidTokenError as e:
-    #         print(f"Error verifying Apple token: {e}")
-    #     return None
-
-    # def handle_social_login(self, request, user_info, login_type):
-    #     email = user_info.get('email')
-    #     if not email:
-    #         messages.error(request, f"Unable to retrieve email for {login_type} login.")
-    #         return redirect('login')
-
-    #     user = User.objects.filter(email=email).first()
-
-    #     if user:
-    #         if user.is_active:
-    #             login(request, user)
-    #             user.device_type = "Website"
-    #             user.last_login = timezone.now()
-    #             user.save()
-    #             messages.success(request, f"Login successful via {login_type.capitalize()}!")
-    #             return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
-    #         else:
-    #             messages.error(request, "Account is inactive.")
-    #             return redirect('login')
-    #     else:
-    #         username = email.split('@')[0]
-    #         user = User.objects.create_user(
-    #             username=username,
-    #             email=email,
-    #             password=None,
-    #             role_id=2,
-    #             is_active=True,
-    #         )
-    #         login(request, user)
-    #         user.device_type = "Website"
-    #         user.last_login = timezone.now()
-    #         user.save()
-    #         messages.success(request, f"User created and login successful via {login_type.capitalize()}!")
-    #         return redirect('player-dashboard')
-
-
-
 ##############################################   ContactPage   ########################################################
 
 class ContactPage(View):
@@ -528,6 +393,145 @@ class PlayerDashboardPage(LoginRequiredMixin,View):
 
 
 
+
+
+
+##############################################   LoginPage   ########################################################
+
+class LoginPage(View):
+
+    def get(self, request, *args, **kwargs):
+        current_language = request.session.get('language', 'en')
+        try:
+            cmsdata = cms_pages.objects.get(id=12)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+        context = {
+            "current_language": current_language,
+            "cmsdata": cmsdata,
+            # "google_client_id": settings.GOOGLE_CLIENT_ID,
+            # "apple_client_id": settings.APPLE_CLIENT_ID,
+            # "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
+            # "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
+        }
+        return render(request, "login.html", context)
+
+    def post(self, request, *args, **kwargs):
+        # Handle language change
+        selected_language = request.POST.get('language', 'en')
+        current_language = request.session['language'] = selected_language
+        
+        # Fetch login type
+        login_type = int(request.POST.get('login_type', 1))
+        username_or_phone = request.POST.get('username_or_phone')
+        password = request.POST.get('password')
+       # If only language is changed (no registration form fields are filled)
+        if not username_or_phone and not password and not password:
+            messages.success(request, "Language changed successfully!")
+            return redirect('login')
+
+        # Proceed with normal login process
+        if login_type == 1:
+            username_or_phone = request.POST.get('username_or_phone')
+            password = request.POST.get('password')
+
+            # Authenticate user
+            user = authenticate(request, username=username_or_phone, password=password)
+
+            if user:
+                if user.is_active:
+                    login(request, user)
+                    user.device_type = "Website"
+                    user.last_login = timezone.now()
+                    user.save()
+                    messages.success(request, "Login successful!")
+                    return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
+                messages.error(request, "Account is inactive.")
+            else:
+                messages.error(request, "Invalid credentials.")
+
+        return redirect('login')
+
+    #     elif login_type == 2:
+    #         google_token = request.POST.get('google_token')
+    #         if google_token:
+    #             google_user_info = self.verify_google_token(google_token)
+    #             if google_user_info:
+    #                 return self.handle_social_login(request, google_user_info, login_type='google')
+
+    #         messages.error(request, "Failed to authenticate with Google.")
+    #         return redirect('login')
+
+    #     elif login_type == 3:
+    #         apple_token = request.POST.get('apple_token')
+    #         if apple_token:
+    #             apple_user_info = self.verify_apple_token(apple_token)
+    #             if apple_user_info:
+    #                 return self.handle_social_login(request, apple_user_info, login_type='apple')
+
+    #         messages.error(request, "Failed to authenticate with Apple.")
+    #         return redirect('login')
+
+    #     messages.error(request, "Invalid login type.")
+    #     return redirect('login')
+
+    # def verify_google_token(self, token):
+    #     try:
+    #         response = requests.get(f'https://oauth2.googleapis.com/tokeninfo?id_token={token}')
+    #         if response.status_code == 200:
+    #             return response.json()
+    #     except Exception as e:
+    #         print(f"Error verifying Google token: {e}")
+    #     return None
+
+    # def verify_apple_token(self, token):
+    #     try:
+    #         apple_public_keys = requests.get('https://appleid.apple.com/auth/keys').json()
+    #         key = apple_public_keys['keys'][0]
+    #         decoded_token = decode(token, key, algorithms=['RS256'], audience=settings.APPLE_CLIENT_ID)
+    #         return decoded_token
+    #     except exceptions.InvalidTokenError as e:
+    #         print(f"Error verifying Apple token: {e}")
+    #     return None
+
+    # def handle_social_login(self, request, user_info, login_type):
+    #     email = user_info.get('email')
+    #     if not email:
+    #         messages.error(request, f"Unable to retrieve email for {login_type} login.")
+    #         return redirect('login')
+
+    #     user = User.objects.filter(email=email).first()
+
+    #     if user:
+    #         if user.is_active:
+    #             login(request, user)
+    #             user.device_type = "Website"
+    #             user.last_login = timezone.now()
+    #             user.save()
+    #             messages.success(request, f"Login successful via {login_type.capitalize()}!")
+    #             return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
+    #         else:
+    #             messages.error(request, "Account is inactive.")
+    #             return redirect('login')
+    #     else:
+    #         username = email.split('@')[0]
+    #         user = User.objects.create_user(
+    #             username=username,
+    #             email=email,
+    #             password=None,
+    #             role_id=2,
+    #             is_active=True,
+    #         )
+    #         login(request, user)
+    #         user.device_type = "Website"
+    #         user.last_login = timezone.now()
+    #         user.save()
+    #         messages.success(request, f"User created and login successful via {login_type.capitalize()}!")
+    #         return redirect('player-dashboard')
+
+
+
+
 # Generate a random 6-digit OTP
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -576,7 +580,6 @@ class RegisterPage(View):
 
         # Generate OTP and save user details in OTPSave table
         otp = generate_otp()
-        # otp = 123456
         OTPSave.objects.create(username=username, phone=phone, password=password, OTP=otp)
 
         # Log the OTP for development purposes

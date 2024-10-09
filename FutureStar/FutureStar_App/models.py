@@ -107,7 +107,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         upload_to="profile_pics/", null=True, blank=True
     )
     card_header = models.ImageField(upload_to="card_header/", null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField(null=True, blank=True,unique=True)
     phone = models.CharField(max_length=20)
     fullname = models.CharField(max_length=150,null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
