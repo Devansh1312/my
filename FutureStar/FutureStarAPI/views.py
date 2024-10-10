@@ -25,201 +25,203 @@ from django.utils.translation import gettext as _
 from django.views import View
 from django.views.decorators.csrf import  csrf_exempt 
 from django.utils.decorators import method_decorator
+from django.db import transaction
+import string
 
 
-class RegisterAPIView(APIView):
-    permission_classes = [AllowAny]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
+# class RegisterAPIView(APIView):
+#     permission_classes = [AllowAny]
+#     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
+#     def post(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
 
-        registration_type = request.data.get('type')
-        device_type = request.data.get('device_type')
-        device_token = request.data.get('device_token')
+#         registration_type = request.data.get('type')
+#         device_type = request.data.get('device_type')
+#         device_token = request.data.get('device_token')
 
-        if registration_type == 1:
-            serializer = RegisterSerializer(data=request.data)
-            if serializer.is_valid():
-                try:
-                    user = serializer.save()
-                    user.device_type = device_type
-                    user.device_token = device_token
-                    user.last_login = timezone.now()
-                    user.save()
+#         if registration_type == 1:
+#             serializer = RegisterSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 try:
+#                     user = serializer.save()
+#                     user.device_type = device_type
+#                     user.device_token = device_token
+#                     user.last_login = timezone.now()
+#                     user.save()
 
-                    refresh = RefreshToken.for_user(user)
+#                     refresh = RefreshToken.for_user(user)
 
-                    return Response({
-                        'status': 1,
-                        'message': _('User registered and logged in successfully'),
-                        'data': {
-                            'refresh_token': str(refresh),
-                            'access_token': str(refresh.access_token),
-                            'id': user.id,
-                            'username': user.username,
-                            'phone': user.phone,
-                            'email': user.email,
-                            'fullname': user.fullname,
-                            'bio': user.bio,
-                            'date_of_birth': user.date_of_birth,
-                            'age': user.age,
-                            'gender': user.gender.id if user.gender else None,
-                            'country': user.country.id if user.country else None,
-                            'city': user.city.id if user.country else None,
-                            'nationality': user.nationality,
-                            'weight': user.weight,
-                            'height': user.height,
-                            'main_playing_position': user.main_playing_position,
-                            'secondary_playing_position': user.secondary_playing_position,
-                            'playing_foot': user.playing_foot,
-                            'favourite_local_team': user.favourite_local_team,
-                            'favourite_team': user.favourite_team,
-                            'favourite_local_player': user.favourite_local_player,
-                            'favourite_player': user.favourite_player,
-                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                            'cover_photo': user.card_header.url if user.card_header else None,
-                            'device_type': user.device_type,
-                            'device_token': user.device_token,
-                        }
-                    }, status=status.HTTP_201_CREATED)
+#                     return Response({
+#                         'status': 1,
+#                         'message': _('User registered and logged in successfully'),
+#                         'data': {
+#                             'refresh_token': str(refresh),
+#                             'access_token': str(refresh.access_token),
+#                             'id': user.id,
+#                             'username': user.username,
+#                             'phone': user.phone,
+#                             'email': user.email,
+#                             'fullname': user.fullname,
+#                             'bio': user.bio,
+#                             'date_of_birth': user.date_of_birth,
+#                             'age': user.age,
+#                             'gender': user.gender.id if user.gender else None,
+#                             'country': user.country.id if user.country else None,
+#                             'city': user.city.id if user.country else None,
+#                             'nationality': user.nationality,
+#                             'weight': user.weight,
+#                             'height': user.height,
+#                             'main_playing_position': user.main_playing_position,
+#                             'secondary_playing_position': user.secondary_playing_position,
+#                             'playing_foot': user.playing_foot,
+#                             'favourite_local_team': user.favourite_local_team,
+#                             'favourite_team': user.favourite_team,
+#                             'favourite_local_player': user.favourite_local_player,
+#                             'favourite_player': user.favourite_player,
+#                             'profile_picture': user.profile_picture.url if user.profile_picture else None,
+#                             'cover_photo': user.card_header.url if user.card_header else None,
+#                             'device_type': user.device_type,
+#                             'device_token': user.device_token,
+#                         }
+#                     }, status=status.HTTP_201_CREATED)
 
-                except IntegrityError as e:
-                    return Response({
-                        'status': 0,
-                        'message': _('User registration failed due to duplicate data'),
-                        'errors': str(e)
-                    }, status=status.HTTP_400_BAD_REQUEST)
+#                 except IntegrityError as e:
+#                     return Response({
+#                         'status': 0,
+#                         'message': _('User registration failed due to duplicate data'),
+#                         'errors': str(e)
+#                     }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Custom handling for validation errors to ensure the message is returned as desired
-            error_message = serializer.errors.get('non_field_errors')
-            if error_message:
-                return Response({
-                    'status': 0,
-                    'message': _(error_message[0])  # Ensures translation is applied
-                }, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({
-                    'status': 0,
-                    'message': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
+#             # Custom handling for validation errors to ensure the message is returned as desired
+#             error_message = serializer.errors.get('non_field_errors')
+#             if error_message:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _(error_message[0])  # Ensures translation is applied
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#             else:
+#                 return Response({
+#                     'status': 0,
+#                     'message': serializer.errors
+#                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        elif registration_type in [2, 3]:
-            # Email registration (no password provided)
-            email = request.data.get('username')
-            if not email:
-                return Response({
-                    'status': 0,
-                    'message': _('Email is required for registration')
-                }, status=status.HTTP_400_BAD_REQUEST)
+#         elif registration_type in [2, 3]:
+#             # Email registration (no password provided)
+#             email = request.data.get('username')
+#             if not email:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('Email is required for registration')
+#                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            user = User.objects.filter(email=email).first()
+#             user = User.objects.filter(email=email).first()
 
-            if user:
-                # If the user exists, log them in
-                if user.is_active:
-                    user.device_type = device_type
-                    user.device_token = device_token
-                    user.last_login = timezone.now()
-                    user.save()
+#             if user:
+#                 # If the user exists, log them in
+#                 if user.is_active:
+#                     user.device_type = device_type
+#                     user.device_token = device_token
+#                     user.last_login = timezone.now()
+#                     user.save()
 
-                    refresh = RefreshToken.for_user(user)
-                    return Response({
-                        'status': 1,
-                        'message': _('User logged in successfully'),
-                        'data': {
-                            'refresh_token': str(refresh),
-                            'access_token': str(refresh.access_token),
-                            'id': user.id,
-                            'username': user.username,
-                            'phone': user.phone,
-                            'email': user.email,
-                            'fullname': user.fullname,
-                            'bio': user.bio,
-                            'date_of_birth': user.date_of_birth,
-                            'age': user.age,
-                            'gender': user.gender.id if user.gender else None,
-                            'country': user.country.id if user.country else None,
-                            'city': user.city.id if user.country else None,
-                            'nationality': user.nationality,
-                            'weight': user.weight,
-                            'height': user.height,
-                            'main_playing_position': user.main_playing_position,
-                            'secondary_playing_position': user.secondary_playing_position,
-                            'playing_foot': user.playing_foot,
-                            'favourite_local_team': user.favourite_local_team,
-                            'favourite_team': user.favourite_team,
-                            'favourite_local_player': user.favourite_local_player,
-                            'favourite_player': user.favourite_player,
-                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                            'cover_photo': user.card_header.url if user.card_header else None,
-                            'device_type': user.device_type,
-                            'device_token': user.device_token, 
-                        }
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({
-                        'status': 0,
-                        'message': _('Account is inactive')
-                    }, status=status.HTTP_400_BAD_REQUEST)
+#                     refresh = RefreshToken.for_user(user)
+#                     return Response({
+#                         'status': 1,
+#                         'message': _('User logged in successfully'),
+#                         'data': {
+#                             'refresh_token': str(refresh),
+#                             'access_token': str(refresh.access_token),
+#                             'id': user.id,
+#                             'username': user.username,
+#                             'phone': user.phone,
+#                             'email': user.email,
+#                             'fullname': user.fullname,
+#                             'bio': user.bio,
+#                             'date_of_birth': user.date_of_birth,
+#                             'age': user.age,
+#                             'gender': user.gender.id if user.gender else None,
+#                             'country': user.country.id if user.country else None,
+#                             'city': user.city.id if user.country else None,
+#                             'nationality': user.nationality,
+#                             'weight': user.weight,
+#                             'height': user.height,
+#                             'main_playing_position': user.main_playing_position,
+#                             'secondary_playing_position': user.secondary_playing_position,
+#                             'playing_foot': user.playing_foot,
+#                             'favourite_local_team': user.favourite_local_team,
+#                             'favourite_team': user.favourite_team,
+#                             'favourite_local_player': user.favourite_local_player,
+#                             'favourite_player': user.favourite_player,
+#                             'profile_picture': user.profile_picture.url if user.profile_picture else None,
+#                             'cover_photo': user.card_header.url if user.card_header else None,
+#                             'device_type': user.device_type,
+#                             'device_token': user.device_token, 
+#                         }
+#                     }, status=status.HTTP_200_OK)
+#                 else:
+#                     return Response({
+#                         'status': 0,
+#                         'message': _('Account is inactive')
+#                     }, status=status.HTTP_400_BAD_REQUEST)
 
-            else:
-                # Generate a random password manually
-                user = User.objects.create_user(
-                    username=email.split('@')[0],
-                    email=email,
-                    password=email.split('@')[0],
-                    is_active=True  # Adjust this if you need email verification
-                )
-                user.device_type = device_type
-                user.device_token = device_token
-                user.last_login = timezone.now()
-                user.save()
+#             else:
+#                 # Generate a random password manually
+#                 user = User.objects.create_user(
+#                     username=email.split('@')[0],
+#                     email=email,
+#                     password=email.split('@')[0],
+#                     is_active=True  # Adjust this if you need email verification
+#                 )
+#                 user.device_type = device_type
+#                 user.device_token = device_token
+#                 user.last_login = timezone.now()
+#                 user.save()
 
-                refresh = RefreshToken.for_user(user)
+#                 refresh = RefreshToken.for_user(user)
 
-                return Response({
-                    'status': 1,
-                    'message': _('User created and logged in successfully'),
-                    'data': {
-                        'refresh_token': str(refresh),
-                        'access_token': str(refresh.access_token),
-                        'data': {
-                            'id': user.id,
-                            'username': user.username,
-                            'phone': user.phone,
-                            'email': user.email,
-                            'fullname': user.fullname,
-                            'bio': user.bio,
-                            'date_of_birth': user.date_of_birth,
-                            'age': user.age,
-                            'gender': user.gender.id if user.gender else None,
-                            'country': user.country.id if user.country else None,
-                            'city': user.city.id if user.country else None,
-                            'nationality': user.nationality,
-                            'weight': user.weight,
-                            'height': user.height,
-                            'main_playing_position': user.main_playing_position,
-                            'secondary_playing_position': user.secondary_playing_position,
-                            'playing_foot': user.playing_foot,
-                            'favourite_local_team': user.favourite_local_team,
-                            'favourite_team': user.favourite_team,
-                            'favourite_local_player': user.favourite_local_player,
-                            'favourite_player': user.favourite_player,
-                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                            'cover_photo': user.card_header.url if user.card_header else None,
-                            'device_type': user.device_type,
-                            'device_token': user.device_token,
-                        }
-                    }
-                }, status=status.HTTP_201_CREATED)
+#                 return Response({
+#                     'status': 1,
+#                     'message': _('User created and logged in successfully'),
+#                     'data': {
+#                         'refresh_token': str(refresh),
+#                         'access_token': str(refresh.access_token),
+#                         'data': {
+#                             'id': user.id,
+#                             'username': user.username,
+#                             'phone': user.phone,
+#                             'email': user.email,
+#                             'fullname': user.fullname,
+#                             'bio': user.bio,
+#                             'date_of_birth': user.date_of_birth,
+#                             'age': user.age,
+#                             'gender': user.gender.id if user.gender else None,
+#                             'country': user.country.id if user.country else None,
+#                             'city': user.city.id if user.country else None,
+#                             'nationality': user.nationality,
+#                             'weight': user.weight,
+#                             'height': user.height,
+#                             'main_playing_position': user.main_playing_position,
+#                             'secondary_playing_position': user.secondary_playing_position,
+#                             'playing_foot': user.playing_foot,
+#                             'favourite_local_team': user.favourite_local_team,
+#                             'favourite_team': user.favourite_team,
+#                             'favourite_local_player': user.favourite_local_player,
+#                             'favourite_player': user.favourite_player,
+#                             'profile_picture': user.profile_picture.url if user.profile_picture else None,
+#                             'cover_photo': user.card_header.url if user.card_header else None,
+#                             'device_type': user.device_type,
+#                             'device_token': user.device_token,
+#                         }
+#                     }
+#                 }, status=status.HTTP_201_CREATED)
 
-        return Response({
-            'status': 0,
-            'message': _('Invalid registration type')
-        }, status=status.HTTP_400_BAD_REQUEST)
+#         return Response({
+#             'status': 0,
+#             'message': _('Invalid registration type')
+#         }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginAPIView(APIView):
@@ -1349,586 +1351,190 @@ class UserGenderListAPIView(generics.ListAPIView):
 #             'data': city_data
 #         }, status=status.HTTP_200_OK)
 
+                
 
-@method_decorator(csrf_exempt,name='dispatch')
-class RegistartionAPI(View):
+                       
+# Generate a random 6-digit OTP
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+class send_otp(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def generate_random_password(self, length=8):
+        """Generate a random password with letters and digits."""
+        characters = string.ascii_letters + string.digits
+        return ''.join(random.choice(characters) for i in range(length))
     
-    
-    def dispatch(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
+        registration_type = request.data.get('type')
         
-        self.lang = request.headers.get("Language")
-        
-        if self.lang:
-            activate(self.lang)
-        print(self.lang)
-        
-        if 'api/validation/' in request.path:
-            return self.Regvalidation(request)
-        
-        elif 'api/otpverification/' in request.path:
-            return self.OTPVarifiction(request)
-        elif 'api/googleuseregister/' in request.path:
-            return self.Google_Auth(request)
-        
-        elif 'api/appleuseregister/' in request.path:
-            return self.Apple_Auth(request)
-        
-        
-        else:
-            
-            return JsonResponse({"message": _("Invalid Request")},status=400)
-        
-        
-    def Regvalidation(self,request):
-        
-        
-        if request.method == "POST":
-            
-            
-            #in pending mod
-            self.header = request.headers.get("Langauge")
-            
-            self.json_loads = json.loads(request.body)
 
-            try:
-                if self.json_loads:
-                    try:
-                        self.reg_type = self.json_loads["type"]
+        # Handle Registration Type 1 (Normal registration)
+        if registration_type == '1':
+            username = request.data.get('username')
+            phone = request.data.get('phone')
+            email = request.data.get('email')
+            password = request.data.get('password')
+            # Check if username or phone already exists in User table
+            if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Username or phone number already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-                        if self.reg_type == "1":
-                            self.user = self.json_loads["username"]
-                            self.phone_number = self.json_loads["phone"]
-                            self.password = self.json_loads["password"]
+            # If user does not exist, generate OTP and store it in OTPSave table
+            otp = generate_otp()
+            # Save or update the OTP in OTPSave
+            otp_record, created = OTPSave.objects.update_or_create(
+                phone=phone,  # or username based on uniqueness
+                defaults={'username': username, 'phone': phone, 'password': password, 'OTP': otp}
+            )
 
-                            self.user_data = User.objects.filter(Q(username=self.user) | Q(phone=self.phone_number)).first()
+            return Response({
+                'status': 1,
+                'message': _('OTP sent successfully.'),
+                'otp': otp  # For development, this is sent in the response.
+            }, status=status.HTTP_200_OK)
 
-                            if self.user_data:
-                                try:
-                                    if self.user_data.username == self.user and self.user_data.phone == self.phone_number:
-                                        if self.lang != "ar": 
-                                            context = {
-                                                "message": _("Account Already Exist")
-                                            }
-                                            return JsonResponse(context)
-                                        else:
-                                            context = {
-                                                "message": _("الحساب موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                    elif self.user_data.username == self.user:
-                                        
-                                        if self.lang != "ar": 
-                                            
+        # Handle Registration Type 2/3 (Social registration via email)
+        elif registration_type in ['2', '3']:
+            username = request.data.get('username')
+            phone = request.data.get('phone')
+            email = request.data.get('email')
+            # Check if email exists in User table
+            if User.objects.filter(email=email).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Email already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-                                            context = {
-                                                "message": _("Username already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("اسم المستخدم موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                    elif self.user_data.phone == self.phone_number:
-                                        if self.lang != "ar": 
+            # If email does not exist, check username and phone if provided
+            if username and phone:
+                # Validate if username or phone already exists in User table
+                if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
+                    return Response({
+                        'status': 0,
+                        'message': _('Username or phone number already exists.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-                                            context = {
-                                                "message": _("Phone No. Already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("رقم الهاتف موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                except Exception as e:
-                                    
-                                    context = {
-                                        "message": str(e)
-                                    }
-                                    return JsonResponse(context)
-                            else:
-                                self.random_otp = str(random.randint(100000, 999999)).zfill(6)
-                                context = {
-                                    "otp": self.random_otp
-                                }
-                                try:
-                                    self.save_otp = OTPSave(username = self.user,phone = self.phone_number,password = self.password,OTP=self.random_otp,type = self.reg_type)
-                                    self.save_otp.save()
-                                    context = {
-                                        "OTP": self.random_otp
-                                    }
-                                    return JsonResponse(context, status=200)
-                                except Exception as e:
-                                    context = {
-                                        "message": str(e)
-                                    }
-                                    return JsonResponse(context, status=400)
-                        elif self.reg_type == "2":
-                            
-                            if request.method == "POST":
-                                self.json_loads = json.loads(request.body)
-                                
-                                self.google_gmail = self.json_loads['email']
-                                
-                                #self.check_user =  User.objects.filter(email = str(self.google_gmail))
-                                
+                # Generate OTP and save in OTPSave for type 2/3 with phone, email, and password
+                otp = generate_otp()
+                random_password = self.generate_random_password()
+                password = random_password  # Set the generated password
+                otp_record, created = OTPSave.objects.update_or_create(
+                    phone=phone,  # Assuming phone is required
+                    password=email.split('@')[0],
+                    defaults={'username': username, 'phone': phone, 'email': email, 'password': password, 'OTP': otp}
+                )
 
-                                request.session["gmail"] = self.google_gmail
-                                context = {
-                                        "message":"True"
-                                }
-                                return JsonResponse(context,status=200)
-                                
-                        elif self.reg_type == "3":
-                            
-                            if request.method == "POST":
-                                self.json_loads = json.loads(request.body)
-                                
-                                self.apple_ID = self.json_loads['email']
-                                
-                                #self.check_user =  User.objects.filter(email = str(self.apple_ID))
-                                
+                return Response({
+                    'status': 1,
+                    'message': _('OTP sent successfully.'),
+                    'otp': otp  # Send OTP in response for development.
+                }, status=status.HTTP_200_OK)
 
-                                request.session["AppleID"] = self.apple_ID
-                                context = {
-                                        "message":"True"
-                                    }
-                                return JsonResponse(context,status=200)        
-                            else:
-                                
-                                if self.lang != "ar": 
+            else:
+                # If username and phone are not provided, return success for email registration
+                return Response({
+                    'status': 1,
+                    'message': _('User can proceed with registration.'),
+                }, status=status.HTTP_200_OK)
 
-                                
-                                    context = {
-                                        "message": _("invalid Request")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                                else:
-                                    context = {
-                                        "message": _("انتهت صلاحية OTP")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                            
-                          
-                          
-                            
-                                   
-                            
-                            
-                    except Exception as e:
-                        return Response(str(e))
-                    
-            except Exception as e:
-                return JsonResponse(str(e))
-            return JsonResponse({"message": _("Invalid request")}, status=400)
-        else:
-            return JsonResponse({'message': _('Invalid Request')}, status=400)
+        return Response({
+            'status': 0,
+            'message': _('Invalid registration type.')
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
-    def OTPVarifiction(self,request):
-        
-        if request.method == "POST":
-            
-            self.loadJson = json.loads(request.body)
-            
-            
-            self.retrieved_otp = self.loadJson['OTP']
-            
-            try:
-                self.otp_saved = OTPSave.objects.filter(OTP = self.retrieved_otp).first()
-                self.dump = True
-            except Exception as e:
-                self.dump = False
-                
-            try:
-                if self.dump ==True:
-                    
-                    if self.otp_saved.type == "1":
-                        
-                        if self.otp_saved.is_expired():
-                            if self.lang != "ar": 
+class verify_and_register(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-                            
-                                context = {
-                                    
-                                    "message": _("OTP has expire")
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                            else:
-                                context = {
-                                    
-                                    "message": _("انتهت صلاحية OTP")
 
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                        
-                        else:
-                        
-                        
-                            self.username = self.otp_saved.username
-                            self.phoneNo = self.otp_saved.phone
-                            self.password = self.otp_saved.password
-                            
-                            
-                            save_user = User(username = self.username,phone = self.phoneNo,password = self.password)
-                            save_user.save()
-                            
-                            self.otp_saved.delete()
-                            
-                            if self.lang != "ar":
-                                
-                                context = {
-                                    "message":_("OTP verified and data saved succesfully")
-                                    
-                                }
-                                
-                                return JsonResponse(context,status= 200)
-                            else:
-                                context = {
-                                    "message":_("تم التحقق من OTP وحفظ البيانات بنجاح")
-                                    
-                                }
-                                
-                                return JsonResponse(context,status= 200)
-                                
-                    elif self.otp_saved.type == "2":
-                        
-                        if self.otp_saved.is_expired():
-                            
-                            if self.lang != "ar":
-                            
-                                context = {
-                                    
-                                    "message": _("OTP has expire")
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                            else:
-                                context = {
-                                    
-                                    "message": _("انتهت صلاحية OTP")
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                        
-                        else:
-                            self.username = self.otp_saved.username
-                            self.phoneNo = self.otp_saved.phone
-                            self.gmail = request.session.get("gmail")
-                            
-                            
-                            
-                            save_user = User(username = self.username,phone = self.phoneNo,email  = self.gmail)
-                            save_user.save()
-                            
-                            self.otp_saved.delete()
-                            
-                            del request.session['gmail']
-                            
-                            if self.lang != "ar":
+    def post(self, request, *args, **kwargs):
+        phone = request.data.get("phone")
+        otp_input = request.data.get("otp")
+        device_type = request.data.get("device_type")
+        device_token = request.data.get("device_token")
 
-                            
-                                context = {
-                                    "message":_("OTP verified and data saved succesfully")
-                                    
-                                }
-                                
-                                return JsonResponse(context,status= 200)
-                            else:
-                                context = {
-                                    "message":_("تم التحقق من OTP وحفظ البيانات بنجاح")
-                                    
-                                }
-                                
-                                return JsonResponse(context,status= 200)
-                                
-                    
-                    elif self.otp_saved.type == "3":
-                        if self.otp_saved.is_expired():
-                            
-                            if self.lang != "ar":
+        if not phone or not otp_input:
+            return Response({
+                'status': 0,
+                'message': _('Phone and OTP are required fields.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-                                context = {
-                                    
-                                    "message": _("OTP has expire")
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                            else:
-                                context = {
-                                    
-                                    "message": _("انتهت صلاحية OTP")
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                                
-                                
-                        else:
-                            self.username = self.otp_saved.username
-                            self.phoneNo = self.otp_saved.phone
-                            self.appleID = request.session.get("AppleID")
-                            
-                            
-                            
-                            save_user = User(username = self.username,phone = self.phoneNo,email  = self.appleID)
-                            save_user.save()
-                            
-                            self.otp_saved.delete()
-                            
-                            del request.session['AppleID']
-                            
-                            if self.lang != "ar":
+        try:
+            # Check if the OTP and phone exist in the OTPSave table
+            otp_record = OTPSave.objects.get(phone=phone, OTP=otp_input)
+        except OTPSave.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Invalid OTP or phone number.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-                                context = {
-                                    "message":_("OTP verified and data saved succesfully")
-                                    
-                                }
-                                
-                                return JsonResponse(context,status= 200)
-                            else:
-                                context = {
-                                    "message":_("تم التحقق من OTP وحفظ البيانات بنجاح")
-                                    
-                                }
-                                
-                                return JsonResponse(context,status= 200)
-                                
-                    
-                        
-                        
-                
-                elif self.dump == False:
-                    
-                    if self.lang != "ar":
-                        context = {
-                            "message":_("Invalid OTP")
-                            
-                            
-                        }   
-                        
-                        return JsonResponse(context,status = 400)     
-                    else:
-                        context = {
-                            "message":_("OTP غير صالح")
-                            
-                            
-                        }   
-                        
-                        return JsonResponse(context,status = 400)  
-            except Exception  as e:
-                
-                context = {
-                    "message":str(e)
+        try:
+            # Create the user within a transaction to ensure atomicity
+            with transaction.atomic():
+                # Create the user in the User table with details from the OTPSave record
+                user = User.objects.create(
+                    username=otp_record.username,
+                    phone=otp_record.phone,
+                    email=otp_record.email,
+                    role_id=5,  # Assuming role_id 5 is for regular users
+                    device_type=device_type,
+                    device_token=device_token
+                )
+                user.set_password(otp_record.password)
+                user.save()
+
+                # Delete OTP record after successful registration
+                otp_record.delete()
+
+
+                # Prepare user data to be sent in the response
+                user_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'phone': user.phone,
+                    'email': user.email,
+                    'fullname': user.fullname,
+                    'bio': user.bio,
+                    'date_of_birth': user.date_of_birth,
+                    'age': user.age,
+                    'gender': user.gender.id if user.gender else None,
+                    'country': user.country.id if user.country else None,
+                    'city': user.city.id if user.country else None,
+                    'nationality': user.nationality,
+                    'weight': user.weight,
+                    'height': user.height,
+                    'main_playing_position': user.main_playing_position,
+                    'secondary_playing_position': user.secondary_playing_position,
+                    'playing_foot': user.playing_foot,
+                    'favourite_local_team': user.favourite_local_team,
+                    'favourite_team': user.favourite_team,
+                    'favourite_local_player': user.favourite_local_player,
+                    'favourite_player': user.favourite_player,
+                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                    'cover_photo': user.card_header.url if user.card_header else None,
+                    'device_type': user.device_type,
+                    'device_token': user.device_token,
                 }
-                return JsonResponse(context,status = 500)    
-                            
-                
-            
-        else:
-            
-            if self.lang != "ar":
-            
-                return JsonResponse({"message":_("Invalid Request")},status = 400)   
-            else:
-                        
-                return JsonResponse({"message":_("طلب غير صالح")},status = 400)   
 
-    def Google_Auth(self,request):
-        
-        if request.method == "POST":
-            
-            self.json_loads = json.loads(request.body)
-            
-            self.username = self.json_loads["username"]
-            self.phone  = self.json_loads['phone']
-            
-            
-            self.user_data = User.objects.filter(Q(username=self.username) | Q(phone=self.phone)).first()
+                # Return response with refresh and access tokens
+                return Response({
+                    'status': 1,
+                    'message': _('User registered successfully'),
+                    'data': user_data  # This should now work correctly
+                }, status=status.HTTP_201_CREATED)
 
-            if self.user_data:
-                                try:
-                                    if self.user_data.username == self.username and self.user_data.phone == self.phone:
-                                        if self.lang != "ar": 
-                                            context = {
-                                                "message": _("Account Already Exist")
-                                            }
-                                            return JsonResponse(context)
-                                        else:
-                                            context = {
-                                                "message": _("الحساب موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                    elif self.user_data.username == self.username:
-                                        if self.lang != "ar": 
-                                            
 
-                                            context = {
-                                                "message": _("Username already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("اسم المستخدم موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                    elif self.user_data.phone == self.phone:
-                                        if self.lang != "ar": 
-
-                                            context = {
-                                                "message": _("Phone No. Already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("رقم الهاتف موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                except Exception as e:
-                                    context = {
-                                        "exception": str(e)
-                                    }
-                                    return JsonResponse(context)
-            else:
-                
-                self.random_otp = str(random.randint(100000, 999999)).zfill(6)
-                context = {
-                                    "otp": self.random_otp
-                }
-                try:
-                    self.email = request.session.get("gmail")
-                    self.save_otp = OTPSave(username = self.username,phone = self.phone,OTP=self.random_otp,email = self.email,type = "2")
-                    self.save_otp.save()
-                    context = {
-                                        "OTP": self.random_otp
-                    }
-                    return JsonResponse(context, status=200)
-                except Exception as e:
-                    context = {
-                                        "message": str(e)
-                    }
-                    return JsonResponse(context, status=400)
-        else:
-            
-            if self.lang != "ar": 
-
-                                
-                                    context = {
-                                        "message": _("invalid Request")
-                                    }
-                                    return JsonResponse(context,status=400) 
-            else:
-                                    context = {
-                                        "message": _("طلب غير صالح")
-                                    }
-                                    return JsonResponse(context,status=400) 
-        
-    def Apple_Auth(self,request):
-        
-        if request.method == "POST":
-            
-            self.json_loads = json.loads(request.body)
-            
-            self.username = self.json_loads["username"]
-            self.phone  = self.json_loads['phone']
-            
-            
-            self.user_data = User.objects.filter(Q(username=self.username) | Q(phone=self.phone)).first()
-
-            if self.user_data:
-                                try:
-                                    if self.user_data.username == self.username and self.user_data.phone == self.phone:
-                                        if self.lang != "ar": 
-                                            context = {
-                                                "message": _("Account Already Exist")
-                                            }
-                                            return JsonResponse(context)
-                                        else:
-                                            context = {
-                                                "message": _("الحساب موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                    elif self.user_data.username == self.username:
-                                        if self.lang != "ar": 
-                                            
-
-                                            context = {
-                                                "message": _("Username already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("اسم المستخدم موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                    elif self.user_data.phone == self.phone:
-                                        if self.lang != "ar": 
-
-                                            context = {
-                                                "message": _("Phone No. Already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("رقم الهاتف موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                except Exception as e:
-                                    context = {
-                                        "exception": str(e)
-                                    }
-                                    return JsonResponse(context)
-            else:
-                
-                self.random_otp = str(random.randint(100000, 999999)).zfill(6)
-                context = {
-                                    "otp": self.random_otp
-                }
-                try:
-                    self.email = request.session.get("AppleID")
-                    self.save_otp = OTPSave(username = self.username,phone = self.phone,OTP=self.random_otp,email = self.email,type = "3")
-                    self.save_otp.save()
-                    context = {
-                                        "OTP": self.random_otp
-                    }
-                    return JsonResponse(context, status=200)
-                except Exception as e:
-                    context = {
-                                        "message": str(e)
-                    }
-                    return JsonResponse(context, status=400)
-        else:
-            if self.lang != "ar": 
-
-                                
-                                    context = {
-                                        "message": _("invalid Request")
-                                    }
-                                    return JsonResponse(context,status=400) 
-            else:
-                                    context = {
-                                        "message": _("طلب غير صالح")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                            
-        
-        
-        
-    
-        
-        
-        
-                
-                
-                
-                
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An error occurred while registering the user.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
             
             

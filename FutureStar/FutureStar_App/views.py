@@ -498,6 +498,8 @@ class ToggleUserStatusView(View):
             return redirect(reverse("coach_list"))
         elif source_page == "referee_list":
             return redirect(reverse("referee_list"))
+        elif source_page == "default_user_list":
+            return redirect(reverse("default_user_list"))
         else:
             return redirect(reverse("Dashboard"))
 
@@ -509,8 +511,8 @@ class PlayerListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=2)  # Fetch users where role_id is 2
-        roles = Role.objects.filter(id=2)  # Fetch roles with id 2
+        users = User.objects.filter(role_id=2)  
+        roles = Role.objects.filter(id=2)
         return render(
             request,
             self.template_name,
@@ -561,6 +563,50 @@ class RefereeListView(LoginRequiredMixin, View):
             },
         )
 
+
+# Default User List View
+@method_decorator(user_role_check, name='dispatch')
+class DefaultUserList(LoginRequiredMixin, View):
+    template_name = "Admin/User/Default_User_List.html"
+
+    def get(self, request):
+        User = get_user_model()  # Get the custom user model
+        users = User.objects.filter(role_id=5)  
+        roles = Role.objects.filter(id=5)
+        return render(
+            request,
+            self.template_name,
+            {
+                "users": users,
+                "roles": roles,
+                "breadcrumb": {"child": "Default User List"},
+            },
+        )
+
+
+@method_decorator(user_role_check, name='dispatch')
+class UserDetailView(View):
+    template_name = "Admin/User/User_Detail.html"
+
+    def post(self, request, pk, *args, **kwargs):
+        user = get_object_or_404(User, pk=pk)
+        source_page = request.POST.get("source_page") 
+        title = request.POST.get("title") 
+        
+        # Fetch additional details if needed (e.g., related profiles or roles)
+        role = user.role  # Assuming the user model has a role foreign key
+    
+        # Return the detail page with all user information
+        return render(
+            request,
+            self.template_name,
+            {
+                "user": user,
+                "role": role,
+                "title":title,
+                "source_page" : source_page,
+            },
+        )
 
 ##############################################  User Category Type Module  ################################################
 # Category CRUD Views

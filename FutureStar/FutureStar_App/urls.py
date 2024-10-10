@@ -38,6 +38,10 @@ urlpatterns = [
     path('players/', PlayerListView.as_view(), name='player_list'),
     path('coach/', CoachListView.as_view(), name='coach_list'),
     path('referee/', RefereeListView.as_view(), name='referee_list'),
+    path('default-user/', DefaultUserList.as_view(), name='default_user_list'),
+    path('user/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
+
+
 
 
     # path('users/<int:user_id>/edit/', UserEditView.as_view(), name='user_edit'),

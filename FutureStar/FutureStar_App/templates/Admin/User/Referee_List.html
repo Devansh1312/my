@@ -1,13 +1,23 @@
-{% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
-<!-- Plugins css start-->
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins CSS start -->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Referee List{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins CSS end -->
+{% endblock %}
+
+{% block title %}Referee List{% endblock %}
+
+{% block content %}
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
             <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
+               <h3>{{ breadcrumb.child }}</h3>
             </div>
             <div class="col-6"></div>
          </div>
@@ -29,16 +39,18 @@
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for user in users %} 
+                        <tbody>
+                           {% for user in users %}
                            <tr>
                               <td>{{ user.username }}</td>
                               <td>{{ user.first_name }}</td>
                               <td>{{ user.last_name }}</td>
                               <td>{{ user.email }}</td>
                               <td>{{ user.phone }}</td>
-                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}"  style="padding: 5px; margin-top: 10px; justify-self: center; justify-items: center;" >
+                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}" 
+                                  style="padding: 5px; margin-top: 10px; justify-self: center; justify-items: center;">
                                  {% if user.is_active %}Active{% else %}Deactive{% endif %}
-                             </td>
+                              </td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -56,25 +68,24 @@
                                                 {% csrf_token %}
                                                 <input type="hidden" name="source_page" value="referee_list">
                                                 <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                                <input type="hidden" name="title" value="Referee">
                                              </form>
                                           </li>
-                                          
-                                          <!-- <li style="padding: 8px 12px;">
-                                             <a class="edit" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" data-id="{{ user.id }}">
-                                                Edit
-                                             </a>
-                                          </li>
-                                          
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a class="delete" href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-id="{{ user.id }}">
-                                                Delete
-                                             </a>
-                                          </li> -->
+                                             <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
+                                             <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' pk=user.pk %}" style="display: none;">
+                                                 {% csrf_token %}
+                                                 <input type="hidden" name="source_page" value="referee_list">
+                                                 <input type="hidden" name="title" value="Referee">
+                                             </form>
+                                         </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
                      </table>
                   </div>
                </div>
@@ -83,71 +94,62 @@
       </div>
    </div>
 </div>
- {% endblock %} {% block scriptcontent %}
-<!-- Plugins JS start-->
+{% endblock %}
+
+{% block scriptcontent %}
+<!-- Plugins JS start -->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
-<!-- Plugins JS Ends-->
+<!-- Plugins JS end -->
+
 <script>
-      // Toggle User Status
-      document.querySelectorAll('.toggle-status').forEach(function(button) {
-         button.addEventListener('click', function() {
-            var userId = button.getAttribute('data-user-id');
-            var status = button.getAttribute('data-status');
-            var url = "{% url 'user_toggle_status' pk='0' %}".replace('0', userId);
-            var form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
-            var csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = 'csrfmiddlewaretoken';
-            csrfToken.value = '{{ csrf_token }}';
-            form.appendChild(csrfToken);
-            var statusInput = document.createElement('input');
-            statusInput.type = 'hidden';
-            statusInput.name = 'status';
-            statusInput.value = status;
-            form.appendChild(statusInput);
-            document.body.appendChild(form);
-            form.submit();
-         });
-      });
-</script>
-<script>
-   document.addEventListener('DOMContentLoaded', function() {
-      // Toggle the visibility of the action card
-      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-         menu.addEventListener('click', function(event) {
-            event.preventDefault();
-            var actionCard = menu.nextElementSibling;
-            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-            // Close other open action cards
-            document.querySelectorAll('.action-card').forEach(function(card) {
-               if (card !== actionCard) {
-                  card.style.display = 'none';
-               }
-            });
-         });
-      });
-      // Hide action card if clicking outside
-      document.addEventListener('click', function(event) {
-         var isClickInside = event.target.closest('.action-menu-container');
-         if (!isClickInside) {
-            document.querySelectorAll('.action-card').forEach(function(card) {
-               card.style.display = 'none';
-            });
-         }
-      });
-   });
-   document.addEventListener('DOMContentLoaded', function() {
-   document.querySelectorAll('.toggle-status').forEach(function(link) {
-      link.addEventListener('click', function(e) {
+   // Toggle User Status
+   document.querySelectorAll('.toggle-status').forEach(function(button) {
+      button.addEventListener('click', function(e) {
          e.preventDefault();
          var userId = this.getAttribute('data-id');
+         var status = this.getAttribute('data-status');
          var form = document.getElementById('status-form-' + userId);
+         form.querySelector('input[name="status"]').value = status;
          form.submit();
       });
    });
-});
-</script> {% endblock %}
+
+   // Toggle the visibility of the action card
+   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+      menu.addEventListener('click', function(event) {
+         event.preventDefault();
+         var actionCard = menu.nextElementSibling;
+         actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+
+         // Close other open action cards
+         document.querySelectorAll('.action-card').forEach(function(card) {
+            if (card !== actionCard) {
+               card.style.display = 'none';
+            }
+         });
+      });
+   });
+
+   // Hide action card if clicking outside
+   document.addEventListener('click', function(event) {
+      var isClickInside = event.target.closest('.action-menu-container');
+      if (!isClickInside) {
+         document.querySelectorAll('.action-card').forEach(function(card) {
+            card.style.display = 'none';
+         });
+      }
+   });
+
+   // View User Details
+   document.querySelectorAll('.view-details').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+         e.preventDefault();
+         var userId = this.getAttribute('data-id');
+         var form = document.getElementById('view-form-' + userId);
+         form.submit();
+      });
+   });
+</script>
+{% endblock %}

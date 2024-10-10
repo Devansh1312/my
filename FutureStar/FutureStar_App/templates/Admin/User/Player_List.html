@@ -1,13 +1,25 @@
-{% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Player List{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}
+Player List
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
             <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
+               <h3>{{ breadcrumb.child }}</h3>
             </div>
             <div class="col-6"></div>
          </div>
@@ -29,23 +41,22 @@
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for user in users %} 
+                        <tbody>
+                           {% for user in users %}
                            <tr>
                               <td>{{ user.username }}</td>
                               <td>{{ user.first_name }}</td>
                               <td>{{ user.last_name }}</td>
                               <td>{{ user.email }}</td>
                               <td>{{ user.phone }}</td>
-                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}"  style="padding: 5px; margin-top: 10px; justify-self: center; justify-items: center;" >
+                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}" style="padding: 5px; margin-top: 10px;">
                                  {% if user.is_active %}Active{% else %}Deactive{% endif %}
-                             </td>
+                              </td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                        <i data-feather="more-vertical"></i>
-                                       <!-- Three dots icon -->
                                     </a>
-                                    <!-- Hidden card for actions -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
@@ -55,26 +66,25 @@
                                              <form id="status-form-{{ user.id }}" method="post" action="{% url 'user_toggle_status' pk=user.id %}" style="display: none;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="source_page" value="player_list">
+                                                <input type="hidden" name="title" value="Player">
                                                 <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
                                              </form>
                                           </li>
-                                          
-                                          <!-- <li style="padding: 8px 12px;">
-                                             <a class="edit" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal" data-id="{{ user.id }}">
-                                                Edit
-                                             </a>
-                                          </li>
-                                          
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a class="delete" href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-id="{{ user.id }}">
-                                                Delete
-                                             </a>
-                                          </li> -->
+                                             <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
+                                             <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' pk=user.pk %}" style="display: none;">
+                                                 {% csrf_token %}
+                                                 <input type="hidden" name="source_page" value="player_list">
+                                                 <input type="hidden" name="title" value="Player">
+                                             </form>
+                                          </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
                      </table>
                   </div>
                </div>
@@ -83,39 +93,37 @@
       </div>
    </div>
 </div>
- {% endblock %} {% block scriptcontent %}
+{% endblock %}
+
+{% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <!-- Plugins JS Ends-->
+
 <script>
+   document.addEventListener('DOMContentLoaded', function() {
       // Toggle User Status
       document.querySelectorAll('.toggle-status').forEach(function(button) {
-         button.addEventListener('click', function() {
-            var userId = button.getAttribute('data-user-id');
-            var status = button.getAttribute('data-status');
-            var url = "{% url 'user_toggle_status' pk='0' %}".replace('0', userId);
-            var form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
-            var csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = 'csrfmiddlewaretoken';
-            csrfToken.value = '{{ csrf_token }}';
-            form.appendChild(csrfToken);
-            var statusInput = document.createElement('input');
-            statusInput.type = 'hidden';
-            statusInput.name = 'status';
-            statusInput.value = status;
-            form.appendChild(statusInput);
-            document.body.appendChild(form);
+         button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = button.getAttribute('data-id');
+            var form = document.getElementById('status-form-' + userId);
             form.submit();
          });
       });
-</script>
-<script>
-   document.addEventListener('DOMContentLoaded', function() {
+
+      // View User Details
+      document.querySelectorAll('.view-details').forEach(function(link) {
+         link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = this.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + userId);
+            form.submit();
+         });
+      });
+
       // Toggle the visibility of the action card
       document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
          menu.addEventListener('click', function(event) {
@@ -130,6 +138,7 @@
             });
          });
       });
+
       // Hide action card if clicking outside
       document.addEventListener('click', function(event) {
          var isClickInside = event.target.closest('.action-menu-container');
@@ -140,14 +149,5 @@
          }
       });
    });
-   document.addEventListener('DOMContentLoaded', function() {
-   document.querySelectorAll('.toggle-status').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-         e.preventDefault();
-         var userId = this.getAttribute('data-id');
-         var form = document.getElementById('status-form-' + userId);
-         form.submit();
-      });
-   });
-});
-</script> {% endblock %}
+</script>
+{% endblock %}

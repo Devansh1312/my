@@ -1,6 +1,5 @@
 {% load static %}
 {% load i18n %}
-
 <!-- footer area start -->
 <footer class="main-footer footer-six pt-80">
     <div class="container">
@@ -21,7 +20,13 @@
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-links wow fadeInUp delay-0-3s">
-                    <h5 class="footer-title">{% trans "Explore" %}</h5>
+                    <h5 class="footer-title">
+                        {% if current_language == 'en' %}
+                        Explore
+                        {% elif current_language == 'ar' %}
+                        استكشاف                                
+                        {% endif %}
+                    </h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
                             <li><a href="{% url 'discover' %}">
@@ -114,6 +119,9 @@
                     </ul>
                     <div class="social-style-two">
                         <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ system_settings.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="{{ system_settings.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ system_settings.linkedin }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
             </div>
@@ -124,9 +132,9 @@
                     <div class="footer-copyright-text wow fadeInUp delay-0-2s">
                         <p>
                             {% if current_language == 'en' %}
-                                Copyright @2024, Future Stars All Rights Reserved
+                                Copyright @2024, FutureStar All Rights Reserved
                             {% elif current_language == 'ar' %}
-                                حقوق النشر @2024، جميع الحقوق محفوظة لـ Future Stars
+                                حقوق الطبع والنشر @2024، FutureStar جميع الحقوق محفوظة                             
                             {% endif %}
                         </p>
                     </div>
@@ -135,10 +143,12 @@
                     <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
                         <p>
                             {% if current_language == 'en' %}
-                                Designed & Developed By Redspark Technologies
+                                Designed & Developed 
                             {% elif current_language == 'ar' %}
-                                تصميم وتطوير بواسطة Redspark Technologies
+                                تصميم وتطوير
                             {% endif %}
+                            By 
+                            <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
                         </p>
                     </div>
                 </div>

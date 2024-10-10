@@ -767,9 +767,16 @@ class OTPVerificationView(View):
 #         # Log the OTP for development purposes
 #         print(f"OTP: {otp}")
 
-#         # Store necessary data in the session
-#         request.session['username'] = username
-#         request.session['email'] = email
+       ## # # Store necessary data in the session
+       ## # request.session['username'] = username
+       ## # request.session['email'] = email
 
-#         messages.success(request, f"An OTP has been sent to your registered email: {email}")
-#         return redirect("verify_otp")  # Redirect to the OTP verification page
+       ## # messages.success(request, f"An OTP has been sent to your registered email: {email}")
+       ## # return redirect("verify_otp")  # Redirect to the OTP verification page
+       ## # Check if user already exists
+#         user= User.objects.get_or_create(
+#             username=username,
+#             defaults={'email': email, 'register_type': '2'}
+#         )
+
+#         return redirect('social_signup',user)  # Redirect to your desired page

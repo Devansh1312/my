@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- Plugins css Ends-->
+
+<style>
+    .profile-info .label-value {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+    }
+
+    .card-header, .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-footer {
+        text-align: right;
+        padding: 1rem;
+    }
+
+    /* Ensure the back button is at the end of the large card */
+    .card-footer a.btn-secondary {
+        display: inline-block;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block title %} {{title}} | Page {% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>{{breadcrumb.child}}</h3>
+            </div>
+             <div class="col-6"></div>
+        </div>
+    </div>
+      <!-- Big Card -->
+      <div class="card">
+         <div class="card-body">
+            <div class="row">
+               <!-- Profile Information -->
+               <div class="col-xl-4">
+                  <div class="card">
+                     <div class="card-header">
+                        <h4 class="card-title mb-0">Profile Details</h4>
+                     </div>
+                     <div class="card-body">
+                        <div class="profile-info text-center mb-3">
+                           <img class="img-70 rounded-circle" alt="Profile Picture" src="{{ user.profile_picture.url }}">
+                           <h5 class="mt-2">{{ user.fullname }}</h5>
+                           <p>{{ user.role.name_en }}</p>
+                        </div>
+                        <hr>
+                        <div class="row">
+                           <div class="col-12 label-value">
+                              <p>Email: {{ user.email|default:"None" }}</p>
+                           </div>
+                           <div class="col-12 label-value">
+                              <p>Phone: {{ user.phone|default:"None" }}</p>
+                           </div>
+                           <div class="col-12 label-value">
+                              <p>Date of Birth: {{ user.date_of_birth|default:"None" }}</p>
+                           </div>
+                           <div class="col-12 label-value">
+                              <p>Gender: {{ user.gender.name|default:"None" }}</p>
+                           </div>
+                           <div class="col-12 label-value">
+                              <p>Country: {{ user.country.name|default:"None" }}</p>
+                           </div>
+                           <div class="col-12 label-value">
+                              <p>City: {{ user.city.name|default:"None" }}</p>
+                           </div>
+                           <div class="col-12 label-value">
+                              <p>Nationality: {{ user.nationality|default:"None" }}</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- Additional Information -->
+               <div class="col-xl-8">
+                  <div class="card">
+                     <div class="card-header">
+                        <h4 class="card-title mb-0">Additional Information</h4>
+                     </div>
+                     <div class="card-body">
+                        <div class="row">
+                           <div class="col-md-6 label-value">
+                              <p>Weight: {{ user.weight|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Height: {{ user.height|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Main Playing Position: {{ user.main_playing_position|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Secondary Playing Position: {{ user.secondary_playing_position|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Playing Foot: {{ user.playing_foot|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Favourite Local Team: {{ user.favourite_local_team|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Favourite Team: {{ user.favourite_team|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Favourite Local Player: {{ user.favourite_local_player|default:"None" }}</p>
+                           </div>
+                           <div class="col-md-6 label-value">
+                              <p>Favourite Player: {{ user.favourite_player|default:"None" }}</p>
+                           </div>
+                           <!-- Bio on its own line -->
+                           <div class="col-12">
+                              <label>Bio:</label>
+                              <p>{{ user.bio|default:"None" }}</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- Card Footer with Back Button -->
+         <div class="card-footer">
+            <a href="{% url source_page %}" class="btn btn-secondary">
+                Back
+            </a>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

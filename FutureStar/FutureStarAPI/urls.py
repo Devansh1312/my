@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 urlpatterns = [
 
-        path('api/register/', RegisterAPIView.as_view(), name='playerregister'),
+        # path('api/register/', RegisterAPIView.as_view(), name='playerregister'),
         path('api/playerlogin/', LoginAPIView.as_view(), name='playerlogin'),
         path('api/logout/', LogoutAPIView.as_view(), name='playerlogout'),  # Add logout endpoint
         path('api/forgot-password/', ForgotPasswordAPIView.as_view(), name='forgot-password'),
@@ -44,12 +44,13 @@ urlpatterns = [
         
         #new apis generation
         
-        path("api/validation/",RegistartionAPI.as_view(),name="regvalidation"),
+        # path("api/validation/",RegistartionAPI.as_view(),name="regvalidation"),
 
-        path("api/otpverification/",RegistartionAPI.as_view(),name="otpVarification"),
-        path("api/googleuseregister/",RegistartionAPI.as_view(),name="googleregister"),
-        path("api/appleuseregister/",RegistartionAPI.as_view(),name="appleregister"),
+        # path("api/otpverification/",RegistartionAPI.as_view(),name="otpVarification"),
+        # path("api/googleuseregister/",RegistartionAPI.as_view(),name="googleregister"),
+        # path("api/appleuseregister/",RegistartionAPI.as_view(),name="appleregister"),
 
 
-        
+        path('api/send-otp/', send_otp.as_view()),
+        path('api/verify-and-register/', verify_and_register.as_view()),
     ]
