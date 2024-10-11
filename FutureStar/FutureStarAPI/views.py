@@ -28,200 +28,252 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 import string
 
+              
+# Generate a random 6-digit OTP
+def generate_otp():
+    return str(random.randint(100000, 999999))
 
-# class RegisterAPIView(APIView):
-#     permission_classes = [AllowAny]
-#     parser_classes = (JSONParser, MultiPartParser, FormParser)
+class send_otp(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-#     def post(self, request, *args, **kwargs):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
+    def generate_random_password(self, length=8):
+        """Generate a random password with letters and digits."""
+        characters = string.ascii_letters + string.digits
+        return ''.join(random.choice(characters) for i in range(length))
+    
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        registration_type = request.data.get('type')
+        
 
-#         registration_type = request.data.get('type')
-#         device_type = request.data.get('device_type')
-#         device_token = request.data.get('device_token')
+        # Handle Registration Type 1 (Normal registration)
+        if registration_type == 1 :
+            username = request.data.get('username')
+            phone = request.data.get('phone')
+            email = request.data.get('email')
+            password = request.data.get('password')
+            # Check if username or phone already exists in User table
+            # Check if the username already exists in the User table
+            if User.objects.filter(username=username).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Username already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-#         if registration_type == 1:
-#             serializer = RegisterSerializer(data=request.data)
-#             if serializer.is_valid():
-#                 try:
-#                     user = serializer.save()
-#                     user.device_type = device_type
-#                     user.device_token = device_token
-#                     user.last_login = timezone.now()
-#                     user.save()
+            # Check if the phone already exists in the User table
+            if User.objects.filter(phone=phone).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Phone number already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-#                     refresh = RefreshToken.for_user(user)
+            # If user does not exist, generate OTP and store it in OTPSave table
+            otp = generate_otp()
+            # Save or update the OTP in OTPSave
+            otp_record, created = OTPSave.objects.update_or_create(
+                phone=phone,  # or username based on uniqueness
+                defaults={'phone': phone, 'OTP': otp}
+            )
 
-#                     return Response({
-#                         'status': 1,
-#                         'message': _('User registered and logged in successfully'),
-#                         'data': {
-#                             'refresh_token': str(refresh),
-#                             'access_token': str(refresh.access_token),
-#                             'id': user.id,
-#                             'username': user.username,
-#                             'phone': user.phone,
-#                             'email': user.email,
-#                             'fullname': user.fullname,
-#                             'bio': user.bio,
-#                             'date_of_birth': user.date_of_birth,
-#                             'age': user.age,
-#                             'gender': user.gender.id if user.gender else None,
-#                             'country': user.country.id if user.country else None,
-#                             'city': user.city.id if user.country else None,
-#                             'nationality': user.nationality,
-#                             'weight': user.weight,
-#                             'height': user.height,
-#                             'main_playing_position': user.main_playing_position,
-#                             'secondary_playing_position': user.secondary_playing_position,
-#                             'playing_foot': user.playing_foot,
-#                             'favourite_local_team': user.favourite_local_team,
-#                             'favourite_team': user.favourite_team,
-#                             'favourite_local_player': user.favourite_local_player,
-#                             'favourite_player': user.favourite_player,
-#                             'profile_picture': user.profile_picture.url if user.profile_picture else None,
-#                             'cover_photo': user.card_header.url if user.card_header else None,
-#                             'device_type': user.device_type,
-#                             'device_token': user.device_token,
-#                         }
-#                     }, status=status.HTTP_201_CREATED)
+            return Response({
+                'status': 1,
+                'message': _('OTP sent successfully.'),
+                'data': otp  # For development, this is sent in the response.
+            }, status=status.HTTP_200_OK)
 
-#                 except IntegrityError as e:
-#                     return Response({
-#                         'status': 0,
-#                         'message': _('User registration failed due to duplicate data'),
-#                         'errors': str(e)
-#                     }, status=status.HTTP_400_BAD_REQUEST)
+        # Handle Registration Type 2/3 (Social registration via email)
+        elif registration_type in [2, 3]:
+            username = request.data.get('username')
+            phone = request.data.get('phone')
+            email = request.data.get('email')
+            # Check if email exists in User table
+            if User.objects.filter(email=email).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Email already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-#             # Custom handling for validation errors to ensure the message is returned as desired
-#             error_message = serializer.errors.get('non_field_errors')
-#             if error_message:
-#                 return Response({
-#                     'status': 0,
-#                     'message': _(error_message[0])  # Ensures translation is applied
-#                 }, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 return Response({
-#                     'status': 0,
-#                     'message': serializer.errors
-#                 }, status=status.HTTP_400_BAD_REQUEST)
+            # If email does not exist, check username and phone if provided
+            if username and phone:
+                # Validate if username or phone already exists in User table
+                # Check if the username already exists in the User table
+                if User.objects.filter(username=username).exists():
+                    return Response({
+                        'status': 0,
+                        'message': _('Username already exists.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-#         elif registration_type in [2, 3]:
-#             # Email registration (no password provided)
-#             email = request.data.get('username')
-#             if not email:
-#                 return Response({
-#                     'status': 0,
-#                     'message': _('Email is required for registration')
-#                 }, status=status.HTTP_400_BAD_REQUEST)
+                # Check if the phone already exists in the User table
+                if User.objects.filter(phone=phone).exists():
+                    return Response({
+                        'status': 0,
+                        'message': _('Phone number already exists.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-#             user = User.objects.filter(email=email).first()
+                # Generate OTP and save in OTPSave for type 2/3 with phone, email, and password
+                otp = generate_otp()
+                random_password = self.generate_random_password()
+                password = random_password  # Set the generated password
+                otp_record, created = OTPSave.objects.update_or_create(
+                    phone=phone,  # Assuming phone is required
+                    password=email.split('@')[0],
+                    defaults={'phone': phone,'OTP': otp}
+                )
 
-#             if user:
-#                 # If the user exists, log them in
-#                 if user.is_active:
-#                     user.device_type = device_type
-#                     user.device_token = device_token
-#                     user.last_login = timezone.now()
-#                     user.save()
+                return Response({
+                    'status': 1,
+                    'message': _('OTP sent successfully.'),
+                    'data': otp  # Send OTP in response for development.
+                }, status=status.HTTP_200_OK)
 
-#                     refresh = RefreshToken.for_user(user)
-#                     return Response({
-#                         'status': 1,
-#                         'message': _('User logged in successfully'),
-#                         'data': {
-#                             'refresh_token': str(refresh),
-#                             'access_token': str(refresh.access_token),
-#                             'id': user.id,
-#                             'username': user.username,
-#                             'phone': user.phone,
-#                             'email': user.email,
-#                             'fullname': user.fullname,
-#                             'bio': user.bio,
-#                             'date_of_birth': user.date_of_birth,
-#                             'age': user.age,
-#                             'gender': user.gender.id if user.gender else None,
-#                             'country': user.country.id if user.country else None,
-#                             'city': user.city.id if user.country else None,
-#                             'nationality': user.nationality,
-#                             'weight': user.weight,
-#                             'height': user.height,
-#                             'main_playing_position': user.main_playing_position,
-#                             'secondary_playing_position': user.secondary_playing_position,
-#                             'playing_foot': user.playing_foot,
-#                             'favourite_local_team': user.favourite_local_team,
-#                             'favourite_team': user.favourite_team,
-#                             'favourite_local_player': user.favourite_local_player,
-#                             'favourite_player': user.favourite_player,
-#                             'profile_picture': user.profile_picture.url if user.profile_picture else None,
-#                             'cover_photo': user.card_header.url if user.card_header else None,
-#                             'device_type': user.device_type,
-#                             'device_token': user.device_token, 
-#                         }
-#                     }, status=status.HTTP_200_OK)
-#                 else:
-#                     return Response({
-#                         'status': 0,
-#                         'message': _('Account is inactive')
-#                     }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                # If username and phone are not provided, return success for email registration
+                return Response({
+                    'status': 1,
+                    'message': _('User can proceed with registration.'),
+                }, status=status.HTTP_200_OK)
 
-#             else:
-#                 # Generate a random password manually
-#                 user = User.objects.create_user(
-#                     username=email.split('@')[0],
-#                     email=email,
-#                     password=email.split('@')[0],
-#                     is_active=True  # Adjust this if you need email verification
-#                 )
-#                 user.device_type = device_type
-#                 user.device_token = device_token
-#                 user.last_login = timezone.now()
-#                 user.save()
+        return Response({
+            'status': 0,
+            'message': _('Invalid registration type.')
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-#                 refresh = RefreshToken.for_user(user)
 
-#                 return Response({
-#                     'status': 1,
-#                     'message': _('User created and logged in successfully'),
-#                     'data': {
-#                         'refresh_token': str(refresh),
-#                         'access_token': str(refresh.access_token),
-#                         'data': {
-#                             'id': user.id,
-#                             'username': user.username,
-#                             'phone': user.phone,
-#                             'email': user.email,
-#                             'fullname': user.fullname,
-#                             'bio': user.bio,
-#                             'date_of_birth': user.date_of_birth,
-#                             'age': user.age,
-#                             'gender': user.gender.id if user.gender else None,
-#                             'country': user.country.id if user.country else None,
-#                             'city': user.city.id if user.country else None,
-#                             'nationality': user.nationality,
-#                             'weight': user.weight,
-#                             'height': user.height,
-#                             'main_playing_position': user.main_playing_position,
-#                             'secondary_playing_position': user.secondary_playing_position,
-#                             'playing_foot': user.playing_foot,
-#                             'favourite_local_team': user.favourite_local_team,
-#                             'favourite_team': user.favourite_team,
-#                             'favourite_local_player': user.favourite_local_player,
-#                             'favourite_player': user.favourite_player,
-#                             'profile_picture': user.profile_picture.url if user.profile_picture else None,
-#                             'cover_photo': user.card_header.url if user.card_header else None,
-#                             'device_type': user.device_type,
-#                             'device_token': user.device_token,
-#                         }
-#                     }
-#                 }, status=status.HTTP_201_CREATED)
+class verify_and_register(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-#         return Response({
-#             'status': 0,
-#             'message': _('Invalid registration type')
-#         }, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        phone = request.data.get("phone")
+        otp_input = request.data.get("otp")
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+        device_type = request.data.get("device_type")
+        device_token = request.data.get("device_token")
+
+        # Check if phone, OTP, username, email, and password are provided
+        if not phone:
+            return Response({
+                'status': 0,
+                'message': _('Phone is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not otp_input:
+            return Response({
+                'status': 0,
+                'message': _('OTP is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not username:
+            return Response({
+                'status': 0,
+                'message': _('Username is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Check if the OTP and phone exist in the OTPSave table
+        try:
+            otp_record = OTPSave.objects.get(phone=phone, OTP=otp_input)
+        except OTPSave.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Invalid OTP or phone number.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the username already exists in the User table
+        if User.objects.filter(username=username).exists():
+            return Response({
+                'status': 0,
+                'message': _('Username already exists.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the phone already exists in the User table
+        if User.objects.filter(phone=phone).exists():
+            return Response({
+                'status': 0,
+                'message': _('Phone number already exists.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if email : 
+        # Check if the email already exists in the User table
+            if User.objects.filter(email=email).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Email already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Create the user within a transaction to ensure atomicity
+            with transaction.atomic():
+                # Create the user in the User table using details from the request body
+                user = User.objects.create(
+                    username=username,
+                    phone=phone,
+                    email=email,
+                    role_id=5,  # Assuming role_id 5 is for regular users
+                    device_type=device_type,
+                    device_token=device_token
+                )
+                user.set_password(password)
+                user.save()
+
+                # Delete OTP record after successful registration
+                otp_record.delete()
+
+                # Prepare user data to be sent in the response
+                user_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'phone': user.phone,
+                    'email': user.email,
+                    'fullname': user.fullname,
+                    'bio': user.bio,
+                    'date_of_birth': user.date_of_birth,
+                    'age': user.age,
+                    'gender': user.gender.id if user.gender else None,
+                    'country': user.country.id if user.country else None,
+                    'city': user.city.id if user.city else None,
+                    'nationality': user.nationality,
+                    'weight': user.weight,
+                    'height': user.height,
+                    'main_playing_position': user.main_playing_position,
+                    'secondary_playing_position': user.secondary_playing_position,
+                    'playing_foot': user.playing_foot,
+                    'favourite_local_team': user.favourite_local_team,
+                    'favourite_team': user.favourite_team,
+                    'favourite_local_player': user.favourite_local_player,
+                    'favourite_player': user.favourite_player,
+                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                    'cover_photo': user.card_header.url if user.card_header else None,
+                    'device_type': user.device_type,
+                    'device_token': user.device_token,
+                }
+
+                # Generate refresh and access tokens
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'status': 1,
+                    'message': _('User registered successfully'),
+                    'data': {
+                        'refresh_token': str(refresh),
+                        'access_token': str(refresh.access_token),
+                        **user_data
+                    }
+                }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An error occurred while registering the user.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LoginAPIView(APIView):
@@ -358,54 +410,10 @@ class LoginAPIView(APIView):
                             'message': _('Account is inactive'),
                         }, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    # Create new user with random password if email doesn't exist
-                    user = User.objects.create_user(
-                        username=email.split('@')[0],
-                        email=email,
-                        password=email.split('@')[0],
-                        is_active=True  # You can adjust if you need email verification
-                    )
-                    user.device_type = device_type
-                    user.device_token = device_token
-                    user.last_login = timezone.now()
-                    user.save()
-
-                    refresh = RefreshToken.for_user(user)
                     return Response({
-                        'status': 1,
-                        'message': _('User created and login successful'),
-                        'data': {
-                            'refresh_token': str(refresh),
-                            'access_token': str(refresh.access_token),
-                            'data': {
-                                'id': user.id,
-                                'username': user.username,
-                                'phone': user.phone,
-                                'email': user.email,
-                                'fullname': user.fullname,
-                                'bio': user.bio,
-                                'date_of_birth': user.date_of_birth,
-                                'age': user.age,
-                                'gender': user.gender.id if user.gender else None,
-                                'country': user.country.id if user.country else None,
-                                'city': user.city.id if user.country else None,
-                                'nationality': user.nationality,
-                                'weight': user.weight,
-                                'height': user.height,
-                                'main_playing_position': user.main_playing_position,
-                                'secondary_playing_position': user.secondary_playing_position,
-                                'playing_foot': user.playing_foot,
-                                'favourite_local_team': user.favourite_local_team,
-                                'favourite_team': user.favourite_team,
-                                'favourite_local_player': user.favourite_local_player,
-                                'favourite_player': user.favourite_player,
-                                'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                                'cover_photo': user.card_header.url if user.card_header else None,
-                                'device_type': user.device_type,
-                                'device_token': user.device_token,
-                            }
-                        }
-                    }, status=status.HTTP_201_CREATED)
+                        'status': 0,
+                        'message': _("Email Does Not Exits Please Register")
+                        }, status=status.HTTP_400_BAD_REQUEST)
 
         # Custom error handling
         error_message = serializer.errors.get('non_field_errors')
@@ -1359,248 +1367,4 @@ class LocationAPIView(APIView):
             'data': city_data
         }, status=status.HTTP_200_OK)
 
-                
-# Generate a random 6-digit OTP
-def generate_otp():
-    return str(random.randint(100000, 999999))
-
-class send_otp(APIView):
-    permission_classes = [AllowAny]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def generate_random_password(self, length=8):
-        """Generate a random password with letters and digits."""
-        characters = string.ascii_letters + string.digits
-        return ''.join(random.choice(characters) for i in range(length))
-    
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-        registration_type = request.data.get('type')
-        
-
-        # Handle Registration Type 1 (Normal registration)
-        if registration_type == 1 :
-            username = request.data.get('username')
-            phone = request.data.get('phone')
-            email = request.data.get('email')
-            password = request.data.get('password')
-            # Check if username or phone already exists in User table
-            # Check if the username already exists in the User table
-            if User.objects.filter(username=username).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('Username already exists.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Check if the phone already exists in the User table
-            if User.objects.filter(phone=phone).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('Phone number already exists.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # If user does not exist, generate OTP and store it in OTPSave table
-            otp = generate_otp()
-            # Save or update the OTP in OTPSave
-            otp_record, created = OTPSave.objects.update_or_create(
-                phone=phone,  # or username based on uniqueness
-                defaults={'phone': phone, 'OTP': otp}
-            )
-
-            return Response({
-                'status': 1,
-                'message': _('OTP sent successfully.'),
-                'data': otp  # For development, this is sent in the response.
-            }, status=status.HTTP_200_OK)
-
-        # Handle Registration Type 2/3 (Social registration via email)
-        elif registration_type in [2, 3]:
-            username = request.data.get('username')
-            phone = request.data.get('phone')
-            email = request.data.get('email')
-            # Check if email exists in User table
-            if User.objects.filter(email=email).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('Email already exists.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # If email does not exist, check username and phone if provided
-            if username and phone:
-                # Validate if username or phone already exists in User table
-                # Check if the username already exists in the User table
-                if User.objects.filter(username=username).exists():
-                    return Response({
-                        'status': 0,
-                        'message': _('Username already exists.')
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-                # Check if the phone already exists in the User table
-                if User.objects.filter(phone=phone).exists():
-                    return Response({
-                        'status': 0,
-                        'message': _('Phone number already exists.')
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-                # Generate OTP and save in OTPSave for type 2/3 with phone, email, and password
-                otp = generate_otp()
-                random_password = self.generate_random_password()
-                password = random_password  # Set the generated password
-                otp_record, created = OTPSave.objects.update_or_create(
-                    phone=phone,  # Assuming phone is required
-                    password=email.split('@')[0],
-                    defaults={'phone': phone,'OTP': otp}
-                )
-
-                return Response({
-                    'status': 1,
-                    'message': _('OTP sent successfully.'),
-                    'data': otp  # Send OTP in response for development.
-                }, status=status.HTTP_200_OK)
-
-            else:
-                # If username and phone are not provided, return success for email registration
-                return Response({
-                    'status': 1,
-                    'message': _('User can proceed with registration.'),
-                }, status=status.HTTP_200_OK)
-
-        return Response({
-            'status': 0,
-            'message': _('Invalid registration type.')
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-
-class verify_and_register(APIView):
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        phone = request.data.get("phone")
-        otp_input = request.data.get("otp")
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
-        device_type = request.data.get("device_type")
-        device_token = request.data.get("device_token")
-
-        # Check if phone, OTP, username, email, and password are provided
-        if not phone:
-            return Response({
-                'status': 0,
-                'message': _('Phone is a required field.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        if not otp_input:
-            return Response({
-                'status': 0,
-                'message': _('OTP is a required field.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        if not username:
-            return Response({
-                'status': 0,
-                'message': _('Username is a required field.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-
-        # Check if the OTP and phone exist in the OTPSave table
-        try:
-            otp_record = OTPSave.objects.get(phone=phone, OTP=otp_input)
-        except OTPSave.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Invalid OTP or phone number.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Check if the username already exists in the User table
-        if User.objects.filter(username=username).exists():
-            return Response({
-                'status': 0,
-                'message': _('Username already exists.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Check if the phone already exists in the User table
-        if User.objects.filter(phone=phone).exists():
-            return Response({
-                'status': 0,
-                'message': _('Phone number already exists.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Check if the email already exists in the User table
-        if User.objects.filter(email=email).exists():
-            return Response({
-                'status': 0,
-                'message': _('Email already exists.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            # Create the user within a transaction to ensure atomicity
-            with transaction.atomic():
-                # Create the user in the User table using details from the request body
-                user = User.objects.create(
-                    username=username,
-                    phone=phone,
-                    email=email,
-                    role_id=5,  # Assuming role_id 5 is for regular users
-                    device_type=device_type,
-                    device_token=device_token
-                )
-                user.set_password(password)
-                user.save()
-
-                # Delete OTP record after successful registration
-                otp_record.delete()
-
-                # Prepare user data to be sent in the response
-                user_data = {
-                    'id': user.id,
-                    'username': user.username,
-                    'phone': user.phone,
-                    'email': user.email,
-                    'fullname': user.fullname,
-                    'bio': user.bio,
-                    'date_of_birth': user.date_of_birth,
-                    'age': user.age,
-                    'gender': user.gender.id if user.gender else None,
-                    'country': user.country.id if user.country else None,
-                    'city': user.city.id if user.city else None,
-                    'nationality': user.nationality,
-                    'weight': user.weight,
-                    'height': user.height,
-                    'main_playing_position': user.main_playing_position,
-                    'secondary_playing_position': user.secondary_playing_position,
-                    'playing_foot': user.playing_foot,
-                    'favourite_local_team': user.favourite_local_team,
-                    'favourite_team': user.favourite_team,
-                    'favourite_local_player': user.favourite_local_player,
-                    'favourite_player': user.favourite_player,
-                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                    'cover_photo': user.card_header.url if user.card_header else None,
-                    'device_type': user.device_type,
-                    'device_token': user.device_token,
-                }
-
-                # Generate refresh and access tokens
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'status': 1,
-                    'message': _('User registered successfully'),
-                    'data': {
-                        'refresh_token': str(refresh),
-                        'access_token': str(refresh.access_token),
-                        **user_data
-                    }
-                }, status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            return Response({
-                'status': 0,
-                'message': _('An error occurred while registering the user.'),
-                'error': str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+ 
