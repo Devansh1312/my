@@ -1352,8 +1352,6 @@ class UserGenderListAPIView(generics.ListAPIView):
 #         }, status=status.HTTP_200_OK)
 
                 
-
-                       
 # Generate a random 6-digit OTP
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -1368,6 +1366,9 @@ class send_otp(APIView):
         return ''.join(random.choice(characters) for i in range(length))
     
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         registration_type = request.data.get('type')
         
 
@@ -1389,13 +1390,13 @@ class send_otp(APIView):
             # Save or update the OTP in OTPSave
             otp_record, created = OTPSave.objects.update_or_create(
                 phone=phone,  # or username based on uniqueness
-                defaults={'username': username, 'phone': phone, 'password': password, 'OTP': otp}
+                defaults={'phone': phone, 'OTP': otp}
             )
 
             return Response({
                 'status': 1,
                 'message': _('OTP sent successfully.'),
-                'otp': otp  # For development, this is sent in the response.
+                'data': otp  # For development, this is sent in the response.
             }, status=status.HTTP_200_OK)
 
         # Handle Registration Type 2/3 (Social registration via email)
@@ -1426,13 +1427,13 @@ class send_otp(APIView):
                 otp_record, created = OTPSave.objects.update_or_create(
                     phone=phone,  # Assuming phone is required
                     password=email.split('@')[0],
-                    defaults={'username': username, 'phone': phone, 'email': email, 'password': password, 'OTP': otp}
+                    defaults={'phone': phone,'OTP': otp}
                 )
 
                 return Response({
                     'status': 1,
                     'message': _('OTP sent successfully.'),
-                    'otp': otp  # Send OTP in response for development.
+                    'data': otp  # Send OTP in response for development.
                 }, status=status.HTTP_200_OK)
 
             else:
@@ -1451,21 +1452,41 @@ class send_otp(APIView):
 class verify_and_register(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         phone = request.data.get("phone")
         otp_input = request.data.get("otp")
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
         device_type = request.data.get("device_type")
         device_token = request.data.get("device_token")
 
-        if not phone or not otp_input:
+        # Check if phone, OTP, username, email, and password are provided
+        if not phone:
             return Response({
                 'status': 0,
-                'message': _('Phone and OTP are required fields.')
+                'message': _('Phone is a required field.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        if not otp_input:
+            return Response({
+                'status': 0,
+                'message': _('OTP is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not username:
+            return Response({
+                'status': 0,
+                'message': _('Username is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Check if the OTP and phone exist in the OTPSave table
         try:
-            # Check if the OTP and phone exist in the OTPSave table
             otp_record = OTPSave.objects.get(phone=phone, OTP=otp_input)
         except OTPSave.DoesNotExist:
             return Response({
@@ -1473,24 +1494,44 @@ class verify_and_register(APIView):
                 'message': _('Invalid OTP or phone number.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check if the username already exists in the User table
+        if User.objects.filter(username=username).exists():
+            return Response({
+                'status': 0,
+                'message': _('Username already exists.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the phone already exists in the User table
+        if User.objects.filter(phone=phone).exists():
+            return Response({
+                'status': 0,
+                'message': _('Phone number already exists.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the email already exists in the User table
+        if User.objects.filter(email=email).exists():
+            return Response({
+                'status': 0,
+                'message': _('Email already exists.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             # Create the user within a transaction to ensure atomicity
             with transaction.atomic():
-                # Create the user in the User table with details from the OTPSave record
+                # Create the user in the User table using details from the request body
                 user = User.objects.create(
-                    username=otp_record.username,
-                    phone=otp_record.phone,
-                    email=otp_record.email,
+                    username=username,
+                    phone=phone,
+                    email=email,
                     role_id=5,  # Assuming role_id 5 is for regular users
                     device_type=device_type,
                     device_token=device_token
                 )
-                user.set_password(otp_record.password)
+                user.set_password(password)
                 user.save()
 
                 # Delete OTP record after successful registration
                 otp_record.delete()
-
 
                 # Prepare user data to be sent in the response
                 user_data = {
@@ -1504,7 +1545,7 @@ class verify_and_register(APIView):
                     'age': user.age,
                     'gender': user.gender.id if user.gender else None,
                     'country': user.country.id if user.country else None,
-                    'city': user.city.id if user.country else None,
+                    'city': user.city.id if user.city else None,
                     'nationality': user.nationality,
                     'weight': user.weight,
                     'height': user.height,
@@ -1521,13 +1562,17 @@ class verify_and_register(APIView):
                     'device_token': user.device_token,
                 }
 
-                # Return response with refresh and access tokens
+                # Generate refresh and access tokens
+                refresh = RefreshToken.for_user(user)
                 return Response({
                     'status': 1,
                     'message': _('User registered successfully'),
-                    'data': user_data  # This should now work correctly
+                    'data': {
+                        'refresh_token': str(refresh),
+                        'access_token': str(refresh.access_token),
+                        **user_data
+                    }
                 }, status=status.HTTP_201_CREATED)
-
 
         except Exception as e:
             return Response({
@@ -1535,555 +1580,3 @@ class verify_and_register(APIView):
                 'message': _('An error occurred while registering the user.'),
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-'''
-
-@method_decorator(csrf_exempt,name='dispatch')
-class RegistartionAPI(View):
-    
-    
-    def dispatch(self,request,*args,**kwargs):
-        
-        self.lang = request.headers.get("Language")
-        
-        if self.lang:
-            activate(self.lang)
-        print(self.lang)
-        
-        if 'api/validation/' in request.path:
-
-            return self.Regvalidation(request)
-        
-        elif 'api/otpverification/' in request.path:
-            return self.OTPVarifiction(request)
-        
-        elif 'api/socialuseregister/' in request.path:
-            return self.Check_social_media_Auth(request)
-        
-        
-        else:
-            
-            return JsonResponse({"message": _("Invalid Request")},status=400)
-        
-        
-    def Regvalidation(self,request):
-        
-        
-        if request.method == "POST":
-            
-            def generate_opt():
-                return str(random.randint(100000,999999))
-            self.header = request.headers.get("Langauge")
-            
-            self.json_loads = json.loads(request.body)
-
-            try:
-                if self.json_loads:
-                    try:
-                        self.reg_type = self.json_loads["type"]
-
-                        if self.reg_type == "1":
-                            self.user = self.json_loads["username"]
-                            self.phone_number = self.json_loads["phone"]
-                            self.password = self.json_loads["password"]
-                            self.device_type = self.json_loads["device_type"]
-                            self.device_token =self.json_loads["device_token"]
-
-
-                            self.user_data = User.objects.filter(Q(username=self.user) | Q(phone=self.phone_number)).first()
-
-                            if self.user_data:
-                                try:
-                                    if self.user_data.username == self.user and self.user_data.phone == self.phone_number:
-                                        if self.lang != "ar": 
-                                            context = {
-                                                "message": _("Account Already Exist")
-                                            }
-                                            return JsonResponse(context)
-                                        else:
-                                            context = {
-                                                "message": _("الحساب موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                    elif self.user_data.username == self.user:
-                                        
-                                        if self.lang != "ar": 
-                                            
-
-                                            context = {
-                                                "message": _("Username already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("اسم المستخدم موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                    elif self.user_data.phone == self.phone_number:
-                                        if self.lang != "ar": 
-
-                                            context = {
-                                                "message": _("Phone No. Already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("رقم الهاتف موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                        
-                                    
-                                        
-                                            
-                                except Exception as e:
-                                    
-                                    context = {
-                                        "message": str(e)
-                                    }
-                                    return JsonResponse(context)
-                            else:
-                    
-                                self.check_in_temp = "True"
-                                
-                            if self.check_in_temp == "True":
-                                try:
-                                
-                                    self.rand_otp = generate_opt()
-                                    
-                                    otp_record, created = OTPSave.objects.update_or_create(
-                                      phone=self.phone_number,
-                                      username = self.user,
-                                    
-                                        defaults={'username': self.user, 'phone': self.phone_number, 'password': self.password, 'OTP': self.rand_otp}
-                                    )
-                                    
-                                    context = {
-                                        "status":1,
-                                        "OTP": self.rand_otp,
-                                        "phone":str(self.phone_number),
-                                        "username":str(self.user),
-                                    }
-                                    return JsonResponse(context, status=200)
-                                
-
-                                        
-                                    
-                                except Exception as e:
-                                    context = {
-                                        
-                                        "status":0,
-                                        "exception":str(e)
-                                    }        
-                                    
-                                    return JsonResponse(context,status=400)
-                                    
-                                
-                        elif self.reg_type == "2":
-                            
-                            if request.method == "POST":
-                                self.json_loads = json.loads(request.body)
-                                
-                                self.google_gmail = self.json_loads['email']
-                                
-                                self.check_user =  User.objects.filter(email = str(self.google_gmail))
-                                
-                                
-                                    
-                                if self.check_user.exists():
-                                    if self.lang != "ar":
-
-                                        context = {
-                                            "status":"0",
-                                            "message":"Google ID already Exist"
-                                        }   
-                                        
-                                        return JsonResponse(context,status=400)
-
-                                    else:
-                                        
-                                        context = {
-                                            "status":"0",
-                                            "message":"معرف Google موجود بالفعل"
-                                        }    
-                                        
-                                        return JsonResponse(context,status=400) 
-                                else:
-                                        
-                                        
-                                    
-                            
-                                    context = {
-                                            "status":"1",
-                                            "email":str(self.google_gmail),
-                                            "message":"success"
-                                    }
-                                    return JsonResponse(context,status=200)
-                            
-                            else:
-                                
-                                if self.lang != "ar": 
-
-                                
-                                    context = {
-                                        
-                                        "message": _("invalid Request")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                                else:
-                                    context = {
-                                        "message": _("انتهت صلاحية OTP")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                                
-                                
-                        elif self.reg_type == "3":
-                            
-                            if request.method == "POST":
-                                self.json_loads = json.loads(request.body)
-                                
-                                self.apple_ID = self.json_loads['email']
-                                
-                                
-                                self.check_user =  User.objects.filter(email = str(self.apple_ID))
-                                
-                                
-                                if self.check_user.exists():
-                                    if self.lang != "ar":
-
-                                        context = {
-                                            "status":"0",
-
-                                            "message":"Apple ID already Exist"
-                                        }   
-                                        return JsonResponse(context,status=400)
-
-                                    else:
-                                        
-                                        context = {
-                                            "status":"0",
-
-                                            "message":"معرف Apple موجود بالفعل"
-                                        }    
-                                        
-                                        return JsonResponse(context,status=400)
-                                else:    
-                                
-                                    
-                                 
-                                    context = {
-                                            "status":"1",
-                                            "message":"success",
-                                            "email":str(self.apple_ID)
-                                               
-                                        
-                                        }
-                                    return JsonResponse(context,status=200)        
-                            else:
-                                
-                                if self.lang != "ar": 
-
-                                
-                                    context = {
-                                        "message": _("invalid Request")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                                else:
-                                    context = {
-                                        "message": _("انتهت صلاحية OTP")
-                                    }
-                                    return JsonResponse(context,status=400) 
-                            
-                          
-                          
-                            
-                                   
-                            
-                            
-                    except Exception as e:
-                        return Response(str(e))
-                    
-            except Exception as e:
-                return JsonResponse(str(e))
-            return JsonResponse({"message": _("Invalid request")}, status=400)
-        else:
-            return JsonResponse({'message': _('Invalid Request')}, status=400)
-
-   
-    def OTPVarifiction(self,request):
-        
-        if request.method == "POST":
-            
-            self.loadJson = json.loads(request.body)
-            
-            
-            self.retrieved_otp = self.loadJson['OTP']
-            self.device_type = self.loadJson["device_type"]
-            self.device_token =self.loadJson["device_token"]
-            
-            print(self.retrieved_otp)
-            
-            try:
-                self.otp_saved = OTPSave.objects.filter(OTP = self.retrieved_otp).first()
-                self.dump = True
-            except Exception as e:
-                self.dump = False
-                
-            try:
-                if self.dump ==True:
-                    
-                        
-                        if self.otp_saved.is_expired():
-                            if self.lang != "ar": 
-
-                            
-                                context = {
-                                    
-                                    "message": _("OTP has expire")
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                            else:
-                                context = {
-                                    
-                                    "message": _("انتهت صلاحية OTP")
-
-                                }
-                                
-                                return JsonResponse(context,status=400)
-                        
-                        else:
-                        
-                        
-                            self.username = self.otp_saved.username
-                            self.phoneNo = self.otp_saved.phone
-                            self.password = self.otp_saved.password
-                            self.email_check = self.otp_saved.email
-                            
-                            
-                            
-                            save_user = User(username = self.username,email= self.email_check,phone = self.phoneNo,password = self.password,device_type = self.device_type,device_token = self.device_token)
-                            
-                            save_user.set_password(self.password)
-                            save_user.save()
-                            
-                            self.otp_saved.delete()
-                            
-                            user = User.objects.get(username = self.username)
-                            
-                            refresh = RefreshToken.for_user(user)
-                            
-                            
-                            if self.lang != "ar":
-                                
-                                self.message = "OTP verified and data saved succesfully"
-
-                                
-                                
-                                
-                            else:
-                                self.message ="تم التحقق من OTP وحفظ البيانات بنجاح"
-
-                            
-                            
-                                
-                            return JsonResponse({
-                                
-                                  'status': 1,
-                        'message': str(self.message),
-                        'data': {
-                            'refresh_token': str(refresh),
-                            'access_token': str(refresh.access_token),
-                            'id': user.id,
-                            'username': user.username,
-                            'phone': user.phone,
-                            'email': user.email,
-                            'fullname': user.fullname,
-                            'bio': user.bio,
-                            'date_of_birth': user.date_of_birth,
-                            'age': user.age,
-                            'gender': user.gender.id if user.gender else None,
-                            'country': user.country.id if user.country else None,
-                            'city': user.city.id if user.country else None,
-                            'nationality': user.nationality,
-                            'weight': user.weight,
-                            'height': user.height,
-                            'main_playing_position': user.main_playing_position,
-                            'secondary_playing_position': user.secondary_playing_position,
-                            'playing_foot': user.playing_foot,
-                            'favourite_local_team': user.favourite_local_team,
-                            'favourite_team': user.favourite_team,
-                            'favourite_local_player': user.favourite_local_player,
-                            'favourite_player': user.favourite_player,
-                            'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                            'cover_photo': user.card_header.url if user.card_header else None,
-                            'device_type': user.device_type,
-                            'device_token': user.device_token, 
-                        },
-                        
-                            },status= 200,safe=False)
-                                
-                   
-                        
-                        
-                
-                elif self.dump == False:
-                    
-                    if self.lang != "ar":
-                        context = {
-                            "status":0,
-                            "message":_("Invalid OTP")
-                            
-                            
-                        }   
-                        
-                        return JsonResponse(context,status = 400)     
-                    else:
-                        context = {
-                            "status":0,
-
-                            "message":_("OTP غير صالح")
-                            
-                            
-                        }   
-                        
-                        return JsonResponse(context,status = 400)  
-            except Exception  as e:
-                
-                context = {
-                    "status":0,
-
-                    "message":str(e)
-                }
-                return JsonResponse(context,status = 500)    
-                            
-                
-            
-        else:
-            
-            if self.lang != "ar":
-                
-            
-                return JsonResponse({"message":_("Invalid Request")},status = 400)   
-            else:
-                        
-                return JsonResponse({"message":_("طلب غير صالح")},status = 400)   
-
-    def Check_social_media_Auth(self,request):
-        
-        if request.method == "POST":
-            
-            self.json_loads = json.loads(request.body)
-            
-            self.username = self.json_loads["username"]
-            self.phone  = self.json_loads['phone']
-            self.ID = self.json_loads['email']
-            
-            
-            
-            self.user_data = User.objects.filter(Q(username=self.username) | Q(phone=self.phone)).first()
-
-            if self.user_data:
-                                try:
-                                    if self.user_data.username == self.username and self.user_data.phone == self.phone:
-                                        if self.lang != "ar": 
-                                            context = {
-                                                "message": _("Account Already Exist")
-                                            }
-                                            return JsonResponse(context)
-                                        else:
-                                            context = {
-                                                "message": _("الحساب موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                            
-                                    elif self.user_data.username == self.username:
-                                        if self.lang != "ar": 
-                                            
-
-                                            context = {
-                                                "message": _("Username already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("اسم المستخدم موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                    elif self.user_data.phone == self.phone:
-                                        if self.lang != "ar": 
-
-                                            context = {
-                                                "message": _("Phone No. Already exist")
-                                            }
-                                            return JsonResponse(context, status=400)
-                                        else:
-                                            context = {
-                                                "message": _("رقم الهاتف موجود بالفعل")
-                                            }
-                                            return JsonResponse(context)
-                                except Exception as e:
-                                    context = {
-                                        "exception": str(e)
-                                    }
-                                    return JsonResponse(context)
-            else:
-                
-                self.random_otp = str(random.randint(100000, 999999)).zfill(6)
-                context = {
-                                    "otp": self.random_otp
-                }
-                try:
-                    
-                   
-                      
-                    self.save_otp = OTPSave(username = self.username,phone = self.phone,OTP=self.random_otp,email = self.ID)
-                    self.save_otp.save()
-                    context = {
-                                        "OTP": self.random_otp
-                    }
-                    return JsonResponse(context, status=200)
-                except Exception as e:
-                    context = {
-                                        "message": str(e)
-                    }
-                    return JsonResponse(context, status=400)
-        else:
-            
-            if self.lang != "ar": 
-
-                                
-                                    context = {
-                                        "message": _("invalid Request")
-                                    }
-                                    return JsonResponse(context,status=400) 
-            else:
-                                    context = {
-                                        "message": _("طلب غير صالح")
-                                    }
-                                    return JsonResponse(context,status=400) 
-        
-
-
-'''            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-             
-        
-        
-        
-        
-                
-        
-        
-    
-                
-        
