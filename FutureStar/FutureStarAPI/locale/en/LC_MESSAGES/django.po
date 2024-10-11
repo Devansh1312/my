@@ -1,0 +1,111 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+
+msgid "User registered and logged in successfully"
+msgstr ""
+
+msgid "User registration failed due to duplicate data"
+msgstr ""
+
+msgid "User registration failed"
+msgstr ""
+
+msgid "Email is required for registration"
+msgstr ""
+
+msgid "User logged in successfully"
+msgstr ""
+
+msgid "Account is inactive"
+msgstr ""
+
+msgid "User created and logged in successfully"
+msgstr ""
+
+msgid "Invalid registration type"
+msgstr ""
+
+msgid "Login successful"
+msgstr ""
+
+msgid "Invalid credentials"
+msgstr ""
+
+msgid "User created and login successful"
+msgstr ""
+
+msgid "Invalid data"
+msgstr ""
+
+msgid "Logout successful"
+msgstr ""
+
+msgid "Logout failed"
+msgstr ""
+
+msgid "OTP sent to your phone."
+msgstr ""
+
+msgid "User with this phone number does not exist."
+msgstr ""
+
+msgid "Invalid data."
+msgstr ""
+
+msgid "OTP verified successfully."
+msgstr ""
+
+msgid "Invalid OTP."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr ""
+
+msgid "User not found."
+msgstr ""
+
+msgid "Old password is incorrect."
+msgstr ""
+
+msgid "New password must be at least 8 characters long."
+msgstr ""
+
+msgid "Player Details."
+msgstr ""
+
+msgid "Profile updated successfully."
+msgstr ""
+
+msgid "Posts fetched successfully."
+msgstr ""
+
+msgid "Post created successfully"
+msgstr ""
+
+msgid "post_id is required."
+msgstr ""
+
+msgid "Post not found."
+msgstr ""
+
+msgid "Post details fetched successfully."
+msgstr ""
+
+msgid "post_id and comment are required."
+msgstr ""
+
+msgid "Comment created successfully."
+msgstr ""
+
+msgid "Post deleted successfully."
+msgstr ""

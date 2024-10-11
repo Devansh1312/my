@@ -41,7 +41,7 @@ urlpatterns = [
 
         
         
-        # path('api/locations/', LocationAPIView.as_view()),
+        path('api/locations/', LocationAPIView.as_view()),
         
         
         #new apis generation

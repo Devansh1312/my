@@ -623,35 +623,31 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Player Details.'),
             'data': {
-                        'id': user.id,
-                        'username': user.username,
-                        'phone': user.phone,
-                        'email': user.email,
-                        'fullname': user.fullname,
-                        'bio': user.bio,
-                        'date_of_birth': user.date_of_birth,
-                        'age': user.age,
-                        'gender': user.gender.id if user.gender else None,
-                        'country': user.country.id if user.country else None,
-                        'city': user.city.id if user.country else None,
-                        'nationality': user.nationality,
-                        'weight': user.weight,
-                        'height': user.height,
-                        'main_playing_position': user.main_playing_position,
-                        'secondary_playing_position': user.secondary_playing_position,
-                        'playing_foot': user.playing_foot,
-                        'favourite_local_team': user.favourite_local_team,
-                        'favourite_team': user.favourite_team,
-                        'favourite_local_player': user.favourite_local_player,
-                        'favourite_player': user.favourite_player,
-                        'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                        'cover_photo': user.card_header.url if user.card_header else None
-                    }
+                'id': user.id,
+                'username': user.username,
+                'phone': user.phone,
+                'email': user.email,
+                'fullname': user.fullname,
+                'bio': user.bio,
+                'date_of_birth': user.date_of_birth,
+                'age': user.age,
+                'gender': user.gender.id if user.gender else None,
+                'country': user.country.id if user.country else None,
+                'city': user.city.id if user.city else None,  # Fixed from user.country
+                'nationality': user.nationality,
+                'weight': user.weight,
+                'height': user.height,
+                'main_playing_position': user.main_playing_position,
+                'secondary_playing_position': user.secondary_playing_position,
+                'playing_foot': user.playing_foot,
+                'favourite_local_team': user.favourite_local_team,
+                'favourite_team': user.favourite_team,
+                'favourite_local_player': user.favourite_local_player,
+                'favourite_player': user.favourite_player,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                'cover_photo': user.card_header.url if user.card_header else None
+            }
         }, status=status.HTTP_200_OK)
-
-
-    permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -669,7 +665,7 @@ class EditProfileAPIView(APIView):
         user.bio = request.data.get('bio', user.bio)
         user.date_of_birth = request.data.get('date_of_birth', user.date_of_birth)
         user.age = request.data.get('age', user.age)
-        
+
         # Assign gender by fetching the corresponding UserGender instance
         gender_id = request.data.get('gender')
         if gender_id:
@@ -683,18 +679,24 @@ class EditProfileAPIView(APIView):
 
         # Handle country
         country_id = request.data.get('country')
-        # if country_id:
-        #     try:
-        #         user.country = Country.objects.get(id=country_id)  # Fetch Country instance
-        #     except Country.DoesNotExist:
-        #         return Response({
-        #             'status': 2,
-        #             'message': _('Invalid country specified.')
-        #         }, status=status.HTTP_400_BAD_REQUEST)
+        if country_id:
+            try:
+                user.country = Country.objects.get(id=country_id)  # Fetch Country instance
+            except Country.DoesNotExist:
+                return Response({
+                    'status': 2,
+                    'message': _('Invalid country specified.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         # Handle city
         city_id = request.data.get('city')
         if city_id:
+            if not user.country:  # Ensure country is set before updating city
+                return Response({
+                    'status': 2,
+                    'message': _('City cannot be set without a valid country.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             try:
                 user.city = City.objects.get(id=city_id)  # Fetch City instance
             except City.DoesNotExist:
@@ -702,6 +704,7 @@ class EditProfileAPIView(APIView):
                     'status': 2,
                     'message': _('Invalid city specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
+
         user.nationality = request.data.get('nationality', user.nationality)
         user.weight = request.data.get('weight', user.weight)
         user.height = request.data.get('height', user.height)
@@ -758,9 +761,9 @@ class EditProfileAPIView(APIView):
                 'bio': user.bio,
                 'date_of_birth': user.date_of_birth,
                 'age': user.age,
-                'gender': user.gender.id if user.gender else None,  # Return the ID of the gender
+                'gender': user.gender.id if user.gender else None,
                 'country': user.country.id if user.country else None,
-                'city': user.city.id if user.country else None,
+                'city': user.city.id if user.city else None,
                 'nationality': user.nationality,
                 'weight': user.weight,
                 'height': user.height,
@@ -775,6 +778,7 @@ class EditProfileAPIView(APIView):
                 'cover_photo': user.card_header.url if user.card_header else None
             }
         }, status=status.HTTP_200_OK)
+
 
 
 
@@ -1317,39 +1321,43 @@ class UserGenderListAPIView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 
-# class LocationAPIView(APIView):
+class LocationAPIView(APIView):
 
-#     def get(self, request):
-#         country_id = request.query_params.get('country_id')
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-#         # If country_id is not provided, return all active countries
-#         if not country_id:
-#             countries = Country.objects.filter(status=True)
-#             country_data = [{'id': country.id, 'name': country.name} for country in countries]
+        country_id = request.query_params.get('country_id')
 
-#             return Response({
-#                 'status': 1,
-#                 'message': 'Countries fetched successfully',
-#                 'data': country_data
-#             }, status=status.HTTP_200_OK)
+        # If country_id is not provided, return all active countries
+        if not country_id:
+            countries = Country.objects.filter(status=True)
+            country_data = [{'id': country.id, 'name': country.name} for country in countries]
 
-#         # If country_id is provided, return cities for that country
-#         try:
-#             country = Country.objects.get(id=country_id, status=True)
-#         except Country.DoesNotExist:
-#             return Response({
-#                 'status': 0,
-#                 'message': 'Country not found or inactive'
-#             }, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                'status': 1,
+                'message': _('Countries fetched successfully.'),
+                'data': country_data
+            }, status=status.HTTP_200_OK)
 
-#         cities = City.objects.filter(country=country, status=True)
-#         city_data = [{'id': city.id, 'name': city.name} for city in cities]
+        # If country_id is provided, return cities for that country
+        try:
+            country = Country.objects.get(id=country_id, status=True)
+        except Country.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Country not found or inactive.')
+            }, status=status.HTTP_404_NOT_FOUND)
 
-#         return Response({
-#             'status': 1,
-#             'message': 'Cities fetched successfully',
-#             'data': city_data
-#         }, status=status.HTTP_200_OK)
+        cities = City.objects.filter(country=country, status=True)
+        city_data = [{'id': city.id, 'name': city.name} for city in cities]
+
+        return Response({
+            'status': 1,
+            'message': _('Cities fetched successfully.'),
+            'data': city_data
+        }, status=status.HTTP_200_OK)
 
                 
 # Generate a random 6-digit OTP
@@ -1373,16 +1381,24 @@ class send_otp(APIView):
         
 
         # Handle Registration Type 1 (Normal registration)
-        if registration_type == '1':
+        if registration_type == 1 :
             username = request.data.get('username')
             phone = request.data.get('phone')
             email = request.data.get('email')
             password = request.data.get('password')
             # Check if username or phone already exists in User table
-            if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
+            # Check if the username already exists in the User table
+            if User.objects.filter(username=username).exists():
                 return Response({
                     'status': 0,
-                    'message': _('Username or phone number already exists.')
+                    'message': _('Username already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if the phone already exists in the User table
+            if User.objects.filter(phone=phone).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Phone number already exists.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # If user does not exist, generate OTP and store it in OTPSave table
@@ -1400,7 +1416,7 @@ class send_otp(APIView):
             }, status=status.HTTP_200_OK)
 
         # Handle Registration Type 2/3 (Social registration via email)
-        elif registration_type in ['2', '3']:
+        elif registration_type in [2, 3]:
             username = request.data.get('username')
             phone = request.data.get('phone')
             email = request.data.get('email')
@@ -1414,10 +1430,18 @@ class send_otp(APIView):
             # If email does not exist, check username and phone if provided
             if username and phone:
                 # Validate if username or phone already exists in User table
-                if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
+                # Check if the username already exists in the User table
+                if User.objects.filter(username=username).exists():
                     return Response({
                         'status': 0,
-                        'message': _('Username or phone number already exists.')
+                        'message': _('Username already exists.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Check if the phone already exists in the User table
+                if User.objects.filter(phone=phone).exists():
+                    return Response({
+                        'status': 0,
+                        'message': _('Phone number already exists.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Generate OTP and save in OTPSave for type 2/3 with phone, email, and password

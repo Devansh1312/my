@@ -4,19 +4,6 @@ from django.utils import timezone
 import datetime
 
 # Create your models here.
-# post  Model
-class Post(models.Model):
-    user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE,default=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        db_table = 'futurestar_app_post'
 
 class Team(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
@@ -42,6 +29,22 @@ class Team(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_team'
+    
+
+# post  Model
+class Post(models.Model):
+    user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE,default=True)
+    title = models.CharField(max_length=255)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)  # Add this if it's optional
+    description = models.TextField()
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = 'futurestar_app_post'
 
 class Post_comment(models.Model):
     user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE,default=True)

@@ -108,19 +108,24 @@ class PostCommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies', 'team_id']
 
     def get_replies(self, obj):
-        if obj.replies.exists():
-            return PostCommentSerializer(obj.replies.all(), many=True).data
-        return []
+        # Get replies for this comment
+        replies = Post_comment.objects.filter(parent=obj)
+        return PostCommentSerializer(replies, many=True).data  # Serialize replies
 
 
 class PostSerializer(serializers.ModelSerializer):
-    comments = PostCommentSerializer(many=True, read_only=True)
+    comments = serializers.SerializerMethodField()  # Change to use a method for comments
     user = UserSerializer(read_only=True)  # Nested user details
     team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), allow_null=True, required=False)
 
     class Meta:
         model = Post
         fields = ['id', 'user', 'team_id', 'title', 'description', 'image', 'date_created', 'comments']
+
+    def get_comments(self, obj):
+        # Get only top-level comments (where parent is None)
+        top_level_comments = Post_comment.objects.filter(post=obj, parent=None)
+        return PostCommentSerializer(top_level_comments, many=True).data  # Serialize top-level comments
 
     def create(self, validated_data):
         team_id = validated_data.pop('team_id', None)
