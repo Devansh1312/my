@@ -423,7 +423,7 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="mb-3">
-                                            <label class="form-label" for="partnership-image-1">Icon-1 </label>
+                                            <label class="form-label" for="partnership-image-1">Icon </label>
                                             <input class="form-control btn-pill" id="partnership-banner-1" name="partnership_banner_1" type="file"  onchange= "displaypartnershipImage(event,count=1)" accept="image/*">
                                             <!--{% if system_settings.fav_icon %}-->
                                                 <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
@@ -514,12 +514,12 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <div class="mb-3">
-                                                    <label class="form-label" for="partnership-image-1">Icon-1 </label>
+                                                    <label class="form-label" for="partnership-image-1">Icon </label>
                                                     <input class="form-control btn-pill" id="partnership-banner-{{ forloop.counter|add:'1' }}" name="partnership_banner_{{ forloop.counter|add:'1' }}" type="file"  onchange= "displaypartnershipImage(event,count=`{{forloop.counter | add:'1'}}`)" accept="image/*">
                                                     <!--{% if system_settings.fav_icon %}-->
                                                         <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
                                                     <!--{% endif %}-->
-                                                    <img id="selected-partnership-image-{{ forloop.counter|add:'1' }}" src = "/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
+                                                    <img id="selected-partnership-image-{{ forloop.counter|add:'1' }}" src = "/media/{{fields.images}}" style="display: block; width: 100px; height: 100px;" />
                                                     <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-{{ forloop.counter|add:'1' }}"></p>
                                                 </div>
                                             </div>
@@ -528,7 +528,7 @@
                                     </div>
                                     {% if forloop.last %}
 
-                                        <input type="hidden" class="last-partnership-field-id-{{ forloop.counter|add:'1' }}" value="{{ forloop.counter|add:'1' }}"/>
+                                        <input type="hidden" class="last-partnership-field-id-1" value="{{ forloop.counter|add:'1' }}"/>
                                     {% endif %}
 
                                     <div class="col-12  text-end " >
@@ -1784,7 +1784,7 @@
 
                                 if(image && image.files && image.files.length > 0) {
                                         const feature_image = image.files[0];
-                                        formData.append(`image_${i}`, feature_image);
+                                        formData.append(`imagep1p_${i}`, feature_image);
 
                                 } 
                             

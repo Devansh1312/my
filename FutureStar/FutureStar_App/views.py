@@ -57,7 +57,7 @@ def LoginFormView(request):
             user = authenticate(
                 request, email=email, password=password
             )  
-
+            
             if user is not None:
                 if user.is_active:  # Check if the user is active
                     if user.role_id == 1:  # Check if user's role_id is 1
@@ -2789,7 +2789,6 @@ def saveDiscoverdetail(request):
                         discover_page.heading_content_ar = discover_content_ar
                         discover_page.section_2_title_en = discover_game_title_en
                         discover_page.section_2_title_ar = discover_game_title_ar
-
                         discover_page.section_2_content_en = discover_game_content_en
                         discover_page.section_2_content_ar = discover_game_content_ar
                         
@@ -3279,7 +3278,7 @@ class cms_advertisepage(LoginRequiredMixin, View):
             
     )     
 #cms advertise
-@method_decorator(user_role_check, name='dispatch') 
+@user_role_check
 @csrf_exempt
 def saveadvertisedetail(request):
         try:
@@ -3362,6 +3361,8 @@ def saveadvertisedetail(request):
                     
                     saveadvertiseetail.section_2_title_en = section_2_title_en
                     saveadvertiseetail.section_2_title_ar = section_2_title_ar
+                    
+                    print("advertise: "+str(section_2_title_ar))
                     saveadvertiseetail.section_2_content_en = section_2_content_en
                     saveadvertiseetail.section_2_content_ar = section_2_content_ar
                     
@@ -3625,7 +3626,8 @@ def saveadvertisedetail(request):
                                         section_content_ar = request.POST.get('section_2_content_ar_{}'.format(str(i)))
                                         existing_section_record = cms_advertise_section_2_dynamic_field.objects.filter(field_id=unique_id).first()
 
-
+                                        print("Name: "+section_title_en)
+                                        
                                         if 'imagess_{}'.format(str(i)) in request.FILES:
                                     
                                             image_1 = request.FILES.get('imagess_{}'.format(str(i)),None)
@@ -3665,10 +3667,10 @@ def saveadvertisedetail(request):
                                         else:        
                                                         savediscoveryview= cms_advertise_section_2_dynamic_field(
                                                                     field_id=unique_id,
-                                                                    title_en=section_2_title_en,
-                                                                    title_ar=section_2_title_ar,
-                                                                    content_en=section_2_content_en,
-                                                                    content_ar=section_2_content_ar,
+                                                                    title_en=section_title_en,
+                                                                    title_ar=section_title_ar,
+                                                                    content_en=section_content_en,
+                                                                    content_ar=section_content_ar,
                                                                     images = image_1
                                                                 
                                                                     
@@ -3711,7 +3713,7 @@ def saveadvertisedetail(request):
                                                 
     
                                         
-                                    unique_id = request.POST.get('usid_{}'.format(i))
+                                    unique_id = request.POST.get('upid_{}'.format(i))
                                     if unique_id != "":
                                     
                                         partnership_title_en = request.POST.get('partnership_title_en_{}'.format(str(i)))
@@ -3720,10 +3722,11 @@ def saveadvertisedetail(request):
                                         partnership_content_ar = request.POST.get('partnership_content_ar_{}'.format(str(i)))
                                         existing_partnership_record = cms_advertise_Partnership_dynamic_field.objects.filter(field_id=unique_id).first()
 
+                                        print(partnership_title_en)
 
-                                        if 'image_{}'.format(str(i)) in request.FILES:
+                                        if 'imagep1p_{}'.format(str(i)) in request.FILES:
                                     
-                                            image_2 = request.FILES.get('image_{}'.format(str(i)),None)
+                                            image_2 = request.FILES.get('imagep1p_{}'.format(str(i)),None)
                                             print("image: "+str(image_2))
                                             
                                             if image_2:
@@ -4187,7 +4190,7 @@ def saveadvertisedetail(request):
 
                    
                     #dom = "True"
-                    messages.success(request, "Home Page Updated Successfully")
+                    messages.success(request, "Advertise Page Updated Successfully")
                                
                 except Exception as e:
                     print(str(e))
