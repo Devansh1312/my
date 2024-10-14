@@ -779,6 +779,75 @@ class PostCreateAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class PostEditAPIView(generics.GenericAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Optional Team-ID from headers
+        team_id = self.request.headers.get('Team-ID')
+        if team_id:
+            return Post.objects.filter(team_id=team_id)
+        else:
+            return Post.objects.filter(user=self.request.user)
+
+    def get_object(self, post_id):
+        # Get the post by post_id from the filtered queryset
+        return get_object_or_404(self.get_queryset(), id=post_id)
+
+    def get(self, request, *args, **kwargs):
+        # Activate the requested language, default is 'en'
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        post_id = request.data.get('post_id')  # Get post_id from request data
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': _('Post ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        post = self.get_object(post_id)  # Retrieve the post object based on post_id
+        serializer = self.get_serializer(post)
+
+        return Response({
+            'status': 1,
+            'message': _('Post fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def patch(self, request, *args, **kwargs):
+        # Activate the requested language, default is 'en'
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        post_id = request.data.get('post_id')  # Get post_id from request data
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': _('Post ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        post = self.get_object(post_id)  # Retrieve the post object based on post_id
+        serializer = self.get_serializer(post, data=request.data, partial=True)  # Allow partial update
+
+        if serializer.is_valid():
+            serializer.save()  # Save changes
+            return Response({
+                'status': 1,
+                'message': _('Post updated successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'status': 0,
+            'message': _('Failed to update the post.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
 class PostDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
