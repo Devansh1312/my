@@ -28,6 +28,43 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 import string
 
+
+def get_user_data(user):
+    """Returns a dictionary with all user details."""
+    followers_count = FollowRequest.get_follower_count(user)
+    following_count = FollowRequest.get_following_count(user)
+    post_count = Post.objects.filter(user=user, team__isnull=True).count()
+    return {
+        'id': user.id,
+        'followers_count' : followers_count,
+        'following_count' : following_count,
+        'post_count' : post_count,
+        'username': user.username,
+        'phone': user.phone,
+        'email': user.email,
+        'fullname': user.fullname,
+        'bio': user.bio,
+        'date_of_birth': user.date_of_birth,
+        'age': user.age,
+        'gender': user.gender.id if user.gender else None,
+        'country': user.country.id if user.country else None,
+        'city': user.city.id if user.city else None,
+        'nationality': user.nationality,
+        'weight': user.weight,
+        'height': user.height,
+        'main_playing_position': user.main_playing_position,
+        'secondary_playing_position': user.secondary_playing_position,
+        'playing_foot': user.playing_foot,
+        'favourite_local_team': user.favourite_local_team,
+        'favourite_team': user.favourite_team,
+        'favourite_local_player': user.favourite_local_player,
+        'favourite_player': user.favourite_player,
+        'profile_picture': user.profile_picture.url if user.profile_picture else None,
+        'cover_photo': user.card_header.url if user.card_header else None,
+        'device_type': user.device_type,
+        'device_token': user.device_token,
+    }
+
               
 # Generate a random 6-digit OTP
 def generate_otp():
@@ -119,7 +156,6 @@ class send_otp(APIView):
                 password = random_password  # Set the generated password
                 otp_record, created = OTPSave.objects.update_or_create(
                     phone=phone,  # Assuming phone is required
-                    password=email.split('@')[0],
                     defaults={'phone': phone,'OTP': otp}
                 )
 
@@ -227,35 +263,6 @@ class verify_and_register(APIView):
                 # Delete OTP record after successful registration
                 otp_record.delete()
 
-                # Prepare user data to be sent in the response
-                user_data = {
-                    'id': user.id,
-                    'username': user.username,
-                    'phone': user.phone,
-                    'email': user.email,
-                    'fullname': user.fullname,
-                    'bio': user.bio,
-                    'date_of_birth': user.date_of_birth,
-                    'age': user.age,
-                    'gender': user.gender.id if user.gender else None,
-                    'country': user.country.id if user.country else None,
-                    'city': user.city.id if user.city else None,
-                    'nationality': user.nationality,
-                    'weight': user.weight,
-                    'height': user.height,
-                    'main_playing_position': user.main_playing_position,
-                    'secondary_playing_position': user.secondary_playing_position,
-                    'playing_foot': user.playing_foot,
-                    'favourite_local_team': user.favourite_local_team,
-                    'favourite_team': user.favourite_team,
-                    'favourite_local_player': user.favourite_local_player,
-                    'favourite_player': user.favourite_player,
-                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                    'cover_photo': user.card_header.url if user.card_header else None,
-                    'device_type': user.device_type,
-                    'device_token': user.device_token,
-                }
-
                 # Generate refresh and access tokens
                 refresh = RefreshToken.for_user(user)
                 return Response({
@@ -264,7 +271,7 @@ class verify_and_register(APIView):
                     'data': {
                         'refresh_token': str(refresh),
                         'access_token': str(refresh.access_token),
-                        **user_data
+                        **get_user_data(user)
                     }
                 }, status=status.HTTP_201_CREATED)
 
@@ -313,33 +320,7 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                'user': {
-                                    'id': user.id,
-                                    'username': user.username,
-                                    'phone': user.phone,
-                                    'email': user.email,
-                                    'fullname': user.fullname,
-                                    'bio': user.bio,
-                                    'date_of_birth': user.date_of_birth,
-                                    'age': user.age,
-                                    'gender': user.gender.id if user.gender else None,
-                                    'country': user.country.id if user.country else None,
-                                    'city': user.city.id if user.country else None,
-                                    'nationality': user.nationality,
-                                    'weight': user.weight,
-                                    'height': user.height,
-                                    'main_playing_position': user.main_playing_position,
-                                    'secondary_playing_position': user.secondary_playing_position,
-                                    'playing_foot': user.playing_foot,
-                                    'favourite_local_team': user.favourite_local_team,
-                                    'favourite_team': user.favourite_team,
-                                    'favourite_local_player': user.favourite_local_player,
-                                    'favourite_player': user.favourite_player,
-                                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                                    'cover_photo': user.card_header.url if user.card_header else None,
-                                    'device_type': user.device_type,
-                                    'device_token': user.device_token,
-                                }
+                                **get_user_data(user)
                             }
                         }, status=status.HTTP_200_OK)
                     else:
@@ -375,33 +356,7 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                'user': {
-                                    'id': user.id,
-                                    'username': user.username,
-                                    'phone': user.phone,
-                                    'email': user.email,
-                                    'fullname': user.fullname,
-                                    'bio': user.bio,
-                                    'date_of_birth': user.date_of_birth,
-                                    'age': user.age,
-                                    'gender': user.gender.id if user.gender else None,
-                                    'country': user.country.id if user.country else None,
-                                    'city': user.city.id if user.country else None,
-                                    'nationality': user.nationality,
-                                    'weight': user.weight,
-                                    'height': user.height,
-                                    'main_playing_position': user.main_playing_position,
-                                    'secondary_playing_position': user.secondary_playing_position,
-                                    'playing_foot': user.playing_foot,
-                                    'favourite_local_team': user.favourite_local_team,
-                                    'favourite_team': user.favourite_team,
-                                    'favourite_local_player': user.favourite_local_player,
-                                    'favourite_player': user.favourite_player,
-                                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                                    'cover_photo': user.card_header.url if user.card_header else None,
-                                    'device_type': user.device_type,
-                                    'device_token': user.device_token,
-                                }
+                                **get_user_data(user)
                             }
                         }, status=status.HTTP_200_OK)
                     else:
@@ -412,7 +367,7 @@ class LoginAPIView(APIView):
                 else:
                     return Response({
                         'status': 0,
-                        'message': _("Email Does Not Exits Please Register")
+                        'message': _("Email Does Not Exits Please Register First")
                         }, status=status.HTTP_400_BAD_REQUEST)
 
         # Custom error handling
@@ -478,7 +433,7 @@ class ForgotPasswordAPIView(APIView):
             user = User.objects.filter(phone=phone).first()
 
             if user:
-                otp = str(random.randint(1000, 9999))
+                otp = str(random.randint(100000, 999999))
                 user.otp = otp
                 user.save()
 
@@ -626,35 +581,13 @@ class EditProfileAPIView(APIView):
             activate(language)
 
         user = request.user
-    
+        
         return Response({
             'status': 1,
             'message': _('Player Details.'),
             'data': {
-                'id': user.id,
-                'username': user.username,
-                'phone': user.phone,
-                'email': user.email,
-                'fullname': user.fullname,
-                'bio': user.bio,
-                'date_of_birth': user.date_of_birth,
-                'age': user.age,
-                'gender': user.gender.id if user.gender else None,
-                'country': user.country.id if user.country else None,
-                'city': user.city.id if user.city else None,  # Fixed from user.country
-                'nationality': user.nationality,
-                'weight': user.weight,
-                'height': user.height,
-                'main_playing_position': user.main_playing_position,
-                'secondary_playing_position': user.secondary_playing_position,
-                'playing_foot': user.playing_foot,
-                'favourite_local_team': user.favourite_local_team,
-                'favourite_team': user.favourite_team,
-                'favourite_local_player': user.favourite_local_player,
-                'favourite_player': user.favourite_player,
-                'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                'cover_photo': user.card_header.url if user.card_header else None
-            }
+                **get_user_data(user)
+                }
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -761,29 +694,7 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Profile updated successfully.'),
             'data': {
-                'id': user.id,
-                'username': user.username,
-                'phone': user.phone,
-                'email': user.email,
-                'fullname': user.fullname,
-                'bio': user.bio,
-                'date_of_birth': user.date_of_birth,
-                'age': user.age,
-                'gender': user.gender.id if user.gender else None,
-                'country': user.country.id if user.country else None,
-                'city': user.city.id if user.city else None,
-                'nationality': user.nationality,
-                'weight': user.weight,
-                'height': user.height,
-                'main_playing_position': user.main_playing_position,
-                'secondary_playing_position': user.secondary_playing_position,
-                'playing_foot': user.playing_foot,
-                'favourite_local_team': user.favourite_local_team,
-                'favourite_team': user.favourite_team,
-                'favourite_local_player': user.favourite_local_player,
-                'favourite_player': user.favourite_player,
-                'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                'cover_photo': user.card_header.url if user.card_header else None
+                **get_user_data(user)
             }
         }, status=status.HTTP_200_OK)
 
