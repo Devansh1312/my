@@ -2063,7 +2063,7 @@ class cms_aboutpage(LoginRequiredMixin, View):
             
         )
 
-@method_decorator(user_role_check, name='dispatch')        
+@user_role_check     
 @csrf_exempt
 def saveAboutUspage(request):
         try:
@@ -2071,7 +2071,7 @@ def saveAboutUspage(request):
                 #text
                 heading_title_en  = request.POST.get('heading_title_en')
                 heading_title_ar  = request.POST.get('heading_title_ar')
-                #heading_section_video  = request.FILES['heading_section_video']
+                heading_url = request.POST.get("heading_url")
                 heading_content_en  = request.POST.get('heading_content_en')
                 heading_content_ar  = request.POST.get('heading_content_ar')
                 heading_year_en  = request.POST.get('heading_year_en')
@@ -2095,25 +2095,6 @@ def saveAboutUspage(request):
                     aboutussave = cms_pages.objects.get(id = "7")
 
 
-                    if 'heading_video' in request.FILES:
-                        
-                        heading_video = request.FILES.get('heading_video',None)
-                        if heading_video:
-                            try:
-                                save_path = os.path.join(settings.MEDIA_ROOT, 'cmspages', heading_video.name)
-                                os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-                                # Save the file
-                                with open(save_path, 'wb+') as destination:
-                                    for chunk in heading_video.chunks():
-                                        destination.write(chunk)
-                                        imageName.append(heading_video.name)
-                                        aboutussave.heading_video = heading_video
-
-                            except Exception as e:
-                                dom = str(e)
-                    else:
-                        pass   
                     
                     if 'testi_icon' in request.FILES:
                         
@@ -2136,7 +2117,8 @@ def saveAboutUspage(request):
                         pass  
                     #section1
                     aboutussave.heading_title_en = heading_title_en
-                    aboutussave.heading_title_ar = heading_content_ar
+                    aboutussave.heading_title_ar = heading_title_ar
+                    aboutussave.heading_url = heading_url
                     aboutussave.heading_content_en = heading_content_en
                     aboutussave.heading_content_ar = heading_content_ar
                     aboutussave.heading_year_title_en =heading_year_en
@@ -5052,7 +5034,7 @@ class cms_registration(LoginRequiredMixin, View):
     ) 
         
 #cms Login
-@method_decorator(user_role_check, name='dispatch') 
+@user_role_check
 @csrf_exempt
 def saveregdetail(request):
         try:
@@ -5122,7 +5104,7 @@ class cms_dashboard(LoginRequiredMixin, View):
     ) 
         
 #cms Login
-@method_decorator(user_role_check, name='dispatch') 
+@user_role_check
 @csrf_exempt
 def savedashdetail(request):
         try:

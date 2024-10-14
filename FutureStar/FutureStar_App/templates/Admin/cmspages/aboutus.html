@@ -57,22 +57,19 @@
                             </div>
                         </div>
                     </div>
-                    <!--heading Video-->
-
+                    <!--heading Url-->
+    
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label" for="heading-section-video">Heading Video </label>
-                                <input class="form-control btn-pill" id="heading-section-video" name="heading_section_video" type="file"  onchange= "displayVideo(event)" accept="Video/*">
+                                <label class="form-label" for="heading-section-url">Heading Url</label>
+                                <input class="form-control btn-pill " id="heading-section-url" name="heading_section_title" type="text" value="{{data.heading_url}}" placeholder="Heading Url">
+                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-url"></p>
 
-                                <video id = "heading-video-id" height="100" width="300" controls>
-                                    <source id="heading-section-video-src" src="/media/{{data.heading_video}}" type="video/mp4">
-
-                                </video>
                             </div>
                         </div>
-                        <p id ="selected-video"></p>
                     </div>
+                  
                     
                     <!--heading content-->
                         
@@ -89,7 +86,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="heading-section-title_arabic">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading_section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-section-content-ar" name="heading_section_content_ar" type="text"  placeholder="Heading content (Arabic)">{{data.heading_content_ar}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-heading-section-content-ar"></p>
 
                             </div>
@@ -331,7 +328,7 @@
                 //text
                 var heading_title_en = document.getElementById("heading-section-title-en")
                 var heading_title_ar = document.getElementById("heading-section-title-ar")
-                var heading_video = document.getElementById("heading-section-video")
+                var heading_url = document.getElementById("heading-section-url")
                 var heading_content_en = document.getElementById("heading-section-content-en")
                 var heading_content_ar = document.getElementById("heading-section-content-ar")
                 var heading_year_en = document.getElementById("heading-section-year-en")
@@ -352,14 +349,13 @@
                 //Image
 
 
-                var testimonal_image = Testi_icon.files[0]
 
 
                 //Video File
-                var heading_section_video = heading_video.files[0]
                 const form_data = [
                     { id: "heading-section-title-en", name: "Title (English)" },
                     { id: "heading-section-title-ar", name: "Title (arabic)" },
+                    { id: "heading-section-url", name: "Url" },
                     { id: "heading-section-content-en", name: "Content (English)" },
                     { id: "heading-section-content-ar", name: "Content (Arabic)" },
                     { id: "heading-section-year-en", name: "Year (English)" },
@@ -374,7 +370,7 @@
                     { id: "meta-title-ar", name: "SEO Title (Arabic)" },
                     { id: "meta-content-en", name: "SEO Content (English)" },
                     { id: "meta-content-ar", name: "SEO Content (Arabic)" }
-
+                    
                 ];
 
                 document.querySelectorAll('.error-message').forEach((msg) => {
@@ -421,12 +417,14 @@
                 return false
             }
 
+
             if(sendData == 'true'){
 
                     const formData = new FormData();
                     //text
                     formData.append('heading_title_en', heading_title_en.value );
-                    formData.append('heading_title_ar', heading_title_ar.value );                    
+                    formData.append('heading_title_ar', heading_title_ar.value );   
+                    formData.append('heading_url', heading_url.value );                  
                     formData.append('heading_content_en', heading_content_en.value );
                     formData.append('heading_content_ar', heading_content_ar.value );
                     formData.append('heading_year_en', heading_year_en.value );
@@ -445,15 +443,10 @@
                     
                     //images
 
-                    if (heading_video .files.length > 0) {
-                        formData.append('heading_video', heading_section_video);
-                } 
-                    else {
-                        console.log("already have image")
-                    }
+                  
 
                     if (Testi_icon.files.length > 0) {
-                        formData.append('testi_icon', testimonal_image);
+                        formData.append('testi_icon', Testi_icon.files[0]);
                 } 
                     else {
                         console.log("already have image")
@@ -511,31 +504,7 @@
        
     
         
-    
-    function displayVideo(event){
-        
-        try{
-            const file = event.target.files[0];
-            const videoURL = URL.createObjectURL(file); 
-
-            
-            const videoSource = document.getElementById('heading-section-video-src');
-            videoSource.src = videoURL;
-
-            console.log(videoSource.src)
-
-            const videoPlayer = document.getElementById('heading-video-id');
-            videoPlayer.load(); 
-        }
-        catch(err){
-            var video_warning = document.getElementById('selected-video')
-
-            video_warning.innerText = err
-
-            video_warning.style.color = "red";
-
-        }
-    }
+  
 </script>
 {% endblock %}
 

@@ -356,7 +356,7 @@ class cms_pages(models.Model):
 
     heading_content_en = models.TextField(blank = True,null=True)
     heading_content_ar = models.TextField(blank = True,null=True)
-    heading_video = models.FileField(upload_to='cmspages/',blank =True,null=True)
+    heading_url = models.CharField(max_length=1000,blank =True,null=True)
     heading_banner = models.ImageField(upload_to='cmspages/', blank=True, null=True)
     heading_image_1 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
     heading_image_2 = models.ImageField(upload_to='cmspages/',blank=True,null = True)
