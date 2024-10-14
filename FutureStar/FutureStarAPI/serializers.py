@@ -1,3 +1,4 @@
+import mimetypes
 from rest_framework import serializers
 from FutureStar_App.models import User
 from FutureStarAPI.models import *
