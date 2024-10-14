@@ -147,3 +147,46 @@ class FollowRequest(models.Model):
     def get_following_count(user):
         """Returns the number of users a given user is following"""
         return FollowRequest.objects.filter(from_user=user, status=2).count()
+
+
+
+# Helper function for dynamic file paths
+def user_directory_path(instance, filename):
+    # Determine the content type (1 for Images, 2 for Videos)
+    content_type = 'images' if instance.content_type == 1 else 'videos'
+    # Construct path using user ID and content type
+    return f'media/{instance.user.id}/{content_type}/{filename}'
+
+class Album(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, related_name='user_album', on_delete=models.CASCADE)
+
+    team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'futurestar_app_album'
+
+class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
+    CONTENT_TYPE = [
+        (1, 'Images'),
+        (2, 'Videos'),
+    ]
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, related_name='user_gallary', on_delete=models.CASCADE)
+    team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
+    album_id = models.ForeignKey(Album, related_name='gallary_set', on_delete=models.CASCADE)
+    content_type = models.IntegerField(choices=CONTENT_TYPE, default=1)
+    
+    # Use the helper function for the upload_to argument
+    image = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
+    video = models.FileField(upload_to=user_directory_path, blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        db_table = 'futurestar_app_gallary'

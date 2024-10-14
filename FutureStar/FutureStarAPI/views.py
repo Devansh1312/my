@@ -1348,3 +1348,84 @@ class LocationAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
  
+
+
+ 
+class AlbumListAPIView(generics.ListCreateAPIView):
+    serializer_class = AlbumSerializer
+
+    def get_queryset(self):
+        team_id = self.request.headers.get('Team-ID')
+        if team_id:
+            return Album.objects.filter(team_id=team_id)
+        else:
+            return Album.objects.filter(user=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        albums = self.get_queryset()
+        serializer = self.get_serializer(albums, many=True)
+
+        return Response({
+            'status': 1,
+            'message': _('Albums fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()  # Album is created without user association in this case
+            return Response({
+                'status': 1,
+                'message': _('Album created successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'status': 0,
+            'message': _('Album creation failed.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+class GallaryListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = GallarySerializer
+
+    def get_queryset(self):
+        team_id = self.request.headers.get('Team-ID')
+        album_id = self.request.query_params.get('album_id')
+
+        queryset = Gallary.objects.all()
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+        if album_id:
+            queryset = queryset.filter(album_id=album_id)
+        return queryset.order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        gallary = self.get_queryset()
+        serializer = self.get_serializer(gallary, many=True)
+
+        return Response({
+            'status': 1,
+            'message': 'Gallery entries fetched successfully.',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # Automatically assign the user
+            return Response({
+                'status': 1,
+                'message': 'Gallary entry created successfully.',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'status': 0,
+            'message': 'Failed to create Gallary entry.',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)

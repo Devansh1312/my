@@ -216,3 +216,63 @@ class UserGenderSerializer(serializers.ModelSerializer):
         if language == 'ar':
             return obj.name_ar
         return obj.name_en
+    
+
+
+class GallarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gallary
+        fields = '__all__'
+
+    def validate(self, data):
+        media_file = data.get('media_file')
+        
+        # Ensure the media file is provided
+        if not media_file:
+            raise serializers.ValidationError("A media file (image or video) must be provided.")
+
+        # Check the file type using the mimetype
+        mime_type, _ = mimetypes.guess_type(media_file.name)
+
+        if mime_type:
+            if mime_type.startswith('image/'):
+                data['content_type'] = 1  # Image
+            elif mime_type.startswith('video/'):
+                data['content_type'] = 2  # Video
+            else:
+                raise serializers.ValidationError("The file must be an image or video.")
+        else:
+            raise serializers.ValidationError("The file type could not be determined.")
+
+        return data
+
+class AlbumSerializer(serializers.ModelSerializer):
+    # Define a custom field to retrieve the thumbnail
+    
+    gallary_items = GallarySerializer(many=True, source='gallary_set', read_only=True)
+
+    thumbnail = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Album
+        # fields = '__all__'
+        fields = ['id', 'user','team_id', 'name', 'created_at', 'updated_at', 'thumbnail', 'gallary_items']
+
+    # Method to get the most recent image or video from the related Gallary
+    def get_thumbnail(self, obj):
+        # Get the last inserted Gallary entry for this album
+        last_media = Gallary.objects.filter(album_id=obj).order_by('-created_at').first()
+        
+        # If no media exists, return None
+        if not last_media:
+            return None
+        
+        # Return the image or video URL depending on the content type
+        if last_media.content_type == 1:
+            return last_media.media_file.url  # Image URL
+        elif last_media.content_type == 2:
+            return last_media.media_file.url  # Video URL
+
+        
+        return None
+    

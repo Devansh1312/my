@@ -32,6 +32,10 @@ urlpatterns = [
         path('api/comments/create/', CommentCreateAPIView.as_view(), name='comment-create'),
         path('api/posts/delete/', PostDeleteAPIView.as_view(), name='post-delete'),
 
+        #############album############
+        path('api/albums/', AlbumListAPIView.as_view()),
+        path('api/gallary/', GallaryListCreateAPIView.as_view(), name='gallary-list-create'),
+     
 
         path('api/fields/', FieldAPIView.as_view()),
         path('api/tournament/', TournamentAPIView.as_view()),
@@ -41,7 +45,6 @@ urlpatterns = [
 
         path('api/genders/', UserGenderListAPIView.as_view()),
 
-        
         
         path('api/locations/', LocationAPIView.as_view()),
         
