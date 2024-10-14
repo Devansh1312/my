@@ -162,12 +162,15 @@ class Album(models.Model):
     user = models.ForeignKey(User, related_name='user_album', on_delete=models.CASCADE)
 
     team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
+    name = models.TextField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'futurestar_app_album'
+    
+    def __str__(self):
+        return self.name
 
 class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
     CONTENT_TYPE = [
@@ -181,8 +184,7 @@ class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
     content_type = models.IntegerField(choices=CONTENT_TYPE, default=1)
     
     # Use the helper function for the upload_to argument
-    image = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
-    video = models.FileField(upload_to=user_directory_path, blank=True, null=True)
+    media_file = models.FileField(upload_to=user_directory_path, blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

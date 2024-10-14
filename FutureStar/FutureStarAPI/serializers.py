@@ -218,7 +218,72 @@ class UserGenderSerializer(serializers.ModelSerializer):
             return obj.name_ar
         return obj.name_en
     
+class UserRoleSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
 
+    class Meta:
+        model = Role
+        fields = ['id', 'name']  # Only return id and the translated name
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate name based on the language
+        if language == 'ar':
+            return obj.name_ar
+        return obj.name_en
+    
+
+
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    profile_type = serializers.ChoiceField(choices=[(1, 'Coach'), (2, 'Referee')])
+    certificates = serializers.ListField(
+        child=serializers.ImageField(), required=False
+    )
+
+    class Meta:
+        model = User
+        fields = ['profile_type', 'coach_username', 'referee_username', 'certificates']
+
+    def validate(self, data):
+        profile_type = data.get('profile_type')
+        if profile_type == 1 and not data.get('coach_username'):
+            raise serializers.ValidationError('Coach username is required for profile type 1.')
+        if profile_type == 2 and not data.get('referee_username'):
+            raise serializers.ValidationError('Referee username is required for profile type 2.')
+        return data
+
+    def update(self, instance, validated_data):
+        profile_type = validated_data.get('profile_type')
+
+        # Handle username based on profile type
+        if profile_type == 1:
+            instance.coach_username = validated_data.get('coach_username')
+            instance.is_coach = True
+            instance.is_referee = False
+        elif profile_type == 2:
+            instance.referee_username = validated_data.get('referee_username')
+            instance.is_referee = True
+            instance.is_coach = False
+
+        # Handle multiple certificates
+        certificates = validated_data.get('certificates', [])
+        if certificates:
+            certificate_paths = []
+            for certificate in certificates:
+                # Save each certificate and get its file path
+                file_path = coach_directory_path(instance, certificate.name)
+                instance.coach_certificate.save(file_path, certificate)
+                certificate_paths.append(file_path)
+            
+            # Store file paths as a comma-separated string
+            instance.coach_certificate = ','.join(certificate_paths)
+        
+        instance.save()
+        return instance
 
 class GallarySerializer(serializers.ModelSerializer):
     class Meta:

@@ -35,6 +35,8 @@ urlpatterns = [
         #############album############
         path('api/albums/', AlbumListAPIView.as_view()),
         path('api/gallary/', GallaryListCreateAPIView.as_view(), name='gallary-list-create'),
+        path('api/albums/delete/', AlbumDeleteAPIView.as_view()),
+        path('api/gallary/delete/', GallaryDeleteAPIView.as_view()),
      
 
         path('api/fields/', FieldAPIView.as_view()),
@@ -45,6 +47,12 @@ urlpatterns = [
 
         path('api/genders/', UserGenderListAPIView.as_view()),
 
+        path('api/role/', UserRoleListAPIView.as_view()),
+        
+        path('api/locations/', LocationAPIView.as_view()),
+        
+
+        path('api/profile/create/', UpdateUserProfileView.as_view(), name='update-user-profile'),
         
         path('api/locations/', LocationAPIView.as_view()),
         

@@ -39,6 +39,7 @@ def get_user_data(user):
         'followers_count' : followers_count,
         'following_count' : following_count,
         'post_count' : post_count,
+        'user_role' : user.role_id,
         'username': user.username,
         'phone': user.phone,
         'email': user.email,
@@ -1308,6 +1309,22 @@ class UserGenderListAPIView(generics.ListAPIView):
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)
 
+class UserRoleListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Role.objects.all()
+    serializer_class = UserRoleSerializer
+
+    def get(self, request, *args, **kwargs):
+        # Get all genders
+        user_role = self.get_queryset()
+        serializer = self.get_serializer(user_role, many=True)
+
+        # Prepare the response with genders directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('user role retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_200_OK)
 
 class LocationAPIView(APIView):
 
@@ -1347,9 +1364,29 @@ class LocationAPIView(APIView):
             'data': city_data
         }, status=status.HTTP_200_OK)
 
+
+class UpdateUserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        serializer = ProfileUpdateSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'status': 1,
+                'message': _('Profile Created successfully'),
+            }, status=status.HTTP_200_OK)
+        
+        # Handling validation errors, including field-specific messages
+        return Response({
+            'status': 0,
+            'message': _('Profile update failed'),
+            'errors': serializer.errors  
+        }, status=status.HTTP_400_BAD_REQUEST)
+
  
-
-
  
 class AlbumListAPIView(generics.ListCreateAPIView):
     serializer_class = AlbumSerializer
@@ -1429,3 +1466,55 @@ class GallaryListCreateAPIView(generics.ListCreateAPIView):
             'message': 'Failed to create Gallary entry.',
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class GallaryDeleteAPIView(generics.DestroyAPIView):
+    queryset = Gallary.objects.all()
+    serializer_class = GallarySerializer
+    lookup_field = 'id'  # Specify to use ID for lookups
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            # Retrieve the Gallary object by ID
+            gallary_instance = self.get_object()
+            # Optionally delete the media file from storage if needed
+            if gallary_instance.media_file:
+                gallary_instance.media_file.delete(save=False)  # Deletes the file from storage
+            
+            # Perform deletion
+            gallary_instance.delete()
+
+            return Response({
+                'status': 1,
+                'message': 'Gallery entry deleted successfully.'
+            }, status=status.HTTP_204_NO_CONTENT)
+
+        except Gallary.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': 'Gallery entry not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+class AlbumDeleteAPIView(generics.DestroyAPIView):
+    queryset = Album.objects.all()
+    serializer_class = AlbumSerializer
+    lookup_field = 'id'  # Specify to use ID for lookups
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            # Retrieve the Album object by ID
+            album_instance = self.get_object()
+            # Perform deletion
+            album_instance.delete()
+
+            return Response({
+                'status': 1,
+                'message': 'Album deleted successfully.'
+            }, status=status.HTTP_204_NO_CONTENT)
+
+        except Album.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': 'Album not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
