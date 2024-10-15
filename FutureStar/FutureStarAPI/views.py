@@ -1666,6 +1666,9 @@ class GallaryListAPIView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 
+
+
+
 class GallaryCreateAPIView(generics.CreateAPIView):
     serializer_class = GallarySerializer
     permission_classes = [IsAuthenticated]
@@ -1675,18 +1678,51 @@ class GallaryCreateAPIView(generics.CreateAPIView):
         language = request.headers.get('Language', 'en')
         activate(language)
 
-        # Extract album_id from the request, if provided
+        # Extract album_id and team_id from the request
         album_id = request.data.get('album_id', None)
+        team_id = request.data.get('team_id', None)
 
+        # Initialize the serializer
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            # Check if album_id is provided in the request
+            album_instance = None
+            team_instance = None
+
+            # Fetch the album instance if album_id is provided
             if album_id:
-                # Handle logic to store in the specified album
-                serializer.save(user=request.user, album_id=album_id)
+                try:
+                    album_instance = Album.objects.get(id=album_id)
+                except Album.DoesNotExist:
+                    raise NotFound(_("Album not found."))
+
+            # Fetch the team instance if team_id is provided
+            if team_id:
+                try:
+                    team_instance = Team.objects.get(id=team_id)
+                except Team.DoesNotExist:
+                    raise NotFound(_("Team not found."))
+
+            # New validation: Check if the album is related to a team
+            if album_instance:
+                if album_instance.team_id and not team_id:
+                    raise ValidationError(_("This album is associated with a team. Please provide a team ID."))
+                if not album_instance.team_id and team_id:
+                    raise ValidationError(_("This album is not associated with a team. Please remove the team ID."))
+
+            # Condition 1: Both team_id and album_id are provided
+            if team_instance and album_instance:
+                serializer.save(user=request.user, album_id=album_instance, team_id=team_instance)
+
+            # Condition 2: Only album_id is provided (check if it belongs to the user)
+            elif album_instance:
+                if album_instance.user == request.user:  # Assuming Album has a user field
+                    serializer.save(user=request.user, album_id=album_instance)
+                else:
+                    raise ValidationError(_("You do not have permission to add to this album."))
+
+            # Condition 3: Neither team_id nor album_id is provided
             else:
-                # Handle logic to store under the logged-in user's general gallery
-                serializer.save(user=request.user, album_id=None)  # Or you can default album_id to None
+                serializer.save(user=request.user, album_id=None)
 
             return Response({
                 'status': 1,
@@ -1699,7 +1735,6 @@ class GallaryCreateAPIView(generics.CreateAPIView):
             'message': _('Failed to create Gallery entry.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-
 ###########gallary list latest 9 ################
 
 class LatestGallaryListAPIView(generics.ListCreateAPIView):
@@ -1708,7 +1743,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
-        team_id = self.request.data.get('Team-ID')
+        team_id = self.request.data.get('team_id')
       
         user_id=self.request.data.get('user_id')
        

@@ -159,7 +159,7 @@ def user_directory_path(instance, filename):
     # Determine the content type (1 for Images, 2 for Videos)
     content_type = 'images' if instance.content_type == 1 else 'videos'
     # Construct path using user ID and content type
-    return f'/{instance.user.id}/{content_type}/{filename}'
+    return f'media/{instance.user.id}/{content_type}/{filename}'
 
 class Album(models.Model):
     id = models.AutoField(primary_key=True)
