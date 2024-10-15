@@ -27,7 +27,7 @@ from django.views.decorators.csrf import  csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db import transaction
 import string
-
+from rest_framework.exceptions import ValidationError
 
 def get_user_data(user, request):
     """Returns a dictionary with all user details."""
@@ -1394,6 +1394,21 @@ class ProfileTypeView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        # Assuming the user is already authenticated and you have access to the user object
+        user = request.user
+
+        # Check if the user is already a coach or referee
+        if user.is_coach:
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a coach and cannot create a new coach profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.is_referee:
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a referee and cannot create a new referee profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
         # Get user roles with specific IDs
         user_roles = Role.objects.filter(id__in=[3, 4, 6])  # Filter for roles with IDs 3, 4, or 6
         serializer = UserRoleSerializer(user_roles, many=True)
@@ -1409,62 +1424,77 @@ class ProfileTypeView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         # Extract the profile type from the request data
         profile_type = request.data.get('profile_type')
         certificates = request.FILES.getlist('certificates')  # Get the list of uploaded files
-        
+
         # Assuming the user is already authenticated and you have access to the user object
-        user = request.user  
+        user = request.user
+
+        # Check if the user is already a coach or referee
+        if user.is_coach and profile_type == '3':
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a coach and cannot create a new coach profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.is_referee and profile_type == '4':
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a referee and cannot create a new referee profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # Set profile type flags and store certificates
         if profile_type == '3':  # Profile type for coach
             user.is_coach = True
             user.is_referee = False
-            
+
             # Handle saving certificates for coach
             coach_certificates = []
             for cert in certificates:
                 # Create the directory path
                 directory_path = os.path.join('media', coach_directory_path(user, ''))
                 os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-                
+
                 # Save the file to the desired path
                 file_path = os.path.join(directory_path, cert.name)
                 with open(file_path, 'wb+') as destination:
                     for chunk in cert.chunks():
                         destination.write(chunk)
                 coach_certificates.append(cert.name)
-            
+
             user.coach_certificate = ','.join(coach_certificates)
 
         elif profile_type == '4':  # Profile type for referee
             user.is_referee = True
             user.is_coach = False
-            
+
             # Handle saving certificates for referee
             referee_certificates = []
             for cert in certificates:
                 # Create the directory path
                 directory_path = os.path.join('media', referee_directory_path(user, ''))
                 os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-                
+
                 # Save the file to the desired path
                 file_path = os.path.join(directory_path, cert.name)
                 with open(file_path, 'wb+') as destination:
                     for chunk in cert.chunks():
                         destination.write(chunk)
                 referee_certificates.append(cert.name)
-                
+
             user.referee_certificate = ','.join(referee_certificates)
 
         # Save the user instance
         user.save()
-        
+
         return Response({
             'status': 1,
             'message': _('Profile type and certificates uploaded successfully.'),
             'user_id': user.id
         }, status=status.HTTP_201_CREATED)
+
 
 def coach_directory_path(instance, filename):
     return f'certificates/coach/{instance.id}/{filename}'
