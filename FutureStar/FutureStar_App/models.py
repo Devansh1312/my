@@ -148,10 +148,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     is_coach = models.BooleanField(default=False)
-    coach_username = models.CharField(max_length=255,null=True,blank=True)
+    # coach_username = models.CharField(max_length=255,null=True,blank=True)
     coach_certificates = models.TextField(null=True, blank=True)    
     is_referee = models.BooleanField(default=False)
-    referee_username = models.CharField(max_length=255,null=True,blank=True)
+    # referee_username = models.CharField(max_length=255,null=True,blank=True)
     referee_certificates = models.TextField(null=True, blank=True)
 
     objects = UserManager()
