@@ -98,15 +98,6 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
-
-# Helper function for dynamic file paths
-def coach_directory_path(instance, filename):
-    # Determine the content type (1 for Images, 2 for Videos)
-    content_type = 'images' if instance.content_type == 1 else 'videos'
-    # Construct path using user ID and content type
-    return f'certificate/{instance.user.id}/'
-
-
 # Custom User Model
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150)
@@ -148,9 +139,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     is_coach = models.BooleanField(default=False)
-    coach_certificates = models.TextField(null=True, blank=True)    
+    coach_certificate = models.TextField(null=True, blank=True)
     is_referee = models.BooleanField(default=False)
-    referee_certificates = models.TextField(null=True, blank=True)
+    referee_certificate = models.TextField(null=True, blank=True)
 
     objects = UserManager()
 

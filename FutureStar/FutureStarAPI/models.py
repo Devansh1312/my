@@ -13,8 +13,10 @@ class Team(models.Model):
     team_establishment_date = models.DateField(blank=True,null=True)
     team_president = models.CharField(max_length=255,blank=True,null=True)
     location = models.CharField(max_length=500,blank=True,null=True)
-    country = models.CharField(max_length=255,blank=True,null=True)
-    city = models.CharField(max_length=255,blank=True,null=True)
+    latitude = models.CharField(max_length=500,blank=True,null=True)
+    longitude = models.CharField(max_length=500,blank=True,null=True)    
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=255,blank=True,null=True)
     email = models.EmailField(max_length=255,blank=True,null=True)
     age_group = models.CharField(max_length=255,blank=True,null=True)
@@ -68,9 +70,11 @@ class Field(models.Model):
     image = models.ImageField(upload_to='fields_images/', blank=True, null=True)  # Add image field
     field_capacity = models.ForeignKey(FieldCapacity, on_delete=models.CASCADE,default=True)
     ground_type = models.ForeignKey(GroundMaterial, on_delete=models.CASCADE,default=True)
-    country = models.CharField(max_length=255)    
-    city = models.CharField(max_length=255)
-    location = models.CharField(max_length=500)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
+    location = models.CharField(max_length=500,blank=True,null=True)
+    latitude = models.CharField(max_length=500,blank=True,null=True)
+    longitude = models.CharField(max_length=500,blank=True,null=True)    
     additional_information = models.TextField(max_length=255,blank=True, null=True)
 
     def __str__(self):
@@ -88,8 +92,8 @@ class Tournament(models.Model):
     number_of_team = models.CharField(max_length=255,blank=True,null=True)
     tournament_name = models.CharField(max_length=255,blank=True,null=True)
     age_group = models.CharField(max_length=255,blank=True,null=True)
-    country = models.CharField(max_length=255,blank=True,null=True)
-    city = models.CharField(max_length=255,blank=True,null=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     tournament_fields = models.ForeignKey(Field,blank=True,null=True,on_delete=models.CASCADE)
     logo = models.ImageField(upload_to='tournament_logo/', blank=True, null=True)  # Add image field
     tournament_joining_cost = models.CharField(max_length=255,blank=True,null=True)
@@ -192,3 +196,30 @@ class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
 
     class Meta:
         db_table = 'futurestar_app_gallary'
+
+
+class TrainingGroups(models.Model):
+    TYPE_CHOICES = [
+        (1, 'Open'),
+        (2, 'Close'),
+    ]
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
+    group_name = models.CharField(max_length=255,blank=True,null=True)
+    group_username = models.CharField(max_length=255,blank=True,null=True)
+    group_type = models.IntegerField(choices=TYPE_CHOICES, default=1)
+    bio = models.TextField(null=True,blank=True)
+    group_president = models.CharField(max_length=255,blank=True,null=True)
+    location = models.CharField(max_length=500,blank=True,null=True)
+    latitude = models.CharField(max_length=500,blank=True,null=True)
+    longitude = models.CharField(max_length=500,blank=True,null=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=255,blank=True,null=True)
+    group_logo = models.ImageField(upload_to='group/group_logo/', blank=True, null=True)  # Add image field
+    group_background_image = models.ImageField(upload_to='group/group_background_image/', blank=True, null=True)  # Add image field
+
+    def __str__(self):
+        return self.group_name
+
+    class Meta:
+        db_table = 'futurestar_app_traininggroups'

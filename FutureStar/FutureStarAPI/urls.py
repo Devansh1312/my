@@ -52,7 +52,7 @@ urlpatterns = [
         path('api/locations/', LocationAPIView.as_view()),
         
 
-        path('api/profile/create/', UpdateUserProfileView.as_view(), name='update-user-profile'),
+        path('api/profile/create/', ProfileTypeView.as_view()),
         
         path('api/locations/', LocationAPIView.as_view()),
         

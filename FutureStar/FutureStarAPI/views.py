@@ -280,7 +280,7 @@ class verify_and_register(APIView):
                     'data': {
                         'refresh_token': str(refresh),
                         'access_token': str(refresh.access_token),
-                        **get_user_data(user)
+                        **get_user_data(user, request) 
                     }
                 }, status=status.HTTP_201_CREATED)
 
@@ -294,6 +294,7 @@ class verify_and_register(APIView):
 
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -329,7 +330,8 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                **get_user_data(user)
+                                **get_user_data(user, request) 
+
                             }
                         }, status=status.HTTP_200_OK)
                     else:
@@ -365,7 +367,8 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                **get_user_data(user)
+                                **get_user_data(user, request) 
+
                             }
                         }, status=status.HTTP_200_OK)
                     else:
@@ -581,6 +584,7 @@ class ChangePasswordAPIView(APIView):
 
 ############################################### Create Profile API ###################################
 class EditProfileAPIView(APIView):
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
 
     permission_classes = [IsAuthenticated]
 
@@ -595,7 +599,8 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Player Details.'),
             'data': {
-                **get_user_data(user)
+                **get_user_data(user, request) 
+
                 }
         }, status=status.HTTP_200_OK)
 
@@ -703,7 +708,8 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Profile updated successfully.'),
             'data': {
-                **get_user_data(user)
+                **get_user_data(user, request) 
+
             }
         }, status=status.HTTP_200_OK)
 
@@ -714,14 +720,19 @@ class EditProfileAPIView(APIView):
 class PostListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+
 
     def get_queryset(self):
-        team_id = self.request.headers.get('Team-ID')  # Optional Team-ID from headers
+        
+        team_id = self.request.data.get('team_id')
+        user_id = self.request.data.get('user_id')  
+  
 
         if team_id:
             return Post.objects.filter(team_id=team_id).order_by('-date_created')  # Filter posts by team
         else:
-            return Post.objects.filter(user=self.request.user).order_by('-date_created')  # Filter posts by user
+            return Post.objects.filter(user=user_id).order_by('-date_created')  # Filter posts by user
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -793,10 +804,12 @@ class PostCreateAPIView(APIView):
 class PostEditAPIView(generics.GenericAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+
 
     def get_queryset(self):
         # Optional Team-ID from headers
-        team_id = self.request.headers.get('Team-ID')
+        team_id = self.request.data.get('team_id')  
         if team_id:
             return Post.objects.filter(team_id=team_id)
         else:
@@ -1373,28 +1386,91 @@ class LocationAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class UpdateUserProfileView(APIView):
+class ProfileTypeView(APIView):
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
-        user = request.user
-        serializer = ProfileUpdateSerializer(user, data=request.data, partial=True)
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'status': 1,
-                'message': _('Profile Created successfully'),
-            }, status=status.HTTP_200_OK)
-        
-        # Handling validation errors, including field-specific messages
-        return Response({
-            'status': 0,
-            'message': _('Profile update failed'),
-            'errors': serializer.errors  
-        }, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get user roles with specific IDs
+        user_roles = Role.objects.filter(id__in=[3, 4, 6])  # Filter for roles with IDs 3, 4, or 6
+        serializer = UserRoleSerializer(user_roles, many=True)
 
- 
+        # Prepare the response with roles directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('User Profiles retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Extract the profile type from the request data
+        profile_type = request.data.get('profile_type')
+        certificates = request.FILES.getlist('certificates')  # Get the list of uploaded files
+        
+        # Assuming the user is already authenticated and you have access to the user object
+        user = request.user  
+
+        # Set profile type flags and store certificates
+        if profile_type == '3':  # Profile type for coach
+            user.is_coach = True
+            user.is_referee = False
+            
+            # Handle saving certificates for coach
+            coach_certificates = []
+            for cert in certificates:
+                # Create the directory path
+                directory_path = os.path.join('media', coach_directory_path(user, ''))
+                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
+                
+                # Save the file to the desired path
+                file_path = os.path.join(directory_path, cert.name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in cert.chunks():
+                        destination.write(chunk)
+                coach_certificates.append(cert.name)
+            
+            user.coach_certificate = ','.join(coach_certificates)
+
+        elif profile_type == '4':  # Profile type for referee
+            user.is_referee = True
+            user.is_coach = False
+            
+            # Handle saving certificates for referee
+            referee_certificates = []
+            for cert in certificates:
+                # Create the directory path
+                directory_path = os.path.join('media', referee_directory_path(user, ''))
+                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
+                
+                # Save the file to the desired path
+                file_path = os.path.join(directory_path, cert.name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in cert.chunks():
+                        destination.write(chunk)
+                referee_certificates.append(cert.name)
+                
+            user.referee_certificate = ','.join(referee_certificates)
+
+        # Save the user instance
+        user.save()
+        
+        return Response({
+            'status': 1,
+            'message': _('Profile type and certificates uploaded successfully.'),
+            'user_id': user.id
+        }, status=status.HTTP_201_CREATED)
+
+def coach_directory_path(instance, filename):
+    return f'certificates/coach/{instance.id}/{filename}'
+
+def referee_directory_path(instance, filename):
+    return f'certificates/referee/{instance.id}/{filename}'
  
 class AlbumListAPIView(generics.ListCreateAPIView):
     serializer_class = AlbumSerializer

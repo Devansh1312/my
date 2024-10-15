@@ -2,6 +2,8 @@ import mimetypes
 from rest_framework import serializers
 from FutureStar_App.models import User
 from FutureStarAPI.models import *
+from django.core.files.storage import default_storage
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -238,43 +240,6 @@ class UserRoleSerializer(serializers.ModelSerializer):
 
 
 
-class ProfileUpdateSerializer(serializers.ModelSerializer):
-    profile_type = serializers.ChoiceField(choices=[(1, 'Coach'), (2, 'Referee')])
-    certificates = serializers.ListField(
-        child=serializers.ImageField(), required=False
-    )
-
-    class Meta:
-        model = User
-        fields = ['profile_type', 'certificates']
-
-
-    def update(self, instance, validated_data):
-        profile_type = validated_data.get('profile_type')
-
-        # Handle username based on profile type
-        if profile_type == 1:
-            instance.is_coach = True
-            instance.is_referee = False
-        elif profile_type == 2:
-            instance.is_referee = True
-            instance.is_coach = False
-
-        # Handle multiple certificates
-        certificates = validated_data.get('certificates', [])
-        if certificates:
-            certificate_paths = []
-            for certificate in certificates:
-                # Save each certificate and get its file path
-                file_path = coach_directory_path(instance, certificate.name)
-                instance.coach_certificate.save(file_path, certificate)
-                certificate_paths.append(file_path)
-            
-            # Store file paths as a comma-separated string
-            instance.coach_certificate = ','.join(certificate_paths)
-        
-        instance.save()
-        return instance
 
 class GallarySerializer(serializers.ModelSerializer):
     class Meta:
