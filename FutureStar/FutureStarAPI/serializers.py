@@ -241,10 +241,25 @@ class UserRoleSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
 class GallarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallary
-        fields = '__all__'
+        fields = ['id', 'user','team_id', 'album_id','content_type','media_file', 'created_at', 'updated_at']
+        read_only_fields = ['user','album_id']
+
+    def to_representation(self, instance):
+        """Customize the representation of the object."""
+        representation = super().to_representation(instance)
+
+        # Check if it's a GET request and remove the album_id
+        request = self.context.get('request')
+        if request and request.method == 'GET':
+            representation.pop('album_id', None)
+
+        return representation
 
     def validate(self, data):
         media_file = data.get('media_file')
@@ -268,17 +283,43 @@ class GallarySerializer(serializers.ModelSerializer):
 
         return data
 
+class DetailAlbumSerializer(serializers.ModelSerializer):
+    # Define a custom field to retrieve the thumbnail
+    gallary_items = GallarySerializer(many=True, source='gallary_set', read_only=True)
+    thumbnail = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Album
+        fields = ['id', 'user', 'team_id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at']
+        read_only_fields = ['user']  # Make the 'user' field read-only
+
+    # Method to get the most recent image or video from the related Gallary
+    def get_thumbnail(self, obj):
+        last_media = Gallary.objects.filter(album_id=obj).order_by('-created_at').first()
+
+        if not last_media:
+            return None
+
+        if last_media.content_type == 1:  # Assuming 1 is for images
+            return last_media.media_file.url
+        elif last_media.content_type == 2:  # Assuming 2 is for videos
+            return last_media.media_file.url
+
+        return None
+
 class AlbumSerializer(serializers.ModelSerializer):
     # Define a custom field to retrieve the thumbnail
+   
+
     
-    gallary_items = GallarySerializer(many=True, source='gallary_set', read_only=True)
+  
 
     thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = Album
         # fields = '__all__'
-        fields = ['id', 'user','team_id', 'name', 'created_at', 'updated_at', 'thumbnail', 'gallary_items']
+        fields = ['id', 'user','team_id', 'name','thumbnail', 'created_at', 'updated_at' ]
 
     # Method to get the most recent image or video from the related Gallary
     def get_thumbnail(self, obj):
@@ -297,4 +338,5 @@ class AlbumSerializer(serializers.ModelSerializer):
 
         
         return None
+    
     

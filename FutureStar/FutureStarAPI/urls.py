@@ -33,8 +33,18 @@ urlpatterns = [
         path('api/posts/delete/', PostDeleteAPIView.as_view(), name='post-delete'),
 
         #############album############
+        path('api/detail_albums/', DetailAlbumListAPIView.as_view()),
+        path('api/detail_albums/create/', DetailAlbumCreateAPIView.as_view()),
         path('api/albums/', AlbumListAPIView.as_view()),
-        path('api/gallary/', GallaryListCreateAPIView.as_view(), name='gallary-list-create'),
+       
+        #############gallary############
+       
+        path('api/gallary/', GallaryListAPIView.as_view(), name='gallary-list'),
+        path('api/gallary/create/', GallaryCreateAPIView.as_view(), name='gallary-create'),
+        path('api/latest_gallary/', LatestGallaryListAPIView.as_view()),
+       
+        #############delete album & gallary############
+
         path('api/albums/delete/', AlbumDeleteAPIView.as_view()),
         path('api/gallary/delete/', GallaryDeleteAPIView.as_view()),
      

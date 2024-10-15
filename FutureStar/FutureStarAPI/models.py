@@ -159,7 +159,7 @@ def user_directory_path(instance, filename):
     # Determine the content type (1 for Images, 2 for Videos)
     content_type = 'images' if instance.content_type == 1 else 'videos'
     # Construct path using user ID and content type
-    return f'media/{instance.user.id}/{content_type}/{filename}'
+    return f'/{instance.user.id}/{content_type}/{filename}'
 
 class Album(models.Model):
     id = models.AutoField(primary_key=True)
@@ -184,7 +184,7 @@ class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, related_name='user_gallary', on_delete=models.CASCADE)
     team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
-    album_id = models.ForeignKey(Album, related_name='gallary_set', on_delete=models.CASCADE)
+    album_id = models.ForeignKey(Album, related_name='gallary_set',null=True, on_delete=models.CASCADE)
     content_type = models.IntegerField(choices=CONTENT_TYPE, default=1)
     
     # Use the helper function for the upload_to argument
