@@ -29,11 +29,16 @@ from django.db import transaction
 import string
 
 
-def get_user_data(user):
+def get_user_data(user, request):
     """Returns a dictionary with all user details."""
     followers_count = FollowRequest.get_follower_count(user)
     following_count = FollowRequest.get_following_count(user)
     post_count = Post.objects.filter(user=user, team__isnull=True).count()
+    gender_name = None
+    if user.gender:
+        serializer = UserGenderSerializer(user.gender, context={'request': request})
+        gender_name = serializer.data['name']
+
     return {
         'id': user.id,
         'followers_count' : followers_count,
@@ -47,9 +52,12 @@ def get_user_data(user):
         'bio': user.bio,
         'date_of_birth': user.date_of_birth,
         'age': user.age,
-        'gender': user.gender.id if user.gender else None,
-        'country': user.country.id if user.country else None,
-        'city': user.city.id if user.city else None,
+        'gender_id': user.gender.id if user.gender else None,
+        'gender_name': gender_name,
+        'country_id': user.country.id if user.country else None,
+        'country_name': user.country.name if user.country else None,
+        'city_id': user.city.id if user.city else None,
+        'city_name': user.city.name if user.city else None,
         'nationality': user.nationality,
         'weight': user.weight,
         'height': user.height,

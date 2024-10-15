@@ -246,26 +246,17 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['profile_type', 'coach_username', 'referee_username', 'certificates']
+        fields = ['profile_type', 'certificates']
 
-    def validate(self, data):
-        profile_type = data.get('profile_type')
-        if profile_type == 1 and not data.get('coach_username'):
-            raise serializers.ValidationError('Coach username is required for profile type 1.')
-        if profile_type == 2 and not data.get('referee_username'):
-            raise serializers.ValidationError('Referee username is required for profile type 2.')
-        return data
 
     def update(self, instance, validated_data):
         profile_type = validated_data.get('profile_type')
 
         # Handle username based on profile type
         if profile_type == 1:
-            instance.coach_username = validated_data.get('coach_username')
             instance.is_coach = True
             instance.is_referee = False
         elif profile_type == 2:
-            instance.referee_username = validated_data.get('referee_username')
             instance.is_referee = True
             instance.is_coach = False
 
