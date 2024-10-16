@@ -34,7 +34,7 @@ urlpatterns = [
 
         #############album############
         path('api/detail_albums/', DetailAlbumListAPIView.as_view()),
-        path('api/detail_albums/create/', DetailAlbumCreateAPIView.as_view()),
+        path('api/albums/create/', DetailAlbumCreateAPIView.as_view()),
         path('api/albums/', AlbumListAPIView.as_view()),
        
         #############gallary############
