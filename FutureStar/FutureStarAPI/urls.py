@@ -24,13 +24,14 @@ urlpatterns = [
 
 
         ######## User Post API ###########
-        path('api/posts/', PostListAPIView.as_view(), name='post-list'),
-        path('api/posts/create/', PostCreateAPIView.as_view(), name='post-create'),
-        path('api/posts/edit/', PostEditAPIView.as_view(), name='post-edit'),
+        path('api/posts/all/', AllPostsListAPIView.as_view()),
+        path('api/posts/', PostListAPIView.as_view()),
+        path('api/posts/create/', PostCreateAPIView.as_view()),
+        path('api/posts/edit/', PostEditAPIView.as_view()),
 
-        path('api/posts/details/', PostDetailAPIView.as_view(), name='post-detail-body'),
-        path('api/comments/create/', CommentCreateAPIView.as_view(), name='comment-create'),
-        path('api/posts/delete/', PostDeleteAPIView.as_view(), name='post-delete'),
+        path('api/posts/details/', PostDetailAPIView.as_view()),
+        path('api/comments/create/', CommentCreateAPIView.as_view()),
+        path('api/posts/delete/', PostDeleteAPIView.as_view()),
 
         #############album############
         path('api/detail_albums/', DetailAlbumListAPIView.as_view()),

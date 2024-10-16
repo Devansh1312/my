@@ -1,8 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
-from django import views
-from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,18 +11,14 @@ from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
-from django.db import IntegrityError
 from django.utils import timezone
 import os
 from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework import generics
-import json 
+from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from django.views import View
-from django.views.decorators.csrf import  csrf_exempt 
-from django.utils.decorators import method_decorator
 from django.db import transaction
 import string
 from rest_framework.exceptions import ValidationError
@@ -717,39 +711,130 @@ class EditProfileAPIView(APIView):
 
 
 ####################### POST API ###############################################################################
-class PostListAPIView(generics.ListAPIView):
+class CustomPostPagination(PageNumberPagination):
+    page_size = 10  # Number of records per page
+    page_query_param = 'page'  # Custom page number param in the body
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # Set max size if needed
+
+    def paginate_queryset(self, queryset, request, view=None):
+        # Get the page number from the body (default: 1)
+        try:
+            page_number = request.data.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            raise ValidationError("Invalid page number.")
+
+        # Perform standard pagination
+        return super().paginate_queryset(queryset, request, view)
+
+
+
+###################################################################################### POST MODULE ################################################################################
+
+
+############################# ALL POST LIST VIEW ##########################
+class AllPostsListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
-
+    parser_classes = [MultiPartParser, FormParser]
+    pagination_class = CustomPostPagination  # Use custom pagination
 
     def get_queryset(self):
-        
-        team_id = self.request.data.get('team_id')
-        group_id = self.request.data.get('group_id')
-        user_id = self.request.data.get('user_id')  
-  
-
-        if team_id:
-            return Post.objects.filter(team_id=team_id).order_by('-date_created')  # Filter posts by team
-        elif group_id:
-            return Post.objects.filter(group_id=group_id).order_by('-date_created')  # Filter posts by team
-        else:
-            return Post.objects.filter(user=user_id).order_by('-date_created')  # Filter posts by user
+        # Return all posts without any filters
+        return Post.objects.all().order_by('-date_created')
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         activate(language)
 
-        posts = self.get_queryset()
-        serializer = self.get_serializer(posts, many=True)
+        queryset = self.get_queryset()
 
+        # Paginate the queryset
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_records = queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
+
+            # Custom response to include pagination data
+            return Response({
+                'status': 1,
+                'message': _('All posts fetched successfully.'),
+                'data': serializer.data,
+                'meta': {
+                    'total_records': total_records,
+                    'total_pages': total_pages,
+                    'current_page': self.paginator.page.number
+                }
+            }, status=status.HTTP_200_OK)
+
+        # In case pagination is not needed or there's no data
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'status': 1,
+            'message': _('All posts fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+##########  LIST OF POST BASED ON USER TEAM AND GROUP ################
+class PostListAPIView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    pagination_class = CustomPostPagination  # Use custom pagination
+
+    def get_queryset(self):
+        team_id = self.request.data.get('team_id')
+        group_id = self.request.data.get('group_id')
+        user_id = self.request.data.get('user_id')
+
+        if team_id:
+            return Post.objects.filter(team_id=team_id).order_by('-date_created')
+        elif group_id:
+            return Post.objects.filter(group_id=group_id).order_by('-date_created')
+        else:
+            return Post.objects.filter(user=user_id).order_by('-date_created')
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        queryset = self.get_queryset()
+
+        # Paginate the queryset
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_records = queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
+
+            # Custom response to include pagination data
+            return Response({
+                'status': 1,
+                'message': _('Posts fetched successfully.'),
+                'data': serializer.data,
+                'meta': {
+                    'total_records': total_records,
+                    'total_pages': total_pages,
+                    'current_page': self.paginator.page.number
+                }
+            }, status=status.HTTP_200_OK)
+
+        # In case pagination is not needed or there's no data
+        serializer = self.get_serializer(queryset, many=True)
         return Response({
             'status': 1,
             'message': _('Posts fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
+
+
+######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
@@ -815,8 +900,7 @@ class PostCreateAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
+##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
@@ -888,7 +972,7 @@ class PostEditAPIView(generics.GenericAPIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
+####################### POST DETAIL API ############################
 class PostDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -928,6 +1012,7 @@ class PostDetailAPIView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
+######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -988,6 +1073,8 @@ class CommentCreateAPIView(APIView):
             'data': PostCommentSerializer(comment).data
         }, status=status.HTTP_201_CREATED)
 
+
+############### POST DELETE API ##############################
 class PostDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1024,8 +1111,503 @@ class PostDeleteAPIView(APIView):
             'status': 1,
             'message': _('Post deleted successfully.')
         }, status=status.HTTP_200_OK)
+    
 
-################################################ Field API View #################################
+################################################################# CREATE NEW PROFILE API #########################################################################################
+
+class ProfileTypeView(APIView):
+    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Assuming the user is already authenticated and you have access to the user object
+        user = request.user
+
+        # Check if the user is already a coach or referee
+        if user.is_coach:
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a coach and cannot create a new coach profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.is_referee:
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a referee and cannot create a new referee profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        # Get user roles with specific IDs
+        user_roles = Role.objects.filter(id__in=[3, 4, 6])  # Filter for roles with IDs 3, 4, or 6
+        serializer = UserRoleSerializer(user_roles, many=True)
+
+        # Prepare the response with roles directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('User Profiles retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Extract the profile type from the request data
+        profile_type = request.data.get('profile_type')
+        certificates = request.FILES.getlist('certificates')  # Get the list of uploaded files
+
+        # Assuming the user is already authenticated and you have access to the user object
+        user = request.user
+
+        # Check if the user is already a coach or referee
+        if user.is_coach and profile_type == '3':
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a coach and cannot create a new coach profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.is_referee and profile_type == '4':
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a referee and cannot create a new referee profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Set profile type flags and store certificates
+        if profile_type == '3':  # Profile type for coach
+            user.is_coach = True
+            user.is_referee = False
+
+            # Handle saving certificates for coach
+            coach_certificates = []
+            for cert in certificates:
+                # Create the directory path
+                directory_path = os.path.join('media', coach_directory_path(user, ''))
+                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
+
+                # Save the file to the desired path
+                file_path = os.path.join(directory_path, cert.name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in cert.chunks():
+                        destination.write(chunk)
+                coach_certificates.append(cert.name)
+
+            user.coach_certificate = ','.join(coach_certificates)
+
+        elif profile_type == '4':  # Profile type for referee
+            user.is_referee = True
+            user.is_coach = False
+
+            # Handle saving certificates for referee
+            referee_certificates = []
+            for cert in certificates:
+                # Create the directory path
+                directory_path = os.path.join('media', referee_directory_path(user, ''))
+                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
+
+                # Save the file to the desired path
+                file_path = os.path.join(directory_path, cert.name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in cert.chunks():
+                        destination.write(chunk)
+                referee_certificates.append(cert.name)
+
+            user.referee_certificate = ','.join(referee_certificates)
+
+        # Save the user instance
+        user.save()
+
+        return Response({
+            'status': 1,
+            'message': _('Profile type and certificates uploaded successfully.'),
+            'data': {
+                'user_id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_coach': user.is_coach,
+                'is_referee': user.is_referee,
+                'coach_certificate': user.coach_certificate if user.is_coach else None,
+                'referee_certificate': user.referee_certificate if user.is_referee else None,
+            }
+        }, status=status.HTTP_201_CREATED)
+
+
+def coach_directory_path(instance, filename):
+    return f'certificates/coach/{instance.id}/{filename}'
+
+def referee_directory_path(instance, filename):
+    return f'certificates/referee/{instance.id}/{filename}'
+
+
+
+
+
+################################ album and gallary ######################################################################################################################
+
+###########detail album with id ################
+
+class DetailAlbumListAPIView(generics.ListAPIView):
+    serializer_class = DetailAlbumSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser) 
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # team_id = self.request.data.get('Team-ID')
+        album_id = self.request.data.get('album_id')  # Fetch album_id from the request body
+        # user_id = self.request.data.get('user_id')  # Fetch album_id from the request body
+        
+        if album_id:
+            try:
+                # Ensure that the album belongs to the user or team
+                # if team_id:
+                #     return Album.objects.filter(id=album_id, team_id=team_id)
+                # else:
+                    return Album.objects.filter(id=album_id)
+            except Album.DoesNotExist:
+                return Album.objects.none()  # Return an empty queryset if not found
+        # else:
+        #     # If no album_id is provided, return albums by team or user
+        #     if team_id:
+        #         return Album.objects.filter(team_id=team_id)
+        #     else:
+        #         return Album.objects.filter(user=user_id)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        albums = self.get_queryset()
+        serializer = self.get_serializer(albums, many=True)
+
+        return Response({
+            'status': 1,
+            'message': _('Albums fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+   
+    
+
+
+class DetailAlbumCreateAPIView(generics.CreateAPIView):
+    serializer_class = DetailAlbumSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser) 
+    permission_classes = [IsAuthenticated]
+
+   
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # Album is created without user association in this case
+            return Response({
+                'status': 1,
+                'message': _('Album created successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'status': 0,
+            'message': _('Album creation failed.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+########### only album list ################
+
+class AlbumListAPIView(generics.ListAPIView):
+    serializer_class = AlbumSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get_queryset(self):
+        team_id = self.request.data.get('Team-ID')
+        user_id=self.request.data.get('user_id')
+    
+
+        queryset = Album.objects.all()
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+
+      
+        else:
+           
+            queryset = queryset.filter(user=user_id)
+ 
+        return queryset.order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        albums = self.get_queryset()  # Renamed 'gallary' to 'albums' for clarity
+        serializer = self.get_serializer(albums, many=True)
+
+        return Response({
+            'status': 1,
+            'message': _('Album entries fetched successfully.'),
+          
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+ 
+
+###########detail gallary with id with diffrentiatee ################
+
+class GallaryListAPIView(generics.ListAPIView):
+    serializer_class = GallarySerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get_queryset(self):
+        team_id = self.request.data.get('Team-ID')
+      
+        user_id=self.request.data.get('user_id')
+        content_type=self.request.data.get('content_type')
+
+
+
+        queryset = Gallary.objects.all()
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+      
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+        if content_type:
+            queryset = queryset.filter(content_type=content_type)
+        return queryset.order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        gallary = self.get_queryset()
+        image_extensions = ('jfif','PNG','.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
+        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
+
+        # Filter images and videos based on their file extensions
+        images = [item for item in gallary if item.media_file.name.endswith(image_extensions)]
+        videos = [item for item in gallary if item.media_file.name.endswith(video_extensions)]
+        
+        # Serialize images and videos separately
+        image_serializer = self.get_serializer(images, many=True)
+        video_serializer = self.get_serializer(videos, many=True)
+
+        return Response({
+            'status': 1,
+            'message': _('Gallery entries fetched successfully.'),
+            'data': {
+                'images': image_serializer.data,
+                'videos': video_serializer.data
+            }
+        }, status=status.HTTP_200_OK)
+
+
+
+class GallaryCreateAPIView(generics.CreateAPIView):
+    serializer_class = GallarySerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        # Extract album_id and team_id from the request
+        album_id = request.data.get('album_id', None)
+        team_id = request.data.get('team_id', None)
+
+        # Initialize the serializer
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            album_instance = None
+            team_instance = None
+
+            # Fetch the album instance if album_id is provided
+            if album_id:
+                try:
+                    album_instance = Album.objects.get(id=album_id)
+                except Album.DoesNotExist:
+                    raise NotFound(_("Album not found."))
+
+            # Fetch the team instance if team_id is provided
+            if team_id:
+                try:
+                    team_instance = Team.objects.get(id=team_id)
+                except Team.DoesNotExist:
+                    raise NotFound(_("Team not found."))
+
+            # New validation: Check if the album is related to a team
+            if album_instance:
+                if album_instance.team_id and not team_id:
+                    raise ValidationError(_("This album is associated with a team. Please provide a team ID."))
+                if not album_instance.team_id and team_id:
+                    raise ValidationError(_("This album is not associated with a team. Please remove the team ID."))
+
+            # Condition 1: Both team_id and album_id are provided
+            if team_instance and album_instance:
+                serializer.save(user=request.user, album_id=album_instance, team_id=team_instance)
+
+            # Condition 2: Only album_id is provided (check if it belongs to the user)
+            elif album_instance:
+                if album_instance.user == request.user:  # Assuming Album has a user field
+                    serializer.save(user=request.user, album_id=album_instance)
+                else:
+                    raise ValidationError(_("You do not have permission to add to this album."))
+
+            # Condition 3: Neither team_id nor album_id is provided
+            else:
+                serializer.save(user=request.user, album_id=None)
+
+            return Response({
+                'status': 1,
+                'message': _('Gallery entry created successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'status': 0,
+            'message': _('Failed to create Gallery entry.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+###########gallary list latest 9 ################
+
+class LatestGallaryListAPIView(generics.ListCreateAPIView):
+    serializer_class = GallarySerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get_queryset(self):
+        team_id = self.request.data.get('team_id')
+      
+        user_id=self.request.data.get('user_id')
+       
+
+        queryset = Gallary.objects.all()
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+      
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+      
+
+        return queryset.order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+
+        gallary = self.get_queryset()
+        image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
+        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
+
+        # Filter images and videos based on their file extensions
+        images = [item for item in gallary if item.media_file.name.endswith(image_extensions)]
+        videos = [item for item in gallary if item.media_file.name.endswith(video_extensions)]
+        
+        latest_images = images[:9]  # Slice to get the first 9 images
+        latest_videos = videos[:9] 
+        
+        # Serialize images and videos separately
+        image_serializer = self.get_serializer(latest_images, many=True)
+        video_serializer = self.get_serializer(latest_videos, many=True)
+
+        return Response({
+            'status': 1,
+            'message': _('Gallery entries fetched successfully.'),
+            'data': {
+                'images': image_serializer.data,
+                'videos': video_serializer.data
+            }
+        }, status=status.HTTP_200_OK)
+
+
+###########  gallary list delete ################
+
+
+class GallaryDeleteAPIView(generics.DestroyAPIView):
+    queryset = Gallary.objects.all()
+    serializer_class = GallarySerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get_object(self):
+        # Fetch the 'id' from the request body
+        id = self.request.data.get('gallary_id')
+        if not id:
+            raise ValidationError({"gallary_id": "This field is required."})
+        try:
+            return Gallary.objects.get(id=id)
+        except Gallary.DoesNotExist:
+            raise ({"message": "Gallery entry not found."})
+
+    def delete(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        activate(language)
+        try:
+            # Retrieve the Gallary object by ID from the body
+            gallary_instance = self.get_object()
+
+            # Optionally delete the media file from storage if needed
+            if gallary_instance.media_file:
+                gallary_instance.media_file.delete(save=False)  # Deletes the file from storage
+            
+            # Perform the deletion
+            gallary_instance.delete()
+
+            return Response({
+                'status': 1,
+                'message': _('Gallery entry deleted successfully.')
+            }, status=status.HTTP_204_NO_CONTENT)
+
+        except Gallary.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': 'Gallery entry not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+###########  album list delete ################
+
+class AlbumDeleteAPIView(generics.DestroyAPIView):
+    queryset = Album.objects.all()
+    serializer_class = AlbumSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Fetch the 'id' from the request body
+        id = self.request.data.get('album_id')
+        if not id:
+            raise ValidationError({"album_id": _("This field is required.")})
+        try:
+            return Album.objects.get(id=id)
+        except Album.DoesNotExist:
+            raise ({"message": _("Album not found.")})
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            # Retrieve the Album object by ID from the body
+            album_instance = self.get_object()
+
+            # Perform the deletion
+            album_instance.delete()
+
+            return Response({
+                'status': 1,
+                'message': _('Album deleted successfully.')
+            }, status=status.HTTP_204_NO_CONTENT)
+
+        except Album.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Album not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+################################################################################## Field API View ##################################################################################
 class FieldAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
@@ -1416,494 +1998,6 @@ class LocationAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class ProfileTypeView(APIView):
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-        # Assuming the user is already authenticated and you have access to the user object
-        user = request.user
-
-        # Check if the user is already a coach or referee
-        if user.is_coach:
-            return Response({
-                'status': 0,
-                'message': _('You are already registered as a coach and cannot create a new coach profile.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        if user.is_referee:
-            return Response({
-                'status': 0,
-                'message': _('You are already registered as a referee and cannot create a new referee profile.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-        # Get user roles with specific IDs
-        user_roles = Role.objects.filter(id__in=[3, 4, 6])  # Filter for roles with IDs 3, 4, or 6
-        serializer = UserRoleSerializer(user_roles, many=True)
-
-        # Prepare the response with roles directly under 'data'
-        return Response({
-            'status': 1,
-            'message': _('User Profiles retrieved successfully.'),
-            'data': serializer.data  # Directly include the serialized data
-        }, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        # Extract the profile type from the request data
-        profile_type = request.data.get('profile_type')
-        certificates = request.FILES.getlist('certificates')  # Get the list of uploaded files
-
-        # Assuming the user is already authenticated and you have access to the user object
-        user = request.user
-
-        # Check if the user is already a coach or referee
-        if user.is_coach and profile_type == '3':
-            return Response({
-                'status': 0,
-                'message': _('You are already registered as a coach and cannot create a new coach profile.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        if user.is_referee and profile_type == '4':
-            return Response({
-                'status': 0,
-                'message': _('You are already registered as a referee and cannot create a new referee profile.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Set profile type flags and store certificates
-        if profile_type == '3':  # Profile type for coach
-            user.is_coach = True
-            user.is_referee = False
-
-            # Handle saving certificates for coach
-            coach_certificates = []
-            for cert in certificates:
-                # Create the directory path
-                directory_path = os.path.join('media', coach_directory_path(user, ''))
-                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-
-                # Save the file to the desired path
-                file_path = os.path.join(directory_path, cert.name)
-                with open(file_path, 'wb+') as destination:
-                    for chunk in cert.chunks():
-                        destination.write(chunk)
-                coach_certificates.append(cert.name)
-
-            user.coach_certificate = ','.join(coach_certificates)
-
-        elif profile_type == '4':  # Profile type for referee
-            user.is_referee = True
-            user.is_coach = False
-
-            # Handle saving certificates for referee
-            referee_certificates = []
-            for cert in certificates:
-                # Create the directory path
-                directory_path = os.path.join('media', referee_directory_path(user, ''))
-                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-
-                # Save the file to the desired path
-                file_path = os.path.join(directory_path, cert.name)
-                with open(file_path, 'wb+') as destination:
-                    for chunk in cert.chunks():
-                        destination.write(chunk)
-                referee_certificates.append(cert.name)
-
-            user.referee_certificate = ','.join(referee_certificates)
-
-        # Save the user instance
-        user.save()
-
-        return Response({
-            'status': 1,
-            'message': _('Profile type and certificates uploaded successfully.'),
-            'data': {
-                'user_id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'is_coach': user.is_coach,
-                'is_referee': user.is_referee,
-                'coach_certificate': user.coach_certificate if user.is_coach else None,
-                'referee_certificate': user.referee_certificate if user.is_referee else None,
-            }
-        }, status=status.HTTP_201_CREATED)
-
-
-def coach_directory_path(instance, filename):
-    return f'certificates/coach/{instance.id}/{filename}'
-
-def referee_directory_path(instance, filename):
-    return f'certificates/referee/{instance.id}/{filename}'
  
-
-################################ album and gallary ######################
-
-###########detail album with id ################
-
-class DetailAlbumListAPIView(generics.ListAPIView):
-    serializer_class = DetailAlbumSerializer
-    parser_classes = (JSONParser, MultiPartParser, FormParser) 
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        # team_id = self.request.data.get('Team-ID')
-        album_id = self.request.data.get('album_id')  # Fetch album_id from the request body
-        # user_id = self.request.data.get('user_id')  # Fetch album_id from the request body
-        
-        if album_id:
-            try:
-                # Ensure that the album belongs to the user or team
-                # if team_id:
-                #     return Album.objects.filter(id=album_id, team_id=team_id)
-                # else:
-                    return Album.objects.filter(id=album_id)
-            except Album.DoesNotExist:
-                return Album.objects.none()  # Return an empty queryset if not found
-        # else:
-        #     # If no album_id is provided, return albums by team or user
-        #     if team_id:
-        #         return Album.objects.filter(team_id=team_id)
-        #     else:
-        #         return Album.objects.filter(user=user_id)
-
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        activate(language)
-
-        albums = self.get_queryset()
-        serializer = self.get_serializer(albums, many=True)
-
-        return Response({
-            'status': 1,
-            'message': _('Albums fetched successfully.'),
-            'data': serializer.data
-        }, status=status.HTTP_200_OK)
-
-   
-    
-
-
-class DetailAlbumCreateAPIView(generics.CreateAPIView):
-    serializer_class = DetailAlbumSerializer
-    parser_classes = (JSONParser, MultiPartParser, FormParser) 
-    permission_classes = [IsAuthenticated]
-
-   
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        activate(language)
-
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)  # Album is created without user association in this case
-            return Response({
-                'status': 1,
-                'message': _('Album created successfully.'),
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
-
-        return Response({
-            'status': 0,
-            'message': _('Album creation failed.'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-    
-########### only album list ################
-
-class AlbumListAPIView(generics.ListAPIView):
-    serializer_class = AlbumSerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def get_queryset(self):
-        team_id = self.request.data.get('Team-ID')
-        user_id=self.request.data.get('user_id')
-    
-
-        queryset = Album.objects.all()
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-
-      
-        else:
-           
-            queryset = queryset.filter(user=user_id)
- 
-        return queryset.order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        activate(language)
-
-        albums = self.get_queryset()  # Renamed 'gallary' to 'albums' for clarity
-        serializer = self.get_serializer(albums, many=True)
-
-        return Response({
-            'status': 1,
-            'message': _('Album entries fetched successfully.'),
-          
-            'data': serializer.data
-        }, status=status.HTTP_200_OK)
- 
-
-###########detail gallary with id with diffrentiatee ################
-
-class GallaryListAPIView(generics.ListAPIView):
-    serializer_class = GallarySerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def get_queryset(self):
-        team_id = self.request.data.get('Team-ID')
-      
-        user_id=self.request.data.get('user_id')
-        content_type=self.request.data.get('content_type')
-
-
-
-        queryset = Gallary.objects.all()
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-      
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
-        if content_type:
-            queryset = queryset.filter(content_type=content_type)
-        return queryset.order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        
-        language = request.headers.get('Language', 'en')
-        activate(language)
-
-        gallary = self.get_queryset()
-        image_extensions = ('jfif','PNG','.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
-        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
-
-        # Filter images and videos based on their file extensions
-        images = [item for item in gallary if item.media_file.name.endswith(image_extensions)]
-        videos = [item for item in gallary if item.media_file.name.endswith(video_extensions)]
-        
-        # Serialize images and videos separately
-        image_serializer = self.get_serializer(images, many=True)
-        video_serializer = self.get_serializer(videos, many=True)
-
-        return Response({
-            'status': 1,
-            'message': _('Gallery entries fetched successfully.'),
-            'data': {
-                'images': image_serializer.data,
-                'videos': video_serializer.data
-            }
-        }, status=status.HTTP_200_OK)
-
-
-
-
-
-class GallaryCreateAPIView(generics.CreateAPIView):
-    serializer_class = GallarySerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        activate(language)
-
-        # Extract album_id and team_id from the request
-        album_id = request.data.get('album_id', None)
-        team_id = request.data.get('team_id', None)
-
-        # Initialize the serializer
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            album_instance = None
-            team_instance = None
-
-            # Fetch the album instance if album_id is provided
-            if album_id:
-                try:
-                    album_instance = Album.objects.get(id=album_id)
-                except Album.DoesNotExist:
-                    raise NotFound(_("Album not found."))
-
-            # Fetch the team instance if team_id is provided
-            if team_id:
-                try:
-                    team_instance = Team.objects.get(id=team_id)
-                except Team.DoesNotExist:
-                    raise NotFound(_("Team not found."))
-
-            # New validation: Check if the album is related to a team
-            if album_instance:
-                if album_instance.team_id and not team_id:
-                    raise ValidationError(_("This album is associated with a team. Please provide a team ID."))
-                if not album_instance.team_id and team_id:
-                    raise ValidationError(_("This album is not associated with a team. Please remove the team ID."))
-
-            # Condition 1: Both team_id and album_id are provided
-            if team_instance and album_instance:
-                serializer.save(user=request.user, album_id=album_instance, team_id=team_instance)
-
-            # Condition 2: Only album_id is provided (check if it belongs to the user)
-            elif album_instance:
-                if album_instance.user == request.user:  # Assuming Album has a user field
-                    serializer.save(user=request.user, album_id=album_instance)
-                else:
-                    raise ValidationError(_("You do not have permission to add to this album."))
-
-            # Condition 3: Neither team_id nor album_id is provided
-            else:
-                serializer.save(user=request.user, album_id=None)
-
-            return Response({
-                'status': 1,
-                'message': _('Gallery entry created successfully.'),
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
-
-        return Response({
-            'status': 0,
-            'message': _('Failed to create Gallery entry.'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-###########gallary list latest 9 ################
-
-class LatestGallaryListAPIView(generics.ListCreateAPIView):
-    serializer_class = GallarySerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def get_queryset(self):
-        team_id = self.request.data.get('team_id')
-      
-        user_id=self.request.data.get('user_id')
-       
-
-        queryset = Gallary.objects.all()
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-      
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
-      
-
-        return queryset.order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        activate(language)
-
-        gallary = self.get_queryset()
-        image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
-        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
-
-        # Filter images and videos based on their file extensions
-        images = [item for item in gallary if item.media_file.name.endswith(image_extensions)]
-        videos = [item for item in gallary if item.media_file.name.endswith(video_extensions)]
-        
-        latest_images = images[:9]  # Slice to get the first 9 images
-        latest_videos = videos[:9] 
-        
-        # Serialize images and videos separately
-        image_serializer = self.get_serializer(latest_images, many=True)
-        video_serializer = self.get_serializer(latest_videos, many=True)
-
-        return Response({
-            'status': 1,
-            'message': _('Gallery entries fetched successfully.'),
-            'data': {
-                'images': image_serializer.data,
-                'videos': video_serializer.data
-            }
-        }, status=status.HTTP_200_OK)
-
-
-###########  gallary list delete ################
-
-
-class GallaryDeleteAPIView(generics.DestroyAPIView):
-    queryset = Gallary.objects.all()
-    serializer_class = GallarySerializer
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def get_object(self):
-        # Fetch the 'id' from the request body
-        id = self.request.data.get('gallary_id')
-        if not id:
-            raise ValidationError({"gallary_id": "This field is required."})
-        try:
-            return Gallary.objects.get(id=id)
-        except Gallary.DoesNotExist:
-            raise ({"message": "Gallery entry not found."})
-
-    def delete(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        activate(language)
-        try:
-            # Retrieve the Gallary object by ID from the body
-            gallary_instance = self.get_object()
-
-            # Optionally delete the media file from storage if needed
-            if gallary_instance.media_file:
-                gallary_instance.media_file.delete(save=False)  # Deletes the file from storage
-            
-            # Perform the deletion
-            gallary_instance.delete()
-
-            return Response({
-                'status': 1,
-                'message': _('Gallery entry deleted successfully.')
-            }, status=status.HTTP_204_NO_CONTENT)
-
-        except Gallary.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': 'Gallery entry not found.'
-            }, status=status.HTTP_404_NOT_FOUND)
-
-###########  album list delete ################
-
-class AlbumDeleteAPIView(generics.DestroyAPIView):
-    queryset = Album.objects.all()
-    serializer_class = AlbumSerializer
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        # Fetch the 'id' from the request body
-        id = self.request.data.get('album_id')
-        if not id:
-            raise ValidationError({"album_id": _("This field is required.")})
-        try:
-            return Album.objects.get(id=id)
-        except Album.DoesNotExist:
-            raise ({"message": _("Album not found.")})
-
-    def delete(self, request, *args, **kwargs):
-        try:
-            # Retrieve the Album object by ID from the body
-            album_instance = self.get_object()
-
-            # Perform the deletion
-            album_instance.delete()
-
-            return Response({
-                'status': 1,
-                'message': _('Album deleted successfully.')
-            }, status=status.HTTP_204_NO_CONTENT)
-
-        except Album.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Album not found.')
-            }, status=status.HTTP_404_NOT_FOUND)
 
