@@ -2056,8 +2056,12 @@ class LocationAPIView(APIView):
 
 ####################################### FOLLOW USER ############################################
 class FollowUnfollowAPI(APIView):
-
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         from_user = request.user
         to_user_id = request.data.get("to_user")
         
@@ -2084,8 +2088,12 @@ class FollowUnfollowAPI(APIView):
 
 ####################################### LIST OF FOLLOWERS #######################################
 class UserFollowersAPI(APIView):
-
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.data.get('user_id')
 
         if not user_id:
@@ -2116,8 +2124,12 @@ class UserFollowersAPI(APIView):
 
 ##################################### LIST OF FOLLOWING ###############################
 class UserFollowingAPI(APIView):
-
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.data.get('user_id')
 
         if not user_id:
