@@ -2054,6 +2054,93 @@ class LocationAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+####################################### FOLLOW USER ############################################
+class FollowUnfollowAPI(APIView):
 
- 
+    def post(self, request):
+        from_user = request.user
+        to_user_id = request.data.get("to_user")
+        
+        to_user = get_object_or_404(User, id=to_user_id)
+        
+        follow_request = FollowRequest.objects.filter(from_user=from_user, to_user=to_user).first()
+        
+        if follow_request:
+            # Unfollow
+            follow_request.delete()
+            return Response({
+                "status": 1,
+                "message": _("You have unfollowed %(username)s.") % {'username': to_user.username}
+            }, status=status.HTTP_200_OK)
+        else:
+            # Follow
+            FollowRequest.objects.create(from_user=from_user, to_user=to_user)
+            return Response({
+                "status": 1,
+                "message": _("You are now following %(username)s.") % {'username': to_user.username}
+            }, status=status.HTTP_201_CREATED)
 
+
+
+####################################### LIST OF FOLLOWERS #######################################
+class UserFollowersAPI(APIView):
+
+    def post(self, request):
+        user_id = request.data.get('user_id')
+
+        if not user_id:
+            return Response({
+                "status": 0,
+                "message": _("User ID is required.")
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, id=user_id)
+
+        followers = FollowRequest.objects.filter(to_user=user).select_related('from_user')
+
+        followers_list = [
+            {
+                "id": follower.from_user.id,
+                "username": follower.from_user.username,
+                "profile_picture": follower.from_user.profile_picture.url if follower.from_user.profile_picture else None
+            }
+            for follower in followers
+        ]
+
+        return Response({
+            "status": 1,
+            "message": _("Followers fetched successfully."),
+            "data": followers_list
+        }, status=status.HTTP_200_OK)
+
+
+##################################### LIST OF FOLLOWING ###############################
+class UserFollowingAPI(APIView):
+
+    def post(self, request):
+        user_id = request.data.get('user_id')
+
+        if not user_id:
+            return Response({
+                "status": 0,
+                "message": _("User ID is required.")
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, id=user_id)
+
+        following = FollowRequest.objects.filter(from_user=user).select_related('to_user')
+
+        following_list = [
+            {
+                "id": follow.to_user.id,
+                "username": follow.to_user.username,
+                "profile_picture": follow.to_user.profile_picture.url if follow.to_user.profile_picture else None
+            }
+            for follow in following
+        ]
+
+        return Response({
+            "status": 1,
+            "message": _("Following users fetched successfully."),
+            "data": following_list
+        }, status=status.HTTP_200_OK)

@@ -22,6 +22,10 @@ urlpatterns = [
         # URL for CreateProfile API (GET for roles, POST for profile creation/update)
         path('api/edit-profile/', EditProfileAPIView.as_view()),
 
+        ## Follow Following 
+        path('follow_unfollow/', FollowUnfollowAPI.as_view()),
+        path('followers/', UserFollowersAPI.as_view()),
+        path('following/', UserFollowingAPI.as_view()),
 
         ######## User Post API ###########
         path('api/posts/all/', AllPostsListAPIView.as_view()),
