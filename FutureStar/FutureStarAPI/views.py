@@ -1369,7 +1369,7 @@ class GallaryListAPIView(generics.ListAPIView):
 
 
 
-        queryset = Gallary.objects.filter(album_id__isnull=True)
+        queryset = Gallary.objects.all()
         if team_id:
             queryset = queryset.filter(team_id=team_id)
       
@@ -1486,7 +1486,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
         user_id=self.request.data.get('user_id')
        
 
-        queryset = Gallary.objects.filter(album_id__isnull=True)
+        queryset = Gallary.objects.all()
         if team_id:
             queryset = queryset.filter(team_id=team_id)
       
