@@ -50,6 +50,7 @@ urlpatterns = [
         path('api/gallary_items/delete/', GallaryDeleteAPIView.as_view()),
      
 
+        ################## fileds URL ################
         path('api/fields/', FieldAPIView.as_view()),
         path('api/tournament/', TournamentAPIView.as_view()),
 
