@@ -11,188 +11,230 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-msgid "User registered and logged in successfully"
-msgstr "تم تسجيل المستخدم وتسجيل الدخول بنجاح"
+msgid "Username already exists."
+msgstr "اسم المستخدم موجود بالفعل."
 
-msgid "User registration failed due to duplicate data"
-msgstr "فشل تسجيل المستخدم بسبب بيانات مكررة"
+msgid "Phone number already exists."
+msgstr "رقم الهاتف موجود بالفعل."
 
-msgid "User registration failed"
-msgstr "فشل تسجيل المستخدم"
+msgid "OTP sent successfully."
+msgstr "تم إرسال رمز التحقق بنجاح."
 
-msgid "Email is required for registration"
-msgstr "البريد الإلكتروني مطلوب للتسجيل"
+msgid "Email already exists."
+msgstr "البريد الإلكتروني موجود بالفعل."
 
-msgid "User logged in successfully"
-msgstr "تم تسجيل دخول المستخدم بنجاح"
+msgid "User can proceed with registration."
+msgstr "يمكن للمستخدم المتابعة في التسجيل."
 
-msgid "Account is inactive"
-msgstr "الحساب غير نشط"
+msgid "Invalid registration type."
+msgstr "نوع التسجيل غير صالح."
 
-msgid "User created and logged in successfully"
-msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
+msgid "Phone is a required field."
+msgstr "رقم الهاتف هو حقل مطلوب."
 
-msgid "Invalid registration type"
-msgstr "نوع التسجيل غير صالح"
+msgid "OTP is a required field."
+msgstr "رمز التحقق هو حقل مطلوب."
 
-msgid "Login successful"
-msgstr "تسجيل الدخول ناجح"
+msgid "Username is a required field."
+msgstr "اسم المستخدم هو حقل مطلوب."
 
-msgid "Invalid credentials"
-msgstr "بيانات الاعتماد غير صالحة"
+msgid "Invalid OTP or phone number."
+msgstr "رمز التحقق أو رقم الهاتف غير صحيح."
 
-msgid "User created and login successful"
-msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
+msgid "User registered successfully."
+msgstr "تم تسجيل المستخدم بنجاح."
 
-msgid "Invalid data"
-msgstr "بيانات غير صالحة"
+msgid "An error occurred while registering the user."
+msgstr "حدث خطأ أثناء تسجيل المستخدم."
 
-msgid "Logout successful"
-msgstr "تم تسجيل الخروج بنجاح"
+msgid "Login successful."
+msgstr "تم تسجيل الدخول بنجاح."
 
-msgid "Logout failed"
-msgstr "فشل تسجيل الخروج"
+msgid "Account is inactive."
+msgstr "الحساب غير نشط."
+
+msgid "Invalid credentials."
+msgstr "بيانات الاعتماد غير صالحة."
+
+msgid "Email Does Not Exits Please Register First."
+msgstr "البريد الإلكتروني غير موجود. الرجاء التسجيل أولاً."
+
+msgid "Logout successful."
+msgstr "تم تسجيل الخروج بنجاح."
+
+msgid "Logout failed."
+msgstr "فشل تسجيل الخروج."
 
 msgid "OTP sent to your phone."
-msgstr "تم إرسال OTP إلى هاتفك."
+msgstr "تم إرسال رمز التحقق إلى هاتفك."
 
 msgid "User with this phone number does not exist."
-msgstr "المستخدم بهذا الرقم الهاتفي غير موجود."
+msgstr "المستخدم برقم الهاتف هذا غير موجود."
 
 msgid "Invalid data."
 msgstr "بيانات غير صالحة."
 
 msgid "OTP verified successfully."
-msgstr "تم التحقق من OTP بنجاح."
+msgstr "تم التحقق من رمز التحقق بنجاح."
 
 msgid "Invalid OTP."
-msgstr "OTP غير صالح."
+msgstr "رمز التحقق غير صالح."
 
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
 
 msgid "User not found."
-msgstr "لم يتم العثور على المستخدم."
+msgstr "المستخدم غير موجود."
 
 msgid "Old password is incorrect."
 msgstr "كلمة المرور القديمة غير صحيحة."
 
 msgid "New password must be at least 8 characters long."
-msgstr "يجب أن تكون كلمة المرور الجديدة مكونة من 8 أحرف على الأقل."
+msgstr "يجب أن تحتوي كلمة المرور الجديدة على 8 أحرف على الأقل."
 
 msgid "Player Details."
 msgstr "تفاصيل اللاعب."
 
+msgid "Invalid gender specified."
+msgstr "تم تحديد نوع جنس غير صالح."
+
+msgid "Invalid country specified."
+msgstr "تم تحديد بلد غير صالح."
+
+msgid "City cannot be set without a valid country."
+msgstr "لا يمكن تعيين المدينة بدون بلد صالح."
+
+msgid "Invalid city specified."
+msgstr "تم تحديد مدينة غير صالحة."
+
 msgid "Profile updated successfully."
 msgstr "تم تحديث الملف الشخصي بنجاح."
 
+msgid "All posts fetched successfully."
+msgstr "تم جلب جميع المنشورات بنجاح."
+
 msgid "Posts fetched successfully."
-msgstr "تم جلب المشاركات بنجاح."
+msgstr "تم جلب المنشورات بنجاح."
 
-msgid "Post created successfully"
-msgstr "تم إنشاء المشاركة بنجاح"
+msgid "Team not found."
+msgstr "لم يتم العثور على الفريق."
 
-msgid "post_id is required."
-msgstr "المعرف_المشاركة مطلوب."
+msgid "Group not found."
+msgstr "المجموعة غير موجودة."
+
+msgid "Post created successfully."
+msgstr "تم إنشاء المنشور بنجاح."
+
+msgid "Post ID is required."
+msgstr "معرف المنشور مطلوب."
+
+msgid "Post fetched successfully."
+msgstr "تم جلب المنشور بنجاح."
+
+msgid "Post updated successfully."
+msgstr "تم تحديث المنشور بنجاح."
+
+msgid "Failed to update the post."
+msgstr "فشل في تحديث المنشور."
 
 msgid "Post not found."
-msgstr "لم يتم العثور على المشاركة."
-
-msgid "Post details fetched successfully."
-msgstr "تم جلب تفاصيل المشاركة بنجاح."
-
-msgid "post_id and comment are required."
-msgstr "المعرف_المشاركة والتعليق مطلوبان."
-
-msgid "Comment created successfully."
-msgstr "تم إنشاء التعليق بنجاح."
+msgstr "المنشور غير موجود."
 
 msgid "Post deleted successfully."
-msgstr "تم حذف المشاركة بنجاح."
+msgstr "تم حذف المنشور بنجاح."
 
-msgid "Read More"
-msgstr "اقرأ المزيد"
+msgid "You are already registered as a coach and cannot create a new coach profile."
+msgstr "أنت مسجل بالفعل كمدرب ولا يمكنك إنشاء ملف مدرب جديد."
 
-# Translation for "Years Of Experience"
-msgid "Years Of Experience"
-msgstr "سنوات الخبرة"
+msgid "You are already registered as a referee and cannot create a new referee profile."
+msgstr "أنت مسجل بالفعل كحكم ولا يمكنك إنشاء ملف حكم جديد."
 
-# Translation for "Projects Completed"
-msgid "Projects Completed"
-msgstr "المشاريع المكتملة"
+msgid "User Profiles retrieved successfully."
+msgstr "تم استرجاع الملفات الشخصية بنجاح."
 
-# Translation for "Professionals Team Member"
-msgid "Professionals Team Member"
-msgstr "أعضاء الفريق المهني"
+msgid "Profile type and certificates uploaded successfully."
+msgstr "تم تحميل نوع الملف الشخصي والشهادات بنجاح."
 
-# Translation for "Awards Winning"
-msgid "Awards Winning"
-msgstr "الجوائز الفائزة"
+msgid "Albums fetched successfully."
+msgstr "تم جلب الألبومات بنجاح."
 
-# Translation for "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
-msgid "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
-msgstr "للمزيد من التفاصيل، يمكننا أن نناقشها معًا."
+msgid "Album created successfully."
+msgstr "تم إنشاء الألبوم بنجاح."
 
-# Translation for "Explore"
-msgid "Explore"
-msgstr "استكشاف"
+msgid "Album entries fetched successfully."
+msgstr "تم جلب إدخالات الألبوم بنجاح."
 
-# Translation for "Discover"
-msgid "Discover"
-msgstr "اكتشف"
+msgid "Gallery entries fetched successfully."
+msgstr "تم جلب إدخالات المعرض بنجاح."
 
-# Translation for "Success Stories"
-msgid "Success Stories"
-msgstr "قصص النجاح"
+msgid "Album not found."
+msgstr "الألبوم غير موجود."
 
-# Translation for "News"
-msgid "News"
-msgstr "الأخبار"
+msgid "This album is associated with a team. Please provide a team ID."
+msgstr "هذا الألبوم مرتبط بفريق. الرجاء تقديم معرف الفريق."
 
-# Translation for "Advertise"
-msgid "Advertise"
-msgstr "الإعلانات"
+msgid "This album is not associated with a team. Please remove the team ID."
+msgstr "هذا الألبوم غير مرتبط بفريق. الرجاء إزالة معرف الفريق."
 
-# Translation for "Contacts"
-msgid "Contacts"
-msgstr "جهات الاتصال"
+msgid "You do not have permission to add to this album."
+msgstr "ليس لديك إذن لإضافة إلى هذا الألبوم."
 
-# Translation for "Supports"
-msgid "Supports"
-msgstr "الدعم"
+msgid "Gallery entry created successfully."
+msgstr "تم إنشاء إدخال المعرض بنجاح."
 
-# Translation for "Terms of Services"
-msgid "Terms of Services"
-msgstr "شروط الخدمة"
+msgid "Failed to create Gallery entry."
+msgstr "فشل في إنشاء إدخال المعرض."
 
-# Translation for "Privacy Policy"
-msgid "Privacy Policy"
-msgstr "سياسة الخصوصية"
+msgid "Gallery entry deleted successfully."
+msgstr "تم حذف إدخال المعرض بنجاح."
 
-# Translation for "Video Tutorials"
-msgid "Video Tutorials"
-msgstr "دروس الفيديو"
+msgid "Gallery entry not found."
+msgstr "إدخال المعرض غير موجود."
 
-# Translation for "Contact"
-msgid "Contact"
-msgstr "تواصل"
+msgid "This field is required."
+msgstr "هذا الحقل مطلوب."
 
-# Translation for "Copyright @2024, Future Stars All Rights Reserved"
-msgid "Copyright @2024, Future Stars All Rights Reserved"
-msgstr "حقوق الطبع والنشر @2024، جميع الحقوق محفوظة لفيوتشر ستارز"
+msgid "Album deleted successfully."
+msgstr "تم حذف الألبوم بنجاح."
 
-# Translation for "Designed & Developed By Redspark Technologies"
-msgid "Designed & Developed By Redspark Technologies"
-msgstr "تصميم وتطوير من قبل Redspark Technologies"
+msgid "Fields retrieved successfully."
+msgstr "تم استرجاع الحقول بنجاح."
 
-# Translation for "Contact Details"
-msgid "Contact Details"
-msgstr "تفاصيل الاتصال"
+msgid "Field created successfully."
+msgstr "تم إنشاء الحقل بنجاح."
 
-# Translation for "Login"
-msgid "Login"
-msgstr "تسجيل الدخول"
+msgid "Field creation failed."
+msgstr "فشل إنشاء الحقل."
 
-# Translation for "Register"
-msgid "Register"
-msgstr "تسجيل"
+msgid "Tournament created successfully."
+msgstr "تم إنشاء البطولة بنجاح."
+
+msgid "Tournament creation failed."
+msgstr "فشل إنشاء البطولة."
+
+msgid "Types retrieved successfully."
+msgstr "تم استرجاع الأنواع بنجاح."
+
+msgid "Invalid team type provided."
+msgstr "تم تقديم نوع فريق غير صالح."
+
+msgid "Team created successfully."
+msgstr "تم إنشاء الفريق بنجاح."
+
+msgid "Team updated successfully."
+msgstr "تم تحديث الفريق بنجاح."
+
+msgid "Gender retrieved successfully."
+msgstr "تم استرجاع الجنس بنجاح."
+
+msgid "User role retrieved successfully."
+msgstr "تم استرجاع دور المستخدم بنجاح."
+
+msgid "Countries fetched successfully."
+msgstr "تم جلب البلدان بنجاح."
+
+msgid "Country not found or inactive."
+msgstr "البلد غير موجود أو غير نشط."
+
+msgid "Cities fetched successfully."
+msgstr "تم جلب المدن بنجاح."

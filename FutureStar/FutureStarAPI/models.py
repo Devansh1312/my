@@ -33,14 +33,9 @@ class Team(models.Model):
         db_table = 'futurestar_app_team'
     
 class TrainingGroups(models.Model):
-    TYPE_CHOICES = [
-        (1, 'Open'),
-        (2, 'Close'),
-    ]
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
     group_name = models.CharField(max_length=255,blank=True,null=True)
     group_username = models.CharField(max_length=255,blank=True,null=True)
-    group_type = models.IntegerField(choices=TYPE_CHOICES, default=1)
     bio = models.TextField(null=True,blank=True)
     group_president = models.CharField(max_length=255,blank=True,null=True)
     location = models.CharField(max_length=500,blank=True,null=True)
@@ -151,15 +146,9 @@ class OTPSave(models.Model):
     
 
 class FollowRequest(models.Model):
-    STATUS_CHOICES = [
-        (1, 'Pending'),
-        (2, 'Accepted'),
-        (3, 'Rejected'),
-    ]
     
     from_user = models.ForeignKey(User, related_name='follow_requests_sent', on_delete=models.CASCADE)
     to_user = models.ForeignKey(User, related_name='follow_requests_received', on_delete=models.CASCADE)
-    status = models.IntegerField(choices=STATUS_CHOICES, default=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -172,12 +161,12 @@ class FollowRequest(models.Model):
     @staticmethod
     def get_follower_count(user):
         """Returns the number of followers for a given user"""
-        return FollowRequest.objects.filter(to_user=user, status=2).count()
+        return FollowRequest.objects.filter(to_user=user).count()
 
     @staticmethod
     def get_following_count(user):
         """Returns the number of users a given user is following"""
-        return FollowRequest.objects.filter(from_user=user, status=2).count()
+        return FollowRequest.objects.filter(from_user=user).count()
 
 
 

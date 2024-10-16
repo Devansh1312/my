@@ -22,6 +22,8 @@ from django.utils.translation import gettext as _
 from django.db import transaction
 import string
 from rest_framework.exceptions import ValidationError
+import re
+
 
 def get_user_data(user, request):
     """Returns a dictionary with all user details."""
@@ -129,12 +131,28 @@ class send_otp(APIView):
             username = request.data.get('username')
             phone = request.data.get('phone')
             email = request.data.get('email')
+            
+            if not email:
+                    return Response({
+                        'status': 0,
+                        'message': _('Email is required.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Check email format using regex
+            email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+            if not re.match(email_regex, email):
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid email format.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             # Check if email exists in User table
             if User.objects.filter(email=email).exists():
                 return Response({
                     'status': 0,
                     'message': _('Email already exists.')
                 }, status=status.HTTP_400_BAD_REQUEST)
+
 
             # If email does not exist, check username and phone if provided
             if username and phone:
@@ -255,7 +273,7 @@ class verify_and_register(APIView):
                 user = User.objects.create(
                     username=username,
                     phone=phone,
-                    email=email,
+                    email = email if email else None ,
                     role_id=5,  # Assuming role_id 5 is for regular users
                     device_type=device_type,
                     device_token=device_token
@@ -392,6 +410,7 @@ class LoginAPIView(APIView):
 
 class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -427,6 +446,7 @@ class LogoutAPIView(APIView):
 
 class ForgotPasswordAPIView(APIView):
     permission_classes = [AllowAny]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -465,6 +485,7 @@ class ForgotPasswordAPIView(APIView):
 
 class VerifyOTPAPIView(APIView):
     permission_classes = [AllowAny]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -498,6 +519,7 @@ class VerifyOTPAPIView(APIView):
 
 class ChangePasswordOtpAPIView(APIView):
     permission_classes = [AllowAny]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -537,6 +559,7 @@ class ChangePasswordOtpAPIView(APIView):
 
 class ChangePasswordAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         # Parse language from the headers
@@ -578,7 +601,7 @@ class ChangePasswordAPIView(APIView):
 
 ############################################### Create Profile API ###################################
 class EditProfileAPIView(APIView):
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     permission_classes = [IsAuthenticated]
 
@@ -712,6 +735,8 @@ class EditProfileAPIView(APIView):
 
 ####################### POST API ###############################################################################
 class CustomPostPagination(PageNumberPagination):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     page_size = 10  # Number of records per page
     page_query_param = 'page'  # Custom page number param in the body
     page_size_query_param = 'page_size'
@@ -739,7 +764,7 @@ class CustomPostPagination(PageNumberPagination):
 class AllPostsListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     pagination_class = CustomPostPagination  # Use custom pagination
 
     def get_queryset(self):
@@ -748,7 +773,8 @@ class AllPostsListAPIView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         queryset = self.get_queryset()
 
@@ -784,7 +810,7 @@ class AllPostsListAPIView(generics.ListAPIView):
 class PostListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     pagination_class = CustomPostPagination  # Use custom pagination
 
     def get_queryset(self):
@@ -801,8 +827,8 @@ class PostListAPIView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
-
+        if language in ['en', 'ar']:
+            activate(language)
         queryset = self.get_queryset()
 
         # Paginate the queryset
@@ -837,11 +863,12 @@ class PostListAPIView(generics.ListAPIView):
 ######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         team_id = request.data.get('team_id')  # Optional team_id from request data
         group_id = request.data.get('group_id')  # Optional team_id from request data
@@ -904,7 +931,7 @@ class PostCreateAPIView(APIView):
 class PostEditAPIView(generics.GenericAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
 
     def get_queryset(self):
@@ -925,7 +952,8 @@ class PostEditAPIView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         # Activate the requested language, default is 'en'
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         post_id = request.data.get('post_id')  # Get post_id from request data
         if not post_id:
@@ -946,7 +974,8 @@ class PostEditAPIView(generics.GenericAPIView):
     def patch(self, request, *args, **kwargs):
         # Activate the requested language, default is 'en'
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         post_id = request.data.get('post_id')  # Get post_id from request data
         if not post_id:
@@ -975,11 +1004,13 @@ class PostEditAPIView(generics.GenericAPIView):
 ####################### POST DETAIL API ############################
 class PostDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
-
+        if language in ['en', 'ar']:
+            activate(language)
         post_id = request.data.get('post_id')
         team_id = request.data.get('team_id')
         group_id = request.data.get('group_id')  # Optional team_id
@@ -1015,10 +1046,12 @@ class PostDetailAPIView(APIView):
 ######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         data = request.data
         post_id = data.get('post_id')
@@ -1077,10 +1110,12 @@ class CommentCreateAPIView(APIView):
 ############### POST DELETE API ##############################
 class PostDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def delete(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         post_id = request.data.get('post_id')
         team_id = request.data.get('team_id')  # Optional team_id
@@ -1116,7 +1151,7 @@ class PostDeleteAPIView(APIView):
 ################################################################# CREATE NEW PROFILE API #########################################################################################
 
 class ProfileTypeView(APIView):
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -1249,7 +1284,7 @@ def referee_directory_path(instance, filename):
 
 class DetailAlbumListAPIView(generics.ListAPIView):
     serializer_class = DetailAlbumSerializer
-    parser_classes = (JSONParser, MultiPartParser, FormParser) 
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -1275,7 +1310,8 @@ class DetailAlbumListAPIView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         albums = self.get_queryset()
         serializer = self.get_serializer(albums, many=True)
@@ -1298,7 +1334,8 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
    
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -1341,7 +1378,8 @@ class AlbumListAPIView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         albums = self.get_queryset()  # Renamed 'gallary' to 'albums' for clarity
         serializer = self.get_serializer(albums, many=True)
@@ -1369,7 +1407,7 @@ class GallaryListAPIView(generics.ListAPIView):
 
 
 
-        queryset = Gallary.objects.all()
+        queryset = Gallary.objects.filter(album_id__isnull=True)        
         if team_id:
             queryset = queryset.filter(team_id=team_id)
       
@@ -1382,7 +1420,8 @@ class GallaryListAPIView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         gallary = self.get_queryset()
         image_extensions = ('jfif','PNG','.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
@@ -1414,7 +1453,8 @@ class GallaryCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         # Extract album_id and team_id from the request
         album_id = request.data.get('album_id', None)
@@ -1486,7 +1526,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
         user_id=self.request.data.get('user_id')
        
 
-        queryset = Gallary.objects.all()
+        queryset = Gallary.objects.filter(album_id__isnull=True)        
         if team_id:
             queryset = queryset.filter(team_id=team_id)
       
@@ -1498,7 +1538,8 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         gallary = self.get_queryset()
         image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
@@ -1538,15 +1579,16 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
         # Fetch the 'id' from the request body
         id = self.request.data.get('gallary_id')
         if not id:
-            raise ValidationError({"gallary_id": "This field is required."})
+            raise ValidationError({"gallary_id": _("This field is required.")})
         try:
             return Gallary.objects.get(id=id)
         except Gallary.DoesNotExist:
-            raise ({"message": "Gallery entry not found."})
+            raise ({"message": _("Gallery entry not found.")})
 
     def delete(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             # Retrieve the Gallary object by ID from the body
             gallary_instance = self.get_object()
@@ -1566,9 +1608,9 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
         except Gallary.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': 'Gallery entry not found.'
+                'message': _('Gallery entry not found.')
             }, status=status.HTTP_404_NOT_FOUND)
-
+        
 ###########  album list delete ################
 
 class AlbumDeleteAPIView(generics.DestroyAPIView):
@@ -1589,6 +1631,9 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
             raise ({"message": _("Album not found.")})
 
     def delete(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             # Retrieve the Album object by ID from the body
             album_instance = self.get_object()
@@ -1614,7 +1659,8 @@ class FieldAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         # Fetch all field capacities and ground types
         field_capacity = FieldCapacity.objects.all()
@@ -1635,7 +1681,8 @@ class FieldAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         # Handle field creation with image upload
         serializer = FieldSerializer(data=request.data, context={'request': request})
@@ -1671,11 +1718,12 @@ class FieldAPIView(APIView):
 
 class TournamentAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         # Fetch all fields for the current user
         fields = Field.objects.filter(user_id=request.user)
@@ -1691,7 +1739,8 @@ class TournamentAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         # Handle tournament creation with logo upload
         serializer = TournamentSerializer(data=request.data, context={'request': request})
@@ -1725,11 +1774,12 @@ class TournamentAPIView(APIView):
 
 class TeamViewAPI(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # To handle file uploads
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
-        activate(language)
+        if language in ['en', 'ar']:
+            activate(language)
 
         # Fetch all categories
         categories = Category.objects.all()
@@ -1754,6 +1804,9 @@ class TeamViewAPI(APIView):
     
 
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user = request.user
 
         # Fetch the team type (category) by its ID from the request
@@ -1929,6 +1982,7 @@ class UserGenderListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = UserGender.objects.all()
     serializer_class = UserGenderSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
         # Get all genders
@@ -1946,6 +2000,7 @@ class UserRoleListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Role.objects.all()
     serializer_class = UserRoleSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
         # Get all genders
@@ -1960,6 +2015,7 @@ class UserRoleListAPIView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 class LocationAPIView(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request):
         language = request.headers.get('Language', 'en')

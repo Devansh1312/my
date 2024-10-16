@@ -143,6 +143,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_referee = models.BooleanField(default=False)
     referee_certificate = models.TextField(null=True, blank=True)
 
+    created_at = models.DateTimeField(default=timezone.now)
+
     objects = UserManager()
 
     USERNAME_FIELD = "username"
