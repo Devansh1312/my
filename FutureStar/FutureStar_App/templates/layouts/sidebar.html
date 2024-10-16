@@ -98,46 +98,7 @@
                   </a>
                   </a>
                </li> -->
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-widget"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-widget"></use>
-                     </svg>
-                     <span class="lan">General Settings</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'fieldcapacity_list' %}">Field Capacity</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'groundmaterial_list' %}">Ground Material</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'tournamentstyle_list' %}">Tournament Style</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'eventtype_list' %}">Event Type</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'partners_list' %}">Partners</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'global_clients_list' %}">Global Clients</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'tryout_club_list' %}">Tryout Club</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'testimonial_list' %}">Testimonial</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'slider_content_list' %}">Slider Content</a>
-                     </li>
-                  </ul>
-               </li>
+               
 
                <li class="sidebar">
                   <a class="sidebar-link sidebar-title link-nav" href="{% url 'news_list' %}">
@@ -180,6 +141,49 @@
                      <span class="lan">CMS Pages</span>
                   </a>
                </li>
+
+
+               <li class="sidebar-list">
+                  <a class="sidebar-link sidebar-title" href="#">
+                     <svg class="stroke-icon">
+                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-widget"></use>
+                     </svg>
+                     <svg class="fill-icon">
+                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-widget"></use>
+                     </svg>
+                     <span class="lan">General Settings</span>
+                  </a>
+                  <ul class="sidebar-submenu">
+                     <li>
+                        <a href="{% url 'fieldcapacity_list' %}">Field Capacity</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'groundmaterial_list' %}">Ground Material</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'tournamentstyle_list' %}">Tournament Style</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'eventtype_list' %}">Event Type</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'partners_list' %}">Partners</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'global_clients_list' %}">Global Clients</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'tryout_club_list' %}">Tryout Club</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'testimonial_list' %}">Testimonial</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'slider_content_list' %}">Slider Content</a>
+                     </li>
+                  </ul>
+               </li>
+               
                <li class="sidebar">
                   <a class="sidebar-link sidebar-title link-nav" href="{% url 'System_Settings' %}">
                      <svg class="stroke-icon">

@@ -11,7 +11,8 @@ from .models import SystemSettings
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
+
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from django.views import View
@@ -450,9 +451,9 @@ class System_Settings(LoginRequiredMixin, View):
                 },
             )
         elif success:
-            return redirect("Dashboard")
+            return redirect("System_Settings")
         else:
-            return redirect("Dashboard")
+            return redirect("System_Settings")
 
 
 #######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
@@ -587,27 +588,45 @@ class DefaultUserList(LoginRequiredMixin, View):
 @method_decorator(user_role_check, name='dispatch')
 class UserDetailView(View):
     template_name = "Admin/User/User_Detail.html"
+    
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, pk=pk)
+            # Fetch the role (assuming a foreign key field role in the User model)
+            role = user.role  
+            return render(
+                request,
+                self.template_name,
+                {
+                    "user": user,
+                    "role": role,
+                    "title": "User Details",
+                    "source_page": request.GET.get("source_page", "default_page"),  # Optional source page
+                },
+            )
+        except Http404:
+            return redirect('Dashboard')  # Redirect to dashboard if user is not found
 
     def post(self, request, pk, *args, **kwargs):
-        user = get_object_or_404(User, pk=pk)
-        source_page = request.POST.get("source_page") 
-        title = request.POST.get("title") 
+        try:
+            user = get_object_or_404(User, pk=pk)
+            source_page = request.POST.get("source_page") 
+            title = request.POST.get("title") 
+            role = user.role  # Assuming the user model has a role foreign key
         
-        # Fetch additional details if needed (e.g., related profiles or roles)
-        role = user.role  # Assuming the user model has a role foreign key
-    
-        # Return the detail page with all user information
-        return render(
-            request,
-            self.template_name,
-            {
-                "user": user,
-                "role": role,
-                "title":title,
-                "source_page" : source_page,
-            },
-        )
-
+            return render(
+                request,
+                self.template_name,
+                {
+                    "user": user,
+                    "role": role,
+                    "title": title,
+                    "source_page": source_page,
+                },
+            )
+        except Http404:
+            return redirect('Dashboard')  # Redirect to dashboard if user is not found
+        
 ##############################################  User Category Type Module  ################################################
 # Category CRUD Views
 @method_decorator(user_role_check, name='dispatch')
