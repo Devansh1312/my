@@ -39,14 +39,14 @@ urlpatterns = [
        
         #############gallary############
        
-        path('api/gallary/', GallaryListAPIView.as_view(), name='gallary-list'),
-        path('api/gallary/create/', GallaryCreateAPIView.as_view(), name='gallary-create'),
-        path('api/latest_gallary/', LatestGallaryListAPIView.as_view()),
+        path('api/gallary_items/', GallaryListAPIView.as_view(), name='gallary-list'),
+        path('api/gallary_items/create/', GallaryCreateAPIView.as_view(), name='gallary-create'),
+        path('api/latest_gallary_items/', LatestGallaryListAPIView.as_view()),
        
         #############delete album & gallary############
 
         path('api/albums/delete/', AlbumDeleteAPIView.as_view()),
-        path('api/gallary/delete/', GallaryDeleteAPIView.as_view()),
+        path('api/gallary_items/delete/', GallaryDeleteAPIView.as_view()),
      
 
         path('api/fields/', FieldAPIView.as_view()),
