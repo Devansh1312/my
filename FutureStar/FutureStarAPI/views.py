@@ -726,11 +726,14 @@ class PostListAPIView(generics.ListAPIView):
     def get_queryset(self):
         
         team_id = self.request.data.get('team_id')
+        group_id = self.request.data.get('group_id')
         user_id = self.request.data.get('user_id')  
   
 
         if team_id:
             return Post.objects.filter(team_id=team_id).order_by('-date_created')  # Filter posts by team
+        elif group_id:
+            return Post.objects.filter(group_id=group_id).order_by('-date_created')  # Filter posts by team
         else:
             return Post.objects.filter(user=user_id).order_by('-date_created')  # Filter posts by user
 
@@ -756,6 +759,8 @@ class PostCreateAPIView(APIView):
         activate(language)
 
         team_id = request.data.get('team_id')  # Optional team_id from request data
+        group_id = request.data.get('group_id')  # Optional team_id from request data
+
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -770,6 +775,17 @@ class PostCreateAPIView(APIView):
                 
                 # Save the post with a team
                 post = serializer.save(user=request.user, team_id=team)
+            elif group_id:
+                try:
+                    group = TrainingGroups.objects.get(id=group_id)
+                except TrainingGroups.DoesNotExist:
+                    return Response({
+                        'status': 0,
+                        'message': _('Group not found.')
+                    }, status=status.HTTP_404_NOT_FOUND)
+                
+                # Save the post with a team
+                post = serializer.save(user=request.user, group_id=group)
             else:
                 # Save the post for the user without a team
                 post = serializer.save(user=request.user)
@@ -809,9 +825,12 @@ class PostEditAPIView(generics.GenericAPIView):
 
     def get_queryset(self):
         # Optional Team-ID from headers
-        team_id = self.request.data.get('team_id')  
+        team_id = self.request.data.get('team_id')
+        group_id = self.request.data.get('group_id')  
         if team_id:
             return Post.objects.filter(team_id=team_id)
+        elif group_id:
+            return Post.objects.filter(group_id=group_id)
         else:
             return Post.objects.filter(user=self.request.user)
 
@@ -878,7 +897,9 @@ class PostDetailAPIView(APIView):
         activate(language)
 
         post_id = request.data.get('post_id')
-        team_id = request.data.get('team_id')  # Optional team_id
+        team_id = request.data.get('team_id')
+        group_id = request.data.get('group_id')  # Optional team_id
+
 
         if not post_id:
             return Response({
@@ -889,6 +910,8 @@ class PostDetailAPIView(APIView):
         try:
             if team_id:
                 post = Post.objects.get(id=post_id, team_id=team_id)
+            elif group_id:
+                post = Post.objects.get(id=post_id, group_id=group_id)
             else:
                 post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
@@ -915,6 +938,7 @@ class CommentCreateAPIView(APIView):
         data = request.data
         post_id = data.get('post_id')
         team_id = data.get('team_id')  # Optional team_id
+        group_id = data.get('group_id')  # Optional team_id
         comment_text = data.get('comment')
         parent_id = data.get('parent_id')
 
@@ -927,6 +951,8 @@ class CommentCreateAPIView(APIView):
         try:
             if team_id:
                 post = Post.objects.get(id=post_id, team_id=team_id)
+            elif group_id:
+                post = Post.objects.get(id=post_id, group_id=group_id)
             else:
                 post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
@@ -952,7 +978,8 @@ class CommentCreateAPIView(APIView):
             post=post,
             comment=comment_text,
             parent=parent_comment,
-            team_id=team_id  # Set the team_id if provided
+            team_id=team_id,  # Set the team_id if provided
+            group_id=group_id  # Set the team_id if provided
         )
 
         return Response({
@@ -970,6 +997,7 @@ class PostDeleteAPIView(APIView):
 
         post_id = request.data.get('post_id')
         team_id = request.data.get('team_id')  # Optional team_id
+        group_id = request.data.get('group_id')  # Optional team_id
 
         if not post_id:
             return Response({
@@ -980,6 +1008,8 @@ class PostDeleteAPIView(APIView):
         try:
             if team_id:
                 post = Post.objects.get(id=post_id, team_id=team_id)
+            elif group_id:
+                post = Post.objects.get(id=post_id, group_id=group_id)
             else:
                 post = Post.objects.get(id=post_id, user=request.user)
         except Post.DoesNotExist:
@@ -1492,7 +1522,15 @@ class ProfileTypeView(APIView):
         return Response({
             'status': 1,
             'message': _('Profile type and certificates uploaded successfully.'),
-            'user_id': user.id
+            'data': {
+                'user_id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_coach': user.is_coach,
+                'is_referee': user.is_referee,
+                'coach_certificate': user.coach_certificate if user.is_coach else None,
+                'referee_certificate': user.referee_certificate if user.is_referee else None,
+            }
         }, status=status.HTTP_201_CREATED)
 
 

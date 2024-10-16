@@ -32,12 +32,38 @@ class Team(models.Model):
     class Meta:
         db_table = 'futurestar_app_team'
     
+class TrainingGroups(models.Model):
+    TYPE_CHOICES = [
+        (1, 'Open'),
+        (2, 'Close'),
+    ]
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
+    group_name = models.CharField(max_length=255,blank=True,null=True)
+    group_username = models.CharField(max_length=255,blank=True,null=True)
+    group_type = models.IntegerField(choices=TYPE_CHOICES, default=1)
+    bio = models.TextField(null=True,blank=True)
+    group_president = models.CharField(max_length=255,blank=True,null=True)
+    location = models.CharField(max_length=500,blank=True,null=True)
+    latitude = models.CharField(max_length=500,blank=True,null=True)
+    longitude = models.CharField(max_length=500,blank=True,null=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=255,blank=True,null=True)
+    group_logo = models.ImageField(upload_to='group/group_logo/', blank=True, null=True)  # Add image field
+    group_background_image = models.ImageField(upload_to='group/group_background_image/', blank=True, null=True)  # Add image field
+
+    def __str__(self):
+        return self.group_name
+
+    class Meta:
+        db_table = 'futurestar_app_traininggroups'
 
 # post  Model
 class Post(models.Model):
     user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE,default=True)
     title = models.CharField(max_length=255)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)  # Add this if it's optional
+    group = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE,null=True,blank=True)
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
     date_created = models.DateTimeField(auto_now_add=True)
@@ -51,6 +77,7 @@ class Post(models.Model):
 class Post_comment(models.Model):
     user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE,default=True)
     team_id = models.ForeignKey(Team ,null=True,blank=True, on_delete=models.CASCADE)
+    gropu_id = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE,null=True,blank=True)
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE,default=True)
     parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
@@ -196,30 +223,3 @@ class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
 
     class Meta:
         db_table = 'futurestar_app_gallary'
-
-
-class TrainingGroups(models.Model):
-    TYPE_CHOICES = [
-        (1, 'Open'),
-        (2, 'Close'),
-    ]
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
-    group_name = models.CharField(max_length=255,blank=True,null=True)
-    group_username = models.CharField(max_length=255,blank=True,null=True)
-    group_type = models.IntegerField(choices=TYPE_CHOICES, default=1)
-    bio = models.TextField(null=True,blank=True)
-    group_president = models.CharField(max_length=255,blank=True,null=True)
-    location = models.CharField(max_length=500,blank=True,null=True)
-    latitude = models.CharField(max_length=500,blank=True,null=True)
-    longitude = models.CharField(max_length=500,blank=True,null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=255,blank=True,null=True)
-    group_logo = models.ImageField(upload_to='group/group_logo/', blank=True, null=True)  # Add image field
-    group_background_image = models.ImageField(upload_to='group/group_background_image/', blank=True, null=True)  # Add image field
-
-    def __str__(self):
-        return self.group_name
-
-    class Meta:
-        db_table = 'futurestar_app_traininggroups'
