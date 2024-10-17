@@ -99,7 +99,7 @@ class ChangePasswordOtpSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']  # Customize as needed
+        fields = ['id', 'username', 'profile_picture']  # Customize as needed
 
 class PostCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
@@ -253,7 +253,7 @@ class UserRoleSerializer(serializers.ModelSerializer):
 class GallarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallary
-        fields = ['id', 'user','team_id', 'album_id','content_type','media_file', 'created_at', 'updated_at']
+        fields = ['id', 'user','team_id','group_id','album_id','content_type','media_file', 'created_at', 'updated_at']
         read_only_fields = ['user','album_id']
 
     def to_representation(self, instance):
@@ -296,7 +296,7 @@ class DetailAlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Album
-        fields = ['id', 'user', 'team_id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'team_id','group_id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at']
         read_only_fields = ['user']  # Make the 'user' field read-only
 
     # Method to get the most recent image or video from the related Gallary
@@ -325,7 +325,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
         # fields = '__all__'
-        fields = ['id', 'user','team_id', 'name','thumbnail', 'created_at', 'updated_at' ]
+        fields = ['id', 'user','team_id','group_id', 'name','thumbnail', 'created_at', 'updated_at' ]
 
     # Method to get the most recent image or video from the related Gallary
     def get_thumbnail(self, obj):

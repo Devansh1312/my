@@ -1297,33 +1297,47 @@ class DetailAlbumListAPIView(generics.ListAPIView):
     serializer_class = DetailAlbumSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPostPagination  # Use custom pagination
 
     def get_queryset(self):
-        # team_id = self.request.data.get('Team-ID')
         album_id = self.request.data.get('album_id')  # Fetch album_id from the request body
-        # user_id = self.request.data.get('user_id')  # Fetch album_id from the request body
-        
+
         if album_id:
             try:
                 # Ensure that the album belongs to the user or team
-                # if team_id:
-                #     return Album.objects.filter(id=album_id, team_id=team_id)
-                # else:
-                    return Album.objects.filter(id=album_id)
+                return Album.objects.filter(id=album_id)
             except Album.DoesNotExist:
-                return Album.objects.none()  # Return an empty queryset if not found
-        # else:
-        #     # If no album_id is provided, return albums by team or user
-        #     if team_id:
-        #         return Album.objects.filter(team_id=team_id)
-        #     else:
-        #         return Album.objects.filter(user=user_id)
+                return Album.objects.none()
+        else:
+             raise ValidationError(_("Album Id is required"))
+           
+      
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)  # Paginate the queryset
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_records = queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
+
+            # Custom response to include pagination data
+            return Response({
+                'status': 1,
+                'message': _('Detailed Albums fetched successfully.'),
+                'data': serializer.data,
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
+                
+            }, status=status.HTTP_200_OK)
+
+        # If pagination is not applicable, return all albums
         albums = self.get_queryset()
         serializer = self.get_serializer(albums, many=True)
 
@@ -1333,7 +1347,6 @@ class DetailAlbumListAPIView(generics.ListAPIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-   
     
 
 
@@ -1370,15 +1383,20 @@ class AlbumListAPIView(generics.ListAPIView):
     serializer_class = AlbumSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomPostPagination 
 
     def get_queryset(self):
-        team_id = self.request.data.get('Team-ID')
+        team_id = self.request.data.get('team_id')
         user_id=self.request.data.get('user_id')
+        group_id=self.request.data.get('group_id')
+
     
 
         queryset = Album.objects.all()
         if team_id:
             queryset = queryset.filter(team_id=team_id)
+        elif group_id:
+            queryset = queryset.filter(group_id=group_id)
 
       
         else:
@@ -1391,6 +1409,24 @@ class AlbumListAPIView(generics.ListAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset) 
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_records = queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
+
+            # Custom response to include pagination data
+            return Response({
+                'status': 1,
+                'message': _('Albums fetched successfully.'),
+                'data': serializer.data,
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
+                
+            }, status=status.HTTP_200_OK)
+
 
         albums = self.get_queryset()  # Renamed 'gallary' to 'albums' for clarity
         serializer = self.get_serializer(albums, many=True)
@@ -1409,11 +1445,14 @@ class GallaryListAPIView(generics.ListAPIView):
     serializer_class = GallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomPostPagination 
+
 
     def get_queryset(self):
-        team_id = self.request.data.get('Team-ID')
+        team_id = self.request.data.get('team_id')
       
         user_id=self.request.data.get('user_id')
+        group_id=self.request.data.get('group_id')
         content_type=self.request.data.get('content_type')
 
 
@@ -1421,6 +1460,8 @@ class GallaryListAPIView(generics.ListAPIView):
         queryset = Gallary.objects.filter(album_id__isnull=True)        
         if team_id:
             queryset = queryset.filter(team_id=team_id)
+        if group_id:
+            queryset = queryset.filter(group_id=group_id)
       
         if user_id:
             queryset = queryset.filter(user_id=user_id)
@@ -1433,6 +1474,25 @@ class GallaryListAPIView(generics.ListAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset) 
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_records = queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
+
+            # Custom response to include pagination data
+            return Response({
+                'status': 1,
+                'message': _('Gallary Items fetched successfully.'),
+                'data': serializer.data,
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
+                
+            }, status=status.HTTP_200_OK)
+
 
         gallary = self.get_queryset()
         image_extensions = ('jfif','PNG','.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
@@ -1467,15 +1527,24 @@ class GallaryCreateAPIView(generics.CreateAPIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Extract album_id and team_id from the request
+        # Extract album_id, team_id, and training_group_id from the request
         album_id = request.data.get('album_id', None)
         team_id = request.data.get('team_id', None)
+        group_id = request.data.get('group_id', None)
 
         # Initialize the serializer
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             album_instance = None
             team_instance = None
+            group_instance = None
+
+            # Fetch the training_group instance if training_group_id is provided
+            if group_id:
+                try:
+                    group_instance = TrainingGroups.objects.get(id=group_id)
+                except TrainingGroup.DoesNotExist:
+                    raise NotFound(_("Training group not found."))
 
             # Fetch the album instance if album_id is provided
             if album_id:
@@ -1498,7 +1567,17 @@ class GallaryCreateAPIView(generics.CreateAPIView):
                 if not album_instance.team_id and team_id:
                     raise ValidationError(_("This album is not associated with a team. Please remove the team ID."))
 
-            # Condition 1: Both team_id and album_id are provided
+            # New validation: Check if the album is related to a training group
+            if album_instance and group_instance:
+                if album_instance.group_id and not group_id:
+                    raise ValidationError(_("This album is associated with a training group. Please provide a training group ID."))
+                if not album_instance.group_id and group_id:
+                    raise ValidationError(_("This album is not associated with a training group. Please remove the training group ID."))
+
+            # Condition 0: Both Training_id and album_id are provided
+            if group_instance and album_instance:
+                serializer.save(user=request.user, album_id=album_instance, group_id=group_instance)
+             # Condition 1: Both team_id and album_id are provided
             if team_instance and album_instance:
                 serializer.save(user=request.user, album_id=album_instance, team_id=team_instance)
 
@@ -1530,11 +1609,14 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
     serializer_class = GallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomPostPagination 
+
 
     def get_queryset(self):
         team_id = self.request.data.get('team_id')
       
         user_id=self.request.data.get('user_id')
+        group_id=self.request.data.get('group_id')
        
 
         queryset = Gallary.objects.filter(album_id__isnull=True)        
@@ -1544,6 +1626,9 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
         if user_id:
             queryset = queryset.filter(user_id=user_id)
       
+        if group_id:
+            queryset = queryset.filter(group_id=group_id)
+
 
         return queryset.order_by('-created_at')
 
@@ -1551,6 +1636,24 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset) 
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_records = queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
+
+            # Custom response to include pagination data
+            return Response({
+                'status': 1,
+                'message': _('Latest Gallary Items fetched successfully.'),
+                'data': serializer.data,
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
+                
+            }, status=status.HTTP_200_OK)
 
         gallary = self.get_queryset()
         image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
@@ -1575,6 +1678,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
                 'videos': video_serializer.data
             }
         }, status=status.HTTP_200_OK)
+
 
 
 ###########  gallary list delete ################

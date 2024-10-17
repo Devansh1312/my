@@ -182,6 +182,8 @@ class Album(models.Model):
     user = models.ForeignKey(User, related_name='user_album', on_delete=models.CASCADE)
 
     team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
+    group_id=models.ForeignKey('TrainingGroups', related_name='training_group_album', null=True, blank=True, on_delete=models.CASCADE)
+   
     name = models.TextField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -201,6 +203,8 @@ class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
     user = models.ForeignKey(User, related_name='user_gallary', on_delete=models.CASCADE)
     team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
     album_id = models.ForeignKey(Album, related_name='gallary_set',null=True, on_delete=models.CASCADE)
+    group_id=models.ForeignKey('TrainingGroups', related_name='training_group_gallary', null=True, blank=True, on_delete=models.CASCADE)
+
     content_type = models.IntegerField(choices=CONTENT_TYPE, default=1)
     
     # Use the helper function for the upload_to argument
