@@ -329,7 +329,13 @@ class LoginAPIView(APIView):
                        User.objects.filter(phone=username_or_phone).first()
 
                 if user and user.check_password(password):
-                    if user.is_active:
+                    if user.role == 1:
+                        return Response({
+                            'status': 0,
+                            'message': _('You Can Not Login Here'),
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    elif user.is_active:
                         user.device_type = device_type
                         user.device_token = device_token
                         user.last_login = timezone.now()
@@ -365,7 +371,12 @@ class LoginAPIView(APIView):
 
                 if user:
                     # If the user already exists, log them in
-                    if user.is_active:
+                    if user.role == 1:
+                        return Response({
+                            'status': 0,
+                            'message': _('You Can Not Login Here'),
+                        }, status=status.HTTP_400_BAD_REQUEST)
+                    elif user.is_active:
                         user.device_type = device_type
                         user.device_token = device_token
                         user.last_login = timezone.now()
