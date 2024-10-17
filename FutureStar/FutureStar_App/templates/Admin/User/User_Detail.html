@@ -58,7 +58,7 @@
                      </div>
                      <div class="card-body">
                         <div class="profile-info text-center mb-3">
-                           <img class="img-70 rounded-circle" alt="Profile Picture" src="{{ user.profile_picture.url }}">
+                           <img class="img-70 rounded-circle" alt="Profile Picture" src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/images/user/7.jpg' %}{% endif %}">
                            <h5 class="mt-2">{{ user.fullname }}</h5>
                            <p>{{ user.role.name_en }}</p>
                         </div>

@@ -11,7 +11,7 @@ from .models import SystemSettings
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404 ,HttpResponseNotAllowed
 
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
@@ -586,34 +586,21 @@ class DefaultUserList(LoginRequiredMixin, View):
 
 
 @method_decorator(user_role_check, name='dispatch')
-class UserDetailView(View):
+class UserDetailView(LoginRequiredMixin,View):
     template_name = "Admin/User/User_Detail.html"
     
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        user_id = request.POST.get('user_id')
+        if user_id == None:
+            return redirect('Dashboard')
         try:
-            user = get_object_or_404(User, pk=pk)
-            # Fetch the role (assuming a foreign key field role in the User model)
-            role = user.role  
-            return render(
-                request,
-                self.template_name,
-                {
-                    "user": user,
-                    "role": role,
-                    "title": "User Details",
-                    "source_page": request.GET.get("source_page", "default_page"),  # Optional source page
-                },
-            )
-        except Http404:
-            return redirect('Dashboard')  # Redirect to dashboard if user is not found
-
-    def post(self, request, pk, *args, **kwargs):
-        try:
-            user = get_object_or_404(User, pk=pk)
+              # Fetch 'user_id' from the POST request
+            user = User.objects.get(id=user_id)  # Get the user object based on 'user_id'
             source_page = request.POST.get("source_page") 
             title = request.POST.get("title") 
-            role = user.role  # Assuming the user model has a role foreign key
-        
+            role = user.role_id  # Assuming the user model has a role foreign key
+            print("POST")
+
             return render(
                 request,
                 self.template_name,
@@ -624,7 +611,31 @@ class UserDetailView(View):
                     "source_page": source_page,
                 },
             )
-        except Http404:
+        except (Http404, HttpResponseNotAllowed):
+            return redirect('Dashboard')
+
+    def post(self, request,*args, **kwargs):
+        user_id = request.POST.get('user_id')
+        if user_id == None:
+            return redirect('Dashboard')
+        try:
+            user = User.objects.get(id=user_id)  # Get the user object based on 'user_id'
+            source_page = request.POST.get("source_page") 
+            title = request.POST.get("title") 
+            role = user.role_id  # Assuming the user model has a role foreign key
+            print("POST")
+
+            return render(
+                request,
+                self.template_name,
+                {
+                    "user": user,
+                    "role": role,
+                    "title": title,
+                    "source_page": source_page,
+                },
+            )
+        except (Http404, HttpResponseNotAllowed):
             return redirect('Dashboard')  # Redirect to dashboard if user is not found
         
 ##############################################  User Category Type Module  ################################################

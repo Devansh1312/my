@@ -75,8 +75,9 @@
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                              <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
-                                             <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' pk=user.pk %}" style="display: none;">
+                                             <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
                                                  {% csrf_token %}
+                                                 <input type="hidden" name="user_id" value="{{ user.id }}">
                                                  <input type="hidden" name="source_page" value="referee_list">
                                                  <input type="hidden" name="title" value="Referee">
                                              </form>
