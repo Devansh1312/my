@@ -651,7 +651,9 @@ class EditProfileAPIView(APIView):
 
         # Assign gender by fetching the corresponding UserGender instance
         gender_id = request.data.get('gender')
-        if gender_id:
+       
+        if gender_id is None:
+            
             try:
                 user.gender = UserGender.objects.get(id=gender_id)  # Fetch UserGender instance
             except UserGender.DoesNotExist:
@@ -662,7 +664,7 @@ class EditProfileAPIView(APIView):
 
         # Handle country
         country_id = request.data.get('country')
-        if country_id:
+        if country_id is None:
             try:
                 user.country = Country.objects.get(id=country_id)  # Fetch Country instance
             except Country.DoesNotExist:
@@ -673,7 +675,7 @@ class EditProfileAPIView(APIView):
 
         # Handle city
         city_id = request.data.get('city')
-        if city_id:
+        if city_id is None:
             if not user.country:  # Ensure country is set before updating city
                 return Response({
                     'status': 2,
