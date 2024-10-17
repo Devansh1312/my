@@ -65,16 +65,16 @@
                              
                             </h4>
                             <p>{{ system_settings.address }}</p>
-                            <div><a class="mailto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i> {{ system_settings.email }}</a></div>
-                            <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a></div>
+                            <div><a class="mailto" href="mailto:{{ system_settings.email }}"><i class="fa-solid fa-envelope"></i> {{ system_settings.email }}</a></div>
+                            <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fa-solid fa-phone"></i>{{ system_settings.phone }}</a></div>
                         </div>
                     </div>
                     <h5>Follow Us</h5>
                     <div class="social-style-two pt-5">
-                        <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <a href="{{ system_settings.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="{{ system_settings.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="{{ system_settings.linkedin }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="{{ system_settings.facebook }}" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>  
+                        <a href="{{ system_settings.twitter }}" target="_blank"> <i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="{{ system_settings.instagram }}" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="{{ system_settings.linkedin }}" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
                     </div>
                 </div>
             </div>
@@ -129,7 +129,7 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group pt-5 mb-0">
-                                    <button type="submit" class="theme-btn style-two w-100">Send Message us <i class="far fa-arrow-right"></i></button>
+                                    <button type="submit" class="theme-btn style-two w-100">Send Message us <i class="fa-solid fa-arrow-right"></i></button>
                                     <div id="msgSubmit" class="hidden"></div>
                                 </div>
                             </div>
@@ -164,6 +164,55 @@
         document.getElementById('change-language-btn').addEventListener('click', function() {
             const selectedLanguage = document.getElementById('language-selector').value;
             localStorage.setItem('language', selectedLanguage);
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone');
+        
+        phoneInput.addEventListener('keypress', function(event) {
+            const charCode = event.which ? event.which : event.keyCode;
+            const charStr = String.fromCharCode(charCode);
+
+            // Allow numbers, backspace, and the "+" symbol
+            if (!charStr.match(/[0-9+]/) && charCode !== 8) {
+                event.preventDefault();
+            }
+
+            // Prevent more than one "+" at the beginning
+            if (charStr === "+" && phoneInput.value.includes("+")) {
+                event.preventDefault();
+            }
+        });
+
+        phoneInput.addEventListener('paste', function(event) {
+            // Handle paste input (only allow numbers and +)
+            let paste = (event.clipboardData || window.clipboardData).getData('text');
+            if (!paste.match(/^[0-9+]+$/)) {
+                event.preventDefault();
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailInput = document.getElementById('email');
+        const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+        
+        emailInput.addEventListener('input', function() {
+            const emailValue = emailInput.value;
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'email-error';
+            
+            // Remove previous error message
+            const prevError = document.querySelector('.email-error');
+            if (prevError) prevError.remove();
+            
+            // Validate email using regex
+            if (!emailRegex.test(emailValue)) {
+                emailInput.classList.add('is-invalid'); // Add invalid class for styling
+                errorDiv.textContent = 'Please enter a valid email address';
+                emailInput.parentNode.appendChild(errorDiv);
+            } else {
+                emailInput.classList.remove('is-invalid'); // Remove invalid class if valid
+            }
         });
     });
 </script>

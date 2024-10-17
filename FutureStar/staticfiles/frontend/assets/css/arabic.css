@@ -1,0 +1,100 @@
+html[dir=rtl] {
+
+    /* Common */
+    body {
+        text-align: right;
+    }
+
+    header .theme-btn,
+    header .selectLanguage {
+        margin-right: 0;
+        margin-left: 10px;
+    }
+
+    .theme-btn i,
+    a.theme-btn i {
+        margin-left: 0px;
+        margin-right: 7px;
+        transform: rotate(-120deg);
+
+    }
+
+    .section-title .sub-title:before {
+        margin-right: 0px;
+        margin-left: 10px;
+    }
+
+    .awards-tabs .nav-link {
+        text-align: right;
+    }
+
+    .testimonial-author .author-image {
+        margin-right: 0px;
+        margin-left: 20px;
+
+    }
+
+    .footer-six .list-style-two li i {
+        margin-right: 0px;
+        margin-left: 12px;
+    }
+
+    .video-dis {
+        text-align: right;
+    }
+
+    .blog-meta li i {
+        margin: -3px 0 0 10px;
+    }
+
+    .read-more i {
+        margin-left: 0px;
+        margin-right: 8px;
+        transform: rotate(-120deg);
+
+    }
+
+    .our-location-address .callto i {
+        margin-right: 0px;
+        margin-left: 10px;
+
+    }
+
+    .footer-six .widget_nav_menu .list-style-two li a:before {
+        right: 0;
+    }
+
+    .footer-six .widget_nav_menu .list-style-two li a:hover {
+        padding-left: 0px;
+        padding-right: 18px;
+    }
+
+    .why-choose-item .why-choose-header i {
+        margin: -11px 0px 0 10px;
+    }
+
+    .slick-list {
+        display: -webkit-box;
+
+    }
+
+    .details-btn {
+        transform: rotate(-120deg);
+    }
+
+    .nav-links{
+        margin-right: auto;
+        margin-left: 0px;
+      
+      }
+      .star-rating .filled-stars {
+        right: 0;
+       
+    }
+      @media only screen and (max-width: 480px) {
+      
+        .main-menu .mobile-logo{
+            margin-left: auto;
+        }
+
+}

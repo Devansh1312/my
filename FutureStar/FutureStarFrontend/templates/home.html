@@ -36,7 +36,7 @@
                         <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
                         {% lang cmsdata current_language "heading_content" as heading_content %}
                         <p>{{ heading_content }}</p>
-                        <a href="" class="theme-btn style-two">{% trans "Read More" %}<i class="far fa-arrow-right"></i>
+                        <a href="" class="theme-btn style-two">{% trans "Read More" %}<i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -467,7 +467,7 @@
                 <div class="image">
                     <img src="{{ app_feature.image.url }}" alt="Work Gallery">
                     <a href="{% url 'index' %}" class="project-btn">
-                        <i class="far fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
                 <div class="content">
@@ -488,11 +488,11 @@
             </div> {% endfor %} </div>
         <div class="work-gallery-controls">
             <button class="work-gallery-prev">
-                <i class="far fa-chevron-left"></i>
+                <i class="fa-solid fa-chevron-left"></i>
             </button>
             <div class="work-gallery-dots"></div>
             <button class="work-gallery-next">
-                <i class="far fa-chevron-right"></i>
+                <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
     </div>
@@ -504,28 +504,28 @@
         <div class="row justify-content-between">
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-2s">
-                    <i class="fal fa-check-circle"></i>
+                    <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ system_settings.happy_user }}">0</span>
                     <span class="counter-title">Happy User</span>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
-                    <i class="fal fa-check-circle"></i>
+                    <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text k" data-speed="3000" data-stop="{{ system_settings.line_of_code }}">0</span>
                     <span class="counter-title">Line of Code</span>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
-                    <i class="fal fa-check-circle"></i>
+                    <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ system_settings.downloads }}">0</span>
                     <span class="counter-title">Downloads</span>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
-                    <i class="fal fa-check-circle"></i>
+                    <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ system_settings.app_rate }}">0</span>
                     <span class="counter-title">App Rates</span>
                 </div>
@@ -642,11 +642,7 @@
                         <li>
                             <i class="far fa-calendar-alt"></i>
                             <span>{{ news.news_date|date:"F d, Y" }}</span>
-                        </li>
-                        <li>
-                            <i class="far fa-comments"></i>
-                            <a href="{% url 'news-detail' news.id %}">Comment (5)</a>
-                        </li>
+                        </li>     
                     </ul>
                 </div>
             </div>

@@ -151,7 +151,7 @@
                         {% elif current_language == 'ar' %}
                             تسجيل الدخول
                         {% endif %}
-                        <i class="far fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </a>
                     <a href="{% url 'register' %}" class="theme-btn style-two">
                         {% if current_language == 'en' %}
@@ -159,7 +159,7 @@
                         {% elif current_language == 'ar' %}
                             تسجيل
                         {% endif %}
-                        <i class="far fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </a>
                     
         
@@ -205,7 +205,7 @@
 
         <ul class="details-wrapper">
             <li>
-                <span><i class="far fa-map-marker-alt"></i></span>
+                <span><i class="fa-solid fa-location-dot"></i></span>
                 <a href="https://maps.google.com/?q={{ system_settings.address|urlencode }}">
                     {{ system_settings.address }}
                 </a>
@@ -215,7 +215,7 @@
                 <a href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a>
             </li>
             <li>
-                <span><i class="far fa-phone"></i></span>
+                <span><i class="fa-solid fa-phone"></i></span>
                 <a href="tel:{{ system_settings.phone }}">{{ system_settings.phone }}</a>
             </li>
         </ul>
@@ -223,7 +223,7 @@
         <!--Social Icons-->
         <div class="social-style-one">
             <a href="{{ system_settings.facebook }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
-            <a href="{{ system_settings.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="{{ system_settings.twitter }}" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
             <a href="{{ system_settings.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
             <a href="{{ system_settings.pinterest }}" target="_blank"><i class="fab fa-pinterest-p"></i></a>
         </div>
