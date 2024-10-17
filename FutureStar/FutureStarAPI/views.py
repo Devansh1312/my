@@ -1352,18 +1352,45 @@ class DetailAlbumListAPIView(generics.ListAPIView):
 
 class DetailAlbumCreateAPIView(generics.CreateAPIView):
     serializer_class = DetailAlbumSerializer
-    parser_classes = (JSONParser, MultiPartParser, FormParser) 
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
-   
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
         serializer = self.get_serializer(data=request.data)
+        
         if serializer.is_valid():
-            serializer.save(user=request.user)  # Album is created without user association in this case
+            # Create the album first
+            album_instance = serializer.save(user=request.user)
+
+            # Now handle the media file upload for the gallery
+            media_file = request.FILES.get('media_file')  # Adjust field name accordingly
+            content_type=self.request.data.get('content_type')
+            if media_file:
+                # Create a gallery entry using the media file
+                gallary_serializer = GallarySerializer(data={
+                    'user': request.user.id,
+                    'media_file': media_file,
+                    'content_type' : content_type,
+                    'album_id': album_instance.id,
+                    # You may want to include other fields like team_id, group_id if needed
+                })
+                
+                if gallary_serializer.is_valid():
+                    gallary_serializer.save()  # Save the gallery entry
+
+                else:
+                    # If gallery entry fails, you might want to rollback the album creation
+                    album_instance.delete()  # Rollback album creation
+                    return Response({
+                        'status': 0,
+                        'message': _('Gallery entry creation failed.'),
+                        'errors': gallary_serializer.errors
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
             return Response({
                 'status': 1,
                 'message': _('Album created successfully.'),
@@ -1375,8 +1402,7 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
             'message': _('Album creation failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+ 
 ########### only album list ################
 
 class AlbumListAPIView(generics.ListAPIView):
