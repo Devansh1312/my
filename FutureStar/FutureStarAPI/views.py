@@ -646,7 +646,17 @@ class EditProfileAPIView(APIView):
         # Update all fields from request data
         user.fullname = request.data.get('fullname', user.fullname)
         user.bio = request.data.get('bio', user.bio)
-        user.date_of_birth = request.data.get('date_of_birth', user.date_of_birth)
+        date_of_birth = request.data.get('date_of_birth')
+        if date_of_birth is not None:
+            try:
+                user.date_of_birth = date_of_birth  # No specific format validator here, assuming the input is correct
+            except (ValueError, TypeError):
+                return Response({
+                    'status': 2,
+                    # 'message': _('Invalid date format for date_of_birth.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user.date_of_birth = None
         user.age = request.data.get('age', user.age)
 
         # Assign gender by fetching the corresponding UserGender instance
