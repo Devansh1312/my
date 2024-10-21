@@ -96,10 +96,29 @@ class ChangePasswordOtpSerializer(serializers.Serializer):
     new_password = serializers.CharField(min_length=8)  # Ensure a minimum length for security
 
 
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ['id', 'team_name', 'team_logo']  
+    
+    def get_team_logo(self, obj):
+        return obj.team_logo.url if obj.team_logo else None 
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingGroups
+        fields = ['id', 'group_name', 'group_logo']
+
+    def get_group_logo(self, obj):
+        return obj.group_logo.url if obj.group_logo else None 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_picture']  # Customize as needed
+        fields = ['id', 'username', 'profile_picture']
+
+    def get_profile_picture(self, obj):
+        return obj.profile_picture.url if obj.profile_picture else None  
 
 class PostCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
@@ -117,35 +136,95 @@ class PostCommentSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    comments = serializers.SerializerMethodField()  # Change to use a method for comments
-    user = UserSerializer(read_only=True)  # Nested user details
-    team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), allow_null=True, required=False)
-    group_id = serializers.PrimaryKeyRelatedField(queryset=TrainingGroups.objects.all(), allow_null=True, required=False)
-
+    entity = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
+    view_count = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'user', 'team_id', 'group_id', 'title', 'description', 'image', 'date_created', 'comments']
+        fields = [
+            'id', 'entity', 'title', 'description', 'image', 
+            'date_created', 'comments', 'view_count', 'like_count',
+            'latitude', 'longitude', 'address', 'house_no', 
+            'premises', 'street', 'city', 'state', 'country_name', 
+            'postalCode', 'country_code'
+        ]
+
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        return obj.image.url if obj.image else None
+    
+    def get_entity(self, obj):
+        if obj.team:
+            # Return unified structure for Team
+            return {
+                'id': obj.team.id,
+                'username': obj.team.team_name,
+                'profile_image': obj.team.team_logo.url if obj.team.team_logo else None,
+                'type': 'team'  # Optional, to indicate type
+            }
+        elif obj.group:
+            # Return unified structure for Group
+            return {
+                'id': obj.group.id,
+                'username': obj.group.group_name,  # Using group_name as a username equivalent
+                'profile_image': obj.group.group_logo.url if obj.group.group_logo else None,
+                'type': 'group'  # Optional, to indicate type
+            }
+        elif obj.user:
+            # Return unified structure for User
+            return {
+                'id': obj.user.id,
+                'username': obj.user.username,
+                'profile_image': obj.user.profile_picture.url if obj.user.profile_picture else None,
+                'type': 'user'  # Optional, to indicate type
+            }
+        return None
+
+    def get_view_count(self, obj):
+        return PostView.objects.filter(post=obj).count()
+
+    def get_like_count(self, obj):
+        return PostLike.objects.filter(post=obj).count()
 
     def get_comments(self, obj):
-        # Get only top-level comments (where parent is None)
+        request = self.context.get('request')
+
+        if request and request.parser_context.get('view').__class__.__name__ in ['AllPostsListAPIView', 'PostListAPIView']:
+            return Post_comment.objects.filter(post=obj, parent=None).count()
+        
         top_level_comments = Post_comment.objects.filter(post=obj, parent=None)
-        return PostCommentSerializer(top_level_comments, many=True).data  # Serialize top-level comments
+        return PostCommentSerializer(top_level_comments, many=True).data
 
     def create(self, validated_data):
+        # Override create to handle team_id/group_id/user assignments
+        user = validated_data.pop('user', None)
         team_id = validated_data.pop('team_id', None)
         group_id = validated_data.pop('group_id', None)
-        post = Post.objects.create(**validated_data, team_id=team_id,group_id=group_id)
+        
+        post = Post.objects.create(**validated_data, user=user, team_id=team_id, group_id=group_id)
         return post
 
     def update(self, instance, validated_data):
-        team_id = validated_data.get('team_id', instance.team_id)
-        group_id = validated_data.get('group_id', instance.group_id)
-        instance.team_id = team_id
-        instance.group_id = group_id
+        instance.user = validated_data.get('user', instance.user)
+        instance.team = validated_data.get('team', instance.team)
+        instance.group = validated_data.get('group', instance.group)
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.image = validated_data.get('image', instance.image)
+        instance.latitude = validated_data.get('latitude', instance.latitude)
+        instance.longitude = validated_data.get('longitude', instance.longitude)
+        instance.address = validated_data.get('address', instance.address)
+        instance.house_no = validated_data.get('house_no', instance.house_no)
+        instance.premises = validated_data.get('premises', instance.premises)
+        instance.street = validated_data.get('street', instance.street)
+        instance.city = validated_data.get('city', instance.city)
+        instance.state = validated_data.get('state', instance.state)
+        instance.country_name = validated_data.get('country_name', instance.country_name)
+        instance.postalCode = validated_data.get('postalCode', instance.postalCode)
+        instance.country_code = validated_data.get('country_code', instance.country_code)
         instance.save()
         return instance
 

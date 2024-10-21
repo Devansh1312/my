@@ -65,6 +65,19 @@ class Post(models.Model):
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
     date_created = models.DateTimeField(auto_now_add=True)
 
+    # New fields
+    latitude = models.FloatField(default=0.0)
+    longitude = models.FloatField(default=0.0)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    house_no = models.CharField(max_length=50, blank=True, null=True)
+    premises = models.CharField(max_length=100, blank=True, null=True)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    country_name = models.CharField(max_length=100, blank=True, null=True)
+    postalCode = models.CharField(max_length=20, blank=True, null=True)
+    country_code = models.CharField(max_length=10, blank=True, null=True)
+
     def __str__(self):
         return self.title
 
@@ -86,7 +99,25 @@ class Post_comment(models.Model):
     class Meta:
         db_table = 'futurestar_app_post_comment'
 
+# PostView model to track views on a post
+class PostView(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='views', on_delete=models.CASCADE)
+    date_viewed = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table = 'futurestar_app_post_view'
+        unique_together = ('user', 'post')  # Each user can only view the post once (optional)
+
+# PostLike model to track likes on a post
+class PostLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
+    date_liked = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'futurestar_app_post_like'
+        unique_together = ('user', 'post')  # Each user can only like the post once
 
 class Field(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE,default=True)

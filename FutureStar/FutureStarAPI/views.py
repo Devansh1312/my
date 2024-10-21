@@ -23,6 +23,9 @@ from django.db import transaction
 import string
 from rest_framework.exceptions import ValidationError
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_user_data(user, request):
@@ -37,8 +40,8 @@ def get_user_data(user, request):
 
     return {
         'id': user.id,
-        'followers_count' : followers_count,
-        'following_count' : following_count,
+        'followers_count' : 100,
+        'following_count' : 100,
         'post_count' : post_count,
         'user_role' : user.role_id,
         'username': user.username,
@@ -85,118 +88,120 @@ class send_otp(APIView):
         return ''.join(random.choice(characters) for i in range(length))
     
     def post(self, request, *args, **kwargs):
+        logger.debug("Starting send_otp post method")
+        
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         registration_type = request.data.get('type')
-        
+        logger.debug(f"Registration Type: {registration_type}")
 
-        # Handle Registration Type 1 (Normal registration)
-        if registration_type == 1 :
-            username = request.data.get('username')
-            phone = request.data.get('phone')
-            email = request.data.get('email')
-            password = request.data.get('password')
-            # Check if username or phone already exists in User table
-            # Check if the username already exists in the User table
-            if User.objects.filter(username=username).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('Username already exists.')
-                }, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # Handle Registration Type 1 (Normal registration)
+            if registration_type == 1:
+                username = request.data.get('username')
+                phone = request.data.get('phone')
+                password = request.data.get('password')
 
-            # Check if the phone already exists in the User table
-            if User.objects.filter(phone=phone).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('Phone number already exists.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # If user does not exist, generate OTP and store it in OTPSave table
-            otp = generate_otp()
-            # Save or update the OTP in OTPSave
-            otp_record, created = OTPSave.objects.update_or_create(
-                phone=phone,  # or username based on uniqueness
-                defaults={'phone': phone, 'OTP': otp}
-            )
-
-            return Response({
-                'status': 1,
-                'message': _('OTP sent successfully.'),
-                'data': otp  # For development, this is sent in the response.
-            }, status=status.HTTP_200_OK)
-
-        # Handle Registration Type 2/3 (Social registration via email)
-        elif registration_type in [2, 3]:
-            username = request.data.get('username')
-            phone = request.data.get('phone')
-            email = request.data.get('email')
-            
-            if not email:
-                    return Response({
-                        'status': 0,
-                        'message': _('Email is required.')
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-                # Check email format using regex
-            email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-            if not re.match(email_regex, email):
-                return Response({
-                    'status': 0,
-                    'message': _('Invalid email format.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Check if email exists in User table
-            if User.objects.filter(email=email).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('Email already exists.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-
-            # If email does not exist, check username and phone if provided
-            if username and phone:
-                # Validate if username or phone already exists in User table
-                # Check if the username already exists in the User table
+                # Check if username or phone already exists
                 if User.objects.filter(username=username).exists():
                     return Response({
                         'status': 0,
                         'message': _('Username already exists.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                # Check if the phone already exists in the User table
                 if User.objects.filter(phone=phone).exists():
                     return Response({
                         'status': 0,
                         'message': _('Phone number already exists.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                # Generate OTP and save in OTPSave for type 2/3 with phone, email, and password
+                # Generate OTP and save it
                 otp = generate_otp()
-                random_password = self.generate_random_password()
-                password = random_password  # Set the generated password
                 otp_record, created = OTPSave.objects.update_or_create(
-                    phone=phone,  # Assuming phone is required
-                    defaults={'phone': phone,'OTP': otp}
+                    phone=phone,
+                    defaults={'phone': phone, 'OTP': otp}
                 )
 
                 return Response({
                     'status': 1,
                     'message': _('OTP sent successfully.'),
-                    'data': otp  # Send OTP in response for development.
+                    'data': otp  # For development, this is sent in the response.
                 }, status=status.HTTP_200_OK)
 
-            else:
-                # If username and phone are not provided, return success for email registration
+            # Handle Registration Type 2/3 (Social registration via email)
+            elif registration_type in [2, 3]:
+                username = request.data.get('username')
+                phone = request.data.get('phone')
+                email = request.data.get('email')
+
+                if not email:
+                    return Response({
+                        'status': 0,
+                        'message': _('Email is required.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Check email format using regex
+                email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+                if not re.match(email_regex, email):
+                    return Response({
+                        'status': 0,
+                        'message': _('Invalid email format.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Check if email exists in User table
+                if User.objects.filter(email=email).exists():
+                    return Response({
+                        'status': 0,
+                        'message': _('Email already exists.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Validate if username or phone already exists if provided
+                if username and phone:
+                    if User.objects.filter(username=username).exists():
+                        return Response({
+                            'status': 0,
+                            'message': _('Username already exists.')
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    if User.objects.filter(phone=phone).exists():
+                        return Response({
+                            'status': 0,
+                            'message': _('Phone number already exists.')
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    otp = generate_otp()
+                    random_password = self.generate_random_password()
+                    otp_record, created = OTPSave.objects.update_or_create(
+                        phone=phone,
+                        defaults={'phone': phone, 'OTP': otp}
+                    )
+
+                    return Response({
+                        'status': 1,
+                        'message': _('OTP sent successfully.'),
+                        'data': otp  # Send OTP in response for development.
+                    }, status=status.HTTP_200_OK)
+
                 return Response({
                     'status': 1,
                     'message': _('User can proceed with registration.'),
                 }, status=status.HTTP_200_OK)
 
-        return Response({
-            'status': 0,
-            'message': _('Invalid registration type.')
-        }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0,
+                'message': _('Invalid registration type.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Error in send_otp: {str(e)}")
+            return Response({
+                'status': 0,
+                'message': _('An error occurred while sending OTP.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class verify_and_register(APIView):
@@ -693,9 +698,9 @@ class EditProfileAPIView(APIView):
             else:
                 setattr(user, field, field_value)  # Otherwise, update with new value
 
-        # Handle date_of_birth and age - retain old values if None or blank
+        # Handle date_of_birth - retain old value if None or blank
         date_of_birth = request.data.get('date_of_birth')
-        if date_of_birth not in [None, '']:
+        if date_of_birth not in [None, '', 'null']:
             try:
                 user.date_of_birth = date_of_birth  # Assuming valid format
             except (ValueError, TypeError):
@@ -704,13 +709,14 @@ class EditProfileAPIView(APIView):
                     'message': _('Invalid date format for date_of_birth.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Handle age - retain old value if None or blank
         age = request.data.get('age')
-        if age not in [None, '']:
+        if age not in [None, '', 'null']:
             user.age = age
 
-        # Assign gender - retain old value if None or blank
+        # Handle gender - retain old value if None or blank
         gender_id = request.data.get('gender')
-        if gender_id not in [None, '']:
+        if gender_id not in [None, '', 'null']:  # Ensure 'null' is also checked
             try:
                 user.gender = UserGender.objects.get(id=gender_id)
             except UserGender.DoesNotExist:
@@ -721,7 +727,7 @@ class EditProfileAPIView(APIView):
 
         # Handle country - retain old value if None or blank
         country_id = request.data.get('country')
-        if country_id not in [None, '']:
+        if country_id not in [None, '', 'null']:
             try:
                 user.country = Country.objects.get(id=country_id)
             except Country.DoesNotExist:
@@ -732,7 +738,7 @@ class EditProfileAPIView(APIView):
 
         # Handle city - retain old value if None or blank
         city_id = request.data.get('city')
-        if city_id not in [None, '']:
+        if city_id not in [None, '', 'null']:
             if not user.country:
                 return Response({
                     'status': 2,
@@ -746,6 +752,7 @@ class EditProfileAPIView(APIView):
                     'status': 2,
                     'message': _('Invalid city specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
+
 
         # Handle profile picture update
         if "profile_picture" in request.FILES:
@@ -803,12 +810,91 @@ class CustomPostPagination(PageNumberPagination):
         except (ValueError, TypeError):
             raise ValidationError("Invalid page number.")
 
+        # Get total number of pages based on the queryset
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        total_pages = paginator.num_pages
+
+        # Check if the requested page number is within the valid range
+        if self.page > total_pages:
+            # If page is out of range, return an empty list
+            return []
+
         # Perform standard pagination
         return super().paginate_queryset(queryset, request, view)
 
-
-
 ###################################################################################### POST MODULE ################################################################################
+
+###################### POST VIEW ################
+class PostViewAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        post_id = request.data.get('post_id')
+
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': _('Post ID is required.')
+            }, status=400)
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post not found.')
+            }, status=404)
+
+        # Track the view
+        PostView.objects.get_or_create(user=request.user, post=post)
+
+        # Return the view count
+        view_count = PostView.objects.filter(post=post).count()
+
+        return Response({
+            'status': 1,
+            'message': _('Post viewed successfully.'),
+            'view_count': view_count
+        }, status=200)
+
+###################### POST LIKE ##################################
+class PostLikeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        post_id = request.data.get('post_id')
+
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': _('Post ID is required.')
+            }, status=400)
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post not found.')
+            }, status=404)
+
+        # Toggle like/unlike
+        post_like, created = PostLike.objects.get_or_create(user=request.user, post=post)
+        if not created:
+            # If the user already liked the post, unlike it (delete the like)
+            post_like.delete()
+            message = _('Post unliked successfully.')
+        else:
+            message = _('Post liked successfully.')
+
+        # Return the like count
+        like_count = PostLike.objects.filter(post=post).count()
+
+        return Response({
+            'status': 1,
+            'message': message,
+            'like_count': like_count
+        }, status=200)
 
 
 ############################# ALL POST LIST VIEW ##########################
@@ -832,7 +918,7 @@ class AllPostsListAPIView(generics.ListAPIView):
         # Paginate the queryset
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(page, many=True, context={'request': request})
             total_records = queryset.count()
             total_pages = self.paginator.page.paginator.num_pages
 
@@ -841,15 +927,12 @@ class AllPostsListAPIView(generics.ListAPIView):
                 'status': 1,
                 'message': _('All posts fetched successfully.'),
                 'data': serializer.data,
-            
                 'total_records': total_records,
                 'total_pages': total_pages,
                 'current_page': self.paginator.page.number
-                
             }, status=status.HTTP_200_OK)
 
-        # In case pagination is not needed or there's no data
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': _('All posts fetched successfully.'),
@@ -872,8 +955,11 @@ class PostListAPIView(generics.ListAPIView):
             return Post.objects.filter(team_id=team_id).order_by('-date_created')
         elif group_id:
             return Post.objects.filter(group_id=group_id).order_by('-date_created')
-        else:
+        elif user_id:
             return Post.objects.filter(user=user_id).order_by('-date_created')
+        else:
+            return Post.objects.filter(user=self.request.user).order_by('-date_created')
+
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -881,34 +967,27 @@ class PostListAPIView(generics.ListAPIView):
             activate(language)
         queryset = self.get_queryset()
 
-        # Paginate the queryset
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = self.get_serializer(page, many=True, context={'request': request})
             total_records = queryset.count()
             total_pages = self.paginator.page.paginator.num_pages
 
-            # Custom response to include pagination data
             return Response({
                 'status': 1,
                 'message': _('Posts fetched successfully.'),
                 'data': serializer.data,
-                'meta': {
-                    'total_records': total_records,
-                    'total_pages': total_pages,
-                    'current_page': self.paginator.page.number
-                }
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
             }, status=status.HTTP_200_OK)
 
-        # In case pagination is not needed or there's no data
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': _('Posts fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
-
-
 
 ######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
@@ -921,11 +1000,12 @@ class PostCreateAPIView(APIView):
             activate(language)
 
         team_id = request.data.get('team_id')  # Optional team_id from request data
-        group_id = request.data.get('group_id')  # Optional team_id from request data
+        group_id = request.data.get('group_id')  # Optional group_id from request data
 
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
+            # Check if team_id is provided
             if team_id:
                 try:
                     team = Team.objects.get(id=team_id)
@@ -935,8 +1015,10 @@ class PostCreateAPIView(APIView):
                         'message': _('Team not found.')
                     }, status=status.HTTP_404_NOT_FOUND)
                 
-                # Save the post with a team
-                post = serializer.save(user=request.user, team_id=team)
+                # Save the post with a team ID
+                post = serializer.save(user=request.user, team_id=team.id)  # Use team.id instead of team
+
+            # Check if group_id is provided
             elif group_id:
                 try:
                     group = TrainingGroups.objects.get(id=group_id)
@@ -946,10 +1028,11 @@ class PostCreateAPIView(APIView):
                         'message': _('Group not found.')
                     }, status=status.HTTP_404_NOT_FOUND)
                 
-                # Save the post with a team
-                post = serializer.save(user=request.user, group_id=group)
+                # Save the post with a group ID
+                post = serializer.save(user=request.user, group_id=group.id)  # Use group.id instead of group
+            
             else:
-                # Save the post for the user without a team
+                # Save the post for the user without a team or group
                 post = serializer.save(user=request.user)
 
             # Handle image upload
@@ -976,6 +1059,7 @@ class PostCreateAPIView(APIView):
             'message': _('Invalid data'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
@@ -1056,15 +1140,13 @@ class PostDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
         post_id = request.data.get('post_id')
         team_id = request.data.get('team_id')
-        group_id = request.data.get('group_id')  # Optional team_id
-
+        group_id = request.data.get('group_id')
 
         if not post_id:
             return Response({
@@ -1085,13 +1167,14 @@ class PostDetailAPIView(APIView):
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PostSerializer(post)
+        serializer = PostSerializer(post, context={'request': request})
 
         return Response({
             'status': 1,
             'message': _('Post details fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+
 
 ######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):

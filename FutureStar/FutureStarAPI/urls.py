@@ -30,6 +30,11 @@ urlpatterns = [
         path('api/following/', UserFollowingAPI.as_view()),
 
         ######## User Post API ###########
+
+        path('api/post/like/', PostLikeAPIView.as_view(), name='post-like'),
+        path('api/post/view/', PostViewAPIView.as_view(), name='post-view'),
+
+
         path('api/posts/all/', AllPostsListAPIView.as_view()),
         path('api/posts/', PostListAPIView.as_view()),
         path('api/posts/create/', PostCreateAPIView.as_view()),
