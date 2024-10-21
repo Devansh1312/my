@@ -611,6 +611,8 @@ class ChangePasswordAPIView(APIView):
 
 
 ############################################### Create Profile API ###################################
+
+
 class EditProfileAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -646,22 +648,47 @@ class EditProfileAPIView(APIView):
         # Update all fields from request data
         user.fullname = request.data.get('fullname', user.fullname)
         user.bio = request.data.get('bio', user.bio)
-        date_of_birth = request.data.get('date_of_birth')
-        if date_of_birth is not None:
+        # date_of_birth = request.data.get('date_of_birth')
+        # # print(date_of_birth)
+        # # if date_of_birth in [None, '']:  # Check if date_of_birth is None or an empty string
+        # #     user.date_of_birth = None  # Store as None (translates to null in the database)
+        # # else:
+        # try:
+        #     user.date_of_birth = date_of_birth  # Assuming input is in the correct format
+        # except (ValueError, TypeError):
+        #     return Response({
+        #         'status': 2,
+        #         'message': _('Invalid date format for date_of_birth.')
+            # }, status=status.HTTP_400_BAD_REQUEST)
+        
+        date_of_birth = request.data.get('date_of_birth').strip() if request.data.get('date_of_birth') else None
+
+        # Check if the 'date_of_birth' is explicitly provided in the request
+     
+        if date_of_birth not in [None, '']:  # Update only if it's not None or an empty string
             try:
-                user.date_of_birth = date_of_birth  # No specific format validator here, assuming the input is correct
+                user.date_of_birth = date_of_birth  # Assuming input is in the correct format
             except (ValueError, TypeError):
                 return Response({
                     'status': 2,
-                    # 'message': _('Invalid date format for date_of_birth.')
+                    'message': _('Invalid date format for date_of_birth.')
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            user.date_of_birth = None
-        user.age = request.data.get('age', user.age)
+            user.date_of_birth = None  # If the date_of_birth is intentionally blank, set it to None
+
+
+        user.age = request.data.get('age', user.age).strip() if request.data.get('age') else user.age
+
+        
 
         # Assign gender by fetching the corresponding UserGender instance
-        gender_id = request.data.get('gender')
-        if gender_id is None:
+        
+
+        gender_id = request.data.get('gender').strip() if request.data.get('gender') else None
+
+        if gender_id in [None, '']:  # If gender is blank, set to None
+            user.gender = None
+        else:
             try:
                 user.gender = UserGender.objects.get(id=gender_id)  # Fetch UserGender instance
             except UserGender.DoesNotExist:
@@ -671,8 +698,11 @@ class EditProfileAPIView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Handle country
-        country_id = request.data.get('country')
-        if country_id is None:
+        country_id = request.data.get('country').strip() if request.data.get('country') else None
+
+        if country_id in [None, '']:  # If country is blank, set to None
+            user.country = None
+        else:
             try:
                 user.country = Country.objects.get(id=country_id)  # Fetch Country instance
             except Country.DoesNotExist:
@@ -681,15 +711,18 @@ class EditProfileAPIView(APIView):
                     'message': _('Invalid country specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Handle city
-        city_id = request.data.get('city')
-        if city_id is None:
+# Handle city
+        city_id = request.data.get('city').strip() if request.data.get('city') else None
+
+        if city_id in [None, '']:  # If city is blank, set to None
+            user.city = None
+        else:
             if not user.country:  # Ensure country is set before updating city
                 return Response({
                     'status': 2,
                     'message': _('City cannot be set without a valid country.')
                 }, status=status.HTTP_400_BAD_REQUEST)
-
+            
             try:
                 user.city = City.objects.get(id=city_id)  # Fetch City instance
             except City.DoesNotExist:
@@ -697,6 +730,7 @@ class EditProfileAPIView(APIView):
                     'status': 2,
                     'message': _('Invalid city specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
+
 
         user.nationality = request.data.get('nationality', user.nationality)
         user.weight = request.data.get('weight', user.weight)
@@ -723,6 +757,7 @@ class EditProfileAPIView(APIView):
 
             path = default_storage.save(file_name, profile_picture)
             user.profile_picture = path
+        
 
         # Handle card header update
         if "cover_photo" in request.FILES:
@@ -740,7 +775,13 @@ class EditProfileAPIView(APIView):
             user.card_header = path
 
         # Save user details
+    
+
+        # Save user details
         user.save()
+
+        # Save user details
+        
 
         return Response({
             'status': 1,
@@ -807,15 +848,15 @@ class AllPostsListAPIView(generics.ListAPIView):
             total_pages = self.paginator.page.paginator.num_pages
 
             # Custom response to include pagination data
-            return Response({
+            return Response({ 
                 'status': 1,
                 'message': _('All posts fetched successfully.'),
                 'data': serializer.data,
-                'meta': {
-                    'total_records': total_records,
-                    'total_pages': total_pages,
-                    'current_page': self.paginator.page.number
-                }
+            
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
+                
             }, status=status.HTTP_200_OK)
 
         # In case pagination is not needed or there's no data
@@ -825,7 +866,6 @@ class AllPostsListAPIView(generics.ListAPIView):
             'message': _('All posts fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
-
 
 ##########  LIST OF POST BASED ON USER TEAM AND GROUP ################
 class PostListAPIView(generics.ListAPIView):
