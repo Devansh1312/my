@@ -661,9 +661,7 @@ class EditProfileAPIView(APIView):
 
         # Assign gender by fetching the corresponding UserGender instance
         gender_id = request.data.get('gender')
-       
         if gender_id is None:
-            
             try:
                 user.gender = UserGender.objects.get(id=gender_id)  # Fetch UserGender instance
             except UserGender.DoesNotExist:
@@ -2211,59 +2209,104 @@ class LocationAPIView(APIView):
 class FollowUnfollowAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def post(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        from_user = request.user
-        to_user_id = request.data.get("to_user")
-        
-        to_user = get_object_or_404(User, id=to_user_id)
-        
-        follow_request = FollowRequest.objects.filter(from_user=from_user, to_user=to_user).first()
-        
+
+        from_user = request.user  # Always the user sending the request
+
+        # Retrieve the source (from_*): the user/team/group initiating the follow request
+        from_team_id = request.data.get('from_team')
+        from_group_id = request.data.get('from_group')
+
+        # Retrieve the target (to_*): the user/team/group being followed
+        to_user_id = request.data.get('to_user')
+        to_team_id = request.data.get('to_team')
+        to_group_id = request.data.get('to_group')
+
+        # Ensure only one "from" field is filled
+        if from_team_id and from_group_id:
+            return Response({
+                "status": 0,
+                "message": _("You can only follow from either a team or a group, not both.")
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Ensure only one "to" field is filled
+        if [to_user_id, to_team_id, to_group_id].count(None) < 2:
+            return Response({
+                "status": 0,
+                "message": _("You can only follow a user, a team, or a group, not multiple.")
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Prepare the follow request based on provided data
+        follow_request = FollowRequest.objects.filter(
+            from_user=from_user if not from_team_id and not from_group_id else None,
+            from_team_id=from_team_id,
+            from_group_id=from_group_id,
+            to_user_id=to_user_id,
+            to_team_id=to_team_id,
+            to_group_id=to_group_id
+        ).first()
+
         if follow_request:
-            # Unfollow
+            # Unfollow logic
             follow_request.delete()
             return Response({
                 "status": 1,
-                "message": _("You have unfollowed %(username)s.") % {'username': to_user.username}
+                "message": _("Unfollowed successfully.")
             }, status=status.HTTP_200_OK)
         else:
-            # Follow
-            FollowRequest.objects.create(from_user=from_user, to_user=to_user)
+            # Follow logic
+            FollowRequest.objects.create(
+                from_user=from_user if not from_team_id and not from_group_id else None,
+                from_team_id=from_team_id,
+                from_group_id=from_group_id,
+                to_user_id=to_user_id,
+                to_team_id=to_team_id,
+                to_group_id=to_group_id
+            )
             return Response({
                 "status": 1,
-                "message": _("You are now following %(username)s.") % {'username': to_user.username}
+                "message": _("Followed successfully.")
             }, status=status.HTTP_201_CREATED)
-
-
 
 ####################################### LIST OF FOLLOWERS #######################################
 class UserFollowersAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def post(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        user_id = request.data.get('user_id')
 
-        if not user_id:
+        # Get the type of entity requesting followers (user/team/group)
+        to_user_id = request.data.get('to_user')
+        to_team_id = request.data.get('to_team')
+        to_group_id = request.data.get('to_group')
+
+        # Ensure one type of entity is provided
+        if [to_user_id, to_team_id, to_group_id].count(None) < 2:
             return Response({
                 "status": 0,
-                "message": _("User ID is required.")
+                "message": _("You can only retrieve followers for one entity type (user, team, or group).")
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = get_object_or_404(User, id=user_id)
+        # Retrieve followers
+        followers = FollowRequest.objects.filter(
+            to_user_id=to_user_id if to_user_id else None,
+            to_team_id=to_team_id if to_team_id else None,
+            to_group_id=to_group_id if to_group_id else None
+        ).select_related('from_user', 'from_team', 'from_group')
 
-        followers = FollowRequest.objects.filter(to_user=user).select_related('from_user')
-
+        # Format the follower list
         followers_list = [
             {
-                "id": follower.from_user.id,
-                "username": follower.from_user.username,
-                "profile_picture": follower.from_user.profile_picture.url if follower.from_user.profile_picture else None
+                "id": follower.get_from_entity().id,
+                "name": follower.get_from_entity().username if follower.from_user else follower.get_from_entity().team_name if follower.from_team else follower.get_from_entity().group_name,
+                "profile_picture": getattr(follower.get_from_entity(), 'profile_picture', None)
             }
             for follower in followers
         ]
@@ -2274,38 +2317,36 @@ class UserFollowersAPI(APIView):
             "data": followers_list
         }, status=status.HTTP_200_OK)
 
-
-##################################### LIST OF FOLLOWING ###############################
+##################################### LIST OF FOLLOWING #######################################
 class UserFollowingAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def post(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        user_id = request.data.get('user_id')
 
-        if not user_id:
-            return Response({
-                "status": 0,
-                "message": _("User ID is required.")
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Get user requesting following list
+        from_user = request.user
 
-        user = get_object_or_404(User, id=user_id)
+        # Retrieve following
+        following = FollowRequest.objects.filter(
+            from_user=from_user
+        ).select_related('to_user', 'to_team', 'to_group')
 
-        following = FollowRequest.objects.filter(from_user=user).select_related('to_user')
-
+        # Format the following list
         following_list = [
             {
-                "id": follow.to_user.id,
-                "username": follow.to_user.username,
-                "profile_picture": follow.to_user.profile_picture.url if follow.to_user.profile_picture else None
+                "id": follow.get_to_entity().id,
+                "name": follow.get_to_entity().username if follow.to_user else follow.get_to_entity().team_name if follow.to_team else follow.get_to_entity().group_name,
+                "profile_picture": getattr(follow.get_to_entity(), 'profile_picture', None)
             }
             for follow in following
         ]
 
         return Response({
             "status": 1,
-            "message": _("Following users fetched successfully."),
+            "message": _("Following entities fetched successfully."),
             "data": following_list
         }, status=status.HTTP_200_OK)
