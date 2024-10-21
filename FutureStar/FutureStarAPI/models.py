@@ -2,6 +2,8 @@ from django.db import models
 from FutureStar_App.models import *
 from django.utils import timezone
 import datetime
+from django.core.exceptions import ValidationError
+
 
 # Create your models here.
 
@@ -146,18 +148,58 @@ class OTPSave(models.Model):
     
 
 class FollowRequest(models.Model):
+    from_user = models.ForeignKey(User, null=True, blank=True, related_name='follow_requests_sent', on_delete=models.CASCADE)
+    from_team = models.ForeignKey(Team, null=True, blank=True, related_name='team_follow_requests_sent', on_delete=models.CASCADE)
+    from_group = models.ForeignKey(TrainingGroups, null=True, blank=True, related_name='group_follow_requests_sent', on_delete=models.CASCADE)
     
-    from_user = models.ForeignKey(User, related_name='follow_requests_sent', on_delete=models.CASCADE)
-    to_user = models.ForeignKey(User, related_name='follow_requests_received', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, null=True, blank=True, related_name='follow_requests_received', on_delete=models.CASCADE)
+    to_team = models.ForeignKey(Team, null=True, blank=True, related_name='team_follow_requests_received', on_delete=models.CASCADE)
+    to_group = models.ForeignKey(TrainingGroups, null=True, blank=True, related_name='group_follow_requests_received', on_delete=models.CASCADE)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'futurestar_app_followrequest'
+        unique_together = (
+            ('from_user', 'to_user'),
+            ('from_team', 'to_team'),
+            ('from_group', 'to_group')
+        )
 
     def __str__(self):
-        return f"{self.from_user} wants to follow {self.to_user}"
-    
+        return f"Follow request from {self.get_from_entity()} to {self.get_to_entity()}"
+
+    def get_from_entity(self):
+        """Returns the from entity."""
+        if self.from_user:
+            return self.from_user
+        if self.from_team:
+            return self.from_team
+        if self.from_group:
+            return self.from_group
+        return None
+
+    def get_to_entity(self):
+        """Returns the to entity."""
+        if self.to_user:
+            return self.to_user
+        if self.to_team:
+            return self.to_team
+        if self.to_group:
+            return self.to_group
+        return None
+
+    def clean(self):
+        """Ensures only one of from_user/from_team/from_group and one of to_user/to_team/to_group is filled."""
+        from_fields = [self.from_user, self.from_team, self.from_group]
+        to_fields = [self.to_user, self.to_team, self.to_group]
+
+        if sum([bool(field) for field in from_fields]) != 1:
+            raise ValidationError("Only one of from_user, from_team, or from_group must be provided.")
+        if sum([bool(field) for field in to_fields]) != 1:
+            raise ValidationError("Only one of to_user, to_team, or to_group must be provided.")
+
     @staticmethod
     def get_follower_count(user):
         """Returns the number of followers for a given user"""
@@ -167,7 +209,6 @@ class FollowRequest(models.Model):
     def get_following_count(user):
         """Returns the number of users a given user is following"""
         return FollowRequest.objects.filter(from_user=user).count()
-
 
 
 # Helper function for dynamic file paths
