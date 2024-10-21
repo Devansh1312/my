@@ -611,11 +611,44 @@ class ChangePasswordAPIView(APIView):
 
 
 ############################################### Create Profile API ###################################
+class UpdateProfilePictureAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        # Ensure profile picture is in the request
+        if "profile_picture" not in request.FILES:
+            return Response({
+                'status': 2,
+                'message': _('No profile picture provided.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        old_profile_picture = user.profile_picture
+        
+        # Handle profile picture update
+        if "profile_picture" in request.FILES:
+            profile_picture = request.FILES["profile_picture"]
+            if old_profile_picture and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture))):
+                os.remove(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture)))
+
+            file_extension = profile_picture.name.split('.')[-1]
+            file_name = f"profile_pics/{user.username}.{file_extension}"
+            path = default_storage.save(file_name, profile_picture)
+            user.profile_picture = path
+        elif request.data.get("profile_picture") in [None, '']:  # Retain old picture if None/blank
+            user.profile_picture = old_profile_picture
+        user.save()
+
+        return Response({
+            'status': 1,
+            'message': _('Profile picture updated successfully.')
+        }, status=status.HTTP_200_OK)
 
 
 class EditProfileAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -629,9 +662,8 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Player Details.'),
             'data': {
-                **get_user_data(user, request) 
-
-                }
+                **get_user_data(user, request)
+            }
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -641,159 +673,112 @@ class EditProfileAPIView(APIView):
 
         user = request.user
 
-        # Get old profile picture and card header (before any changes)
+        # Get old profile picture and card header
         old_profile_picture = user.profile_picture
         old_card_header = user.card_header
 
-        # Update all fields from request data
-        user.fullname = request.data.get('fullname', user.fullname)
-        user.bio = request.data.get('bio', user.bio)
-        # date_of_birth = request.data.get('date_of_birth')
-        # # print(date_of_birth)
-        # # if date_of_birth in [None, '']:  # Check if date_of_birth is None or an empty string
-        # #     user.date_of_birth = None  # Store as None (translates to null in the database)
-        # # else:
-        # try:
-        #     user.date_of_birth = date_of_birth  # Assuming input is in the correct format
-        # except (ValueError, TypeError):
-        #     return Response({
-        #         'status': 2,
-        #         'message': _('Invalid date format for date_of_birth.')
-            # }, status=status.HTTP_400_BAD_REQUEST)
-        
-        date_of_birth = request.data.get('date_of_birth').strip() if request.data.get('date_of_birth') else None
+        # Fields that should be set to NULL if provided as blank or None
+        null_fields = ['fullname', 'bio', 'nationality', 'weight', 'height', 'main_playing_position',
+                       'secondary_playing_position', 'playing_foot', 'favourite_local_team', 'favourite_team',
+                       'favourite_local_player', 'favourite_player']
 
-        # Check if the 'date_of_birth' is explicitly provided in the request
-     
-        if date_of_birth not in [None, '']:  # Update only if it's not None or an empty string
+        for field in null_fields:
+            field_value = request.data.get(field)
+            if field_value is None or field_value == '':
+                setattr(user, field, None)  # Set the field to null if blank or None
+            else:
+                setattr(user, field, field_value)  # Otherwise, update with new value
+
+        # Handle date_of_birth and age - retain old values if None or blank
+        date_of_birth = request.data.get('date_of_birth')
+        if date_of_birth not in [None, '']:
             try:
-                user.date_of_birth = date_of_birth  # Assuming input is in the correct format
+                user.date_of_birth = date_of_birth  # Assuming valid format
             except (ValueError, TypeError):
                 return Response({
                     'status': 2,
                     'message': _('Invalid date format for date_of_birth.')
                 }, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            user.date_of_birth = None  # If the date_of_birth is intentionally blank, set it to None
 
+        age = request.data.get('age')
+        if age not in [None, '']:
+            user.age = age
 
-        user.age = request.data.get('age', user.age).strip() if request.data.get('age') else user.age
-
-        
-
-        # Assign gender by fetching the corresponding UserGender instance
-        
-
-        gender_id = request.data.get('gender').strip() if request.data.get('gender') else None
-
-        if gender_id in [None, '']:  # If gender is blank, set to None
-            user.gender = None
-        else:
+        # Assign gender - retain old value if None or blank
+        gender_id = request.data.get('gender')
+        if gender_id not in [None, '']:
             try:
-                user.gender = UserGender.objects.get(id=gender_id)  # Fetch UserGender instance
+                user.gender = UserGender.objects.get(id=gender_id)
             except UserGender.DoesNotExist:
                 return Response({
                     'status': 2,
                     'message': _('Invalid gender specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Handle country
-        country_id = request.data.get('country').strip() if request.data.get('country') else None
-
-        if country_id in [None, '']:  # If country is blank, set to None
-            user.country = None
-        else:
+        # Handle country - retain old value if None or blank
+        country_id = request.data.get('country')
+        if country_id not in [None, '']:
             try:
-                user.country = Country.objects.get(id=country_id)  # Fetch Country instance
+                user.country = Country.objects.get(id=country_id)
             except Country.DoesNotExist:
                 return Response({
                     'status': 2,
                     'message': _('Invalid country specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-# Handle city
-        city_id = request.data.get('city').strip() if request.data.get('city') else None
-
-        if city_id in [None, '']:  # If city is blank, set to None
-            user.city = None
-        else:
-            if not user.country:  # Ensure country is set before updating city
+        # Handle city - retain old value if None or blank
+        city_id = request.data.get('city')
+        if city_id not in [None, '']:
+            if not user.country:
                 return Response({
                     'status': 2,
                     'message': _('City cannot be set without a valid country.')
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             try:
-                user.city = City.objects.get(id=city_id)  # Fetch City instance
+                user.city = City.objects.get(id=city_id)
             except City.DoesNotExist:
                 return Response({
                     'status': 2,
                     'message': _('Invalid city specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-
-        user.nationality = request.data.get('nationality', user.nationality)
-        user.weight = request.data.get('weight', user.weight)
-        user.height = request.data.get('height', user.height)
-        user.main_playing_position = request.data.get('main_playing_position', user.main_playing_position)
-        user.secondary_playing_position = request.data.get('secondary_playing_position', user.secondary_playing_position)
-        user.playing_foot = request.data.get('playing_foot', user.playing_foot)
-        user.favourite_local_team = request.data.get('favourite_local_team', user.favourite_local_team)
-        user.favourite_team = request.data.get('favourite_team', user.favourite_team)
-        user.favourite_local_player = request.data.get('favourite_local_player', user.favourite_local_player)
-        user.favourite_player = request.data.get('favourite_player', user.favourite_player)
-
         # Handle profile picture update
         if "profile_picture" in request.FILES:
             profile_picture = request.FILES["profile_picture"]
-
-            # Delete the old profile picture if it exists
             if old_profile_picture and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture))):
                 os.remove(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture)))
 
-            # Save the new profile picture
             file_extension = profile_picture.name.split('.')[-1]
             file_name = f"profile_pics/{user.username}.{file_extension}"
-
             path = default_storage.save(file_name, profile_picture)
             user.profile_picture = path
-        
+        elif request.data.get("profile_picture") in [None, '']:  # Retain old picture if None/blank
+            user.profile_picture = old_profile_picture
 
         # Handle card header update
         if "cover_photo" in request.FILES:
             card_header = request.FILES["cover_photo"]
-
-            # Delete the old card header if it exists
             if old_card_header and os.path.isfile(os.path.join(settings.MEDIA_ROOT, str(old_card_header))):
                 os.remove(os.path.join(settings.MEDIA_ROOT, str(old_card_header)))
 
-            # Save the new card header
             file_extension = card_header.name.split('.')[-1]
             file_name = f"card_header/{user.username}.{file_extension}"
-
             path = default_storage.save(file_name, card_header)
             user.card_header = path
-
-        # Save user details
-    
+        elif request.data.get("cover_photo") in [None, '']:  # Retain old header if None/blank
+            user.card_header = old_card_header
 
         # Save user details
         user.save()
-
-        # Save user details
-        
 
         return Response({
             'status': 1,
             'message': _('Profile updated successfully.'),
             'data': {
-                **get_user_data(user, request) 
-
+                **get_user_data(user, request)
             }
         }, status=status.HTTP_200_OK)
-
-
-
 
 ####################### POST API ###############################################################################
 class CustomPostPagination(PageNumberPagination):
