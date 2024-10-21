@@ -639,11 +639,15 @@ class UpdateProfilePictureAPIView(APIView):
             user.profile_picture = path
         elif request.data.get("profile_picture") in [None, '']:  # Retain old picture if None/blank
             user.profile_picture = old_profile_picture
+        # Save user details
         user.save()
 
         return Response({
             'status': 1,
-            'message': _('Profile picture updated successfully.')
+            'message': _('Profile Image updated successfully.'),
+            'data': {
+                **get_user_data(user, request)
+            }
         }, status=status.HTTP_200_OK)
 
 
