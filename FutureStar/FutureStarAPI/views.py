@@ -2042,15 +2042,19 @@ class PostReportCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         # Automatically associate the report with the logged-in user
-        post_report = serializer.save(user_id=self.request.user)
+        serializer.save(user_id=self.request.user)
 
-        # Prepare and return a custom response after creation
+    def create(self, request, *args, **kwargs):
+        # Overriding the create method to return a custom response
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post_report = self.perform_create(serializer)  # Saving the report
+
         return Response({
             'status': 1,
             'message': _('Report created successfully.'),
-            'data': PostReportSerializer(post_report).data  # Serialize the newly created report
-        }, status=status.HTTP_200_OK)
-
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_201_CREATED)
     
 
 ################################################################################## Field API View ##################################################################################
