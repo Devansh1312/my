@@ -14,9 +14,20 @@ class Team(models.Model):
     bio = models.TextField(null=True,blank=True)
     team_establishment_date = models.DateField(blank=True,null=True)
     team_president = models.CharField(max_length=255,blank=True,null=True)
-    location = models.CharField(max_length=500,blank=True,null=True)
-    latitude = models.CharField(max_length=500,blank=True,null=True)
-    longitude = models.CharField(max_length=500,blank=True,null=True)    
+    
+     # New fields
+    latitude = models.FloatField(default=0.0)
+    longitude = models.FloatField(default=0.0)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    house_no = models.CharField(max_length=50, blank=True, null=True)
+    premises = models.CharField(max_length=100, blank=True, null=True)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    country_name = models.CharField(max_length=100, blank=True, null=True)
+    postalCode = models.CharField(max_length=20, blank=True, null=True)
+    country_code = models.CharField(max_length=10, blank=True, null=True)
+        
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=255,blank=True,null=True)
@@ -40,7 +51,20 @@ class TrainingGroups(models.Model):
     group_username = models.CharField(max_length=255,blank=True,null=True)
     bio = models.TextField(null=True,blank=True)
     group_president = models.CharField(max_length=255,blank=True,null=True)
-    location = models.CharField(max_length=500,blank=True,null=True)
+
+     # New fields
+    latitude = models.FloatField(default=0.0)
+    longitude = models.FloatField(default=0.0)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    house_no = models.CharField(max_length=50, blank=True, null=True)
+    premises = models.CharField(max_length=100, blank=True, null=True)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    country_name = models.CharField(max_length=100, blank=True, null=True)
+    postalCode = models.CharField(max_length=20, blank=True, null=True)
+    country_code = models.CharField(max_length=10, blank=True, null=True)
+
     latitude = models.CharField(max_length=500,blank=True,null=True)
     longitude = models.CharField(max_length=500,blank=True,null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
@@ -128,9 +152,20 @@ class Field(models.Model):
     ground_type = models.ForeignKey(GroundMaterial, on_delete=models.CASCADE,default=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
-    location = models.CharField(max_length=500,blank=True,null=True)
-    latitude = models.CharField(max_length=500,blank=True,null=True)
-    longitude = models.CharField(max_length=500,blank=True,null=True)    
+    
+     # New fields
+    latitude = models.FloatField(default=0.0)
+    longitude = models.FloatField(default=0.0)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    house_no = models.CharField(max_length=50, blank=True, null=True)
+    premises = models.CharField(max_length=100, blank=True, null=True)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    country_name = models.CharField(max_length=100, blank=True, null=True)
+    postalCode = models.CharField(max_length=20, blank=True, null=True)
+    country_code = models.CharField(max_length=10, blank=True, null=True) 
+    
     additional_information = models.TextField(max_length=255,blank=True, null=True)
 
     def __str__(self):
