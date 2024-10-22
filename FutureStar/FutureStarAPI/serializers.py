@@ -356,69 +356,89 @@ class UserRoleSerializer(serializers.ModelSerializer):
 
 
 
-
 class GallarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallary
-        fields = ['id', 'user','team_id','group_id','album_id','content_type','media_file', 'created_at', 'updated_at']
-        read_only_fields = ['user','album_id']
+        fields = ['id', 'user', 'team_id', 'group_id', 'album_id', 'content_type', 'media_file', 'created_at', 'updated_at']
+        # read_only_fields = ['album_id']
 
     def to_representation(self, instance):
-        """Customize the representation of the object."""
         representation = super().to_representation(instance)
-
-        # Check if it's a GET request and remove the album_id
         request = self.context.get('request')
         if request and request.method == 'GET':
             representation.pop('album_id', None)
-
         return representation
 
     def validate(self, data):
         media_file = data.get('media_file')
-        
-        # Ensure the media file is provided
         if not media_file:
             raise serializers.ValidationError("A media file (image or video) must be provided.")
-
-        # Check the file type using the mimetype
+        
         mime_type, _ = mimetypes.guess_type(media_file.name)
-
         if mime_type:
             if mime_type.startswith('image/'):
-                data['content_type'] = 1  # Image
+                data['content_type'] = 1
             elif mime_type.startswith('video/'):
-                data['content_type'] = 2  # Video
+                data['content_type'] = 2
             else:
                 raise serializers.ValidationError("The file must be an image or video.")
         else:
             raise serializers.ValidationError("The file type could not be determined.")
-
         return data
 
+    def create(self, validated_data):
+        return Gallary.objects.create(**validated_data)
+
+
+class GetGallarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gallary
+        fields = ['id', 'user', 'team_id', 'group_id', 'album_id', 'content_type', 'media_file', 'created_at', 'updated_at']
+        read_only_fields = ['album_id', 'user']  # Make 'user' read-only since it will be auto-assigned
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+        if request and request.method == 'GET':
+            representation.pop('album_id', None)
+        return representation
+
+    def validate(self, data):
+        media_file = data.get('media_file')
+        if not media_file:
+            raise serializers.ValidationError("A media file (image or video) must be provided.")
+        
+        mime_type, _ = mimetypes.guess_type(media_file.name)
+        if mime_type:
+            if mime_type.startswith('image/'):
+                data['content_type'] = 1
+            elif mime_type.startswith('video/'):
+                data['content_type'] = 2
+            else:
+                raise serializers.ValidationError("The file must be an image or video.")
+        else:
+            raise serializers.ValidationError("The file type could not be determined.")
+        return data
+
+    def create(self, validated_data):
+        # Automatically set the user from the request context
+        validated_data['user'] = self.context['request'].user
+        return Gallary.objects.create(**validated_data)
+
 class DetailAlbumSerializer(serializers.ModelSerializer):
-    # Define a custom field to retrieve the thumbnail
     gallary_items = GallarySerializer(many=True, source='gallary_set', read_only=True)
     thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = Album
-        fields = ['id', 'user', 'team_id','group_id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at']
-        read_only_fields = ['user']  # Make the 'user' field read-only
+        fields = ['id', 'user', 'team_id', 'group_id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at']
+        read_only_fields = ['user']
 
-    # Method to get the most recent image or video from the related Gallary
     def get_thumbnail(self, obj):
         last_media = Gallary.objects.filter(album_id=obj).order_by('-created_at').first()
-
         if not last_media:
             return None
-
-        if last_media.content_type == 1:  # Assuming 1 is for images
-            return last_media.media_file.url
-        elif last_media.content_type == 2:  # Assuming 2 is for videos
-            return last_media.media_file.url
-
-        return None
+        return last_media.media_file.url
 
 class AlbumSerializer(serializers.ModelSerializer):
     # Define a custom field to retrieve the thumbnail

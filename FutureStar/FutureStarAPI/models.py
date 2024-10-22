@@ -248,44 +248,43 @@ def user_directory_path(instance, filename):
     # Determine the content type (1 for Images, 2 for Videos)
     content_type = 'images' if instance.content_type == 1 else 'videos'
     # Construct path using user ID and content type
-    return f'media/{instance.user.id}/{content_type}/{filename}'
+    return f'media/{content_type}/{filename}'
 
 class Album(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, related_name='user_album', on_delete=models.CASCADE)
-
-    team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
-    group_id=models.ForeignKey('TrainingGroups', related_name='training_group_album', null=True, blank=True, on_delete=models.CASCADE)
-   
-    name = models.TextField(null=True,blank=True)
+    team_id = models.ForeignKey('Team', null=True, blank=True, on_delete=models.CASCADE)
+    group_id = models.ForeignKey('TrainingGroups', related_name='training_group_album', null=True, blank=True, on_delete=models.CASCADE)
+    name = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'futurestar_app_album'
-    
+
     def __str__(self):
         return self.name
 
-class Gallary(models.Model):  # Fixing typo from "Gallary(models.Models)"
+
+class Gallary(models.Model):
     CONTENT_TYPE = [
         (1, 'Images'),
         (2, 'Videos'),
     ]
+    
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, related_name='user_gallary', on_delete=models.CASCADE)
-    team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
-    album_id = models.ForeignKey(Album, related_name='gallary_set',null=True, on_delete=models.CASCADE)
-    group_id=models.ForeignKey('TrainingGroups', related_name='training_group_gallary', null=True, blank=True, on_delete=models.CASCADE)
-
+    team_id = models.ForeignKey('Team', null=True, blank=True, on_delete=models.CASCADE)
+    album_id = models.ForeignKey('Album', related_name='gallary_set', null=True, on_delete=models.CASCADE)
+    group_id = models.ForeignKey('TrainingGroups', related_name='training_group_gallary', null=True, blank=True, on_delete=models.CASCADE)
     content_type = models.IntegerField(choices=CONTENT_TYPE, default=1)
-    
-    # Use the helper function for the upload_to argument
     media_file = models.FileField(upload_to=user_directory_path, blank=True, null=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"Gallery Item {self.id} by User {self.user.id}"
 
     class Meta:
         db_table = 'futurestar_app_gallary'
+

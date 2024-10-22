@@ -207,9 +207,11 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': (
     #     'rest_framework.permissions.IsAuthenticated',  # Default permission to authenticated users
     # ),
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',  # Use JSON for parsing
-    ],
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',  # Important for file uploads
+        'rest_framework.parsers.FormParser',
+    )
 }
 
 # JWT Configuration
