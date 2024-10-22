@@ -929,7 +929,7 @@ class PostListAPIView(generics.ListAPIView):
             return Post.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-date_created')
 
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -973,60 +973,49 @@ class PostCreateAPIView(APIView):
         serializer = PostSerializer(data=request.data)
 
         if serializer.is_valid():
-            # Check if team_id is provided
-            if team_id:
-                try:
+            try:
+                # Check if team_id is provided
+                if team_id:
                     team = Team.objects.get(id=team_id)
-                except Team.DoesNotExist:
-                    return Response({
-                        'status': 0,
-                        'message': _('Team not found.')
-                    }, status=status.HTTP_404_NOT_FOUND)
-                
-                # Save the post with a team ID
-                post = serializer.save(user=request.user, team_id=team.id)  # Use team.id instead of team
-
-            # Check if group_id is provided
-            elif group_id:
-                try:
+                    post = serializer.save(user=request.user, team_id=team.id)
+                elif group_id:
                     group = TrainingGroups.objects.get(id=group_id)
-                except TrainingGroups.DoesNotExist:
-                    return Response({
-                        'status': 0,
-                        'message': _('Group not found.')
-                    }, status=status.HTTP_404_NOT_FOUND)
-                
-                # Save the post with a group ID
-                post = serializer.save(user=request.user, group_id=group.id)  # Use group.id instead of group
-            
-            else:
-                # Save the post for the user without a team or group
-                post = serializer.save(user=request.user)
+                    post = serializer.save(user=request.user, group_id=group.id)
+                else:
+                    post = serializer.save(user=request.user)
 
-            # Handle image upload
-            if "image" in request.FILES:
-                image = request.FILES["image"]
+                # Handle image upload
+                if "image" in request.FILES:
+                    image = request.FILES["image"]
+                    file_extension = image.name.split('.')[-1]
+                    file_name = f"post_images/{post.id}_{request.user.username}.{file_extension}"
+                    image_path = default_storage.save(file_name, image)
+                    post.image = image_path
+                    post.save()
 
-                # Save new image with a structured filename
-                file_extension = image.name.split('.')[-1]
-                file_name = f"post_images/{post.id}_{request.user.username}.{file_extension}"
+                return Response({
+                    'status': 1,
+                    'message': _('Post created successfully'),
+                    'data': PostSerializer(post).data
+                }, status=status.HTTP_201_CREATED)
 
-                # Save the image and update the post instance
-                image_path = default_storage.save(file_name, image)
-                post.image = image_path
-                post.save()
-
-            return Response({
-                'status': 1,
-                'message': _('Post created successfully'),
-                'data': PostSerializer(post).data
-            }, status=status.HTTP_201_CREATED)
+            except Team.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Team not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+            except TrainingGroups.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Group not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
 
         return Response({
             'status': 0,
             'message': _('Invalid data'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 ##########################   EDIT POST API ##################################
@@ -1116,8 +1105,6 @@ class PostDetailAPIView(APIView):
 
         # Get the data from the request
         post_id = request.data.get('post_id')
-        team_id = request.data.get('team_id')
-        group_id = request.data.get('group_id')
 
         # Validate the presence of post_id
         if not post_id:
@@ -1140,7 +1127,7 @@ class PostDetailAPIView(APIView):
         # Retrieve the view count for the post
         view_count = PostView.objects.filter(post=post).count()
 
-        # Serialize the post details
+        # Serialize the post details with the paginated comments
         serializer = PostSerializer(post, context={'request': request})
 
         # Return the combined response with both post details and view count
@@ -1148,8 +1135,8 @@ class PostDetailAPIView(APIView):
             'status': 1,
             'message': _('Post details fetched successfully.'),
             'data': serializer.data,
-            'view_count': view_count
         }, status=status.HTTP_200_OK)
+
 
 ######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):

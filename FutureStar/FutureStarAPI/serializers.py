@@ -251,29 +251,46 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_comments(self, obj):
         request = self.context.get('request')
-        if request and request.parser_context.get('view').__class__.__name__ in ['AllPostsListAPIView', 'PostListAPIView']:
-            return Post_comment.objects.filter(post=obj, parent=None).count()
-        # Filter the top-level comments for the post (parent=None for top-level)
-        comments = Post_comment.objects.filter(post=obj, parent=None)
         
-        # Apply pagination using the custom pagination class
+        # If request context or parser context is missing, return an empty list
+        if request is None or request.parser_context is None:
+            return []
+
+        # Get the view's class name
+        view_class_name = request.parser_context.get('view').__class__.__name__
+
+        # If view is 'AllPostsListAPIView' or 'PostListAPIView', return the comment count
+        if view_class_name in ['AllPostsListAPIView', 'PostListAPIView']:
+            return Post_comment.objects.filter(post=obj, parent=None).count()
+
+        # For other views, return paginated comments
+        comments = Post_comment.objects.filter(post=obj, parent=None)
         paginator = CustomPostPagination()
         paginated_comments = paginator.paginate_queryset(comments, request)
 
-        # Use the PostCommentSerializer for the paginated comments
+        if paginated_comments is None:
+            return {
+                "total_records": 0,
+                "total_pages": 0,
+                "current_page": 1,
+                "results": []
+            }
+
         serializer = PostCommentSerializer(paginated_comments, many=True, context={'request': request})
 
-        # Return the paginated response
-        return paginator.get_paginated_response(serializer.data).data
+        total_records = comments.count()
+        page_size = paginator.get_page_size(request)
+        total_pages = (total_records // page_size) + (1 if total_records % page_size > 0 else 0)
+        current_page = paginator.page.number
 
-    def get_comments(self, obj):
-        request = self.context.get('request')
+        return {
+            "total_records": total_records,
+            "total_pages": total_pages,
+            "current_page": current_page,
+            "results": serializer.data
+        }
 
-        if request and request.parser_context.get('view').__class__.__name__ in ['AllPostsListAPIView', 'PostListAPIView']:
-            return Post_comment.objects.filter(post=obj, parent=None).count()
-        
-        top_level_comments = Post_comment.objects.filter(post=obj, parent=None)
-        return PostCommentSerializer(top_level_comments, many=True).data
+
 
     def create(self, validated_data):
         # Override create to handle team_id/group_id/user assignments
