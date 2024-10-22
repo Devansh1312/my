@@ -28,8 +28,8 @@ class Team(models.Model):
     postalCode = models.CharField(max_length=20, blank=True, null=True)
     country_code = models.CharField(max_length=10, blank=True, null=True)
         
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
+    country_id = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city_id = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=255,blank=True,null=True)
     email = models.EmailField(max_length=255,blank=True,null=True)
     age_group = models.CharField(max_length=255,blank=True,null=True)
@@ -65,10 +65,9 @@ class TrainingGroups(models.Model):
     postalCode = models.CharField(max_length=20, blank=True, null=True)
     country_code = models.CharField(max_length=10, blank=True, null=True)
 
-    latitude = models.CharField(max_length=500,blank=True,null=True)
-    longitude = models.CharField(max_length=500,blank=True,null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
+
+    country_id = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city_id = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=255,blank=True,null=True)
     group_logo = models.ImageField(upload_to='group/group_logo/', blank=True, null=True)  # Add image field
     group_background_image = models.ImageField(upload_to='group/group_background_image/', blank=True, null=True)  # Add image field
@@ -150,9 +149,9 @@ class Field(models.Model):
     image = models.ImageField(upload_to='fields_images/', blank=True, null=True)  # Add image field
     field_capacity = models.ForeignKey(FieldCapacity, on_delete=models.CASCADE,default=True)
     ground_type = models.ForeignKey(GroundMaterial, on_delete=models.CASCADE,default=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
-    
+    country_id = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city_id = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
+
      # New fields
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)
@@ -322,4 +321,37 @@ class Gallary(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_gallary'
+
+
+
+
+class Report(models.Model):
+    id=models.AutoField(primary_key=True)
+    title_en=models.CharField(max_length=255, blank=True, null=True)
+    title_ar=models.CharField(max_length=255, blank=True, null=True)
+    content_en=models.TextField(blank=True, null=True)
+    content_ar=models.TextField(blank=True, null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title_en
+    
+    class Meta:
+        db_table = 'futurestar_app_reports'
+
+    
+class PostReport(models.Model):
+    id=models.AutoField(primary_key=True)
+    report_id=models.ForeignKey(Report, on_delete=models.CASCADE)
+    post_id=models.ForeignKey(Post, on_delete=models.CASCADE)
+    user_id=models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Post Report {self.id} for Report {self.report_id.id}"
+    
+    class Meta:
+        db_table = 'futurestar_app_postreport'
 
