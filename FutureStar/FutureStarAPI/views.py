@@ -855,15 +855,15 @@ class PostLikeAPIView(APIView):
         else:
             message = _('Post liked successfully.')
 
-        # Return the like count
-        like_count = PostLike.objects.filter(post=post).count()
-
+        # Serialize the post data with comments set to empty
+        serializer = PostSerializer(post, context={'request': request})
+        
+        # Return the full post data with an empty comment list
         return Response({
             'status': 1,
             'message': message,
-            'data': like_count
+            'data': serializer.data
         }, status=200)
-
 
 ############################# ALL POST LIST VIEW ##########################
 class AllPostsListAPIView(generics.ListAPIView):
@@ -1905,6 +1905,154 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
                 'message': _('Album not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
+
+########################################################################  Sponsor API ################################################################
+class SponsorAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    team_query_param = 'team_id'  # Custom page number param in the body
+    group_query_param = 'group_id'  # Custom page number param in the body
+
+    def get(self, request):
+        team_id = request.data.get(self.team_query_param)
+        group_id = request.data.get(self.group_query_param)
+        
+        if team_id:
+            sponsors = Sponsor.objects.filter(team_id=team_id).order_by('-created_at')
+        elif group_id:
+            sponsors = Sponsor.objects.filter(group_id=group_id).order_by('-created_at')
+        else:
+            return Response({
+                "status": 0,
+                "message": _("Please provide team_id or group_id"),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Prepare response data
+        sponsor_list = [
+            {
+                "id": sponsor.id,
+                "name": sponsor.name,
+                "logo": sponsor.logo.url if sponsor.logo else None,
+                "phone": sponsor.phone,
+                "email": sponsor.email,
+                "url": sponsor.url,
+                "team_id": sponsor.team_id.id if sponsor.team_id else None,
+                "group_id": sponsor.group_id.id if sponsor.group_id else None,
+                "created_at": sponsor.created_at,
+                "updated_at": sponsor.updated_at
+            } for sponsor in sponsors
+        ]
+        
+        return Response({
+            "status": 1,
+            "message": _("Sponsers list found sucessfully"),
+            "data": sponsor_list
+        }, status=status.HTTP_200_OK)
+        
+    def post(self, request):
+        data = request.data
+        
+        name = data.get('name')
+        phone = data.get('phone')
+        email = data.get('email')
+        url = data.get('url')
+        team_id = data.get('team_id')
+        group_id = data.get('group_id')
+        
+        # Ensure team_id or group_id is provided
+        if not team_id and not group_id:
+            return Response({
+                "status": 0,
+                "message": _("Please provide team_id or group_id")
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Handle the image upload
+            logo = None
+            if "logo" in request.FILES:
+                image = request.FILES["logo"]
+                file_extension = image.name.split('.')[-1]
+                file_name = f"sponsors_images/{name}_{request.user.username}.{file_extension}"
+                image_path = default_storage.save(file_name, image)
+                logo = image_path  # Assign the saved image path to the logo variable
+
+            # Create the new sponsor
+            sponsor = Sponsor.objects.create(
+                name=name,
+                logo=logo,
+                phone=phone,
+                email=email,
+                url=url,
+                team_id=Team.objects.get(id=team_id) if team_id else None,
+                group_id=TrainingGroups.objects.get(id=group_id) if group_id else None
+            )
+
+            return Response({
+                "status": 1,
+                "message": _("Sponsor created successfully"),
+                "data": {
+                    "id": sponsor.id,
+                    "name": sponsor.name,
+                    "logo": sponsor.logo.url if sponsor.logo else None,
+                    "phone": sponsor.phone,
+                    "email": sponsor.email,
+                    "url": sponsor.url,
+                    "team_id": sponsor.team_id.id if sponsor.team_id else None,
+                    "group_id": sponsor.group_id.id if sponsor.group_id else None,
+                    "created_at": sponsor.created_at,
+                    "updated_at": sponsor.updated_at
+                }
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({
+                "status": 0,
+                "message": _("Failed to create sponsor"),
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+######################################################################## Report API View ###################################################################################
+class ReportListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get all genders
+        user_report = self.get_queryset()
+        serializer = self.get_serializer(user_report, many=True)
+
+        # Prepare the response with genders directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('Reports retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_200_OK)
+
+class PostReportCreateView(generics.CreateAPIView):
+    queryset = PostReport.objects.all()
+    serializer_class = PostReportSerializer
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can create reports
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def perform_create(self, serializer):
+        # Automatically associate the report with the logged-in user
+        post_report = serializer.save(user_id=self.request.user)
+
+        # Prepare and return a custom response after creation
+        return Response({
+            'status': 1,
+            'message': _('Report created successfully.'),
+            'data': PostReportSerializer(post_report).data  # Serialize the newly created report
+        }, status=status.HTTP_200_OK)
+
+    
+
 ################################################################################## Field API View ##################################################################################
 class FieldAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2452,3 +2600,5 @@ class UserFollowingAPI(APIView):
             "message": _("Following entities fetched successfully."),
             "data": following_list
         }, status=status.HTTP_200_OK)
+    
+

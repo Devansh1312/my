@@ -200,12 +200,14 @@ class PostSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     view_count = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Post
         fields = [
             'id', 'entity', 'title', 'description', 'image', 
-            'date_created', 'comments', 'view_count', 'like_count',
+            'date_created', 'comments', 'view_count', 'like_count','is_like',
             'latitude', 'longitude', 'address', 'house_no', 
             'premises', 'street', 'city', 'state', 'country_name', 
             'postalCode', 'country_code'
@@ -249,6 +251,13 @@ class PostSerializer(serializers.ModelSerializer):
     def get_like_count(self, obj):
         return PostLike.objects.filter(post=obj).count()
     
+    def get_is_like(self, obj):
+        request = self.context.get('request')  # Access the request object from the context
+        if request and PostLike.objects.filter(post=obj, user=request.user).exists():
+            return True
+        return False
+
+    
     def get_comments(self, obj):
         request = self.context.get('request')
         
@@ -262,7 +271,11 @@ class PostSerializer(serializers.ModelSerializer):
         # If view is 'AllPostsListAPIView' or 'PostListAPIView', return the comment count
         if view_class_name in ['AllPostsListAPIView', 'PostListAPIView']:
             return Post_comment.objects.filter(post=obj, parent=None).count()
+         # If the view is 'PostLikeAPIView', return an empty list
 
+        if view_class_name == 'PostLikeAPIView':
+            return []
+        
         # For other views, return paginated comments
         comments = Post_comment.objects.filter(post=obj, parent=None)
         paginator = CustomPostPagination()
@@ -350,7 +363,9 @@ class GroundMaterialSerializer(serializers.ModelSerializer):
 class FieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = Field
-        fields = ['field_name', 'image', 'field_capacity', 'ground_type', 'country', 'city', 'location', 'additional_information']  # Exclude user_id
+        fields = ['field_name', 'image', 'field_capacity', 'ground_type', 'country_id', 'city_id', 'latitude', 'longitude', 'address', 'house_no', 
+            'premises', 'street', 'city', 'state', 'country_name', 
+            'postalCode', 'country_code', 'additional_information']  # Exclude user_id
 
     def create(self, validated_data):
         # Automatically associate the field with the currently logged-in user
@@ -522,10 +537,6 @@ class DetailAlbumSerializer(serializers.ModelSerializer):
 class AlbumSerializer(serializers.ModelSerializer):
     # Define a custom field to retrieve the thumbnail
    
-
-    
-  
-
     thumbnail = serializers.SerializerMethodField()
 
     class Meta:
@@ -551,4 +562,38 @@ class AlbumSerializer(serializers.ModelSerializer):
         
         return None
     
+
+class ReportSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Report
+        fields = ['id', 'title', 'content','created_at', 'updated_at']
+
+    def get_title(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate title based on the language
+        if language == 'ar':
+            return obj.title_ar
+        return obj.title_en
+
+    def get_content(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate content based on the language
+        if language == 'ar':
+            return obj.content_ar
+        return obj.content_en
     
+class PostReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostReport
+        fields = ['id', 'report_id', 'post_id', 'user_id', 'created_at', 'updated_at']
+        read_only_fields = ['user_id']  # Make user_id read-only
+         
