@@ -168,7 +168,7 @@ class NewsDetailPage(View):
 
         # Fetch CMS data
         try:
-            cmsdata = cms_pages.objects.get(id=4)
+            cmsdata = cms_pages.objects.get(id=5)
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
 

@@ -124,15 +124,43 @@ class PostCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
     parent = serializers.PrimaryKeyRelatedField(queryset=Post_comment.objects.all(), allow_null=True)
+    entity = serializers.SerializerMethodField()  # Add entity field
 
     class Meta:
         model = Post_comment
-        fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies', 'team_id','group_id']
+        fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies', 'entity']
 
     def get_replies(self, obj):
         # Get replies for this comment
         replies = Post_comment.objects.filter(parent=obj)
         return PostCommentSerializer(replies, many=True).data  # Serialize replies
+
+    def get_entity(self, obj):
+        # Return unified structure for Team, Group, or User
+        if obj.team_id:  # Corrected field name
+            return {
+                'id': obj.team_id.id,
+                'username': obj.team_id.team_name,
+                'profile_image': obj.team_id.team_logo.url if obj.team_id.team_logo else None,
+                'type': 'team'  # Optional: entity type for frontend differentiation
+            }
+        elif obj.group_id:  # Corrected typo and field name
+            return {
+                'id': obj.group_id.id,
+                'username': obj.group_id.group_name,
+                'profile_image': obj.group_id.group_logo.url if obj.group_id.group_logo else None,
+                'type': 'group'  # Optional: entity type for frontend differentiation
+            }
+        elif obj.user:
+            return {
+                'id': obj.user.id,
+                'username': obj.user.username,
+                'profile_image': obj.user.profile_picture.url if obj.user.profile_picture else None,
+                'type': 'user'  # Optional: entity type for frontend differentiation
+            }
+        return None
+
+
 
 
 class PostSerializer(serializers.ModelSerializer):

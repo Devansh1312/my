@@ -86,15 +86,16 @@ class Post(models.Model):
 
 class Post_comment(models.Model):
     user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE,default=True)
-    team_id = models.ForeignKey(Team ,null=True,blank=True, on_delete=models.CASCADE)
-    gropu_id = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE,null=True,blank=True)
-    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE,default=True)
+    team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
+    group_id = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE, null=True, blank=True)  # Corrected typo
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE, default=True)
     parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Comment by {self.user.username} on {self.post.title}'
+
 
     class Meta:
         db_table = 'futurestar_app_post_comment'

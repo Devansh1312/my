@@ -32,7 +32,7 @@ urlpatterns = [
         ######## User Post API ###########
 
         path('api/post/like/', PostLikeAPIView.as_view(), name='post-like'),
-        path('api/post/view/', PostViewAPIView.as_view(), name='post-view'),
+        # path('api/post/view/', PostViewAPIView.as_view(), name='post-view'),
 
 
         path('api/posts/all/', AllPostsListAPIView.as_view()),
@@ -40,7 +40,7 @@ urlpatterns = [
         path('api/posts/create/', PostCreateAPIView.as_view()),
         path('api/posts/edit/', PostEditAPIView.as_view()),
 
-        path('api/posts/details/', PostDetailAPIView.as_view()),
+        path('api/posts/details/', PostDetailAPIView.as_view()), #Post Detail View As well As Post View Increment 
         path('api/comments/create/', CommentCreateAPIView.as_view()),
         path('api/posts/delete/', PostDeleteAPIView.as_view()),
 

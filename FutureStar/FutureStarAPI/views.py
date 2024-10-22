@@ -824,38 +824,38 @@ class CustomPostPagination(PageNumberPagination):
 
 ###################################################################################### POST MODULE ################################################################################
 
-###################### POST VIEW ################
-class PostViewAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+# ###################### POST VIEW ################
+# class PostViewAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        post_id = request.data.get('post_id')
+#     def post(self, request, *args, **kwargs):
+#         post_id = request.data.get('post_id')
 
-        if not post_id:
-            return Response({
-                'status': 0,
-                'message': _('Post ID is required.')
-            }, status=400)
+#         if not post_id:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Post ID is required.')
+#             }, status=400)
 
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Post not found.')
-            }, status=404)
+#         try:
+#             post = Post.objects.get(id=post_id)
+#         except Post.DoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Post not found.')
+#             }, status=404)
 
-        # Track the view
-        PostView.objects.get_or_create(user=request.user, post=post)
+#         # Track the view
+#         PostView.objects.get_or_create(user=request.user, post=post)
 
-        # Return the view count
-        view_count = PostView.objects.filter(post=post).count()
+#         # Return the view count
+#         view_count = PostView.objects.filter(post=post).count()
 
-        return Response({
-            'status': 1,
-            'message': _('Post viewed successfully.'),
-            'view_count': view_count
-        }, status=200)
+#         return Response({
+#             'status': 1,
+#             'message': _('Post viewed successfully.'),
+#             'view_count': view_count
+#         }, status=200)
 
 ###################### POST LIKE ##################################
 class PostLikeAPIView(APIView):
@@ -956,9 +956,9 @@ class PostListAPIView(generics.ListAPIView):
         elif group_id:
             return Post.objects.filter(group_id=group_id).order_by('-date_created')
         elif user_id:
-            return Post.objects.filter(user=user_id).order_by('-date_created')
+            return Post.objects.filter(user=user_id, team_id__isnull=True, group_id__isnull=True).order_by('-date_created')
         else:
-            return Post.objects.filter(user=self.request.user).order_by('-date_created')
+            return Post.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-date_created')
 
 
     def get(self, request, *args, **kwargs):
@@ -1141,58 +1141,68 @@ class PostDetailAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        # Activate the language based on the request headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
+        # Get the data from the request
         post_id = request.data.get('post_id')
         team_id = request.data.get('team_id')
         group_id = request.data.get('group_id')
 
+        # Validate the presence of post_id
         if not post_id:
             return Response({
                 'status': 0,
-                'message': _('post_id is required.')
+                'message': _('Post ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            if team_id:
-                post = Post.objects.get(id=post_id, team_id=team_id)
-            elif group_id:
-                post = Post.objects.get(id=post_id, group_id=group_id)
-            else:
-                post = Post.objects.get(id=post_id, user=request.user)
+            post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
+        # Track the post view
+        PostView.objects.get_or_create(user=request.user, post=post)
+
+        # Retrieve the view count for the post
+        view_count = PostView.objects.filter(post=post).count()
+
+        # Serialize the post details
         serializer = PostSerializer(post, context={'request': request})
 
+        # Return the combined response with both post details and view count
         return Response({
             'status': 1,
             'message': _('Post details fetched successfully.'),
-            'data': serializer.data
+            'data': serializer.data,
+            'view_count': view_count
         }, status=status.HTTP_200_OK)
-
 
 ######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-
+    
     def post(self, request, *args, **kwargs):
+        # Set the language based on headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract data from request
         data = request.data
         post_id = data.get('post_id')
-        team_id = data.get('team_id')  # Optional team_id
-        group_id = data.get('group_id')  # Optional team_id
         comment_text = data.get('comment')
         parent_id = data.get('parent_id')
+        team_id = data.get('team_id')  # Optional team_id
+        group_id = data.get('group_id')  # Optional group_id
 
+        # Validate that post_id and comment are provided
         if not post_id or not comment_text:
             return Response({
                 'status': 0,
@@ -1200,12 +1210,7 @@ class CommentCreateAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            if team_id:
-                post = Post.objects.get(id=post_id, team_id=team_id)
-            elif group_id:
-                post = Post.objects.get(id=post_id, group_id=group_id)
-            else:
-                post = Post.objects.get(id=post_id, user=request.user)
+            post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
@@ -1223,22 +1228,54 @@ class CommentCreateAPIView(APIView):
                     'message': _('Parent comment not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
-        # Create the comment
-        comment = Post_comment.objects.create(
-            user=request.user,
-            post=post,
-            comment=comment_text,
-            parent=parent_comment,
-            team_id=team_id,  # Set the team_id if provided
-            group_id=group_id  # Set the team_id if provided
-        )
+        # Create the comment based on the entity type (team, group, or user)
+        if team_id:
+            try:
+                team = Team.objects.get(id=team_id)
+                comment = Post_comment.objects.create(
+                    user=request.user,
+                    post=post,
+                    comment=comment_text,
+                    parent=parent_comment,
+                    team_id=team_id  # Store team ID
+                )
+            except Team.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Team not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
 
+        elif group_id:
+            try:
+                group = TrainingGroups.objects.get(id=group_id)
+                comment = Post_comment.objects.create(
+                    user=request.user,
+                    post=post,
+                    comment=comment_text,
+                    parent=parent_comment,
+                    group_id=group_id  # Store group ID
+                )
+            except TrainingGroups.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Group not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+        else:
+            # Comment is from the user
+            comment = Post_comment.objects.create(
+                user=request.user,
+                post=post,
+                comment=comment_text,
+                parent=parent_comment
+            )
+
+        # Return the response with comment details including the entity (team, group, or user)
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
-            'data': PostCommentSerializer(comment).data
+            'data': PostCommentSerializer(comment).data  # Return serialized comment data
         }, status=status.HTTP_201_CREATED)
-
 
 ############### POST DELETE API ##############################
 class PostDeleteAPIView(APIView):
