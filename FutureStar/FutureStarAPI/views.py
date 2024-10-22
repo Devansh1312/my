@@ -1914,8 +1914,8 @@ class SponsorAPI(APIView):
     group_query_param = 'group_id'  # Custom page number param in the body
 
     def get(self, request):
-        team_id = request.data.get(self.team_query_param)
-        group_id = request.data.get(self.group_query_param)
+        team_id = request.query_params.get(self.team_query_param)
+        group_id = request.query_params.get(self.group_query_param)
         
         if team_id:
             sponsors = Sponsor.objects.filter(team_id=team_id).order_by('-created_at')
@@ -2052,7 +2052,7 @@ class PostReportCreateView(generics.CreateAPIView):
 
         return Response({
             'status': 1,
-            'message': _('Report created successfully.'),
+            'message': _('Post Report Submitted Successfully.'),
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_201_CREATED)
     
