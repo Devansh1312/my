@@ -824,38 +824,6 @@ class CustomPostPagination(PageNumberPagination):
 
 ###################################################################################### POST MODULE ################################################################################
 
-# ###################### POST VIEW ################
-# class PostViewAPIView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request, *args, **kwargs):
-#         post_id = request.data.get('post_id')
-
-#         if not post_id:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('Post ID is required.')
-#             }, status=400)
-
-#         try:
-#             post = Post.objects.get(id=post_id)
-#         except Post.DoesNotExist:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('Post not found.')
-#             }, status=404)
-
-#         # Track the view
-#         PostView.objects.get_or_create(user=request.user, post=post)
-
-#         # Return the view count
-#         view_count = PostView.objects.filter(post=post).count()
-
-#         return Response({
-#             'status': 1,
-#             'message': _('Post viewed successfully.'),
-#             'view_count': view_count
-#         }, status=200)
 
 ###################### POST LIKE ##################################
 class PostLikeAPIView(APIView):
@@ -893,7 +861,7 @@ class PostLikeAPIView(APIView):
         return Response({
             'status': 1,
             'message': message,
-            'like_count': like_count
+            'data': like_count
         }, status=200)
 
 

@@ -3,6 +3,8 @@ from rest_framework import serializers
 from FutureStar_App.models import User
 from FutureStarAPI.models import *
 from django.core.files.storage import default_storage
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 
 
 
@@ -161,6 +163,36 @@ class PostCommentSerializer(serializers.ModelSerializer):
         return None
 
 
+####################### PAGIINATION API ###############################################################################
+class CustomPostPagination(PageNumberPagination):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    page_size = 10  # Number of records per page
+    page_query_param = 'page'  # Custom page number param in the body
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # Set max size if needed
+
+    def paginate_queryset(self, queryset, request, view=None):
+        # Get the page number from the body (default: 1)
+        try:
+            page_number = request.data.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            raise ValidationError("Invalid page number.")
+
+        # Get total number of pages based on the queryset
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        total_pages = paginator.num_pages
+
+        # Check if the requested page number is within the valid range
+        if self.page > total_pages:
+            # If page is out of range, return an empty list
+            return []
+
+        # Perform standard pagination
+        return super().paginate_queryset(queryset, request, view)
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -216,6 +248,23 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_like_count(self, obj):
         return PostLike.objects.filter(post=obj).count()
+    
+    def get_comments(self, obj):
+        request = self.context.get('request')
+        if request and request.parser_context.get('view').__class__.__name__ in ['AllPostsListAPIView', 'PostListAPIView']:
+            return Post_comment.objects.filter(post=obj, parent=None).count()
+        # Filter the top-level comments for the post (parent=None for top-level)
+        comments = Post_comment.objects.filter(post=obj, parent=None)
+        
+        # Apply pagination using the custom pagination class
+        paginator = CustomPostPagination()
+        paginated_comments = paginator.paginate_queryset(comments, request)
+
+        # Use the PostCommentSerializer for the paginated comments
+        serializer = PostCommentSerializer(paginated_comments, many=True, context={'request': request})
+
+        # Return the paginated response
+        return paginator.get_paginated_response(serializer.data).data
 
     def get_comments(self, obj):
         request = self.context.get('request')
