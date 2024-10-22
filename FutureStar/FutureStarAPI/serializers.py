@@ -365,6 +365,12 @@ class GallarySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         request = self.context.get('request')
+
+        if 'media_file' in representation:
+            full_url = representation['media_file']
+            # Get the relative path from the full URL
+            relative_url = full_url.replace(f"{request.scheme}://{request.get_host()}", "")
+            representation['media_file'] = relative_url
         if request and request.method == 'GET':
             representation.pop('album_id', None)
         return representation
@@ -399,6 +405,13 @@ class GetGallarySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         request = self.context.get('request')
+
+        if 'media_file' in representation:
+            full_url = representation['media_file']
+            # Get the relative path from the full URL
+            relative_url = full_url.replace(f"{request.scheme}://{request.get_host()}", "")
+            representation['media_file'] = relative_url
+
         if request and request.method == 'GET':
             representation.pop('album_id', None)
         return representation

@@ -1573,23 +1573,18 @@ class AlbumListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         team_id = self.request.data.get('team_id')
-        user_id=self.request.data.get('user_id')
-        group_id=self.request.data.get('group_id')
+        user_id = self.request.data.get('user_id')
+        group_id = self.request.data.get('group_id')
 
-    
-
-        queryset = Album.objects.all()
         if team_id:
-            queryset = queryset.filter(team_id=team_id)
+            return Album.objects.filter(team_id=team_id).order_by('-created_at')
         elif group_id:
-            queryset = queryset.filter(group_id=group_id)
-
-      
+            return Album.objects.filter(group_id=group_id).order_by('-created_at')
+        elif user_id:
+            return Album.objects.filter(user=user_id, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
         else:
-           
-            queryset = queryset.filter(user=user_id)
- 
-        return queryset.order_by('-created_at')
+            return Album.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
+
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -1634,22 +1629,21 @@ class GallaryListAPIView(generics.ListAPIView):
     pagination_class = CustomPostPagination
 
     def get_queryset(self):
-        team_id = self.request.data.get('team_id')
-        user_id = self.request.data.get('user_id')
-        group_id = self.request.data.get('group_id')
-        content_type = self.request.data.get('content_type')
+            team_id = self.request.data.get('team_id')
+            user_id = self.request.data.get('user_id')
+            group_id = self.request.data.get('group_id')
+            content_type = self.request.data.get('content_type')
 
-        queryset = Gallary.objects.filter(album_id__isnull=True)  # Filter by default for no album
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-        if group_id:
-            queryset = queryset.filter(group_id=group_id)
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
-        if content_type:
-            queryset = queryset.filter(content_type=content_type)
-
-        return queryset.order_by('-created_at')
+            if team_id:
+                return Gallary.objects.filter(team_id=team_id, album_id__isnull=True).order_by('-created_at')
+            elif group_id:
+                return Gallary.objects.filter(group_id=group_id, album_id__isnull=True).order_by('-created_at')
+            elif content_type:
+                return Gallary.objects.filter(content_type=content_type, album_id__isnull=True).order_by('-created_at')
+            elif user_id:
+                return Gallary.objects.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+            else:
+                return Gallary.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -1676,7 +1670,7 @@ class GallaryListAPIView(generics.ListAPIView):
             # }, status=status.HTTP_200_OK)
 
         # Handle non-paginated response
-        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
+        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff','.webp')
         video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
 
         # Create Q objects for filtering images and videos
@@ -1808,20 +1802,20 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
     pagination_class = CustomPostPagination 
 
     def get_queryset(self):
-        team_id = self.request.data.get('team_id')
-        user_id = self.request.data.get('user_id')
-        group_id = self.request.data.get('group_id')
+            team_id = self.request.data.get('team_id')
+            user_id = self.request.data.get('user_id')
+            group_id = self.request.data.get('group_id')
+            
 
-        queryset = Gallary.objects.filter(album_id__isnull=True)
-        
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
-        if group_id:
-            queryset = queryset.filter(group_id=group_id)
-
-        return queryset.order_by('-created_at')
+            if team_id:
+                return Gallary.objects.filter(team_id=team_id, album_id__isnull=True).order_by('-created_at')
+            elif group_id:
+                return Gallary.objects.filter(group_id=group_id, album_id__isnull=True).order_by('-created_at')
+           
+            elif user_id:
+                return Gallary.objects.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+            else:
+                return Gallary.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
