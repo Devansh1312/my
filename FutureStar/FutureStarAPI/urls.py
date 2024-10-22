@@ -64,6 +64,12 @@ urlpatterns = [
         ########################## Sponsor URL ##################
         path('api/sponsor/', SponsorAPI.as_view()),
 
+
+        ########################## Report URL ##################
+
+        path('api/reports/', ReportListAPIView.as_view()),
+        path('api/postreport/create/', PostReportCreateView.as_view(), name='postreport-create'),
+
         ################## fileds URL ################
         path('api/fields/', FieldAPIView.as_view()),
         path('api/tournament/', TournamentAPIView.as_view()),
