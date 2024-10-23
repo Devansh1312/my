@@ -26,8 +26,8 @@ urlpatterns = [
 
         ## Follow Following 
         path('api/follow_unfollow/', FollowUnfollowAPI.as_view()),
-        path('api/followers/', UserFollowersAPI.as_view()),
-        path('api/following/', UserFollowingAPI.as_view()),
+        path('api/followers/', ListFollowersAPI.as_view()),
+        path('api/following/', ListFollowingAPI.as_view()),
 
         ######## User Post API ###########
 

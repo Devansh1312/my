@@ -234,48 +234,42 @@ class FollowRequest(models.Model):
             ('from_group', 'to_group')
         )
 
-    def __str__(self):
-        return f"Follow request from {self.get_from_entity()} to {self.get_to_entity()}"
+    # Count followers for any entity (user, team, or group)
+    @classmethod
+    def count_followers(cls, to_user=None, to_team=None, to_group=None):
+        return cls.objects.filter(
+            to_user=to_user if to_user else None,
+            to_team=to_team if to_team else None,
+            to_group=to_group if to_group else None
+        ).count()
 
+    # Count followings for any entity (user, team, or group)
+    @classmethod
+    def count_following(cls, from_user=None, from_team=None, from_group=None):
+        return cls.objects.filter(
+            from_user=from_user if from_user else None,
+            from_team=from_team if from_team else None,
+            from_group=from_group if from_group else None
+        ).count()
+
+    # Helper method to return the source entity (user/team/group) from which the request was sent
     def get_from_entity(self):
-        """Returns the from entity."""
         if self.from_user:
             return self.from_user
-        if self.from_team:
+        elif self.from_team:
             return self.from_team
-        if self.from_group:
+        elif self.from_group:
             return self.from_group
-        return None
 
+    # Helper method to return the target entity (user/team/group) to which the request was sent
     def get_to_entity(self):
-        """Returns the to entity."""
         if self.to_user:
             return self.to_user
-        if self.to_team:
+        elif self.to_team:
             return self.to_team
-        if self.to_group:
+        elif self.to_group:
             return self.to_group
-        return None
 
-    def clean(self):
-        """Ensures only one of from_user/from_team/from_group and one of to_user/to_team/to_group is filled."""
-        from_fields = [self.from_user, self.from_team, self.from_group]
-        to_fields = [self.to_user, self.to_team, self.to_group]
-
-        if sum([bool(field) for field in from_fields]) != 1:
-            raise ValidationError("Only one of from_user, from_team, or from_group must be provided.")
-        if sum([bool(field) for field in to_fields]) != 1:
-            raise ValidationError("Only one of to_user, to_team, or to_group must be provided.")
-
-    @staticmethod
-    def get_follower_count(user):
-        """Returns the number of followers for a given user"""
-        return FollowRequest.objects.filter(to_user=user).count()
-
-    @staticmethod
-    def get_following_count(user):
-        """Returns the number of users a given user is following"""
-        return FollowRequest.objects.filter(from_user=user).count()
 
 
 # Helper function for dynamic file paths

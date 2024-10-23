@@ -30,9 +30,13 @@ logger = logging.getLogger(__name__)
 
 def get_user_data(user, request):
     """Returns a dictionary with all user details."""
-    followers_count = FollowRequest.get_follower_count(user)
-    following_count = FollowRequest.get_following_count(user)
-    post_count = Post.objects.filter(user=user, team__isnull=True).count()
+    
+    # Get follower and following counts for the user
+    followers_count = FollowRequest.count_followers(to_user=user)
+    following_count = FollowRequest.count_following(from_user=user)
+    
+    post_count = Post.objects.filter(user=user, team__isnull=True,group_isnull=True).count()
+    
     gender_name = None
     if user.gender:
         serializer = UserGenderSerializer(user.gender, context={'request': request})
@@ -40,10 +44,10 @@ def get_user_data(user, request):
 
     return {
         'id': user.id,
-        'followers_count' : 100,
-        'following_count' : 100,
-        'post_count' : post_count,
-        'user_role' : user.role_id,
+        'followers_count': followers_count,  # Actual follower count
+        'following_count': following_count,  # Actual following count
+        'post_count': post_count,
+        'user_role': user.role_id,
         'username': user.username,
         'phone': user.phone,
         'email': user.email,
@@ -2527,7 +2531,7 @@ class FollowUnfollowAPI(APIView):
             }, status=status.HTTP_201_CREATED)
 
 ####################################### LIST OF FOLLOWERS #######################################
-class UserFollowersAPI(APIView):
+class ListFollowersAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -2536,16 +2540,15 @@ class UserFollowersAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Get the type of entity requesting followers (user/team/group)
         to_user_id = request.data.get('to_user')
         to_team_id = request.data.get('to_team')
         to_group_id = request.data.get('to_group')
 
-        # Ensure one type of entity is provided
+        # Ensure only one entity type is requested
         if [to_user_id, to_team_id, to_group_id].count(None) < 2:
             return Response({
                 "status": 0,
-                "message": _("You can only retrieve followers for one entity type (user, team, or group).")
+                "message": _("You can only fetch followers for one entity type (user, team, or group).")
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve followers
@@ -2555,24 +2558,29 @@ class UserFollowersAPI(APIView):
             to_group_id=to_group_id if to_group_id else None
         ).select_related('from_user', 'from_team', 'from_group')
 
-        # Format the follower list
+        # Format followers list
         followers_list = [
             {
                 "id": follower.get_from_entity().id,
-                "name": follower.get_from_entity().username if follower.from_user else follower.get_from_entity().team_name if follower.from_team else follower.get_from_entity().group_name,
-                "profile_picture": getattr(follower.get_from_entity(), 'profile_picture', None)
+                "name": getattr(follower.get_from_entity(), 'username', None) or
+                        getattr(follower.get_from_entity(), 'team_name', None) or
+                        getattr(follower.get_from_entity(), 'group_name', None),
+                "profile_picture": getattr(follower.get_from_entity(), 'profile_picture', None) or
+                                   getattr(follower.get_from_entity(), 'team_logo', None) or
+                                   getattr(follower.get_from_entity(), 'group_logo', None)
             }
             for follower in followers
         ]
 
         return Response({
             "status": 1,
-            "message": _("Followers fetched successfully."),
+            "message": _("Followers list fetched successfully."),
             "data": followers_list
         }, status=status.HTTP_200_OK)
 
+
 ##################################### LIST OF FOLLOWING #######################################
-class UserFollowingAPI(APIView):
+class ListFollowingAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -2581,10 +2589,9 @@ class UserFollowingAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Get user requesting following list
         from_user = request.user
 
-        # Retrieve following
+        # Retrieve the following
         following = FollowRequest.objects.filter(
             from_user=from_user
         ).select_related('to_user', 'to_team', 'to_group')
@@ -2593,16 +2600,18 @@ class UserFollowingAPI(APIView):
         following_list = [
             {
                 "id": follow.get_to_entity().id,
-                "name": follow.get_to_entity().username if follow.to_user else follow.get_to_entity().team_name if follow.to_team else follow.get_to_entity().group_name,
-                "profile_picture": getattr(follow.get_to_entity(), 'profile_picture', None)
+                "name": getattr(follow.get_to_entity(), 'username', None) or
+                        getattr(follow.get_to_entity(), 'team_name', None) or
+                        getattr(follow.get_to_entity(), 'group_name', None),
+                "profile_picture": getattr(follow.get_to_entity(), 'profile_picture', None) or
+                                   getattr(follow.get_to_entity(), 'team_logo', None) or
+                                   getattr(follow.get_to_entity(), 'group_logo', None)
             }
             for follow in following
         ]
 
         return Response({
             "status": 1,
-            "message": _("Following entities fetched successfully."),
+            "message": _("Following list fetched successfully."),
             "data": following_list
         }, status=status.HTTP_200_OK)
-    
-
