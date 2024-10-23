@@ -361,12 +361,20 @@ class GroundMaterialSerializer(serializers.ModelSerializer):
     
 
 class FieldSerializer(serializers.ModelSerializer):
+    city_id_name= serializers.SerializerMethodField()
+    country_id_name = serializers.SerializerMethodField()
     class Meta:
         model = Field
-        fields = ['field_name', 'image', 'field_capacity', 'ground_type', 'country_id', 'city_id', 'latitude', 'longitude', 'address', 'house_no', 
+        fields = ['field_name', 'image', 'field_capacity', 'ground_type', 'country_id','country_id_name', 'city_id','city_id_name', 'latitude', 'longitude', 'address', 'house_no', 
             'premises', 'street', 'city', 'state', 'country_name', 
             'postalCode', 'country_code', 'additional_information']  # Exclude user_id
+    def get_country_id_name(self, obj):
+        return obj.country_id.name if obj.country_id else None  # Return None if no country
 
+    # Method to retrieve city name for city_id_name field
+    def get_city_id_name(self, obj):
+        return obj.city_id.name if obj.city_id else None # Return None if no city
+    
     def create(self, validated_data):
         # Automatically associate the field with the currently logged-in user
         user = self.context['request'].user
@@ -375,6 +383,10 @@ class FieldSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
+    city_name = serializers.SerializerMethodField()  # Change to city_name
+    country_name = serializers.SerializerMethodField()  # Change to country_name
+    tournament_fields_name=serializers.SerializerMethodField()  # Change to tournament_fields_name
+
     class Meta:
         model = Tournament
         fields = [
@@ -384,11 +396,25 @@ class TournamentSerializer(serializers.ModelSerializer):
             'number_of_team',
             'age_group',
             'country',
+            'country_name',
             'city',
+            'city_name',
             'tournament_fields',
+            'tournament_fields_name',
             'logo',
             'tournament_joining_cost',
         ]  # Exclude user_id
+
+    def get_country_name(self, obj):
+        return obj.country.name if obj.country else None  # Assuming 'country' is the field in Tournament
+
+    # Method to retrieve city name for city_name field
+    def get_city_name(self, obj):
+        return obj.city.name if obj.city else None  # # Return None if no city
+    
+    # Method to retrieve tournament fields name for tournament_fields_name field
+    def get_tournament_fields_name(self, obj):
+        return obj.tournament_fields.field_name if obj.tournament_fields else None
 
     def create(self, validated_data):
         # Automatically associate the tournament with the currently logged-in user
