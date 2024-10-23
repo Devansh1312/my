@@ -10,12 +10,13 @@ from django.core.exceptions import ValidationError
 class Team(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
     team_name = models.CharField(max_length=255,blank=True,null=True)
+    team_username = models.CharField(max_length=255,blank=True,null=True)
     team_type = models.ForeignKey(Category,on_delete=models.CASCADE,default=True)
     bio = models.TextField(null=True,blank=True)
     team_establishment_date = models.DateField(blank=True,null=True)
     team_president = models.CharField(max_length=255,blank=True,null=True)
     
-     # New fields
+    # New fields
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)
     address = models.CharField(max_length=255, blank=True, null=True)
@@ -37,8 +38,8 @@ class Team(models.Model):
     branches = models.CharField(max_length=500,blank=True,null=True)
     team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)  # Add image field
     team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)  # Add image field
-    team_uniform = models.ImageField(upload_to='team/team_uniform/', blank=True, null=True)  # Add image field
-
+    team_uniform = models.TextField( blank=True, null=True) 
+    
     def __str__(self):
         return self.team_name
 
