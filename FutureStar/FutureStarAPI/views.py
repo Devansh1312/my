@@ -1246,7 +1246,7 @@ class PostDeleteAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        post_id = request.data.get('post_id')
+        post_id = request.query_params.get('post_id')
         team_id = request.data.get('team_id')  # Optional team_id
         group_id = request.data.get('group_id')  # Optional team_id
 
@@ -2190,7 +2190,26 @@ class TeamViewAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Fetch all categories
+        # Check if 'team_id' is provided in the request
+        team_id = request.query_params.get('team_id', None)
+
+        if team_id:
+            # Fetch and return the team data if 'team_id' is provided
+            try:
+                team = Team.objects.get(id=team_id)
+                serializer = TeamSerializer(team)
+                return Response({
+                    'status': 1,
+                    'message': _('Team data retrieved successfully.'),
+                    'data': serializer.data
+                }, status=status.HTTP_200_OK)
+            except Team.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Team not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+        # If no 'team_id' is provided, return categories
         categories = Category.objects.all()
 
         # Construct the response data with language-specific names
@@ -2207,9 +2226,10 @@ class TeamViewAPI(APIView):
 
         return Response({
             'status': 1,
-            'message': _('Types retrieved successfully.'),
+            'message': _('Categories retrieved successfully.'),
             'data': type_data
         }, status=status.HTTP_200_OK)
+
     
 
     def post(self, request):
@@ -2300,6 +2320,8 @@ class TeamViewAPI(APIView):
         team_instance.bio = request.data.get('bio', team_instance.bio)
         team_instance.team_establishment_date = request.data.get('team_establishment_date', team_instance.team_establishment_date)
         team_instance.team_president = request.data.get('team_president', team_instance.team_president)
+        team_instance.entry_fees = request.data.get('entry_fees', team_instance.entry_fees)
+
 
         # Add the remaining fields from the model
         team_instance.latitude = request.data.get('latitude', team_instance.latitude)
@@ -2313,8 +2335,21 @@ class TeamViewAPI(APIView):
         team_instance.country_name = request.data.get('country_name', team_instance.country_name)
         team_instance.postalCode = request.data.get('postalCode', team_instance.postalCode)
         team_instance.country_code = request.data.get('country_code', team_instance.country_code)
-        team_instance.country_id = request.data.get('country_id', team_instance.country_id)
-        team_instance.city_id = request.data.get('city_id', team_instance.city_id)
+        country_id = request.data.get('country_id')
+        if country_id:
+            try:
+                team_instance.country_id = Country.objects.get(id=country_id)
+            except Country.DoesNotExist:
+                return Response({'status': 0, 'message': _('Invalid country ID provided.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        city_id = request.data.get('city_id')
+        if city_id:
+            try:
+                team_instance.city_id = City.objects.get(id=city_id)  # Assuming City is your model for city
+            except City.DoesNotExist:
+                return Response({'status': 0, 'message': _('Invalid city ID provided.')}, status=status.HTTP_400_BAD_REQUEST)
+
+# Save the team instance
         team_instance.phone = request.data.get('phone', team_instance.phone)
         team_instance.email = request.data.get('email', team_instance.email)
         team_instance.age_group = request.data.get('age_group', team_instance.age_group)
