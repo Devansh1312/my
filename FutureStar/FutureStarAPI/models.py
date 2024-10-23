@@ -176,6 +176,7 @@ class Field(models.Model):
 
 class Tournament(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
+    team_id = models.ForeignKey(Team,null=True, blank=True, on_delete=models.CASCADE)
     tournament_name = models.CharField(max_length=255,blank=True,null=True)
     tournament_starting_date = models.DateField(blank=True,null=True)
     tournament_final_date = models.DateField(blank=True,null=True)
