@@ -1142,6 +1142,71 @@ class PostDetailAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+
+################################ Get comment API #############################
+class PostCommentPagination(CustomPostPagination):
+    def paginate_queryset(self, queryset, request, view=None):
+        return super().paginate_queryset(queryset, request, view)
+
+class PostCommentAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Validate post_id from request data
+        post_id = request.data.get('post_id')
+        if not post_id:
+            return Response({
+                'status': 0,
+                'message': _('Post ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the top-level comments for the post
+        comments = Post_comment.objects.filter(post=post, parent=None).order_by('-date_created')
+
+        # Paginate the comments
+        paginator = PostCommentPagination()
+        paginated_comments = paginator.paginate_queryset(comments, request)
+
+        # If pagination fails or no comments are found
+        if paginated_comments is None:
+            return Response({
+                'status': 1,
+                'message': _('No comments found for this post.'),
+                'data': {
+                    'total_records': 0,
+                    'total_pages': 0,
+                    'current_page': 1,
+                    'results': []
+                }
+            }, status=status.HTTP_200_OK)
+
+        # Serialize the paginated comments
+        serializer = PostCommentSerializer(paginated_comments, many=True)
+
+        # Return paginated response
+        return Response({
+            'status': 1,
+            'message': _('Comments fetched successfully.'),
+            'data': serializer.data,
+            'total_records': comments.count(),
+            'total_pages': paginator.page.paginator.num_pages,
+            'current_page': paginator.page.number,
+        }, status=status.HTTP_200_OK)
+
+
 ######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]

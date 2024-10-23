@@ -192,38 +192,6 @@ class PostCommentSerializer(serializers.ModelSerializer):
         return None
 
 
-####################### PAGIINATION API ###############################################################################
-class CustomPostPagination(PageNumberPagination):
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    page_size = 10  # Number of records per page
-    page_query_param = 'page'  # Custom page number param in the body
-    page_size_query_param = 'page_size'
-    max_page_size = 100  # Set max size if needed
-
-    def paginate_queryset(self, queryset, request, view=None):
-        # Get the page number from the body (default: 1)
-        try:
-            page_number = request.data.get(self.page_query_param, 1)
-            self.page = int(page_number)
-            if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
-        except (ValueError, TypeError):
-            raise ValidationError("Invalid page number.")
-
-        # Get total number of pages based on the queryset
-        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
-        total_pages = paginator.num_pages
-
-        # Check if the requested page number is within the valid range
-        if self.page > total_pages:
-            # If page is out of range, return an empty list
-            return []
-
-        # Perform standard pagination
-        return super().paginate_queryset(queryset, request, view)
-
-
 class PostSerializer(serializers.ModelSerializer):
     entity = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
@@ -288,45 +256,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     
     def get_comments(self, obj):
-        request = self.context.get('request')
-        
-        # If request context or parser context is missing, return an empty list
-        if request is None or request.parser_context is None:
-            return []
-
-        # Get the view's class name
-        view_class_name = request.parser_context.get('view').__class__.__name__
-
-        # If view is 'AllPostsListAPIView' or 'PostListAPIView', return the comment count
-        if view_class_name in ['AllPostsListAPIView', 'PostListAPIView','PostLikeAPIView']:
-            return Post_comment.objects.filter(post=obj, parent=None).count()
-        
-        # For other views, return paginated comments
-        comments = Post_comment.objects.filter(post=obj, parent=None)
-        paginator = CustomPostPagination()
-        paginated_comments = paginator.paginate_queryset(comments, request)
-
-        if paginated_comments is None:
-            return {
-                "total_records": 0,
-                "total_pages": 0,
-                "current_page": 1,
-                "results": []
-            }
-
-        serializer = PostCommentSerializer(paginated_comments, many=True, context={'request': request})
-
-        total_records = comments.count()
-        page_size = paginator.get_page_size(request)
-        total_pages = (total_records // page_size) + (1 if total_records % page_size > 0 else 0)
-        current_page = paginator.page.number
-
-        return {
-            "total_records": total_records,
-            "total_pages": total_pages,
-            "current_page": current_page,
-            "results": serializer.data
-        }
+        # Always return the count of top-level comments
+        return Post_comment.objects.filter(post=obj, parent=None).count()
 
 
 
