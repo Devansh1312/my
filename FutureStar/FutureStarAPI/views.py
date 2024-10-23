@@ -2301,6 +2301,24 @@ class TeamViewAPI(APIView):
         team_instance.team_establishment_date = request.data.get('team_establishment_date', team_instance.team_establishment_date)
         team_instance.team_president = request.data.get('team_president', team_instance.team_president)
 
+        # Add the remaining fields from the model
+        team_instance.latitude = request.data.get('latitude', team_instance.latitude)
+        team_instance.longitude = request.data.get('longitude', team_instance.longitude)
+        team_instance.address = request.data.get('address', team_instance.address)
+        team_instance.house_no = request.data.get('house_no', team_instance.house_no)
+        team_instance.premises = request.data.get('premises', team_instance.premises)
+        team_instance.street = request.data.get('street', team_instance.street)
+        team_instance.city = request.data.get('city', team_instance.city)
+        team_instance.state = request.data.get('state', team_instance.state)
+        team_instance.country_name = request.data.get('country_name', team_instance.country_name)
+        team_instance.postalCode = request.data.get('postalCode', team_instance.postalCode)
+        team_instance.country_code = request.data.get('country_code', team_instance.country_code)
+        team_instance.country_id = request.data.get('country_id', team_instance.country_id)
+        team_instance.city_id = request.data.get('city_id', team_instance.city_id)
+        team_instance.phone = request.data.get('phone', team_instance.phone)
+        team_instance.email = request.data.get('email', team_instance.email)
+        team_instance.age_group = request.data.get('age_group', team_instance.age_group)
+
         # Handle file uploads (same as before)
         if 'team_logo' in request.FILES:
             logo = request.FILES['team_logo']
