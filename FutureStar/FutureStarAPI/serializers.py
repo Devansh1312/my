@@ -99,10 +99,25 @@ class ChangePasswordOtpSerializer(serializers.Serializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    team_type_name = serializers.SerializerMethodField()
+    country_id_name = serializers.CharField(source='country_id.name', allow_null=True)  # Assuming 'country_id' is a ForeignKey
+    city_id_name = serializers.CharField(source='city_id.name', allow_null=True)  # Assuming 'city_id' is a ForeignKey
+
     class Meta:
         model = Team
-        fields = ['id', 'team_name', 'team_logo']  
-    
+        fields = [
+            'id', 'user_id', 'team_name', 'team_username', 'team_type','team_type_name' ,'bio',
+            'team_establishment_date', 'team_president','country_id', 'city_id','country_id_name','city_id_name' ,'latitude', 'longitude',
+            'address', 'house_no', 'premises', 'street', 'city', 'state', 'country_name',
+            'postalCode', 'country_code', 'phone', 'email',
+            'age_group', 'entry_fees', 'branches', 'team_logo', 'team_background_image', 'team_uniform'
+        ]
+
+    def get_team_type_name(self, obj):
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        return obj.team_type.name_ar if language == 'ar' else obj.team_type.name_en
+
     def get_team_logo(self, obj):
         return obj.team_logo.url if obj.team_logo else None 
 

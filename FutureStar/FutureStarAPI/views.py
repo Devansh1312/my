@@ -2223,23 +2223,27 @@ class TeamViewAPI(APIView):
             team_type_id = request.data.get('team_type')
             team_type_instance = Category.objects.get(id=team_type_id)
         except Category.DoesNotExist:
-            return Response({'status': 0, 'message': _('Invalid team type provided.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0, 
+                'message': _('Invalid team type provided.')}, 
+                status=status.HTTP_400_BAD_REQUEST
+                )
 
-        
-        
         # Check if team_username already exists in either the Team or User model
         team_username = request.data.get('team_username')
-        
-        if Team.objects.filter(team_username=team_username).exists() or User.objects.filter(username=team_username).exists():
-            return Response({'status': 0, 'message': _('The username is already in use either as a team username or a user username.')}, status=status.HTTP_400_BAD_REQUEST)
 
+        if Team.objects.filter(team_username=team_username).exists() or User.objects.filter(username=team_username).exists():
+            return Response({
+                'status': 0, 
+                'message': _('The username is already in use either as a team username or a user username.')}, 
+                status=status.HTTP_400_BAD_REQUEST)
 
         # Create a new team instance
         team_instance = Team(
             user_id=user,
             team_name=request.data.get('team_name'),
-            team_username = request.data.get('team_username'),
-            team_type=team_type_instance,  
+            team_username=request.data.get('team_username'),
+            team_type=team_type_instance,
         )
 
         # Handle file uploads (same as your existing logic)
@@ -2250,60 +2254,28 @@ class TeamViewAPI(APIView):
             logo_path = default_storage.save(file_name, logo)
             team_instance.team_logo = logo_path
 
-
         # Save the team instance
         team_instance.save()
 
-        # Construct response data
-        response_data = {
-        'id': team_instance.id,
-        'user_id': user.id,
-        'username': user.username,
-        'team_name': team_instance.team_name,
-        'team_username': team_instance.team_username,
-        'team_type': team_instance.team_type.id,  # Return the category ID
-        'bio': team_instance.bio,
-        'team_establishment_date': team_instance.team_establishment_date,
-        'team_president': team_instance.team_president,
-        
-        # Location details
-        'latitude': team_instance.latitude,
-        'longitude': team_instance.longitude,
-        'address': team_instance.address,
-        'house_no': team_instance.house_no,
-        'premises': team_instance.premises,
-        'street': team_instance.street,
-        'city': team_instance.city,
-        'state': team_instance.state,
-        'country_name': team_instance.country_name,
-        'postal_code': team_instance.postalCode,
-        'country_code': team_instance.country_code,
+        # Fetch the newly created team instance from the database to return fresh data
+        team_instance = Team.objects.get(id=team_instance.id)
 
-        # Foreign key fields
-        'country_id': team_instance.country_id.id if team_instance.country_id else None,
-        'city_id': team_instance.city_id.id if team_instance.city_id else None,
-
-        'phone': team_instance.phone,
-        'email': team_instance.email,
-        'age_group': team_instance.age_group,
-        'entry_fees': team_instance.entry_fees,
-        'branches': team_instance.branches,
-
-        # Images
-        'team_logo': team_instance.team_logo.url if team_instance.team_logo else None,
-        'team_background_image': team_instance.team_background_image.url if team_instance.team_background_image else None,
-        'team_uniform': team_instance.team_uniform.url if team_instance.team_uniform else None
-        }
+        # Serialize the data
+        serializer = TeamSerializer(team_instance)
 
         return Response({
             'status': 1,
             'message': _('Team created successfully.'),
-            'data': response_data
+            'data': serializer.data
         }, status=status.HTTP_201_CREATED)
+
     
     def put(self, request):
         team_id = request.data.get('team_id')
         user = request.user
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
         if not team_id:
             return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
@@ -2329,26 +2301,6 @@ class TeamViewAPI(APIView):
         team_instance.team_establishment_date = request.data.get('team_establishment_date', team_instance.team_establishment_date)
         team_instance.team_president = request.data.get('team_president', team_instance.team_president)
 
-        # Add the remaining fields from the model
-        team_instance.latitude = request.data.get('latitude', team_instance.latitude)
-        team_instance.longitude = request.data.get('longitude', team_instance.longitude)
-        team_instance.address = request.data.get('address', team_instance.address)
-        team_instance.house_no = request.data.get('house_no', team_instance.house_no)
-        team_instance.premises = request.data.get('premises', team_instance.premises)
-        team_instance.street = request.data.get('street', team_instance.street)
-        team_instance.city = request.data.get('city', team_instance.city)
-        team_instance.state = request.data.get('state', team_instance.state)
-        team_instance.country_name = request.data.get('country_name', team_instance.country_name)
-        team_instance.postalCode = request.data.get('postalCode', team_instance.postalCode)
-        team_instance.country_code = request.data.get('country_code', team_instance.country_code)
-        team_instance.country_id = request.data.get('country_id', team_instance.country_id)
-        team_instance.city_id = request.data.get('city_id', team_instance.city_id)
-        team_instance.phone = request.data.get('phone', team_instance.phone)
-        team_instance.email = request.data.get('email', team_instance.email)
-        team_instance.age_group = request.data.get('age_group', team_instance.age_group)
-        team_instance.entry_fees = request.data.get('entry_fees', team_instance.entry_fees)
-        team_instance.branches = request.data.get('branches', team_instance.branches)
-
         # Handle file uploads (same as before)
         if 'team_logo' in request.FILES:
             logo = request.FILES['team_logo']
@@ -2364,78 +2316,36 @@ class TeamViewAPI(APIView):
             background_image_path = default_storage.save(file_name, background_image)
             team_instance.team_background_image = background_image_path
 
-        # Handle multiple team uniform uploads
+        # Handle multiple team uniform uploads (if necessary)
         if 'team_uniform' in request.FILES:
             uniforms = request.FILES.getlist('team_uniform')
-            team_uniform_images = []  # List to store names of saved uniform images
+            team_uniform_images = []
 
             for uniform in uniforms:
-                # Create the directory path
-                directory_path = os.path.join(settings.MEDIA_ROOT, 'team', 'team_uniform')  # Use MEDIA_ROOT
-                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-
-                # Save the file to the desired path
+                directory_path = os.path.join(settings.MEDIA_ROOT, 'team', 'team_uniform')
+                os.makedirs(directory_path, exist_ok=True)
                 file_path = os.path.join(directory_path, uniform.name)
                 with open(file_path, 'wb+') as destination:
                     for chunk in uniform.chunks():
                         destination.write(chunk)
+                team_uniform_images.append(f"team/team_uniform/{uniform.name}")
 
-                # Store the relative path instead of the full path
-                team_uniform_images.append(f"team/team_uniform/{uniform.name}")  # Store the relative path
-
-            # Join the paths into a single string, separated by commas
             team_instance.team_uniform = ','.join(team_uniform_images)
 
         team_instance.save()
 
-        # Construct response data (same as before)
-        response_data = {
-        'id': team_instance.id,
-        'user_id': user.id,
-        'username': user.username,
-        'team_name': team_instance.team_name,
-        'team_username': team_instance.team_username,
-        'team_type': team_instance.team_type.id,  # Return the category ID
-        'bio': team_instance.bio,
-        'team_establishment_date': team_instance.team_establishment_date,
-        'team_president': team_instance.team_president,
-        
-        # Location details
-        'latitude': team_instance.latitude,
-        'longitude': team_instance.longitude,
-        'address': team_instance.address,
-        'house_no': team_instance.house_no,
-        'premises': team_instance.premises,
-        'street': team_instance.street,
-        'city': team_instance.city,
-        'state': team_instance.state,
-        'country_name': team_instance.country_name,
-        'postal_code': team_instance.postalCode,
-        'country_code': team_instance.country_code,
+        # Fetch the updated team instance from the database to return fresh data
+        team_instance = Team.objects.get(id=team_instance.id)
 
-        # Foreign key fields
-        'country_id': team_instance.country_id.id if team_instance.country_id else None,
-        'city_id': team_instance.city_id.id if team_instance.city_id else None,
-
-        'phone': team_instance.phone,
-        'email': team_instance.email,
-        'age_group': team_instance.age_group,
-        'entry_fees': team_instance.entry_fees,
-        'branches': team_instance.branches,
-
-        # Images
-        'team_logo': team_instance.team_logo.url if team_instance.team_logo else None,
-        'team_background_image': team_instance.team_background_image.url if team_instance.team_background_image else None,
-        'uniform_images': [
-        os.path.join(settings.MEDIA_URL, img) for img in team_instance.team_uniform.split(',') if img
-    ] if team_instance.team_uniform else [],
-        }
+        # Serialize the data
+        serializer = TeamSerializer(team_instance)
 
         return Response({
             'status': 1,
             'message': _('Team updated successfully.'),
-            'data': response_data
+            'data': serializer.data
         }, status=status.HTTP_200_OK)
+
 
 
 class UserGenderListAPIView(generics.ListAPIView):
