@@ -31,7 +31,7 @@ urlpatterns = [
 
         ######## User Post API ###########
 
-        path('api/post/like/', PostLikeAPIView.as_view(), name='post-like'),
+        path('api/posts/like/', PostLikeAPIView.as_view(), name='post-like'),
         # path('api/post/view/', PostViewAPIView.as_view(), name='post-view'),
 
 

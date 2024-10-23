@@ -269,12 +269,8 @@ class PostSerializer(serializers.ModelSerializer):
         view_class_name = request.parser_context.get('view').__class__.__name__
 
         # If view is 'AllPostsListAPIView' or 'PostListAPIView', return the comment count
-        if view_class_name in ['AllPostsListAPIView', 'PostListAPIView']:
+        if view_class_name in ['AllPostsListAPIView', 'PostListAPIView','PostLikeAPIView']:
             return Post_comment.objects.filter(post=obj, parent=None).count()
-         # If the view is 'PostLikeAPIView', return an empty list
-
-        if view_class_name == 'PostLikeAPIView':
-            return []
         
         # For other views, return paginated comments
         comments = Post_comment.objects.filter(post=obj, parent=None)
