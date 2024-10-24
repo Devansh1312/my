@@ -2795,3 +2795,25 @@ class ListFollowingAPI(APIView):
             "message": _("Following list fetched successfully."),
             "data": following_list
         }, status=status.HTTP_200_OK)
+
+##################################### Mobile Dashboard Image #######################################
+
+class DashboardImageAPI(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+            
+        banners = MobieDashboardBanner.objects.all()
+        serializer = MobieDashboardBannerSerializer(banners, many=True)
+        
+     
+    
+        return Response({
+            "status": 1,
+            "message": _("Dashboard banner list fetched successfully."),
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)

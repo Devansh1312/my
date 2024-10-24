@@ -93,6 +93,10 @@ urlpatterns = [
         path('api/locations/', LocationAPIView.as_view()),
         
         
+        ################## Mobile Dashboard Image  ################
+        
+        path('api/dashboard-images/', DashboardImageAPI.as_view())
+         
         #new apis generation
         
         # path("api/validation/",RegistartionAPI.as_view(),name="regvalidation"),
