@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from .models import *
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import password_validation
-
+from FutureStarAPI.models import MobileDashboardBanner
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
@@ -200,3 +200,10 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             attrs={"autocomplete": "new-password", "class": "form-control"}
         ),
     )
+
+
+
+class MobileDashboardBannerForm(forms.ModelForm):
+    class Meta:
+        model = MobileDashboardBanner
+        fields = ['id','image']

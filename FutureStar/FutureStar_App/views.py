@@ -27,6 +27,7 @@ from django.template.loader import render_to_string
 import sys
 from functools import wraps
 
+from FutureStarAPI.models import MobileDashboardBanner
 
 
 def user_role_check(view_func):
@@ -5189,3 +5190,80 @@ def savedashdetail(request):
 
                return JsonResponse(response_data) 
         
+
+# @method_decorator(user_role_check, name='dispatch')
+class MobileDashboardBannerListView(View):
+    template_name = "Admin/MobileApp/DasboardBanner/dashboard_banner_list.html"
+
+    def get(self, request):
+        banners = MobileDashboardBanner.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {
+                "banners": banners,
+                "breadcrumb": {"child": "Mobile Dashboard Banners"},
+            },
+        )
+
+
+
+
+# @method_decorator(user_role_check, name='dispatch')
+class MobileDashboardBannerCreateView(View):
+    # template_name = "Admin/General_Settings/MobileDashboardBanner_Create.html"
+
+    def post(self, request):
+        image_file = request.FILES.get("image")
+
+        # Handling image upload
+        image_file = request.FILES.get("image")
+        image_name = None
+        if image_file:
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "dashboardbanner_images")
+            )
+            image_name = fs.save(image_file.name, image_file)
+            image_name = "dashboardbanner_images/" + image_name
+
+        MobileDashboardBanner.objects.create(
+            image=image_name,  # Save the relative image path in the database
+        )
+
+        messages.success(request, "Banner created successfully.")
+        return redirect("dashboard_banner_list")
+
+# @method_decorator(user_role_check, name='dispatch')
+class MobileDashboardBannerEditView(View):
+    # template_name = "Admin/General_Settings/MobileDashboardBanner_Edit.html"
+
+    def post(self, request, pk):
+        banner_item = get_object_or_404(MobileDashboardBanner, pk=pk)
+
+        image_file = request.FILES.get("image")
+        if image_file:
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "dashboardbanner_images")
+            )
+            if banner_item.image and banner_item.image.path:
+                old_image_path = banner_item.image.path
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+            image_name = fs.save(image_file.name, image_file)
+            banner_item.image = "dashboardbanner_images/" + image_name
+
+        banner_item.save()
+        messages.success(request, "Banner updated successfully.")
+        return redirect("dashboard_banner_list")
+
+# @method_decorator(user_role_check, name='dispatch')
+class MobileDashboardBannerDeleteView(View):
+    def post(self, request, pk):
+        banner = get_object_or_404(MobileDashboardBanner, pk=pk)
+        if banner.image and banner.image.path:
+            old_image_path = banner.image.path
+            if os.path.exists(old_image_path):
+                os.remove(old_image_path)
+        banner.delete()
+        messages.success(request, "Banner deleted successfully.")
+        return redirect("dashboard_banner_list")

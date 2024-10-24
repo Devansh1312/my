@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 def custom_404_view(request, exception=None):
     if not request.user.is_authenticated:
         return redirect('login')  # Redirect to login if the user is not authenticated
-    return render(request, 'error\error.html', status=404)
+    return render(request, 'error/error.html', status=404)
 
 handler404 = 'FutureStar_App.urls.custom_404_view'
 
@@ -208,6 +208,12 @@ urlpatterns = [
     path('slider_content/create/', Slider_ContentCreateView.as_view(), name='slider_content_create'),
     path('slider_content/update/<int:pk>/', Slider_ContentUpdateView.as_view(), name='slider_content_update'),
     path('slider_content/delete/<int:pk>/', Slider_ContentDeleteView.as_view(), name='slider_content_delete'),
+
+    #dashboard_banner URL
+    path('dashboard_banner/', MobileDashboardBannerListView.as_view(), name='dashboard_banner_list'),
+    path('dashboard_banner/create/', MobileDashboardBannerCreateView.as_view(), name='dashboard_banner_create'),
+    path('dashboard_banner/edit/<int:pk>/', MobileDashboardBannerEditView.as_view(), name='dashboard_banner_edit'),  # Edit URL
+    path('dashboard_banner/delete/<int:pk>/', MobileDashboardBannerDeleteView.as_view(), name='dashboard_banner_delete'),
 
    
 
