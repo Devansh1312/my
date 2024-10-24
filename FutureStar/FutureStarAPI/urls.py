@@ -72,7 +72,7 @@ urlpatterns = [
         ########################## Report URL ##################
 
         path('api/reports/', ReportListAPIView.as_view()),
-        path('api/postreport/create/', PostReportCreateView.as_view(), name='postreport-create'),
+        path('api/reports/create/', PostReportCreateView.as_view()),
 
         ################## fileds URL ################
         path('api/fields/', FieldAPIView.as_view()),
