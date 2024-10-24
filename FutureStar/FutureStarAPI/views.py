@@ -2926,7 +2926,177 @@ class DashboardImageAPI(APIView):
             "message": _("Dashboard banner list fetched successfully."),
             "data": serializer.data
         }, status=status.HTTP_200_OK)
+
+
+####################################################################### Event Moodule #############################################################################################
+
+###################### Event LIKE ##################################
+class EventLikeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        event_id = request.data.get('event_id')
+
+        if not event_id:
+            return Response({
+                'status': 0,
+                'message': _('Event id is required.')
+            }, status=400)
+
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Event not found.')
+            }, status=404)
+
+        # Toggle like/unlike
+        event_like, created = EventLike.objects.get_or_create(user=request.user, event=event)
+        if not created:
+            # If the user already liked the post, unlike it (delete the like)
+            event_like.delete()
+            message = _('Event unliked successfully.')
+        else:
+            message = _('Event liked successfully.')
+
+        # Serialize the post data with comments set to empty
+        serializer = PostSerializer(event, context={'request': request})
+        
+        # Return the full post data with an empty comment list
+        return Response({
+            'status': 1,
+            'message': message,
+            'data': serializer.data
+        }, status=200)
     
+
+################################ Get comment of EVENT API #############################
+class EventCommentPagination(CustomPostPagination):
+    def paginate_queryset(self, queryset, request, view=None):
+        return super().paginate_queryset(queryset, request, view)
+
+class EventCommentAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Validate event_id from request data
+        event_id = request.data.get('event_id')
+        if not event_id:
+            return Response({
+                'status': 0,
+                'message': _('Event ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Event not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the top-level comments for the post
+        comments = Event_comment.objects.filter(event=event, parent=None).order_by('-date_created')
+
+        # Paginate the comments
+        paginator = EventCommentPagination()
+        paginated_comments = paginator.paginate_queryset(comments, request)
+
+        # If pagination fails or no comments are found
+        if paginated_comments is None:
+            return Response({
+                'status': 1,
+                'message': _('No comments found for this Event.'),
+                'data': {
+                    'total_records': 0,
+                    'total_pages': 0,
+                    'current_page': 1,
+                    'data': []
+                }
+            }, status=status.HTTP_200_OK)
+
+        # Serialize the paginated comments
+        serializer = EventCommentPagination(paginated_comments, many=True)
+
+        # Return paginated response
+        return Response({
+            'status': 1,
+            'message': _('Comments fetched successfully.'),
+            'data': serializer.data,
+            'total_records': comments.count(),
+            'total_pages': paginator.page.paginator.num_pages,
+            'current_page': paginator.page.number,
+        }, status=status.HTTP_200_OK)
+
+
+######################## COMMNET CREATE API ###########################
+class EventCommentCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def post(self, request, *args, **kwargs):
+        # Set the language based on headers
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Extract data from request
+        data = request.data
+        event_id = data.get('event_id')
+        comment_text = data.get('comment')
+        parent_id = data.get('parent_id')
+       
+        # Validate that event_id and comment are provided
+        if not event_id or not comment_text:
+            return Response({
+                'status': 0,
+                'message': _('event_id and comment are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Handle parent comment (if it's a reply)
+        parent_comment = None
+        if parent_id:
+            try:
+                parent_comment = Event_comment.objects.get(id=parent_id)
+            except Event_comment.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Parent comment not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+
+        # Comment is from the user
+        comment = Event_comment.objects.create(
+            user=request.user,
+            event=event,
+            comment=comment_text,
+            parent=parent_comment
+        )
+
+        # Return the response with comment details including the entity (team, group, or user)
+        return Response({
+            'status': 1,
+            'message': _('Comment created successfully.'),
+            'data': EventCommentSerializer(comment).data  # Return serialized comment data
+        }, status=status.HTTP_201_CREATED)
+
+
+
+
 
 ##################################### Event #######################################
 

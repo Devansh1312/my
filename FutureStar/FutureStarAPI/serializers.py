@@ -631,3 +631,32 @@ class EventSerializer(serializers.ModelSerializer):
         # Automatically set the user from the request context
         validated_data['event_organizer'] = self.context['request'].user
         return Event.objects.create(**validated_data)
+
+
+
+class EventCommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
+    parent = serializers.PrimaryKeyRelatedField(queryset=Post_comment.objects.all(), allow_null=True)
+    entity = serializers.SerializerMethodField()  # Add entity field
+
+    class Meta:
+        model = Event_comment
+        fields = ['id', 'user', 'event', 'parent', 'comment', 'date_created', 'replies', 'entity']
+
+    def get_replies(self, obj):
+        # Get replies for this comment
+        replies = Event_comment.objects.filter(parent=obj)
+        return EventCommentSerializer(replies, many=True).data  # Serialize replies
+
+    def get_entity(self, obj):
+        
+        if obj.user:
+            return {
+                'id': obj.user.id,
+                'username': obj.user.username,
+                'profile_image': obj.user.profile_picture.url if obj.user.profile_picture else None,
+                'type': 'user'  # Optional: entity type for frontend differentiation
+            }
+        return None
+    

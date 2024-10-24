@@ -41,7 +41,7 @@ urlpatterns = [
         path('api/posts/edit/', PostEditAPIView.as_view()),
 
         path('api/posts/details/', PostDetailAPIView.as_view()), #Post Detail View As well As Post View Increment 
-        path('api/posts-comments/', PostCommentAPIView.as_view()),  # New API for paginated comments
+        path('api/comments/', PostCommentAPIView.as_view()),  # New API for paginated comments
 
         path('api/comments/create/', CommentCreateAPIView.as_view()),
         path('api/posts/delete/', PostDeleteAPIView.as_view()),
