@@ -369,3 +369,9 @@ class Sponsor(models.Model):
     class Meta:
         db_table = 'futurestar_app_sponsor'
 
+class MobieDashboardBanner(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to='dashboardbanner_images/', blank= True, null= True)
+    created_at= models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
