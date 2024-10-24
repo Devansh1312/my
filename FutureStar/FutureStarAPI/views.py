@@ -822,10 +822,14 @@ class CustomPostPagination(PageNumberPagination):
 
         # Check if the requested page number is within the valid range
         if self.page > total_pages:
-            # If page is out of range, return an empty list
-            return []
+            # Return custom response for invalid page
+            return Response({
+                'status': 0,
+                'message': _('Page Not Found'),
+                'data': []
+            }, status=400)
 
-        # Perform standard pagination
+        # Perform standard pagination if valid page
         return super().paginate_queryset(queryset, request, view)
 
 ###################################################################################### POST MODULE ################################################################################
@@ -891,6 +895,14 @@ class AllPostsListAPIView(generics.ListAPIView):
 
         # Paginate the queryset
         page = self.paginate_queryset(queryset)
+        if page is None:  # If the page is None, this means pagination failed
+            # This block will handle invalid page number
+            return Response({
+                'status': 0,
+                'message': _('Page Not Found'),
+                'data': []
+            }, status=400)
+
         if page is not None:
             serializer = self.get_serializer(page, many=True, context={'request': request})
             total_records = queryset.count()
@@ -2018,8 +2030,6 @@ class SponsorAPI(APIView):
                 "id": sponsor.id,
                 "name": sponsor.name,
                 "logo": sponsor.logo.url if sponsor.logo else None,
-                "phone": sponsor.phone,
-                "email": sponsor.email,
                 "url": sponsor.url,
                 "team_id": sponsor.team_id.id if sponsor.team_id else None,
                 "group_id": sponsor.group_id.id if sponsor.group_id else None,
@@ -2038,8 +2048,6 @@ class SponsorAPI(APIView):
         data = request.data
         
         name = data.get('name')
-        phone = data.get('phone')
-        email = data.get('email')
         url = data.get('url')
         team_id = data.get('team_id')
         group_id = data.get('group_id')
@@ -2050,6 +2058,22 @@ class SponsorAPI(APIView):
                 "status": 0,
                 "message": _("Please provide team_id or group_id")
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check the number of existing sponsors for the team or group
+        max_sponsors = 6
+        existing_sponsors_count = 0
+
+        if team_id:
+            existing_sponsors_count = Sponsor.objects.filter(team_id=team_id).count()
+        elif group_id:
+            existing_sponsors_count = Sponsor.objects.filter(group_id=group_id).count()
+
+        # If the limit is reached, return an error message
+        if existing_sponsors_count >= max_sponsors:
+            return Response({
+                "status": 0,
+                "message": _("Maximum limit of sponsors reached for this team/group.")
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             # Handle the image upload
@@ -2057,7 +2081,8 @@ class SponsorAPI(APIView):
             if "logo" in request.FILES:
                 image = request.FILES["logo"]
                 file_extension = image.name.split('.')[-1]
-                file_name = f"sponsors_images/{name}_{request.user.username}.{file_extension}"
+                unique_suffix = get_random_string(8)  # Generate a random suffix to ensure unique filenames
+                file_name = f"sponsors_images/{name}_{request.user.id}_{unique_suffix}.{file_extension}"
                 image_path = default_storage.save(file_name, image)
                 logo = image_path  # Assign the saved image path to the logo variable
 
@@ -2065,8 +2090,6 @@ class SponsorAPI(APIView):
             sponsor = Sponsor.objects.create(
                 name=name,
                 logo=logo,
-                phone=phone,
-                email=email,
                 url=url,
                 team_id=Team.objects.get(id=team_id) if team_id else None,
                 group_id=TrainingGroups.objects.get(id=group_id) if group_id else None
@@ -2079,8 +2102,6 @@ class SponsorAPI(APIView):
                     "id": sponsor.id,
                     "name": sponsor.name,
                     "logo": sponsor.logo.url if sponsor.logo else None,
-                    "phone": sponsor.phone,
-                    "email": sponsor.email,
                     "url": sponsor.url,
                     "team_id": sponsor.team_id.id if sponsor.team_id else None,
                     "group_id": sponsor.group_id.id if sponsor.group_id else None,
@@ -2095,6 +2116,7 @@ class SponsorAPI(APIView):
                 "message": _("Failed to create sponsor"),
                 "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class SponsorDetailAPIView(APIView):
@@ -2126,8 +2148,6 @@ class SponsorDetailAPIView(APIView):
             "id": sponsor.id,
             "name": sponsor.name,
             "logo": sponsor.logo.url if sponsor.logo else None,
-            "phone": sponsor.phone,
-            "email": sponsor.email,
             "url": sponsor.url,
             "team_id": sponsor.team_id.id if sponsor.team_id else None,
             "group_id": sponsor.group_id.id if sponsor.group_id else None,
@@ -2140,6 +2160,95 @@ class SponsorDetailAPIView(APIView):
             "message": _("Sponsor details fetched successfully"),
             "data": sponsor_data
         }, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        sponsor_id = request.data.get('sponsor_id')
+
+        if not sponsor_id:
+            return Response({
+                "status": 0,
+                "message": _("Please provide sponsor_id"),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            sponsor = Sponsor.objects.get(id=sponsor_id)
+        except Sponsor.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": _("Sponsor not found"),
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get new data
+        name = request.data.get('name', sponsor.name)
+        url = request.data.get('url', sponsor.url)
+        # Handle logo update
+        logo = sponsor.logo
+        if "logo" in request.FILES:
+            # Delete the old logo from the storage
+            if logo:
+                default_storage.delete(logo.name)  # Deletes the old logo file
+
+            # Save the new logo
+            image = request.FILES["logo"]
+            file_extension = image.name.split('.')[-1]
+            unique_suffix = get_random_string(8)  # Generate a random suffix to ensure unique filenames
+            file_name = f"sponsors_images/{name}_{request.user.id}_{unique_suffix}.{file_extension}"
+            logo = default_storage.save(file_name, image)
+
+        # Update sponsor details
+        sponsor.name = name
+        sponsor.logo = logo
+        sponsor.url = url
+        sponsor.save()
+
+        return Response({
+            "status": 1,
+            "message": _("Sponsor updated successfully"),
+            "data": {
+                "id": sponsor.id,
+                "name": sponsor.name,
+                "logo": sponsor.logo.url if sponsor.logo else None,
+                "url": sponsor.url,
+                "team_id": sponsor.team_id.id if sponsor.team_id else None,
+                "group_id": sponsor.group_id.id if sponsor.group_id else None,
+                "created_at": sponsor.created_at,
+                "updated_at": sponsor.updated_at
+            }
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        sponsor_id = request.query_params.get('sponsor_id')
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        if not sponsor_id:
+            return Response({
+                "status": 0,
+                "message": _("Please provide sponsor_id"),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            sponsor = Sponsor.objects.get(id=sponsor_id)
+            # Delete logo file from storage if it exists
+            if sponsor.logo:
+                default_storage.delete(sponsor.logo.name)
+
+            sponsor.delete()  # Delete the sponsor record
+
+            return Response({
+                "status": 1,
+                "message": _("Sponsor deleted successfully"),
+            }, status=status.HTTP_204_NO_CONTENT)
+
+        except Sponsor.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": _("Sponsor not found"),
+            }, status=status.HTTP_404_NOT_FOUND)
 
 ######################################################################## Report API View ###################################################################################
 class ReportListAPIView(generics.ListAPIView):

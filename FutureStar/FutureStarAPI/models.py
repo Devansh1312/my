@@ -355,8 +355,6 @@ class PostReport(models.Model):
 class Sponsor(models.Model):
     name = models.CharField(max_length=20,blank=True, null=True)
     logo = models.ImageField(upload_to='sponsors_images/', blank=True, null=True)  
-    phone = models.CharField(max_length=255, blank=True, null=True)
-    email = models.CharField(max_length=30, blank=True, null=True)
     url = models.CharField(max_length=255, blank=True, null=True)
     team_id = models.ForeignKey('Team', blank=True, null=True,  on_delete=models.CASCADE)
     group_id = models.ForeignKey('TrainingGroups', blank=True, null=True,  on_delete=models.CASCADE)
