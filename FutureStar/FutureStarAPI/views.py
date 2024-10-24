@@ -2961,7 +2961,7 @@ class EventLikeAPIView(APIView):
             message = _('Event liked successfully.')
 
         # Serialize the post data with comments set to empty
-        serializer = PostSerializer(event, context={'request': request})
+        serializer = EventSerializer(event, context={'request': request})
         
         # Return the full post data with an empty comment list
         return Response({

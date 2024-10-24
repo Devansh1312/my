@@ -598,7 +598,7 @@ class EventTypeSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     class Meta:
         model = EventType
-        fields = ['id', 'name']
+        fields = ['id', 'name','created_at', 'updated_at']
 
     def get_name(self, obj):
         # Get the language from the request context
@@ -614,15 +614,22 @@ class EventTypeSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     event_type_name = serializers.SerializerMethodField()  # Keep it as event_type_name
+    comments = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
         fields = ['team', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
                   'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
                   'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
-                  'event_description', 'event_cost', 'created_at', 'updated_at']
+                  'event_description', 'event_cost', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at']
         read_only_fields = ['event_organizer']  # Make 'user' read-only since it will be auto-assigned
-        
+
+    event_image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        return obj.event_image.url if obj.event_image else None  
 
     def get_event_type_name(self, obj):
         return obj.event_type.name_en if obj.event_type else None
@@ -631,6 +638,20 @@ class EventSerializer(serializers.ModelSerializer):
         # Automatically set the user from the request context
         validated_data['event_organizer'] = self.context['request'].user
         return Event.objects.create(**validated_data)
+    
+    def get_like_count(self, obj):
+        return EventLike.objects.filter(post=obj).count()
+    
+    def get_is_like(self, obj):
+        request = self.context.get('request')  # Access the request object from the context
+        if request and EventLike.objects.filter(event=obj, user=request.user).exists():
+            return True
+        return False
+        
+    def get_comments(self, obj):
+        # Always return the count of top-level comments
+        return Event_comment.objects.filter(event=obj, parent=None).count()
+
 
 
 

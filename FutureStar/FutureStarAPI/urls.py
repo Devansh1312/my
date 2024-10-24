@@ -67,7 +67,9 @@ urlpatterns = [
         path('api/events/create/', EventCreateAPIView.as_view()),
         path('api/events/detail/', EventDetailAPIView.as_view()),
         path('api/team_events/', TeamEventAPIView.as_view()),
-
+        path('api/event/like/', EventLikeAPIView.as_view()),
+        path('api/event/comments/', EventCommentAPIView.as_view()),  # New API for paginated comments
+        path('api/event/comments/create/', EventCommentCreateAPIView.as_view()),
       
 
      
