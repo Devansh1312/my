@@ -2916,8 +2916,8 @@ class DashboardImageAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
             
-        banners = MobieDashboardBanner.objects.all()
-        serializer = MobieDashboardBannerSerializer(banners, many=True)
+        banners = MobileDashboardBanner.objects.all()
+        serializer = MobileDashboardBannerSerializer(banners, many=True)
         
      
     

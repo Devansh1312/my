@@ -589,7 +589,7 @@ class PostReportSerializer(serializers.ModelSerializer):
         read_only_fields = ['user_id']  # Make user_id read-only
         
 
-class MobieDashboardBannerSerializer(serializers.ModelSerializer):
+class MobileDashboardBannerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MobieDashboardBanner
+        model = MobileDashboardBanner
         fields = ['id', 'image', 'created_at', 'updated_at']
