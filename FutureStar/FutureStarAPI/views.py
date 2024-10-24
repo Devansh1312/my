@@ -1953,7 +1953,7 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
             return Response({
                 'status': 1,
                 'message': _('Gallery entry deleted successfully.')
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         except Gallary.DoesNotExist:
             return Response({
@@ -1994,7 +1994,7 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
             return Response({
                 'status': 1,
                 'message': _('Album deleted successfully.')
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         except Album.DoesNotExist:
             return Response({
@@ -2242,7 +2242,7 @@ class SponsorDetailAPIView(APIView):
             return Response({
                 "status": 1,
                 "message": _("Sponsor deleted successfully"),
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
 
         except Sponsor.DoesNotExist:
             return Response({
