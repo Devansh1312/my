@@ -198,13 +198,15 @@ class PostSerializer(serializers.ModelSerializer):
     view_count = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
+    is_reported = serializers.SerializerMethodField()  # New field
+
 
 
     class Meta:
         model = Post
         fields = [
-            'id', 'entity', 'title', 'description', 'image', 
-            'date_created', 'comments', 'view_count', 'like_count','is_like',
+            'id', 'entity', 'title', 'description', 'image', 'media_type',
+            'date_created', 'comments', 'view_count', 'like_count','is_like','is_reported',
             'latitude', 'longitude', 'address', 'house_no', 
             'premises', 'street', 'city', 'state', 'country_name', 
             'postalCode', 'country_code'
@@ -253,6 +255,12 @@ class PostSerializer(serializers.ModelSerializer):
         if request and PostLike.objects.filter(post=obj, user=request.user).exists():
             return True
         return False
+    
+    def get_is_reported(self, obj):
+        request = self.context.get('request')  # Access the request object from the context
+        if request and PostReport.objects.filter(post_id=obj, user_id=request.user).exists():
+            return True
+        return False
 
     
     def get_comments(self, obj):
@@ -277,6 +285,7 @@ class PostSerializer(serializers.ModelSerializer):
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.image = validated_data.get('image', instance.image)
+        instance.media_type = validated_data.get('media_type', instance.media_type)
         instance.latitude = validated_data.get('latitude', instance.latitude)
         instance.longitude = validated_data.get('longitude', instance.longitude)
         instance.address = validated_data.get('address', instance.address)

@@ -87,6 +87,7 @@ class Post(models.Model):
     group = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE,null=True,blank=True)
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
+    media_type = models.CharField(max_length=10,null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
     # New fields

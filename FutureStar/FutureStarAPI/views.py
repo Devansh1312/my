@@ -24,6 +24,8 @@ import string
 from rest_framework.exceptions import ValidationError
 import re
 import logging
+from django.utils.crypto import get_random_string
+
 
 logger = logging.getLogger(__name__)
 
@@ -992,7 +994,8 @@ class PostCreateAPIView(APIView):
                 if "image" in request.FILES:
                     image = request.FILES["image"]
                     file_extension = image.name.split('.')[-1]
-                    file_name = f"post_images/{post.id}_{request.user.username}.{file_extension}"
+                    unique_suffix = get_random_string(8)  # Ensure unique filename
+                    file_name = f"post_images/{post.id}_{request.user.username}_{unique_suffix}.{file_extension}"
                     image_path = default_storage.save(file_name, image)
                     post.image = image_path
                     post.save()
@@ -1067,23 +1070,36 @@ class PostEditAPIView(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
 
     def patch(self, request, *args, **kwargs):
-        # Activate the requested language, default is 'en'
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        post_id = request.data.get('post_id')  # Get post_id from request data
+        post_id = request.data.get('post_id')
         if not post_id:
             return Response({
                 'status': 0,
                 'message': _('Post ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        post = self.get_object(post_id)  # Retrieve the post object based on post_id
-        serializer = self.get_serializer(post, data=request.data, partial=True)  # Allow partial update
+        post = self.get_object(post_id)
+        serializer = self.get_serializer(post, data=request.data, partial=True)
 
         if serializer.is_valid():
-            serializer.save()  # Save changes
+            # Handle image replacement
+            if 'image' in request.FILES:
+                # Delete old image if it exists
+                if post.image and default_storage.exists(post.image.name):
+                    default_storage.delete(post.image.name)  # Access the file path with .name
+
+                # Save new image with a unique filename
+                image = request.FILES['image']
+                file_extension = image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)  # Ensure unique filename
+                file_name = f"post_images/{post.id}_{request.user.username}_{unique_suffix}.{file_extension}"
+                image_path = default_storage.save(file_name, image)
+                post.image = image_path
+
+            serializer.save()  # Save other changes
             return Response({
                 'status': 1,
                 'message': _('Post updated successfully.'),
@@ -2081,6 +2097,50 @@ class SponsorAPI(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class SponsorDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        sponsor_id = request.query_params.get('sponsor_id')
+
+        if not sponsor_id:
+            return Response({
+                "status": 0,
+                "message": _("Please provide sponsor_id"),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            sponsor = Sponsor.objects.get(id=sponsor_id)
+        except Sponsor.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": _("Sponsor not found"),
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Prepare response data
+        sponsor_data = {
+            "id": sponsor.id,
+            "name": sponsor.name,
+            "logo": sponsor.logo.url if sponsor.logo else None,
+            "phone": sponsor.phone,
+            "email": sponsor.email,
+            "url": sponsor.url,
+            "team_id": sponsor.team_id.id if sponsor.team_id else None,
+            "group_id": sponsor.group_id.id if sponsor.group_id else None,
+            "created_at": sponsor.created_at,
+            "updated_at": sponsor.updated_at
+        }
+
+        return Response({
+            "status": 1,
+            "message": _("Sponsor details fetched successfully"),
+            "data": sponsor_data
+        }, status=status.HTTP_200_OK)
+
 ######################################################################## Report API View ###################################################################################
 class ReportListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -2419,36 +2479,41 @@ class TeamViewAPI(APIView):
         team_instance.email = request.data.get('email', team_instance.email)
         team_instance.age_group = request.data.get('age_group', team_instance.age_group)
 
-        # Handle file uploads (same as before)
-        if 'team_logo' in request.FILES:
-            logo = request.FILES['team_logo']
-            file_extension = logo.name.split('.')[-1]
-            file_name = f"team/team_logo/{team_instance.team_name}_{team_instance.id}.{file_extension}"
-            logo_path = default_storage.save(file_name, logo)
-            team_instance.team_logo = logo_path
-
+        # Handle background image update
         if 'team_background_image' in request.FILES:
+            # Delete old background image if it exists
+            if team_instance.team_background_image and default_storage.exists(team_instance.team_background_image.name):  # Use .name here
+                default_storage.delete(team_instance.team_background_image.name)  # Use .name here
+
+            # Upload new background image with a unique filename
             background_image = request.FILES['team_background_image']
             file_extension = background_image.name.split('.')[-1]
-            file_name = f"team/team_background_image/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            unique_suffix = get_random_string(8)  # Ensure the name is unique
+            file_name = f"team/team_background_image/{team_instance.id}_{unique_suffix}.{file_extension}"
             background_image_path = default_storage.save(file_name, background_image)
             team_instance.team_background_image = background_image_path
 
-        # Handle multiple team uniform uploads (if necessary)
+        # Handle team uniform update
         if 'team_uniform' in request.FILES:
+            # Delete old uniform if it exists
+            if team_instance.team_uniform:
+                old_uniforms = team_instance.team_uniform.split(',')
+                for old_uniform in old_uniforms:
+                    if default_storage.exists(old_uniform):
+                        default_storage.delete(old_uniform)
+
+            # Upload new team uniform with unique filenames
             uniforms = request.FILES.getlist('team_uniform')
             team_uniform_images = []
-
             for uniform in uniforms:
-                directory_path = os.path.join(settings.MEDIA_ROOT, 'team', 'team_uniform')
-                os.makedirs(directory_path, exist_ok=True)
-                file_path = os.path.join(directory_path, uniform.name)
-                with open(file_path, 'wb+') as destination:
-                    for chunk in uniform.chunks():
-                        destination.write(chunk)
-                team_uniform_images.append(f"team/team_uniform/{uniform.name}")
+                unique_suffix = get_random_string(8)
+                file_extension = uniform.name.split('.')[-1]
+                file_name = f"team/team_uniform/{team_instance.id}_{unique_suffix}.{file_extension}"
+                uniform_path = default_storage.save(file_name, uniform)
+                team_uniform_images.append(uniform_path)
 
             team_instance.team_uniform = ','.join(team_uniform_images)
+
 
         team_instance.save()
 
@@ -2463,9 +2528,45 @@ class TeamViewAPI(APIView):
             'message': _('Team updated successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+    
+    def patch(self, request):
+        """API for updating team logo"""
+        team_id = request.data.get('team_id')
+        if not team_id:
+            return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            team_instance = Team.objects.get(id=team_id, user_id=request.user)
+        except Team.DoesNotExist:
+            return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
+
+        if 'team_logo' in request.FILES:
+            # Delete old logo if it exists
+            if team_instance.team_logo and default_storage.exists(team_instance.team_logo.name):  # Use .name here
+                default_storage.delete(team_instance.team_logo.name)  # Use .name here
+
+            # Upload new logo with a unique filename
+            logo = request.FILES['team_logo']
+            file_extension = logo.name.split('.')[-1]
+            unique_suffix = get_random_string(8)  # Generate a random suffix to ensure unique filenames
+            file_name = f"team/team_logo/{team_instance.id}_{unique_suffix}.{file_extension}"
+            logo_path = default_storage.save(file_name, logo)
+            team_instance.team_logo = logo_path
+
+        team_instance.save()
+
+        # Serialize and return the updated data
+        serializer = TeamSerializer(team_instance)
+
+        return Response({
+            'status': 1,
+            'message': _('Team logo updated successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
 
 
 
+##################################################################### User Gender List API View ##############################################################################
 class UserGenderListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = UserGender.objects.all()
