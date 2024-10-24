@@ -361,7 +361,7 @@ class Sponsor(models.Model):
     team_id = models.ForeignKey('Team', blank=True, null=True,  on_delete=models.CASCADE)
     group_id = models.ForeignKey('TrainingGroups', blank=True, null=True,  on_delete=models.CASCADE)
     created_at= models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -374,4 +374,10 @@ class MobieDashboardBanner(models.Model):
     id = models.AutoField(primary_key=True)
     image = models.ImageField(upload_to='dashboardbanner_images/', blank= True, null= True)
     created_at= models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Dashboard Banner {self.id} and Image {self.image}"
+
+    class Meta:
+        db_table = 'futurestar_app_dashboardbanner'
