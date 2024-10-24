@@ -593,3 +593,41 @@ class MobileDashboardBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = MobileDashboardBanner
         fields = ['id', 'image', 'created_at', 'updated_at']
+
+class EventTypeSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    class Meta:
+        model = EventType
+        fields = ['id', 'name']
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate title based on the language
+        if language == 'ar':
+            return obj.name_ar
+        return obj.name_en
+
+
+
+class EventSerializer(serializers.ModelSerializer):
+    event_type_name = serializers.SerializerMethodField()  # Keep it as event_type_name
+
+    class Meta:
+        model = Event
+        fields = ['team', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
+                  'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
+                  'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
+                  'event_description', 'event_cost', 'created_at', 'updated_at']
+        read_only_fields = ['event_organizer']  # Make 'user' read-only since it will be auto-assigned
+        
+
+    def get_event_type_name(self, obj):
+        return obj.event_type.name_en if obj.event_type else None
+
+    def create(self, validated_data):
+        # Automatically set the user from the request context
+        validated_data['event_organizer'] = self.context['request'].user
+        return Event.objects.create(**validated_data)

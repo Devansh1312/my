@@ -61,6 +61,15 @@ urlpatterns = [
 
         path('api/albums/delete/', AlbumDeleteAPIView.as_view()),
         path('api/gallary_items/delete/', GallaryDeleteAPIView.as_view()),
+
+        ########################## Events URL ##################
+        path('api/events/', EventsAPIView.as_view()),
+        path('api/events/create/', EventCreateAPIView.as_view()),
+        path('api/events/detail/', EventDetailAPIView.as_view()),
+        path('api/team_events/', TeamEventAPIView.as_view()),
+
+      
+
      
 
         ########################## Sponsor URL ##################

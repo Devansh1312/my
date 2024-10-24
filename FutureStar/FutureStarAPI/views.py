@@ -2926,3 +2926,170 @@ class DashboardImageAPI(APIView):
             "message": _("Dashboard banner list fetched successfully."),
             "data": serializer.data
         }, status=status.HTTP_200_OK)
+    
+
+##################################### Event #######################################
+
+class EventsAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        try:
+            
+            events = Event.objects.all()
+            serializer = EventSerializer(events, many=True)
+            return Response({
+                "status": 1,
+                "message": _("All Event list fetched successfully."),
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except:
+            return Response({
+                "status": 0,
+                "message": _("Error occurred while fetching event list.")
+            }, status=status.HTTP_400_BAD_REQUEST)      
+
+
+class TeamEventAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Get the team_id from query parameters
+        team_id = request.query_params.get('team_id', None)
+
+        try:
+            # Filter events by team_id if provided, otherwise fetch all events
+            if team_id:
+                events = Event.objects.filter(team=team_id)
+            else:
+                return Response({
+                "status": 0,
+                "message": _("Team id is Required."),
+               
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = EventSerializer(events, many=True)
+            return Response({
+                "status": 1,
+                "message": _("Event list fetched successfully."),
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "status": 0,
+                "message": _("Error occurred while fetching event list."),
+                
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EventDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Get the event_id from query parameters
+        event_id = request.query_params.get('event_id', None)
+
+        if not event_id:
+            return Response({
+                "status": 0,
+                "message": _("event_id is required."),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # If event_id is provided, fetch a specific event
+            event = Event.objects.get(id=event_id)  # Ensure the event exists
+            serializer = EventSerializer(event)
+            return Response({
+                "status": 1,
+                "message": _("Event details fetched successfully."),
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except Event.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": _("Event not found."),
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({
+                "status": 0,
+                "message": _("Error occurred while fetching event details."),
+                "error": str(e)  # Include the exception message for debugging
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+class EventCreateAPIView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Fetch all event types
+        event_types = EventType.objects.all()
+        serializer = EventTypeSerializer(event_types, many=True, context={'request': request})
+
+        return Response({
+            'status': 1,
+            'message': _('Events retrieved successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Ensure team_id is provided
+        team_id = request.data.get('team')
+        if not team_id:
+            return Response({
+                'status': 0,
+                'message': _('Team ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the Team instance using the provided team_id
+            team_instance = Team.objects.get(id=team_id)
+        except Team.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Team not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Handle event creation
+        serializer = EventSerializer(data=request.data, context={'request': request})
+        
+        if serializer.is_valid():
+            # Set the team instance on the validated data before saving
+            event_instance = serializer.save(team=team_instance)
+
+            return Response({
+                'status': 1,
+                'message': _('Event created successfully.'),
+                'data': EventSerializer(event_instance).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Event creation failed.'),
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
