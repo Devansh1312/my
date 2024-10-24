@@ -27,7 +27,7 @@ from django.template.loader import render_to_string
 import sys
 from functools import wraps
 
-from FutureStarAPI.models import MobileDashboardBanner
+from FutureStarAPI.models import *
 
 
 def user_role_check(view_func):
@@ -5267,3 +5267,93 @@ class MobileDashboardBannerDeleteView(View):
         banner.delete()
         messages.success(request, "Banner deleted successfully.")
         return redirect("dashboard_banner_list")
+    
+    
+    
+######################################################### Report Module ###############################################
+# @method_decorator(user_role_check, name='dispatch')
+class ReportListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/Report/report.html"
+
+    def get(self, request):
+        reports = Report.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {
+                "reports": reports,
+                "breadcrumb": {"child": "Report List"},
+            },
+        )
+
+# @method_decorator(user_role_check, name='dispatch')
+class ReportCreateView(View):
+    def post(self, request):
+        title_en = request.POST.get("title_en")
+        content_en = request.POST.get("content_en")
+        title_ar = request.POST.get("title_ar")
+        content_ar = request.POST.get("content_ar")
+        
+        if not title_en or not content_en or not title_ar or not content_ar:
+            messages.error(request, "Title and Description are required.")
+            return redirect("report_list")
+
+        # if not title_en or  content_en or  title_ar or  content_ar:
+        #     messages.error(request, "Title and Content are required.")
+        #     return redirect("report_list")
+
+        report = Report.objects.create(
+            title_en=title_en,
+            title_ar=title_ar,
+            content_en=content_en,
+            content_ar=content_ar,
+        )
+            
+        messages.success(request, "Report created successfully.")
+        return redirect("report_list")
+
+# @method_decorator(user_role_check, name='dispatch')
+class ReportEditView(View):
+    template_name = "Admin/MobileApp/Report/report.html"
+
+    def get(self, request, report_id):
+        # Get the report object based on the ID
+        report_item = get_object_or_404(Report, id=report_id)
+
+        # Prepare context with existing report data
+        context = {
+            'report': report_item,  # Send the old data to the template
+        }
+
+        # Render the template with old report data
+        return render(request, self.template_name, context)
+
+    def post(self, request, report_id):
+        # Get the report object to be updated
+        report_item = get_object_or_404(Report, id=report_id)
+
+        # Fetch new data from the form submission
+        title_en = request.POST.get("title_en")
+        content_en = request.POST.get("content_en")
+        title_ar = request.POST.get("title_ar")
+        content_ar = request.POST.get("content_ar")
+
+        
+
+        # Update the report with new data
+        report_item.title_en = title_en
+        report_item.title_ar = title_ar
+        report_item.content_en = content_en
+        report_item.content_ar = content_ar
+        report_item.save()
+
+        messages.success(request, "Report updated successfully.")
+        return redirect("report_list")
+
+# @method_decorator(user_role_check, name='dispatch')
+class ReportDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        report = get_object_or_404(Report, pk=pk)
+        report.delete()
+        messages.success(request, "Report deleted successfully.")
+        return redirect("report_list")

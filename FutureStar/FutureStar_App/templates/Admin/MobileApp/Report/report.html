@@ -1,0 +1,403 @@
+{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% load sass_tags %} {% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- Plugins css Ends--> {% endblock %} <style>
+    .is-invalid {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+    }
+</style> {% block title %} Report Management {% endblock %} {% block content %} <div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>{{breadcrumb.child}}</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addReportModal">Add Report</button>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Report List -->
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display" id="basic-1">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title (English)</th>
+                                        <th>Title (Arabic)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody> {% for report_item in reports %} <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            {{ report_item.title_en|slice:":30" }}{% if report_item.title_en|length > 30 %}... <a href="#" class="view-report-btn" data-report-id="{{ report_item.id }}" data-report-title_en="{{ report_item.title_en }}" data-report-title_ar="{{ report_item.title_ar }}" data-report-content_en="{{ report_item.content_en }}" data-report-content_ar="{{ report_item.content_ar }}"> Read more </a> {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ report_item.title_ar|slice:":30" }}{% if report_item.title_ar|length > 30 %}... <a href="#" class="view-report-btn" data-report-id="{{ report_item.id }}" data-report-title_en="{{ report_item.title_en }}" data-report-title_ar="{{ report_item.title_ar }}" data-report-content_en="{{ report_item.content_en }}" data-report-content_ar="{{ report_item.content_ar }}"> Read more </a> {% endif %}
+                                        </td>
+                                        <td>
+                                            <!-- Action buttons -->
+                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                    <i data-feather="more-vertical"></i>
+                                                </a>
+                                                <div class="action-card" style="
+                                                        display: none;
+                                                        position: absolute;
+                                                        top: 100%;
+                                                        right: 0;
+                                                        background: #fff;
+                                                        border: 1px solid #ccc;
+                                                        border-radius: 4px;
+                                                        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                                                        z-index: 10;
+                                                        width: 150px;
+                                                    ">
+                                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                            <a style="font-size: large;" href="#" class="view-report-btn" data-report-id="{{ report_item.id }}" data-report-title_en="{{ report_item.title_en }}" data-report-title_ar="{{ report_item.title_ar }}" data-report-content_en="{{ report_item.content_en }}" data-report-content_ar="{{ report_item.content_ar }}"> View </a>
+                                                        </li>
+                                                        <li style="padding: 8px 12px;">
+                                                            <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editReportModal" data-report-id="{{ report_item.id }}" data-report-title_en="{{ report_item.title_en }}" data-report-content_en="{{ report_item.content_en }}" data-report-title_ar="{{ report_item.title_ar }}" data-report-content_ar="{{ report_item.content_ar }}"> Edit </a>
+                                                        </li>
+                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                            <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteReportModal" data-report-id="{{ report_item.id }}"> Delete </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr> {% endfor %} </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add Report Modal -->
+        <div class="modal fade" id="addReportModal" tabindex="-1" aria-labelledby="addReportModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addReportModalLabel">Add Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'report_create' %}" id="addReportForm" enctype="multipart/form-data"> {% csrf_token %} <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label for="title_en" class="form-label">Title in English</label>
+                                    <textarea class="form-control" id="title_en" name="title_en" placeholder="Enter Report Title"></textarea>
+                                    <div class="invalid-feedback" id="title_en-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="title_ar" class="form-label">Title in Arabic</label>
+                                    <textarea class="form-control" id="title_ar" name="title_ar" placeholder="Enter Report Title"></textarea>
+                                    <div class="invalid-feedback" id="title_ar-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="content_en" class="form-label">Content in English</label>
+                                    <textarea class="form-control" id="content_en" name="content_en" placeholder="Enter Report Content"></textarea>
+                                    <div class="invalid-feedback" id="content_en-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="content_ar" class="form-label">Content in Arabic</label>
+                                    <textarea class="form-control" id="content_ar" name="content_ar" placeholder="Enter Report Content"></textarea>
+                                    <div class="invalid-feedback" id="content_ar-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Report</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Edit Report Modal -->
+        <div class="modal fade" id="editReportModal" tabindex="-1" aria-labelledby="editReportModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editReportModalLabel">Edit Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" id="editReportForm" enctype="multipart/form-data"> {% csrf_token %} <div class="row">
+                                <input type="hidden" id="editReportId" name="id" />
+                                <div class="col-6 mb-3">
+                                    <label for="editTitle_en" class="form-label">Title in English</label>
+                                    <textarea class="form-control" id="editTitle_en" name="title_en" placeholder="Enter Report Title"></textarea>
+                                    <div class="invalid-feedback" id="edit-title_en-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="editTitle_ar" class="form-label">Title in Arabic</label>
+                                    <textarea class="form-control" id="editTitle_ar" name="title_ar" placeholder="Enter Report Title"></textarea>
+                                    <div class="invalid-feedback" id="edit-title_ar-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="editContent_en" class="form-label">Content in English</label>
+                                    <textarea class="form-control" id="editContent_en" name="content_en" placeholder="Enter Report Content"></textarea>
+                                    <div class="invalid-feedback" id="edit-content_en-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="editContent_ar" class="form-label">Content in Arabic</label>
+                                    <textarea class="form-control" id="editContent_ar" name="content_ar" placeholder="Enter Report Content"></textarea>
+                                    <div class="invalid-feedback" id="edit-content_ar-error"></div>
+                                    <!-- Error message container -->
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Report</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- View Report Modal -->
+        <div class="modal fade bd-example-modal-lg" id="viewReportModal" tabindex="-1" aria-labelledby="viewReportModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content shadow-lg border-0 rounded">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="viewReportModalLabel">Report Details</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Title in English:</label>
+                                <span id="reportTitleEn"></span>
+                                <!-- Example title in English -->
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Title in Arabic:</label>
+                                <span id="reportTitleAr"></span>
+                                <!-- Example title in Arabic -->
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Content in English:</label>
+                                <span id="reportContentEn"></span>
+                                <!-- Example content in English -->
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Content in Arabic:</label>
+                                <span id="reportContentAr"></span>
+                                <!-- Example content in Arabic -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Delete Report Modal -->
+        <div class="modal fade" id="deleteReportModal" tabindex="-1" aria-labelledby="deleteReportModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteReportModalLabel">Delete Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" id="deleteReportForm"> {% csrf_token %} <input type="hidden" id="deleteReportId" name="id" />
+                            <p>Are you sure you want to delete this report?</p>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> {% endblock %} {% block script %} <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+<!-- Plugins JS Ends-->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Edit Report Modal
+        var editReportModal = document.getElementById("editReportModal");
+        if (editReportModal) {
+            editReportModal.addEventListener("show.bs.modal", function(event) {
+                var button = event.relatedTarget;
+                var reportId = button.getAttribute("data-report-id");
+                var reportTitle_en = button.getAttribute("data-report-title_en");
+                var reportContent_en = button.getAttribute("data-report-content_en");
+                var reportTitle_ar = button.getAttribute("data-report-title_ar");
+                var reportContent_ar = button.getAttribute("data-report-content_ar");
+                var form = document.getElementById("editReportForm");
+                // Update form action to point to the correct report ID for editing
+                form.action = "{% url 'report_edit' 0 %}".replace("0", reportId);
+                // Set the values in the form
+                form.querySelector("#editReportId").value = reportId;
+                form.querySelector("#editTitle_en").value = reportTitle_en || "";
+                form.querySelector("#editContent_en").value = reportContent_en || "";
+                form.querySelector("#editTitle_ar").value = reportTitle_ar || "";
+                form.querySelector("#editContent_ar").value = reportContent_ar || "";
+            });
+        }
+        // Delete Report Modal
+        var deleteReportModal = document.getElementById("deleteReportModal");
+        if (deleteReportModal) {
+            deleteReportModal.addEventListener("show.bs.modal", function(event) {
+                var button = event.relatedTarget;
+                var reportId = button.getAttribute("data-report-id");
+                var deleteForm = document.getElementById("deleteReportForm");
+                deleteForm.action = "{% url 'report_delete' 0 %}".replace("0", reportId);
+            });
+        }
+    });
+    // View Report Modal
+    document.querySelectorAll(".view-report-btn").forEach(function(button) {
+        button.addEventListener("click", function() {
+            const reportId = this.getAttribute("data-report-id");
+            const titleEn = this.getAttribute("data-report-title_en");
+            const titleAr = this.getAttribute("data-report-title_ar");
+            const contentEn = this.getAttribute("data-report-content_en");
+            const contentAr = this.getAttribute("data-report-content_ar");
+            // Set the data in the modal
+            document.getElementById("reportTitleEn").textContent = titleEn;
+            document.getElementById("reportTitleAr").textContent = titleAr;
+            document.getElementById("reportContentEn").textContent = contentEn;
+            document.getElementById("reportContentAr").textContent = contentAr;
+            // Show the modal
+            const viewReportModal = new bootstrap.Modal(document.getElementById("viewReportModal"));
+            viewReportModal.show();
+        });
+    });
+    // Toggle the visibility of the action card
+    document.querySelectorAll(".three-dots-menu").forEach(function(menu) {
+        menu.addEventListener("click", function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = actionCard.style.display === "none" || actionCard.style.display === "" ? "block" : "none";
+            // Close other open action cards
+            document.querySelectorAll(".action-card").forEach(function(card) {
+                if (card !== actionCard) {
+                    card.style.display = "none";
+                }
+            });
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        // Form validation for Add and Edit Report modals
+        function validateForm(form) {
+            var title_en = form.querySelector('textarea[name="title_en"]');
+            var content_en = form.querySelector('textarea[name="content_en"]');
+            var title_ar = form.querySelector('textarea[name="title_ar"]');
+            var content_ar = form.querySelector('textarea[name="content_ar"]');
+            var isValid = true;
+            // Title validation English
+            if (title_en.value.trim() === "") {
+                title_en.classList.add("is-invalid");
+                var title_enErrorId = form.id === "addReportForm" ? "title_en-error" : "edit-title_en-error";
+                document.getElementById(title_enErrorId).textContent = "Title in English is required.";
+                isValid = false;
+            } else {
+                title_en.classList.remove("is-invalid");
+                var title_enErrorId = form.id === "addReportForm" ? "title_en-error" : "edit-title_en-error";
+                document.getElementById(title_enErrorId).textContent = "";
+            }
+            // Title validation Arabic
+            if (title_ar.value.trim() === "") {
+                title_ar.classList.add("is-invalid");
+                var title_arErrorId = form.id === "addReportForm" ? "title_ar-error" : "edit-title_ar-error";
+                document.getElementById(title_arErrorId).textContent = "Title in Arabic is required.";
+                isValid = false;
+            } else {
+                title_ar.classList.remove("is-invalid");
+                var title_arErrorId = form.id === "addReportForm" ? "title_ar-error" : "edit-title_ar-error";
+                document.getElementById(title_arErrorId).textContent = "";
+            }
+            // Content validation English
+            if (content_en.value.trim() === "") {
+                content_en.classList.add("is-invalid");
+                var content_enErrorId = form.id === "addReportForm" ? "content_en-error" : "edit-content_en-error";
+                document.getElementById(content_enErrorId).textContent = "Content in English is required.";
+                isValid = false;
+            } else {
+                content_en.classList.remove("is-invalid");
+                var content_enErrorId = form.id === "addReportForm" ? "content_en-error" : "edit-content_en-error";
+                document.getElementById(content_enErrorId).textContent = "";
+            }
+            // Content validation Arabic
+            if (content_ar.value.trim() === "") {
+                content_ar.classList.add("is-invalid");
+                var content_arErrorId = form.id === "addReportForm" ? "content_ar-error" : "edit-content_ar-error";
+                document.getElementById(content_arErrorId).textContent = "Content in Arabic is required.";
+                isValid = false;
+            } else {
+                content_ar.classList.remove("is-invalid");
+                var content_arErrorId = form.id === "addReportForm" ? "content_ar-error" : "edit-content_ar-error";
+                document.getElementById(content_arErrorId).textContent = "";
+            }
+            return isValid;
+        }
+        // Add Report form submission handler
+        var addReportForm = document.getElementById("addReportForm");
+        if (addReportForm) {
+            addReportForm.addEventListener("submit", function(event) {
+                console.log("Add Report Form Submitted");
+                var form = event.target;
+                if (!validateForm(form)) {
+                    console.log("Validation failed");
+                    event.preventDefault(); // Prevent form submission if validation fails
+                }
+            });
+        }
+        // Edit Report form submission handler
+        var editReportForm = document.getElementById("editReportForm");
+        if (editReportForm) {
+            editReportForm.addEventListener("submit", function(event) {
+                console.log("Edit Report Form Submitted");
+                var form = event.target;
+                if (!validateForm(form)) {
+                    console.log("Validation failed");
+                    event.preventDefault(); // Prevent form submission if validation fails
+                }
+            });
+        }
+        // Edit Report Modal - populate with existing data
+        var editReportModal = document.getElementById("editReportModal");
+        if (editReportModal) {
+            editReportModal.addEventListener("show.bs.modal", function(event) {
+                var button = event.relatedTarget;
+                var reportId = button.getAttribute("data-report-id");
+                var reportTitle_en = button.getAttribute("data-report-title_en");
+                var reportContent_en = button.getAttribute("data-report-content_en");
+                var reportTitle_ar = button.getAttribute("data-report-title_ar");
+                var reportContent_ar = button.getAttribute("data-report-content_ar");
+                var form = document.getElementById("editReportForm");
+                // Update form action to point to the correct report ID for editing
+                form.action = "{% url 'report_edit' 0 %}".replace("0", reportId);
+                // Set the values in the form
+                form.querySelector("#editReportId").value = reportId;
+                form.querySelector("#editTitle_en").value = reportTitle_en || "";
+                form.querySelector("#editContent_en").value = reportContent_en || "";
+                form.querySelector("#editTitle_ar").value = reportTitle_ar || "";
+                form.querySelector("#editContent_ar").value = reportContent_ar || "";
+            });
+        }
+        // Hide action card if clicking outside
+        document.addEventListener("click", function(event) {
+            var isClickInside = event.target.closest(".action-menu-container");
+            if (!isClickInside) {
+                document.querySelectorAll(".action-card").forEach(function(card) {
+                    card.style.display = "none";
+                });
+            }
+        });
+    });
+</script> {% endblock %}

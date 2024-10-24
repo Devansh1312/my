@@ -214,6 +214,12 @@ urlpatterns = [
     path('dashboard_banner/create/', MobileDashboardBannerCreateView.as_view(), name='dashboard_banner_create'),
     path('dashboard_banner/edit/<int:pk>/', MobileDashboardBannerEditView.as_view(), name='dashboard_banner_edit'),  # Edit URL
     path('dashboard_banner/delete/<int:pk>/', MobileDashboardBannerDeleteView.as_view(), name='dashboard_banner_delete'),
+    
+    #Report URl's
+    path('reports/', ReportListView.as_view(), name='report_list'),
+    path('reports/create/', ReportCreateView.as_view(), name='report_create'),
+    path('reports/edit/<int:report_id>/', ReportEditView.as_view(), name='report_edit'),
+    path('reports/delete/<int:pk>/', ReportDeleteView.as_view(), name='report_delete'),
 
    
 
