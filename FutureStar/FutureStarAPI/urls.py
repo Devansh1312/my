@@ -89,20 +89,16 @@ urlpatterns = [
         path('api/fields/', FieldAPIView.as_view()),
         path('api/tournament/', TournamentAPIView.as_view()),
 
-
         path('api/team/', TeamViewAPI.as_view()),
-
+        ############### Additional API #########################
         path('api/genders/', UserGenderListAPIView.as_view()),
-
+        path('api/general/settings/', GeneralSettingsList.as_view()),
+        path('api/faq/', FAQListAPIView.as_view()),
         path('api/role/', UserRoleListAPIView.as_view()),
-        
         path('api/locations/', LocationAPIView.as_view()),
-        
 
+        ###################### New Coach or Refree Profile ########################
         path('api/profile/create/', ProfileTypeView.as_view()),
-        
-        path('api/locations/', LocationAPIView.as_view()),
-        
         
         ################## Mobile Dashboard Image  ################
         

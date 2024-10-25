@@ -3270,3 +3270,62 @@ class EventCreateAPIView(generics.CreateAPIView):
                 'message': _('Event creation failed.'),
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+############################################################### FAQ API #####################################################################################################
+class FAQListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        # Get all genders
+        faq = self.get_queryset()
+        serializer = self.get_serializer(faq, many=True)
+
+        # Prepare the response with genders directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('FAQ retrieved successfully.'),
+            'data': serializer.data,
+        }, status=status.HTTP_200_OK)
+    
+############################################################ General Settings API ####################################################################################
+class GeneralSettingsList(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        general_settings = SystemSettings.objects.first()
+
+        if not general_settings:
+            return Response({
+                'status': 0,
+                'message': _('No general settings found.'),
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            'status': 1,
+            'message': _('General Settings retrieved successfully.'),
+            'data': {
+                'website_name_english': general_settings.website_name_english,
+                'website_name_arabic': general_settings.website_name_arabic,
+                'phone': general_settings.phone,
+                'email': general_settings.email,
+                'address': general_settings.address,
+                'instagram': general_settings.instagram,
+                'facebook': general_settings.facebook,
+                'twitter': general_settings.twitter,
+                'linkedin': general_settings.linkedin,
+                'pinterest': general_settings.pinterest,
+                'happy_user': general_settings.happy_user,
+                'line_of_code': general_settings.line_of_code,
+                'downloads': general_settings.downloads,
+                'app_rate': general_settings.app_rate,
+                'years_of_experience': general_settings.years_of_experience,
+                'project_completed': general_settings.project_completed,
+                'proffesioan_team_members': general_settings.proffesioan_team_members,
+                'awards_winning': general_settings.awards_winning,
+            }
+        }, status=status.HTTP_200_OK)
