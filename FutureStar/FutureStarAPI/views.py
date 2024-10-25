@@ -809,27 +809,33 @@ class CustomPostPagination(PageNumberPagination):
     def paginate_queryset(self, queryset, request, view=None):
         # Get the page number from the body (default: 1)
         try:
+            # Try to fetch and validate the page number
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
                 raise ValidationError("Page number must be a positive integer.")
         except (ValueError, TypeError):
-            raise ValidationError("Invalid page number.")
-
-        # Get total number of pages based on the queryset
-        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
-        total_pages = paginator.num_pages
-
-        # Check if the requested page number is within the valid range
-        if self.page > total_pages:
-            # Return custom response for invalid page
+            # If the page number is invalid, return a custom error response
             return Response({
                 'status': 0,
                 'message': _('Page Not Found'),
                 'data': []
             }, status=400)
 
-        # Perform standard pagination if valid page
+        # Get total number of pages based on the queryset
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        total_pages = paginator.num_pages
+
+        # Check if the requested page number is out of range
+        if self.page > total_pages:
+            # Return custom response for an invalid page
+            return Response({
+                'status': 0,
+                'message': _('Page Not Found'),
+                'data': []
+            }, status=400)
+
+        # Perform standard pagination if the page is valid
         return super().paginate_queryset(queryset, request, view)
 
 ###################################################################################### POST MODULE ################################################################################
@@ -3001,7 +3007,7 @@ class EventCommentAPIView(APIView):
                 'message': _('Event not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Get the top-level comments for the post
+        # Get the top-level comments for the event
         comments = Event_comment.objects.filter(event=event, parent=None).order_by('-date_created')
 
         # Paginate the comments
@@ -3021,8 +3027,8 @@ class EventCommentAPIView(APIView):
                 }
             }, status=status.HTTP_200_OK)
 
-        # Serialize the paginated comments
-        serializer = EventCommentPagination(paginated_comments, many=True)
+        # Use a serializer to serialize the paginated comments (not the pagination class)
+        serializer = EventCommentSerializer(paginated_comments, many=True)
 
         # Return paginated response
         return Response({
@@ -3033,6 +3039,7 @@ class EventCommentAPIView(APIView):
             'total_pages': paginator.page.paginator.num_pages,
             'current_page': paginator.page.number,
         }, status=status.HTTP_200_OK)
+
 
 
 ######################## COMMNET CREATE API ###########################
