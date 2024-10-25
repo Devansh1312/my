@@ -1526,7 +1526,12 @@ class DetailAlbumListAPIView(generics.ListAPIView):
             except Album.DoesNotExist:
                 return Album.objects.none()
         else:
-             raise ValidationError(_("Album Id is required"))
+                 return Response({
+                'status': 0,
+                'message': _("Album Id is required"),
+            }, status=status.HTTP_400_BAD_REQUEST)
+                
+
            
       
 
@@ -1793,35 +1798,63 @@ class GallaryCreateAPIView(generics.CreateAPIView):
                 try:
                     group_instance = TrainingGroups.objects.get(id=group_id)
                 except TrainingGroups.DoesNotExist:
-                    raise NotFound(_("Training group not found."))
+                        return Response({
+                        'status': 0,
+                        'message': _("Training group not found."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
             # Fetch the album instance if album_id is provided
             if album_id:
                 try:
                     album_instance = Album.objects.get(id=album_id)
                 except Album.DoesNotExist:
-                    raise NotFound(_("Album not found."))
+                      return Response({
+                        'status': 0,
+                        'message': _("Album not found."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
 
             # Fetch the team instance if team_id is provided
             if team_id:
                 try:
                     team_instance = Team.objects.get(id=team_id)
                 except Team.DoesNotExist:
-                    raise NotFound(_("Team not found."))
+                    return Response({
+                            'status': 0,
+                            'message': _("Team not found."),
+                        }, status=status.HTTP_400_BAD_REQUEST)
 
             # New validation: Check if the album is related to a team
             if album_instance:
                 if album_instance.team_id and not team_id:
-                    raise ValidationError(_("This album is associated with a team. Please provide a team ID."))
+                      return Response({
+                            'status': 0,
+                            'message': _("This album is associated with a team. Please provide a team ID."),
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                 
                 if not album_instance.team_id and team_id:
-                    raise ValidationError(_("This album is not associated with a team. Please remove the team ID."))
+                      return Response({
+                        'status': 0,
+                        'message': _("This album is not associated with a team. Please remove the team ID."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                   
 
             # New validation: Check if the album is related to a training group
             if album_instance and group_instance:
                 if album_instance.group_id and not group_id:
-                    raise ValidationError(_("This album is associated with a training group. Please provide a training group ID."))
+                    return Response({
+                        'status': 0,
+                        'message': _("This album is associated with a training group. Please provide a training group ID."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                   
                 if not album_instance.group_id and group_id:
-                    raise ValidationError(_("This album is not associated with a training group. Please remove the training group ID."))
+                               return Response({
+                                'status': 0,
+                                'message': _("This album is not associated with a training group. Please remove the training group ID."),
+                            }, status=status.HTTP_400_BAD_REQUEST)
+                                
 
             # Condition 0: Both Training_id and album_id are provided
             if group_instance and album_instance:
@@ -1834,7 +1867,13 @@ class GallaryCreateAPIView(generics.CreateAPIView):
                 if album_instance.user == request.user:  # Assuming Album has a user field
                     serializer.save(album_id=album_instance)
                 else:
-                    raise ValidationError(_("You do not have permission to add to this album."))
+                        return Response({
+                            'status': 0,
+                            'message': _("You do not have permission to add to this album."),
+                        }, status=status.HTTP_400_BAD_REQUEST)
+                            
+
+                  
             # Condition 3: Neither team_id nor album_id is provided
             else:
                 serializer.save(album_id=None)
@@ -1935,7 +1974,13 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
         # Fetch the 'id' from the request body
         id = self.request.data.get('gallary_id')
         if not id:
-            raise ValidationError({"gallary_id": _("This field is required.")})
+                return Response({
+                'status': 0,
+                'message': _({"gallary_id": _("This field is required.")}),
+            }, status=status.HTTP_400_BAD_REQUEST)
+                
+
+        
         try:
             return Gallary.objects.get(id=id)
         except Gallary.DoesNotExist:
@@ -1980,7 +2025,13 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
         # Fetch the 'id' from the request body
         id = self.request.data.get('album_id')
         if not id:
-            raise ValidationError({"album_id": _("This field is required.")})
+                return Response({
+                'status': 0,
+                'message': _({"album_id": _("This field is required.")}),
+            }, status=status.HTTP_400_BAD_REQUEST)
+                
+
+          
         try:
             return Album.objects.get(id=id)
         except Album.DoesNotExist:
@@ -2007,6 +2058,7 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
                 'status': 0,
                 'message': _('Album not found.')
             }, status=status.HTTP_404_NOT_FOUND)
+
 
 
 ########################################################################  Sponsor API ################################################################
@@ -3107,30 +3159,72 @@ class EventCommentCreateAPIView(APIView):
 
 ##################################### Event #######################################
 
+class CustomEventPagination(PageNumberPagination):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        try:
+            page_number = request.data.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+
+        if self.page > self.total_pages or self.page < 1:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)  # Use HTTP 400 for invalid page requests
+
+        return super().paginate_queryset(queryset, request, view)
+
 class EventsAPIView(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
-    parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
+        paginator = CustomEventPagination()
         try:
-            
             events = Event.objects.all()
-            serializer = EventSerializer(events, many=True)
-            return Response({
-                "status": 1,
-                "message": _("All Event list fetched successfully."),
-                "data": serializer.data
-            }, status=status.HTTP_200_OK)
+            paginated_events = paginator.paginate_queryset(events, request, view=self)
+            serializer = EventSerializer(paginated_events, many=True)
 
-        except:
+            # Return paginated response with pagination details
             return Response({
-                "status": 0,
-                "message": _("Error occurred while fetching event list.")
-            }, status=status.HTTP_400_BAD_REQUEST)      
+                'status': 1,
+                'message': _('All Events fetched successfully.'),
+                'data': serializer.data,
+                'total_records': paginator.page.paginator.count,
+                'total_pages': paginator.total_pages,
+                'current_page': paginator.page.number
+            })
+        
+         
 
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('Error occurred while fetching event list.'),
+                'error': str(e),
+                'data':[]
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class TeamEventAPIView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
@@ -3144,32 +3238,51 @@ class TeamEventAPIView(APIView):
         # Get the team_id from query parameters
         team_id = request.query_params.get('team_id', None)
 
-        try:
-            # Filter events by team_id if provided, otherwise fetch all events
-            if team_id:
-                events = Event.objects.filter(team=team_id)
-            else:
-                return Response({
+        # Return error if team_id is not provided
+        if not team_id:
+            return Response({
                 "status": 0,
-                "message": _("Team id is Required."),
-               
+                "message": _("Team id is required."),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = EventSerializer(events, many=True)
+        paginator = CustomEventPagination()  # Initialize the custom pagination
+
+        try:
+            # Filter events by team_id
+            events = Event.objects.filter(team=team_id)
+
+            # Paginate the queryset
+            paginated_events = paginator.paginate_queryset(events, request, view=self)
+
+            # If pagination returns None, it means the page was invalid
+            if paginated_events is None:
+                return Response({
+                    'status': 0,
+                    'message': _('Page not found.'),
+                    'data': []
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Serialize the paginated events
+            serializer = EventSerializer(paginated_events, many=True)
+
+            # Return paginated response with pagination details
             return Response({
-                "status": 1,
-                "message": _("Event list fetched successfully."),
-                "data": serializer.data
+                'status': 1,
+                'message': _("Event list fetched successfully."),
+                'data': serializer.data,
+                'total_records': paginator.page.paginator.count,
+                'total_pages': paginator.total_pages,
+                'current_page': paginator.page.number
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({
-                "status": 0,
-                "message": _("Error occurred while fetching event list."),
-                
+                'status': 0,
+                'message': _('Error occurred while fetching event list.'),
+                'error': str(e),
+                'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
-
-
+        
 class EventDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
     parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
@@ -3270,6 +3383,111 @@ class EventCreateAPIView(generics.CreateAPIView):
                 'message': _('Event creation failed.'),
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateEventAPIView(APIView):
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+
+    def get_object(self, event_id):
+        try:
+            return Event.objects.get(id=event_id, event_organizer=self.request.user)
+        except Event.DoesNotExist:
+            return None
+
+    def patch(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        event_id = request.data.get('event_id')
+        if not event_id:
+            return Response({
+                'status': 0,
+                'message': _('Event ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        event = self.get_object(event_id)
+        if not event:
+            return Response({
+                'status': 0,
+                'message': _('Event not found or you are not authorized to update this event.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(event, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            # Handle event image replacement
+            if 'event_image' in request.FILES:
+                # Delete old image if it exists
+                if event.event_image and default_storage.exists(event.event_image.name):
+                    default_storage.delete(event.event_image.name)
+
+                # Save new image with a unique filename
+                event_image = request.FILES['event_image']
+                file_extension = event_image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)  # Ensure unique filename
+                file_name = f"event_images/{event.id}_{request.user.username}_{unique_suffix}.{file_extension}"
+                image_path = default_storage.save(file_name, event_image)
+                event.event_image = image_path
+
+            serializer.save()  # Save other changes
+            return Response({
+                'status': 1,
+                'message': _('Event updated successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'status': 0,
+            'message': _('Failed to update the event.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class DeleteEventAPIView(APIView):
+
+#     def get_object(self, event_id):
+#         try:
+#             return Event.objects.get(id=event_id, event_organizer=self.request.user)
+#         except Event.DoesNotExist:
+#             return None
+
+#     def delete(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
+
+#         event_id = request.data.get('event_id')
+#         if not event_id:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Event ID is required.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         event = self.get_object(event_id)
+#         if not event:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Event not found or you are not authorized to delete this event.')
+#             }, status=status.HTTP_404_NOT_FOUND)
+
+#         # Optionally delete the associated event image
+#         if event.event_image and default_storage.exists(event.event_image.name):
+#             default_storage.delete(event.event_image.name)
+
+#         event.delete()
+#         return Response({
+#             'status': 1,
+#             'message': _('Event deleted successfully.')
+#         }, status=status.HTTP_200_OK)
+
+
+
+
+
 
 ############################################################### FAQ API #####################################################################################################
 class FAQListAPIView(generics.ListAPIView):

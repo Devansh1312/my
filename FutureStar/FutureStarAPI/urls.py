@@ -63,13 +63,21 @@ urlpatterns = [
         path('api/gallary_items/delete/', GallaryDeleteAPIView.as_view()),
 
         ########################## Events URL ##################
+       
         path('api/events/', EventsAPIView.as_view()),
         path('api/events/create/', EventCreateAPIView.as_view()),
+        path('api/events_types/', EventCreateAPIView.as_view()),
+
+        path('api/events/update/', UpdateEventAPIView.as_view()),
+        # path('api/events/delete/',DeleteEventAPIView.as_view()),
         path('api/events/detail/', EventDetailAPIView.as_view()),
         path('api/team_events/', TeamEventAPIView.as_view()),
+
         path('api/event/like/', EventLikeAPIView.as_view()),
         path('api/event/comments/', EventCommentAPIView.as_view()),  # New API for paginated comments
         path('api/event/comments/create/', EventCommentCreateAPIView.as_view()),
+      
+
       
 
      
