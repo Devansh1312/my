@@ -5374,7 +5374,7 @@ class PostReportListView(LoginRequiredMixin, View):
             self.template_name,
             {
                 "reports": reports,
-                "breadcrumb": {"child": "Report List"},
+                "breadcrumb": {"child": "Reported Post's"},
             },
         )
         
