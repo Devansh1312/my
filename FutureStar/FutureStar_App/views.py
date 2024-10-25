@@ -5366,7 +5366,7 @@ class PostReportListView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/Post_Report.html"
 
     def get(self, request):
-        reports = PostReport.objects.select_related('post_id', 'user_id', 'report_id').all()
+        reports = PostReport.objects.select_related('post_id', 'user_id', 'report_id').order_by('-created_at').all()
         return render(
             request,
             self.template_name,
