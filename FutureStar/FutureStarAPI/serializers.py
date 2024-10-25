@@ -133,15 +133,32 @@ class TeamSerializer(serializers.ModelSerializer):
         # Return the relative path for the team background image
         return obj.team_background_image.url if obj.team_background_image else None
 
+class TrainingGroupSerializer(serializers.ModelSerializer):
+    post_count = serializers.SerializerMethodField()
+    group_logo_url = serializers.SerializerMethodField()
+    group_background_image_url = serializers.SerializerMethodField()
 
-
-class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainingGroups
-        fields = ['id', 'group_name', 'group_logo']
+        fields = [
+            'id', 'user_id', 'group_name', 'group_username', 'bio', 'group_founder',
+            'latitude', 'longitude', 'address', 'house_no', 'premises', 'street',
+            'city', 'state', 'country_name', 'postalCode', 'country_code',
+            'phone', 'group_logo', 'group_background_image', 'post_count', 
+            'group_logo_url', 'group_background_image_url'
+        ]
 
-    def get_group_logo(self, obj):
-        return obj.group_logo.url if obj.group_logo else None 
+    def get_post_count(self, obj):
+        """Get the count of posts related to this group."""
+        return Post.objects.filter(group=obj).count()
+
+    def get_group_logo_url(self, obj):
+        """Get the URL of the group logo."""
+        return obj.group_logo.url if obj.group_logo else None
+
+    def get_group_background_image_url(self, obj):
+        """Get the URL of the group background image."""
+        return obj.group_background_image.url if obj.group_background_image else None
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

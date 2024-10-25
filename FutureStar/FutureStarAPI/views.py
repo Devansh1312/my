@@ -25,6 +25,7 @@ from rest_framework.exceptions import ValidationError
 import re
 import logging
 from django.utils.crypto import get_random_string
+from django.utils.timezone import now
 
 
 logger = logging.getLogger(__name__)
@@ -2473,6 +2474,7 @@ class TournamentAPIView(APIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
+################################################################## TEAM API ###############################################################################################
 class TeamViewAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -2730,8 +2732,148 @@ class TeamViewAPI(APIView):
             'message': _('Team logo updated successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+    
 
+#################################################################### Trainnig Group API #########################################################################################
+class TrainingGroupAPI(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    # 1. Get Group Detail by ID
+    def get(self, request):
+        group_id = request.query_params.get('group_id')
+        if not group_id:
+            return Response({
+                'status': 0, 
+                'message': _('Group ID is required.')
+                },status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            group = TrainingGroups.objects.get(id=group_id)
+            serializer = TrainingGroupSerializer(group)
+            return Response({
+                'status': 1,
+                'message': _('Group details retrieved successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        except TrainingGroups.DoesNotExist:
+            return Response({
+                'status': 0, 
+                'message': _('Group not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+    
+    # 2. Create a Group
+    def post(self, request):
+        request.data['group_founder'] = request.user.id  # Set the logged-in user as the group founder
+        serializer = TrainingGroupSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            group = serializer.save(created_at=now(), updated_at=now())
 
+            # Handle group_logo upload
+            if 'group_logo' in request.FILES:
+                logo = request.FILES['group_logo']
+                file_extension = logo.name.split('.')[-1]
+                file_name = f"group/group_logo/{group.id}_{get_random_string(8)}.{file_extension}"
+                logo_path = default_storage.save(file_name, logo)
+                group.group_logo = logo_path
+
+            # Handle group_background_image upload
+            if 'group_background_image' in request.FILES:
+                background_image = request.FILES['group_background_image']
+                file_extension = background_image.name.split('.')[-1]
+                file_name = f"group/group_background_image/{group.id}_{get_random_string(8)}.{file_extension}"
+                background_image_path = default_storage.save(file_name, background_image)
+                group.group_background_image = background_image_path
+
+            group.save()  # Save logo and background image fields
+            return Response({
+                'status': 1,
+                'message': _('Group created successfully.'),
+                'data': TrainingGroupSerializer(group).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Failed to create group.'),
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # 3. Edit Group Details
+    def put(self, request):
+        group_id = request.data.get('group_id')
+        if not group_id:
+            return Response({'status': 0, 'message': _('Group ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            group = TrainingGroups.objects.get(id=group_id, group_founder=request.user)
+            serializer = TrainingGroupSerializer(group, data=request.data, partial=True)
+
+            # Handle group_background_image update and delete old one if exists
+            if 'group_background_image' in request.FILES:
+                if group.group_background_image and default_storage.exists(group.group_background_image.name):
+                    default_storage.delete(group.group_background_image.name)
+                background_image = request.FILES['group_background_image']
+                file_extension = background_image.name.split('.')[-1]
+                file_name = f"group/group_background_image/{group_id}_{get_random_string(8)}.{file_extension}"
+                background_image_path = default_storage.save(file_name, background_image)
+                group.group_background_image = background_image_path
+            
+            if serializer.is_valid():
+                group = serializer.save(updated_at=now())
+                return Response({
+                    'status': 1,
+                    'message': _('Group details updated successfully.'),
+                    'data': TrainingGroupSerializer(group).data
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Failed to update group details.'),
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except TrainingGroups.DoesNotExist:
+            return Response({
+                'status': 0, 
+                'message': _('Group not found or you are not the founder.')
+                }, status=status.HTTP_404_NOT_FOUND)
+    
+    # 4. Update Group Logo and Background Image
+    def patch(self, request):
+        group_id = request.data.get('group_id')
+        if not group_id:
+            return Response({
+                'status': 0, 
+                'message': _('Group ID is required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            group = TrainingGroups.objects.get(id=group_id, group_founder=request.user)
+            
+            # Handle group_logo update and delete old one if exists
+            if 'group_logo' in request.FILES:
+                if group.group_logo and default_storage.exists(group.group_logo.name):
+                    default_storage.delete(group.group_logo.name)
+                logo = request.FILES['group_logo']
+                file_extension = logo.name.split('.')[-1]
+                file_name = f"group/group_logo/{group_id}_{get_random_string(8)}.{file_extension}"
+                logo_path = default_storage.save(file_name, logo)
+                group.group_logo = logo_path
+
+            group.updated_at = now()
+            group.save()
+
+            serializer = TrainingGroupSerializer(group)
+            return Response({
+                'status': 1,
+                'message': _('Group logo and background image updated successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        
+        except TrainingGroups.DoesNotExist:
+            return Response({
+                'status': 0, 
+                'message': _('Group not found or you are not the founder.')
+                }, status=status.HTTP_404_NOT_FOUND)
 
 ##################################################################### User Gender List API View ##############################################################################
 class UserGenderListAPIView(generics.ListAPIView):
