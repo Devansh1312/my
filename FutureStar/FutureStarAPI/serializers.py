@@ -618,6 +618,7 @@ class EventSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
     # event_image = serializers.SerializerMethodField()
+    event_organizer = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -631,6 +632,29 @@ class EventSerializer(serializers.ModelSerializer):
 
     # def get_event_image(self, obj):
     #     return obj.event_image.url if obj.event_image else None  
+    def get_event_organizer(self, obj):
+        user = obj.event_organizer
+        return {
+            'username': user.username,
+            'fullname': user.fullname,
+            'phone': user.phone,
+            'email': user.email,
+            'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
+        }
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        # Convert the event_image URL to a relative URL
+        if 'event_image' in representation and representation['event_image'] is not None:
+            full_url = representation['event_image']
+            request = self.context.get('request')
+            if request:
+                relative_url = full_url.replace(f"{request.scheme}://{request.get_host()}", "")
+                representation['event_image'] = relative_url
+        else:
+            representation['event_image'] = None  # Set to None if no image is available
+
+        return representation
 
     def get_event_type_name(self, obj):
         return obj.event_type.name_en if obj.event_type else None
