@@ -223,7 +223,10 @@ urlpatterns = [
 
     #Post Report URL's
     path('post_reports/', PostReportListView.as_view(), name='post_report_list'),
-    path('post_reports/delete/<int:pk>/', PostReportDeleteView.as_view(), name='report_delete')
+    path('post_reports/delete/<int:pk>/', PostReportDeleteView.as_view(), name='report_delete'),
     
+    #Team list URL's
+    path('team_lists/', TeamListView.as_view(), name='team_list'),
+    path('team_lists/delete/<int:pk>/', TeamDeleteview.as_view(), name='team_delete')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   

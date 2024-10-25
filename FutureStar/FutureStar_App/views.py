@@ -5390,4 +5390,33 @@ class PostReportDeleteView(LoginRequiredMixin, View):
         post.delete()
         
         messages.success(request, "Post deleted successfully.")
-        return redirect('post-report-list')
+        return redirect('post_report_list')
+    
+    
+######################################################### Team List Module ###############################################
+    
+    
+@method_decorator(user_role_check, name='dispatch')
+class TeamListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/Team_List.html"
+    
+    def get(self, request):
+        teams = Team.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {
+                "teams": teams,
+                "breadcrumb": {"child": "Team Lists"},
+            },
+        )
+        
+        
+@method_decorator(user_role_check, name='dispatch')
+class TeamDeleteview(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        team.delete()
+        
+        messages.success(request, "Team deleted successfully.")
+        return redirect('team_list')
