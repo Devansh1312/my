@@ -221,6 +221,9 @@ urlpatterns = [
     path('reports/edit/<int:report_id>/', ReportEditView.as_view(), name='report_edit'),
     path('reports/delete/<int:pk>/', ReportDeleteView.as_view(), name='report_delete'),
 
-   
+    #Post Report URL's
+    path('post_reports/', PostReportListView.as_view(), name='post-report-list'),
+    # path('post_reports/delete/<int:pk>/', .as_view(), name='report_delete')
+    
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   

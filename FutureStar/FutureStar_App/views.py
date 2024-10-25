@@ -5271,7 +5271,7 @@ class MobileDashboardBannerDeleteView(View):
     
     
 ######################################################### Report Module ###############################################
-# @method_decorator(user_role_check, name='dispatch')
+@method_decorator(user_role_check, name='dispatch')
 class ReportListView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/Report/report.html"
 
@@ -5286,7 +5286,7 @@ class ReportListView(LoginRequiredMixin, View):
             },
         )
 
-# @method_decorator(user_role_check, name='dispatch')
+@method_decorator(user_role_check, name='dispatch')
 class ReportCreateView(View):
     def post(self, request):
         title_en = request.POST.get("title_en")
@@ -5312,7 +5312,7 @@ class ReportCreateView(View):
         messages.success(request, "Report created successfully.")
         return redirect("report_list")
 
-# @method_decorator(user_role_check, name='dispatch')
+@method_decorator(user_role_check, name='dispatch')
 class ReportEditView(View):
     template_name = "Admin/MobileApp/Report/report.html"
 
@@ -5350,10 +5350,28 @@ class ReportEditView(View):
         messages.success(request, "Report updated successfully.")
         return redirect("report_list")
 
-# @method_decorator(user_role_check, name='dispatch')
+@method_decorator(user_role_check, name='dispatch')
 class ReportDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         report = get_object_or_404(Report, pk=pk)
         report.delete()
         messages.success(request, "Report deleted successfully.")
         return redirect("report_list")
+    
+    
+######################################################### Post  Report's List Module ###############################################
+
+# @method_decorator(user_role_check, name='dispatch')
+class PostReportListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/Post_Report.html"
+
+    def get(self, request):
+        reports = PostReport.objects.select_related('post_id', 'user_id', 'report_id').all()
+        return render(
+            request,
+            self.template_name,
+            {
+                "reports": reports,
+                "breadcrumb": {"child": "Report List"},
+            },
+        )
