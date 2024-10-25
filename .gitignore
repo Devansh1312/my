@@ -9,6 +9,25 @@ __pycache__/
 # .gitignore
 .env
 
+*.gitignore
+
+**/migrations/*.py
+!**/migrations/__init__.py
+*.jpg
+*.png
+*.pyc
+*.jpeg
+*.jfif
+__pycache__/
+**/migrations/0001_initial.py
+**/migrations/0002_initial.py
+**/migrations/0003_initial.py
+**/migrations/0004_initial.py
+*0001_initial.py
+*0002_initial.py
+*0003_initial.py
+*0004_initial.py
+*.mp4
 
 
 # Distribution / packaging
