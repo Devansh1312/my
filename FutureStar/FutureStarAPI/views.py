@@ -2798,57 +2798,31 @@ class TrainingGroupAPI(APIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
     
-    # 3. Edit Group Details
-    def put(self, request):
-        group_id = request.data.get('group_id')
-        if not group_id:
-            return Response({'status': 0, 'message': _('Group ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            group = TrainingGroups.objects.get(id=group_id, group_founder=request.user)
-            serializer = TrainingGroupSerializer(group, data=request.data, partial=True)
-
-            # Handle group_background_image update and delete old one if exists
-            if 'group_background_image' in request.FILES:
-                if group.group_background_image and default_storage.exists(group.group_background_image.name):
-                    default_storage.delete(group.group_background_image.name)
-                background_image = request.FILES['group_background_image']
-                file_extension = background_image.name.split('.')[-1]
-                file_name = f"group/group_background_image/{group_id}_{get_random_string(8)}.{file_extension}"
-                background_image_path = default_storage.save(file_name, background_image)
-                group.group_background_image = background_image_path
-            
-            if serializer.is_valid():
-                group = serializer.save(updated_at=now())
-                return Response({
-                    'status': 1,
-                    'message': _('Group details updated successfully.'),
-                    'data': TrainingGroupSerializer(group).data
-                }, status=status.HTTP_200_OK)
-            else:
-                return Response({
-                    'status': 0,
-                    'message': _('Failed to update group details.'),
-                    'errors': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
-        except TrainingGroups.DoesNotExist:
-            return Response({
-                'status': 0, 
-                'message': _('Group not found or you are not the founder.')
-                }, status=status.HTTP_404_NOT_FOUND)
     
-    # 4. Update Group Logo and Background Image
+    # 3. Update Group Logo and Background Image
     def patch(self, request):
         group_id = request.data.get('group_id')
         if not group_id:
             return Response({
                 'status': 0, 
                 'message': _('Group ID is required.')
-                }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             group = TrainingGroups.objects.get(id=group_id, group_founder=request.user)
             
+            # Update group fields based on request data, retaining old values if not provided
+            fields_to_update = [
+                'group_name', 'group_username', 'bio', 'latitude', 'longitude',
+                'address', 'house_no', 'premises', 'street', 'city',
+                'state', 'country_name', 'postalCode', 'country_code', 'phone'
+            ]
+
+            for field in fields_to_update:
+                new_value = request.data.get(field)
+                if new_value is not None:  # Only update if a new value is provided
+                    setattr(group, field, new_value)
+
             # Handle group_logo update and delete old one if exists
             if 'group_logo' in request.FILES:
                 if group.group_logo and default_storage.exists(group.group_logo.name):
@@ -2859,21 +2833,61 @@ class TrainingGroupAPI(APIView):
                 logo_path = default_storage.save(file_name, logo)
                 group.group_logo = logo_path
 
-            group.updated_at = now()
-            group.save()
+            # Handle group_background_image update
+            if 'group_background_image' in request.FILES:
+                if group.group_background_image and default_storage.exists(group.group_background_image.name):
+                    default_storage.delete(group.group_background_image.name)
+                background_image = request.FILES['group_background_image']
+                file_extension = background_image.name.split('.')[-1]
+                file_name = f"group/group_background_image/{group_id}_{get_random_string(8)}.{file_extension}"
+                background_image_path = default_storage.save(file_name, background_image)
+                group.group_background_image = background_image_path
 
-            serializer = TrainingGroupSerializer(group)
+            # No need to get user from request data; it's already part of the group
+            user = group.group_founder  
+
+            group.updated_at = timezone.now()  # Set updated_at to the current time
+            group.save()  # Save the group instance
+
             return Response({
                 'status': 1,
-                'message': _('Group logo and background image updated successfully.'),
-                'data': serializer.data
+                'message': _('Group updated successfully.'),
+                'data': {
+                    'group_id': group.id,
+                    'group_name': group.group_name,
+                    'group_username': group.group_username,
+                    'group_founder': {
+                        'username': user.username,
+                        'fullname': user.fullname,
+                        'phone': user.phone,
+                        'email': user.email,
+                        'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
+                    },
+                    'bio': group.bio,
+                    'latitude': group.latitude,
+                    'longitude': group.longitude,
+                    'address': group.address,
+                    'house_no': group.house_no,
+                    'premises': group.premises,
+                    'street': group.street,
+                    'city': group.city,
+                    'state': group.state,
+                    'country_name': group.country_name,
+                    'postalCode': group.postalCode,
+                    'country_code': group.country_code,
+                    'phone': group.phone,
+                    'group_logo': group.group_logo.url if group.group_logo else None,
+                    'group_background_image': group.group_background_image.url if group.group_background_image else None,
+                    'updated_at': group.updated_at,
+                }
             }, status=status.HTTP_200_OK)
-        
+
         except TrainingGroups.DoesNotExist:
             return Response({
                 'status': 0, 
                 'message': _('Group not found or you are not the founder.')
-                }, status=status.HTTP_404_NOT_FOUND)
+            }, status=status.HTTP_404_NOT_FOUND)
+
 
 ##################################################################### User Gender List API View ##############################################################################
 class UserGenderListAPIView(generics.ListAPIView):
@@ -3675,6 +3689,7 @@ class GeneralSettingsList(APIView):
                 'email': general_settings.email,
                 'address': general_settings.address,
                 'currency_symbol': general_settings.currency_symbol,
+                'event_convenience_fee': general_settings.event_convenience_fee,
                 'instagram': general_settings.instagram,
                 'facebook': general_settings.facebook,
                 'twitter': general_settings.twitter,

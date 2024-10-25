@@ -430,7 +430,7 @@ class EventBooking(models.Model):
     total_amount=models.FloatField(default=0.0)
     created_at=models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.event.event_name
     

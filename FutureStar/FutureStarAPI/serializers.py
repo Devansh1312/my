@@ -2,9 +2,7 @@ import mimetypes
 from rest_framework import serializers
 from FutureStar_App.models import User
 from FutureStarAPI.models import *
-from django.core.files.storage import default_storage
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from django.core.files.images import get_image_dimensions
 
 
 
@@ -137,17 +135,28 @@ class TrainingGroupSerializer(serializers.ModelSerializer):
     post_count = serializers.SerializerMethodField()
     group_logo_url = serializers.SerializerMethodField()
     group_background_image_url = serializers.SerializerMethodField()
+    group_founder = serializers.SerializerMethodField()
 
     class Meta:
         model = TrainingGroups
         fields = [
-            'id', 'user_id', 'group_name', 'group_username', 'bio', 'group_founder',
+            'id','group_name', 'group_username', 'bio', 'group_founder',
             'latitude', 'longitude', 'address', 'house_no', 'premises', 'street',
             'city', 'state', 'country_name', 'postalCode', 'country_code',
             'phone', 'group_logo', 'group_background_image', 'post_count', 
             'group_logo_url', 'group_background_image_url'
         ]
-
+    
+    def get_group_founder(self, obj):
+        user = obj.group_founder
+        return {
+            'username': user.username,
+            'fullname': user.fullname,
+            'phone': user.phone,
+            'email': user.email,
+            'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
+        }
+    
     def get_post_count(self, obj):
         """Get the count of posts related to this group."""
         return Post.objects.filter(group=obj).count()
@@ -159,6 +168,7 @@ class TrainingGroupSerializer(serializers.ModelSerializer):
     def get_group_background_image_url(self, obj):
         """Get the URL of the group background image."""
         return obj.group_background_image.url if obj.group_background_image else None
+    
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
