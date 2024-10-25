@@ -3314,6 +3314,7 @@ class GeneralSettingsList(APIView):
                 'phone': general_settings.phone,
                 'email': general_settings.email,
                 'address': general_settings.address,
+                'currency_symbol': general_settings.currency_symbol,
                 'instagram': general_settings.instagram,
                 'facebook': general_settings.facebook,
                 'twitter': general_settings.twitter,

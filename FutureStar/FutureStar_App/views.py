@@ -391,6 +391,7 @@ class System_Settings(LoginRequiredMixin, View):
             system_settings.phone = request.POST.get("phone")
             system_settings.email = request.POST.get("email")
             system_settings.address = request.POST.get("address")
+            system_settings.currency_symbol = request.POST.get("currency_symbol")
             system_settings.instagram = request.POST.get("instagram")
             system_settings.facebook = request.POST.get("facebook")
             system_settings.twitter = request.POST.get("twitter")
@@ -419,6 +420,7 @@ class System_Settings(LoginRequiredMixin, View):
                 "line_of_code": "This field is required.",
                 "downloads": "This field is required.",
                 "app_rate": "This field is required.",
+                "currency_symbol": "This field is required.",
             }
 
             for field, error_message in fields.items():
