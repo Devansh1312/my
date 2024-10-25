@@ -617,6 +617,7 @@ class EventSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
+    # event_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -626,10 +627,10 @@ class EventSerializer(serializers.ModelSerializer):
                   'event_description', 'event_cost', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at']
         read_only_fields = ['event_organizer']  # Make 'user' read-only since it will be auto-assigned
 
-    event_image = serializers.SerializerMethodField()
+   
 
-    def get_image(self, obj):
-        return obj.event_image.url if obj.event_image else None  
+    # def get_event_image(self, obj):
+    #     return obj.event_image.url if obj.event_image else None  
 
     def get_event_type_name(self, obj):
         return obj.event_type.name_en if obj.event_type else None
@@ -640,7 +641,7 @@ class EventSerializer(serializers.ModelSerializer):
         return Event.objects.create(**validated_data)
     
     def get_like_count(self, obj):
-        return EventLike.objects.filter(post=obj).count()
+        return EventLike.objects.filter(event=obj).count()
     
     def get_is_like(self, obj):
         request = self.context.get('request')  # Access the request object from the context

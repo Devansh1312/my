@@ -231,8 +231,8 @@ class TournamentStyle(models.Model):
 class EventType(models.Model):
     name_en = models.CharField(max_length=100)
     name_ar = models.CharField(max_length=100,null=True,blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.name_en
