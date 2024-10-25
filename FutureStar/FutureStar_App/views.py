@@ -5363,7 +5363,7 @@ class ReportDeleteView(LoginRequiredMixin, View):
     
 ######################################################### Post  Report's List Module ###############################################
 
-# @method_decorator(user_role_check, name='dispatch')
+@method_decorator(user_role_check, name='dispatch')
 class PostReportListView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/Post_Report.html"
 
@@ -5377,3 +5377,15 @@ class PostReportListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Report List"},
             },
         )
+        
+@method_decorator(user_role_check, name='dispatch')
+class PostReportDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        report = get_object_or_404(PostReport, pk=pk)
+        print(pk)
+        post = report.post_id
+        
+        post.delete()
+        
+        messages.success(request, "Post deleted successfully.")
+        return redirect('post-report-list')
