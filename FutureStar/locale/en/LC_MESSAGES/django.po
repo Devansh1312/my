@@ -12,166 +12,100 @@ msgstr ""
 "X-Generator: Poedit 3.5\n"
 
 msgid "User registered and logged in successfully"
-msgstr "User registered and logged in successfully"
+msgstr ""
 
 msgid "User registration failed due to duplicate data"
-msgstr "User registration failed due to duplicate data"
+msgstr ""
 
 msgid "User registration failed"
-msgstr "User registration failed"
+msgstr ""
 
 msgid "Email is required for registration"
-msgstr "Email is required for registration"
+msgstr ""
 
 msgid "User logged in successfully"
-msgstr "User logged in successfully"
+msgstr ""
 
 msgid "Account is inactive"
-msgstr "Account is inactive"
+msgstr ""
 
 msgid "User created and logged in successfully"
-msgstr "User created and logged in successfully"
+msgstr ""
 
 msgid "Invalid registration type"
-msgstr "Invalid registration type"
+msgstr ""
 
 msgid "Login successful"
-msgstr "Login successful"
+msgstr ""
 
 msgid "Invalid credentials"
-msgstr "Invalid credentials"
+msgstr ""
 
 msgid "User created and login successful"
-msgstr "User created and login successful"
+msgstr ""
 
 msgid "Invalid data"
-msgstr "Invalid data"
+msgstr ""
 
 msgid "Logout successful"
-msgstr "Logout successful"
+msgstr ""
 
 msgid "Logout failed"
-msgstr "Logout failed"
+msgstr ""
 
 msgid "OTP sent to your phone."
-msgstr "OTP sent to your phone."
+msgstr ""
 
 msgid "User with this phone number does not exist."
-msgstr "User with this phone number does not exist."
+msgstr ""
 
 msgid "Invalid data."
-msgstr "Invalid data."
+msgstr ""
 
 msgid "OTP verified successfully."
-msgstr "OTP verified successfully."
+msgstr ""
 
 msgid "Invalid OTP."
-msgstr "Invalid OTP."
+msgstr ""
 
 msgid "Password changed successfully."
-msgstr "Password changed successfully."
+msgstr ""
 
 msgid "User not found."
-msgstr "User not found."
+msgstr ""
 
 msgid "Old password is incorrect."
-msgstr "Old password is incorrect."
+msgstr ""
 
 msgid "New password must be at least 8 characters long."
-msgstr "New password must be at least 8 characters long."
+msgstr ""
 
 msgid "Player Details."
-msgstr "Player Details."
+msgstr ""
 
 msgid "Profile updated successfully."
-msgstr "Profile updated successfully."
+msgstr ""
 
 msgid "Posts fetched successfully."
-msgstr "Posts fetched successfully."
+msgstr ""
 
 msgid "Post created successfully"
-msgstr "Post created successfully"
+msgstr ""
 
 msgid "post_id is required."
-msgstr "post_id is required."
+msgstr ""
 
 msgid "Post not found."
-msgstr "Post not found."
+msgstr ""
 
 msgid "Post details fetched successfully."
-msgstr "Post details fetched successfully."
+msgstr ""
 
 msgid "post_id and comment are required."
-msgstr "post_id and comment are required."
+msgstr ""
 
 msgid "Comment created successfully."
-msgstr "Comment created successfully."
+msgstr ""
 
 msgid "Post deleted successfully."
-msgstr "Post deleted successfully."
-
-msgid "Read More"
-msgstr "Read More"
-
-msgid "Years Of Experience"
-msgstr "Years Of Experience"
-
-msgid "Projects Completed"
-msgstr "Projects Completed"
-
-msgid "Professionals Team Member"
-msgstr "Professionals Team Member"
-
-msgid "Awards Winning"
-msgstr "Awards Winning"
-
-msgid "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
-msgstr "Ut enim ad minima veniam nostrum exercitationem ullam corporise"
-
-msgid "Explore"
-msgstr "Explore"
-
-msgid "Discover"
-msgstr "Discover"
-
-msgid "Success Stories"
-msgstr "Success Stories"
-
-msgid "News"
-msgstr "News"
-
-msgid "Advertise"
-msgstr "Advertise"
-
-msgid "Contacts"
-msgstr "Contacts"
-
-msgid "Supports"
-msgstr "Supports"
-
-msgid "Terms of Services"
-msgstr "Terms of Services"
-
-msgid "Privacy Policy"
-msgstr "Privacy Policy"
-
-msgid "Video Tutorials"
-msgstr "Video Tutorials"
-
-msgid "Contact"
-msgstr "Contact"
-
-msgid "Copyright @2024, Future Stars All Rights Reserved"
-msgstr "Copyright @2024, Future Stars All Rights Reserved"
-
-msgid "Designed & Developed By Redspark Technologies"
-msgstr "Designed & Developed By Redspark Technologies"
-
-msgid "Contact Details"
-msgstr "Contact Details"
-
-msgid "Login"
-msgstr "Login"
-
-msgid "Register"
-msgstr "Register"
+msgstr ""

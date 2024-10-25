@@ -421,7 +421,21 @@ class Event(models.Model):
     class Meta:
         db_table = 'futurestar_app_event'
 
-
+class EventBooking(models.Model):
+    id = models.AutoField(primary_key=True)
+    event=models.ForeignKey(Event, on_delete=models.CASCADE)
+    tickets=models.IntegerField()
+    convenience_fee=models.FloatField(default=0.0)
+    ticket_amount=models.FloatField(default=0.0)
+    total_amount=models.FloatField(default=0.0)
+    created_at=models.DateTimeField(default=datetime.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.event.event_name
+    
+    class Meta:
+        db_table = 'futurestar_app_eventbooking'
 
 class Event_comment(models.Model):
     user = models.ForeignKey(User, related_name='event_comments', on_delete=models.CASCADE,default=True)

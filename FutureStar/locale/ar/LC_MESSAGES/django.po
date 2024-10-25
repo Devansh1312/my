@@ -11,230 +11,101 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-msgid "Username already exists."
-msgstr "اسم المستخدم موجود بالفعل."
+msgid "User registered and logged in successfully"
+msgstr "تم تسجيل المستخدم وتسجيل الدخول بنجاح"
 
-msgid "Phone number already exists."
-msgstr "رقم الهاتف موجود بالفعل."
+msgid "User registration failed due to duplicate data"
+msgstr "فشل تسجيل المستخدم بسبب بيانات مكررة"
 
-msgid "OTP sent successfully."
-msgstr "تم إرسال رمز التحقق بنجاح."
+msgid "User registration failed"
+msgstr "فشل تسجيل المستخدم"
 
-msgid "Email already exists."
-msgstr "البريد الإلكتروني موجود بالفعل."
+msgid "Email is required for registration"
+msgstr "البريد الإلكتروني مطلوب للتسجيل"
 
-msgid "User can proceed with registration."
-msgstr "يمكن للمستخدم المتابعة في التسجيل."
+msgid "User logged in successfully"
+msgstr "تم تسجيل دخول المستخدم بنجاح"
 
-msgid "Invalid registration type."
-msgstr "نوع التسجيل غير صالح."
+msgid "Account is inactive"
+msgstr "الحساب غير نشط"
 
-msgid "Phone is a required field."
-msgstr "رقم الهاتف هو حقل مطلوب."
+msgid "User created and logged in successfully"
+msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
 
-msgid "OTP is a required field."
-msgstr "رمز التحقق هو حقل مطلوب."
+msgid "Invalid registration type"
+msgstr "نوع التسجيل غير صالح"
 
-msgid "Username is a required field."
-msgstr "اسم المستخدم هو حقل مطلوب."
+msgid "Login successful"
+msgstr "تسجيل الدخول ناجح"
 
-msgid "Invalid OTP or phone number."
-msgstr "رمز التحقق أو رقم الهاتف غير صحيح."
+msgid "Invalid credentials"
+msgstr "بيانات الاعتماد غير صالحة"
 
-msgid "User registered successfully."
-msgstr "تم تسجيل المستخدم بنجاح."
+msgid "User created and login successful"
+msgstr "تم إنشاء المستخدم وتسجيل الدخول بنجاح"
 
-msgid "An error occurred while registering the user."
-msgstr "حدث خطأ أثناء تسجيل المستخدم."
+msgid "Invalid data"
+msgstr "بيانات غير صالحة"
 
-msgid "Login successful."
-msgstr "تم تسجيل الدخول بنجاح."
+msgid "Logout successful"
+msgstr "تم تسجيل الخروج بنجاح"
 
-msgid "Account is inactive."
-msgstr "الحساب غير نشط."
-
-msgid "Invalid credentials."
-msgstr "بيانات الاعتماد غير صالحة."
-
-msgid "Email Does Not Exits Please Register First."
-msgstr "البريد الإلكتروني غير موجود. الرجاء التسجيل أولاً."
-
-msgid "Logout successful."
-msgstr "تم تسجيل الخروج بنجاح."
-
-msgid "Logout failed."
-msgstr "فشل تسجيل الخروج."
+msgid "Logout failed"
+msgstr "فشل تسجيل الخروج"
 
 msgid "OTP sent to your phone."
-msgstr "تم إرسال رمز التحقق إلى هاتفك."
+msgstr "تم إرسال OTP إلى هاتفك."
 
 msgid "User with this phone number does not exist."
-msgstr "المستخدم برقم الهاتف هذا غير موجود."
+msgstr "المستخدم بهذا الرقم الهاتفي غير موجود."
 
 msgid "Invalid data."
 msgstr "بيانات غير صالحة."
 
 msgid "OTP verified successfully."
-msgstr "تم التحقق من رمز التحقق بنجاح."
+msgstr "تم التحقق من OTP بنجاح."
 
 msgid "Invalid OTP."
-msgstr "رمز التحقق غير صالح."
+msgstr "OTP غير صالح."
 
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
 
 msgid "User not found."
-msgstr "المستخدم غير موجود."
+msgstr "لم يتم العثور على المستخدم."
 
 msgid "Old password is incorrect."
 msgstr "كلمة المرور القديمة غير صحيحة."
 
 msgid "New password must be at least 8 characters long."
-msgstr "يجب أن تحتوي كلمة المرور الجديدة على 8 أحرف على الأقل."
+msgstr "يجب أن تكون كلمة المرور الجديدة مكونة من 8 أحرف على الأقل."
 
 msgid "Player Details."
 msgstr "تفاصيل اللاعب."
 
-msgid "Invalid gender specified."
-msgstr "تم تحديد نوع جنس غير صالح."
-
-msgid "Invalid country specified."
-msgstr "تم تحديد بلد غير صالح."
-
-msgid "City cannot be set without a valid country."
-msgstr "لا يمكن تعيين المدينة بدون بلد صالح."
-
-msgid "Invalid city specified."
-msgstr "تم تحديد مدينة غير صالحة."
-
 msgid "Profile updated successfully."
 msgstr "تم تحديث الملف الشخصي بنجاح."
 
-msgid "All posts fetched successfully."
-msgstr "تم جلب جميع المنشورات بنجاح."
-
 msgid "Posts fetched successfully."
-msgstr "تم جلب المنشورات بنجاح."
+msgstr "تم جلب المشاركات بنجاح."
 
-msgid "Team not found."
-msgstr "لم يتم العثور على الفريق."
+msgid "Post created successfully"
+msgstr "تم إنشاء المشاركة بنجاح"
 
-msgid "Group not found."
-msgstr "المجموعة غير موجودة."
-
-msgid "Post created successfully."
-msgstr "تم إنشاء المنشور بنجاح."
-
-msgid "Post ID is required."
-msgstr "معرف المنشور مطلوب."
-
-msgid "Post fetched successfully."
-msgstr "تم جلب المنشور بنجاح."
-
-msgid "Post updated successfully."
-msgstr "تم تحديث المنشور بنجاح."
-
-msgid "Failed to update the post."
-msgstr "فشل في تحديث المنشور."
+msgid "post_id is required."
+msgstr "المعرف_المشاركة مطلوب."
 
 msgid "Post not found."
-msgstr "المنشور غير موجود."
+msgstr "لم يتم العثور على المشاركة."
+
+msgid "Post details fetched successfully."
+msgstr "تم جلب تفاصيل المشاركة بنجاح."
+
+msgid "post_id and comment are required."
+msgstr "المعرف_المشاركة والتعليق مطلوبان."
+
+msgid "Comment created successfully."
+msgstr "تم إنشاء التعليق بنجاح."
 
 msgid "Post deleted successfully."
-msgstr "تم حذف المنشور بنجاح."
-
-msgid "You are already registered as a coach and cannot create a new coach profile."
-msgstr "أنت مسجل بالفعل كمدرب ولا يمكنك إنشاء ملف مدرب جديد."
-
-msgid "You are already registered as a referee and cannot create a new referee profile."
-msgstr "أنت مسجل بالفعل كحكم ولا يمكنك إنشاء ملف حكم جديد."
-
-msgid "User Profiles retrieved successfully."
-msgstr "تم استرجاع الملفات الشخصية بنجاح."
-
-msgid "Profile type and certificates uploaded successfully."
-msgstr "تم تحميل نوع الملف الشخصي والشهادات بنجاح."
-
-msgid "Albums fetched successfully."
-msgstr "تم جلب الألبومات بنجاح."
-
-msgid "Album created successfully."
-msgstr "تم إنشاء الألبوم بنجاح."
-
-msgid "Album entries fetched successfully."
-msgstr "تم جلب إدخالات الألبوم بنجاح."
-
-msgid "Gallery entries fetched successfully."
-msgstr "تم جلب إدخالات المعرض بنجاح."
-
-msgid "Album not found."
-msgstr "الألبوم غير موجود."
-
-msgid "This album is associated with a team. Please provide a team ID."
-msgstr "هذا الألبوم مرتبط بفريق. الرجاء تقديم معرف الفريق."
-
-msgid "This album is not associated with a team. Please remove the team ID."
-msgstr "هذا الألبوم غير مرتبط بفريق. الرجاء إزالة معرف الفريق."
-
-msgid "You do not have permission to add to this album."
-msgstr "ليس لديك إذن لإضافة إلى هذا الألبوم."
-
-msgid "Gallery entry created successfully."
-msgstr "تم إنشاء إدخال المعرض بنجاح."
-
-msgid "Failed to create Gallery entry."
-msgstr "فشل في إنشاء إدخال المعرض."
-
-msgid "Gallery entry deleted successfully."
-msgstr "تم حذف إدخال المعرض بنجاح."
-
-msgid "Gallery entry not found."
-msgstr "إدخال المعرض غير موجود."
-
-msgid "This field is required."
-msgstr "هذا الحقل مطلوب."
-
-msgid "Album deleted successfully."
-msgstr "تم حذف الألبوم بنجاح."
-
-msgid "Fields retrieved successfully."
-msgstr "تم استرجاع الحقول بنجاح."
-
-msgid "Field created successfully."
-msgstr "تم إنشاء الحقل بنجاح."
-
-msgid "Field creation failed."
-msgstr "فشل إنشاء الحقل."
-
-msgid "Tournament created successfully."
-msgstr "تم إنشاء البطولة بنجاح."
-
-msgid "Tournament creation failed."
-msgstr "فشل إنشاء البطولة."
-
-msgid "Types retrieved successfully."
-msgstr "تم استرجاع الأنواع بنجاح."
-
-msgid "Invalid team type provided."
-msgstr "تم تقديم نوع فريق غير صالح."
-
-msgid "Team created successfully."
-msgstr "تم إنشاء الفريق بنجاح."
-
-msgid "Team updated successfully."
-msgstr "تم تحديث الفريق بنجاح."
-
-msgid "Gender retrieved successfully."
-msgstr "تم استرجاع الجنس بنجاح."
-
-msgid "User role retrieved successfully."
-msgstr "تم استرجاع دور المستخدم بنجاح."
-
-msgid "Countries fetched successfully."
-msgstr "تم جلب البلدان بنجاح."
-
-msgid "Country not found or inactive."
-msgstr "البلد غير موجود أو غير نشط."
-
-msgid "Cities fetched successfully."
-msgstr "تم جلب المدن بنجاح."
+msgstr "تم حذف المشاركة بنجاح."
