@@ -3,7 +3,7 @@ from FutureStar_App.models import *
 from django.utils import timezone
 import datetime
 from django.core.exceptions import ValidationError
-
+from datetime import datetime 
 
 # Create your models here.
 
@@ -439,7 +439,23 @@ class EventLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='event_likes', on_delete=models.CASCADE, default=True)
     date_liked = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=datetime.now)  
 
     class Meta:
         db_table = 'futurestar_app_event_like'
         unique_together = ('user', 'event')  # Each user can only like the post once
+
+
+
+class FAQ(models.Model):
+    question_en = models.TextField(blank=True,null=True)
+    question_ar = models.TextField(blank=True,null=True)
+    answer_en = models.TextField(blank=True,null=True)
+    answer_ar = models.TextField(blank=True,null=True)
+    date_created = models.DateTimeField(default=datetime.now)  
+
+    def __str__(self):
+        return self.question_en
+
+    class Meta:
+        db_table = 'futurestar_app_faq'

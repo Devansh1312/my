@@ -163,7 +163,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
 
     def get_replies(self, obj):
         # Get replies for this comment
-        replies = Post_comment.objects.filter(parent=obj)
+        replies = Post_comment.objects.filter(parent=obj).order_by('-date_created')
         return PostCommentSerializer(replies, many=True).data  # Serialize replies
 
     def get_entity(self, obj):
@@ -668,7 +668,7 @@ class EventCommentSerializer(serializers.ModelSerializer):
 
     def get_replies(self, obj):
         # Get replies for this comment
-        replies = Event_comment.objects.filter(parent=obj)
+        replies = Event_comment.objects.filter(parent=obj).order_by('-date_created')
         return EventCommentSerializer(replies, many=True).data  # Serialize replies
 
     def get_entity(self, obj):
@@ -681,4 +681,36 @@ class EventCommentSerializer(serializers.ModelSerializer):
                 'type': 'user'  # Optional: entity type for frontend differentiation
             }
         return None
+
+
+
+
     
+class FAQSerializer(serializers.ModelSerializer):
+    question = serializers.SerializerMethodField()
+    answer = serializers.SerializerMethodField()
+
+
+    class Meta:
+        model = FAQ
+        fields = ['id','question','answer']  # Only return id and the translated name
+
+    def get_question(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate name based on the language
+        if language == 'ar':
+            return obj.question_ar
+        return obj.question_en
+    
+    def get_answer(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate name based on the language
+        if language == 'ar':
+            return obj.answer_ar
+        return obj.answer_en
