@@ -222,7 +222,7 @@ urlpatterns = [
     path('reports/delete/<int:pk>/', ReportDeleteView.as_view(), name='report_delete'),
 
     #Post Report URL's
-    path('post_reports/', PostReportListView.as_view(), name='post-report-list'),
+    path('post_reports/', PostReportListView.as_view(), name='post_report_list'),
     path('post_reports/delete/<int:pk>/', PostReportDeleteView.as_view(), name='report_delete')
     
 
