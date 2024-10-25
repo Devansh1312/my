@@ -168,6 +168,7 @@ class SystemSettings(models.Model):
     email = models.EmailField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     currency_symbol = models.CharField(max_length=10,null=True, blank=True)
+    event_convenience_fee = models.IntegerField(null=True, blank=True)
     instagram = models.TextField(null=True, blank=True)
     facebook = models.TextField(null=True, blank=True)
     twitter = models.TextField(null=True, blank=True)
