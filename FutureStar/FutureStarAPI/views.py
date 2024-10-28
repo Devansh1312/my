@@ -1534,7 +1534,7 @@ class DetailAlbumListAPIView(generics.ListAPIView):
     pagination_class = CustomPostPagination  # Use custom pagination
 
     def get_queryset(self):
-        album_id = self.request.data.get('album_id')  # Fetch album_id from the request body
+        album_id = self.request.query_params.get('album_id')  # Fetch album_id from the request body
 
         if album_id:
             try:
@@ -1652,9 +1652,9 @@ class AlbumListAPIView(generics.ListAPIView):
     pagination_class = CustomPostPagination 
 
     def get_queryset(self):
-        team_id = self.request.data.get('team_id')
-        user_id = self.request.data.get('user_id')
-        group_id = self.request.data.get('group_id')
+        team_id = self.request.query_params.get('team_id')
+        user_id = self.request.query_params.get('user_id')
+        group_id = self.request.query_params.get('group_id')
 
         if team_id:
             return Album.objects.filter(team_id=team_id).order_by('-created_at')
@@ -1701,92 +1701,117 @@ class AlbumListAPIView(generics.ListAPIView):
  
 
 ###########detail gallary with id with diffrentiatee ################
-
-class GallaryListAPIView(generics.ListAPIView):
+class ImageGallaryListAPIView(generics.ListAPIView):
     serializer_class = GetGallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     pagination_class = CustomPostPagination
 
     def get_queryset(self):
-            team_id = self.request.data.get('team_id')
-            user_id = self.request.data.get('user_id')
-            group_id = self.request.data.get('group_id')
-            content_type = self.request.data.get('content_type')
-
-            if team_id:
-                return Gallary.objects.filter(team_id=team_id, album_id__isnull=True).order_by('-created_at')
-            elif group_id:
-                return Gallary.objects.filter(group_id=group_id, album_id__isnull=True).order_by('-created_at')
-            elif content_type:
-                return Gallary.objects.filter(content_type=content_type, album_id__isnull=True).order_by('-created_at')
-            elif user_id:
-                return Gallary.objects.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
-            else:
-                return Gallary.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
-
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        queryset = self.get_queryset()
-        print(queryset)
-
-        # Pagination handling
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            total_records = queryset.count()
-            total_pages = self.paginator.page.paginator.num_pages
-
-            # return Response({
-            #     'status': 1,
-            #     'message': _('Gallery Items fetched successfully.'),
-            #     'data': serializer.data,
-            #     'total_records': total_records,
-            #     'total_pages': total_pages,
-            #     'current_page': self.paginator.page.number
-            # }, status=status.HTTP_200_OK)
-
-        # Handle non-paginated response
-        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff','.webp')
-        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
-
-        # Create Q objects for filtering images and videos
+        team_id = self.request.query_params.get('team_id')
+        user_id = self.request.query_params.get('user_id')
+        group_id = self.request.query_params.get('group_id')
+        content_type = self.request.query_params.get('content_type')
+        
+        # Filter the base queryset according to parameters
+        queryset = Gallary.objects.filter(album_id__isnull=True)
+        
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+        elif group_id:
+            queryset = queryset.filter(group_id=group_id)
+        elif content_type:
+            queryset = queryset.filter(content_type=content_type)
+        elif user_id:
+            queryset = queryset.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True)
+        else:
+            queryset = queryset.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True)
+        
+        # Filter to include only images
+        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')
         image_query = Q()
         for ext in image_extensions:
             image_query |= Q(media_file__iendswith=ext)
+        
+        return queryset.filter(image_query).order_by('-created_at')
 
-        video_query = Q()
-        for ext in video_extensions:
-            video_query |= Q(media_file__iendswith=ext)
-
-        # Filter images and videos based on the Q objects
-        images = queryset.filter(image_query)
-        videos = queryset.filter(video_query)
-
-        # Serialize images and videos separately
-        image_serializer = self.get_serializer(images, many=True)
-        video_serializer = self.get_serializer(videos, many=True)
-
-        print('images', image_serializer.data)
-        print('videos', video_serializer.data)
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_pages = self.paginator.page.paginator.num_pages
+            current_page = self.paginator.page.number
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            total_pages = 1
+            current_page = 1
 
         return Response({
             'status': 1,
-            'message': _('Gallery entries fetched successfully.'),
-            'data': {
-                'images': image_serializer.data,
-                'videos': video_serializer.data
-            },
-            'total_records': queryset.count(),  # This should count all records
-            'total_pages': self.paginator.page.paginator.num_pages if page is not None else 1,
-            'current_page': self.paginator.page.number if page is not None else 1
+            'message': _('Image gallery entries fetched successfully.'),
+            'data': serializer.data,
+            'total_records': queryset.count(),
+            'total_pages': total_pages,
+            'current_page': current_page
         }, status=status.HTTP_200_OK)
 
+class VideoGallaryListAPIView(generics.ListAPIView):
+    serializer_class = GetGallarySerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomPostPagination
 
+    def get_queryset(self):
+        team_id = self.request.query_params.get('team_id')
+        user_id = self.request.query_params.get('user_id')
+        group_id = self.request.query_params.get('group_id')
+        content_type = self.request.query_params.get('content_type')
+        
+        # Filter the base queryset according to parameters
+        queryset = Gallary.objects.filter(album_id__isnull=True)
+        
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+        elif group_id:
+            queryset = queryset.filter(group_id=group_id)
+        elif content_type:
+            queryset = queryset.filter(content_type=content_type)
+        elif user_id:
+            queryset = queryset.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True)
+        else:
+            queryset = queryset.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True)
+        
+        # Filter to include only videos
+        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
+        video_query = Q()
+        for ext in video_extensions:
+            video_query |= Q(media_file__iendswith=ext)
+        
+        return queryset.filter(video_query).order_by('-created_at')
 
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            total_pages = self.paginator.page.paginator.num_pages
+            current_page = self.paginator.page.number
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            total_pages = 1
+            current_page = 1
+
+        return Response({
+            'status': 1,
+            'message': _('Video gallery entries fetched successfully.'),
+            'data': serializer.data,
+            'total_records': queryset.count(),
+            'total_pages': total_pages,
+            'current_page': current_page
+        }, status=status.HTTP_200_OK)
 
 class GallaryCreateAPIView(generics.CreateAPIView):
     serializer_class = GetGallarySerializer
@@ -1909,27 +1934,37 @@ class GallaryCreateAPIView(generics.CreateAPIView):
 ###########gallary list latest 9 ################
 
 class LatestGallaryListAPIView(generics.ListCreateAPIView):
-
     serializer_class = GetGallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    pagination_class = CustomPostPagination 
 
     def get_queryset(self):
-            team_id = self.request.data.get('team_id')
-            user_id = self.request.data.get('user_id')
-            group_id = self.request.data.get('group_id')
-            
+        team_id = self.request.data.get('team_id')
+        user_id = self.request.data.get('user_id')
+        group_id = self.request.data.get('group_id')
 
-            if team_id:
-                return Gallary.objects.filter(team_id=team_id, album_id__isnull=True).order_by('-created_at')
-            elif group_id:
-                return Gallary.objects.filter(group_id=group_id, album_id__isnull=True).order_by('-created_at')
-           
-            elif user_id:
-                return Gallary.objects.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
-            else:
-                return Gallary.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+        if team_id:
+            return Gallary.objects.filter(team_id=team_id, album_id__isnull=True).order_by('-created_at')
+        elif group_id:
+            return Gallary.objects.filter(group_id=group_id, album_id__isnull=True).order_by('-created_at')
+        elif user_id:
+            return Gallary.objects.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+        else:
+            return Gallary.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+
+    def get_latest_albums(self):
+        team_id = self.request.data.get('team_id')
+        user_id = self.request.data.get('user_id')
+        group_id = self.request.data.get('group_id')
+
+        if team_id:
+            return Album.objects.filter(team_id=team_id).order_by('-created_at')
+        elif group_id:
+            return Album.objects.filter(group_id=group_id).order_by('-created_at')
+        elif user_id:
+            return Album.objects.filter(user=user_id, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
+        else:
+            return Album.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -1937,46 +1972,40 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
             activate(language)
 
         queryset = self.get_queryset()
-        
-        # Apply pagination
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
-            video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
+        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
+        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
 
-            # Create Q objects for filtering images and videos
-            image_query = Q()
-            for ext in image_extensions:
-                image_query |= Q(media_file__iendswith=ext)
+        image_query = Q()
+        for ext in image_extensions:
+            image_query |= Q(media_file__iendswith=ext)
 
-            video_query = Q()
-            for ext in video_extensions:
-                video_query |= Q(media_file__iendswith=ext)
+        video_query = Q()
+        for ext in video_extensions:
+            video_query |= Q(media_file__iendswith=ext)
 
-            # Filter images and videos based on the Q objects
-            images = queryset.filter(image_query)
-            videos = queryset.filter(video_query)
+        # Filter and limit to the latest 9 images and videos separately
+        images = queryset.filter(image_query)[:9]
+        videos = queryset.filter(video_query)[:9]
 
-            # Serialize images and videos separately
-            image_serializer = self.get_serializer(images, many=True)
-            video_serializer = self.get_serializer(videos, many=True)
+        image_serializer = self.get_serializer(images, many=True)
+        video_serializer = self.get_serializer(videos, many=True)
 
-            return Response({
-                'status': 1,
-                'message': _('Gallery entries fetched successfully.'),
-                'data': {
-                    'images': image_serializer.data,
-                    'videos': video_serializer.data
-                },
-                'total_records': queryset.count(),  # This should count all records
-                'total_pages': self.paginator.page.paginator.num_pages if page is not None else 1,
-                'current_page': self.paginator.page.number if page is not None else 1
-            }, status=status.HTTP_200_OK)
+        # Fetch and serialize the latest 9 albums
+        latest_albums = self.get_latest_albums()[:9]
+        album_serializer = AlbumSerializer(latest_albums, many=True)
 
         return Response({
-            'status': 0,
-            'message': _('No gallery entries found.')
-        }, status=status.HTTP_404_NOT_FOUND)
+            'status': 1,
+            'message': _('Gallery entries and latest albums fetched successfully.'),
+            'data': {
+                'images': image_serializer.data,
+                'videos': video_serializer.data,
+                'latest_albums': album_serializer.data,
+            },
+        }, status=status.HTTP_200_OK)
+
+
+
 
 ###########  gallary list delete ################
 
@@ -1989,7 +2018,7 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
 
     def get_object(self):
         # Fetch the 'id' from the request body
-        id = self.request.data.get('gallary_id')
+        id = self.request.query_params.get('gallary_id')
         if not id:
                 return Response({
                 'status': 0,
@@ -2040,7 +2069,7 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
 
     def get_object(self):
         # Fetch the 'id' from the request body
-        id = self.request.data.get('album_id')
+        id = self.request.query_params.get('album_id')
         if not id:
                 return Response({
                 'status': 0,
