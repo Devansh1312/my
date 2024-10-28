@@ -1,6 +1,7 @@
 import mimetypes
 from rest_framework import serializers
 from FutureStar_App.models import User
+from urllib.parse import urlparse
 from FutureStarAPI.models import *
 from django.core.files.images import get_image_dimensions
 
@@ -467,8 +468,8 @@ class GallarySerializer(serializers.ModelSerializer):
 
         if 'media_file' in representation:
             full_url = representation['media_file']
-            # Get the relative path from the full URL
-            relative_url = full_url.replace(f"{request.scheme}://{request.get_host()}", "")
+            parsed_url = urlparse(full_url)
+            relative_url = parsed_url.path  # This will give you the relative path
             representation['media_file'] = relative_url
         if request and request.method == 'GET':
             representation.pop('album_id', None)
@@ -504,12 +505,11 @@ class GetGallarySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         request = self.context.get('request')
-
         if 'media_file' in representation:
-            full_url = representation['media_file']
-            # Get the relative path from the full URL
-            relative_url = full_url.replace(f"{request.scheme}://{request.get_host()}", "")
-            representation['media_file'] = relative_url
+                full_url = representation['media_file']
+                parsed_url = urlparse(full_url)
+                relative_url = parsed_url.path  # Extracts the path component, which is the relative URL
+                representation['media_file'] = relative_url
 
         if request and request.method == 'GET':
             representation.pop('album_id', None)
@@ -676,7 +676,8 @@ class EventSerializer(serializers.ModelSerializer):
             full_url = representation['event_image']
             request = self.context.get('request')
             if request:
-                relative_url = full_url.replace(f"{request.scheme}://{request.get_host()}", "")
+                parsed_url = urlparse(full_url)
+                relative_url = parsed_url.path  # Extracts only the path part, giving the relative URL
                 representation['event_image'] = relative_url
         else:
             representation['event_image'] = None  # Set to None if no image is available
@@ -705,7 +706,13 @@ class EventSerializer(serializers.ModelSerializer):
         return Event_comment.objects.filter(event=obj, parent=None).count()
 
 
+class EventBookingSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = EventBooking
+        fields = ['id', 'event', 'tickets', 'convenience_fee', 'ticket_amount', 'total_amount']
 
+  
 
 class EventCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()

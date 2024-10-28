@@ -361,99 +361,6 @@ document.querySelectorAll('.view-news-btn').forEach(function(button) {
     });
 });
 
-// Form validation for Add and Edit News modals
-function validateForm(form) {
-        var title_en = form.querySelector('input[name="title_en"]');
-        var description_en = form.querySelector('input[name="description_en"]');
-        var title_ar = form.querySelector('input[name="title_ar"]');
-        var description_ar = form.querySelector('input[name="description_ar"]');
-        var image = form.querySelector('input[name="image"]');
-        var isValid = true;
-
-        // Title validation English
-        if (title_en.value.trim() === '') {
-            title_en.classList.add('is-invalid');
-            var title_enErrorId = form.id === 'addNewsForm' ? 'title_en-error' : 'edit-title_en-error';
-            document.getElementById(title_enErrorId).textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            title_en.classList.remove('is-invalid');
-            var title_enErrorId = form.id === 'addNewsForm' ? 'title_en-error' : 'edit-title_en-error';
-            document.getElementById(title_enErrorId).textContent = '';
-        }
-
-        // Title validation Arabic
-        if (title_ar.value.trim() === '') {
-            title_ar.classList.add('is-invalid');
-            var title_arErrorId = form.id === 'addNewsForm' ? 'title_ar-error' : 'edit-title_ar-error';
-            document.getElementById(title_arErrorId).textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            title_ar.classList.remove('is-invalid');
-            var title_arErrorId = form.id === 'addNewsForm' ? 'title_ar-error' : 'edit-title_ar-error';
-            document.getElementById(title_arErrorId).textContent = '';
-        }
-
-        // Description validation English
-        if (description_en.value.trim() === '') {
-            description_en.classList.add('is-invalid');
-            var description_enErrorId = form.id === 'addNewsForm' ? 'description_en-error' : 'edit-description_en-error';
-            document.getElementById(description_enErrorId).textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            description_en.classList.remove('is-invalid');
-            var description_enErrorId = form.id === 'addNewsForm' ? 'description_en-error' : 'edit-description_en-error';
-            document.getElementById(description_enErrorId).textContent = '';
-        }
-
-        // Description validation Arabic
-        if (description_ar.value.trim() === '') {
-            description_ar.classList.add('is-invalid');
-            var description_arErrorId = form.id === 'addNewsForm' ? 'description_ar-error' : 'edit-description_ar-error';
-            document.getElementById(description_arErrorId).textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            description_ar.classList.remove('is-invalid');
-            var description_arErrorId = form.id === 'addNewsForm' ? 'description_ar-error' : 'edit-description_ar-error';
-            document.getElementById(description_arErrorId).textContent = '';
-        }
-
-        // Image validation (only for Add News)
-        if (form.id === 'addNewsForm' && image.files.length === 0) {
-            image.classList.add('is-invalid');
-            document.getElementById('image-error').textContent = 'An image is required.';
-            isValid = false;
-        } else {
-            image.classList.remove('is-invalid');
-            document.getElementById('image-error').textContent = '';
-        }
-
-        return isValid;
-    }
-
-    var addNewsForm = document.getElementById('addNewsForm');
-    if (addNewsForm) {
-        addNewsForm.addEventListener('submit', function(event) {
-            console.log('Add News Form Submitted');
-            var form = event.target;
-            if (!validateForm(form)) {
-                console.log('Validation failed');
-                event.preventDefault(); // Prevent form submission
-            }
-        });
-    }
-
-    var editNewsForm = document.getElementById('editNewsForm');
-    if (editNewsForm) {
-        editNewsForm.addEventListener('submit', function(event) {
-            console.log('Edit News Form Submitted');
-            var form = event.target;
-            if (!validateForm(form)) {
-                console.log('Validation failed');
-                event.preventDefault(); // Prevent form submission
-            }
-        });
-    }
 // Toggle the visibility of the action card
 document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
     menu.addEventListener('click', function(event) {
@@ -478,6 +385,62 @@ document.addEventListener('click', function(event) {
         });
     }
 });
+
+
+
+// Form Validation of add and edit
+$(document).ready(function () {
+    function validateForm(form) {
+        let isValid = true;
+        
+        $(form).find('textarea, input[type="file"]').each(function () {
+            const $this = $(this);
+            const errorMessageId = $this.attr('id') + '-error';
+            const $errorMessage = $('#' + errorMessageId);
+
+            if ($this.attr('name') !== 'image' || form.id === 'addNewsForm') {
+                if ($this.val().trim() === '') {
+                    $this.addClass('is-invalid');
+                    $errorMessage.text('This field is required.').css('color', 'red');
+                    isValid = false;
+                } else {
+                    $this.removeClass('is-invalid');
+                    $errorMessage.text('');
+                }
+            }
+        });
+        
+        return isValid;
+    }
+
+    // Add form validation
+    $('#addNewsForm').on('submit', function (event) {
+        event.preventDefault();
+        if (!validateForm(this)) {
+            console.log('Add News form validation failed');
+            return;
+        }
+        this.submit();
+    });
+
+    // Edit form validation
+    $('#editNewsForm').on('submit', function (event) {
+        event.preventDefault();
+        if (!validateForm(this)) {
+            console.log('Edit News form validation failed');
+            return;
+        }
+        this.submit();
+    });
+
+    // Reset invalid class and error message on input change
+    $('#addNewsForm, #editNewsForm').find('textarea, input[type="file"]').on('input change', function () {
+        $(this).removeClass('is-invalid');
+        $('#' + $(this).attr('id') + '-error').text('');
+    });
+});
+
+
 </script>
 
 {% endblock %}

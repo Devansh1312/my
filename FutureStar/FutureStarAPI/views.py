@@ -3603,6 +3603,90 @@ class UpdateEventAPIView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class EventBookingDetailView(APIView):
+  def get(self, request, *args, **kwargs):
+        # Fetch event_id from query parameters
+        event_id = request.query_params.get("event_id")
+        
+        if not event_id:
+            return Response({"error": "event_id query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the event by ID
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({"detail": "Event not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize the event data
+        serializer = EventSerializer(event)
+        return Response({
+                'status': 1,
+                'message': _('Event Booking Detail Fetched successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+
+       
+
+class EventBookingCreateAPIView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    serializer_class = EventBookingSerializer
+
+    def post(self, request, *args, **kwargs):
+        # Activate language based on the request header
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Ensure event_id is provided
+        event_id = request.data.get('event_id')
+        if not event_id:
+            return Response({
+                'status': 0,
+                'message': _('Event ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch the Event instance using the provided event_id
+        try:
+            event_instance = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Event not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Prepare data for booking creation
+        booking_data = {
+            'event': event_instance.id,
+            'tickets': request.data.get('tickets'),
+            'convenience_fee': request.data.get('convenience_fee', 0.0),
+            'ticket_amount': request.data.get('ticket_amount', 0.0),
+            'total_amount': request.data.get('total_amount', 0.0),
+        }
+
+        # Handle booking creation using the serializer
+        serializer = self.get_serializer(data=booking_data)
+
+        if serializer.is_valid():
+            booking_instance = serializer.save()
+            return Response({
+                'status': 1,
+                'message': _('Booking created successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Booking creation failed.'),
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+
+
+
 # class DeleteEventAPIView(APIView):
 
 #     def get_object(self, event_id):

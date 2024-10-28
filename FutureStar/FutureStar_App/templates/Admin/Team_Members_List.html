@@ -82,11 +82,11 @@ Team Members List
                                                 data-team_members-designations-en="{{ team_members_item.designations_en }}" 
                                                 data-team_members-designations-ar="{{ team_members_item.designations_ar }}" 
                                                 data-team_members-image="{{ team_members_item.image.url }}">
-                                                   <i data-feather="edit"></i> Edit </a>
+                                                    Edit </a>
                                              </li>
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTeam_MembersModal" data-team_members-id="{{ team_members_item.id }}">
-                                                   <i data-feather="trash-2"></i> Delete </a>
+                                                    Delete </a>
                                              </li>
                                           </ul>
                                        </div>
@@ -265,88 +265,71 @@ Team Members List
 
 
 // Form validation for Add and Edit Team_Members modals
-function validateForm(form) {
-    var nameEn = form.querySelector('input[name="name_en"]');
-    var nameAr = form.querySelector('input[name="name_ar"]');
-    var designationsEn = form.querySelector('input[name="designations_en"]');
-    var designationsAr = form.querySelector('input[name="designations_ar"]');
-    var image = form.querySelector('input[name="image"]');
-    var isValid = true;
+$(document).ready(function () {
+    function validateForm(form) {
+        let isValid = true;
 
-    // English Name validation
-    if (nameEn.value.trim() === '') {
-        nameEn.classList.add('is-invalid');
-        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-en-error' : 'edit-name-en-error';
-        document.getElementById(nameErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        nameEn.classList.remove('is-invalid');
-        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-en-error' : 'edit-name-en-error';
-        document.getElementById(nameErrorId).textContent = '';
+        // Check each input field in the form
+        $(form).find('input[type="text"]').each(function () {
+            const $input = $(this);
+            const inputId = $input.attr('id');
+            const $errorElement = $('#' + inputId + '-error');
+
+            if ($input.val().trim() === '') {
+                $input.addClass('is-invalid');
+                $errorElement.text('This field is required.').css('color', 'red');
+                isValid = false;
+            } else {
+                $input.removeClass('is-invalid');
+                $errorElement.text('');
+            }
+        });
+
+        // Image validation (only required in the Add form)
+        if (form.id === 'addTeam_MembersForm') {
+            const $imageInput = $(form).find('input[type="file"]#image');
+            const $imageErrorElement = $('#image-error');
+
+            if ($imageInput.val().trim() === '') {
+                $imageInput.addClass('is-invalid');
+                $imageErrorElement.text('An image is required.').css('color', 'red');
+                isValid = false;
+            } else {
+                $imageInput.removeClass('is-invalid');
+                $imageErrorElement.text('');
+            }
+        }
+
+        return isValid;
     }
 
-    // Arabic Name validation
-    if (nameAr.value.trim() === '') {
-        nameAr.classList.add('is-invalid');
-        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-ar-error' : 'edit-name-ar-error';
-        document.getElementById(nameErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        nameAr.classList.remove('is-invalid');
-        var nameErrorId = form.id === 'addTeam_MembersForm' ? 'name-ar-error' : 'edit-name-ar-error';
-        document.getElementById(nameErrorId).textContent = '';
-    }
+    // Add form validation on submit
+    $('#addTeam_MembersForm').on('submit', function (event) {
+        event.preventDefault();
+        if (!validateForm(this)) {
+            console.log('Add Team Member form validation failed');
+            return; // Prevent form submission
+        }
+        this.submit();
+    });
 
-    // English Designations validation
-    if (designationsEn.value.trim() === '') {
-        designationsEn.classList.add('is-invalid');
-        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-en-error' : 'edit-designations-en-error';
-        document.getElementById(designationsErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        designationsEn.classList.remove('is-invalid');
-        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-en-error' : 'edit-designations-en-error';
-        document.getElementById(designationsErrorId).textContent = '';
-    }
+    // Edit form validation on submit
+    $('#editTeam_MembersForm').on('submit', function (event) {
+        event.preventDefault();
+        if (!validateForm(this)) {
+            console.log('Edit Team Member form validation failed');
+            return; // Prevent form submission
+        }
+        this.submit();
+    });
 
-    // Arabic Designations validation
-    if (designationsAr.value.trim() === '') {
-        designationsAr.classList.add('is-invalid');
-        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-ar-error' : 'edit-designations-ar-error';
-        document.getElementById(designationsErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        designationsAr.classList.remove('is-invalid');
-        var designationsErrorId = form.id === 'addTeam_MembersForm' ? 'designations-ar-error' : 'edit-designations-ar-error';
-        document.getElementById(designationsErrorId).textContent = '';
-    }
-
-    // Image validation (only for Add Team_Members)
-    if (form.id === 'addTeam_MembersForm' && image.files.length === 0) {
-        image.classList.add('is-invalid');
-        document.getElementById('image-error').textContent = 'An image is required.';
-        isValid = false;
-    } else {
-        image.classList.remove('is-invalid');
-        document.getElementById('image-error').textContent = '';
-    }
-
-    return isValid;
-}
-
-document.getElementById('addTeam_MembersForm').addEventListener('submit', function(event) {
-    var form = event.target;
-    if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
-    }
+    // Reset invalid class and error message on input change
+    $('#addTeam_MembersForm, #editTeam_MembersForm').find('input[type="text"], input[type="file"]').on('input change', function () {
+        $(this).removeClass('is-invalid');
+        $('#' + $(this).attr('id') + '-error').text('');
+    });
 });
 
-document.getElementById('editTeam_MembersForm').addEventListener('submit', function(event) {
-    var form = event.target;
-    if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
-    }
-});
 
 // Toggle the visibility of the action card
 document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
