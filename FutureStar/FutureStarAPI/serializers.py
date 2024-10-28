@@ -432,6 +432,23 @@ class UserGenderSerializer(serializers.ModelSerializer):
         if language == 'ar':
             return obj.name_ar
         return obj.name_en
+
+class PlayingPositionSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PlayingPosition
+        fields = ['id', 'name','shortname']  # Only return id and the translated name
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Return the appropriate name based on the language
+        if language == 'ar':
+            return obj.name_ar
+        return obj.name_en
     
 class UserRoleSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()

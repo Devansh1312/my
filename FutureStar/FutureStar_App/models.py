@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
+from datetime import datetime 
 
 # Inquire Blog Management    
 class Inquire(models.Model):
@@ -98,6 +99,21 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
+#PlayingPosition
+class PlayingPosition(models.Model):
+    name_en = models.TextField(blank=True,null=True)
+    name_ar = models.TextField(blank=True,null=True)
+    shortname = models.TextField(blank=True,null=True)
+    created_at = models.DateTimeField(default=datetime.now)
+    updated_at = models.DateTimeField(default=datetime.now) 
+
+    def __str__(self):
+        return self.name_en
+
+    class Meta:
+        db_table = 'futurestar_app_playing_position'
+
+
 # Custom User Model
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150)
@@ -119,8 +135,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     nationality = models.CharField(max_length=150,null=True, blank=True)
     weight = models.CharField(max_length=150,null=True, blank=True)
     height = models.CharField(max_length=150,null=True, blank=True)
-    main_playing_position = models.CharField(max_length=150,null=True, blank=True)
-    secondary_playing_position = models.CharField(max_length=150,null=True, blank=True)
+    main_playing_position = models.ForeignKey(PlayingPosition,null=True, blank=True, on_delete=models.CASCADE,related_name='main_position_users')
+    secondary_playing_position = models.ForeignKey(PlayingPosition, null=True, blank=True, on_delete=models.CASCADE,related_name='secondary_position_users')
     playing_foot = models.CharField(max_length=150,null=True, blank=True)
     favourite_local_team = models.CharField(max_length=150,null=True, blank=True)
     favourite_team = models.CharField(max_length=150,null=True, blank=True)

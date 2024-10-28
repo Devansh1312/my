@@ -477,17 +477,3 @@ class FAQ(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_faq'
-
-
-class PlayingPosition(models.Model):
-    name_en = models.TextField(blank=True,null=True)
-    name_ar = models.TextField(blank=True,null=True)
-    shortname = models.TextField(blank=True,null=True)
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(default=datetime.now) 
-
-    def __str__(self):
-        return self.name_en
-
-    class Meta:
-        db_table = 'futurestar_app_playing_position'

@@ -45,6 +45,20 @@ def get_user_data(user, request):
         serializer = UserGenderSerializer(user.gender, context={'request': request})
         gender_name = serializer.data['name']
 
+    # Main and secondary playing positions with id and name fields
+    main_playing_position = None
+    main_playing_position_id = user.main_playing_position.id if user.main_playing_position else None
+    secondary_playing_position = None
+    secondary_playing_position_id = user.secondary_playing_position.id if user.secondary_playing_position else None
+    
+    if user.main_playing_position:
+        main_position_serializer = PlayingPositionSerializer(user.main_playing_position, context={'request': request})
+        main_playing_position = main_position_serializer.data
+    if user.secondary_playing_position:
+        secondary_position_serializer = PlayingPositionSerializer(user.secondary_playing_position, context={'request': request})
+        secondary_playing_position = secondary_position_serializer.data
+
+
     return {
         'id': user.id,
         'followers_count': 100,  # Actual follower count
@@ -67,8 +81,10 @@ def get_user_data(user, request):
         'nationality': user.nationality,
         'weight': user.weight,
         'height': user.height,
-        'main_playing_position': user.main_playing_position,
-        'secondary_playing_position': user.secondary_playing_position,
+        'main_playing_position_id': main_playing_position_id,
+        'main_playing_position': main_playing_position,
+        'secondary_playing_position_id': secondary_playing_position_id,
+        'secondary_playing_position': secondary_playing_position,
         'playing_foot': user.playing_foot,
         'favourite_local_team': user.favourite_local_team,
         'favourite_team': user.favourite_team,
@@ -2907,6 +2923,33 @@ class UserGenderListAPIView(generics.ListAPIView):
             'message': _('Gender retrieved successfully.'),
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)
+
+
+
+############################################################## Playing Position API List View ################################################################################
+class PlayingPositionListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PlayingPosition.objects.all()
+    serializer_class = PlayingPositionSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get all playing positions
+        playing_positions = self.get_queryset()
+        serializer = self.get_serializer(playing_positions, many=True)
+
+        # Prepare the response with playing positions directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('Playing positions retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_200_OK)
+
+
+#######################################################  USER ROLE API LIST VIEW #############################################################################################
 
 class UserRoleListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
