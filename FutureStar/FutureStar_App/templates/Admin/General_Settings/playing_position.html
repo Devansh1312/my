@@ -1,12 +1,25 @@
-{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% load sass_tags %} {% block css %}
+{% extends 'base.html' %} 
+{% load custom_filters %} 
+{% load static %} 
+{% load sass_tags %} 
+
+{% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} <style>
+<!-- Plugins css Ends--> 
+{% endblock %} 
+
+<style>
     .is-invalid {
         border-color: #dc3545;
         background-color: #f8d7da;
     }
-</style> {% block title %} Report Management {% endblock %} {% block content %} <div class="page-body">
+</style> 
+
+{% block title %} Report Management {% endblock %} 
+
+{% block content %} 
+<div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -30,53 +43,47 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name (English)</th>
-                                        <th>Name (Arabic)</th>
-                                        <th>ShortName</th>
-
+                                        <th> Playing Position (English)</th>
+                                        <th> Playing Position (Arabic)</th>
+                                        <th>Short Name</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody> {% for playing_positions_item in playing_positions %} <tr>
+                                <tbody> 
+                                    {% for playing_positions_item in playing_positions %} 
+                                    <tr>
                                         <td>{{ forloop.counter }}</td>
+                                        <td>{{ playing_positions_item.name_en}}</td>
+                                        <td>{{ playing_positions_item.name_ar }}</td>
+                                        <td>{{ playing_positions_item.shortname }}</td>
                                         <td>
-                                            {{ playing_positions_item.name_en}}
-                                        </td>
-                                        <td>
-                                            {{ playing_positions_item.name_ar }}
-                                        </td>
-                                        <td>
-                                            {{ playing_positions_item.shortname }} 
-                                        </td>
-                                        <td>
-                                            <!-- Action buttons -->
                                             <div class="action-menu-container" style="position: relative; display: inline-block;">
                                                 <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                                     <i data-feather="more-vertical"></i>
                                                 </a>
                                                 <div class="action-card" style="
-                                                        display: none;
-                                                        position: absolute;
-                                                        top: 100%;
-                                                        right: 0;
-                                                        background: #fff;
-                                                        border: 1px solid #ccc;
-                                                        border-radius: 4px;
-                                                        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-                                                        z-index: 10;
-                                                        width: 150px;
-                                                    ">
+                                                    display: none;
+                                                    position: absolute;
+                                                    top: 100%;
+                                                    right: 0;
+                                                    background: #fff;
+                                                    border: 1px solid #ccc;
+                                                    border-radius: 4px;
+                                                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                                                    z-index: 10;
+                                                    width: 150px;
+                                                ">
                                                     <ul style="list-style: none; padding: 0; margin: 0;">
-                                                   
                                                         <li style="padding: 8px 12px;">
-                                                            <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editPlayingPositionModal" data-playingpositions-id="{{ playing_positions_item.id }}" data-playingpositions-name_en="{{ playing_positions_item.name_en }}" data-playingpositions-name_en="{{ playing_positions_item.shortname }}" data-playingpositions-name_ar="{{ playing_positions_item.name_ar }}" > Edit </a>
+                                                            <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editPlayingPositionModal" data-playingpositions-id="{{ playing_positions_item.id }}" data-playingpositions-name_en="{{ playing_positions_item.name_en }}" data-playingpositions-name_ar="{{ playing_positions_item.name_ar }}" data-playingpositions-shortname="{{ playing_positions_item.shortname }}"> Edit </a>
                                                         </li>
-                                                       
                                                     </ul>
                                                 </div>
                                             </div>
                                         </td>
-                                    </tr> {% endfor %} </tbody>
+                                    </tr> 
+                                    {% endfor %} 
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -92,26 +99,24 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="post" action="{% url 'playing_position_create' %}" id="addPlayingPositionForm" enctype="multipart/form-data"> {% csrf_token %} <div class="row">
+                        <form method="post" action="{% url 'playing_position_create' %}" id="addPlayingPositionForm" enctype="multipart/form-data"> 
+                            {% csrf_token %} 
+                            <div class="row">
                                 <div class="col-6 mb-3">
-                                    <label for="name_en" class="form-label">Name in English</label>
-                                    <textarea class="form-control" id="name_en" name="name_en" placeholder="Enter Playing Position Name"></textarea>
+                                    <label for="name_en" class="form-label"> Playing Position in English</label>
+                                    <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Playing Position" />
                                     <div class="invalid-feedback" id="name_en-error"></div>
-                                    <!-- Error message container -->
                                 </div>
                                 <div class="col-6 mb-3">
-                                    <label for="name_ar" class="form-label">Name in Arabic</label>
-                                    <textarea class="form-control" id="name_ar" name="name_ar" placeholder="Enter Playing Position Name"></textarea>
+                                    <label for="name_ar" class="form-label"> Playing Position in Arabic</label>
+                                    <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Playing Position" />
                                     <div class="invalid-feedback" id="name_ar-error"></div>
-                                    <!-- Error message container -->
                                 </div>
                                 <div class="col-6 mb-3">
-                                    <label for="shortname" class="form-label">ShortName</label>
-                                    <textarea class="form-control" id="shortname" name="shortname" placeholder="Enter Playing Position Shortname"></textarea>
+                                    <label for="shortname" class="form-label">Short Name</label>
+                                    <input type="text" class="form-control" id="shortname" name="shortname" placeholder="Enter Playing Position Short Name" />
                                     <div class="invalid-feedback" id="shortname-error"></div>
-                                    <!-- Error message container -->
                                 </div>
-                              
                                 <button type="submit" class="btn btn-primary">Add Playing Position</button>
                             </div>
                         </form>
@@ -128,27 +133,25 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="post" id="editPlayingPositionForm" enctype="multipart/form-data"> {% csrf_token %} <div class="row">
+                        <form method="post" id="editPlayingPositionForm" enctype="multipart/form-data"> 
+                            {% csrf_token %} 
+                            <div class="row">
                                 <input type="hidden" id="playingpositionsId" name="id" />
                                 <div class="col-6 mb-3">
-                                    <label for="name_en" class="form-label">Name in English</label>
-                                    <textarea class="form-control" id="name_en" name="name_en" placeholder="Enter Playing Position Name"></textarea>
+                                    <label for="name_en" class="form-label"> Playing Position in English</label>
+                                    <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Playing Position" />
                                     <div class="invalid-feedback" id="name_en-error"></div>
-                                    <!-- Error message container -->
                                 </div>
                                 <div class="col-6 mb-3">
-                                    <label for="name_ar" class="form-label">Name in Arabic</label>
-                                    <textarea class="form-control" id="name_ar" name="name_ar" placeholder="Enter Playing Position Name"></textarea>
+                                    <label for="name_ar" class="form-label"> Playing Position in Arabic</label>
+                                    <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Playing Position" />
                                     <div class="invalid-feedback" id="name_ar-error"></div>
-                                    <!-- Error message container -->
                                 </div>
-                                <div class="col-6 mb-3">
-                                    <label for="shortname" class="form-label">ShortName</label>
-                                    <textarea class="form-control" id="shortname" name="shortname" placeholder="Enter Playing Position Shortname"></textarea>
+                                <div class="col-sm-12 mb-3">
+                                    <label for="shortname" class="form-label">Short Name</label>
+                                    <input type="text" class="form-control" id="shortname" name="shortname" placeholder="Enter Playing Position Short Name of Position" />
                                     <div class="invalid-feedback" id="shortname-error"></div>
-                                    <!-- Error message container -->
                                 </div>
-                              
                                 <button type="submit" class="btn btn-primary">Update Playing Position</button>
                             </div>
                         </form>
@@ -156,12 +159,14 @@
                 </div>
             </div>
         </div>
-        
-      
-</div> {% endblock %} {% block script %} <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+    </div> 
+</div> 
+{% endblock %} 
+
+{% block script %} 
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
-<!-- Plugins JS Ends-->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Edit Report Modal
@@ -173,7 +178,7 @@
                 var playingpositionsName_en = button.getAttribute("data-playingpositions-name_en");
                 var playingpositionsName_ar = button.getAttribute("data-playingpositions-name_ar");
                 var playingpositionsShortname = button.getAttribute("data-playingpositions-shortname");
-           
+
                 var form = document.getElementById("editPlayingPositionForm");
                 // Update form action to point to the correct report ID for editing
                 form.action = "{% url 'playing_position_edit' 0 %}".replace("0", playingpositionsId);
@@ -184,9 +189,7 @@
                 form.querySelector("#shortname").value = playingpositionsShortname || "";
             });
         }
-     
     });
-   
 
     // Toggle the visibility of the action card
     document.querySelectorAll(".three-dots-menu").forEach(function(menu) {
@@ -202,101 +205,65 @@
             });
         });
     });
-    document.addEventListener("DOMContentLoaded", function() {
-        // Form validation for Add and Edit Playing Position modals
+
+    $(document).ready(function () {
         function validateForm(form) {
-            var name_en = form.querySelector('textarea[name="name_en"]');
-            var name_ar = form.querySelector('textarea[name="name_ar"]');
-            var shortname = form.querySelector('textarea[name="shortname"]');
-            var isValid = true;
-            // Name validation English
-            if (name_en.value.trim() === "") {
-                name_en.classList.add("is-invalid");
-                var name_enErrorId = form.id === "addPlayingPositionForm" ? "name_en-error" : "edit-name_en-error";
-                document.getElementById(name_enErrorId).textContent = "Name in English is required.";
-                isValid = false;
-            } else {
-                name_en.classList.remove("is-invalid");
-                var name_enErrorId = form.id === "addPlayingPositionForm" ? "name_en-error" : "edit-name_en-error";
-                document.getElementById(name_enErrorId).textContent = "";
-            }
-            // Name validation Arabic
-            if (name_ar.value.trim() === "") {
-                name_ar.classList.add("is-invalid");
-                var name_arErrorId = form.id === "addPlayingPositionForm" ? "name_ar-error" : "edit-name_ar-error";
-                document.getElementById(name_arErrorId).textContent = "Name in Arabic is required.";
-                isValid = false;
-            } else {
-                name_ar.classList.remove("is-invalid");
-                var name_arErrorId = form.id === "addPlayingPositionForm" ? "name_ar-error" : "edit-name_ar-error";
-                document.getElementById(name_arErrorId).textContent = "";
-            }
-            // Content validation English
-            if (shortname.value.trim() === "") {
-                shortname.classList.add("is-invalid");
-                var shortnameErrorId = form.id === "addPlayingPositionForm" ? "shortname-error" : "edit-shortname-error";
-                document.getElementById(shortnameErrorId).textContent = "Shortname is required.";
-                isValid = false;
-            } else {
-                shortname.classList.remove("is-invalid");
-                var shortnameErrorId = form.id === "addPlayingPositionForm" ? "shortname-error" : "edit-shortname-error";
-                document.getElementById(shortnameErrorId).textContent = "";
-            }
-            // Content validation Arabic
-            
+            let isValid = true;
+
+            // Check each input field in the form
+            $(form).find('input').each(function () {
+                const $input = $(this);
+                const errorId = $input.attr('id') + '-error'; // e.g., name_en-error
+                const $errorElement = $('#' + errorId);
+
+                if ($input.val().trim() === '') {
+                    $input.addClass('is-invalid');
+                    $errorElement.text('This field is required.').css('color', 'red');
+                    isValid = false;
+                } else {
+                    $input.removeClass('is-invalid');
+                    $errorElement.text('');
+                }
+            });
+
             return isValid;
         }
-        // Add Report form submission handler
-        var addPlayingPositionForm = document.getElementById("addPlayingPositionForm");
-        if (addPlayingPositionForm) {
-            addPlayingPositionForm.addEventListener("submit", function(event) {
-                console.log("Add Playing Position Form Submitted");
-                var form = event.target;
-                if (!validateForm(form)) {
-                    console.log("Validation failed");
-                    event.preventDefault(); // Prevent form submission if validation fails
-                }
-            });
-        }
-        // Edit Report form submission handler
-        var editPlayingPositionForm = document.getElementById("editPlayingPositionForm");
-        if (editPlayingPositionForm) {
-            editPlayingPositionForm.addEventListener("submit", function(event) {
-                console.log("Edit PlayingPosition FormSubmitted");
-                var form = event.target;
-                if (!validateForm(form)) {
-                    console.log("Validation failed");
-                    event.preventDefault(); // Prevent form submission if validation fails
-                }
-            });
-        }
-        // Edit Report Modal - populate with existing data
-        var editPlayingPositionForm = document.getElementById("editPlayingPositionForm");
-        if (editPlayingPositionForm) {
-            editPlayingPositionForm.addEventListener("show.bs.modal", function(event) {
-                var button = event.relatedTarget;
-                var playingpositionsId = button.getAttribute("data-playingpositions-id");
-                var playingpositionsName_en = button.getAttribute("data-playingpositions-name_en");
-                var playingpositionsName_ar = button.getAttribute("data-playingpositions-name_ar");
-                var playingpositionsShortname = button.getAttribute("data-playingpositions-shortname");
-                var form = document.getElementById("editPlayingPositionForm");
-                // Update form action to point to the correct report ID for editing
-                form.action = "{% url 'playing_position_edit' 0 %}".replace("0", playingpositionsId);
-                // Set the values in the form
-                form.querySelector("#playingpositionsId").value = playingpositionsId;
-                form.querySelector("#name_en").value = playingpositionsName_en || "";
-                form.querySelector("#name_ar").value = playingpositionsName_ar || "";
-                form.querySelector("#shortname").value = playingpositionsShortname || "";
-            });
-        }
-        // Hide action card if clicking outside
-        document.addEventListener("click", function(event) {
-            var isClickInside = event.target.closest(".action-menu-container");
-            if (!isClickInside) {
-                document.querySelectorAll(".action-card").forEach(function(card) {
-                    card.style.display = "none";
-                });
+
+        // Add form validation on submit
+        $('#addPlayingPositionForm').on('submit', function (event) {
+            event.preventDefault();
+            if (!validateForm(this)) {
+                console.log('Add Playing Position form validation failed');
+                return; // Prevent form submission
             }
+            this.submit();
+        });
+
+        // Edit form validation on submit
+        $('#editPlayingPositionForm').on('submit', function (event) {
+            event.preventDefault();
+            if (!validateForm(this)) {
+                console.log('Edit Playing Position form validation failed');
+                return; // Prevent form submission
+            }
+            this.submit();
+        });
+
+        // Reset invalid class and error message on input change
+        $('#addPlayingPositionForm, #editPlayingPositionForm').find('input').on('input', function () {
+            $(this).removeClass('is-invalid');
+            $('#' + $(this).attr('id') + '-error').text('');
         });
     });
-</script> {% endblock %}
+
+    // Hide action card if clicking outside
+    document.addEventListener("click", function(event) {
+        var isClickInside = event.target.closest(".action-menu-container");
+        if (!isClickInside) {
+            document.querySelectorAll(".action-card").forEach(function(card) {
+                card.style.display = "none";
+            });
+        }
+    });
+</script> 
+{% endblock %}
