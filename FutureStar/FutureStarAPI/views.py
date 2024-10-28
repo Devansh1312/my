@@ -1972,20 +1972,12 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
             activate(language)
 
         queryset = self.get_queryset()
-        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')
-        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
+        images = queryset.filter(content_type=1)[:9]
+        videos = queryset.filter(content_type=2)[:9]
 
-        image_query = Q()
-        for ext in image_extensions:
-            image_query |= Q(media_file__iendswith=ext)
-
-        video_query = Q()
-        for ext in video_extensions:
-            video_query |= Q(media_file__iendswith=ext)
-
-        # Filter and limit to the latest 9 images and videos separately
-        images = queryset.filter(image_query)[:9]
-        videos = queryset.filter(video_query)[:9]
+        # Serialize images and videos
+        image_serializer = self.get_serializer(images, many=True)
+        video_serializer = self.get_serializer(videos, many=True)
 
         image_serializer = self.get_serializer(images, many=True)
         video_serializer = self.get_serializer(videos, many=True)
