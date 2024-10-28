@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from .models import *
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import password_validation
-from FutureStarAPI.models import MobileDashboardBanner
+from FutureStarAPI.models import MobileDashboardBanner,PlayingPosition
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
@@ -207,3 +207,9 @@ class MobileDashboardBannerForm(forms.ModelForm):
     class Meta:
         model = MobileDashboardBanner
         fields = ['id','image']
+
+
+class PlayingPositionForm(forms.ModelForm):
+    class Meta:
+        model = PlayingPosition
+        fields = ["name_en","name_ar","shortname"]

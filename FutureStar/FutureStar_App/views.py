@@ -5420,3 +5420,82 @@ class TeamDeleteview(LoginRequiredMixin, View):
         
         messages.success(request, "Team deleted successfully.")
         return redirect('team_list')
+
+
+######################### Playing Position #############################
+
+@method_decorator(user_role_check, name='dispatch')
+class PlayingPositionListView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/playing_position.html"
+
+    def get(self, request):
+        playing_positions = PlayingPosition.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {
+                "playing_positions": playing_positions,
+                "breadcrumb": {"child": "Playing Positions List"},
+            },
+        )
+
+@method_decorator(user_role_check, name='dispatch')
+class PlayingPositionCreateView(LoginRequiredMixin,View):
+    def post(self, request):
+        name_en=request.POST.get("name_en")
+        name_ar=request.POST.get("name_ar")
+        shortname=request.POST.get("shortname")
+
+                
+        if not name_en or not name_ar or not shortname :
+            messages.error(request, "Title and Description are required.")
+            return redirect("playing_position_list")
+
+       
+        playing_positions = PlayingPosition.objects.create(
+            name_en=name_en,
+            name_ar=name_ar,
+            shortname=shortname,
+        
+        )
+            
+        messages.success(request, "Playing Position Added successfully.")
+        return redirect("playing_position_list")
+
+@method_decorator(user_role_check, name='dispatch')
+class PlayingPositionEditView(LoginRequiredMixin,View):
+    template_name = "Admin/General_Settings/playing_position.html"
+
+    def get(self, request, playing_position_id):
+        # Get the report object based on the ID
+        playing_positions = get_object_or_404(PlayingPosition, id=playing_position_id)
+
+        # Prepare context with existing report data
+        context = {
+            'playing_positions': playing_positions,  # Send the old data to the template
+        }
+
+        # Render the template with old report data
+        return render(request, self.template_name, context)
+
+    def post(self, request, playing_position_id):
+        # Get the report object to be updated
+        playing_positions = get_object_or_404(PlayingPosition, id=playing_position_id)
+
+        # Fetch new data from the form submission
+        name_en=request.POST.get("name_en")
+        name_ar=request.POST.get("name_ar")
+        shortname=request.POST.get("shortname")
+
+
+        
+
+        # Update the report with new data
+        playing_positions.name_en = name_en
+        playing_positions.name_ar = name_ar
+        playing_positions.shortname = shortname
+     
+        playing_positions.save()
+
+        messages.success(request, "Playing Positions updated successfully.")
+        return redirect("playing_position_list")

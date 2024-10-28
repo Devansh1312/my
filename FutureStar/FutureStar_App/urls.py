@@ -227,6 +227,11 @@ urlpatterns = [
     
     #Team list URL's
     path('team_lists/', TeamListView.as_view(), name='team_list'),
-    path('team_lists/delete/<int:pk>/', TeamDeleteview.as_view(), name='team_delete')
+    path('team_lists/delete/<int:pk>/', TeamDeleteview.as_view(), name='team_delete'),
+
+    #Playing Position URLS's
+    path('playing_positions/', PlayingPositionListView.as_view(), name='playing_position_list'),
+    path('playing_positions/create/', PlayingPositionCreateView.as_view(), name='playing_position_create'),
+    path('playing_positions/edit/<int:playing_position_id>/', PlayingPositionEditView.as_view(), name='playing_position_edit'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
