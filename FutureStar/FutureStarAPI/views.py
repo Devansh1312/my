@@ -1711,29 +1711,22 @@ class ImageGallaryListAPIView(generics.ListAPIView):
         team_id = self.request.query_params.get('team_id')
         user_id = self.request.query_params.get('user_id')
         group_id = self.request.query_params.get('group_id')
-        content_type = self.request.query_params.get('content_type')
-        
+        content_type = self.request.query_params.get('content_type', 1)  # Default to images if not specified
+
+        # Base queryset for images with album_id as null and content_type=1 for images
+        queryset = Gallary.objects.filter(album_id__isnull=True, content_type=1)
+
         # Filter the base queryset according to parameters
-        queryset = Gallary.objects.filter(album_id__isnull=True)
-        
         if team_id:
             queryset = queryset.filter(team_id=team_id)
         elif group_id:
             queryset = queryset.filter(group_id=group_id)
-        elif content_type:
-            queryset = queryset.filter(content_type=content_type)
         elif user_id:
             queryset = queryset.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True)
         else:
             queryset = queryset.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True)
-        
-        # Filter to include only images
-        image_extensions = ('.jfif', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')
-        image_query = Q()
-        for ext in image_extensions:
-            image_query |= Q(media_file__iendswith=ext)
-        
-        return queryset.filter(image_query).order_by('-created_at')
+
+        return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -1757,6 +1750,7 @@ class ImageGallaryListAPIView(generics.ListAPIView):
             'current_page': current_page
         }, status=status.HTTP_200_OK)
 
+
 class VideoGallaryListAPIView(generics.ListAPIView):
     serializer_class = GetGallarySerializer
     permission_classes = [IsAuthenticated]
@@ -1767,29 +1761,22 @@ class VideoGallaryListAPIView(generics.ListAPIView):
         team_id = self.request.query_params.get('team_id')
         user_id = self.request.query_params.get('user_id')
         group_id = self.request.query_params.get('group_id')
-        content_type = self.request.query_params.get('content_type')
-        
+        content_type = self.request.query_params.get('content_type', 2)  # Default to videos if not specified
+
+        # Base queryset for videos with album_id as null and content_type=2 for videos
+        queryset = Gallary.objects.filter(album_id__isnull=True, content_type=2)
+
         # Filter the base queryset according to parameters
-        queryset = Gallary.objects.filter(album_id__isnull=True)
-        
         if team_id:
             queryset = queryset.filter(team_id=team_id)
         elif group_id:
             queryset = queryset.filter(group_id=group_id)
-        elif content_type:
-            queryset = queryset.filter(content_type=content_type)
         elif user_id:
             queryset = queryset.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True)
         else:
             queryset = queryset.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True)
-        
-        # Filter to include only videos
-        video_extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv')
-        video_query = Q()
-        for ext in video_extensions:
-            video_query |= Q(media_file__iendswith=ext)
-        
-        return queryset.filter(video_query).order_by('-created_at')
+
+        return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -1812,7 +1799,7 @@ class VideoGallaryListAPIView(generics.ListAPIView):
             'total_pages': total_pages,
             'current_page': current_page
         }, status=status.HTTP_200_OK)
-
+    
 class GallaryCreateAPIView(generics.CreateAPIView):
     serializer_class = GetGallarySerializer
     permission_classes = [IsAuthenticated]
