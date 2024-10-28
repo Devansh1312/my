@@ -42,7 +42,7 @@ urlpatterns = [
 
         path('api/posts/details/', PostDetailAPIView.as_view()), #Post Detail View As well As Post View Increment 
         path('api/comments/', PostCommentAPIView.as_view()),  # New API for paginated comments
-
+    
         path('api/comments/create/', CommentCreateAPIView.as_view()),
         path('api/posts/delete/', PostDeleteAPIView.as_view()),
 
@@ -70,6 +70,9 @@ urlpatterns = [
 
         path('api/events/update/', UpdateEventAPIView.as_view()),
         # path('api/events/delete/',DeleteEventAPIView.as_view()),
+        path('api/events/booking/', EventBookingDetailView.as_view()),
+        path('api/events/booking/create/', EventBookingCreateAPIView.as_view()),
+
         path('api/events/detail/', EventDetailAPIView.as_view()),
         path('api/events/team', TeamEventAPIView.as_view()),
 
