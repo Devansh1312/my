@@ -261,60 +261,28 @@ class OTPSave(models.Model):
     
 
 class FollowRequest(models.Model):
-    from_user = models.ForeignKey(User, null=True, blank=True, related_name='follow_requests_sent', on_delete=models.CASCADE)
-    from_team = models.ForeignKey(Team, null=True, blank=True, related_name='team_follow_requests_sent', on_delete=models.CASCADE)
-    from_group = models.ForeignKey(TrainingGroups, null=True, blank=True, related_name='group_follow_requests_sent', on_delete=models.CASCADE)
-    
-    to_user = models.ForeignKey(User, null=True, blank=True, related_name='follow_requests_received', on_delete=models.CASCADE)
-    to_team = models.ForeignKey(Team, null=True, blank=True, related_name='team_follow_requests_received', on_delete=models.CASCADE)
-    to_group = models.ForeignKey(TrainingGroups, null=True, blank=True, related_name='group_follow_requests_received', on_delete=models.CASCADE)
-    
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(null=True,blank=True)
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=USER_TYPE)
+    target_id = models.IntegerField(null=True,blank=True)
+    target_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=USER_TYPE)
+
     created_at = models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'futurestar_app_followrequest'
         unique_together = (
-            ('from_user', 'to_user'),
-            ('from_team', 'to_team'),
-            ('from_group', 'to_group')
+            ('created_by_id', 'creator_type', 'target_id', 'target_type'),
         )
-
-    # Count followers for any entity (user, team, or group)
-    @classmethod
-    def count_followers(cls, to_user=None, to_team=None, to_group=None):
-        return cls.objects.filter(
-            to_user=to_user if to_user else None,
-            to_team=to_team if to_team else None,
-            to_group=to_group if to_group else None
-        ).count()
-
-    # Count followings for any entity (user, team, or group)
-    @classmethod
-    def count_following(cls, from_user=None, from_team=None, from_group=None):
-        return cls.objects.filter(
-            from_user=from_user if from_user else None,
-            from_team=from_team if from_team else None,
-            from_group=from_group if from_group else None
-        ).count()
-
-    # Helper method to return the source entity (user/team/group) from which the request was sent
-    def get_from_entity(self):
-        if self.from_user:
-            return self.from_user
-        elif self.from_team:
-            return self.from_team
-        elif self.from_group:
-            return self.from_group
-
-    # Helper method to return the target entity (user/team/group) to which the request was sent
-    def get_to_entity(self):
-        if self.to_user:
-            return self.to_user
-        elif self.to_team:
-            return self.to_team
-        elif self.to_group:
-            return self.to_group
 
 
 

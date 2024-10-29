@@ -58,17 +58,25 @@ class UpdateCurrentTypeAPIView(APIView):
 def get_user_data(user, request):
     """Returns a dictionary with all user details."""
     
-    # Get follower and following counts for the user
-    followers_count = FollowRequest.count_followers(to_user=user)
-    following_count = FollowRequest.count_following(from_user=user)
+    # Calculate follower and following counts for the user
+    followers_count = FollowRequest.objects.filter(target_id=user.id, target_type=FollowRequest.USER_TYPE).count()
+    following_count = FollowRequest.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
     
-    post_count = Post.objects.filter(created_by_id=user.id, creator_type=1).count()
+    post_count = Post.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
+    
+    # Check if the current user is following this user
+    is_follow = FollowRequest.objects.filter(
+        created_by_id=request.user.id,
+        creator_type=FollowRequest.USER_TYPE,
+        target_id=user.id,
+        target_type=FollowRequest.USER_TYPE
+    ).exists()
     
     gender_name = None
     if user.gender:
         serializer = UserGenderSerializer(user.gender, context={'request': request})
         gender_name = serializer.data['name']
-
+    
     # Main and secondary playing positions with id and name fields
     main_playing_position = None
     main_playing_position_id = user.main_playing_position.id if user.main_playing_position else None
@@ -81,14 +89,14 @@ def get_user_data(user, request):
     if user.secondary_playing_position:
         secondary_position_serializer = PlayingPositionSerializer(user.secondary_playing_position, context={'request': request})
         secondary_playing_position = secondary_position_serializer.data
-
-
+    
     return {
         'id': user.id,
-        'followers_count': 100,  # Actual follower count
-        'following_count': 100,  # Actual following count
-        'creator_type':1,
+        'followers_count': followers_count,
+        'following_count': following_count,
+        'creator_type': 1,
         'post_count': post_count,
+        'is_follow': is_follow,
         'user_role': user.role_id,
         'username': user.username,
         'phone': user.phone,
@@ -121,7 +129,6 @@ def get_user_data(user, request):
         'device_token': user.device_token,
     }
 
-
 ######################################################################################### Get Team Data ###################################################################
 def get_team_data(user, request):
     """Returns a dictionary with the user's team details."""
@@ -132,13 +139,28 @@ def get_team_data(user, request):
     except Team.DoesNotExist:
         return None  # If no team exists, return None or empty dictionary as needed
     
+    # Get follower and following counts for the team
+    followers_count = FollowRequest.objects.filter(target_id=team.id, target_type=FollowRequest.TEAM_TYPE).count()
+    following_count = FollowRequest.objects.filter(created_by_id=team.id, creator_type=FollowRequest.TEAM_TYPE).count()
+    
+    # Check if the current user is following this team
+    is_follow = FollowRequest.objects.filter(
+        created_by_id=request.user.id,
+        creator_type=FollowRequest.USER_TYPE,
+        target_id=team.id,
+        target_type=FollowRequest.TEAM_TYPE
+    ).exists()
+    
     # Get post count for the team
-    team_post_count = Post.objects.filter(created_by_id=team.id, creator_type=Post.TEAM_TYPE).count()
+    team_post_count = Post.objects.filter(created_by_id=team.id, creator_type=FollowRequest.TEAM_TYPE).count()
     
     return {
         'team_id': team.id,
+        'followers_count': followers_count,
+        'following_count': following_count,
         'post_count': team_post_count,
-        'creator_type':2,
+        'is_follow': is_follow,
+        'creator_type': 2,
         'team_name': team.team_name,
         'team_username': team.team_username,
         'team_type_id': team.team_type.id if team.team_type else None,
@@ -171,7 +193,6 @@ def get_team_data(user, request):
         'team_uniform': team.team_uniform,
     }
 
-
 ############################################################################# Get Group Data ######################################################
 def get_group_data(user, request):
     """Returns a dictionary with the user's group details."""
@@ -182,13 +203,28 @@ def get_group_data(user, request):
     except TrainingGroups.DoesNotExist:
         return None  # If no group exists, return None or empty dictionary as needed
     
+    # Get follower and following counts for the group
+    followers_count = FollowRequest.objects.filter(target_id=group.id, target_type=FollowRequest.GROUP_TYPE).count()
+    following_count = FollowRequest.objects.filter(created_by_id=group.id, creator_type=FollowRequest.GROUP_TYPE).count()
+    
+    # Check if the current user is following this group
+    is_follow = FollowRequest.objects.filter(
+        created_by_id=request.user.id,
+        creator_type=FollowRequest.USER_TYPE,
+        target_id=group.id,
+        target_type=FollowRequest.GROUP_TYPE
+    ).exists()
+    
     # Get post count for the group
-    group_post_count = Post.objects.filter(created_by_id=group.id, creator_type=Post.GROUP_TYPE).count()
+    group_post_count = Post.objects.filter(created_by_id=group.id, creator_type=FollowRequest.GROUP_TYPE).count()
     
     return {
         'group_id': group.id,
+        'followers_count': followers_count,
+        'following_count': following_count,
         'post_count': group_post_count,
-        'creator_type':3,
+        'is_follow': is_follow,
+        'creator_type': 3,
         'group_name': group.group_name,
         'group_username': group.group_username,
         'bio': group.bio,
@@ -208,7 +244,6 @@ def get_group_data(user, request):
         'group_logo': group.group_logo.url if group.group_logo else None,
         'group_background_image': group.group_background_image.url if group.group_background_image else None,
     }
-
 
 ###################################################### Send OTP API #############################################################################################################
               
@@ -3091,156 +3126,127 @@ class LocationAPIView(APIView):
 
 ####################################### FOLLOW USER ############################################
 class FollowUnfollowAPI(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
     def post(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
+        creator_type = request.data.get('creator_type')
+        created_by_id = request.data.get('created_by_id')
+        target_id = request.data.get('target_id')
+        target_type = request.data.get('target_type')
 
-        from_user = request.user  # Always the user sending the request
-
-        # Retrieve the source (from_*): the user/team/group initiating the follow request
-        from_team_id = request.data.get('from_team')
-        from_group_id = request.data.get('from_group')
-
-        # Retrieve the target (to_*): the user/team/group being followed
-        to_user_id = request.data.get('to_user')
-        to_team_id = request.data.get('to_team')
-        to_group_id = request.data.get('to_group')
-
-        # Ensure only one "from" field is filled
-        if from_team_id and from_group_id:
-            return Response({
-                "status": 0,
-                "message": _("You can only follow from either a team or a group, not both.")
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Ensure only one "to" field is filled
-        if [to_user_id, to_team_id, to_group_id].count(None) < 2:
-            return Response({
-                "status": 0,
-                "message": _("You can only follow a user, a team, or a group, not multiple.")
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Prepare the follow request based on provided data
-        follow_request = FollowRequest.objects.filter(
-            from_user=from_user if not from_team_id and not from_group_id else None,
-            from_team_id=from_team_id,
-            from_group_id=from_group_id,
-            to_user_id=to_user_id,
-            to_team_id=to_team_id,
-            to_group_id=to_group_id
-        ).first()
-
-        if follow_request:
-            # Unfollow logic
+        try:
+            follow_request = FollowRequest.objects.get(
+                created_by_id=created_by_id,
+                creator_type=creator_type,
+                target_id=target_id,
+                target_type=target_type
+            )
+            # If follow request exists, unfollow
             follow_request.delete()
             return Response({
-                "status": 1,
-                "message": _("Unfollowed successfully.")
+                'status': 1,
+                'message': 'Unfollowed successfully.',
+                'data': {}
             }, status=status.HTTP_200_OK)
-        else:
-            # Follow logic
+        except FollowRequest.DoesNotExist:
+            # Follow request does not exist, create one
             FollowRequest.objects.create(
-                from_user=from_user if not from_team_id and not from_group_id else None,
-                from_team_id=from_team_id,
-                from_group_id=from_group_id,
-                to_user_id=to_user_id,
-                to_team_id=to_team_id,
-                to_group_id=to_group_id
+                created_by_id=created_by_id,
+                creator_type=creator_type,
+                target_id=target_id,
+                target_type=target_type
             )
             return Response({
-                "status": 1,
-                "message": _("Followed successfully.")
+                'status': 1,
+                'message': 'Followed successfully.',
             }, status=status.HTTP_201_CREATED)
 
+
 ####################################### LIST OF FOLLOWERS #######################################
-class ListFollowersAPI(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
+class ListFollowersAPI(generics.ListAPIView):
+    def get_queryset(self):
+        target_id = self.request.query_params.get('target_id')
+        target_type = self.request.query_params.get('target_type')
+        return FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
 
-    def post(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        followers = []
 
-        to_user_id = request.data.get('to_user')
-        to_team_id = request.data.get('to_team')
-        to_group_id = request.data.get('to_group')
-
-        # Ensure only one entity type is requested
-        if [to_user_id, to_team_id, to_group_id].count(None) < 2:
-            return Response({
-                "status": 0,
-                "message": _("You can only fetch followers for one entity type (user, team, or group).")
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Retrieve followers
-        followers = FollowRequest.objects.filter(
-            to_user_id=to_user_id if to_user_id else None,
-            to_team_id=to_team_id if to_team_id else None,
-            to_group_id=to_group_id if to_group_id else None
-        ).select_related('from_user', 'from_team', 'from_group')
-
-        # Format followers list
-        followers_list = [
-            {
-                "id": follower.get_from_entity().id,
-                "name": getattr(follower.get_from_entity(), 'username', None) or
-                        getattr(follower.get_from_entity(), 'team_name', None) or
-                        getattr(follower.get_from_entity(), 'group_name', None),
-                "profile_picture": getattr(follower.get_from_entity(), 'profile_picture', None) or
-                                   getattr(follower.get_from_entity(), 'team_logo', None) or
-                                   getattr(follower.get_from_entity(), 'group_logo', None)
-            }
-            for follower in followers
-        ]
+        for follow in queryset:
+            if follow.creator_type == FollowRequest.USER_TYPE:
+                user = User.objects.get(id=follow.created_by_id)
+                followers.append({
+                    'creator_type': 1,
+                    'creator_id': user.id,
+                    'username': user.username,
+                    'profile': user.profile_picture.url if user.profile_picture else None
+                })
+            elif follow.creator_type == FollowRequest.TEAM_TYPE:
+                team = Team.objects.get(id=follow.created_by_id)
+                followers.append({
+                    'creator_type': 2,
+                    'creator_id': team.id,
+                    'username': team.team_username,
+                    'profile': team.team_logo.url if team.team_logo else None
+                })
+            elif follow.creator_type == FollowRequest.GROUP_TYPE:
+                group = TrainingGroups.objects.get(id=follow.created_by_id)
+                followers.append({
+                    'creator_type': 3,
+                    'creator_id': group.id,
+                    'username': group.group_username,
+                    'profile': group.group_logo.url if group.group_logo else None
+                })
 
         return Response({
-            "status": 1,
-            "message": _("Followers list fetched successfully."),
-            "data": followers_list
+            'status': 1,
+            'message': 'Followers fetched successfully.',
+            'data': followers
         }, status=status.HTTP_200_OK)
 
 
 ##################################### LIST OF FOLLOWING #######################################
-class ListFollowingAPI(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
+class ListFollowingAPI(generics.ListAPIView):
+    def get_queryset(self):
+        creator_type = self.request.query_params.get('creator_type')
+        created_by_id = self.request.query_params.get('created_by_id')
+        return FollowRequest.objects.filter(creator_type=creator_type, created_by_id=created_by_id)
 
-    def post(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        following = []
 
-        from_user = request.user
-
-        # Retrieve the following
-        following = FollowRequest.objects.filter(
-            from_user=from_user
-        ).select_related('to_user', 'to_team', 'to_group')
-
-        # Format the following list
-        following_list = [
-            {
-                "id": follow.get_to_entity().id,
-                "name": getattr(follow.get_to_entity(), 'username', None) or
-                        getattr(follow.get_to_entity(), 'team_name', None) or
-                        getattr(follow.get_to_entity(), 'group_name', None),
-                "profile_picture": getattr(follow.get_to_entity(), 'profile_picture', None) or
-                                   getattr(follow.get_to_entity(), 'team_logo', None) or
-                                   getattr(follow.get_to_entity(), 'group_logo', None)
-            }
-            for follow in following
-        ]
+        for follow in queryset:
+            if follow.target_type == FollowRequest.USER_TYPE:
+                user = User.objects.get(id=follow.target_id)
+                following.append({
+                    'creator_type': 1,
+                    'creator_id': user.id,
+                    'username': user.username,
+                    'profile': user.profile_picture.url if user.profile_picture else None
+                })
+            elif follow.target_type == FollowRequest.TEAM_TYPE:
+                team = Team.objects.get(id=follow.target_id)
+                following.append({
+                    'creator_type': 2,
+                    'creator_id': team.id,
+                    'username': team.team_username,
+                    'profile': team.team_logo.url if team.team_logo else None
+                })
+            elif follow.target_type == FollowRequest.GROUP_TYPE:
+                group = TrainingGroups.objects.get(id=follow.target_id)
+                following.append({
+                    'creator_type': 3,
+                    'creator_id': group.id,
+                    'username': group.group_username,
+                    'profile': group.group_logo.url if group.group_logo else None
+                })
 
         return Response({
-            "status": 1,
-            "message": _("Following list fetched successfully."),
-            "data": following_list
+            'status': 1,
+            'message': 'Following list fetched successfully.',
+            'data': following
         }, status=status.HTTP_200_OK)
+
 
 ##################################### Mobile Dashboard Image #######################################
 
