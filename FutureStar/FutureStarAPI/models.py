@@ -4,6 +4,8 @@ from django.utils import timezone
 import datetime
 from django.core.exceptions import ValidationError
 from datetime import datetime 
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 
@@ -253,8 +255,9 @@ class OTPSave(models.Model):
               
 
     def save(self, *args, **kwargs):
-            self.expires_at = timezone.now() + datetime.timedelta(minutes=1)
-            super().save(*args, **kwargs)
+        self.expires_at = timezone.now() + timedelta(minutes=1)  # Set expiration time
+        super().save(*args, **kwargs)
+
 
     def is_expired(self):
             return timezone.now() > self.expires_at
@@ -286,19 +289,29 @@ class FollowRequest(models.Model):
 
 
 
-# Helper function for dynamic file paths
+
 def user_directory_path(instance, filename):
     # Determine the content type (1 for Images, 2 for Videos)
     content_type = 'images' if instance.content_type == 1 else 'videos'
     # Construct path using user ID and content type
     return f'media/{content_type}/{filename}'
 
+
 class Album(models.Model):
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, related_name='user_album', on_delete=models.CASCADE)
-    team_id = models.ForeignKey('Team', null=True, blank=True, on_delete=models.CASCADE)
-    group_id = models.ForeignKey('TrainingGroups', related_name='training_group_album', null=True, blank=True, on_delete=models.CASCADE)
     name = models.TextField(null=True, blank=True)
+    created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,blank=True, null=True)  # Stores 1, 2, or 3 based on the type
     created_at = models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -308,28 +321,37 @@ class Album(models.Model):
     def __str__(self):
         return self.name
 
-
 class Gallary(models.Model):
-    CONTENT_TYPE = [
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+    CONTENT_TYPE_CHOICES = [
         (1, 'Images'),
         (2, 'Videos'),
     ]
     
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, related_name='user_gallary', on_delete=models.CASCADE)
-    team_id = models.ForeignKey('Team', null=True, blank=True, on_delete=models.CASCADE)
-    album_id = models.ForeignKey('Album', related_name='gallary_set', null=True, on_delete=models.CASCADE)
-    group_id = models.ForeignKey('TrainingGroups', related_name='training_group_gallary', null=True, blank=True, on_delete=models.CASCADE)
-    content_type = models.IntegerField(choices=CONTENT_TYPE, default=1)
+    created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
+    album = models.ForeignKey('Album', related_name='gallery_items', null=True, on_delete=models.CASCADE)
+    content_type = models.IntegerField(choices=CONTENT_TYPE_CHOICES, default=1)
     media_file = models.FileField(upload_to=user_directory_path, blank=True, null=True)
     created_at = models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Gallery Item {self.id} by User {self.user.id}"
+        return f"Gallery Item {self.id} by {self.get_creator_type_display()}"
 
     class Meta:
-        db_table = 'futurestar_app_gallary'
+        db_table = 'futurestar_app_gallery'
+
+
 
 
 
@@ -365,11 +387,20 @@ class PostReport(models.Model):
         db_table = 'futurestar_app_postreport'
 
 class Sponsor(models.Model):
+     
+    TEAM_TYPE = 1
+    GROUP_TYPE = 2
+
+    CREATOR_TYPE_CHOICES = (
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
     name = models.CharField(max_length=20,blank=True, null=True)
     logo = models.ImageField(upload_to='sponsors_images/', blank=True, null=True)  
     url = models.CharField(max_length=255, blank=True, null=True)
-    team_id = models.ForeignKey('Team', blank=True, null=True,  on_delete=models.CASCADE)
-    group_id = models.ForeignKey('TrainingGroups', blank=True, null=True,  on_delete=models.CASCADE)
+    created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
+   
     created_at= models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -378,6 +409,10 @@ class Sponsor(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_sponsor'
+
+
+
+
 
 class MobileDashboardBanner(models.Model):
     

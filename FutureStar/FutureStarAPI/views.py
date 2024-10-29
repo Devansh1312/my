@@ -1696,60 +1696,104 @@ class DetailAlbumListAPIView(generics.ListAPIView):
     
 
 
+
+
 class DetailAlbumCreateAPIView(generics.CreateAPIView):
     serializer_class = DetailAlbumSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
+    def activate_language(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            album_instance = serializer.save(user=request.user)
+    def post(self, request, *args, **kwargs):
+                self.activate_language(request)
 
-            media_files = request.FILES.getlist('media_file')  # Get a list of media files
-            gallery_items = []
+                creator_type = request.data.get('creator_type')
+                creator_type_id = request.data.get('creator_type_id')
+                print(f"Received creator_type: {creator_type}, creator_type_id: {creator_type_id}")
 
-            if media_files:
-                for media_file in media_files:
-                    gallary_data = {
-                        'user': request.user.id,
-                        'media_file': media_file,
-                        'album_id': album_instance.id,
-                        'content_type': request.data.get('content_type'),
-                        'team_id': request.data.get('team_id'),
-                        'group_id': request.data.get('group_id')
-                    }
-                    gallary_serializer = GallarySerializer(data=gallary_data)
-                    if gallary_serializer.is_valid():
-                        gallery_item = gallary_serializer.save()
-                        print(gallery_item)
-                        gallery_items.append(gallery_item)
-                    else:
-                        album_instance.delete()  # Clean up the album if any media fails
+                # Convert creator_type to integer
+                try:
+                    creator_type = int(creator_type)
+                except ValueError:
+                    return Response({
+                        'status': 0,
+                        'message': _('creator_type must be a valid integer.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Validate creator_type and creator_type_id
+                if creator_type == Album.USER_TYPE:  # User
+                    creator_type_id = request.user.id
+                elif creator_type == Album.TEAM_TYPE:  # Team
+                    if not creator_type_id or not Team.objects.filter(id=creator_type_id).exists():
                         return Response({
                             'status': 0,
-                            'message': _('Gallery entry creation failed.'),
-                            'errors': gallary_serializer.errors
+                            'message': _('A valid Team ID is required for the specified creator type.')
                         }, status=status.HTTP_400_BAD_REQUEST)
+                elif creator_type == Album.GROUP_TYPE:  # Group
+                    if not creator_type_id or not TrainingGroups.objects.filter(id=creator_type_id).exists():
+                        return Response({
+                            'status': 0,
+                            'message': _('A valid Group ID is required for the specified creator type.')
+                        }, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({
+                        'status': 0,
+                        'message': _('Invalid creator type.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Return response after processing all media files
-            album_data = DetailAlbumSerializer(album_instance).data
-            return Response({
-                'status': 1,
-                'message': _('Detailed Albums Add successfully.'),
-                'data': [album_data]
-            }, status=status.HTTP_201_CREATED)
+                # Update request data
+                request.data['created_by_id'] = creator_type_id  # Store the creator ID in created_by_id
+                print(f"Assigned created_by_id: {request.data['created_by_id']}")
 
-        return Response({
-            'status': 0,
-            'message': _('Album creation failed.'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+                # Save album instance
+                serializer = self.get_serializer(data=request.data)
+                if serializer.is_valid():
+                    album_instance = serializer.save()  # Save album instance
+                    print(f"Album created with ID: {album_instance.id}")
 
+                    # Process media files
+                    media_files = request.FILES.getlist('media_file')
+                    gallery_items = []
+
+                    if media_files:
+                        for media_file in media_files:
+                            gallery_data = {
+                                'user': request.user.id,
+                                'media_file': media_file,
+                                'album_id': album_instance.id,
+                                'content_type': request.data.get('content_type'),
+                                'team_id': creator_type_id if creator_type == Album.TEAM_TYPE else None,
+                                'group_id': creator_type_id if creator_type == Album.GROUP_TYPE else None,
+                            }
+                            gallery_serializer = GallarySerializer(data=gallery_data)
+                            if gallery_serializer.is_valid():
+                                gallery_item = gallery_serializer.save()
+                                gallery_items.append(gallery_item)
+                            else:
+                                album_instance.delete()  # Clean up the album if any media fails
+                                return Response({
+                                    'status': 0,
+                                    'message': _('Gallery entry creation failed.'),
+                                    'errors': gallery_serializer.errors
+                                }, status=status.HTTP_400_BAD_REQUEST)
+
+                    # Return response after processing all media files
+                    album_data = DetailAlbumSerializer(album_instance).data
+                    return Response({
+                        'status': 1,
+                        'message': _('Detailed Albums added successfully.'),
+                        'data': [album_data]
+                    }, status=status.HTTP_201_CREATED)
+
+                return Response({
+                    'status': 0,
+                    'message': _('Album creation failed.'),
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 ########### only album list ################
 
 class AlbumListAPIView(generics.ListAPIView):
@@ -1759,19 +1803,19 @@ class AlbumListAPIView(generics.ListAPIView):
     pagination_class = CustomPostPagination 
 
     def get_queryset(self):
-        team_id = self.request.query_params.get('team_id')
-        user_id = self.request.query_params.get('user_id')
-        group_id = self.request.query_params.get('group_id')
+        # You can filter albums based on creator_type or created_by_id here if needed
+        creator_type = self.request.query_params.get('creator_type', None)
+        created_by_id = self.request.query_params.get('created_by_id', None)
 
-        if team_id:
-            return Album.objects.filter(team_id=team_id).order_by('-created_at')
-        elif group_id:
-            return Album.objects.filter(group_id=group_id).order_by('-created_at')
-        elif user_id:
-            return Album.objects.filter(user=user_id, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
-        else:
-            return Album.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
+        queryset = Album.objects.all()
 
+        if creator_type is not None:
+            queryset = queryset.filter(creator_type=creator_type)
+
+        if created_by_id is not None:
+            queryset = queryset.filter(created_by_id=created_by_id)
+
+        return queryset
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -1784,29 +1828,41 @@ class AlbumListAPIView(generics.ListAPIView):
             total_records = queryset.count()
             total_pages = self.paginator.page.paginator.num_pages
 
-            # Custom response to include pagination data
+            # Custom response to include pagination data and additional fields
             return Response({
                 'status': 1,
                 'message': _('Albums fetched successfully.'),
-                'data': serializer.data,
+                'data': [
+                    {
+                        **album_data,
+                        'user': request.user.id,
+                        'team_id': album_data['created_by_id'] if album_data['creator_type'] == Album.TEAM_TYPE else None,
+                        'group_id': album_data['created_by_id'] if album_data['creator_type'] == Album.GROUP_TYPE else None,
+                    }
+                    for album_data in serializer.data
+                ],
                 'total_records': total_records,
                 'total_pages': total_pages,
                 'current_page': self.paginator.page.number
-                
             }, status=status.HTTP_200_OK)
 
-
-        albums = self.get_queryset()  # Renamed 'gallary' to 'albums' for clarity
+        albums = self.get_queryset()
         serializer = self.get_serializer(albums, many=True)
 
+        # Return data including user, team_id, and group_id
         return Response({
             'status': 1,
             'message': _('Album entries fetched successfully.'),
-          
-            'data': serializer.data
+            'data': [
+                {
+                    **album_data,
+                    'user': request.user.id,
+                    'team_id': album_data['created_by_id'] if album_data['creator_type'] == Album.TEAM_TYPE else None,
+                    'group_id': album_data['created_by_id'] if album_data['creator_type'] == Album.GROUP_TYPE else None,
+                }
+                for album_data in serializer.data
+            ]
         }, status=status.HTTP_200_OK)
- 
-
 ###########detail gallary with id with diffrentiatee ################
 class ImageGallaryListAPIView(generics.ListAPIView):
     serializer_class = GetGallarySerializer
@@ -1815,30 +1871,28 @@ class ImageGallaryListAPIView(generics.ListAPIView):
     pagination_class = CustomPostPagination
 
     def get_queryset(self):
-        team_id = self.request.query_params.get('team_id')
-        user_id = self.request.query_params.get('user_id')
-        group_id = self.request.query_params.get('group_id')
         content_type = self.request.query_params.get('content_type', 1)  # Default to images if not specified
 
-        # Base queryset for images with album_id as null and content_type=1 for images
-        queryset = Gallary.objects.filter(album_id__isnull=True, content_type=1)
+        # Base queryset for images with album_id as null and content_type for images
+        queryset = Gallary.objects.filter(album_id__isnull=True, content_type=content_type)
 
-        # Filter the base queryset according to parameters
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-        elif group_id:
-            queryset = queryset.filter(group_id=group_id)
-        elif user_id:
-            queryset = queryset.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True)
-        else:
-            queryset = queryset.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True)
+        # Get query parameters for filtering
+        creator_type = self.request.query_params.get('creator_type', None)
+        created_by_id = self.request.query_params.get('created_by_id', None)
+
+        # Filter the queryset based on creator_type and created_by_id
+        if created_by_id is not None:
+            queryset = queryset.filter(created_by_id=created_by_id)
+
+        if creator_type is not None:
+            queryset = queryset.filter(creator_type=creator_type)
 
         return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
-        
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             total_pages = self.paginator.page.paginator.num_pages
@@ -1848,10 +1902,20 @@ class ImageGallaryListAPIView(generics.ListAPIView):
             total_pages = 1
             current_page = 1
 
+        # Modify the response to include user, team_id, and group_id
+        response_data = []
+        for gallary_data in serializer.data:
+            response_data.append({
+                **gallary_data,
+                'user': request.user.id,
+                'team_id': gallary_data['created_by_id'] if gallary_data['creator_type'] == Gallary.TEAM_TYPE else None,
+                'group_id': gallary_data['created_by_id'] if gallary_data['creator_type'] == Gallary.GROUP_TYPE else None,
+            })
+
         return Response({
             'status': 1,
             'message': _('Image gallery entries fetched successfully.'),
-            'data': serializer.data,
+            'data': response_data,
             'total_records': queryset.count(),
             'total_pages': total_pages,
             'current_page': current_page
@@ -1865,30 +1929,28 @@ class VideoGallaryListAPIView(generics.ListAPIView):
     pagination_class = CustomPostPagination
 
     def get_queryset(self):
-        team_id = self.request.query_params.get('team_id')
-        user_id = self.request.query_params.get('user_id')
-        group_id = self.request.query_params.get('group_id')
         content_type = self.request.query_params.get('content_type', 2)  # Default to videos if not specified
-
+        
         # Base queryset for videos with album_id as null and content_type=2 for videos
-        queryset = Gallary.objects.filter(album_id__isnull=True, content_type=2)
+        queryset = Gallary.objects.filter(album_id__isnull=True, content_type=content_type)
 
-        # Filter the base queryset according to parameters
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-        elif group_id:
-            queryset = queryset.filter(group_id=group_id)
-        elif user_id:
-            queryset = queryset.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True)
-        else:
-            queryset = queryset.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True)
+        # Get query parameters for filtering
+        creator_type = self.request.query_params.get('creator_type', None)
+        created_by_id = self.request.query_params.get('created_by_id', None)
+
+        # Filter the queryset based on creator_type and created_by_id
+        if created_by_id is not None:
+            queryset = queryset.filter(created_by_id=created_by_id)
+
+        if creator_type is not None:
+            queryset = queryset.filter(creator_type=creator_type)
 
         return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
-        
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             total_pages = self.paginator.page.paginator.num_pages
@@ -1898,17 +1960,31 @@ class VideoGallaryListAPIView(generics.ListAPIView):
             total_pages = 1
             current_page = 1
 
+        # Modify the response to include user, team_id, and group_id
+        response_data = []
+        for gallary_data in serializer.data:
+            response_data.append({
+                'id': gallary_data.get('id'),
+                'album': gallary_data.get('album'),
+                'content_type': gallary_data.get('content_type'),
+                'media_file': gallary_data.get('media_file'),
+                'created_at': gallary_data.get('created_at'),
+                'updated_at': gallary_data.get('updated_at'),
+                'user': request.user.id,
+                'team_id': gallary_data['created_by_id'] if gallary_data['creator_type'] == Gallary.TEAM_TYPE else None,
+                'group_id': gallary_data['created_by_id'] if gallary_data['creator_type'] == Gallary.GROUP_TYPE else None,
+            })
+
         return Response({
             'status': 1,
             'message': _('Video gallery entries fetched successfully.'),
-            'data': serializer.data,
+            'data': response_data,
             'total_records': queryset.count(),
             'total_pages': total_pages,
             'current_page': current_page
         }, status=status.HTTP_200_OK)
-    
-class GallaryCreateAPIView(generics.CreateAPIView):
-    serializer_class = GetGallarySerializer
+
+class GallaryCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -1917,114 +1993,78 @@ class GallaryCreateAPIView(generics.CreateAPIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Extract album_id, team_id, and group_id from the request
-        album_id = request.data.get('album_id', None)
-        team_id = request.data.get('team_id', None)
-        group_id = request.data.get('group_id', None)
+        # Get album_id, creator_type, and created_by_id from request data
+        album_id = request.data.get('album_id')
+        created_by_id = request.data.get('created_by_id', request.user.id)
+        creator_type = request.data.get('creator_type')
 
-        # Initialize the serializer
-        serializer = self.get_serializer(data=request.data)
+        if not creator_type:
+            return Response({
+                'status': 0,
+                'message': _('creator_type is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = GetGallarySerializer(data=request.data)
         if serializer.is_valid():
+            # Fetch album instance if album_id is provided
             album_instance = None
-            team_instance = None
-            group_instance = None
-
-            # Fetch the training_group instance if training_group_id is provided
-            if group_id:
-                try:
-                    group_instance = TrainingGroups.objects.get(id=group_id)
-                except TrainingGroups.DoesNotExist:
-                        return Response({
-                        'status': 0,
-                        'message': _("Training group not found."),
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Fetch the album instance if album_id is provided
             if album_id:
                 try:
                     album_instance = Album.objects.get(id=album_id)
                 except Album.DoesNotExist:
-                      return Response({
+                    return Response({
                         'status': 0,
                         'message': _("Album not found."),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
+            # Validate the creator_type
+            creator_type = int(creator_type)
+            if creator_type not in [Gallary.USER_TYPE, Gallary.TEAM_TYPE, Gallary.GROUP_TYPE]:
+                return Response({
+                    'status': 0,
+                    'message': _("Invalid creator type."),
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Fetch the team instance if team_id is provided
-            if team_id:
-                try:
-                    team_instance = Team.objects.get(id=team_id)
-                except Team.DoesNotExist:
-                    return Response({
-                            'status': 0,
-                            'message': _("Team not found."),
-                        }, status=status.HTTP_400_BAD_REQUEST)
+            # Check permissions based on creator type
+            if creator_type == Gallary.USER_TYPE and created_by_id != request.user.id:
+                return Response({
+                    'status': 0,
+                    'message': _("You can only create a gallery for yourself."),
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            # New validation: Check if the album is related to a team
-            if album_instance:
-                if album_instance.team_id and not team_id:
-                      return Response({
-                            'status': 0,
-                            'message': _("This album is associated with a team. Please provide a team ID."),
-                        }, status=status.HTTP_400_BAD_REQUEST)
-
-                 
-                if not album_instance.team_id and team_id:
-                      return Response({
-                        'status': 0,
-                        'message': _("This album is not associated with a team. Please remove the team ID."),
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-                   
-
-            # New validation: Check if the album is related to a training group
-            if album_instance and group_instance:
-                if album_instance.group_id and not group_id:
+            elif creator_type == Gallary.TEAM_TYPE:
+                if not Team.objects.filter(id=created_by_id).exists():
+                    print("vbn",Team.id)
+                    print("dfgdf",created_by_id)
+                    print(Team.objects.filter(id=created_by_id).exists())
                     return Response({
                         'status': 0,
-                        'message': _("This album is associated with a training group. Please provide a training group ID."),
+                        'message': _("Invalid team ID."),
                     }, status=status.HTTP_400_BAD_REQUEST)
-                   
-                if not album_instance.group_id and group_id:
-                               return Response({
-                                'status': 0,
-                                'message': _("This album is not associated with a training group. Please remove the training group ID."),
-                            }, status=status.HTTP_400_BAD_REQUEST)
-                                
 
-            # Condition 0: Both Training_id and album_id are provided
-            if group_instance and album_instance:
-                serializer.save(album_id=album_instance, group_id=group_instance)
-            # Condition 1: Both team_id and album_id are provided
-            elif team_instance and album_instance:
-                serializer.save(album_id=album_instance, team_id=team_instance)
-            # Condition 2: Only album_id is provided (check if it belongs to the user)
-            elif album_instance:
-                if album_instance.user == request.user:  # Assuming Album has a user field
-                    serializer.save(album_id=album_instance)
-                else:
-                        return Response({
-                            'status': 0,
-                            'message': _("You do not have permission to add to this album."),
-                        }, status=status.HTTP_400_BAD_REQUEST)
-                            
+            elif creator_type == Gallary.GROUP_TYPE:
+                if not TrainingGroups.objects.filter(id=created_by_id).exists():
+                    return Response({
+                        'status': 0,
+                        'message': _("Invalid group ID."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-                  
-            # Condition 3: Neither team_id nor album_id is provided
-            else:
-                serializer.save(album_id=None)
+            # Save the gallery entry
+            gallery = serializer.save(created_by_id=created_by_id, creator_type=creator_type, album_id=album_instance)
 
             return Response({
                 'status': 1,
                 'message': _('Gallery entry created successfully.'),
-                'data': serializer.data
+                'data': GetGallarySerializer(gallery).data,
+                'team_id': created_by_id if creator_type == Gallary.TEAM_TYPE else None,
+                'group_id': created_by_id if creator_type == Gallary.GROUP_TYPE else None
             }, status=status.HTTP_201_CREATED)
 
         return Response({
             'status': 0,
             'message': _('Failed to create Gallery entry.'),
             'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+        }, status=status.HTTP_400_BAD_REQUEST)    
 ###########gallary list latest 9 ################
 
 class LatestGallaryListAPIView(generics.ListCreateAPIView):
@@ -2033,32 +2073,36 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
-        team_id = self.request.data.get('team_id')
-        user_id = self.request.data.get('user_id')
-        group_id = self.request.data.get('group_id')
+        creator_type = self.request.query_params.get('creator_type')
+        created_by_id = self.request.query_params.get('created_by_id', self.request.user.id)
 
-        if team_id:
-            return Gallary.objects.filter(team_id=team_id, album_id__isnull=True).order_by('-created_at')
-        elif group_id:
-            return Gallary.objects.filter(group_id=group_id, album_id__isnull=True).order_by('-created_at')
-        elif user_id:
-            return Gallary.objects.filter(user_id=user_id, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+        queryset = Gallary.objects.filter(album_id__isnull=True).order_by('-created_at')
+        if creator_type == str(Gallary.TEAM_TYPE):
+            queryset = queryset.filter(creator_type=Gallary.TEAM_TYPE, created_by_id=created_by_id)
+        elif creator_type == str(Gallary.GROUP_TYPE):
+            queryset = queryset.filter(creator_type=Gallary.GROUP_TYPE, created_by_id=created_by_id)
+        elif creator_type == str(Gallary.USER_TYPE):
+            queryset = queryset.filter(creator_type=Gallary.USER_TYPE, created_by_id=created_by_id)
         else:
-            return Gallary.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True, album_id__isnull=True).order_by('-created_at')
+            queryset = queryset.filter(created_by_id=self.request.user.id)
+        
+        return queryset
 
     def get_latest_albums(self):
-        team_id = self.request.data.get('team_id')
-        user_id = self.request.data.get('user_id')
-        group_id = self.request.data.get('group_id')
+        creator_type = self.request.query_params.get('creator_type')
+        created_by_id = self.request.query_params.get('created_by_id', self.request.user.id)
 
-        if team_id:
-            return Album.objects.filter(team_id=team_id).order_by('-created_at')
-        elif group_id:
-            return Album.objects.filter(group_id=group_id).order_by('-created_at')
-        elif user_id:
-            return Album.objects.filter(user=user_id, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
+        queryset = Album.objects.all().order_by('-created_at')
+        if creator_type == str(Gallary.TEAM_TYPE):
+            queryset = queryset.filter(creator_type=Gallary.TEAM_TYPE, created_by_id=created_by_id)
+        elif creator_type == str(Gallary.GROUP_TYPE):
+            queryset = queryset.filter(creator_type=Gallary.GROUP_TYPE, created_by_id=created_by_id)
+        elif creator_type == str(Gallary.USER_TYPE):
+            queryset = queryset.filter(creator_type=Gallary.USER_TYPE, created_by_id=created_by_id)
         else:
-            return Album.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-created_at')
+            queryset = queryset.filter(creator_type=Gallary.USER_TYPE, created_by_id=self.request.user.id)
+        
+        return queryset
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -2073,24 +2117,65 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
         image_serializer = self.get_serializer(images, many=True)
         video_serializer = self.get_serializer(videos, many=True)
 
-        image_serializer = self.get_serializer(images, many=True)
-        video_serializer = self.get_serializer(videos, many=True)
-
         # Fetch and serialize the latest 9 albums
         latest_albums = self.get_latest_albums()[:9]
         album_serializer = AlbumSerializer(latest_albums, many=True)
+
+        # Retrieve creator type from the request data
+        creator_type = request.query_params.get('creator_type')
+
+        # Format images, videos, and albums response data with specific fields
+        def format_response_data(gallary_data):
+            return {
+                'id': gallary_data.get('id'),
+                'album': gallary_data.get('album'),
+                'content_type': gallary_data.get('content_type'),
+                'media_file': gallary_data.get('media_file'),
+                'created_at': gallary_data.get('created_at'),
+                'updated_at': gallary_data.get('updated_at'),
+                'user': request.user.id,
+                'team_id': gallary_data['created_by_id'] if gallary_data['creator_type'] == Gallary.TEAM_TYPE else None,
+                'group_id': gallary_data['created_by_id'] if gallary_data['creator_type'] == Gallary.GROUP_TYPE else None,
+            }
+
+        # Apply formatting based on creator type to each image, video, and album entry
+        formatted_images = [
+            format_response_data(data) for data in image_serializer.data
+            if (creator_type == str(Gallary.TEAM_TYPE) and data['creator_type'] == Gallary.TEAM_TYPE) or
+               (creator_type == str(Gallary.GROUP_TYPE) and data['creator_type'] == Gallary.GROUP_TYPE) or
+               (creator_type == str(Gallary.USER_TYPE) and data['creator_type'] == Gallary.USER_TYPE)
+        ]
+        formatted_videos = [
+            format_response_data(data) for data in video_serializer.data
+            if (creator_type == str(Gallary.TEAM_TYPE) and data['creator_type'] == Gallary.TEAM_TYPE) or
+               (creator_type == str(Gallary.GROUP_TYPE) and data['creator_type'] == Gallary.GROUP_TYPE) or
+               (creator_type == str(Gallary.USER_TYPE) and data['creator_type'] == Gallary.USER_TYPE)
+        ]
+        formatted_albums = [
+            {
+                'id': album.get('id'),
+                'name': album.get('name'),
+                'created_at': album.get('created_at'),
+                'updated_at': album.get('updated_at'),
+                'user': request.user.id,
+                'team_id': album['created_by_id'] if album['creator_type'] == Album.TEAM_TYPE else None,
+                'group_id': album['created_by_id'] if album['creator_type'] == Album.GROUP_TYPE else None,
+            }
+            for album in album_serializer.data
+            if (creator_type == str(Album.TEAM_TYPE) and album['creator_type'] == Album.TEAM_TYPE) or
+               (creator_type == str(Album.GROUP_TYPE) and album['creator_type'] == Album.GROUP_TYPE) or
+               (creator_type == str(Album.USER_TYPE) and album['creator_type'] == Album.USER_TYPE)
+        ]
 
         return Response({
             'status': 1,
             'message': _('Gallery entries and latest albums fetched successfully.'),
             'data': {
-                'images': image_serializer.data,
-                'videos': video_serializer.data,
-                'albums': album_serializer.data,
+                'images': formatted_images,
+                'videos': formatted_videos,
+                'albums': formatted_albums,
             },
         }, status=status.HTTP_200_OK)
-
-
 
 
 ###########  gallary list delete ################

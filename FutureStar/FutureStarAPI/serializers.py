@@ -516,20 +516,19 @@ class GallarySerializer(serializers.ModelSerializer):
 class GetGallarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallary
-        fields = ['id', 'user', 'team_id', 'group_id', 'album_id', 'content_type', 'media_file', 'created_at', 'updated_at']
-        read_only_fields = ['album_id', 'user']  # Make 'user' read-only since it will be auto-assigned
+        fields = ['id', 'album', 'content_type', 'media_file', 'created_at', 'updated_at', 'creator_type', 'created_by_id']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         request = self.context.get('request')
         if 'media_file' in representation:
-                full_url = representation['media_file']
-                parsed_url = urlparse(full_url)
-                relative_url = parsed_url.path  # Extracts the path component, which is the relative URL
-                representation['media_file'] = relative_url
+            full_url = representation['media_file']
+            parsed_url = urlparse(full_url)
+            relative_url = parsed_url.path
+            representation['media_file'] = relative_url
 
         if request and request.method == 'GET':
-            representation.pop('album_id', None)
+            representation.pop('album', None)
         return representation
 
     def validate(self, data):
@@ -548,20 +547,30 @@ class GetGallarySerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError("The file type could not be determined.")
         return data
-
-    def create(self, validated_data):
-        # Automatically set the user from the request context
-        validated_data['user'] = self.context['request'].user
-        return Gallary.objects.create(**validated_data)
-
 class DetailAlbumSerializer(serializers.ModelSerializer):
     gallary_items = GallarySerializer(many=True, source='gallary_set', read_only=True)
     thumbnail = serializers.SerializerMethodField()
+    entity = serializers.SerializerMethodField()
 
     class Meta:
         model = Album
-        fields = ['id', 'user', 'team_id', 'group_id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at']
-        read_only_fields = ['user']
+        fields = ['id', 'name', 'thumbnail', 'gallary_items', 'created_at', 'updated_at', 'entity']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        # Get creator details from the validated data
+        creator_type = self.context['request'].data.get('creator_type')
+        creator_type_id = self.context['request'].data.get('creator_type_id')
+
+        # Debugging output
+        print(f"Creating Album with creator_type: {creator_type}, creator_type_id: {creator_type_id}")
+
+        # Set `created_by_id` and `creator_type` based on incoming data
+        validated_data['created_by_id'] = creator_type_id
+        validated_data['creator_type'] = creator_type
+
+        # Now create and return the Album instance
+        return Album.objects.create(**validated_data)
 
     def get_thumbnail(self, obj):
         last_media = Gallary.objects.filter(album_id=obj).order_by('-created_at').first()
@@ -569,6 +578,43 @@ class DetailAlbumSerializer(serializers.ModelSerializer):
             return None
         return last_media.media_file.url
 
+    def get_entity(self, obj):
+        if obj.creator_type == Album.TEAM_TYPE:
+            try:
+                team = Team.objects.get(id=obj.created_by_id)
+                return {
+                    'id': team.id,
+                    'name': team.team_name,
+                    'profile_image': team.team_logo.url if team.team_logo else None,
+                    'type': 'team'
+                }
+            except Team.DoesNotExist:
+                return None  # Handle the error as needed
+
+        elif obj.creator_type == Album.GROUP_TYPE:
+            try:
+                group = TrainingGroups.objects.get(id=obj.created_by_id)
+                return {
+                    'id': group.id,
+                    'name': group.group_name,
+                    'profile_image': group.group_logo.url if group.group_logo else None,
+                    'type': 'group'
+                }
+            except TrainingGroups.DoesNotExist:
+                return None  # Handle the error as needed
+
+        else:  # USER_TYPE
+            try:
+                user = User.objects.get(id=obj.created_by_id)
+                return {
+                    'id': user.id,
+                    'username': user.username,
+                    'profile_image': user.profile_picture.url if user.profile_picture else None,
+                    'type': 'user'
+                }
+            except User.DoesNotExist:
+                return None  # Handle the error as needed
+            
 class AlbumSerializer(serializers.ModelSerializer):
     # Define a custom field to retrieve the thumbnail
    
@@ -577,7 +623,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
         # fields = '__all__'
-        fields = ['id', 'user','team_id','group_id', 'name','thumbnail', 'created_at', 'updated_at' ]
+        fields = ['id', 'created_by_id', 'creator_type', 'name','thumbnail', 'created_at', 'updated_at' ]
 
     # Method to get the most recent image or video from the related Gallary
     def get_thumbnail(self, obj):
@@ -597,6 +643,8 @@ class AlbumSerializer(serializers.ModelSerializer):
         
         return None
     
+
+
 
 class ReportSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
