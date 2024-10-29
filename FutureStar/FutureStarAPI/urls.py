@@ -15,6 +15,11 @@ urlpatterns = [
         path('api/verify-otp/', VerifyOTPAPIView.as_view(), name='verify-otp'),
         path('api/change-password-otp/', ChangePasswordOtpAPIView.as_view(), name='change-password-otp'),
         
+
+        # Switch Current User Type 
+        path('api/user/update-current-type/', UpdateCurrentTypeAPIView.as_view()),
+
+
         # For logged-in users
         path('api/change-password/', ChangePasswordAPIView.as_view(), name='change-password'),   
         

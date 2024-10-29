@@ -30,7 +30,31 @@ from django.utils.timezone import now
 
 logger = logging.getLogger(__name__)
 
+##################################################### User Current Type Switch API Z###############################################
+class UpdateCurrentTypeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def put(self, request, *args, **kwargs):
+        user = request.user  # Retrieve the authenticated user from the token
+        
+        # Deserialize and validate input data
+        serializer = UpdateCurrentTypeSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()  # Updates the current_type for the authenticated user
+            return Response({
+                'status': 1,
+                'message': _('Current type updated successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            'status': 0,
+            'message': _('Failed to update current type.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+#################################################### Get User data ##########################################################################################################
 def get_user_data(user, request):
     """Returns a dictionary with all user details."""
     
@@ -63,6 +87,7 @@ def get_user_data(user, request):
         'id': user.id,
         'followers_count': 100,  # Actual follower count
         'following_count': 100,  # Actual following count
+        'creator_type':1,
         'post_count': post_count,
         'user_role': user.role_id,
         'username': user.username,
@@ -96,6 +121,96 @@ def get_user_data(user, request):
         'device_token': user.device_token,
     }
 
+
+######################################################################################### Get Team Data ###################################################################
+def get_team_data(user, request):
+    """Returns a dictionary with the user's team details."""
+    
+    # Get the user's team (assuming only one team is allowed per user)
+    try:
+        team = Team.objects.get(user_id=user)
+    except Team.DoesNotExist:
+        return None  # If no team exists, return None or empty dictionary as needed
+    
+    # Get post count for the team
+    team_post_count = Post.objects.filter(created_by_id=team.id, creator_type=Post.TEAM_TYPE).count()
+    
+    return {
+        'team_id': team.id,
+        'post_count': team_post_count,
+        'creator_type':2,
+        'team_name': team.team_name,
+        'team_username': team.team_username,
+        'team_type_id': team.team_type.id if team.team_type else None,
+        'team_type_name': team.team_type.name_en if team.team_type else None,
+        'bio': team.bio,
+        'team_establishment_date': team.team_establishment_date,
+        'team_president': team.team_president,
+        'latitude': team.latitude,
+        'longitude': team.longitude,
+        'address': team.address,
+        'house_no': team.house_no,
+        'premises': team.premises,
+        'street': team.street,
+        'city': team.city,
+        'state': team.state,
+        'country_name': team.country_name,
+        'postalCode': team.postalCode,
+        'country_code': team.country_code,
+        'country_id': team.country_id.id if team.country_id else None,
+        'country_name': team.country_id.name if team.country_id else None,
+        'city_id': team.city_id.id if team.city_id else None,
+        'city_name': team.city_id.name if team.city_id else None,
+        'phone': team.phone,
+        'email': team.email,
+        'age_group': team.age_group,
+        'entry_fees': team.entry_fees,
+        'branches': team.branches,
+        'team_logo': team.team_logo.url if team.team_logo else None,
+        'team_background_image': team.team_background_image.url if team.team_background_image else None,
+        'team_uniform': team.team_uniform,
+    }
+
+
+############################################################################# Get Group Data ######################################################
+def get_group_data(user, request):
+    """Returns a dictionary with the user's group details."""
+    
+    # Get the user's group (assuming only one group is allowed per user)
+    try:
+        group = TrainingGroups.objects.get(group_founder=user)
+    except TrainingGroups.DoesNotExist:
+        return None  # If no group exists, return None or empty dictionary as needed
+    
+    # Get post count for the group
+    group_post_count = Post.objects.filter(created_by_id=group.id, creator_type=Post.GROUP_TYPE).count()
+    
+    return {
+        'group_id': group.id,
+        'post_count': group_post_count,
+        'creator_type':3,
+        'group_name': group.group_name,
+        'group_username': group.group_username,
+        'bio': group.bio,
+        'group_founder': group.group_founder.id,
+        'latitude': group.latitude,
+        'longitude': group.longitude,
+        'address': group.address,
+        'house_no': group.house_no,
+        'premises': group.premises,
+        'street': group.street,
+        'city': group.city,
+        'state': group.state,
+        'country_name': group.country_name,
+        'postalCode': group.postalCode,
+        'country_code': group.country_code,
+        'phone': group.phone,
+        'group_logo': group.group_logo.url if group.group_logo else None,
+        'group_background_image': group.group_background_image.url if group.group_background_image else None,
+    }
+
+
+###################################################### Send OTP API #############################################################################################################
               
 # Generate a random 6-digit OTP
 def generate_otp():
@@ -320,7 +435,10 @@ class verify_and_register(APIView):
                     'data': {
                         'refresh_token': str(refresh),
                         'access_token': str(refresh.access_token),
-                        **get_user_data(user, request) 
+                        'user':get_user_data(user, request),
+                        'team':get_team_data(user, request),
+                        'group':get_group_data(user, request),
+                        'current_type':user.current_type,
                     }
                 }, status=status.HTTP_201_CREATED)
 
@@ -376,7 +494,10 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                **get_user_data(user, request) 
+                                'user':get_user_data(user, request),
+                                'team':get_team_data(user, request),
+                                'group':get_group_data(user, request),
+                                'current_type':user.current_type,
 
                             }
                         }, status=status.HTTP_200_OK)
@@ -418,7 +539,10 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                **get_user_data(user, request) 
+                                'user':get_user_data(user, request),
+                                'team':get_team_data(user, request),
+                                'group':get_group_data(user, request),
+                                'current_type':user.current_type,
 
                             }
                         }, status=status.HTTP_200_OK)
@@ -674,7 +798,10 @@ class UpdateProfilePictureAPIView(APIView):
             'status': 1,
             'message': _('Profile Image updated successfully.'),
             'data': {
-                **get_user_data(user, request)
+                'user':get_user_data(user, request),
+                'team':get_team_data(user, request),
+                'group':get_group_data(user, request),
+                'current_type':user.current_type,
             }
         }, status=status.HTTP_200_OK)
 
@@ -694,7 +821,10 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Player Details.'),
             'data': {
-                **get_user_data(user, request)
+                'user':get_user_data(user, request),
+                'team':get_team_data(user, request),
+                'group':get_group_data(user, request),
+                'current_type':user.current_type,
             }
         }, status=status.HTTP_200_OK)
 
@@ -810,7 +940,10 @@ class EditProfileAPIView(APIView):
             'status': 1,
             'message': _('Profile updated successfully.'),
             'data': {
-                **get_user_data(user, request)
+                'user':get_user_data(user, request),
+                'team':get_team_data(user, request),
+                'group':get_group_data(user, request),
+                'current_type':user.current_type,
             }
         }, status=status.HTTP_200_OK)
 

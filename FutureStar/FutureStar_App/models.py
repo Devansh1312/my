@@ -116,6 +116,15 @@ class PlayingPosition(models.Model):
 
 # Custom User Model
 class User(AbstractBaseUser, PermissionsMixin):
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    CURRENT_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+    current_type = models.IntegerField(choices=CURRENT_TYPE_CHOICES,default=1)  # Stores 1, 2, or 3 based on the type
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     username = models.CharField(max_length=150, unique=True)

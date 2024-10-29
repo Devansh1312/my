@@ -789,3 +789,17 @@ class FAQSerializer(serializers.ModelSerializer):
         if language == 'ar':
             return obj.answer_ar
         return obj.answer_en
+    
+
+
+class UpdateCurrentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['current_type']
+    
+    def validate_current_type(self, value):
+        if value not in [User.USER_TYPE, User.TEAM_TYPE, User.GROUP_TYPE]:
+            raise serializers.ValidationError("Invalid type. Allowed values are 1, 2, or 3.")
+        return value
+
+
