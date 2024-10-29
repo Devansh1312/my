@@ -60,7 +60,7 @@ urlpatterns = [
         path('api/media/all_videos/', VideoGallaryListAPIView.as_view(), name='gallary-list'),
         
         path('api/media/create/', GallaryCreateAPIView.as_view(), name='gallary-create'),
-        path('api/media/recent_media/', LatestGallaryListAPIView.as_view()),
+        path('api/media/recent/', LatestGallaryListAPIView.as_view()),
        
         #############delete album & gallary############
 

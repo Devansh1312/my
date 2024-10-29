@@ -181,43 +181,46 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PostCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
-    user = UserSerializer(read_only=True)
-    parent = serializers.PrimaryKeyRelatedField(queryset=Post_comment.objects.all(), allow_null=True)
-    entity = serializers.SerializerMethodField()  # Add entity field
+    entity = serializers.SerializerMethodField()
 
     class Meta:
         model = Post_comment
-        fields = ['id', 'user', 'post', 'parent', 'comment', 'date_created', 'replies', 'entity']
+        fields = ['id', 'created_by_id', 'creator_type', 'post', 'parent', 'comment', 'date_created', 'replies', 'entity']
 
     def get_replies(self, obj):
-        # Get replies for this comment
+        # Only fetch replies (children) where parent is the current comment (obj)
         replies = Post_comment.objects.filter(parent=obj).order_by('-date_created')
-        return PostCommentSerializer(replies, many=True).data  # Serialize replies
+        return PostCommentSerializer(replies, many=True, context=self.context).data
 
     def get_entity(self, obj):
-        # Return unified structure for Team, Group, or User
-        if obj.team_id:  # Corrected field name
+        # Get entity details based on creator_type
+        if obj.creator_type == Post_comment.TEAM_TYPE:
+            team = Team.objects.get(id=obj.created_by_id)
             return {
-                'id': obj.team_id.id,
-                'username': obj.team_id.team_name,
-                'profile_image': obj.team_id.team_logo.url if obj.team_id.team_logo else None,
-                'type': 'team'  # Optional: entity type for frontend differentiation
+                'id': team.id,
+                'name': team.team_name,
+                'profile_image': team.team_logo.url if team.team_logo else None,
+                'type': 'team'
             }
-        elif obj.group_id:  # Corrected typo and field name
+        elif obj.creator_type == Post_comment.GROUP_TYPE:
+            group = TrainingGroups.objects.get(id=obj.created_by_id)
             return {
-                'id': obj.group_id.id,
-                'username': obj.group_id.group_name,
-                'profile_image': obj.group_id.group_logo.url if obj.group_id.group_logo else None,
-                'type': 'group'  # Optional: entity type for frontend differentiation
+                'id': group.id,
+                'name': group.group_name,
+                'profile_image': group.group_logo.url if group.group_logo else None,
+                'type': 'group'
             }
-        elif obj.user:
+        else:  # USER_TYPE
+            user = User.objects.get(id=obj.created_by_id)
             return {
-                'id': obj.user.id,
-                'username': obj.user.username,
-                'profile_image': obj.user.profile_picture.url if obj.user.profile_picture else None,
-                'type': 'user'  # Optional: entity type for frontend differentiation
+                'id': user.id,
+                'username': user.username,
+                'profile_image': user.profile_picture.url if user.profile_picture else None,
+                'type': 'user'
             }
         return None
+
+
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -226,51 +229,49 @@ class PostSerializer(serializers.ModelSerializer):
     view_count = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
-    is_reported = serializers.SerializerMethodField()  # New field
-
-
+    is_reported = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = [
             'id', 'entity', 'title', 'description', 'image', 'media_type',
-            'date_created', 'comments', 'view_count', 'like_count','is_like','is_reported',
-            'latitude', 'longitude', 'address', 'house_no', 
-            'premises', 'street', 'city', 'state', 'country_name', 
+            'date_created', 'comments', 'view_count', 'like_count', 'is_like', 'is_reported',
+            'latitude', 'longitude', 'address', 'house_no',
+            'premises', 'street', 'city', 'state', 'country_name',
             'postalCode', 'country_code'
         ]
+
+    def get_entity(self, obj):
+        if obj.creator_type == Post.USER_TYPE:
+            user = User.objects.get(id=obj.created_by_id)
+            return {
+                'id': user.id,
+                'username': user.username,
+                'profile_image': user.profile_picture.url if user.profile_picture else None,
+                'type': 'user'
+            }
+        elif obj.creator_type == Post.TEAM_TYPE:
+            team = Team.objects.get(id=obj.created_by_id)
+            return {
+                'id': team.id,
+                'username': team.team_name,
+                'profile_image': team.team_logo.url if team.team_logo else None,
+                'type': 'team'
+            }
+        elif obj.creator_type == Post.GROUP_TYPE:
+            group = TrainingGroups.objects.get(id=obj.created_by_id)
+            return {
+                'id': group.id,
+                'username': group.group_name,
+                'profile_image': group.group_logo.url if group.group_logo else None,
+                'type': 'group'
+            }
+        return None
 
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
         return obj.image.url if obj.image else None
-    
-    def get_entity(self, obj):
-        if obj.team:
-            # Return unified structure for Team
-            return {
-                'id': obj.team.id,
-                'username': obj.team.team_name,
-                'profile_image': obj.team.team_logo.url if obj.team.team_logo else None,
-                'type': 'team'  # Optional, to indicate type
-            }
-        elif obj.group:
-            # Return unified structure for Group
-            return {
-                'id': obj.group.id,
-                'username': obj.group.group_name,  # Using group_name as a username equivalent
-                'profile_image': obj.group.group_logo.url if obj.group.group_logo else None,
-                'type': 'group'  # Optional, to indicate type
-            }
-        elif obj.user:
-            # Return unified structure for User
-            return {
-                'id': obj.user.id,
-                'username': obj.user.username,
-                'profile_image': obj.user.profile_picture.url if obj.user.profile_picture else None,
-                'type': 'user'  # Optional, to indicate type
-            }
-        return None
 
     def get_view_count(self, obj):
         return PostView.objects.filter(post=obj).count()
@@ -280,7 +281,7 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_is_like(self, obj):
         request = self.context.get('request')  # Access the request object from the context
-        if request and PostLike.objects.filter(post=obj, user=request.user).exists():
+        if request and PostLike.objects.filter(post=obj, created_by_id=request.user.id, creator_type=Post.USER_TYPE).exists():
             return True
         return False
     
@@ -298,18 +299,17 @@ class PostSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        # Override create to handle team_id/group_id/user assignments
-        user = validated_data.pop('user', None)
-        team_id = validated_data.pop('team_id', None)
-        group_id = validated_data.pop('group_id', None)
+        # Remove 'created_by_id' and 'creator_type' from validated_data if they exist
+        created_by_id = validated_data.pop('created_by_id', None)
+        creator_type = validated_data.pop('creator_type', None)
         
-        post = Post.objects.create(**validated_data, user=user, team_id=team_id, group_id=group_id)
+        # Now create the post with validated data and additional fields
+        post = Post.objects.create(**validated_data, created_by_id=created_by_id, creator_type=creator_type)
         return post
 
+
+
     def update(self, instance, validated_data):
-        instance.user = validated_data.get('user', instance.user)
-        instance.team = validated_data.get('team', instance.team)
-        instance.group = validated_data.get('group', instance.group)
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.image = validated_data.get('image', instance.image)

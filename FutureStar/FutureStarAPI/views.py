@@ -38,7 +38,7 @@ def get_user_data(user, request):
     followers_count = FollowRequest.count_followers(to_user=user)
     following_count = FollowRequest.count_following(from_user=user)
     
-    post_count = Post.objects.filter(user=user, team__isnull=True).count()
+    post_count = Post.objects.filter(created_by_id=user.id, creator_type=1).count()
     
     gender_name = None
     if user.gender:
@@ -880,7 +880,11 @@ class PostLikeAPIView(APIView):
             }, status=404)
 
         # Toggle like/unlike
-        post_like, created = PostLike.objects.get_or_create(user=request.user, post=post)
+        creator_type = request.data.get('creator_type')
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user ID
+
+        post_like, created = PostLike.objects.get_or_create(created_by_id=created_by_id, post=post, creator_type=creator_type)
+        
         if not created:
             # If the user already liked the post, unlike it (delete the like)
             post_like.delete()
@@ -903,10 +907,9 @@ class AllPostsListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    pagination_class = CustomPostPagination  # Use custom pagination
+    pagination_class = CustomPostPagination
 
     def get_queryset(self):
-        # Return all posts without any filters
         return Post.objects.all().order_by('-date_created')
 
     def get(self, request, *args, **kwargs):
@@ -916,36 +919,25 @@ class AllPostsListAPIView(generics.ListAPIView):
 
         queryset = self.get_queryset()
 
-        # Paginate the queryset
         page = self.paginate_queryset(queryset)
-        if page is None:  # If the page is None, this means pagination failed
-            # This block will handle invalid page number
+        if page is None:
             return Response({
                 'status': 0,
                 'message': _('Page Not Found'),
                 'data': []
             }, status=400)
 
-        if page is not None:
-            serializer = self.get_serializer(page, many=True, context={'request': request})
-            total_records = queryset.count()
-            total_pages = self.paginator.page.paginator.num_pages
+        serializer = self.get_serializer(page, many=True, context={'request': request})
+        total_records = queryset.count()
+        total_pages = self.paginator.page.paginator.num_pages
 
-            # Custom response to include pagination data
-            return Response({ 
-                'status': 1,
-                'message': _('All posts fetched successfully.'),
-                'data': serializer.data,
-                'total_records': total_records,
-                'total_pages': total_pages,
-                'current_page': self.paginator.page.number
-            }, status=status.HTTP_200_OK)
-
-        serializer = self.get_serializer(queryset, many=True, context={'request': request})
-        return Response({
+        return Response({ 
             'status': 1,
             'message': _('All posts fetched successfully.'),
-            'data': serializer.data
+            'data': serializer.data,
+            'total_records': total_records,
+            'total_pages': total_pages,
+            'current_page': self.paginator.page.number
         }, status=status.HTTP_200_OK)
 
 ##########  LIST OF POST BASED ON USER TEAM AND GROUP ################
@@ -953,24 +945,25 @@ class PostListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    pagination_class = CustomPostPagination  # Use custom pagination
+    pagination_class = CustomPostPagination
 
     def get_queryset(self):
-        team_id = self.request.data.get('team_id')
-        group_id = self.request.data.get('group_id')
-        user_id = self.request.data.get('user_id')
+        # Get created_by_id and creator_type from query_params
+        created_by_id = self.request.query_params.get('created_by_id')
+        creator_type = self.request.query_params.get('creator_type')
 
-        if team_id:
-            return Post.objects.filter(team_id=team_id).order_by('-date_created')
-        elif group_id:
-            return Post.objects.filter(group_id=group_id).order_by('-date_created')
-        elif user_id:
-            return Post.objects.filter(user=user_id, team_id__isnull=True, group_id__isnull=True).order_by('-date_created')
-        else:
-            return Post.objects.filter(user=self.request.user, team_id__isnull=True, group_id__isnull=True).order_by('-date_created')
+        # Set default values if either parameter is missing
+        if not created_by_id or not creator_type:
+            created_by_id = self.request.user.id  # Default to the logged-in user’s ID
+            creator_type = 1  # Default type
 
+        # Filter posts based on created_by_id and creator_type
+        return Post.objects.filter(
+            created_by_id=created_by_id,
+            creator_type=creator_type
+        ).order_by('-date_created')
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -998,6 +991,7 @@ class PostListAPIView(generics.ListAPIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
+
 ######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1008,49 +1002,36 @@ class PostCreateAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        team_id = request.data.get('team_id')  # Optional team_id from request data
-        group_id = request.data.get('group_id')  # Optional group_id from request data
+        # Get created_by_id and creator_type from request data
+        created_by_id = request.data.get('created_by_id')
+        creator_type = request.data.get('creator_type')
+
+        if not created_by_id or not creator_type:
+            return Response({
+                'status': 0,
+                'message': _('created_by_id and creator_type are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = PostSerializer(data=request.data)
-
         if serializer.is_valid():
-            try:
-                # Check if team_id is provided
-                if team_id:
-                    team = Team.objects.get(id=team_id)
-                    post = serializer.save(user=request.user, team_id=team.id)
-                elif group_id:
-                    group = TrainingGroups.objects.get(id=group_id)
-                    post = serializer.save(user=request.user, group_id=group.id)
-                else:
-                    post = serializer.save(user=request.user)
+            post = serializer.save(created_by_id=created_by_id, creator_type=creator_type)
 
-                # Handle image upload
-                if "image" in request.FILES:
-                    image = request.FILES["image"]
-                    file_extension = image.name.split('.')[-1]
-                    unique_suffix = get_random_string(8)  # Ensure unique filename
-                    file_name = f"post_images/{post.id}_{request.user.username}_{unique_suffix}.{file_extension}"
-                    image_path = default_storage.save(file_name, image)
-                    post.image = image_path
-                    post.save()
+            if "image" in request.FILES:
+                image = request.FILES["image"]
+                file_extension = image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                file_name = f"post_images/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
+                image_path = default_storage.save(file_name, image)
+                post.image = image_path
+                post.save()
+            
+            post.refresh_from_db()
 
-                return Response({
-                    'status': 1,
-                    'message': _('Post created successfully'),
-                    'data': PostSerializer(post).data
-                }, status=status.HTTP_201_CREATED)
-
-            except Team.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Team not found.')
-                }, status=status.HTTP_404_NOT_FOUND)
-            except TrainingGroups.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Group not found.')
-                }, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                'status': 1,
+                'message': _('Post created successfully'),
+                'data': PostSerializer(post).data
+            }, status=status.HTTP_201_CREATED)
 
         return Response({
             'status': 0,
@@ -1058,44 +1039,39 @@ class PostCreateAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-
     def get_queryset(self):
-        # Optional Team-ID from headers
-        team_id = self.request.data.get('team_id')
-        group_id = self.request.data.get('group_id')  
-        if team_id:
-            return Post.objects.filter(team_id=team_id)
-        elif group_id:
-            return Post.objects.filter(group_id=group_id)
-        else:
-            return Post.objects.filter(user=self.request.user)
+        # Get created_by_id and creator_type from request data
+        created_by_id = self.request.data.get('created_by_id')
+        creator_type = self.request.data.get('creator_type')
+
+        # Ensure both parameters are provided and valid
+        if not created_by_id or not creator_type:
+            return Post.objects.none()
+
+        return Post.objects.filter(created_by_id=created_by_id, creator_type=creator_type)
 
     def get_object(self, post_id):
-        # Get the post by post_id from the filtered queryset
         return get_object_or_404(self.get_queryset(), id=post_id)
 
     def get(self, request, *args, **kwargs):
-        # Activate the requested language, default is 'en'
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        post_id = request.data.get('post_id')  # Get post_id from request data
+        post_id = request.data.get('post_id')
         if not post_id:
             return Response({
                 'status': 0,
                 'message': _('Post ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        post = self.get_object(post_id)  # Retrieve the post object based on post_id
+        post = self.get_object(post_id)
         serializer = self.get_serializer(post)
 
         return Response({
@@ -1120,21 +1096,18 @@ class PostEditAPIView(generics.GenericAPIView):
         serializer = self.get_serializer(post, data=request.data, partial=True)
 
         if serializer.is_valid():
-            # Handle image replacement
             if 'image' in request.FILES:
-                # Delete old image if it exists
                 if post.image and default_storage.exists(post.image.name):
-                    default_storage.delete(post.image.name)  # Access the file path with .name
+                    default_storage.delete(post.image.name)
 
-                # Save new image with a unique filename
                 image = request.FILES['image']
                 file_extension = image.name.split('.')[-1]
-                unique_suffix = get_random_string(8)  # Ensure unique filename
-                file_name = f"post_images/{post.id}_{request.user.username}_{unique_suffix}.{file_extension}"
+                unique_suffix = get_random_string(8)
+                file_name = f"post_images/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
                 image_path = default_storage.save(file_name, image)
                 post.image = image_path
 
-            serializer.save()  # Save other changes
+            serializer.save()
             return Response({
                 'status': 1,
                 'message': _('Post updated successfully.'),
@@ -1177,7 +1150,10 @@ class PostDetailAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Track the post view
-        PostView.objects.get_or_create(user=request.user, post=post)
+        creator_type = request.data.get('creator_type')
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user ID
+
+        PostView.objects.get_or_create(created_by_id=created_by_id, post=post, creator_type=creator_type)
 
         # Retrieve the view count for the post
         view_count = PostView.objects.filter(post=post).count()
@@ -1189,7 +1165,10 @@ class PostDetailAPIView(APIView):
         return Response({
             'status': 1,
             'message': _('Post details fetched successfully.'),
-            'data': serializer.data,
+            'data': {
+                **serializer.data,
+                'view_count': view_count,  # Include view count in response
+            },
         }, status=status.HTTP_200_OK)
 
 
@@ -1224,12 +1203,12 @@ class PostCommentAPIView(APIView):
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Get the top-level comments for the post
-        comments = Post_comment.objects.filter(post=post, parent=None).order_by('-date_created')
+        # Get only top-level comments (parent=None) for the post
+        top_level_comments = Post_comment.objects.filter(post=post, parent=None).order_by('-date_created')
 
         # Paginate the comments
         paginator = PostCommentPagination()
-        paginated_comments = paginator.paginate_queryset(comments, request)
+        paginated_comments = paginator.paginate_queryset(top_level_comments, request)
 
         # If pagination fails or no comments are found
         if paginated_comments is None:
@@ -1245,43 +1224,42 @@ class PostCommentAPIView(APIView):
             }, status=status.HTTP_200_OK)
 
         # Serialize the paginated comments
-        serializer = PostCommentSerializer(paginated_comments, many=True)
+        serializer = PostCommentSerializer(paginated_comments, many=True, context={'request': request})
 
         # Return paginated response
         return Response({
             'status': 1,
             'message': _('Comments fetched successfully.'),
             'data': serializer.data,
-            'total_records': comments.count(),
+            'total_records': top_level_comments.count(),
             'total_pages': paginator.page.paginator.num_pages,
             'current_page': paginator.page.number,
         }, status=status.HTTP_200_OK)
+
 
 
 ######################## COMMNET CREATE API ###########################
 class CommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    
+
     def post(self, request, *args, **kwargs):
-        # Set the language based on headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        # Extract data from request
         data = request.data
         post_id = data.get('post_id')
         comment_text = data.get('comment')
         parent_id = data.get('parent_id')
-        team_id = data.get('team_id')  # Optional team_id
-        group_id = data.get('group_id')  # Optional group_id
+        created_by_id = data.get('created_by_id')
+        creator_type = data.get('creator_type')
 
-        # Validate that post_id and comment are provided
-        if not post_id or not comment_text:
+        # Validate the required fields
+        if not post_id or not comment_text or not created_by_id or not creator_type:
             return Response({
                 'status': 0,
-                'message': _('post_id and comment are required.')
+                'message': _('post_id, comment, created_by_id and creator_type are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -1292,7 +1270,7 @@ class CommentCreateAPIView(APIView):
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Handle parent comment (if it's a reply)
+        # Validate parent comment if provided
         parent_comment = None
         if parent_id:
             try:
@@ -1303,54 +1281,21 @@ class CommentCreateAPIView(APIView):
                     'message': _('Parent comment not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
-        # Create the comment based on the entity type (team, group, or user)
-        if team_id:
-            try:
-                team = Team.objects.get(id=team_id)
-                comment = Post_comment.objects.create(
-                    user=request.user,
-                    post=post,
-                    comment=comment_text,
-                    parent=parent_comment,
-                    team_id=team_id  # Store team ID
-                )
-            except Team.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Team not found.')
-                }, status=status.HTTP_404_NOT_FOUND)
+        # Create the comment using the new fields
+        comment = Post_comment.objects.create(
+            created_by_id=created_by_id,
+            creator_type=creator_type,
+            post=post,
+            comment=comment_text,
+            parent=parent_comment
+        )
 
-        elif group_id:
-            try:
-                group = TrainingGroups.objects.get(id=group_id)
-                comment = Post_comment.objects.create(
-                    user=request.user,
-                    post=post,
-                    comment=comment_text,
-                    parent=parent_comment,
-                    group_id=group_id  # Store group ID
-                )
-            except TrainingGroups.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Group not found.')
-                }, status=status.HTTP_404_NOT_FOUND)
-
-        else:
-            # Comment is from the user
-            comment = Post_comment.objects.create(
-                user=request.user,
-                post=post,
-                comment=comment_text,
-                parent=parent_comment
-            )
-
-        # Return the response with comment details including the entity (team, group, or user)
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
-            'data': PostCommentSerializer(comment).data  # Return serialized comment data
+            'data': PostCommentSerializer(comment).data
         }, status=status.HTTP_201_CREATED)
+
 
 ############### POST DELETE API ##############################
 class PostDeleteAPIView(APIView):
@@ -1363,35 +1308,29 @@ class PostDeleteAPIView(APIView):
             activate(language)
 
         post_id = request.query_params.get('post_id')
-        team_id = request.data.get('team_id')  # Optional team_id
-        group_id = request.data.get('group_id')  # Optional team_id
+        created_by_id = request.query_params.get('created_by_id')
+        creator_type = request.query_params.get('creator_type')
 
-        if not post_id:
+        if not post_id or not created_by_id or not creator_type:
             return Response({
                 'status': 0,
-                'message': _('post_id is required.')
+                'message': _('post_id, created_by_id, and creator_type are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            if team_id:
-                post = Post.objects.get(id=post_id, team_id=team_id)
-            elif group_id:
-                post = Post.objects.get(id=post_id, group_id=group_id)
-            else:
-                post = Post.objects.get(id=post_id, user=request.user)
+            post = Post.objects.get(id=post_id, created_by_id=created_by_id, creator_type=creator_type)
+            post.delete()
+            return Response({
+                'status': 1,
+                'message': _('Post deleted successfully.')
+            }, status=status.HTTP_200_OK)
+
         except Post.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Post not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        post.delete()
-
-        return Response({
-            'status': 1,
-            'message': _('Post deleted successfully.')
-        }, status=status.HTTP_200_OK)
-    
 
 ################################################################# CREATE NEW PROFILE API #########################################################################################
 
@@ -1979,7 +1918,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
             'data': {
                 'images': image_serializer.data,
                 'videos': video_serializer.data,
-                'latest_albums': album_serializer.data,
+                'albums': album_serializer.data,
             },
         }, status=status.HTTP_200_OK)
 

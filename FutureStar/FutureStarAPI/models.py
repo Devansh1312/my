@@ -81,16 +81,24 @@ class TrainingGroups(models.Model):
 
 # post  Model
 class Post(models.Model):
-    user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE,default=True)
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # Stores 1, 2, or 3 based on the type
+
     title = models.CharField(max_length=255)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)  # Add this if it's optional
-    group = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE,null=True,blank=True)
     description = models.TextField()
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)  # Add image field
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     media_type = models.IntegerField(default=1)
     date_created = models.DateTimeField(default=datetime.now)
 
-    # New fields
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)
     address = models.CharField(max_length=255, blank=True, null=True)
@@ -110,40 +118,72 @@ class Post(models.Model):
         db_table = 'futurestar_app_post'
 
 class Post_comment(models.Model):
-    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE,default=True)
-    team_id = models.ForeignKey(Team, null=True, blank=True, on_delete=models.CASCADE)
-    group_id = models.ForeignKey(TrainingGroups, on_delete=models.CASCADE, null=True, blank=True)  # Corrected typo
-    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE, default=True)
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # Stores 1, 2, or 3 based on the type
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
-    date_created = models.DateTimeField(default=datetime.now)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Comment by {self.user.username} on {self.post.title}'
-
+        return f'Comment by ID {self.created_by_id} on {self.post.title}'
 
     class Meta:
         db_table = 'futurestar_app_post_comment'
 
-# PostView model to track views on a post
+
+# models.py
+
 class PostView(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # 1, 2, or 3 based on the type
     post = models.ForeignKey(Post, related_name='views', on_delete=models.CASCADE)
     date_viewed = models.DateTimeField(default=datetime.now)
-    
+
     class Meta:
         db_table = 'futurestar_app_post_view'
-        unique_together = ('user', 'post')  # Each user can only view the post once (optional)
+        unique_together = ('created_by_id', 'post')  # Ensure one view per user/team/group per post
 
-# PostLike model to track likes on a post
 class PostLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # 1, 2, or 3 based on the type
     post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
     date_liked = models.DateTimeField(default=datetime.now)
 
     class Meta:
         db_table = 'futurestar_app_post_like'
-        unique_together = ('user', 'post')  # Each user can only like the post once
+        unique_together = ('created_by_id', 'post')  # Ensure one like per user/team/group per post
+
 
 class Field(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE,default=True)
