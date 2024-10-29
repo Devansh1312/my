@@ -280,16 +280,50 @@ class PostSerializer(serializers.ModelSerializer):
         return PostLike.objects.filter(post=obj).count()
     
     def get_is_like(self, obj):
-        request = self.context.get('request')  # Access the request object from the context
-        if request and PostLike.objects.filter(post=obj, created_by_id=request.user.id, creator_type=Post.USER_TYPE).exists():
-            return True
+        request = self.context.get('request')
+        if request:
+            # Retrieve creator_type and created_by_id from request data or query parameters
+            creator_type = request.data.get('creator_type') or request.query_params.get('creator_type')
+            created_by_id = request.data.get('created_by_id') or request.query_params.get('created_by_id')
+
+            # Use default values if neither request data nor query parameters provide valid values
+            creator_type = int(creator_type) if creator_type not in [None, '', '0'] else PostLike.USER_TYPE
+            created_by_id = int(created_by_id) if created_by_id not in [None, '', '0'] else request.user.id
+
+            # Check if a like exists for the given post, creator_type, and created_by_id
+            if PostLike.objects.filter(
+                post=obj,
+                created_by_id=created_by_id,
+                creator_type=creator_type
+            ).exists():
+                return True
+
         return False
+
+
     
     def get_is_reported(self, obj):
-        request = self.context.get('request')  # Access the request object from the context
-        if request and PostReport.objects.filter(post_id=obj, user_id=request.user).exists():
-            return True
+        request = self.context.get('request')
+        if request:
+            # Retrieve creator_type and created_by_id from request data or query parameters
+            creator_type = request.data.get('creator_type') or request.query_params.get('creator_type')
+            created_by_id = request.data.get('created_by_id') or request.query_params.get('created_by_id')
+
+            # Use default values if neither request data nor query parameters provide valid values
+            creator_type = int(creator_type) if creator_type not in [None, '', '0'] else PostReport.USER_TYPE
+            created_by_id = int(created_by_id) if created_by_id not in [None, '', '0'] else request.user.id
+
+            # Check if a report exists for the given post, creator_type, and created_by_id
+            if PostReport.objects.filter(
+                post_id=obj,
+                creator_type=creator_type,
+                created_by_id=created_by_id
+            ).exists():
+                return True
+
         return False
+
+
 
     
     def get_comments(self, obj):
@@ -677,8 +711,9 @@ class ReportSerializer(serializers.ModelSerializer):
 class PostReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostReport
-        fields = ['id', 'report_id', 'post_id', 'user_id', 'created_at', 'updated_at']
-        read_only_fields = ['user_id']  # Make user_id read-only
+        fields = ['id', 'report_id', 'post_id', 'creator_type', 'created_by_id', 'created_at', 'updated_at']
+        read_only_fields = ['created_by_id']  # Make created_by_id read-only
+
         
 
 class MobileDashboardBannerSerializer(serializers.ModelSerializer):

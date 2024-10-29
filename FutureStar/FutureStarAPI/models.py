@@ -373,23 +373,34 @@ class Report(models.Model):
 
     
 class PostReport(models.Model):
-    id=models.AutoField(primary_key=True)
-    report_id=models.ForeignKey(Report, on_delete=models.CASCADE)
-    post_id=models.ForeignKey(Post, on_delete=models.CASCADE)
-    user_id=models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at=models.DateTimeField(default=datetime.now)
-    updated_at=models.DateTimeField(auto_now=True)
-    
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    report_id = models.ForeignKey(Report, on_delete=models.CASCADE)
+    post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
+    created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
+    created_at = models.DateTimeField(default=datetime.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return f"Post Report {self.id} for Report {self.report_id.id}"
-    
+
     class Meta:
         db_table = 'futurestar_app_postreport'
 
 class Sponsor(models.Model):
      
-    TEAM_TYPE = 1
-    GROUP_TYPE = 2
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
 
     CREATOR_TYPE_CHOICES = (
         (TEAM_TYPE, 'Team'),
