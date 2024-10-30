@@ -5370,7 +5370,22 @@ class PostReportListView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/Post_Report.html"
 
     def get(self, request):
-        reports = PostReport.objects.select_related('post_id', 'user_id', 'report_id').order_by('-created_at').all()
+        reports = PostReport.objects.select_related('post_id', 'report_id').order_by('-created_at').all()
+
+
+        for report in reports:
+            if report.creator_type == PostReport.USER_TYPE:
+
+                report.user_info = User.objects.filter(id=report.created_by_id).first()
+            elif report.creator_type == PostReport.TEAM_TYPE:
+
+                report.user_info = Team.objects.filter(id=report.created_by_id).first()
+            elif report.creator_type == PostReport.GROUP_TYPE:
+
+                report.user_info = TrainingGroups.objects.filter(id=report.created_by_id).first()
+            else:
+                report.user_info = None  
+
         return render(
             request,
             self.template_name,

@@ -44,6 +44,7 @@ Post Report Management
                                 <th>No.</th>
                                 <th>Post Title</th> 
                                 <th>User Name</th>
+                                <th>Profile Type</th>
                                 <th>Report Title</th>
                                 <th>Date</th>
                                 <th>Actions</th>
@@ -58,8 +59,29 @@ Post Report Management
                                     <a href="#" class="view-report-btn" data-report-id="{{ report.id }}" 
                                        data-report-title="{{ report.report_id.title }}">Read more</a>{% endif %}
                                 </td>
-                                <td>{{ report.user_id.username }}</td>
-                                <td>{{ report.report_id.title_en }}</td>
+                                <td>
+                                 {% if report.creator_type == 1 %}
+                                     {{ report.user_info.username }}  
+                                 {% elif report.creator_type == 2 %}
+                                     {{ report.user_info.team_username }}    
+                                 {% elif report.creator_type == 3 %}
+                                     {{ report.user_info.group_username }} 
+                                 {% else %}
+                                     Unknown
+                                 {% endif %}
+                                 </td>
+                                    <td>
+                                    {% if report.creator_type == 1 %}
+                                        {{ report.user_info.role.name_en }}  
+                                    {% elif report.creator_type == 2 %}
+                                       Team    
+                                    {% elif report.creator_type == 3 %}
+                                        Training  Group
+                                    {% else %}
+                                       Unknown
+                                    {% endif %}
+                                    </td>
+                                 <td>{{ report.report_id.title_en }}</td>
                                 <td>{{ report.created_at }}</td>
                                 <td>
                                     <!-- Action buttons -->
@@ -77,8 +99,19 @@ Post Report Management
                                                    data-report-detail="{{ report.report_id.content_en }}" 
                                                    data-post-title="{{ report.post_id.title }}" 
                                                    data-post-description="{{ report.post_id.description }}" 
-                                                   data-username="{{ report.user_id.username }}" 
-                                                   data-mobile-no="{{ report.user_id.phone }}">
+                                                   {% if report.creator_type == 1 %}
+                                                      data-username="{{ report.user_info.username }}" 
+                                                      data-mobile-no="{{ report.user_info.phone }}"
+                                                   {% elif report.creator_type == 2 %}
+                                                      data-username="{{ report.user_info.team_username }}" 
+                                                      data-mobile-no="{{ report.user_info.phone }}"  
+                                                   {% elif report.creator_type == 3 %}
+                                                      data-username="{{ report.user_info.group_username }}"  
+                                                      data-mobile-no="{{ report.user_info.phone }}"  
+                                                   {% else %}
+                                                      data-username="Unknown" 
+                                                      data-mobile-no="Unknown"
+                                                   {% endif %}>
                                                    View
                                                 </a>
                                             </li>                                             
@@ -209,31 +242,32 @@ Post Report Management
         });
     }
    });
-   // view report data
-   document.querySelectorAll('.view-report-btn').forEach(function(button) {
-      button.addEventListener('click', function() {
-          const reportId = this.getAttribute('data-report-id');
-          const reportTitle = this.getAttribute('data-report-title');
-          const reportDetail = this.getAttribute('data-report-detail'); // Add data-report-detail attribute in button
-          const postTitle = this.getAttribute('data-post-title');
-          const postContent = this.getAttribute('data-post-description');
-          const username = this.getAttribute('data-username');
-          const mobileNo = this.getAttribute('data-mobile-no'); // Add data-mobile-no attribute in button
-  
-          // Set the data in the modal
-          document.getElementById('reportId').textContent = reportId;
-          document.getElementById('reportTitle').textContent = reportTitle;
-          document.getElementById('reportDetail').textContent = reportDetail;
-          document.getElementById('postTitle').textContent = postTitle;
-          document.getElementById('postContent').textContent = postContent;
-          document.getElementById('username').textContent = username;
-          document.getElementById('mobileNo').textContent = mobileNo;
-  
-          // Show the modal
-          const viewReportModal = new bootstrap.Modal(document.getElementById('viewReportModal'));
-          viewReportModal.show();
+      // view report data
+      document.querySelectorAll('.view-report-btn').forEach(function(button) {
+         button.addEventListener('click', function() {
+            const reportId = this.getAttribute('data-report-id');
+            const reportTitle = this.getAttribute('data-report-title');
+            const reportDetail = this.getAttribute('data-report-detail');
+            const postTitle = this.getAttribute('data-post-title');
+            const postContent = this.getAttribute('data-post-description');
+            const username = this.getAttribute('data-username');
+            const mobileNo = this.getAttribute('data-mobile-no');
+
+            // Set the data in the modal
+            document.getElementById('reportId').textContent = reportId;
+            document.getElementById('reportTitle').textContent = reportTitle;
+            document.getElementById('reportDetail').textContent = reportDetail;
+            document.getElementById('postTitle').textContent = postTitle;
+            document.getElementById('postContent').textContent = postContent;
+            document.getElementById('username').textContent = username;
+            document.getElementById('mobileNo').textContent = mobileNo;
+
+            // Show the modal
+            const viewReportModal = new bootstrap.Modal(document.getElementById('viewReportModal'));
+            viewReportModal.show();
+         });
       });
-  });
+
   
    
    
