@@ -339,7 +339,8 @@ class Gallary(models.Model):
     id = models.AutoField(primary_key=True)
     created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
-    album = models.ForeignKey('Album', related_name='gallery_items', null=True, on_delete=models.CASCADE)
+    album = models.ForeignKey('Album', related_name='gallery_set', null=True, on_delete=models.CASCADE)
+
     content_type = models.IntegerField(choices=CONTENT_TYPE_CHOICES, default=1)
     media_file = models.FileField(upload_to=user_directory_path, blank=True, null=True)
     created_at = models.DateTimeField(default=datetime.now)
