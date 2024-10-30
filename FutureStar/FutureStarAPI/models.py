@@ -17,7 +17,7 @@ class AgeGroup(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
-        return self.title_en
+        return self.name_en
     
     class Meta:
         db_table = 'futurestar_app_age_group'

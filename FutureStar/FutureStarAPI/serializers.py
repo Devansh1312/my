@@ -791,3 +791,22 @@ class UpdateCurrentTypeSerializer(serializers.ModelSerializer):
         return value
 
 
+
+class AgeGroupSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AgeGroup
+        fields = ['id', 'name', 'created_at', 'updated_at']
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Get the name based on the language, with a fallback to "Unnamed" if null
+        if language == 'ar':
+            name = obj.name_ar 
+        else:
+            name = obj.name_en 
+        return name

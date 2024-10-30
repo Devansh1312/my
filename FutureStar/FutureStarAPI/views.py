@@ -3781,3 +3781,38 @@ class GeneralSettingsList(APIView):
                 'awards_winning': general_settings.awards_winning,
             }
         }, status=status.HTTP_200_OK)
+
+
+
+
+
+
+class AgeGroupListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        try:
+            age_groups = AgeGroup.objects.all()
+            # Pass the request in the context to make it accessible in the serializer
+            serializer = AgeGroupSerializer(age_groups, many=True, context={'request': request})
+
+            return Response({
+                'status': 1,
+                'message': _('Age Groups fetched successfully.'),
+                'data': serializer.data,
+            })
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('Error occurred while fetching Age Groups list.'),
+                'error': str(e),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+

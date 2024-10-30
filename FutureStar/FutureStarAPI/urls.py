@@ -115,6 +115,8 @@ urlpatterns = [
         path('api/training/group/', TrainingGroupAPI.as_view()),
         ############### Additional API #########################
         path('api/genders/', UserGenderListAPIView.as_view()),
+        path('api/age_groups/', AgeGroupListAPIView.as_view()),
+
         path('api/general/settings/', GeneralSettingsList.as_view()),
         path('api/faq/', FAQListAPIView.as_view()),
         path('api/role/', UserRoleListAPIView.as_view()),
