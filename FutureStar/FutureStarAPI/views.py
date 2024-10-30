@@ -877,8 +877,8 @@ class EditProfileAPIView(APIView):
         old_card_header = user.card_header
 
         # Fields that should be set to NULL if provided as blank or None
-        null_fields = ['fullname', 'bio', 'nationality', 'weight', 'height', 'main_playing_position',
-                       'secondary_playing_position', 'playing_foot', 'favourite_local_team', 'favourite_team',
+        null_fields = ['fullname', 'bio', 'nationality', 'weight', 'height',
+                       'playing_foot', 'favourite_local_team', 'favourite_team',
                        'favourite_local_player', 'favourite_player']
 
         for field in null_fields:
@@ -903,6 +903,34 @@ class EditProfileAPIView(APIView):
         age = request.data.get('age')
         if age not in [None, '', 'null']:
             user.age = age
+        
+        # Handle main_playing_position - set to NULL if blank, zero, or 'null' is provided
+        main_playing_position_id = request.data.get('main_playing_position')
+        if main_playing_position_id in [None, '', '0', 'null']:
+            user.main_playing_position = None
+        else:
+            try:
+                user.main_playing_position = PlayingPosition.objects.get(id=main_playing_position_id)
+            except PlayingPosition.DoesNotExist:
+                return Response({
+                    'status': 2,
+                    'message': _('Invalid main playing position specified.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Handle secondary_playing_position - set to NULL if blank, zero, or 'null' is provided
+        secondary_playing_position_id = request.data.get('secondary_playing_position')
+        if secondary_playing_position_id in [None, '', '0', 'null']:
+            user.secondary_playing_position = None
+        else:
+            try:
+                user.secondary_playing_position = PlayingPosition.objects.get(id=secondary_playing_position_id)
+            except PlayingPosition.DoesNotExist:
+                return Response({
+                    'status': 2,
+                    'message': _('Invalid secondary playing position specified.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+
 
         # Handle gender - retain old value if None or blank
         gender_id = request.data.get('gender')
