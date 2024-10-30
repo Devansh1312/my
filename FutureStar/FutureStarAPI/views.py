@@ -136,7 +136,7 @@ def get_team_data(user, request):
     
     # Get the user's team (assuming only one team is allowed per user)
     try:
-        team = Team.objects.get(user_id=user)
+        team = Team.objects.get(team_president=user)
     except Team.DoesNotExist:
         return None  # If no team exists, return None or empty dictionary as needed
     
@@ -190,7 +190,6 @@ def get_team_data(user, request):
         'email': team.email,
         'age_group': team.age_group,
         'entry_fees': team.entry_fees,
-        'branches': team.branches,
         'team_logo': team.team_logo.url if team.team_logo else None,
         'team_background_image': team.team_background_image.url if team.team_background_image else None,
         'team_uniform': team.team_uniform,
