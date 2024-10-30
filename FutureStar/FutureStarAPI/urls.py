@@ -111,10 +111,6 @@ urlpatterns = [
         path('api/tournament/', TournamentAPIView.as_view()),
 
 
-        ################# Team URL ################
-        path('api/team/', TeamViewAPI.as_view()),
-
-
          ################# Training Group URL ################
         path('api/training/group/', TrainingGroupAPI.as_view()),
         ############### Additional API #########################

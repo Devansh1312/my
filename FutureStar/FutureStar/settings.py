@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',  # Add this for DRF
     'rest_framework_simplejwt',  # Add this for JWT Authentication
     'FutureStarAPI',  # Add your app where User model is defined
+    'FutureStarTeamApp',
     'sass_processor',
     'widget_tweaks',
     'social_django',
