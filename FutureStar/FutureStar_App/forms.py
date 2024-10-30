@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import *
+from FutureStarAPI.models import *
+
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import password_validation
 from FutureStarAPI.models import MobileDashboardBanner,PlayingPosition
@@ -67,6 +69,15 @@ class RoleForm(forms.ModelForm):
 
         }
 
+# Role Form
+class AgeGroupForm(forms.ModelForm):
+    class Meta:
+        model = AgeGroup
+        fields = ["name_en","name_ar"]
+        widgets = {
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter Age Group "}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل الفئة العمرية"}),
+        }
 
 # # Gender Form
 # class GenderForm(forms.ModelForm):

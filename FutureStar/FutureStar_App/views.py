@@ -5514,3 +5514,74 @@ class PlayingPositionEditView(LoginRequiredMixin,View):
 
         messages.success(request, "Playing Positions updated successfully.")
         return redirect("playing_position_list")
+
+
+############################################# Age Group CRUD ###############################################
+################################################################# AgeGroup CRUD Views ###################################################
+@method_decorator(user_role_check, name='dispatch')
+class AgeGroupCreateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/AgeGroup.html"
+
+    def get(self, request):
+        form = AgeGroupForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = AgeGroupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Age Group Created successfully.")
+            return redirect("agegroup_list")
+        messages.error(
+            request,
+            "There was an error creating the age group. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class AgeGroupUpdateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/AgeGroup.html"  # Fixed template name
+
+    def get(self, request, pk):
+        agegroup = get_object_or_404(AgeGroup, pk=pk)
+        form = AgeGroupForm(instance=agegroup)
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, pk):
+        agegroup = get_object_or_404(AgeGroup, pk=pk)
+        form = AgeGroupForm(request.POST, instance=agegroup)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "AgeGroup Updated Successfully.")
+            return redirect("agegroup_list")
+        messages.error(
+            request,
+            "There was an error updating the agegroup. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class AgeGroupDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        agegroup = get_object_or_404(AgeGroup, pk=pk)
+        agegroup.delete()
+        messages.success(request, "AgeGroup Deleted Successfully.")
+        return redirect("agegroup_list")
+
+    def post(self, request, pk):
+        agegroup = get_object_or_404(AgeGroup, pk=pk)
+        agegroup.delete()
+        messages.success(request, "AgeGroup Deleted Successfully.")
+        return redirect("agegroup_list")
+
+@method_decorator(user_role_check, name='dispatch')
+class AgeGroupListView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/AgeGroup.html"
+
+    def get(self, request):
+        agegroup = AgeGroup.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {"agegroup": agegroup, "breadcrumb": {"parent": "User", "child": "Age Group"}},
+        )

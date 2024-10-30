@@ -61,6 +61,12 @@ urlpatterns = [
     path('roles/create/', RoleCreateView.as_view(), name='role_create'),
     path('roles/update/<int:pk>/', RoleUpdateView.as_view(), name='role_update'),
     path('roles/delete/<int:pk>/', RoleDeleteView.as_view(), name='role_delete'),
+    
+    #User AgeGroup URL
+    path('agegroup/', AgeGroupListView.as_view(), name='agegroup_list'),
+    path('agegroup/create/', AgeGroupCreateView.as_view(), name='agegroup_create'),
+    path('agegroup/update/<int:pk>/', AgeGroupUpdateView.as_view(), name='agegroup_update'),
+    path('agegroup/delete/<int:pk>/', AgeGroupDeleteView.as_view(), name='agegroup_delete'),
 
     
     #Category List URL
