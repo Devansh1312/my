@@ -1666,7 +1666,7 @@ def referee_directory_path(instance, filename):
 class CustomMediaPagination(PageNumberPagination):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    page_size = 30  # Number of records per page
+    page_size = 30  # Number of records per page 
     page_query_param = 'page'  # Custom page number param in the body
     page_size_query_param = 'page_size'
     max_page_size = 100  # Set max size if needed
