@@ -9,14 +9,26 @@ from datetime import timedelta
 
 # Create your models here.
 
+class AgeGroup(models.Model):
+    id=models.AutoField(primary_key=True)
+    name_en=models.CharField(max_length=255, blank=True, null=True)
+    name_ar=models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
+
+    def __str__(self):
+        return self.title_en
+    
+    class Meta:
+        db_table = 'futurestar_app_age_group'
+
 class Team(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
-    team_name = models.CharField(max_length=255,blank=True,null=True)
-    team_username = models.CharField(max_length=255,blank=True,null=True)
-    team_type = models.ForeignKey(Category,on_delete=models.CASCADE,default=True)
-    bio = models.TextField(null=True,blank=True)
-    team_establishment_date = models.DateField(blank=True,null=True)
-    team_president = models.CharField(max_length=255,blank=True,null=True)
+    team_name = models.CharField(max_length=255, blank=True, null=True)
+    team_username = models.CharField(max_length=255, blank=True, null=True)
+    team_type = models.ForeignKey(Category, on_delete=models.CASCADE, default=True)
+    bio = models.TextField(null=True, blank=True)
+    team_establishment_date = models.DateField(blank=True, null=True)
+    team_president = models.ForeignKey(User, on_delete=models.CASCADE, related_name='president_of_teams',blank=True, null=True)  # ForeignKey to User model
     
     # New fields
     latitude = models.FloatField(default=0.0)
@@ -33,17 +45,16 @@ class Team(models.Model):
         
     country_id = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city_id = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=255,blank=True,null=True)
-    email = models.EmailField(max_length=255,blank=True,null=True)
-    age_group = models.CharField(max_length=255,blank=True,null=True)
-    entry_fees = models.CharField(max_length=255,blank=True,null=True)
-    branches = models.CharField(max_length=500,blank=True,null=True)
-    team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)  # Add image field
-    team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)  # Add image field
-    team_uniform = models.TextField( blank=True, null=True)
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(default=datetime.now) 
-    
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    age_group = models.CharField(max_length=255, blank=True, null=True)
+    entry_fees = models.CharField(max_length=255, blank=True, null=True)
+    team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)
+    team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)
+    team_uniform = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
+
     def __str__(self):
         return self.team_name
 
@@ -72,8 +83,8 @@ class TrainingGroups(models.Model):
     phone = models.CharField(max_length=255,blank=True,null=True)
     group_logo = models.ImageField(upload_to='group/group_logo/', blank=True, null=True)  # Add image field
     group_background_image = models.ImageField(upload_to='group/group_background_image/', blank=True, null=True)  # Add image field
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.group_name
@@ -112,6 +123,8 @@ class Post(models.Model):
     country_name = models.CharField(max_length=100, blank=True, null=True)
     postalCode = models.CharField(max_length=20, blank=True, null=True)
     country_code = models.CharField(max_length=10, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.title
@@ -136,6 +149,8 @@ class Post_comment(models.Model):
     parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return f'Comment by ID {self.created_by_id} on {self.post.title}'
@@ -161,6 +176,8 @@ class PostView(models.Model):
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # 1, 2, or 3 based on the type
     post = models.ForeignKey(Post, related_name='views', on_delete=models.CASCADE)
     date_viewed = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_post_view'
@@ -181,6 +198,8 @@ class PostLike(models.Model):
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # 1, 2, or 3 based on the type
     post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
     date_liked = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_post_like'
@@ -210,8 +229,8 @@ class Field(models.Model):
     country_code = models.CharField(max_length=10, blank=True, null=True) 
     
     additional_information = models.TextField(max_length=255,blank=True, null=True)
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.field_name
@@ -234,8 +253,8 @@ class Tournament(models.Model):
     tournament_fields = models.ForeignKey(Field,blank=True,null=True,on_delete=models.CASCADE)
     logo = models.ImageField(upload_to='tournament_logo/', blank=True, null=True)  # Add image field
     tournament_joining_cost = models.CharField(max_length=255,blank=True,null=True)
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.tournament_name
@@ -248,7 +267,8 @@ class OTPSave(models.Model):
     id = models.AutoField(primary_key=True)
     phone = models.CharField(max_length=100,blank=True,null=True)
     OTP = models.CharField(max_length=100,blank=True,null=True)
-    created_at = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_otpsave'
@@ -278,8 +298,8 @@ class FollowRequest(models.Model):
     target_id = models.IntegerField(null=True,blank=True)
     target_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=USER_TYPE)
 
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_followrequest'
@@ -312,8 +332,8 @@ class Album(models.Model):
     name = models.TextField(null=True, blank=True)
     created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,blank=True, null=True)  # Stores 1, 2, or 3 based on the type
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_album'
@@ -343,8 +363,8 @@ class Gallary(models.Model):
 
     content_type = models.IntegerField(choices=CONTENT_TYPE_CHOICES, default=1)
     media_file = models.FileField(upload_to=user_directory_path, blank=True, null=True)
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return f"Gallery Item {self.id} by {self.get_creator_type_display()}"
@@ -363,8 +383,8 @@ class Report(models.Model):
     title_ar=models.CharField(max_length=255, blank=True, null=True)
     content_en=models.TextField(blank=True, null=True)
     content_ar=models.TextField(blank=True, null=True)
-    created_at=models.DateTimeField(default=datetime.now)
-    updated_at=models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.title_en
@@ -389,8 +409,8 @@ class PostReport(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
     created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return f"Post Report {self.id} for Report {self.report_id.id}"
@@ -413,8 +433,8 @@ class Sponsor(models.Model):
     created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
    
-    created_at= models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
     
     def __str__(self):
         return self.name
@@ -430,8 +450,8 @@ class MobileDashboardBanner(models.Model):
     
     id = models.AutoField(primary_key=True)
     image = models.ImageField(upload_to='dashboardbanner_images/', blank= True, null= True)
-    created_at= models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.id
@@ -467,8 +487,8 @@ class Event(models.Model):
 
     event_description=models.TextField(blank=True, null=True)
     event_cost=models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    created_at=models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
     
     def __str__(self):
         return self.event_name
@@ -483,8 +503,8 @@ class EventBooking(models.Model):
     convenience_fee=models.FloatField(default=0.0)
     ticket_amount=models.FloatField(default=0.0)
     total_amount=models.FloatField(default=0.0)
-    created_at=models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.event.event_name
@@ -498,6 +518,8 @@ class Event_comment(models.Model):
     parent = models.ForeignKey('self', related_name='event_replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
     date_created = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.id
@@ -512,7 +534,9 @@ class EventLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='event_likes', on_delete=models.CASCADE, default=True)
     date_liked = models.DateTimeField(default=datetime.now)
-    date_created = models.DateTimeField(default=datetime.now)  
+    date_created = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)   
 
     class Meta:
         db_table = 'futurestar_app_event_like'
@@ -525,7 +549,9 @@ class FAQ(models.Model):
     question_ar = models.TextField(blank=True,null=True)
     answer_en = models.TextField(blank=True,null=True)
     answer_ar = models.TextField(blank=True,null=True)
-    date_created = models.DateTimeField(default=datetime.now)  
+    date_created = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)  
 
     def __str__(self):
         return self.question_en

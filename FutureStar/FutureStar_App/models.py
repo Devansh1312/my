@@ -13,7 +13,9 @@ class Inquire(models.Model):
     fullname = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField()
-    message = models.TextField()  
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)   
 
     class Meta:
         db_table = 'futurestar_app_inquire'
@@ -22,6 +24,8 @@ class Inquire(models.Model):
 class Role(models.Model):
     name_en = models.CharField(max_length=100,null=True,blank=True)
     name_ar = models.CharField(max_length=100,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.name_en
@@ -32,6 +36,8 @@ class Role(models.Model):
 class Category(models.Model):
     name_en = models.CharField(max_length=100,null=True,blank=True)
     name_ar = models.CharField(max_length=100,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
         return self.name_en
@@ -63,6 +69,8 @@ class UserManager(BaseUserManager):
 class UserGender(models.Model):
     name_en = models.CharField(max_length=100,null=True,blank=True)
     name_ar = models.CharField(max_length=100,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
     def __str__(self):
         return self.name_en
     
@@ -77,7 +85,8 @@ class Country(models.Model):
     zone_id = models.IntegerField(default=0)
     country_code = models.IntegerField(null=True, blank=True)
     status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_country'
@@ -91,7 +100,8 @@ class City(models.Model):
     name = models.CharField(max_length=255)
     country= models.ForeignKey(Country, on_delete=models.CASCADE )
     status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     class Meta:
         db_table = 'futurestar_app_city'
@@ -104,8 +114,8 @@ class PlayingPosition(models.Model):
     name_en = models.TextField(blank=True,null=True)
     name_ar = models.TextField(blank=True,null=True)
     shortname = models.TextField(blank=True,null=True)
-    created_at = models.DateTimeField(default=datetime.now)
-    updated_at = models.DateTimeField(default=datetime.now) 
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)  
 
     def __str__(self):
         return self.name_en
@@ -168,7 +178,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_referee = models.BooleanField(default=False)
     referee_certificate = models.TextField(null=True, blank=True)
 
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     objects = UserManager()
 

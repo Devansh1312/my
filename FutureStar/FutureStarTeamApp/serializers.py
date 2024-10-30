@@ -20,15 +20,19 @@ class TeamSerializer(serializers.ModelSerializer):
     following_count = serializers.SerializerMethodField()  # Adding the following count field
     is_follow = serializers.SerializerMethodField()  # Adding the is_follow field
     creator_type = serializers.IntegerField(default=2, read_only=True)  # Static field with value 2
+    # New fields for team president
+    team_president_id = serializers.SerializerMethodField()
+    team_president_username = serializers.SerializerMethodField()
+    team_president_profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
         fields = [
             'id', 'user_id', 'team_name', 'team_username', 'team_type', 'team_type_name', 'bio', 'team_establishment_date', 
-            'team_president', 'latitude', 'longitude', 'address', 'house_no', 'premises', 'street', 'city', 'state', 
-            'country_name', 'postalCode', 'country_code', 'country_id', 'country_id_name', 'city_id', 'city_id_name', 
-            'phone', 'email', 'age_group', 'entry_fees', 'branches', 'team_logo', 'team_background_image', 
-            'team_uniform', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type'
+            'team_president_id', 'team_president_username', 'team_president_profile_picture', 'latitude', 'longitude', 'address', 
+            'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'country_id', 
+            'country_id_name', 'city_id', 'city_id_name', 'phone', 'email', 'age_group', 'entry_fees', 'team_logo', 
+            'team_background_image', 'team_uniform', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type'
         ]
 
     def get_post_count(self, obj):
@@ -84,3 +88,13 @@ class TeamSerializer(serializers.ModelSerializer):
             target_id=obj.id,
             target_type=FollowRequest.TEAM_TYPE
         ).exists()
+    
+    # Custom methods to get the team president details
+    def get_team_president_id(self, obj):
+        return obj.team_president.id if obj.team_president else None
+
+    def get_team_president_username(self, obj):
+        return obj.team_president.username if obj.team_president else None
+
+    def get_team_president_profile_picture(self, obj):
+        return obj.team_president.profile_picture.url if obj.team_president and obj.team_president.profile_picture else None
