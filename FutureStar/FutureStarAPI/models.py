@@ -512,8 +512,21 @@ class EventBooking(models.Model):
     class Meta:
         db_table = 'futurestar_app_eventbooking'
 
+
+# Event  model to track likes & Comments on a Event
 class Event_comment(models.Model):
-    user = models.ForeignKey(User, related_name='event_comments', on_delete=models.CASCADE,default=True)
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)
     event = models.ForeignKey(Event, related_name='event_comments', on_delete=models.CASCADE, default=True)
     parent = models.ForeignKey('self', related_name='event_replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
@@ -522,26 +535,33 @@ class Event_comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
     def __str__(self):
-        return self.id
-
+        return f'Comment by ID {self.created_by_id} on Event {self.event.id}'
 
     class Meta:
         db_table = 'futurestar_app_event_comment'
 
 
-# PostLike model to track likes on a post
 class EventLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)
     event = models.ForeignKey(Event, related_name='event_likes', on_delete=models.CASCADE, default=True)
     date_liked = models.DateTimeField(default=datetime.now)
-    date_created = models.DateTimeField(default=datetime.now)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)   
 
     class Meta:
         db_table = 'futurestar_app_event_like'
-        unique_together = ('user', 'event')  # Each user can only like the post once
-
+        unique_together = ('creator_type','created_by_id', 'event')  # Ensure one like per user/team/group per event
 
 
 class FAQ(models.Model):

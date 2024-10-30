@@ -649,21 +649,18 @@ class EventSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
-    # event_image = serializers.SerializerMethodField()
     event_organizer = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
-        fields = ['team', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
-                  'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
-                  'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
-                  'event_description', 'event_cost', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at']
-        read_only_fields = ['event_organizer']  # Make 'user' read-only since it will be auto-assigned
+        fields = [
+            'id', 'team', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
+            'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
+            'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
+            'event_description', 'event_cost', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['event_organizer']  # Make 'event_organizer' read-only since it will be auto-assigned
 
-   
-
-    # def get_event_image(self, obj):
-    #     return obj.event_image.url if obj.event_image else None  
     def get_event_organizer(self, obj):
         user = obj.event_organizer
         return {
@@ -671,8 +668,9 @@ class EventSerializer(serializers.ModelSerializer):
             'fullname': user.fullname,
             'phone': user.phone,
             'email': user.email,
-            'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
+            'profile_pic': user.profile_picture.url if user.profile_picture else None,
         }
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
@@ -696,16 +694,21 @@ class EventSerializer(serializers.ModelSerializer):
         # Automatically set the user from the request context
         validated_data['event_organizer'] = self.context['request'].user
         return Event.objects.create(**validated_data)
-    
+
     def get_like_count(self, obj):
         return EventLike.objects.filter(event=obj).count()
-    
+
     def get_is_like(self, obj):
         request = self.context.get('request')  # Access the request object from the context
-        if request and EventLike.objects.filter(event=obj, user=request.user).exists():
-            return True
+        if request:
+            creator_type = request.data.get('creator_type') or request.query_params.get('creator_type')
+            created_by_id = request.data.get('created_by_id') or request.query_params.get('created_by_id')
+            creator_type = int(creator_type) if creator_type not in [None, '', '0'] else EventLike.USER_TYPE
+            created_by_id = int(created_by_id) if created_by_id not in [None, '', '0'] else request.user.id
+            if EventLike.objects.filter(event=obj, created_by_id=created_by_id, creator_type=creator_type).exists():
+                return True
         return False
-        
+
     def get_comments(self, obj):
         # Always return the count of top-level comments
         return Event_comment.objects.filter(event=obj, parent=None).count()
@@ -721,30 +724,42 @@ class EventBookingSerializer(serializers.ModelSerializer):
 
 class EventCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
-    user = UserSerializer(read_only=True)
-    parent = serializers.PrimaryKeyRelatedField(queryset=Post_comment.objects.all(), allow_null=True)
-    entity = serializers.SerializerMethodField()  # Add entity field
+    entity = serializers.SerializerMethodField()
 
     class Meta:
         model = Event_comment
-        fields = ['id', 'user', 'event', 'parent', 'comment', 'date_created', 'replies', 'entity']
+        fields = ['id', 'created_by_id', 'creator_type', 'event', 'parent', 'comment', 'date_created', 'replies', 'entity']
 
     def get_replies(self, obj):
-        # Get replies for this comment
         replies = Event_comment.objects.filter(parent=obj).order_by('-date_created')
-        return EventCommentSerializer(replies, many=True).data  # Serialize replies
+        return EventCommentSerializer(replies, many=True).data
 
     def get_entity(self, obj):
-        
-        if obj.user:
+        if obj.creator_type == Event_comment.TEAM_TYPE:
+            team = Team.objects.get(id=obj.created_by_id)
             return {
-                'id': obj.user.id,
-                'username': obj.user.username,
-                'profile_image': obj.user.profile_picture.url if obj.user.profile_picture else None,
-                'type': 'user'  # Optional: entity type for frontend differentiation
+                'id': team.id,
+                'name': team.team_name,
+                'profile_image': team.team_logo.url if team.team_logo else None,
+                'type': 'team'
+            }
+        elif obj.creator_type == Event_comment.GROUP_TYPE:
+            group = TrainingGroups.objects.get(id=obj.created_by_id)
+            return {
+                'id': group.id,
+                'name': group.group_name,
+                'profile_image': group.group_logo.url if group.group_logo else None,
+                'type': 'group'
+            }
+        else:  # USER_TYPE
+            user = User.objects.get(id=obj.created_by_id)
+            return {
+                'id': user.id,
+                'username': user.username,
+                'profile_image': user.profile_picture.url if user.profile_picture else None,
+                'type': 'user'
             }
         return None
-
 
 
 
