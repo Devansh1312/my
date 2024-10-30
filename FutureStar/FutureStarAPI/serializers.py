@@ -440,17 +440,22 @@ class PlayingPositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PlayingPosition
-        fields = ['id', 'name','shortname']  # Only return id and the translated name
+        fields = ['id', 'name']  # Only return id and the combined name
 
     def get_name(self, obj):
         # Get the language from the request context
         request = self.context.get('request')
         language = request.headers.get('Language', 'en') if request else 'en'
         
-        # Return the appropriate name based on the language
+        # Get the name based on the language
         if language == 'ar':
-            return obj.name_ar
-        return obj.name_en
+            name = obj.name_ar
+        else:
+            name = obj.name_en
+        
+        # Combine the name and shortname
+        return f"{name} - {obj.shortname}"
+
     
 class UserRoleSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()

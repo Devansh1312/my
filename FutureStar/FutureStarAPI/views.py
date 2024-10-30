@@ -78,19 +78,18 @@ def get_user_data(user, request):
         serializer = UserGenderSerializer(user.gender, context={'request': request})
         gender_name = serializer.data['name']
     
-    # Main and secondary playing positions with id and name fields
-    main_playing_position = None
+    # Main and secondary playing positions with id and combined name-shortname fields
+    main_playing_position_name = None
     main_playing_position_id = user.main_playing_position.id if user.main_playing_position else None
-    secondary_playing_position = None
+    secondary_playing_position_name = None
     secondary_playing_position_id = user.secondary_playing_position.id if user.secondary_playing_position else None
-    
+
     if user.main_playing_position:
-        main_position_serializer = PlayingPositionSerializer(user.main_playing_position, context={'request': request})
-        main_playing_position = main_position_serializer.data
+        main_playing_position_name = f"{user.main_playing_position.name_en} - {user.main_playing_position.shortname}"
+
     if user.secondary_playing_position:
-        secondary_position_serializer = PlayingPositionSerializer(user.secondary_playing_position, context={'request': request})
-        secondary_playing_position = secondary_position_serializer.data
-    
+        secondary_playing_position_name = f"{user.secondary_playing_position.name_en} - {user.secondary_playing_position.shortname}"
+
     return {
         'id': user.id,
         'followers_count': followers_count,
@@ -116,9 +115,9 @@ def get_user_data(user, request):
         'weight': user.weight,
         'height': user.height,
         'main_playing_position_id': main_playing_position_id,
-        'main_playing_position': main_playing_position,
+        'main_playing_position_name': main_playing_position_name,
         'secondary_playing_position_id': secondary_playing_position_id,
-        'secondary_playing_position': secondary_playing_position,
+        'secondary_playing_position_name': secondary_playing_position_name,
         'playing_foot': user.playing_foot,
         'favourite_local_team': user.favourite_local_team,
         'favourite_team': user.favourite_team,
@@ -129,6 +128,7 @@ def get_user_data(user, request):
         'device_type': user.device_type,
         'device_token': user.device_token,
     }
+
 
 ######################################################################################### Get Team Data ###################################################################
 def get_team_data(user, request):
