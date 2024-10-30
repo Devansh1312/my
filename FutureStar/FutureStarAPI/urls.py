@@ -56,7 +56,7 @@ urlpatterns = [
 
 
         path('api/media/album_detail/', DetailAlbumListAPIView.as_view()),
-        path('api/media/album/create/', DetailAlbumCreateAPIView.as_view()),
+        path('api/media/album_create/', DetailAlbumCreateAPIView.as_view()),
         path('api/media/all_albums/', AlbumListAPIView.as_view()),
        
         #############gallary############
@@ -69,7 +69,7 @@ urlpatterns = [
        
         #############delete album & gallary############
 
-        path('api/media/album/delete/', AlbumDeleteAPIView.as_view()),
+        path('api/media/album_delete/', AlbumDeleteAPIView.as_view()),
         path('api/media/delete/', GallaryDeleteAPIView.as_view()),
 
         ########################## Events URL ##################

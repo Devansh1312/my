@@ -1663,7 +1663,45 @@ def referee_directory_path(instance, filename):
 
 
 ################################ album and gallary ######################################################################################################################
+class CustomMediaPagination(PageNumberPagination):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
+    page_size = 30  # Number of records per page
+    page_query_param = 'page'  # Custom page number param in the body
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # Set max size if needed
+
+    def paginate_queryset(self, queryset, request, view=None):
+        # Get the page number from the body (default: 1)
+        try:
+            # Try to fetch and validate the page number
+            page_number = request.data.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            # If the page number is invalid, return a custom error response
+            return Response({
+                'status': 0,
+                'message': _('Page Not Found'),
+                'data': []
+            }, status=400)
+
+        # Get total number of pages based on the queryset
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        total_pages = paginator.num_pages
+
+        # Check if the requested page number is out of range
+        if self.page > total_pages:
+            # Return custom response for an invalid page
+            return Response({
+                'status': 0,
+                'message': _('Page Not Found'),
+                'data': []
+            }, status=400)
+
+        # Perform standard pagination if the page is valid
+        return super().paginate_queryset(queryset, request, view)
 ###########detail album with id ################
 class DetailAlbumListAPIView(generics.ListAPIView):
     serializer_class = DetailAlbumSerializer
@@ -1795,7 +1833,7 @@ class AlbumListAPIView(generics.ListAPIView):
     serializer_class = AlbumSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    pagination_class = CustomPostPagination 
+    pagination_class = CustomMediaPagination 
 
     def get_queryset(self):
         creator_type = self.request.query_params.get('creator_type', None)
@@ -1890,7 +1928,7 @@ class ImageGallaryListAPIView(generics.ListAPIView):
     serializer_class = GetGallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    pagination_class = CustomPostPagination
+    pagination_class = CustomMediaPagination
 
     def get_queryset(self):
         content_type = self.request.query_params.get('content_type', 1)  # Default to images if not specified
@@ -1948,7 +1986,7 @@ class VideoGallaryListAPIView(generics.ListAPIView):
     serializer_class = GetGallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    pagination_class = CustomPostPagination
+    pagination_class = CustomMediaPagination
 
     def get_queryset(self):
         content_type = self.request.query_params.get('content_type', 2)  # Default to videos if not specified
