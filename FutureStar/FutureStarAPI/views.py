@@ -822,7 +822,8 @@ class UpdateProfilePictureAPIView(APIView):
                 os.remove(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture)))
 
             file_extension = profile_picture.name.split('.')[-1]
-            file_name = f"profile_pics/{user.username}.{file_extension}"
+            unique_suffix = get_random_string(8)
+            file_name = f"profile_pics/{user.id}_{unique_suffix}.{file_extension}"
             path = default_storage.save(file_name, profile_picture)
             user.profile_picture = path
         elif request.data.get("profile_picture") in [None, '']:  # Retain old picture if None/blank
@@ -950,7 +951,8 @@ class EditProfileAPIView(APIView):
                 os.remove(os.path.join(settings.MEDIA_ROOT, str(old_profile_picture)))
 
             file_extension = profile_picture.name.split('.')[-1]
-            file_name = f"profile_pics/{user.username}.{file_extension}"
+            unique_suffix = get_random_string(8)
+            file_name = f"profile_pics/{user.id}_{unique_suffix}.{file_extension}"            
             path = default_storage.save(file_name, profile_picture)
             user.profile_picture = path
         elif request.data.get("profile_picture") in [None, '']:  # Retain old picture if None/blank
@@ -963,7 +965,8 @@ class EditProfileAPIView(APIView):
                 os.remove(os.path.join(settings.MEDIA_ROOT, str(old_card_header)))
 
             file_extension = card_header.name.split('.')[-1]
-            file_name = f"card_header/{user.username}.{file_extension}"
+            unique_suffix = get_random_string(8)
+            file_name = f"card_header/{user.id}_{unique_suffix}.{file_extension}"
             path = default_storage.save(file_name, card_header)
             user.card_header = path
         elif request.data.get("cover_photo") in [None, '']:  # Retain old header if None/blank
