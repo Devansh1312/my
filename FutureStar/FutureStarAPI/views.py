@@ -903,7 +903,7 @@ class EditProfileAPIView(APIView):
 
         # Handle age - retain old value if None or blank
         age = request.data.get('age')
-        if age not in [None, '', 'null']:
+        if age not in [None,'0', '', 'null']:
             user.age = age
         
         # Handle main_playing_position - set to NULL if blank, zero, or 'null' is provided
@@ -936,7 +936,7 @@ class EditProfileAPIView(APIView):
 
         # Handle gender - retain old value if None or blank
         gender_id = request.data.get('gender')
-        if gender_id not in [None, '', 'null']:  # Ensure 'null' is also checked
+        if gender_id not in [None, '','0', 'null']:  # Ensure 'null' is also checked
             try:
                 user.gender = UserGender.objects.get(id=gender_id)
             except UserGender.DoesNotExist:
@@ -947,7 +947,7 @@ class EditProfileAPIView(APIView):
 
         # Handle country - retain old value if None or blank
         country_id = request.data.get('country')
-        if country_id not in [None, '', 'null']:
+        if country_id not in [None,'0', '', 'null']:
             try:
                 user.country = Country.objects.get(id=country_id)
             except Country.DoesNotExist:
@@ -958,7 +958,7 @@ class EditProfileAPIView(APIView):
 
         # Handle city - retain old value if None or blank
         city_id = request.data.get('city')
-        if city_id not in [None, '', 'null']:
+        if city_id not in [None,'0', '', 'null']:
             if not user.country:
                 return Response({
                     'status': 2,
@@ -1015,6 +1015,7 @@ class EditProfileAPIView(APIView):
                 'current_type':user.current_type,
             }
         }, status=status.HTTP_200_OK)
+
 
 ####################### POST API ###############################################################################
 class CustomPostPagination(PageNumberPagination):
