@@ -280,3 +280,86 @@ class TeamViewAPI(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
     
+
+
+
+class TeamBranchAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+  
+    def post(self, request, *args, **kwargs):
+        # Set language based on the 'Language' header
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Initialize the serializer with request data
+        serializer = TeamBranchSerializer(data=request.data, context={'request': request})
+        
+        if serializer.is_valid():
+            # Save the validated data to create a TeamBranch instance
+            team_branch_instance = serializer.save()
+
+            # Handle image upload if an image file is provided in request.FILES
+            if "upload_image" in request.FILES:
+                image = request.FILES["upload_image"]
+                file_extension = image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                
+                # Retrieve the team ID for constructing the file name
+                team_id = request.data.get("team_id")
+                file_name = f"team_branch_images/{team_branch_instance.id}_{team_id}_{unique_suffix}.{file_extension}"
+                
+                # Save the image using the default storage
+                image_path = default_storage.save(file_name, image)
+                team_branch_instance.upload_image = image_path
+                team_branch_instance.save()
+
+            # Refresh the instance to ensure all fields are up-to-date
+            team_branch_instance.refresh_from_db()
+
+            # Return a success response with the created data
+            return Response({
+                'status': 1,
+                'message': _('Field created successfully.'),
+                'data': TeamBranchSerializer(team_branch_instance).data
+            }, status=status.HTTP_201_CREATED)
+        
+        # Return an error response if validation fails
+        return Response({
+            'status': 0,
+            'message': _('Team Branch creation failed.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, *args, **kwargs):
+        # Set language based on the 'Language' header
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Get the team_id from query parameters
+        team_branch_id = self.request.query_params.get('team_branch_id')
+        if not team_branch_id:
+            return Response({
+                'status': 0,
+                'message': _('Team Branch ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Retrieve the TeamBranch instance associated with the team_id
+        try:
+            team_branch_instance = TeamBranch.objects.get(id=team_branch_id)
+        except TeamBranch.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('No TeamBranch found for the given ID.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize and return the TeamBranch data
+        serializer = TeamBranchSerializer(team_branch_instance, context={'request': request})
+        return Response({
+            'status': 1,
+            'message': _('TeamBranch retrieved successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+        

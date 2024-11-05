@@ -98,3 +98,25 @@ class TeamSerializer(serializers.ModelSerializer):
 
     def get_team_founder_profile_picture(self, obj):
         return obj.team_founder.profile_picture.url if obj.team_founder and obj.team_founder.profile_picture else None
+
+
+
+    
+class TeamBranchSerializer(serializers.ModelSerializer):
+    age_group_name = serializers.SerializerMethodField()
+    field_size_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TeamBranch
+        fields = [
+            'id', 'team_id', 'team_name', 'age_group_id', 'age_group_name', 'upload_image', 'field_size', 
+            'field_size_name', 'phone', 'email', 'latitude', 'longitude', 'address', 'house_no', 'premises', 
+            'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'entry_fees', 'description', 
+            'created_at', 'updated_at'
+        ]
+
+    def get_field_size_name(self, obj):
+        return obj.field_size.name if obj.field_size else None  
+
+    def get_age_group_name(self, obj):
+        return obj.age_group_id.name_en if obj.age_group_id else None
