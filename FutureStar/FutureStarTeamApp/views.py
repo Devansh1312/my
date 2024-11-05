@@ -73,7 +73,7 @@ class TeamViewAPI(APIView):
         user = request.user
 
         # Check if the user has already created a team
-        if Team.objects.filter(user_id=user).exists():
+        if Team.objects.filter(team_founder=user).exists():
             return Response({
                 'status': 0,
                 'message': _('You can only create one team.')
@@ -100,7 +100,7 @@ class TeamViewAPI(APIView):
 
         # Create a new team instance
         team_instance = Team(
-            user_id=user,
+            team_founder=user,
             team_name=request.data.get('team_name'),
             team_username=request.data.get('team_username'),
             team_type=team_type_instance,
@@ -141,7 +141,7 @@ class TeamViewAPI(APIView):
             return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            team_instance = Team.objects.get(id=team_id, user_id=request.user)
+            team_instance = Team.objects.get(id=team_id, team_founder=request.user)
         except Team.DoesNotExist:
             return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
 
@@ -253,7 +253,7 @@ class TeamViewAPI(APIView):
             return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            team_instance = Team.objects.get(id=team_id, user_id=request.user)
+            team_instance = Team.objects.get(id=team_id, team_founder=request.user)
         except Team.DoesNotExist:
             return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
 

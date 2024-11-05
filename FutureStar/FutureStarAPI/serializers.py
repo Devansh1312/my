@@ -491,7 +491,7 @@ class GallarySerializer(serializers.ModelSerializer):
         if mime_type:
             if mime_type.startswith('image/'):
                 data['content_type'] = 1
-            elif mime_type.startswith('video/'):
+            elif mime_type.startswith('video/mp4'):
                 data['content_type'] = 2
             else:
                 raise serializers.ValidationError("The file must be an image or video.")
@@ -539,7 +539,7 @@ class GetGallarySerializer(serializers.ModelSerializer):
         if mime_type:
             if mime_type.startswith('image/'):
                 data['content_type'] = 1
-            elif mime_type.startswith('video/'):
+            elif mime_type.startswith('video/mp4'):
                 data['content_type'] = 2
             else:
                 raise serializers.ValidationError("The file must be an image or video.")
