@@ -160,6 +160,8 @@ class TeamViewAPI(APIView):
         team_instance.bio = request.data.get('bio', team_instance.bio)
         team_instance.team_establishment_date = request.data.get('team_establishment_date', team_instance.team_establishment_date)
         team_instance.team_president = request.data.get('team_president', team_instance.team_president)
+        team_instance.team_founder = request.data.get('team_founder', team_instance.team_founder)
+
         team_instance.entry_fees = request.data.get('entry_fees', team_instance.entry_fees)
 
 
