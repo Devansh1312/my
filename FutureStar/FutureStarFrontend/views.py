@@ -677,9 +677,10 @@ class OTPVerificationView(View):
     
 
 def custom_404_view(request, exception=None):
+        # template_name = "Admin/User/Referee_List.html"
     
 
-        return render(request, 'templates/error404.html', status=404)
+        return render(request, 'templates/404.html')
     
 
 ############################### google ###########################

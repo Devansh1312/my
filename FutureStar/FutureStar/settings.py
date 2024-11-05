@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'sass_processor',
     'widget_tweaks',
     'corsheaders',
+    'whitenoise' ,
     'social_django',
 
 ]
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'FutureStarAPI.middleware.MiddlewareToken',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
 
 ]
 
