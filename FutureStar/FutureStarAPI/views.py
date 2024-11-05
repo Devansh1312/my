@@ -2963,6 +2963,7 @@ class UserRoleListAPIView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 class LocationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request):
@@ -3004,6 +3005,8 @@ class LocationAPIView(APIView):
 
 ####################################### FOLLOW USER ############################################
 class FollowUnfollowAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)    
     def post(self, request):
         creator_type = request.data.get('creator_type')
         created_by_id = request.data.get('created_by_id')
@@ -3040,6 +3043,8 @@ class FollowUnfollowAPI(APIView):
 ################ Pagination ##################
 # Custom Pagination class with fixed paginate_queryset
 class CustomFollowRequestPagination(PageNumberPagination):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     page_size = 10
     page_query_param = 'page'
     page_size_query_param = 'page_size'
@@ -3088,6 +3093,8 @@ class CustomFollowRequestPagination(PageNumberPagination):
 ####################################### LIST OF FOLLOWERS #######################################
 class ListFollowersAPI(generics.ListAPIView):
     pagination_class = CustomFollowRequestPagination
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
         target_id = self.request.query_params.get('target_id')
@@ -3165,6 +3172,8 @@ class ListFollowersAPI(generics.ListAPIView):
 ##################################### LIST OF FOLLOWING #######################################
 class ListFollowingAPI(generics.ListAPIView):
     pagination_class = CustomFollowRequestPagination
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
         creator_type = self.request.query_params.get('creator_type')
@@ -3251,7 +3260,7 @@ class DashboardImageAPI(APIView):
 
 ####################################################################### Event Moodule #############################################################################################
 
-###################### Event LIKE ##################################
+###################### Event LIKE ######################
 class EventLikeAPIView(APIView):
     permission_classes = [IsAuthenticated]    
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3298,7 +3307,7 @@ class EventLikeAPIView(APIView):
             'data': serializer.data
         }, status=200)
 
-################################ Get Comment of EVENT API #############################
+###################### Get Comment of EVENT API ######################
 class EventCommentAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3355,7 +3364,7 @@ class EventCommentAPIView(APIView):
             'current_page': paginator.page.number,
         }, status=status.HTTP_200_OK)
 
-######################## COMMENT CREATE API ###########################
+###################### COMMENT CREATE API ######################
 class EventCommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3417,7 +3426,7 @@ class EventCommentCreateAPIView(APIView):
 
 
 
-##################################### Event Pagination #######################################
+###################### Event Pagination ######################
 
 class CustomEventPagination(PageNumberPagination):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3452,7 +3461,7 @@ class CustomEventPagination(PageNumberPagination):
         return super().paginate_queryset(queryset, request, view)
 
 
-######################### All Events and my events ###################
+###################### All Events and my events ######################
 class EventsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3516,7 +3525,7 @@ class EventsAPIView(APIView):
             'current_page': paginator.page.number
         })
 
-################ Event Details API ###################################
+###################### Event Details API ######################
 class EventDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
     parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
@@ -3558,7 +3567,7 @@ class EventDetailAPIView(APIView):
                 "error": str(e)  # Include the exception message for debugging
             }, status=status.HTTP_400_BAD_REQUEST)
 
-###################### Event Create API  ###################################
+###################### Event Create API  ######################
 class EventCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = EventSerializer
@@ -3651,7 +3660,7 @@ class EventCreateAPIView(generics.CreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-################### Event Detail Update #####################################
+###################### Event Detail Update ######################
 class UpdateEventAPIView(APIView):
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
@@ -3714,7 +3723,7 @@ class UpdateEventAPIView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-################## Event Bookin API #############################
+###################### Event Bookin API ######################
 class EventBookingDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -3748,7 +3757,7 @@ class EventBookingDetailView(APIView):
         }, status=status.HTTP_200_OK)
 
     
-########## Event Bokking Craete API ################
+###################### Event Bokking Craete API ######################
 class EventBookingCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
