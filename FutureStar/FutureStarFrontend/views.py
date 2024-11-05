@@ -580,7 +580,7 @@ class RegisterPage(View):
 
         # Generate OTP and save user details in OTPSave table
         otp = generate_otp()
-        OTPSave.objects.create(username=username, phone=phone, password=password, OTP=otp)
+        OTPSave.objects.create(phone=phone, OTP=otp)
 
         # Log the OTP for development purposes
         print(f"OTP: {otp}")
@@ -588,6 +588,7 @@ class RegisterPage(View):
         # Store phone and username in the session to access in OTP verification
         request.session['phone'] = phone
         request.session['username'] = username
+        request.session['password'] = password  # Store password in the session temporarily
         messages.success(request, f"Your OTP is {otp}")
         return redirect("verify_otp")
 
@@ -642,6 +643,8 @@ class OTPVerificationView(View):
         # Retrieve the saved username and phone from the session
         username = request.session.get('username')
         phone = request.session.get('phone')
+        password = request.session.get('password')  # Retrieve password from session
+        email = request.session.get('email')  # Retrieve password from session
 
         try:
             otp_record = OTPSave.objects.get(OTP=otp_input, phone=phone)
@@ -650,9 +653,14 @@ class OTPVerificationView(View):
             return redirect("verify_otp")
 
         # If OTP is valid, create a new user in the User table
-        user = User.objects.create(username=otp_record.username, phone=otp_record.phone, email=otp_record.email,
-                                    role_id=5, device_type="web")
-        user.set_password(otp_record.password)
+        user = User.objects.create(
+            username=username,
+            phone=phone,
+            email=email,  # Make sure to handle email properly
+            role_id=5,
+            device_type="web"
+        )
+        user.set_password(password)  # Use the password stored in the session
         user.save()
 
         # Delete the OTP record now that the user is registered
@@ -660,10 +668,12 @@ class OTPVerificationView(View):
 
         # Clear session data
         request.session.pop('username', None)
+        request.session.pop('password', None)
         request.session.pop('phone', None)
 
         messages.success(request, "Registration successful! Please log in.")
         return redirect("login")
+
     
 
 ############################### google ###########################

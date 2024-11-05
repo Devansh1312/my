@@ -1,95 +1,160 @@
-{% extends 'base1.html' %} {% load static %} {% load lang_filter %} {% block css %}
+{% extends 'base1.html' %}
+{% load static %}
+{% load lang_filter %}
+{% block css %}
 <!-- Plugins css start-->
-<!-- Plugins css Ends--> {% endblock %} {% block title %} Future Star || Register {% endblock %} {% block content %}
+<!-- Plugins css Ends-->
+<style>
+    /* Style for the eye icon */
+    .eye-icon {
+        position: absolute;
+        right: 15px;
+        top: 70%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        z-index: 1; /* Ensure it appears above input */
+    }
+
+    .form-group {
+        position: relative; /* Make form-group relative for absolute positioning of the icon */
+    }
+
+    /* Red border for required fields */
+    .required-field {
+        border: 2px solid red;
+    }
+
+    /* Red border for form group on error */
+    .form-group.error {
+        border: 2px solid red; /* Add red border to the whole form group */
+    }
+
+    /* Error message styling */
+    .error-message {
+        color: red;
+        font-size: 12px;
+        display: none; /* Hidden by default */
+        margin-top: 5px; /* Add some spacing above the error message */
+    }
+</style>
+{% endblock %}
+
+{% block title %} Future Star || Register {% endblock %}
+{% block content %}
 <!-- Page Banner Start -->
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-12">
-                <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s"> {% lang cmsdata current_language "heading_title" as heading_title %} <h2>{{heading_title}}</h2>
+                <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                    <h2>{{heading_title}}</h2>
                 </div>
             </div>
             <div class="col-xl-6 col-lg-4">
-                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" method="post" action="{% url 'register' %}"> {% csrf_token %} <div class="row">
+                <form id="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" method="post" action="{% url 'register' %}" onsubmit="return validateForm();">
+                    {% csrf_token %}
+                    <div class="row">
                         <input name="register_type" id="register_type" type="hidden" value="1">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="username">Username</label>
-                                <input type="text" id="username" name="username" class="form-control" placeholder="" required>
+                                <input type="text" id="username" name="username" class="form-control" required placeholder="">
+                                <div class="error-message" id="usernameError">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="phone">Phone Number</label>
-                                <input type="text" id="phone" name="phone" class="form-control" placeholder="" required>
+                                <input type="text" id="phone" name="phone" class="form-control" required placeholder="" pattern="[0-9]*" inputmode="numeric">
+                                <div class="error-message" id="phoneError">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <input type="password" id="password" name="password" class="form-control" placeholder="" required>
+                                <input type="password" id="password" name="password" class="form-control" required placeholder="">
+                                <span class="eye-icon" id="togglePassword"><i class="fa fa-eye" aria-hidden="true"></i></span>
+                                <div class="error-message" id="passwordError">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="confirmPassword">Confirm Password</label>
-                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="" required>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required placeholder="">
+                                <span class="eye-icon" id="toggleConfirmPassword"><i class="fa fa-eye" aria-hidden="true"></i></span>
+                                <div class="error-message" id="confirmPasswordError">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="d-flex mb-30 justify-content-between">
                                 <label>
-                                    <input type="checkbox" required /> You agree to our Terms and have read and acknowledge the Privacy Policy </label>
+                                    <input type="checkbox" required /> You agree to our Terms and have read and acknowledge the Privacy Policy
+                                </label>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group pt-5 mb-60">
-                                <button type="submit" class="theme-btn style-two w-100" id="submitBtn">Sign Up <i class="fa-solid fa-arrow-right"></i>
-                                </button>
+                                <button type="submit" class="theme-btn style-two w-100" id="submitBtn">Sign Up <i class="fa-solid fa-arrow-right"></i></button>
                             </div>
-                            <div class="text-center"> Already have an account? <a href="{% url 'login' %}">Sign In</a>
-                            </div>
+                            <div class="text-center"> Already have an account? <a href="{% url 'login' %}">Sign In</a></div>
                         </div>
+                    </div>
                 </form>
-                <!-- <div class="col-md-12">
-                    <div class="form-group">
-                        <div class="or">
-                            <span>OR</span>
-                        </div>
-                    </div>
-                    <div class="continue-with-social text-center">
-                        <button class="btn-social" id="googleSignUpBtn">
-                            <span>
-                                <img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" />
-                            </span> Signup With Google </button>
-                        <button class="btn-social" id="appleSignUpBtn">
-                            <span>
-                                <img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" />
-                            </span> Signup With Apple </button>
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
-    </div>
-</section> {% endblock %} {% block script %} <script>
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
     function validateForm() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return false; // Prevent form submission
-        }
-        return true; // Allow form submission
+        let valid = true;
+
+        // Clear previous error messages and styles
+        $('.form-group').removeClass('error'); // Remove error class from all form groups
+        $('.error-message').hide();
+
+        // Validate required fields
+        $('#teamForm input[required]').each(function() {
+            if ($(this).val() === '') {
+                valid = false;
+                $(this).closest('.form-group').addClass('error'); // Add error class to the form group
+                const errorId = $(this).attr('id') + 'Error';
+                $('#' + errorId).show(); // Show error message
+            }
+        });
+
+        return valid; // Allow form submission if all required fields are filled
     }
-    // Handle Google Sign Up
-    document.getElementById('googleSignUpBtn').onclick = function() {
-        // Call your backend to initiate Google OAuth
-        window.location.href = "";
-    };
-    // // Handle Apple Sign Up
-    // document.getElementById('appleSignUpBtn').onclick = function() {
-    //     // Call your backend to initiate Apple OAuth
-    //     window.location.href = "";
-    // };
-</script> {% endblock %}
+
+    // Handle password visibility toggle
+    $('#togglePassword').on('click', function() {
+        const passwordField = $('#password');
+        const passwordFieldType = passwordField.attr('type');
+
+        // Toggle the type attribute
+        passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
+        $(this).find('i').toggleClass('fa-eye fa-eye-slash'); // Change the icon
+    });
+
+    // Handle confirm password visibility toggle
+    $('#toggleConfirmPassword').on('click', function() {
+        const confirmPasswordField = $('#confirmPassword');
+        const confirmPasswordFieldType = confirmPasswordField.attr('type');
+
+        // Toggle the type attribute
+        confirmPasswordField.attr('type', confirmPasswordFieldType === 'password' ? 'text' : 'password');
+        $(this).find('i').toggleClass('fa-eye fa-eye-slash'); // Change the icon
+    });
+
+    // Ensure that the phone field accepts only numeric input
+    $('#phone').on('keypress', function(e) {
+        if (!/\d/.test(String.fromCharCode(e.which))) {
+            e.preventDefault(); // Prevent non-numeric input
+        }
+    });
+</script>
+{% endblock %}
