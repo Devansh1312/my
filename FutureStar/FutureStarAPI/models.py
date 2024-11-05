@@ -470,12 +470,6 @@ class Event(models.Model):
        
     )
 
-    EVENTS_SECTION_CHOICES = [
-        (1, 'All Events'),
-        (2, 'My Events'),
-    ]
-
-
     id = models.AutoField(primary_key=True)
     # team=models.ForeignKey('Team', on_delete=models.CASCADE)
 
@@ -504,7 +498,6 @@ class Event(models.Model):
     event_cost=models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
-    events_sections = models.IntegerField(choices=EVENTS_SECTION_CHOICES, default=1)
 
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -517,8 +510,19 @@ class Event(models.Model):
         db_table = 'futurestar_app_event'
 
 class EventBooking(models.Model):
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+    
     id = models.AutoField(primary_key=True)
-    # user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)  # Add user fie
+    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)    
     event=models.ForeignKey(Event, on_delete=models.CASCADE)
     tickets=models.IntegerField()
     convenience_fee=models.FloatField(default=0.0)

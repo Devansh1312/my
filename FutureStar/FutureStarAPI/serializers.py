@@ -658,7 +658,7 @@ class EventSerializer(serializers.ModelSerializer):
             'id', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
             'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
-            'event_description', 'event_cost',   'created_by_id','creator_type','events_sections', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
+            'event_description', 'event_cost',   'created_by_id','creator_type', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
         ]
         read_only_fields = ['event_organizer']  # Make 'event_organizer' read-only since it will be auto-assigned
 
@@ -716,10 +716,12 @@ class EventSerializer(serializers.ModelSerializer):
 
 
 class EventBookingSerializer(serializers.ModelSerializer):
-   
+    event_details = EventSerializer(source='event', read_only=True)  # Nested serializer for event details
+
     class Meta:
         model = EventBooking
-        fields = ['id', 'event', 'tickets', 'convenience_fee', 'ticket_amount', 'total_amount']
+        fields = ['id', 'event', 'event_details', 'tickets', 'creator_type', 'created_by_id', 'convenience_fee', 'ticket_amount', 'total_amount']
+
 
   
 

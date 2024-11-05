@@ -125,7 +125,7 @@ urlpatterns = [
         path('api/faq/', FAQListAPIView.as_view()),
         path('api/role/', UserRoleListAPIView.as_view()),
         path('api/locations/', LocationAPIView.as_view()),
-        path('api/playing/positions/', PlayingPositionListAPIView.as_view()),
+        path('api/playing_positions/', PlayingPositionListAPIView.as_view()),
 
         ###################### New Coach or Refree Profile ########################
         path('api/profile/create/', ProfileTypeView.as_view()),

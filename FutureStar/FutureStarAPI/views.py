@@ -1285,6 +1285,10 @@ class PostEditAPIView(generics.GenericAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+                
+        created_by_id = self.request.data.get('created_by_id')
+        creator_type = self.request.data.get('creator_type')
+
 
         post_id = request.data.get('post_id')
         if not post_id:
@@ -3032,16 +3036,79 @@ class FollowUnfollowAPI(APIView):
                 'message': 'Followed successfully.',
             }, status=status.HTTP_201_CREATED)
 
+################ Pagination ##################
+class CustomFollowRequestPagination(PageNumberPagination):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count  # Total records in the queryset
+
+        if self.page > self.total_pages or self.page < 1:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': 'Data fetched successfully.',
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
 
 ####################################### LIST OF FOLLOWERS #######################################
 class ListFollowersAPI(generics.ListAPIView):
+    pagination_class = CustomFollowRequestPagination  # Add pagination to the view
+
     def get_queryset(self):
         target_id = self.request.query_params.get('target_id')
         target_type = self.request.query_params.get('target_type')
-        return FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
+        search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
+
+        queryset = FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
+
+        # Filter followers based on search_key
+        if search_key:
+            # Separate filtering for each type
+            user_ids = User.objects.filter(username__icontains=search_key).values_list('id', flat=True)
+            team_ids = Team.objects.filter(team_username__icontains=search_key).values_list('id', flat=True)
+            group_ids = TrainingGroups.objects.filter(group_username__icontains=search_key).values_list('id', flat=True)
+
+            # Filter queryset by matching IDs in each target type
+            queryset = queryset.filter(
+                Q(target_type=FollowRequest.USER_TYPE, target_id__in=user_ids) |
+                Q(target_type=FollowRequest.TEAM_TYPE, target_id__in=team_ids) |
+                Q(target_type=FollowRequest.GROUP_TYPE, target_id__in=group_ids)
+            )
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = self.paginate_queryset(self.get_queryset())
         followers = []
 
         for follow in queryset:
@@ -3051,6 +3118,7 @@ class ListFollowersAPI(generics.ListAPIView):
                     'creator_type': 1,
                     'creator_id': user.id,
                     'username': user.username,
+                    'role': user.role.id,
                     'profile': user.profile_picture.url if user.profile_picture else None
                 })
             elif follow.creator_type == FollowRequest.TEAM_TYPE:
@@ -3059,6 +3127,7 @@ class ListFollowersAPI(generics.ListAPIView):
                     'creator_type': 2,
                     'creator_id': team.id,
                     'username': team.team_username,
+                    'role': 6,
                     'profile': team.team_logo.url if team.team_logo else None
                 })
             elif follow.creator_type == FollowRequest.GROUP_TYPE:
@@ -3067,25 +3136,45 @@ class ListFollowersAPI(generics.ListAPIView):
                     'creator_type': 3,
                     'creator_id': group.id,
                     'username': group.group_username,
+                    'role': 7,
                     'profile': group.group_logo.url if group.group_logo else None
                 })
 
-        return Response({
+        return self.get_paginated_response({
             'status': 1,
             'message': 'Followers fetched successfully.',
             'data': followers
-        }, status=status.HTTP_200_OK)
+        })
 
 
 ##################################### LIST OF FOLLOWING #######################################
 class ListFollowingAPI(generics.ListAPIView):
+    pagination_class = CustomFollowRequestPagination
+
     def get_queryset(self):
         creator_type = self.request.query_params.get('creator_type')
         created_by_id = self.request.query_params.get('created_by_id')
-        return FollowRequest.objects.filter(creator_type=creator_type, created_by_id=created_by_id)
+        search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
+
+        queryset = FollowRequest.objects.filter(creator_type=creator_type, created_by_id=created_by_id)
+
+        if search_key:
+            # Separate filtering for each type
+            user_ids = User.objects.filter(username__icontains=search_key).values_list('id', flat=True)
+            team_ids = Team.objects.filter(team_username__icontains=search_key).values_list('id', flat=True)
+            group_ids = TrainingGroups.objects.filter(group_username__icontains=search_key).values_list('id', flat=True)
+
+            # Filter queryset by matching IDs in each target type
+            queryset = queryset.filter(
+                Q(target_type=FollowRequest.USER_TYPE, target_id__in=user_ids) |
+                Q(target_type=FollowRequest.TEAM_TYPE, target_id__in=team_ids) |
+                Q(target_type=FollowRequest.GROUP_TYPE, target_id__in=group_ids)
+            )
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = self.paginate_queryset(self.get_queryset())
         following = []
 
         for follow in queryset:
@@ -3095,6 +3184,7 @@ class ListFollowingAPI(generics.ListAPIView):
                     'creator_type': 1,
                     'creator_id': user.id,
                     'username': user.username,
+                    'role': user.role.id,
                     'profile': user.profile_picture.url if user.profile_picture else None
                 })
             elif follow.target_type == FollowRequest.TEAM_TYPE:
@@ -3103,6 +3193,7 @@ class ListFollowingAPI(generics.ListAPIView):
                     'creator_type': 2,
                     'creator_id': team.id,
                     'username': team.team_username,
+                    'role': 6,
                     'profile': team.team_logo.url if team.team_logo else None
                 })
             elif follow.target_type == FollowRequest.GROUP_TYPE:
@@ -3111,16 +3202,15 @@ class ListFollowingAPI(generics.ListAPIView):
                     'creator_type': 3,
                     'creator_id': group.id,
                     'username': group.group_username,
+                    'role': 7,
                     'profile': group.group_logo.url if group.group_logo else None
                 })
 
-        return Response({
+        return self.get_paginated_response({
             'status': 1,
             'message': 'Following list fetched successfully.',
             'data': following
-        }, status=status.HTTP_200_OK)
-
-
+        })
 ##################################### Mobile Dashboard Image #######################################
 
 class DashboardImageAPI(APIView):
@@ -3148,7 +3238,8 @@ class DashboardImageAPI(APIView):
 
 ###################### Event LIKE ##################################
 class EventLikeAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]    
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         event_id = request.data.get('event_id')
@@ -3311,7 +3402,7 @@ class EventCommentCreateAPIView(APIView):
 
 
 
-##################################### Event #######################################
+##################################### Event Pagination #######################################
 
 class CustomEventPagination(PageNumberPagination):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3345,41 +3436,8 @@ class CustomEventPagination(PageNumberPagination):
 
         return super().paginate_queryset(queryset, request, view)
 
-# class EventsAPIView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-#     def get(self, request):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
-
-#         paginator = CustomEventPagination()
-#         try:
-#             events = Event.objects.all()
-#             paginated_events = paginator.paginate_queryset(events, request, view=self)
-#             serializer = EventSerializer(paginated_events, many=True)
-
-#             # Return paginated response with pagination details
-#             return Response({
-#                 'status': 1,
-#                 'message': _('All Events fetched successfully.'),
-#                 'data': serializer.data,
-#                 'total_records': paginator.page.paginator.count,
-#                 'total_pages': paginator.total_pages,
-#                 'current_page': paginator.page.number
-#             })
-        
-         
-
-#         except Exception as e:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('Error occurred while fetching event list.'),
-#                 'error': str(e),
-#                 'data':[]
-#             }, status=status.HTTP_400_BAD_REQUEST)
-
+######################### All Events and my events ###################
 class EventsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3391,53 +3449,44 @@ class EventsAPIView(APIView):
 
         paginator = CustomEventPagination()
         
-        # Get the events_sections from query parameters
-        events_section = request.query_params.get('events_sections', 1)  # Default to 1 if not provided
+        events_section = request.query_params.get('events_section')  # Default to 1 if not provided
         creator_type = request.query_params.get('creator_type')  # Get creator_type from query parameters
         created_by_id = request.query_params.get('created_by_id')  # Get created_by_id from query parameters
 
         try:
-            # Check if events_section is an integer and convert it
             events_section = int(events_section)
         except ValueError:
             return Response({
                 'status': 0,
-                'message': 'Invalid events_sections value. It must be an integer.'
+                'message': 'Invalid events_section value. It must be an integer.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Initialize the queryset based on events_section
         if events_section == 1:
             # Show all events
             events = Event.objects.all()
+
         elif events_section == 2:
-            # Show events created by the logged-in user
-            events = Event.objects.filter(event_organizer=request.user)
+            # Show events created by the specified creator_type and created_by_id
+            events = Event.objects.filter(
+                creator_type=creator_type, 
+                created_by_id=created_by_id
+            )
+
+            
+            if not events.exists():
+                # If no created events, look up joined events in EventBooking
+                joined_events_ids = EventBooking.objects.filter(
+                    creator_type=creator_type,
+                    created_by_id=created_by_id
+                ).values_list('event_id', flat=True)
+                
+                events = Event.objects.filter(id__in=joined_events_ids)
+
         else:
             return Response({
                 'status': 0,
-                'message': 'Invalid events_sections value. Allowed values are 1 or 2.'
+                'message': 'Invalid events_section value. Allowed values are 1 or 2.'
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Further filter by creator_type and created_by_id if provided
-        if creator_type is not None:
-            try:
-                creator_type = int(creator_type)
-                events = events.filter(creator_type=creator_type)
-            except ValueError:
-                return Response({
-                    'status': 0,
-                    'message': 'Invalid creator_type value. It must be an integer.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-        if created_by_id is not None:
-            try:
-                created_by_id = int(created_by_id)
-                events = events.filter(created_by_id=created_by_id)
-            except ValueError:
-                return Response({
-                    'status': 0,
-                    'message': 'Invalid created_by_id value. It must be an integer.'
-                }, status=status.HTTP_400_BAD_REQUEST)
 
         # Paginate the queryset
         paginated_events = paginator.paginate_queryset(events, request, view=self)
@@ -3451,63 +3500,8 @@ class EventsAPIView(APIView):
             'total_pages': paginator.total_pages,
             'current_page': paginator.page.number
         })
-# class TeamEventAPIView(APIView):
-#     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
-#     parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
 
-#     def get(self, request):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
-
-#         # Get the team_id from query parameters
-#         team_id = request.query_params.get('team_id', None)
-
-#         # Return error if team_id is not provided
-#         if not team_id:
-#             return Response({
-#                 "status": 0,
-#                 "message": _("Team id is required."),
-#             }, status=status.HTTP_400_BAD_REQUEST)
-
-#         paginator = CustomEventPagination()  # Initialize the custom pagination
-
-#         try:
-#             # Filter events by team_id
-#             events = Event.objects.filter(team=team_id)
-
-#             # Paginate the queryset
-#             paginated_events = paginator.paginate_queryset(events, request, view=self)
-
-#             # If pagination returns None, it means the page was invalid
-#             if paginated_events is None:
-#                 return Response({
-#                     'status': 0,
-#                     'message': _('Page not found.'),
-#                     'data': []
-#                 }, status=status.HTTP_400_BAD_REQUEST)
-
-#             # Serialize the paginated events
-#             serializer = EventSerializer(paginated_events, many=True)
-
-#             # Return paginated response with pagination details
-#             return Response({
-#                 'status': 1,
-#                 'message': _("Event list fetched successfully."),
-#                 'data': serializer.data,
-#                 'total_records': paginator.page.paginator.count,
-#                 'total_pages': paginator.total_pages,
-#                 'current_page': paginator.page.number
-#             }, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('Error occurred while fetching event list.'),
-#                 'error': str(e),
-#                 'data': []
-#             }, status=status.HTTP_400_BAD_REQUEST)
-        
+################ Event Details API ###################################
 class EventDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
     parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
@@ -3549,6 +3543,7 @@ class EventDetailAPIView(APIView):
                 "error": str(e)  # Include the exception message for debugging
             }, status=status.HTTP_400_BAD_REQUEST)
 
+###################### Event Create API  ###################################
 class EventCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = EventSerializer
@@ -3641,6 +3636,7 @@ class EventCreateAPIView(generics.CreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+################### Event Detail Update #####################################
 class UpdateEventAPIView(APIView):
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
@@ -3703,60 +3699,41 @@ class UpdateEventAPIView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+################## Event Bookin API #############################
 class EventBookingDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         # Fetch event_id from query parameters
         event_id = request.query_params.get("event_id")
         
         if not event_id:
-            return Response({"error": "event_id query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0,
+                "error": "event id  is required"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get all bookings for the specified event
-        bookings = EventBooking.objects.filter(event_id=event_id)
-        
+        # Get the logged-in user's ID
+        user_id = request.user.id
+        creator_type = EventBooking.USER_TYPE  # Or determine dynamically if there are multiple creator types
+
+        # Get all bookings for the specified event by the logged-in user
+        bookings = EventBooking.objects.filter(event_id=event_id, created_by_id=user_id, creator_type=creator_type)
+
         if not bookings.exists():
-            return Response({"detail": "No bookings found for this event."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "No bookings found for this event by the logged-in user."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Serialize the booking data
-        serializer = EventBookingSerializer(bookings, many=True)
+        # Serialize the booking data with nested event details
+        serializer = EventBookingSerializer(bookings, many=True, context={'request': request})
         
         return Response({
             'status': 1,
             'message': _('Event Booking Detail Fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+
     
-# class EventsJoinedAPIView(APIView):
-#     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
-    
-#     def get(self, request, *args, **kwargs):
-#         user = request.user  # Get the logged-in user
-
-#         # Filter EventBooking by the logged-in user
-#         joined_bookings = EventBooking.objects.filter(user=user)
-
-#         if not joined_bookings.exists():
-#             return Response({
-#                 'status': 0,
-#                 'message': _("No joined events found for this user."),
-#                 'data': []
-#             }, status=status.HTTP_404_NOT_FOUND)
-
-#         # Extract event IDs from the joined bookings
-#         event_ids = joined_bookings.values_list('event_id', flat=True).distinct()
-        
-#         # Get the events based on the filtered event IDs
-#         events = Event.objects.filter(id__in=event_ids)
-
-#         # Serialize the events
-#         serializer = EventSerializer(events, many=True)
-
-#         return Response({
-#             'status': 1,
-#             'message': _("Joined events fetched successfully."),
-#             'data': serializer.data
-#         }, status=status.HTTP_200_OK)
+########## Event Bokking Craete API ################
 class EventBookingCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
