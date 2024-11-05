@@ -3087,18 +3087,16 @@ class CustomFollowRequestPagination(PageNumberPagination):
 
 ####################################### LIST OF FOLLOWERS #######################################
 class ListFollowersAPI(generics.ListAPIView):
-    pagination_class = CustomFollowRequestPagination  # Add pagination to the view
+    pagination_class = CustomFollowRequestPagination
 
     def get_queryset(self):
         target_id = self.request.query_params.get('target_id')
         target_type = self.request.query_params.get('target_type')
         search_key = self.request.query_params.get('search_key', '')
 
-        # Start with filtering by target_id and target_type
         queryset = FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
 
         if search_key:
-            # Filter followers based on search_key applied to the creator (created_by_id) field
             user_ids = User.objects.filter(username__icontains=search_key).values_list('id', flat=True)
             team_ids = Team.objects.filter(team_username__icontains=search_key).values_list('id', flat=True)
             group_ids = TrainingGroups.objects.filter(group_username__icontains=search_key).values_list('id', flat=True)
@@ -3112,12 +3110,23 @@ class ListFollowersAPI(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
+        # Get target ID and type for is_follow check
+        target_id = self.request.query_params.get('target_id')
+        target_type = self.request.query_params.get('target_type')
+
         # Get the paginated page object
         page = self.paginate_queryset(self.get_queryset())
         followers = []
 
         # Loop through the paginated results and build the response data
         for follow in page:
+            is_follow = FollowRequest.objects.filter(
+                created_by_id=target_id,
+                creator_type=target_type,
+                target_id=follow.created_by_id,
+                target_type=follow.creator_type
+            ).exists()
+
             if follow.creator_type == FollowRequest.USER_TYPE:
                 user = User.objects.get(id=follow.created_by_id)
                 followers.append({
@@ -3125,7 +3134,8 @@ class ListFollowersAPI(generics.ListAPIView):
                     'creator_id': user.id,
                     'username': user.username,
                     'role': user.role.id,
-                    'profile': user.profile_picture.url if user.profile_picture else None
+                    'profile': user.profile_picture.url if user.profile_picture else None,
+                    'is_follow': is_follow
                 })
             elif follow.creator_type == FollowRequest.TEAM_TYPE:
                 team = Team.objects.get(id=follow.created_by_id)
@@ -3134,7 +3144,8 @@ class ListFollowersAPI(generics.ListAPIView):
                     'creator_id': team.id,
                     'username': team.team_username,
                     'role': 6,
-                    'profile': team.team_logo.url if team.team_logo else None
+                    'profile': team.team_logo.url if team.team_logo else None,
+                    'is_follow': is_follow
                 })
             elif follow.creator_type == FollowRequest.GROUP_TYPE:
                 group = TrainingGroups.objects.get(id=follow.created_by_id)
@@ -3143,11 +3154,13 @@ class ListFollowersAPI(generics.ListAPIView):
                     'creator_id': group.id,
                     'username': group.group_username,
                     'role': 7,
-                    'profile': group.group_logo.url if group.group_logo else None
+                    'profile': group.group_logo.url if group.group_logo else None,
+                    'is_follow': is_follow
                 })
 
         # Use the paginated response method
         return self.get_paginated_response(followers)
+
 
 ##################################### LIST OF FOLLOWING #######################################
 class ListFollowingAPI(generics.ListAPIView):
