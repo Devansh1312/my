@@ -3097,8 +3097,8 @@ class ListFollowersAPI(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
-        target_id = self.request.query_params.get('target_id')
-        target_type = self.request.query_params.get('target_type')
+        target_id = self.request.query_params.get('created_by_id')
+        target_type = self.request.query_params.get('creator_type')
         search_key = self.request.query_params.get('search_key', '')
 
         queryset = FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
@@ -3118,8 +3118,8 @@ class ListFollowersAPI(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         # Get target ID and type for is_follow check
-        target_id = self.request.query_params.get('target_id')
-        target_type = self.request.query_params.get('target_type')
+        target_id = self.request.query_params.get('created_by_id')
+        target_type = self.request.query_params.get('creator_type')
 
         # Get the paginated page object
         page = self.paginate_queryset(self.get_queryset())
