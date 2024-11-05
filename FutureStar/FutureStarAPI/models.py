@@ -461,8 +461,23 @@ class MobileDashboardBanner(models.Model):
 
 
 class Event(models.Model):
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+
+    CREATOR_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+       
+    )
+
+    EVENTS_SECTION_CHOICES = [
+        (1, 'All Events'),
+        (2, 'My Events'),
+    ]
+
+
     id = models.AutoField(primary_key=True)
-    team=models.ForeignKey('Team', on_delete=models.CASCADE)
+    # team=models.ForeignKey('Team', on_delete=models.CASCADE)
 
     event_organizer=models.ForeignKey(User, on_delete=models.CASCADE)
     event_name=models.CharField(max_length=255, blank=True, null=True)
@@ -487,6 +502,11 @@ class Event(models.Model):
 
     event_description=models.TextField(blank=True, null=True)
     event_cost=models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
+    events_sections = models.IntegerField(choices=EVENTS_SECTION_CHOICES, default=1)
+
+
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
     
@@ -498,6 +518,7 @@ class Event(models.Model):
 
 class EventBooking(models.Model):
     id = models.AutoField(primary_key=True)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)  # Add user fie
     event=models.ForeignKey(Event, on_delete=models.CASCADE)
     tickets=models.IntegerField()
     convenience_fee=models.FloatField(default=0.0)

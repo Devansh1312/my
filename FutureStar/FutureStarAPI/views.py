@@ -1708,38 +1708,52 @@ class DetailAlbumListAPIView(generics.ListAPIView):
     serializer_class = DetailAlbumSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomMediaPagination
 
     def get_queryset(self):
-        album_id = self.request.query_params.get('album_id')  # Fetch album_id from the request body
-
+        album_id = self.request.data.get('album_id')
         if album_id:
-            # Ensure that the album belongs to the user or team
             return Album.objects.filter(id=album_id)
-        return Album.objects.none()  # Return an empty queryset if no album_id is provided
+        return Album.objects.none()
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        queryset = self.get_queryset()  # Get the queryset
-        if not queryset.exists():  # Check if the queryset is empty
+        queryset = self.get_queryset()
+        if not queryset.exists():
             return Response({
                 'status': 0,
                 'message': _("Album Id is required or Album not found."),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(queryset, many=True)  # Serialize all albums
+        album = queryset.first()
+        gallary_items_queryset = Gallary.objects.filter(album=album).order_by('-created_at')
+        
+        page = self.paginate_queryset(gallary_items_queryset)
+        if page is not None:
+            gallary_items_serializer = GallarySerializer(page, many=True)
+            total_records = gallary_items_queryset.count()
+            total_pages = self.paginator.page.paginator.num_pages
 
+            return Response({
+                'status': 1,
+                'message': _('Detail Albums fetched successfully.'),
+                'data': gallary_items_serializer.data,
+                'total_records': total_records,
+                'total_pages': total_pages,
+                'current_page': self.paginator.page.number
+            }, status=status.HTTP_200_OK)
+
+        # Return unpaginated data if pagination is not applied
+        gallary_items_serializer = GallarySerializer(gallary_items_queryset, many=True)
         return Response({
             'status': 1,
-            'message': _('Albums fetched successfully.'),
-            'data': serializer.data
+            'message': _('Detail Albums fetched successfully.'),
+            'data': gallary_items_serializer.data,
+            'total_records': gallary_items_queryset.count()
         }, status=status.HTTP_200_OK)
-
-
-
-
 class DetailAlbumCreateAPIView(generics.CreateAPIView):
     serializer_class = DetailAlbumSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1870,7 +1884,7 @@ class AlbumListAPIView(generics.ListAPIView):
 
             queryset = queryset.filter(created_by_id=created_by_id)
 
-        return queryset
+        return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -2060,7 +2074,8 @@ class GallaryCreateAPIView(APIView):
         album_id = request.data.get('album_id')
         created_by_id = request.data.get('created_by_id', request.user.id)
         creator_type = request.data.get('creator_type')
-
+        if album_id in [None, '0', '']:
+            album_id = None
         if not creator_type:
             return Response({
                 'status': 0,
@@ -2069,17 +2084,6 @@ class GallaryCreateAPIView(APIView):
 
         serializer = GetGallarySerializer(data=request.data)
         if serializer.is_valid():
-            # Fetch album instance if album_id is provided
-            album_instance = None
-            if album_id:
-                try:
-                    album_instance = Album.objects.get(id=album_id)
-                except Album.DoesNotExist:
-                    return Response({
-                        'status': 0,
-                        'message': _("Album not found."),
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
             # Validate the creator_type
             creator_type = int(creator_type)
             if creator_type not in [Gallary.USER_TYPE, Gallary.TEAM_TYPE, Gallary.GROUP_TYPE]:
@@ -2089,17 +2093,8 @@ class GallaryCreateAPIView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Check permissions based on creator type
-            if creator_type == Gallary.USER_TYPE and created_by_id != request.user.id:
-                return Response({
-                    'status': 0,
-                    'message': _("You can only create a gallary for yourself."),
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            elif creator_type == Gallary.TEAM_TYPE:
+            if creator_type == Gallary.TEAM_TYPE:
                 if not Team.objects.filter(id=created_by_id).exists():
-                    print("vbn",Team.id)
-                    print("dfgdf",created_by_id)
-                    print(Team.objects.filter(id=created_by_id).exists())
                     return Response({
                         'status': 0,
                         'message': _("Invalid team ID."),
@@ -2112,22 +2107,36 @@ class GallaryCreateAPIView(APIView):
                         'message': _("Invalid group ID."),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
+            # Fetch album instance if album_id is provided
+            album_instance = None
+            if album_id:
+                try:
+                    album_instance = Album.objects.get(id=album_id)
+                except Album.DoesNotExist:
+                    return Response({
+                        'status': 0,
+                        'message': _("Album not found."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
             # Save the gallary entry
-            gallary = serializer.save(created_by_id=created_by_id, creator_type=creator_type, album_id=album_instance)
+            gallary = serializer.save(
+                created_by_id=created_by_id,
+                creator_type=creator_type,
+                album_id=album_instance.id if album_instance else None  # Pass the ID or None
+            )
 
             return Response({
                 'status': 1,
-                'message': _('gallary entry created successfully.'),
+                'message': _('Gallery entry created successfully.'),
                 'data': GetGallarySerializer(gallary).data,
-                # 'team_id': created_by_id if creator_type == Gallary.TEAM_TYPE else None,
-                # 'group_id': created_by_id if creator_type == Gallary.GROUP_TYPE else None
             }, status=status.HTTP_201_CREATED)
 
         return Response({
             'status': 0,
-            'message': _('Failed to create gallary entry.'),
+            'message': _('Failed to create gallery entry.'),
             'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)    
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 ###########gallary list latest 9 ################
 
 class LatestGallaryListAPIView(generics.ListCreateAPIView):
@@ -2217,10 +2226,11 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
             {
                 'id': album.get('id'),
                 'name': album.get('name'),
+                'thumbnail': album.get('thumbnail'),
+                'creator_type': album.get('creator_type'),  # Use album object here
+                'created_by_id': album.get('created_by_id'),
                 'created_at': album.get('created_at'),
                 'updated_at': album.get('updated_at'),
-                'creator_type': album.get('creator_type'),  # Use album object here
-                'created_by_id': album.get('created_by_id')
             }
             for album in album_serializer.data
             if (creator_type == str(Album.TEAM_TYPE) and album['creator_type'] == Album.TEAM_TYPE) or
@@ -3335,6 +3345,41 @@ class CustomEventPagination(PageNumberPagination):
 
         return super().paginate_queryset(queryset, request, view)
 
+# class EventsAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+#     def get(self, request):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
+
+#         paginator = CustomEventPagination()
+#         try:
+#             events = Event.objects.all()
+#             paginated_events = paginator.paginate_queryset(events, request, view=self)
+#             serializer = EventSerializer(paginated_events, many=True)
+
+#             # Return paginated response with pagination details
+#             return Response({
+#                 'status': 1,
+#                 'message': _('All Events fetched successfully.'),
+#                 'data': serializer.data,
+#                 'total_records': paginator.page.paginator.count,
+#                 'total_pages': paginator.total_pages,
+#                 'current_page': paginator.page.number
+#             })
+        
+         
+
+#         except Exception as e:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Error occurred while fetching event list.'),
+#                 'error': str(e),
+#                 'data':[]
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
 class EventsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3345,87 +3390,123 @@ class EventsAPIView(APIView):
             activate(language)
 
         paginator = CustomEventPagination()
-        try:
-            events = Event.objects.all()
-            paginated_events = paginator.paginate_queryset(events, request, view=self)
-            serializer = EventSerializer(paginated_events, many=True)
-
-            # Return paginated response with pagination details
-            return Response({
-                'status': 1,
-                'message': _('All Events fetched successfully.'),
-                'data': serializer.data,
-                'total_records': paginator.page.paginator.count,
-                'total_pages': paginator.total_pages,
-                'current_page': paginator.page.number
-            })
         
-         
+        # Get the events_sections from query parameters
+        events_section = request.query_params.get('events_sections', 1)  # Default to 1 if not provided
+        creator_type = request.query_params.get('creator_type')  # Get creator_type from query parameters
+        created_by_id = request.query_params.get('created_by_id')  # Get created_by_id from query parameters
 
-        except Exception as e:
+        try:
+            # Check if events_section is an integer and convert it
+            events_section = int(events_section)
+        except ValueError:
             return Response({
                 'status': 0,
-                'message': _('Error occurred while fetching event list.'),
-                'error': str(e),
-                'data':[]
+                'message': 'Invalid events_sections value. It must be an integer.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-class TeamEventAPIView(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
-    parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
-
-    def get(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        # Get the team_id from query parameters
-        team_id = request.query_params.get('team_id', None)
-
-        # Return error if team_id is not provided
-        if not team_id:
+        # Initialize the queryset based on events_section
+        if events_section == 1:
+            # Show all events
+            events = Event.objects.all()
+        elif events_section == 2:
+            # Show events created by the logged-in user
+            events = Event.objects.filter(event_organizer=request.user)
+        else:
             return Response({
-                "status": 0,
-                "message": _("Team id is required."),
+                'status': 0,
+                'message': 'Invalid events_sections value. Allowed values are 1 or 2.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        paginator = CustomEventPagination()  # Initialize the custom pagination
-
-        try:
-            # Filter events by team_id
-            events = Event.objects.filter(team=team_id)
-
-            # Paginate the queryset
-            paginated_events = paginator.paginate_queryset(events, request, view=self)
-
-            # If pagination returns None, it means the page was invalid
-            if paginated_events is None:
+        # Further filter by creator_type and created_by_id if provided
+        if creator_type is not None:
+            try:
+                creator_type = int(creator_type)
+                events = events.filter(creator_type=creator_type)
+            except ValueError:
                 return Response({
                     'status': 0,
-                    'message': _('Page not found.'),
-                    'data': []
+                    'message': 'Invalid creator_type value. It must be an integer.'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Serialize the paginated events
-            serializer = EventSerializer(paginated_events, many=True)
+        if created_by_id is not None:
+            try:
+                created_by_id = int(created_by_id)
+                events = events.filter(created_by_id=created_by_id)
+            except ValueError:
+                return Response({
+                    'status': 0,
+                    'message': 'Invalid created_by_id value. It must be an integer.'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Return paginated response with pagination details
-            return Response({
-                'status': 1,
-                'message': _("Event list fetched successfully."),
-                'data': serializer.data,
-                'total_records': paginator.page.paginator.count,
-                'total_pages': paginator.total_pages,
-                'current_page': paginator.page.number
-            }, status=status.HTTP_200_OK)
+        # Paginate the queryset
+        paginated_events = paginator.paginate_queryset(events, request, view=self)
+        serializer = EventSerializer(paginated_events, many=True, context={'request': request})
 
-        except Exception as e:
-            return Response({
-                'status': 0,
-                'message': _('Error occurred while fetching event list.'),
-                'error': str(e),
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'status': 1,
+            'message': _('Events fetched successfully.'),
+            'data': serializer.data,
+            'total_records': paginator.page.paginator.count,
+            'total_pages': paginator.total_pages,
+            'current_page': paginator.page.number
+        })
+# class TeamEventAPIView(APIView):
+#     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+#     parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
+
+#     def get(self, request):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
+
+#         # Get the team_id from query parameters
+#         team_id = request.query_params.get('team_id', None)
+
+#         # Return error if team_id is not provided
+#         if not team_id:
+#             return Response({
+#                 "status": 0,
+#                 "message": _("Team id is required."),
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         paginator = CustomEventPagination()  # Initialize the custom pagination
+
+#         try:
+#             # Filter events by team_id
+#             events = Event.objects.filter(team=team_id)
+
+#             # Paginate the queryset
+#             paginated_events = paginator.paginate_queryset(events, request, view=self)
+
+#             # If pagination returns None, it means the page was invalid
+#             if paginated_events is None:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('Page not found.'),
+#                     'data': []
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+
+#             # Serialize the paginated events
+#             serializer = EventSerializer(paginated_events, many=True)
+
+#             # Return paginated response with pagination details
+#             return Response({
+#                 'status': 1,
+#                 'message': _("Event list fetched successfully."),
+#                 'data': serializer.data,
+#                 'total_records': paginator.page.paginator.count,
+#                 'total_pages': paginator.total_pages,
+#                 'current_page': paginator.page.number
+#             }, status=status.HTTP_200_OK)
+
+#         except Exception as e:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Error occurred while fetching event list.'),
+#                 'error': str(e),
+#                 'data': []
+#             }, status=status.HTTP_400_BAD_REQUEST)
         
 class EventDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
@@ -3470,6 +3551,7 @@ class EventDetailAPIView(APIView):
 
 class EventCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = EventSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
@@ -3488,46 +3570,76 @@ class EventCreateAPIView(generics.CreateAPIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
+        data = request.data.copy()
+        data['event_organizer'] = request.user.id  # Set the event organizer to the logged-in user
 
-        # Ensure team_id is provided
-        team_id = request.data.get('team')
-        if not team_id:
+        # Extract and validate creator_type and created_by_id
+        creator_type = data.get('creator_type')
+        created_by_id = data.get('created_by_id')
+
+        # Validate creator_type and created_by_id
+        if creator_type is None:
             return Response({
                 'status': 0,
-                'message': _('Team ID is required.')
+                'message': 'creator_type must be provided.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Fetch the Team instance using the provided team_id
-            team_instance = Team.objects.get(id=team_id)
-        except Team.DoesNotExist:
+            creator_type = int(creator_type)
+        except (ValueError, TypeError):
             return Response({
                 'status': 0,
-                'message': _('Team not found.')
-            }, status=status.HTTP_404_NOT_FOUND)
+                'message': 'creator_type must be a valid integer.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Handle event creation
-        serializer = EventSerializer(data=request.data, context={'request': request})
-        
-        if serializer.is_valid():
-            # Set the team instance on the validated data before saving
-            event_instance = serializer.save(team=team_instance)
+        # Logic for handling creator_type and created_by_id
+        if creator_type == Event.USER_TYPE:
+            # If creator_type is USER_TYPE, set created_by_id to the logged-in user's ID
+            data['created_by_id'] = request.user.id
+        elif creator_type == Event.TEAM_TYPE:
+            # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
+            if created_by_id is None:
+                return Response({
+                    'status': 0,
+                    'message': 'created_by_id must be provided for TEAM_TYPE.'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({
-                'status': 1,
-                'message': _('Event created successfully.'),
-                'data': EventSerializer(event_instance).data
-            }, status=status.HTTP_201_CREATED)
+            try:
+                created_by_id = int(created_by_id)
+            except (ValueError, TypeError):
+                return Response({
+                    'status': 0,
+                    'message': 'created_by_id must be a valid integer.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Validate if created_by_id exists in Team model
+            if not Team.objects.filter(id=created_by_id).exists():
+                return Response({
+                    'status': 0,
+                    'message': 'Invalid team ID.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data['created_by_id'] = created_by_id  # Use the provided team ID
+      
         else:
             return Response({
                 'status': 0,
-                'message': _('Event creation failed.'),
-                'errors': serializer.errors
+                'message': 'Invalid creator type.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Add validated creator_type to data
+        data['creator_type'] = creator_type
+
+        serializer = self.serializer_class(data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'status': 1,
+                'message': _('Events Fetched successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateEventAPIView(APIView):
     serializer_class = EventSerializer
@@ -3593,29 +3705,58 @@ class UpdateEventAPIView(APIView):
 
 
 class EventBookingDetailView(APIView):
-  def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         # Fetch event_id from query parameters
         event_id = request.query_params.get("event_id")
         
         if not event_id:
             return Response({"error": "event_id query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            # Fetch the event by ID
-            event = Event.objects.get(id=event_id)
-        except Event.DoesNotExist:
-            return Response({"detail": "Event not found."}, status=status.HTTP_404_NOT_FOUND)
+        # Get all bookings for the specified event
+        bookings = EventBooking.objects.filter(event_id=event_id)
+        
+        if not bookings.exists():
+            return Response({"detail": "No bookings found for this event."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Serialize the event data
-        serializer = EventSerializer(event)
+        # Serialize the booking data
+        serializer = EventBookingSerializer(bookings, many=True)
+        
         return Response({
-                'status': 1,
-                'message': _('Event Booking Detail Fetched successfully.'),
-                'data': serializer.data
-            }, status=status.HTTP_200_OK)
+            'status': 1,
+            'message': _('Event Booking Detail Fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+# class EventsJoinedAPIView(APIView):
+#     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    
+#     def get(self, request, *args, **kwargs):
+#         user = request.user  # Get the logged-in user
 
-       
+#         # Filter EventBooking by the logged-in user
+#         joined_bookings = EventBooking.objects.filter(user=user)
 
+#         if not joined_bookings.exists():
+#             return Response({
+#                 'status': 0,
+#                 'message': _("No joined events found for this user."),
+#                 'data': []
+#             }, status=status.HTTP_404_NOT_FOUND)
+
+#         # Extract event IDs from the joined bookings
+#         event_ids = joined_bookings.values_list('event_id', flat=True).distinct()
+        
+#         # Get the events based on the filtered event IDs
+#         events = Event.objects.filter(id__in=event_ids)
+
+#         # Serialize the events
+#         serializer = EventSerializer(events, many=True)
+
+#         return Response({
+#             'status': 1,
+#             'message': _("Joined events fetched successfully."),
+#             'data': serializer.data
+#         }, status=status.HTTP_200_OK)
 class EventBookingCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3636,26 +3777,29 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Fetch the Event instance using the provided event_id
-        try:
-            event_instance = Event.objects.get(id=event_id)
-        except Event.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Event not found.')
-            }, status=status.HTTP_404_NOT_FOUND)
+        event_instance = get_object_or_404(Event, id=event_id)
+
+        # Retrieve convenience_fee from request or SystemSettings
+        convenience_fee = request.data.get('convenience_fee')
+        if convenience_fee is None:
+            # Fetch the event_convenience_fee from SystemSettings if not provided
+            try:
+                system_settings = SystemSettings.objects.latest('id')  # Assuming you want the latest settings
+                convenience_fee = system_settings.event_convenience_fee or 0
+            except SystemSettings.DoesNotExist:
+                convenience_fee = 0  # Default to 0 if SystemSettings is not configured
 
         # Prepare data for booking creation
         booking_data = {
             'event': event_instance.id,
             'tickets': request.data.get('tickets'),
-            'convenience_fee': request.data.get('convenience_fee', 0.0),
+            'convenience_fee': convenience_fee,
             'ticket_amount': request.data.get('ticket_amount', 0.0),
             'total_amount': request.data.get('total_amount', 0.0),
         }
 
         # Handle booking creation using the serializer
         serializer = self.get_serializer(data=booking_data)
-
         if serializer.is_valid():
             booking_instance = serializer.save()
             return Response({
@@ -3669,8 +3813,6 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'message': _('Booking creation failed.'),
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-
 
 
 

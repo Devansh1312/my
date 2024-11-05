@@ -499,6 +499,7 @@ class GallarySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("The file type could not be determined.")
         
         return data
+    
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -654,10 +655,10 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = [
-            'id', 'team', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
+            'id', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
             'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
-            'event_description', 'event_cost', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
+            'event_description', 'event_cost',   'created_by_id','creator_type','events_sections', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
         ]
         read_only_fields = ['event_organizer']  # Make 'event_organizer' read-only since it will be auto-assigned
 

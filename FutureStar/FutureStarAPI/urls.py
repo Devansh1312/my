@@ -81,10 +81,14 @@ urlpatterns = [
         path('api/events/update/', UpdateEventAPIView.as_view()),
         # path('api/events/delete/',DeleteEventAPIView.as_view()),
         path('api/events/booking/', EventBookingDetailView.as_view()),
+        # path('api/joined_events/', EventsJoinedAPIView.as_view()),
+
         path('api/events/booking/create/', EventBookingCreateAPIView.as_view()),
 
         path('api/events/detail/', EventDetailAPIView.as_view()),
-        path('api/events/team', TeamEventAPIView.as_view()),
+        # path('api/team_events/', TeamEventAPIView.as_view()),
+        # path('api/user_events/', UserEventsAPIView.as_view()),
+
 
         path('api/events/like/', EventLikeAPIView.as_view()),
         path('api/events/comments/', EventCommentAPIView.as_view()),  # New API for paginated comments
