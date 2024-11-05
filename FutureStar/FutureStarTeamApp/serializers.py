@@ -31,7 +31,7 @@ class TeamSerializer(serializers.ModelSerializer):
             'id', 'team_name', 'team_username', 'team_type', 'team_type_name', 'bio', 'team_establishment_date', 
             'team_founder_id', 'team_founder_username', 'team_founder_profile_picture','team_president', 'latitude', 'longitude', 'address', 
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'country_id', 
-            'country_id_name', 'city_id', 'city_id_name', 'phone', 'email', 'age_group', 'entry_fees', 'team_logo', 
+            'country_id_name', 'city_id', 'city_id_name', 'phone', 'email','team_logo', 
             'team_background_image', 'team_uniform', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type'
         ]
 

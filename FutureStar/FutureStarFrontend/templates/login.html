@@ -25,13 +25,18 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="username_or_phone">Username or Phone</label>
-                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control" placeholder="" required>
+                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control" placeholder="Enter your username or phone" required>
+                                <div class="error-message text-danger" id="usernameError" style="display:none;">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="form-group">
+                            <div class="form-group position-relative">
                                 <label for="password">Password</label>
-                                <input type="password" id="password" name="password" class="form-control" placeholder="">
+                                <input type="password" id="password" name="password" class="form-control" required placeholder="Enter your password">
+                                <span class="eye-icon" id="togglePassword">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </span>
+                                <div class="error-message text-danger" id="passwordError" style="display:none;">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -42,15 +47,6 @@
                                 You don't have an account? <a href="{% url 'register' %}">Sign up</a>
                             </div>
                         </div>
-                        <!-- <div class="col-md-12">
-                            <div class="form-group">
-                                <div class="or"><span>OR</span></div>
-                            </div>
-                            <div class="continue-with-social text-center">
-                                <button id="googleLoginBtn" class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-google.png'%}" class="img-fluid" alt="" /></span> Sign In With Google</button>
-                                <button id="appleLoginBtn" class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png'%}" class="img-fluid" alt="" /></span> Sign In With Apple</button>
-                            </div>
-                        </div> -->
                     </div>
                 </form>
             </div>
@@ -62,43 +58,75 @@
 
 {% block script %}
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+<script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    // Google Login
     function handleCredentialResponse(response) {
         const googleToken = response.credential;
-        console.log("Google Token Received:", googleToken);  // Debugging log
         document.getElementById('login_type').value = 2;  
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'google_token';
         input.value = googleToken;
-        document.getElementById('loginForm').appendChild(input);
-        document.getElementById('loginForm').submit();
+        document.getElementById('teamForm').appendChild(input);
+        document.getElementById('teamForm').submit();
     }
 
     window.onload = function () {
         google.accounts.id.initialize({
-            client_id: "383301504241-ldk6vs8db27e4ec0culn07a58cjt90jp.apps.googleusercontent.com",  // Dynamically passed from settings.py
+            client_id: "383301504241-ldk6vs8db27e4ec0culn07a58cjt90jp.apps.googleusercontent.com",
             callback: handleCredentialResponse
         });
-
         google.accounts.id.renderButton(
             document.getElementById('googleLoginBtn'),
             { theme: 'outline', size: 'large' }
         );
     };
 
-    // Apple Login
-    // document.getElementById('appleLoginBtn').addEventListener('click', function () {
-    //     AppleID.auth.init({
-    //         clientId: '{{ apple_client_id }}',
-    //         scope: 'name email',
-    //         redirectURI: '{{ apple_redirect_uri }}',
-    //         state: '{{ social_auth_state_string }}',
-    //         usePopup: true
-    //     });
-    // });
+    $(document).ready(function () {
+        $('#teamForm').on('submit', function (e) {
+            let isValid = true;
+
+            if ($('#username_or_phone').val().trim() === '') {
+                $('#usernameError').show();
+                isValid = false;
+            } else {
+                $('#usernameError').hide();
+            }
+
+            if ($('#password').val().trim() === '') {
+                $('#passwordError').show();
+                isValid = false;
+            } else {
+                $('#passwordError').hide();
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert("Please fill in all required fields.");
+            }
+        });
+
+        $('#togglePassword').on('click', function() {
+            const passwordField = $('#password');
+            const passwordFieldType = passwordField.attr('type');
+            passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
+            $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+        });
+    });
 </script>
+
+<style>
+    .form-group.position-relative .eye-icon {
+        position: absolute;
+        top: 70%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+    .error-message {
+        font-size: 12px;
+    }
+</style>
 {% endblock %}

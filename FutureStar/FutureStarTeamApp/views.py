@@ -165,9 +165,6 @@ class TeamViewAPI(APIView):
         team_instance.team_president = request.data.get('team_president', team_instance.team_president)
         team_instance.team_founder = request.data.get('team_founder', team_instance.team_founder)
 
-        team_instance.entry_fees = request.data.get('entry_fees', team_instance.entry_fees)
-
-
         # Add the remaining fields from the model
         team_instance.latitude = request.data.get('latitude', team_instance.latitude)
         team_instance.longitude = request.data.get('longitude', team_instance.longitude)
@@ -197,7 +194,6 @@ class TeamViewAPI(APIView):
 # Save the team instance
         team_instance.phone = request.data.get('phone', team_instance.phone)
         team_instance.email = request.data.get('email', team_instance.email)
-        team_instance.age_group = request.data.get('age_group', team_instance.age_group)
 
         # Handle background image update
         if 'team_background_image' in request.FILES:
