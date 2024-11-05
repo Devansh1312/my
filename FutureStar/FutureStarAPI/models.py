@@ -49,8 +49,8 @@ class Team(models.Model):
     city_id = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(max_length=255, blank=True, null=True)
-    age_group = models.CharField(max_length=255, blank=True, null=True)
-    entry_fees = models.CharField(max_length=255, blank=True, null=True)
+    
+   
     team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)
     team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)
     team_uniform = models.TextField(blank=True, null=True)
@@ -62,6 +62,38 @@ class Team(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_team'
+
+class TeamBranch(models.Model):
+    id=models.AutoField(primary_key=True)
+    team_id=models.ForeignKey(Team,on_delete=models.CASCADE)
+    team_name=models.CharField(max_length=200)
+    age_group_id=models.ForeignKey(AgeGroup,on_delete=models.CASCADE)
+    upload_image=models.ImageField(upload_to='team/team_branch/', blank=True, null=True)
+    field_size=models.ForeignKey(FieldCapacity,on_delete=models.CASCADE)
+    phone = models.CharField(max_length=100,blank=True,null=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+   
+    latitude = models.FloatField(default=0.0)
+    longitude = models.FloatField(default=0.0)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    house_no = models.CharField(max_length=50, blank=True, null=True)
+    premises = models.CharField(max_length=100, blank=True, null=True)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    country_name = models.CharField(max_length=100, blank=True, null=True)
+    postalCode = models.CharField(max_length=20, blank=True, null=True)
+    country_code = models.CharField(max_length=10, blank=True, null=True)
+
+    entry_fees=models.CharField(max_length=200)
+    description=models.TextField()
+
+    def __str__(self):
+        return self.team_name
+
+    class Meta:
+        db_table = 'futurestar_app_team_branch'
+
     
 class TrainingGroups(models.Model):
     group_name = models.CharField(max_length=255,blank=True,null=True)
@@ -605,3 +637,6 @@ class FAQ(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_faq'
+
+
+
