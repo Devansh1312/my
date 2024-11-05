@@ -28,7 +28,9 @@ class Team(models.Model):
     team_type = models.ForeignKey(Category, on_delete=models.CASCADE, default=True)
     bio = models.TextField(null=True, blank=True)
     team_establishment_date = models.DateField(blank=True, null=True)
-    team_president = models.ForeignKey(User, on_delete=models.CASCADE, related_name='president_of_teams',blank=True, null=True)  # ForeignKey to User model
+    team_president = models.CharField(max_length=255, blank=True, null=True)
+    team_founder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='founder_of_teams',blank=True, null=True)  # ForeignKey to User model
+
     
     # New fields
     latitude = models.FloatField(default=0.0)
@@ -519,7 +521,7 @@ class EventBooking(models.Model):
         (TEAM_TYPE, 'Team'),
         (GROUP_TYPE, 'Group'),
     )
-    
+
     id = models.AutoField(primary_key=True)
     created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)    
