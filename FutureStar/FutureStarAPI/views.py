@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
+from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.db import transaction
@@ -3037,8 +3038,8 @@ class FollowUnfollowAPI(APIView):
             }, status=status.HTTP_201_CREATED)
 
 ################ Pagination ##################
+# Custom Pagination class with fixed paginate_queryset
 class CustomFollowRequestPagination(PageNumberPagination):
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
     page_size = 10
     page_query_param = 'page'
     page_size_query_param = 'page_size'
@@ -3059,16 +3060,19 @@ class CustomFollowRequestPagination(PageNumberPagination):
 
         paginator = self.django_paginator_class(queryset, self.get_page_size(request))
         self.total_pages = paginator.num_pages
-        self.total_records = paginator.count  # Total records in the queryset
+        self.total_records = paginator.count
 
-        if self.page > self.total_pages or self.page < 1:
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
             return Response({
                 'status': 0,
                 'message': _('Page not found.'),
                 'data': []
             }, status=400)
 
-        return super().paginate_queryset(queryset, request, view)
+        self.paginated_data = page
+        return list(page)
 
     def get_paginated_response(self, data):
         return Response({
@@ -3080,6 +3084,7 @@ class CustomFollowRequestPagination(PageNumberPagination):
             'data': data
         })
 
+
 ####################################### LIST OF FOLLOWERS #######################################
 class ListFollowersAPI(generics.ListAPIView):
     pagination_class = CustomFollowRequestPagination  # Add pagination to the view
@@ -3087,31 +3092,32 @@ class ListFollowersAPI(generics.ListAPIView):
     def get_queryset(self):
         target_id = self.request.query_params.get('target_id')
         target_type = self.request.query_params.get('target_type')
-        search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
+        search_key = self.request.query_params.get('search_key', '')
 
+        # Start with filtering by target_id and target_type
         queryset = FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
 
-        # Filter followers based on search_key
         if search_key:
-            # Separate filtering for each type
+            # Filter followers based on search_key applied to the creator (created_by_id) field
             user_ids = User.objects.filter(username__icontains=search_key).values_list('id', flat=True)
             team_ids = Team.objects.filter(team_username__icontains=search_key).values_list('id', flat=True)
             group_ids = TrainingGroups.objects.filter(group_username__icontains=search_key).values_list('id', flat=True)
 
-            # Filter queryset by matching IDs in each target type
             queryset = queryset.filter(
-                Q(target_type=FollowRequest.USER_TYPE, target_id__in=user_ids) |
-                Q(target_type=FollowRequest.TEAM_TYPE, target_id__in=team_ids) |
-                Q(target_type=FollowRequest.GROUP_TYPE, target_id__in=group_ids)
+                Q(creator_type=FollowRequest.USER_TYPE, created_by_id__in=user_ids) |
+                Q(creator_type=FollowRequest.TEAM_TYPE, created_by_id__in=team_ids) |
+                Q(creator_type=FollowRequest.GROUP_TYPE, created_by_id__in=group_ids)
             )
 
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.paginate_queryset(self.get_queryset())
+        # Get the paginated page object
+        page = self.paginate_queryset(self.get_queryset())
         followers = []
 
-        for follow in queryset:
+        # Loop through the paginated results and build the response data
+        for follow in page:
             if follow.creator_type == FollowRequest.USER_TYPE:
                 user = User.objects.get(id=follow.created_by_id)
                 followers.append({
@@ -3140,12 +3146,8 @@ class ListFollowersAPI(generics.ListAPIView):
                     'profile': group.group_logo.url if group.group_logo else None
                 })
 
-        return self.get_paginated_response({
-            'status': 1,
-            'message': 'Followers fetched successfully.',
-            'data': followers
-        })
-
+        # Use the paginated response method
+        return self.get_paginated_response(followers)
 
 ##################################### LIST OF FOLLOWING #######################################
 class ListFollowingAPI(generics.ListAPIView):
@@ -3174,10 +3176,12 @@ class ListFollowingAPI(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.paginate_queryset(self.get_queryset())
+        # Get the paginated page object
+        page = self.paginate_queryset(self.get_queryset())
         following = []
 
-        for follow in queryset:
+        # Loop through the paginated results and build the response data
+        for follow in page:
             if follow.target_type == FollowRequest.USER_TYPE:
                 user = User.objects.get(id=follow.target_id)
                 following.append({
@@ -3206,11 +3210,9 @@ class ListFollowingAPI(generics.ListAPIView):
                     'profile': group.group_logo.url if group.group_logo else None
                 })
 
-        return self.get_paginated_response({
-            'status': 1,
-            'message': 'Following list fetched successfully.',
-            'data': following
-        })
+        # Use the paginated response method
+        return self.get_paginated_response(following)
+
 ##################################### Mobile Dashboard Image #######################################
 
 class DashboardImageAPI(APIView):
@@ -3766,6 +3768,57 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
             except SystemSettings.DoesNotExist:
                 convenience_fee = 0  # Default to 0 if SystemSettings is not configured
 
+        # Extract and validate creator_type and created_by_id
+        creator_type = request.data.get('creator_type')
+        created_by_id = request.data.get('created_by_id')
+
+        if creator_type is None:
+            return Response({
+                'status': 0,
+                'message': 'creator_type must be provided.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            creator_type = int(creator_type)
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': 'creator_type must be a valid integer.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Logic for handling creator_type and created_by_id
+        if creator_type == Event.USER_TYPE:
+            # If creator_type is USER_TYPE, set created_by_id to the logged-in user's ID
+            created_by_id = request.user.id
+        elif creator_type == Event.TEAM_TYPE:
+            # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
+            if created_by_id is None:
+                return Response({
+                    'status': 0,
+                    'message': 'created_by_id must be provided for TEAM_TYPE.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                created_by_id = int(created_by_id)
+            except (ValueError, TypeError):
+                return Response({
+                    'status': 0,
+                    'message': 'created_by_id must be a valid integer.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Validate if created_by_id exists in Team model
+            if not Team.objects.filter(id=created_by_id).exists():
+                return Response({
+                    'status': 0,
+                    'message': 'Invalid team ID.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        else:
+            return Response({
+                'status': 0,
+                'message': 'Invalid creator type.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Prepare data for booking creation
         booking_data = {
             'event': event_instance.id,
@@ -3773,6 +3826,8 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
             'convenience_fee': convenience_fee,
             'ticket_amount': request.data.get('ticket_amount', 0.0),
             'total_amount': request.data.get('total_amount', 0.0),
+            'creator_type': creator_type,
+            'created_by_id': created_by_id,
         }
 
         # Handle booking creation using the serializer
@@ -3790,6 +3845,8 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'message': _('Booking creation failed.'),
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 
