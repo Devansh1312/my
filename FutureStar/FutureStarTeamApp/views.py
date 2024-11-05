@@ -132,6 +132,7 @@ class TeamViewAPI(APIView):
 
     def put(self, request):
         team_id = request.data.get('team_id')
+        print(team_id)
         user = request.user
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -141,7 +142,9 @@ class TeamViewAPI(APIView):
             return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            print(team_id)
             team_instance = Team.objects.get(id=team_id, team_founder=request.user)
+            print(team_instance)
         except Team.DoesNotExist:
             return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
 

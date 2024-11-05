@@ -24,6 +24,7 @@ urlpatterns = [
     path('register/', RegisterPage.as_view(), name='register'),
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
     path('social_signup/', SocialSignupView.as_view(), name='social_signup'),
+    path('test-404/', custom_404_view),
     # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
     # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
     # path('apple/login/', AppleLoginView.as_view(), name='apple_login'),
@@ -34,3 +35,4 @@ urlpatterns = [
 
     ]
 
+handler404 = 'FutureStarFrontend.views.custom_404_view'

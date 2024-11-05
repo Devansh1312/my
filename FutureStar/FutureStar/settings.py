@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-x7$wh)3+(3$)13tn$!pa=x#@1%l*qdmwk%zv!x(vlvsxkwey9-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://futurestar.redspark.redspark.a2hosted.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'FutureStarTeamApp',
     'sass_processor',
     'widget_tweaks',
+    'corsheaders',
     'social_django',
 
 ]
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add this for CORS
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -61,6 +63,11 @@ MIDDLEWARE = [
     'FutureStarAPI.middleware.MiddlewareToken',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
+]
+
+CORS_ALLOWED_ORIGINS  = [
+    'https://futurestar.redspark.redspark.a2hosted.com',
+    'http://localhost:3000',
 ]
 
 ROOT_URLCONF = 'FutureStar.urls'
@@ -89,7 +96,7 @@ WSGI_APPLICATION = 'FutureStar.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'futurestar3',
+        'NAME': 'futurestar',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

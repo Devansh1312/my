@@ -676,6 +676,12 @@ class OTPVerificationView(View):
 
     
 
+def custom_404_view(request, exception=None):
+    
+
+        return render(request, 'templates/error404.html', status=404)
+    
+
 ############################### google ###########################
 # class GoogleLoginView(View):
 #     def get(self, request):
