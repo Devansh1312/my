@@ -24,6 +24,9 @@ class TeamSerializer(serializers.ModelSerializer):
     team_founder_id = serializers.SerializerMethodField()
     team_founder_username = serializers.SerializerMethodField()
     team_founder_profile_picture = serializers.SerializerMethodField()
+    branches = serializers.SerializerMethodField()  # This will call our custom method for branches
+    team_logo = serializers.SerializerMethodField()
+    team_background_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
@@ -32,8 +35,37 @@ class TeamSerializer(serializers.ModelSerializer):
             'team_founder_id', 'team_founder_username', 'team_founder_profile_picture','team_president', 'latitude', 'longitude', 'address', 
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'country_id', 
             'country_id_name', 'city_id', 'city_id_name', 'phone', 'email','team_logo', 
-            'team_background_image', 'team_uniform', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type'
+            'team_background_image', 'team_uniform', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type','branches'
         ]
+
+
+    def get_branches(self, obj):
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Fetch branches related to the team
+        branches = TeamBranch.objects.filter(team_id=obj.id)
+
+        # Format branch information as a list of dictionaries with language-based age group name
+        branch_data = [
+            {
+                'id': branch.id,
+                'team_name': branch.team_name,
+                'age_group': branch.age_group_id.name_ar if language == 'ar' else branch.age_group_id.name_en if branch.age_group_id else None,
+                'gender': branch.gender
+            }
+            for branch in branches
+        ]
+
+        return branch_data
+    
+    def get_team_logo(self, obj):
+        # Return only the relative URL for the team logo if it exists
+        return obj.team_logo.url if obj.team_logo else None
+
+    def get_team_background_image(self, obj):
+        # Return only the relative URL for the team background image if it exists
+        return obj.team_background_image.url if obj.team_background_image else None
 
     def get_post_count(self, obj):
         # Assuming Post model has a ForeignKey to Team
@@ -110,7 +142,7 @@ class TeamBranchSerializer(serializers.ModelSerializer):
         model = TeamBranch
         fields = [
             'id', 'team_id', 'team_name', 'age_group_id', 'age_group_name', 'upload_image', 'field_size', 
-            'field_size_name', 'phone', 'email', 'latitude', 'longitude', 'address', 'house_no', 'premises', 
+            'field_size_name', 'phone', 'email','gender', 'latitude', 'longitude', 'address', 'house_no', 'premises', 
             'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'entry_fees', 'description', 
             'created_at', 'updated_at'
         ]
@@ -120,3 +152,29 @@ class TeamBranchSerializer(serializers.ModelSerializer):
 
     def get_age_group_name(self, obj):
         return obj.age_group_id.name_en if obj.age_group_id else None
+
+
+class JoinBranchSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()  # Custom method to include user data
+
+    class Meta:
+        model = JoinBranch
+        fields = ['id', 'branch_id', 'user', 'joinning_type', 'user_id']  # Keep 'user_id' here for input purposes
+
+    def get_user(self, obj):
+        """Retrieve user data as a dictionary."""
+        user = obj.user_id  # Get the related User object via foreign key
+        return {
+            'id': user.id,
+            'username': user.username,
+            'phone': user.phone,
+            'profile_picture': user.profile_picture.url if user.profile_picture else None,
+            'nationality': user.nationality
+        }
+
+    def to_representation(self, instance):
+        """Customize the output representation of the serializer."""
+        representation = super().to_representation(instance)
+        # Remove 'user_id' from the output as it's already represented in 'user'
+        representation.pop('user_id', None)
+        return representation

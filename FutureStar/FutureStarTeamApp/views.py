@@ -13,6 +13,9 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext as _
 from django.utils.crypto import get_random_string
+from rest_framework.pagination import PageNumberPagination
+from django.core.paginator import Paginator, EmptyPage
+from django.db import IntegrityError
 
 
 ################################################################## TEAM API ###############################################################################################
@@ -363,3 +366,201 @@ class TeamBranchAPIView(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         
+
+
+class StaffManagementView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def get(self, request):
+        branch_id = request.query_params.get('branch_id')
+        if not branch_id:
+            return Response({'status': 0, 'message': _('branch_id is required')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter staff by type
+        managerial_staff = JoinBranch.objects.filter(branch_id=branch_id, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE)
+        coach_staff = JoinBranch.objects.filter(branch_id=branch_id, joinning_type=JoinBranch.COACH_STAFF_TYPE)
+        medical_staff = JoinBranch.objects.filter(branch_id=branch_id, joinning_type=JoinBranch.MEDICAL_STAFF_TYPE)
+        players = JoinBranch.objects.filter(branch_id=branch_id, joinning_type=JoinBranch.PLAYER_TYPE)
+
+        # Serialize each type
+        managerial_serializer = JoinBranchSerializer(managerial_staff, many=True)
+        coach_serializer = JoinBranchSerializer(coach_staff, many=True)
+        medical_serializer = JoinBranchSerializer(medical_staff, many=True)
+        players_serializer = JoinBranchSerializer(players, many=True)
+
+        response_data = {
+            'status': 1,
+            'message': _('Data retrieved successfully.'),
+            'data': {
+                'managerial_staff': managerial_serializer.data,
+                'coach_staff': coach_serializer.data,
+                'medical_staff': medical_serializer.data,
+                'players': players_serializer.data
+            }
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        branch_id = request.data.get('branch_id')
+        user_id = request.data.get('user_id')
+        joinning_type = request.data.get('joinning_type')
+
+        if not branch_id or not user_id or joinning_type is None:
+            return Response({
+                'status': 0, 
+                'message': _('branch_id, user_id, and joinning_type are required')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Convert joinning_type to an integer and validate it
+        try:
+            joinning_type = int(joinning_type)
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Please provide a valid joinning type')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate joinning_type to accept only values 1, 2, 3, or 4
+        if joinning_type not in [1, 2, 3, 4]:
+            return Response({
+                'status': 0,
+                'message': _('Please provide a valid joinning type.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        join_branch_data = {
+            'branch_id': branch_id,
+            'user_id': user_id,
+            'joinning_type': joinning_type
+        }
+
+        serializer = JoinBranchSerializer(data=join_branch_data)
+        if serializer.is_valid():
+            try:
+                serializer.save()
+                # Set success message based on joinning_type
+                if joinning_type in [JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE, JoinBranch.MEDICAL_STAFF_TYPE]:
+                    success_message = _('Staff added successfully.')
+                elif joinning_type == JoinBranch.PLAYER_TYPE:
+                    success_message = _('Player added successfully.')
+
+                return Response({
+                    'status': 1,
+                    'message': success_message,
+                    'data': serializer.data
+                }, status=status.HTTP_201_CREATED)
+            except IntegrityError:
+                return Response({
+                    'status': 0,
+                    'message': _('User has already joined this branch.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            'status': 0,
+            'message': _('Failed to add staff/player.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+################ Pagination ##################
+# Custom Pagination class with fixed paginate_queryset
+class CustomUserSearchPagination(PageNumberPagination):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': 'Data fetched successfully.',
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+    
+
+class UserSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomUserSearchPagination  # Set the pagination class
+
+    def get(self, request):
+        search_type = request.query_params.get('search_type')
+        phone = request.query_params.get('phone')
+        branch_id = request.query_params.get('branch_id')  # Get branch_id from request
+
+        # Check for valid search_type, comparing with string values
+        if search_type not in ['1', '2']:
+            return Response({'status': 0, 'message': _('Invalid search type. Must be 1 or 2.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Initialize a queryset
+        users = User.objects.none()
+
+        if search_type == '1':
+            users = User.objects.filter(role_id=5)
+        elif search_type == '2':
+            users = User.objects.filter(role_id__in=[5, 2])
+
+        # Filter by phone if provided
+        if phone:
+            users = users.filter(phone__icontains=phone)
+
+        # Exclude users who have already joined the specified branch
+        if branch_id:
+            joined_users = JoinBranch.objects.filter(branch_id=branch_id).values_list('user_id', flat=True)
+            users = users.exclude(id__in=joined_users)
+
+        # Apply pagination
+        paginator = self.pagination_class()
+        paginated_users = paginator.paginate_queryset(users, request)
+
+        # Construct the response data manually
+        user_data = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'phone': user.phone,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                'nationality': user.nationality
+            }
+            for user in paginated_users
+        ]
+
+        # Return paginated response with custom data
+        return paginator.get_paginated_response(user_data)
