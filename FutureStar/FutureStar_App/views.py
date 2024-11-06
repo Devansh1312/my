@@ -596,24 +596,21 @@ class UserDetailView(LoginRequiredMixin, View):
     
     def get_user_related_data(self, user):
         posts = Post.objects.filter(created_by_id=user.id, creator_type=Post.USER_TYPE)
-        print(posts)
         events = Event.objects.filter(event_organizer=user)
-        return posts, events
+        event_bookings = EventBooking.objects.filter(created_by_id=user.id, creator_type=EventBooking.USER_TYPE)
+        return posts, events, event_bookings
 
     def get(self, request):
         user_id = request.GET.get('user_id') 
         if not user_id:
             return redirect('Dashboard') 
         try:
-            
-            
             user = User.objects.get(id=user_id)
-            posts, events = self.get_user_related_data(user)
+            posts, events, event_bookings = self.get_user_related_data(user)
             source_page = request.GET.get("source_page")
             title = request.GET.get("title")
             role = user.role_id  
 
-            
             return render(
                 request,
                 self.template_name,
@@ -624,6 +621,7 @@ class UserDetailView(LoginRequiredMixin, View):
                     "source_page": source_page,
                     "posts": posts,
                     "events": events,
+                    "events_bookings": event_bookings,  # pass event bookings to template
                 },
             )
         except User.DoesNotExist:
@@ -635,12 +633,11 @@ class UserDetailView(LoginRequiredMixin, View):
             return redirect('Dashboard')  
         try:
             user = User.objects.get(id=user_id)
-            posts, events = self.get_user_related_data(user)
+            posts, events, event_bookings = self.get_user_related_data(user)
             source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id  
-            
-            
+
             return render(
                 request,
                 self.template_name,
@@ -651,10 +648,12 @@ class UserDetailView(LoginRequiredMixin, View):
                     "source_page": source_page,
                     "posts": posts,  
                     "events": events,
+                    "events_bookings": event_bookings,  # pass event bookings to template
                 },
             )
         except User.DoesNotExist:
             return redirect('Dashboard') 
+ 
         
 ##############################################  User Category Type Module  ################################################
 # Category CRUD Views
