@@ -398,45 +398,70 @@ class PlayerDashboardPage(LoginRequiredMixin,View):
 
 ##############################################   LoginPage   ########################################################
 
+
 class LoginPage(View):
 
+    def authenticate_username_or_phone(self, username_or_phone, password):
+        # Check if input is username or phone and retrieve user accordingly
+        try:
+            if username_or_phone.isdigit():
+                user = User.objects.get(phone=username_or_phone)
+            else:
+                user = User.objects.get(username=username_or_phone)
+        except User.DoesNotExist:
+            return None
+
+        # Use Django's built-in authenticate to verify the password
+        user = authenticate(username=user.username, password=password)
+        return user
+
     def get(self, request, *args, **kwargs):
+        # Check if the user is already authenticated
+        if request.user.is_authenticated:
+            # Redirect based on user role
+            if request.user.role.id == 1:
+                return redirect('Dashboard')  # Redirect to the dashboard if role is 1
+            else:
+                return redirect('player-dashboard')  # Redirect to home for any other role
+
+        # Proceed if user is not authenticated
         current_language = request.session.get('language', 'en')
         try:
             cmsdata = cms_pages.objects.get(id=12)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
+
         context = {
             "current_language": current_language,
             "cmsdata": cmsdata,
+            # Uncomment these lines if needed
             # "google_client_id": settings.GOOGLE_CLIENT_ID,
             # "apple_client_id": settings.APPLE_CLIENT_ID,
             # "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
             # "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
         }
+
         return render(request, "login.html", context)
 
     def post(self, request, *args, **kwargs):
         # Handle language change
         selected_language = request.POST.get('language', 'en')
-        current_language = request.session['language'] = selected_language
-        
+        request.session['language'] = selected_language
+
         # Fetch login type
         login_type = int(request.POST.get('login_type', 1))
         username_or_phone = request.POST.get('username_or_phone')
         password = request.POST.get('password')
-       # If only language is changed (no registration form fields are filled)
-        if not username_or_phone and not password and not password:
+
+        # If only language is changed (no login fields are filled)
+        if not username_or_phone and not password:
             messages.success(request, "Language changed successfully!")
             return redirect('login')
 
-        # Proceed with normal login process
+        # Proceed with the login process
         if login_type == 1:
-            username_or_phone = request.POST.get('username_or_phone')
-            password = request.POST.get('password')
-
-            # Authenticate user
-            user = authenticate(request, username=username_or_phone, password=password)
+            # Custom login logic for username or phone number
+            user = self.authenticate_username_or_phone(username_or_phone, password)
 
             if user:
                 if user.is_active:
@@ -446,7 +471,8 @@ class LoginPage(View):
                     user.save()
                     messages.success(request, "Login successful!")
                     return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
-                messages.error(request, "Account is inactive.")
+                else:
+                    messages.error(request, "Account is inactive.")
             else:
                 messages.error(request, "Invalid credentials.")
 
