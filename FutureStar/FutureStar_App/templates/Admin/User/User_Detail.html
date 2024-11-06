@@ -138,12 +138,18 @@
                            <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
                         </li>
                         <li class="nav-item">
-                           <a class="nav-link" id="event-tab" data-toggle="tab" href="#event" role="tab" aria-controls="event" aria-selected="false">Event</a>
+                           <a class="nav-link" id="organized_event-tab" data-toggle="tab" href="#organized_event" role="tab" aria-controls="organized_event" aria-selected="false">Organized Events</a>
+                        </li>
+                        <li class="nav-item">
+                           <a class="nav-link" id="participated_event-tab" data-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
+                        </li>
+                        <li class="nav-item">
+                           <a class="nav-link" id="team-tab" data-toggle="tab" href="#team" role="tab" aria-controls="team" aria-selected="false">Team</a>
                         </li>
                      </ul>
    
                      <div class="tab-content" id="dataTabContent">
-                        <!-- Post Tab Content -->
+                        <!-- Post Tab  -->
                         <div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
                            <div class="table-responsive">
                               <table class="display" id="post-table">
@@ -196,19 +202,81 @@
                            </div>
                         </div>
    
-                        <!-- Event Tab Content -->
-                        <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+                        <!--Organized Event Tab  -->
+                        <div class="tab-pane fade" id="organized_event" role="tabpanel" aria-labelledby="organized_event-tab">
                            <div class="table-responsive">
-                              <table class="display" id="event-table">
+                              <table class="display" id="organized_event-table">
                                  <thead>
                                     <tr>
+                                       <th>No</th>
                                        <th>Event Name</th>
-                                       <th>Type</th>
-                                       <th>Date</th>
+                                       <th>Event Description</th>
+                                       <th>Event Type</th>
+                                       <th>Event Cost</th>
+                                       <th>Event Date</th>
                                     </tr>
                                  </thead>
                                  <tbody>
                                     {% for event in events %}
+                                    <tr>
+                                       <td>{{ forloop.counter }}</td>
+                                       <td>{{ event.event_name }}</td>
+                                       <td>{{ event.event_description }}</td>
+                                       <td>{{ event.event_type }}</td>
+                                       <td>{{ event.event_cost }}</td>
+                                       <td>{{ event.event_date|date:"d-M-Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+
+                        <!--Participated Event Tab  -->
+                        <div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
+                           <div class="table-responsive">
+                              <table class="display" id="participated_event-table">
+                                 <thead>
+                                    <tr>
+                                       <th>No</th>
+                                       <th>Event Name</th>
+                                       <th>Event Type</th>
+                                       <th>No of Tickets</th>
+                                       <th>Total Paid</th>
+                                       <th>Booking Date</th>
+                                       <th>Event Date</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    {% for event_booking in events_bookings %}
+                                    <tr>
+                                       <td>{{ forloop.counter }}</td>
+                                       <td>{{ event_booking.event.event_name }}</td>
+                                       <td>{{ event_booking.event.event_type }}</td>
+                                       <td>{{ event_booking.ticket_amount|floatformat:0 }}</td>
+                                       <td>{{ event_booking.total_amount }}</td>
+                                       <td>{{ event_booking.created_at|date:"d-M-Y" }}</td>
+                                       <td>{{ event_booking.event.event_date|date:"d-M-Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+                        
+                        <!-- Team Tab  -->
+                        <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+                           <div class="table-responsive">
+                              <table class="display" id="team-table">
+                                 <thead>
+                                    <tr>
+                                       <th>team Name</th>
+                                       <th>askjjiasnf</th>
+                                       <th>dsljkfnijsdfn</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    {% for team in teams %}
                                     <tr>
                                        <td>{{ event.event_name }}</td>
                                        <td>{{ event.event_type }}</td>
@@ -219,6 +287,8 @@
                               </table>
                            </div>
                         </div>
+
+
                      </div>
                   </div>
                </div>
@@ -241,15 +311,24 @@
 $(document).ready(function() {
    // Initialize datatables for both tables
    $('#post-table').DataTable();
-   $('#event-table').DataTable();
+   $('#organized_event-table').DataTable();
+   $('#participated_event-table').DataTable();
+   $('#team-table').DataTable();
 
    // Adjust DataTables when tabs are switched
    $('#dataTab a').on('shown.bs.tab', function (e) {
       var target = $(e.target).attr("href"); 
       if (target === "#post") {
          $('#post-table').DataTable().columns.adjust().draw(); 
-      } else if (target === "#event") {
-         $('#event-table').DataTable().columns.adjust().draw(); 
+      } 
+      else if (target === "#organized_event") {
+         $('#organized_event-table').DataTable().columns.adjust().draw(); 
+      }
+      else if (target === "#participated_event") {
+         $('#participated_event-table').DataTable().columns.adjust().draw(); 
+      }
+      else if (target === "#team") {
+         $('#team-table').DataTable().columns.adjust().draw(); 
       }
    });
 });
