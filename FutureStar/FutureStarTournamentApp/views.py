@@ -41,10 +41,6 @@ from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 
 
-
-
-
-
 class TournamentAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -94,3 +90,89 @@ class TournamentAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
+############### Custom Pagination ###############
+class CustomBranchSearchPagination(PageNumberPagination): 
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': _('Data fetched successfully.'),
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+
+
+################################# Branch Search API ####################################################
+class TeamBranchSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomBranchSearchPagination
+
+    def get(self, request):
+        # Extract parameters from the request
+        tournament_id = request.query_params.get('tournament_id')
+        search_key = request.query_params.get('search', '').strip()
+        
+        # Validate and fetch the tournament
+        tournament = get_object_or_404(Tournament, id=tournament_id)
+        age_group = tournament.age_group
+
+        # Filter TeamBranch entries by age group and team name
+        queryset = TeamBranch.objects.filter(age_group_id=age_group)
+        
+        if search_key:
+            queryset = queryset.filter(team_name__icontains=search_key)
+        
+        # Paginate the results
+        paginator = self.pagination_class()
+        paginated_data = paginator.paginate_queryset(queryset, request, view=self)
+        
+        # Format the paginated data to include branch_id, team_name, and team_logo
+        formatted_data = [
+            {
+                "branch_id": branch.id,
+                "team_name": branch.team_name,
+                "team_logo": branch.upload_image.url if branch.upload_image else None
+            }
+            for branch in paginated_data
+        ]
+        
+        # Create response with formatted paginated data
+        return paginator.get_paginated_response(formatted_data)
