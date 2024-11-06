@@ -2695,10 +2695,7 @@ class TournamentAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Fetch all fields for the current user
         fields = Field.objects.filter(user_id=request.user)
-
-        # Construct the response data manually
         fields_data = [{'id': field.id, 'field_name': field.field_name} for field in fields]
 
         return Response({
@@ -2712,7 +2709,6 @@ class TournamentAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Handle tournament creation with logo upload
         serializer = TournamentSerializer(data=request.data, context={'request': request})
         
         if serializer.is_valid():
@@ -2721,11 +2717,8 @@ class TournamentAPIView(APIView):
             # Handle logo upload
             if 'logo' in request.FILES:
                 logo = request.FILES['logo']
-                # Save the new logo with a structured filename
                 file_extension = logo.name.split('.')[-1]
                 file_name = f"tournament_logo/{tournament_instance.tournament_name}_{tournament_instance.id}.{file_extension}"
-
-                # Save the logo and update the instance
                 logo_path = default_storage.save(file_name, logo)
                 tournament_instance.logo = logo_path
                 tournament_instance.save()
@@ -2735,12 +2728,12 @@ class TournamentAPIView(APIView):
                 'message': _('Tournament created successfully.'),
                 'data': TournamentSerializer(tournament_instance).data
             }, status=status.HTTP_201_CREATED)
-        else:
-            return Response({
-                'status': 0,
-                'message': _('Tournament creation failed.'),
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            'status': 0,
+            'message': _('Tournament creation failed.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 

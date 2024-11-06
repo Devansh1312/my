@@ -378,9 +378,9 @@ class FieldSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
-    city_name = serializers.SerializerMethodField()  # Change to city_name
-    country_name = serializers.SerializerMethodField()  # Change to country_name
-    tournament_fields_name=serializers.SerializerMethodField()  # Change to tournament_fields_name
+    city_name = serializers.SerializerMethodField()  # To show city name
+    country_name = serializers.SerializerMethodField()  # To show country name
+    tournament_fields_name = serializers.SerializerMethodField()  # To show field name
 
     class Meta:
         model = Tournament
@@ -398,24 +398,43 @@ class TournamentSerializer(serializers.ModelSerializer):
             'tournament_fields_name',
             'logo',
             'tournament_joining_cost',
-        ]  # Exclude user_id
+            'number_of_group',  # Add number_of_group to create groups based on selection
+        ]
 
     def get_country_name(self, obj):
-        return obj.country.name if obj.country else None  # Assuming 'country' is the field in Tournament
+        return obj.country.name if obj.country else None  # Return country name or None
 
-    # Method to retrieve city name for city_name field
     def get_city_name(self, obj):
-        return obj.city.name if obj.city else None  # # Return None if no city
+        return obj.city.name if obj.city else None  # Return city name or None
     
-    # Method to retrieve tournament fields name for tournament_fields_name field
     def get_tournament_fields_name(self, obj):
-        return obj.tournament_fields.field_name if obj.tournament_fields else None
+        return obj.tournament_fields.field_name if obj.tournament_fields else None  # Return field name or None
 
     def create(self, validated_data):
         # Automatically associate the tournament with the currently logged-in user
-        user = self.context['request'].user
-        return Tournament.objects.create(user_id=user, **validated_data)
     
+        number_of_group = validated_data.pop('number_of_group', 1)  # Get number of groups, default to 1
+
+        # Define group names based on the number of groups selected
+        group_name_mapping = {
+            1: ['Group-A'],
+            2: ['Group-A', 'Group-B'],
+            3: ['Group-A', 'Group-B', 'Group-C'],
+            4: ['Group-A', 'Group-B', 'Group-C', 'Group-D'],
+        }
+        group_names = group_name_mapping.get(number_of_group)
+
+        if not group_names:
+            raise serializers.ValidationError("Invalid number of groups selected.")
+
+        # Create the tournament instance
+        tournament = Tournament.objects.create(number_of_group=number_of_group, **validated_data)
+
+        # Create corresponding groups in GroupTable
+        for group_name in group_names:
+            GroupTable.objects.create(tournament_id=tournament, group_name=group_name)
+
+        return tournament
 
 
 class UserGenderSerializer(serializers.ModelSerializer):

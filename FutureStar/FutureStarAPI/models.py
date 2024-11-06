@@ -278,14 +278,25 @@ class Field(models.Model):
 
 
 class Tournament(models.Model):
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
+    Group_A = 1
+    Group_B = 2
+    Group_C = 3
+    Group_D=4
+    GROUP_TYPE_CHOICES = (
+        (Group_A, 'Group-A'),
+        (Group_B, 'Group-B'),
+        (Group_C, 'Group-C'),
+        (Group_D, 'Group-D'),
+
+    )
+  
     team_id = models.ForeignKey(Team,null=True, blank=True, on_delete=models.CASCADE)
     tournament_name = models.CharField(max_length=255,blank=True,null=True)
     tournament_starting_date = models.DateField(blank=True,null=True)
     tournament_final_date = models.DateField(blank=True,null=True)
     number_of_team = models.CharField(max_length=255,blank=True,null=True)
-    tournament_name = models.CharField(max_length=255,blank=True,null=True)
-    age_group = models.CharField(max_length=255,blank=True,null=True)
+    number_of_group=models.IntegerField(choices=GROUP_TYPE_CHOICES,default=1)
+    age_group = models.ForeignKey(AgeGroup,on_delete=models.CASCADE,blank=True,null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     tournament_fields = models.ForeignKey(Field,blank=True,null=True,on_delete=models.CASCADE)
@@ -299,7 +310,17 @@ class Tournament(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_tournament'
-        
+
+class GroupTable(models.Model):
+    id = models.AutoField(primary_key=True)
+    tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    group_name = models.CharField(max_length=255,blank=True,null=True)
+    
+    def __str__(self):
+        return self.group_name
+
+    class Meta:
+        db_table = 'futurestar_app_grouptable'
 
 class OTPSave(models.Model):
     id = models.AutoField(primary_key=True)
