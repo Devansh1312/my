@@ -415,17 +415,12 @@ class TournamentSerializer(serializers.ModelSerializer):
     
         number_of_group = validated_data.pop('number_of_group', 1)  # Get number of groups, default to 1
 
-        # Define group names based on the number of groups selected
-        group_name_mapping = {
-            1: ['Group-A'],
-            2: ['Group-A', 'Group-B'],
-            3: ['Group-A', 'Group-B', 'Group-C'],
-            4: ['Group-A', 'Group-B', 'Group-C', 'Group-D'],
-        }
-        group_names = group_name_mapping.get(number_of_group)
+        # Dynamically create group names based on the number of groups
+        if number_of_group < 1:
+            raise serializers.ValidationError("Number of groups must be at least 1.")
 
-        if not group_names:
-            raise serializers.ValidationError("Invalid number of groups selected.")
+        # Generate group names dynamically like 'Group-A', 'Group-B', 'Group-C', ...
+        group_names = [f"Group-{chr(65 + i)}" for i in range(number_of_group)]
 
         # Create the tournament instance
         tournament = Tournament.objects.create(number_of_group=number_of_group, **validated_data)

@@ -278,24 +278,14 @@ class Field(models.Model):
 
 
 class Tournament(models.Model):
-    Group_A = 1
-    Group_B = 2
-    Group_C = 3
-    Group_D=4
-    GROUP_TYPE_CHOICES = (
-        (Group_A, 'Group-A'),
-        (Group_B, 'Group-B'),
-        (Group_C, 'Group-C'),
-        (Group_D, 'Group-D'),
 
-    )
   
     team_id = models.ForeignKey(Team,null=True, blank=True, on_delete=models.CASCADE)
     tournament_name = models.CharField(max_length=255,blank=True,null=True)
     tournament_starting_date = models.DateField(blank=True,null=True)
     tournament_final_date = models.DateField(blank=True,null=True)
     number_of_team = models.CharField(max_length=255,blank=True,null=True)
-    number_of_group=models.IntegerField(choices=GROUP_TYPE_CHOICES,default=1)
+    number_of_group=models.IntegerField()
     age_group = models.ForeignKey(AgeGroup,on_delete=models.CASCADE,blank=True,null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
@@ -520,11 +510,11 @@ class MobileDashboardBanner(models.Model):
 
 
 class Event(models.Model):
-    USER_TYPE = 1
+  
     TEAM_TYPE = 2
 
     CREATOR_TYPE_CHOICES = (
-        (USER_TYPE, 'User'),
+   
         (TEAM_TYPE, 'Team'),
        
     )
@@ -556,7 +546,7 @@ class Event(models.Model):
     event_description=models.TextField(blank=True, null=True)
     event_cost=models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     created_by_id = models.IntegerField(blank=True, null=True)  # Stores the ID of User, Team, or Group
-    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True)
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, blank=True, null=True,default=TEAM_TYPE)
 
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
