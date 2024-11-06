@@ -2686,57 +2686,6 @@ class FieldAPIView(APIView):
 
 
 
-class TournamentAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        fields = Field.objects.filter(user_id=request.user)
-        fields_data = [{'id': field.id, 'field_name': field.field_name} for field in fields]
-
-        return Response({
-            'status': 1,
-            'message': _('Fields retrieved successfully.'),
-            'data': fields_data
-        }, status=status.HTTP_200_OK)
-
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        serializer = TournamentSerializer(data=request.data, context={'request': request})
-        
-        if serializer.is_valid():
-            tournament_instance = serializer.save()
-
-            # Handle logo upload
-            if 'logo' in request.FILES:
-                logo = request.FILES['logo']
-                file_extension = logo.name.split('.')[-1]
-                file_name = f"tournament_logo/{tournament_instance.tournament_name}_{tournament_instance.id}.{file_extension}"
-                logo_path = default_storage.save(file_name, logo)
-                tournament_instance.logo = logo_path
-                tournament_instance.save()
-
-            return Response({
-                'status': 1,
-                'message': _('Tournament created successfully.'),
-                'data': TournamentSerializer(tournament_instance).data
-            }, status=status.HTTP_201_CREATED)
-        
-        return Response({
-            'status': 0,
-            'message': _('Tournament creation failed.'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 #################################################################### Trainnig Group API #########################################################################################
 class TrainingGroupAPI(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)

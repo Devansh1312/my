@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',  # Add this for JWT Authentication
     'FutureStarAPI',  # Add your app where User model is defined
     'FutureStarTeamApp',
+    'FutureStarTournamentApp',
     'sass_processor',
     'widget_tweaks',
     'corsheaders',
