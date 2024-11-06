@@ -137,7 +137,7 @@ def get_team_data(user, request):
     
     # Get the user's team (assuming only one team is allowed per user)
     try:
-        team = Team.objects.get(team_president=user)
+        team = Team.objects.get(team_founder=user)
     except Team.DoesNotExist:
         return None  # If no team exists, return None or empty dictionary as needed
     
@@ -169,9 +169,7 @@ def get_team_data(user, request):
         'team_type_name': team.team_type.name_en if team.team_type else None,
         'bio': team.bio,
         'team_establishment_date': team.team_establishment_date,
-        'team_president_id': team.team_president.id if team.team_president and team.team_president.id else None,
-        'team_president_username': team.team_president.username if team.team_president and team.team_president.username else None,
-        'team_president_profile_picture': team.team_president.profile_picture.url if team.team_president and team.team_president.profile_picture else None,
+        'team_president': team.team_president,
         'latitude': team.latitude,
         'longitude': team.longitude,
         'address': team.address,
@@ -189,12 +187,14 @@ def get_team_data(user, request):
         'city_name': team.city_id.name if team.city_id else None,
         'phone': team.phone,
         'email': team.email,
-        'age_group': team.age_group,
-        'entry_fees': team.entry_fees,
         'team_logo': team.team_logo.url if team.team_logo else None,
         'team_background_image': team.team_background_image.url if team.team_background_image else None,
         'team_uniform': team.team_uniform,
+        'team_founder_id': team.team_founder.id if team.team_founder else None,
+        'team_founder_username': team.team_founder.username if team.team_founder else None,
+        'team_founder_profile_picture': team.team_founder.profile_picture.url if team.team_founder and team.team_founder.profile_picture else None,
     }
+
 
 ############################################################################# Get Group Data ######################################################
 def get_group_data(user, request):
