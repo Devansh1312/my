@@ -10,7 +10,7 @@ handler404 = 'FutureStarFrontend.views.custom_404_view'
 urlpatterns = [
     
         path('api/tournament/', TournamentAPIView.as_view()),
-        path('api/team-branches/', TeamBranchSearchView.as_view()),
+        path('api/search-team-branches/', TeamBranchSearchView.as_view()),
 
     ]
 
