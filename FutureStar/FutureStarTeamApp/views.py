@@ -557,7 +557,7 @@ class UserSearchView(APIView):
                 'username': user.username,
                 'phone': user.phone,
                 'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                'nationality': user.nationality
+                'country_id': user.country.id if user.country else None,
             }
             for user in paginated_users
         ]

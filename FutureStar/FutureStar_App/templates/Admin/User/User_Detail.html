@@ -38,17 +38,8 @@
 
 {% block content %}
 <div class="page-body">
-    <div class="container-fluid">
-        <div class="page-title">
-            <div class="row">
-                <div class="col-6">
-                    <h3>{{breadcrumb.child}}</h3>
-            </div>
-             <div class="col-6"></div>
-        </div>
-    </div>
       <!-- Big Card -->
-      <div class="card">
+      <div class="card" style="margin-top:100px;">
          <div class="card-body">
             <div class="row">
                <!-- Profile Information -->
@@ -60,70 +51,68 @@
                      <div class="card-body">
                         <div class="profile-info text-center mb-3">
                            <img class="img-70 rounded-circle" alt="Profile Picture" src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/images/user/7.jpg' %}{% endif %}">
-                           <h5 class="mt-2">{{ user.fullname }}</h5>
-                           <p>{{ user.role.name_en }}</p>
                         </div>
-                        <hr>
                         <div class="row">
-                           <div class="col-12 label-value">
-                              <p>Email: {{ user.email|default:"None" }}</p>
+                           <div class="col-4 label-value">
+                              <p>Full Name:{{ user.fullname }}</p>
                            </div>
-                           <div class="col-12 label-value">
-                              <p>Phone: {{ user.phone|default:"None" }}</p>
+                           <div class="col-4 label-value">
+                              <p>Role: {{ user.role.name_en }}</p>
                            </div>
-                           <div class="col-12 label-value">
+                           <div class="col-4 label-value">
                               <p>Date of Birth: {{ user.date_of_birth|default:"None" }}</p>
                            </div>
-                           <div class="col-12 label-value">
+                           <div class="col-4 label-value">
+                              <p>Email: {{ user.email|default:"None" }}</p>
+                           </div>
+                           <div class="col-4 label-value">
+                              <p>Phone: {{ user.phone|default:"None" }}</p>
+                           </div>
+                           <div class="col-4 label-value">
                               <p>Gender: {{ user.gender.name|default:"None" }}</p>
                            </div>
-                           <div class="col-12 label-value">
+                           <div class="col-4 label-value">
                               <p>Country: {{ user.country.name|default:"None" }}</p>
                            </div>
-                           <div class="col-12 label-value">
+                           <div class="col-4 label-value">
                               <p>City: {{ user.city.name|default:"None" }}</p>
                            </div>
-                           <div class="col-12 label-value">
+                           <div class="col-4 label-value">
                               <p>Nationality: {{ user.nationality|default:"None" }}</p>
                            </div>
                         </div>
                      </div>
-                  </div>
-               </div>
-
-               <!-- Additional Information -->
-               <div class="col-xl-8">
-                  <div class="card">
+                  
                      <div class="card-header">
                         <h4 class="card-title mb-0">Additional Information</h4>
                      </div>
                      <div class="card-body">
                         <div class="row">
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Weight: {{ user.weight|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Height: {{ user.height|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Main Playing Position: {{ user.main_playing_position|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Secondary Playing Position: {{ user.secondary_playing_position|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Playing Foot: {{ user.playing_foot|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Favourite Local Team: {{ user.favourite_local_team|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Favourite Team: {{ user.favourite_team|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Favourite Local Player: {{ user.favourite_local_player|default:"None" }}</p>
                            </div>
-                           <div class="col-md-6 label-value">
+                           <div class="col-md-4 label-value">
                               <p>Favourite Player: {{ user.favourite_player|default:"None" }}</p>
                            </div>
                            <!-- Bio on its own line -->
@@ -180,12 +169,25 @@
                                           {% endif %}
                                        </td>
                                        <td>
-                                          {% if post.image %}
-                                             <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="auto">
+                                          {% if post.media_type == 1 %}
+                                              {% if post.image %}
+                                                  <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="100">
+                                              {% else %}
+                                                  No Image
+                                              {% endif %}
+                                          {% elif post.media_type == 2 %}
+                                              {% if post.image %}
+                                                  <video width="200" height="100" controls>
+                                                      <source src="{{ post.image.url }}" type="video/mp4">
+                                                      Your browser does not support the video tag.
+                                                  </video>
+                                              {% else %}
+                                                  No Video
+                                              {% endif %}
                                           {% else %}
-                                             No Image
+                                              No Media
                                           {% endif %}
-                                      </td>
+                                      </td>                                      
                                        <td>{{ post.date_created|date:"d-M-Y" }}</td>
                                     </tr>
                                     {% endfor %}
