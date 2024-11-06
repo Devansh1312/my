@@ -1937,9 +1937,9 @@ class AlbumListAPIView(generics.ListAPIView):
             'data': [
                 {
                     **album_data,
-                    'user': request.user.id,
-                    'team_id': album_data['created_by_id'] if album_data['creator_type'] == Album.TEAM_TYPE else None,
-                    'group_id': album_data['created_by_id'] if album_data['creator_type'] == Album.GROUP_TYPE else None,
+                    # 'user': request.user.id,
+                    # 'team_id': album_data['created_by_id'] if album_data['creator_type'] == Album.TEAM_TYPE else None,
+                    # 'group_id': album_data['created_by_id'] if album_data['creator_type'] == Album.GROUP_TYPE else None,
                 }
                 for album_data in serializer.data
             ]

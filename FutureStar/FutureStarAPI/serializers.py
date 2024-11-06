@@ -558,34 +558,28 @@ class DetailAlbumSerializer(serializers.ModelSerializer):
         last_media = Gallary.objects.filter(album=obj).order_by('-created_at').first()
         return last_media.media_file.url if last_media else None
 class AlbumSerializer(serializers.ModelSerializer):
-    # Define a custom field to retrieve the thumbnail
-   
+    # Define custom fields to retrieve the thumbnail URL and content type
     thumbnail = serializers.SerializerMethodField()
+    content_type = serializers.SerializerMethodField()  # Field for content_type
 
     class Meta:
         model = Album
-        # fields = '__all__'
-        fields = ['id', 'created_by_id', 'creator_type', 'name','thumbnail', 'created_at', 'updated_at' ]
+        fields = ['id', 'created_by_id', 'creator_type', 'name', 'thumbnail', 'content_type', 'created_at', 'updated_at']
 
-    # Method to get the most recent image or video from the related Gallary
+    # Method to get the most recent image or video URL from the related Gallary
     def get_thumbnail(self, obj):
         # Get the last inserted Gallary entry for this album
         last_media = Gallary.objects.filter(album_id=obj).order_by('-created_at').first()
         
-        # If no media exists, return None
-        if not last_media:
-            return None
-        
-        # Return the image or video URL depending on the content type
-        if last_media.content_type == 1:
-            return last_media.media_file.url  # Image URL
-        elif last_media.content_type == 2:
-            return last_media.media_file.url  # Video URL
+        # Return the media file URL if it exists, otherwise return None
+        return last_media.media_file.url if last_media else None
 
+    # Method to get the content_type of the most recent Gallary media for the album
+    def get_content_type(self, obj):
+        last_media = Gallary.objects.filter(album_id=obj).order_by('-created_at').first()
         
-        return None
-    
-
+        # Return the content_type if media exists, otherwise None
+        return last_media.content_type if last_media else None
 class ReportSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
