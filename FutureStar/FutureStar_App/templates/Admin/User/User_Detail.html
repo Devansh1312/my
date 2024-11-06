@@ -6,6 +6,7 @@
 {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <!-- Plugins css Ends-->
 
 <style>
@@ -51,7 +52,7 @@
          <div class="card-body">
             <div class="row">
                <!-- Profile Information -->
-               <div class="col-xl-4">
+               <div class="col-xl-12">
                   <div class="card">
                      <div class="card-header">
                         <h4 class="card-title mb-0">Profile Details</h4>
@@ -137,13 +138,119 @@
             </div>
          </div>
 
-         <!-- Card Footer with Back Button -->
-         <div class="card-footer">
-            <a href="{% url source_page %}" class="btn btn-secondary">
-                Back
-            </a>
+         <!-- Datatable Section -->
+         <div class="row">
+            <div class="col-sm-12">
+               <div class="card">
+                  <div class="card-body">
+                     <!-- Add tab navigation -->
+                     <ul class="nav nav-tabs" id="dataTab" role="tablist">
+                        <li class="nav-item">
+                           <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
+                        </li>
+                        <li class="nav-item">
+                           <a class="nav-link" id="event-tab" data-toggle="tab" href="#event" role="tab" aria-controls="event" aria-selected="false">Event</a>
+                        </li>
+                     </ul>
+   
+                     <div class="tab-content" id="dataTabContent">
+                        <!-- Post Tab Content -->
+                        <div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
+                           <div class="table-responsive">
+                              <table class="display" id="post-table">
+                                 <thead>
+                                    <tr>
+                                       <th>No</th>
+                                       <th>Post Title</th>
+                                       <th>Description</th>
+                                       <th>Image</th>
+                                       <th>date created</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    {% for post in posts %}
+                                    <tr>
+                                       <td>{{ forloop.counter }}</td>
+                                       <td>{{ post.title }}</td>
+                                       <td>
+                                          {% if post.creator_type == post.USER_TYPE %}
+                                              {{ post.description }}
+                                          {% else %}
+                                             invalid
+                                          {% endif %}
+                                       </td>
+                                       <td>
+                                          {% if post.image %}
+                                             <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="auto">
+                                          {% else %}
+                                             No Image
+                                          {% endif %}
+                                      </td>
+                                       <td>{{ post.date_created|date:"d-M-Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+   
+                        <!-- Event Tab Content -->
+                        <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+                           <div class="table-responsive">
+                              <table class="display" id="event-table">
+                                 <thead>
+                                    <tr>
+                                       <th>Event Name</th>
+                                       <th>Type</th>
+                                       <th>Date</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    {% for event in events %}
+                                    <tr>
+                                       <td>{{ event.event_name }}</td>
+                                       <td>{{ event.event_type }}</td>
+                                       <td>{{ event.event_date }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
          </div>
       </div>
    </div>
-</div>
+{% endblock %}
+
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<!-- Plugins JS Ends-->
+
+<script>
+$(document).ready(function() {
+   // Initialize datatables for both tables
+   $('#post-table').DataTable();
+   $('#event-table').DataTable();
+
+   // Adjust DataTables when tabs are switched
+   $('#dataTab a').on('shown.bs.tab', function (e) {
+      var target = $(e.target).attr("href"); 
+      if (target === "#post") {
+         $('#post-table').DataTable().columns.adjust().draw(); 
+      } else if (target === "#event") {
+         $('#event-table').DataTable().columns.adjust().draw(); 
+      }
+   });
+});
+</script>
+
 {% endblock %}

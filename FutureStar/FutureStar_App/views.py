@@ -591,21 +591,29 @@ class DefaultUserList(LoginRequiredMixin, View):
 
 
 @method_decorator(user_role_check, name='dispatch')
-class UserDetailView(LoginRequiredMixin,View):
+class UserDetailView(LoginRequiredMixin, View):
     template_name = "Admin/User/User_Detail.html"
     
-    def get(self, request, *args, **kwargs):
-        user_id = request.POST.get('user_id')
-        if user_id == None:
-            return redirect('Dashboard')
-        try:
-              # Fetch 'user_id' from the POST request
-            user = User.objects.get(id=user_id)  # Get the user object based on 'user_id'
-            source_page = request.POST.get("source_page") 
-            title = request.POST.get("title") 
-            role = user.role_id  # Assuming the user model has a role foreign key
-            print("POST")
+    def get_user_related_data(self, user):
+        posts = Post.objects.filter(created_by_id=user.id, creator_type=Post.USER_TYPE)
+        print(posts)
+        events = Event.objects.filter(event_organizer=user)
+        return posts, events
 
+    def get(self, request):
+        user_id = request.GET.get('user_id') 
+        if not user_id:
+            return redirect('Dashboard') 
+        try:
+            
+            
+            user = User.objects.get(id=user_id)
+            posts, events = self.get_user_related_data(user)
+            source_page = request.GET.get("source_page")
+            title = request.GET.get("title")
+            role = user.role_id  
+
+            
             return render(
                 request,
                 self.template_name,
@@ -614,22 +622,25 @@ class UserDetailView(LoginRequiredMixin,View):
                     "role": role,
                     "title": title,
                     "source_page": source_page,
+                    "posts": posts,
+                    "events": events,
                 },
             )
-        except (Http404, HttpResponseNotAllowed):
-            return redirect('Dashboard')
+        except User.DoesNotExist:
+            return redirect('Dashboard')  
 
-    def post(self, request,*args, **kwargs):
+    def post(self, request):
         user_id = request.POST.get('user_id')
-        if user_id == None:
-            return redirect('Dashboard')
+        if not user_id:
+            return redirect('Dashboard')  
         try:
-            user = User.objects.get(id=user_id)  # Get the user object based on 'user_id'
-            source_page = request.POST.get("source_page") 
-            title = request.POST.get("title") 
-            role = user.role_id  # Assuming the user model has a role foreign key
-            print("POST")
-
+            user = User.objects.get(id=user_id)
+            posts, events = self.get_user_related_data(user)
+            source_page = request.POST.get("source_page")
+            title = request.POST.get("title")
+            role = user.role_id  
+            
+            
             return render(
                 request,
                 self.template_name,
@@ -638,10 +649,12 @@ class UserDetailView(LoginRequiredMixin,View):
                     "role": role,
                     "title": title,
                     "source_page": source_page,
+                    "posts": posts,  
+                    "events": events,
                 },
             )
-        except (Http404, HttpResponseNotAllowed):
-            return redirect('Dashboard')  # Redirect to dashboard if user is not found
+        except User.DoesNotExist:
+            return redirect('Dashboard') 
         
 ##############################################  User Category Type Module  ################################################
 # Category CRUD Views
