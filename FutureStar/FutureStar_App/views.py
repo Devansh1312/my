@@ -7,12 +7,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import SystemSettings
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse, Http404 ,HttpResponseNotAllowed
-
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from django.views import View
@@ -28,6 +26,7 @@ import sys
 from functools import wraps
 
 from FutureStarAPI.models import *
+from FutureStarTeamApp.models import *
 
 
 def user_role_check(view_func):
@@ -598,7 +597,8 @@ class UserDetailView(LoginRequiredMixin, View):
         posts = Post.objects.filter(created_by_id=user.id, creator_type=Post.USER_TYPE)
         events = Event.objects.filter(event_organizer=user)
         event_bookings = EventBooking.objects.filter(created_by_id=user.id, creator_type=EventBooking.USER_TYPE)
-        return posts, events, event_bookings
+        teams = JoinBranch.objects.filter(user_id=user.id)
+        return posts, events, event_bookings, teams
 
     def get(self, request):
         user_id = request.GET.get('user_id') 
@@ -606,7 +606,7 @@ class UserDetailView(LoginRequiredMixin, View):
             return redirect('Dashboard') 
         try:
             user = User.objects.get(id=user_id)
-            posts, events, event_bookings = self.get_user_related_data(user)
+            posts, events, event_bookings, teams = self.get_user_related_data(user)
             source_page = request.GET.get("source_page")
             title = request.GET.get("title")
             role = user.role_id  
@@ -621,7 +621,8 @@ class UserDetailView(LoginRequiredMixin, View):
                     "source_page": source_page,
                     "posts": posts,
                     "events": events,
-                    "events_bookings": event_bookings,  # pass event bookings to template
+                    "events_bookings": event_bookings, 
+                    "teams": teams,
                 },
             )
         except User.DoesNotExist:
@@ -633,7 +634,7 @@ class UserDetailView(LoginRequiredMixin, View):
             return redirect('Dashboard')  
         try:
             user = User.objects.get(id=user_id)
-            posts, events, event_bookings = self.get_user_related_data(user)
+            posts, events, event_bookings, teams = self.get_user_related_data(user)
             source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id  
@@ -648,7 +649,8 @@ class UserDetailView(LoginRequiredMixin, View):
                     "source_page": source_page,
                     "posts": posts,  
                     "events": events,
-                    "events_bookings": event_bookings,  # pass event bookings to template
+                    "events_bookings": event_bookings, 
+                    "teams": teams,
                 },
             )
         except User.DoesNotExist:

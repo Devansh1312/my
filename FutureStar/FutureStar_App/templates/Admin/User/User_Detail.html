@@ -270,17 +270,21 @@
                               <table class="display" id="team-table">
                                  <thead>
                                     <tr>
-                                       <th>team Name</th>
-                                       <th>askjjiasnf</th>
-                                       <th>dsljkfnijsdfn</th>
+                                       <th>No</th>
+                                       <th>Team Name</th>
+                                       <th>Age</th>
+                                       <th>Joining Type</th>
+                                       <th>Joining Date</th>
                                     </tr>
                                  </thead>
                                  <tbody>
-                                    {% for team in teams %}
-                                    <tr>
-                                       <td>{{ event.event_name }}</td>
-                                       <td>{{ event.event_type }}</td>
-                                       <td>{{ event.event_date }}</td>
+                                    {% for teams in teams %}
+                                    <tr> 
+                                       <td>{{ forloop.counter }}</td>
+                                       <td>{{ teams.branch_id.team_name }}</td>
+                                       <td>{{ teams.branch_id.age_group_id }}</td>
+                                       <td>{{ teams.joinning_type }}</td>
+                                       <td>{{ teams.created_at }}</td>
                                     </tr>
                                     {% endfor %}
                                  </tbody>
