@@ -65,3 +65,37 @@ class TournamentSerializer(serializers.ModelSerializer):
 
         return tournament
 
+
+
+class GroupTableSerializer(serializers.ModelSerializer):
+    tournament_id_name = serializers.SerializerMethodField() 
+    class Meta:
+        model = GroupTable
+        fields = ['id','tournament_id','tournament_id_name','group_name','created_at','updated_at']
+
+    def get_tournament_id_name(self, obj):
+        return obj.tournament_id.tournament_name if obj.tournament_id else None
+
+class TournamentGroupTeamSerializer(serializers.ModelSerializer):
+    group_id_name = serializers.SerializerMethodField()
+    team_branch_name = serializers.SerializerMethodField()
+    tournament_id_name = serializers.SerializerMethodField()
+    team_branch_logo= serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TournamentGroupTeam
+        fields = ['id','group_id','group_id_name','team_branch_id','team_branch_name','team_branch_logo','tournament_id','tournament_id_name','created_at','updated_at']
+
+    def get_group_id_name(self, obj):
+        return obj.group_id.group_name if obj.group_id else None
+    
+    def get_team_branch_name(self, obj):
+        return obj.team_branch_id.team_name if obj.team_branch_id else None
+    
+    def get_tournament_id_name(self, obj):
+        return obj.tournament_id.tournament_name if obj.tournament_id else None
+    
+    def get_team_branch_logo(self, obj):
+        if obj.team_branch_id and obj.team_branch_id.team_id and obj.team_branch_id.team_id.team_logo:
+             return obj.team_branch_id.team_id.team_logo.url
+        return None

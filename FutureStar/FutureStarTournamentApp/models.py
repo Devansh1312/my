@@ -48,3 +48,16 @@ class GroupTable(models.Model):
     class Meta:
         db_table = 'futurestar_app_grouptable'
 
+class TournamentGroupTeam(models.Model):
+    id = models.AutoField(primary_key=True)
+    group_id = models.ForeignKey(GroupTable, on_delete=models.CASCADE)
+    team_branch_id = models.ForeignKey(TeamBranch, on_delete=models.CASCADE,blank=True, null=True)
+    tournament_id=models.ForeignKey(Tournament,on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f'{self.group_id} - {self.team_branch_id}'
+    
+    class Meta:
+        db_table = 'futurestar_app_tournament_groupteam'
