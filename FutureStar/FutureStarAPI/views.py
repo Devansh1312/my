@@ -2811,10 +2811,16 @@ class FollowUnfollowAPI(APIView):
             )
             # If follow request exists, unfollow
             follow_request.delete()
+            followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
+            following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
             return Response({
                 'status': 1,
                 'message': 'Unfollowed successfully.',
-                'data': {}
+                'data': {
+                    'followers_count': followers_count,
+                    'following_count': following_count,
+                    'is_follow': False,
+                }
             }, status=status.HTTP_200_OK)
         except FollowRequest.DoesNotExist:
             # Follow request does not exist, create one
@@ -2824,9 +2830,16 @@ class FollowUnfollowAPI(APIView):
                 target_id=target_id,
                 target_type=target_type
             )
+            followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
+            following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
             return Response({
                 'status': 1,
                 'message': 'Followed successfully.',
+                'data': {
+                    'followers_count': followers_count,
+                    'following_count': following_count,
+                    'is_follow': True,
+                }
             }, status=status.HTTP_201_CREATED)
 
 ################ Pagination ##################
