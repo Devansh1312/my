@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'FutureStarAPI',  # Add your app where User model is defined
     'FutureStarTeamApp',
     'FutureStarTournamentApp',
+    'FutureStarTrainingGroupApp',
     'sass_processor',
     'widget_tweaks',
     'corsheaders',

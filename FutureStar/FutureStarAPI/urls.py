@@ -113,9 +113,6 @@ urlpatterns = [
         ################## fileds URL ################
         path('api/fields/', FieldAPIView.as_view()),
 
-
-         ################# Training Group URL ################
-        path('api/training/group/', TrainingGroupAPI.as_view()),
         ############### Additional API #########################
         path('api/genders/', UserGenderListAPIView.as_view()),
         path('api/age_groups/', AgeGroupListAPIView.as_view()),

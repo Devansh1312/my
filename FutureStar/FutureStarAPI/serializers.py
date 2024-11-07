@@ -96,49 +96,6 @@ class ChangePasswordOtpSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Same as above
     new_password = serializers.CharField(min_length=8)  # Ensure a minimum length for security
 
-
-from rest_framework import serializers
-
-
-class TrainingGroupSerializer(serializers.ModelSerializer):
-    post_count = serializers.SerializerMethodField()
-    group_logo_url = serializers.SerializerMethodField()
-    group_background_image_url = serializers.SerializerMethodField()
-    group_founder = serializers.SerializerMethodField()
-
-    class Meta:
-        model = TrainingGroups
-        fields = [
-            'id','group_name', 'group_username', 'bio', 'group_founder',
-            'latitude', 'longitude', 'address', 'house_no', 'premises', 'street',
-            'city', 'state', 'country_name', 'postalCode', 'country_code',
-            'phone', 'group_logo', 'group_background_image', 'post_count', 
-            'group_logo_url', 'group_background_image_url'
-        ]
-    
-    def get_group_founder(self, obj):
-        user = obj.group_founder
-        return {
-            'username': user.username,
-            'fullname': user.fullname,
-            'phone': user.phone,
-            'email': user.email,
-            'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
-        }
-    
-    def get_post_count(self, obj):
-        """Get the count of posts related to this group."""
-        return Post.objects.filter(group=obj).count()
-
-    def get_group_logo_url(self, obj):
-        """Get the URL of the group logo."""
-        return obj.group_logo.url if obj.group_logo else None
-
-    def get_group_background_image_url(self, obj):
-        """Get the URL of the group background image."""
-        return obj.group_background_image.url if obj.group_background_image else None
-    
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
