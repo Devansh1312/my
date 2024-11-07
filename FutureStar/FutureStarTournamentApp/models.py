@@ -49,10 +49,19 @@ class GroupTable(models.Model):
         db_table = 'futurestar_app_grouptable'
 
 class TournamentGroupTeam(models.Model):
+    REQUESTED=0
+    ACCEPTED=1
+    REJECTED=2
+    JOINNING_TYPE_CHOICES = (
+        (REQUESTED, 'REQUESTED'),
+        (ACCEPTED, 'ACCEPTED'),
+        (REJECTED, 'REJECTED'),   
+    )
     id = models.AutoField(primary_key=True)
     group_id = models.ForeignKey(GroupTable, on_delete=models.CASCADE)
     team_branch_id = models.ForeignKey(TeamBranch, on_delete=models.CASCADE,blank=True, null=True)
     tournament_id=models.ForeignKey(Tournament,on_delete=models.CASCADE)
+    status = models.IntegerField(choices=JOINNING_TYPE_CHOICES,default=0)  
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     

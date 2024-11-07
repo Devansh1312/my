@@ -1,3 +1,4 @@
+from collections import defaultdict,OrderedDict
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
@@ -129,7 +130,39 @@ class TournamentAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+class TournamentDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        # Fetch the tournament using the tournament_id from the query parameters
+        tournament_id = request.query_params.get('tournament_id')
+
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('Tournament ID is required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the tournament object using the provided tournament_id
+            tournament = Tournament.objects.get(id=tournament_id)
+            
+            # Serialize the tournament data
+            serializer = TournamentSerializer(tournament, context={'request': request})
+
+            # Format the response as required
+            return Response({
+                'status': 1,
+                'message': _('Tournament details fetched successfully.'),
+                'data':  serializer.data,
+               
+            }, status=status.HTTP_200_OK)
+
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament not found.'),
+            }, status=status.HTTP_404_NOT_FOUND)
 class GroupTableAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -151,10 +184,11 @@ class GroupTableAPIView(APIView):
     
 
 
+
+
 class TournamentGroupTeamListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-
 
     # Handle GET request to list TournamentGroupTeam instances
     def get(self, request, *args, **kwargs):
@@ -166,8 +200,10 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 'message': _('Tournament ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filter TournamentGroupTeam instances by tournament_id
-        tournament_group_teams = TournamentGroupTeam.objects.filter(tournament_id=tournament_id)
+        # Filter and order TournamentGroupTeam instances by tournament_id and group_name
+        tournament_group_teams = TournamentGroupTeam.objects.filter(
+            tournament_id=tournament_id
+        ).select_related('group_id').order_by('group_id__group_name')
 
         # Check if any teams were found for the given tournament
         if not tournament_group_teams.exists():
@@ -176,14 +212,24 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 'message': _('No Tournament Group Teams found for the specified tournament.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TournamentGroupTeamSerializer(tournament_group_teams, many=True)
+        # Group teams by group_id, maintaining alphabetical order
+        grouped_teams = defaultdict(list)
+        for team in tournament_group_teams:
+            group_name = team.group_id.group_name if team.group_id else 'Unknown Group'
+            grouped_teams[group_name].append(team)
+
+        # Use OrderedDict to ensure groups are ordered alphabetically in the response
+        grouped_data = OrderedDict()
+        for group_name in sorted(grouped_teams.keys()):
+            teams = grouped_teams[group_name]
+            serializer = TournamentGroupTeamSerializer(teams, many=True)
+            grouped_data[group_name] = serializer.data
 
         return Response({
             'status': 1,
             'message': _('Tournament Group Teams fetched successfully.'),
-            'data': serializer.data
+            'data': grouped_data
         }, status=status.HTTP_200_OK)
-    # Handle POST request to create a new TournamentGroupTeam instance
     def post(self, request, *args, **kwargs):
         # Check if the team is already added to the same group
         team_branch_id = request.data.get('team_branch_id')  # Assuming the team ID is in the request body

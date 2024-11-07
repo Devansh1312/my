@@ -526,13 +526,11 @@ class Event(models.Model):
 
 class EventBooking(models.Model):
     USER_TYPE = 1
-    TEAM_TYPE = 2
-    GROUP_TYPE = 3
+  
     
     CREATOR_TYPE_CHOICES = (
         (USER_TYPE, 'User'),
-        (TEAM_TYPE, 'Team'),
-        (GROUP_TYPE, 'Group'),
+      
     )
 
     id = models.AutoField(primary_key=True)

@@ -3414,10 +3414,8 @@ class EventCreateAPIView(generics.CreateAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Logic for handling creator_type and created_by_id
-        if creator_type == Event.USER_TYPE:
-            # If creator_type is USER_TYPE, set created_by_id to the logged-in user's ID
-            data['created_by_id'] = request.user.id
-        elif creator_type == Event.TEAM_TYPE:
+       
+        if creator_type == Event.TEAM_TYPE:
             # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
             if created_by_id is None:
                 return Response({
@@ -3611,32 +3609,13 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Logic for handling creator_type and created_by_id
-        if creator_type == Event.USER_TYPE:
-            # If creator_type is USER_TYPE, set created_by_id to the logged-in user's ID
-            created_by_id = request.user.id
-        elif creator_type == Event.TEAM_TYPE:
-            # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
-            if created_by_id is None:
-                return Response({
-                    'status': 0,
-                    'message': 'created_by_id must be provided for TEAM_TYPE.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                created_by_id = int(created_by_id)
-            except (ValueError, TypeError):
-                return Response({
-                    'status': 0,
-                    'message': 'created_by_id must be a valid integer.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Validate if created_by_id exists in Team model
-            if not Team.objects.filter(id=created_by_id).exists():
-                return Response({
-                    'status': 0,
-                    'message': 'Invalid team ID.'
-                }, status=status.HTTP_400_BAD_REQUEST)
         
+            # If creator_type is USER_TYPE, set created_by_id to the logged-in user's ID
+        created_by_id = request.user.id
+        if creator_type == EventBooking.USER_TYPE:
+            # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
+            created_by_id = request.user.id
+
         else:
             return Response({
                 'status': 0,
