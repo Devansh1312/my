@@ -4,6 +4,8 @@ from FutureStar_App.models import User
 from urllib.parse import urlparse
 from FutureStarAPI.models import *
 from django.core.files.images import get_image_dimensions
+from django.core.files.storage import default_storage
+from django.utils.crypto import get_random_string
 
 
 
@@ -399,27 +401,41 @@ class GallarySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         media_file = data.get('media_file')
+        creator_type = data.get('creator_type')
+        created_by_id = data.get('created_by_id')
+
+        # Check if media_file is provided
         if not media_file:
             raise serializers.ValidationError("A media file (image or video) must be provided.")
         
-        mime_type, _ = mimetypes.guess_type(media_file.name)
+        # Generate unique file name
+        file_extension = media_file.name.split('.')[-1]
+        unique_suffix = get_random_string(8)
+        file_name = f"media_file/{creator_type}_{created_by_id}_{unique_suffix}.{file_extension}"
+
+        # Save the file to storage
+        logo = default_storage.save(file_name, media_file)
+        data['media_file'] = logo  # Update data with the saved file path
+
+        # Check MIME type to determine content type
+        mime_type, _ = mimetypes.guess_type(logo)
         if mime_type:
             if mime_type.startswith('image/'):
-                data['content_type'] = 1
+                data['content_type'] = 1  # Image type
             elif mime_type.startswith('video/'):
-                data['content_type'] = 2
+                data['content_type'] = 2  # Video type
             else:
                 raise serializers.ValidationError("The file must be an image or video.")
         else:
             raise serializers.ValidationError("The file type could not be determined.")
-        
+
         return data
-    
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         request = self.context.get('request')
         
+        # Convert media_file to relative path if it exists
         if 'media_file' in representation:
             full_url = representation['media_file']
             parsed_url = urlparse(full_url)
