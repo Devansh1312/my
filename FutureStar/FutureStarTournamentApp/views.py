@@ -115,11 +115,23 @@ class TournamentAPIView(APIView):
             if 'logo' in request.FILES:
                 logo = request.FILES['logo']
                 file_extension = logo.name.split('.')[-1]
-                file_name = f"tournament_logo/{tournament_instance.tournament_name}_{tournament_instance.id}.{file_extension}"
+                unique_suffix = get_random_string(8)
+                file_name = f"tournament_logo/{tournament_instance.id}_{unique_suffix}.{file_extension}"
                 logo_path = default_storage.save(file_name, logo)
                 tournament_instance.logo = logo_path
                 tournament_instance.save()
 
+            # Handle logo upload
+            if 'tournament_banner' in request.FILES:
+                logo = request.FILES['tournament_banner']
+                file_extension = logo.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                file_name = f"tournament_banner/{tournament_instance.id}_{unique_suffix}.{file_extension}"
+                logo_path = default_storage.save(file_name, logo)
+                tournament_instance.tournament_banner = logo_path
+                tournament_instance.save()
+
+            serializer.save()
             return Response({
                 'status': 1,
                 'message': _('Tournament created successfully.'),
@@ -159,10 +171,22 @@ class TournamentAPIView(APIView):
             if 'logo' in request.FILES:
                 logo = request.FILES['logo']
                 file_extension = logo.name.split('.')[-1]
-                file_name = f"tournament_logo/{tournament_instance.tournament_name}_{tournament_instance.id}.{file_extension}"
+                unique_suffix = get_random_string(8)
+                file_name = f"tournament_logo/{tournament_instance.id}_{unique_suffix}.{file_extension}"
                 logo_path = default_storage.save(file_name, logo)
                 tournament_instance.logo = logo_path
                 tournament_instance.save()
+            # Handle logo upload
+            if 'tournament_banner' in request.FILES:
+                logo = request.FILES['tournament_banner']
+                file_extension = logo.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                file_name = f"tournament_banner/{tournament_instance.id}_{unique_suffix}.{file_extension}"
+                logo_path = default_storage.save(file_name, logo)
+                tournament_instance.tournament_banner = logo_path
+                tournament_instance.save()
+
+            serializer.save()
 
             return Response({
                 'status': 1,
