@@ -2667,7 +2667,7 @@ class FieldAPIView(APIView):
 
         # Handle field creation with image upload
         serializer = FieldSerializer(data=request.data, context={'request': request})
-        user = request.user
+        user = request.user.id
         
         if serializer.is_valid():
             field_instance = serializer.save()
@@ -3426,7 +3426,6 @@ class EventCreateAPIView(generics.CreateAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Logic for handling creator_type and created_by_id
-       
         if creator_type == Event.TEAM_TYPE:
             # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
             if created_by_id is None:
@@ -3451,7 +3450,7 @@ class EventCreateAPIView(generics.CreateAPIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             data['created_by_id'] = created_by_id  # Use the provided team ID
-      
+        
         else:
             return Response({
                 'status': 0,
@@ -3463,7 +3462,19 @@ class EventCreateAPIView(generics.CreateAPIView):
 
         serializer = self.serializer_class(data=data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
+            # Save the event instance first to generate an ID
+            event = serializer.save()
+
+            # Check if an event image was provided in the request
+            if 'event_image' in request.FILES:
+                event_image = request.FILES['event_image']
+                file_extension = event_image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)  # Ensure unique filename
+                file_name = f"event_images/{event.id}_{event.creator_type}_{event.created_by_id}_{unique_suffix}.{file_extension}"
+                image_path = default_storage.save(file_name, event_image)
+                event.event_image = image_path
+                event.save()  # Save the event with the updated image path
+
             return Response({
                 'status': 1,
                 'message': _('Events Fetched successfully.'),
@@ -3517,7 +3528,7 @@ class UpdateEventAPIView(APIView):
                 event_image = request.FILES['event_image']
                 file_extension = event_image.name.split('.')[-1]
                 unique_suffix = get_random_string(8)  # Ensure unique filename
-                file_name = f"event_images/{event.id}_{request.user.username}_{unique_suffix}.{file_extension}"
+                file_name = f"event_images/{event.id}_{event.creator_type}_{event.created_by_id}_{unique_suffix}.{file_extension}"
                 image_path = default_storage.save(file_name, event_image)
                 event.event_image = image_path
 
