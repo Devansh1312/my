@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+{% endblock %}
+
+<style>
+   .is-invalid {
+       border-color: #dc3545;
+       background-color: #f8d7da;
+   }
+</style>
+
+{% block title %}
+Team List View
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{breadcrumb.child}}</h3>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="display" id="basic-1">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Team Name</th> 
+                                <th>Team User Name</th>
+                                <th>Created By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in teams %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ team.team_name }}</td>
+                                <td>{{ team.team_username }}</td>
+                                <td>{{ team.user_id.username }}</td>
+                                <td>
+                                    <!-- Action buttons -->
+
+                                    <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                        <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                            <i data-feather="more-vertical"></i>
+                                        </a>
+                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                            <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                
+                                                   <a href="#" class="view-details" data-id="{{ team.id }}">View</a>
+                                                <form id="view-form-{{ team.id }}" method="post" action="{% url 'team_detail' %}" style="display: none;">
+                                                   {% csrf_token %}
+                                                   <input type="hidden" name="team_id" value="{{ team.id }}">
+                                                </form>
+
+                                                </li> 
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+
+
+<!-- View Team Modal
+<div class="modal fade bd-example-modal-lg" id="viewTeamModal" tabindex="-1" aria-labelledby="viewTeamModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+       <div class="modal-content shadow-lg border-0 rounded">
+          <div class="modal-header bg-primary text-white">
+             <h5 class="modal-title" id="viewTeamModalLabel">Team Details</h5>
+             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+             <div class="row">
+                Team Details Section
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Team Name:</label>
+                   <span id="teamName"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Team Username:</label>
+                   <span id="teamUsername"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Created By:</label>
+                   <span id="createdBy"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Team Type:</label>
+                   <span id="teamType"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Bio:</label>
+                   <span id="bio"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Establishment Date:</label>
+                   <span id="establishmentDate"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">President:</label>
+                   <span id="teamPresident"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Latitude:</label>
+                   <span id="latitude"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Longitude:</label>
+                   <span id="longitude"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Address:</label>
+                   <span id="address"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">House No:</label>
+                   <span id="houseNo"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Premises:</label>
+                   <span id="premises"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Street:</label>
+                   <span id="street"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">City:</label>
+                   <span id="city"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">State:</label>
+                   <span id="state"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Country:</label>
+                   <span id="country"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Postal Code:</label>
+                   <span id="postalCode"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Country Code:</label>
+                   <span id="countryCode"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Phone:</label>
+                   <span id="phone"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Email:</label>
+                   <span id="email"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Age Group:</label>
+                   <span id="ageGroup"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Entry Fees:</label>
+                   <span id="entryFees"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                   <label class="form-label fw-bold">Branches:</label>
+                   <span id="branches"></span>
+                </div>
+             </div>
+             <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Team Logo:</label>
+                    <img id="teamLogoPreview" src="" alt="Team Logo" class="img-fluid">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Background Image:</label>
+                    <img id="teamBackgroundImagePreview" src="" alt="Background Image" class="img-fluid">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-bold">Uniform:</label>
+                    <img id="teamUniformPreview" src="" alt="Uniform" class="img-fluid">
+                </div>
+             </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+       </div>
+    </div>
+  </div>  -->
+ 
+
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+
+
+<script>
+
+   
+
+   // Toggle the visibility of the action card
+   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+       menu.addEventListener('click', function(event) {
+           event.preventDefault();
+           var actionCard = menu.nextElementSibling;
+           actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+           // Close other open action cards
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                   card.style.display = 'none';
+               }
+           });
+       });
+   });
+
+
+   // View User Details
+document.querySelectorAll('.view-details').forEach(function(link) {
+   link.addEventListener('click', function(e) {
+       e.preventDefault();
+       var TeamId = this.getAttribute('data-id');
+       var form = document.getElementById('view-form-' + TeamId);
+       form.submit();
+   });
+});
+
+   // Hide action card if clicking outside
+   document.addEventListener('click', function(event) {
+       var isClickInside = event.target.closest('.action-menu-container');
+       if (!isClickInside) {
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+           });
+       }
+   });
+</script>
+
+
+{% endblock %}
