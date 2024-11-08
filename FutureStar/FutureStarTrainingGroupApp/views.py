@@ -177,34 +177,8 @@ class TrainingGroupAPI(APIView):
             return Response({
                 'status': 1,
                 'message': _('Group updated successfully.'),
-                'data': {
-                    'group_id': group.id,
-                    'group_name': group.group_name,
-                    'group_username': group.group_username,
-                    'group_founder': {
-                        'username': user.username,
-                        'fullname': user.fullname,
-                        'phone': user.phone,
-                        'email': user.email,
-                        'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
-                    },
-                    'bio': group.bio,
-                    'latitude': group.latitude,
-                    'longitude': group.longitude,
-                    'address': group.address,
-                    'house_no': group.house_no,
-                    'premises': group.premises,
-                    'street': group.street,
-                    'city': group.city,
-                    'state': group.state,
-                    'country_name': group.country_name,
-                    'postalCode': group.postalCode,
-                    'country_code': group.country_code,
-                    'phone': group.phone,
-                    'group_logo': group.group_logo.url if group.group_logo else None,
-                    'group_background_image': group.group_background_image.url if group.group_background_image else None,
-                    'updated_at': group.updated_at,
-                }
+                'data': TrainingGroupSerializer(group).data
+
             }, status=status.HTTP_200_OK)
 
         except TrainingGroups.DoesNotExist:
@@ -216,8 +190,7 @@ class TrainingGroupAPI(APIView):
 
 
 
-
-################ Pagination ##################
+# Pagination Class
 class MemberSearchPagination(PageNumberPagination):
     page_size = 10
     page_query_param = 'page'
@@ -229,7 +202,7 @@ class MemberSearchPagination(PageNumberPagination):
             page_number = request.query_params.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
@@ -256,46 +229,43 @@ class MemberSearchPagination(PageNumberPagination):
     def get_paginated_response(self, data):
         return Response({
             'status': 1,
-            'message': 'Data fetched successfully.',
+            'message': _('Data fetched successfully.'),
             'total_records': self.total_records,
             'total_pages': self.total_pages,
             'current_page': self.page,
             'data': data
         })
 
-
+# Search Members View
 class SearchMemberView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     pagination_class = MemberSearchPagination
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         phone = request.query_params.get('phone')
         group_id = request.query_params.get('group_id')
 
-        # Validate required parameters
         if not group_id:
             return Response({
                 'status': 0,
-                'message': 'Group ID is required.'
+                'message': _('Group ID is required.')
             }, status=400)
 
-        # Initialize queryset for members with role_id = 5
         users = User.objects.filter(role_id=5)
 
-        # Filter by phone if provided
         if phone:
             users = users.filter(phone__icontains=phone)
 
-        # Exclude users who have already joined the specified group
         joined_users = JoinTrainingGroup.objects.filter(group_id=group_id).values_list('member_id', flat=True)
         users = users.exclude(id__in=joined_users)
 
-        # Apply pagination
         paginator = self.pagination_class()
         paginated_users = paginator.paginate_queryset(users, request)
 
-        # Construct response data
         user_data = [
             {
                 'id': user.id,
@@ -307,31 +277,27 @@ class SearchMemberView(APIView):
             for user in paginated_users
         ]
 
-        # Return paginated response with custom data
         return paginator.get_paginated_response(user_data)
 
-
-
-###################### Member and Organizer List ######################
-
+# Group Members View
 class GroupMembersView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         group_id = request.query_params.get('group_id')
         
-        # Validate group_id
         if not group_id:
             return Response({
                 'status': 0,
-                'message': 'Group ID is required.'
+                'message': _('Group ID is required.')
             }, status=400)
         
-        # Fetch all entries for the specified group
         group_members = JoinTrainingGroup.objects.filter(group_id=group_id)
         
-        # Separate members and organizers
         members_data = []
         organizers_data = []
         
@@ -348,115 +314,104 @@ class GroupMembersView(APIView):
             else:
                 members_data.append(user_data)
         
-        # Return response with separate lists for members and organizers
         return Response({
             'status': 1,
-            'message': 'Group members fetched successfully.',
+            'message': _('Group members fetched successfully.'),
             'data': {
                 'members': members_data,
                 'organizers': organizers_data
             }
         })
-    
-######### Group Membership ######################
+
+# Add Member to Group View
 class GroupMembersAddView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        Add a member or organizer to a group.
-        """
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.data.get('user_id')
         group_id = request.data.get('group_id')
-        join_type = int(request.data.get('JoinTrainingGroup_type', JoinTrainingGroup.MEMBER))  # Default to MEMBER if not provided
+        join_type = int(request.data.get('JoinTrainingGroup_type', JoinTrainingGroup.MEMBER))
 
-        # Validate inputs
         if not user_id or not group_id:
             return Response({
                 'status': 0,
-                'message': 'User ID and Group ID are required.'
+                'message': _('User ID and Group ID are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Fetch the user and group
         try:
             user = User.objects.get(id=user_id)
             group = TrainingGroups.objects.get(id=group_id)
         except User.DoesNotExist:
-            return Response({'status': 0, 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 0, 'message': _('User not found.')}, status=status.HTTP_404_NOT_FOUND)
         except TrainingGroups.DoesNotExist:
-            return Response({'status': 0, 'message': 'Group not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 0, 'message': _('Group not found.')}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the user is already in the group
         existing_membership = JoinTrainingGroup.objects.filter(member_id=user, group_id=group).first()
 
         if existing_membership:
-            # If the user is already an organizer, prevent any changes
             if existing_membership.JoinTrainingGroup_type == JoinTrainingGroup.ORGANIZER:
                 return Response({
                     'status': 0,
-                    'message': 'User is already an organizer and cannot be changed to a member.'
+                    'message': _('User is already an organizer and cannot be changed to a member.')
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # If the user is a member and wants to be upgraded to organizer
             if join_type == JoinTrainingGroup.ORGANIZER:
                 existing_membership.JoinTrainingGroup_type = JoinTrainingGroup.ORGANIZER
                 existing_membership.save()
                 return Response({
                     'status': 1,
-                    'message': 'User upgraded to organizer in the group.'
+                    'message': _('User upgraded to organizer in the group.')
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({
                     'status': 0,
-                    'message': 'User is already a member of this group.'
+                    'message': _('User is already a member of this group.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-        # If the user is not already a member or organizer, create a new record
         JoinTrainingGroup.objects.create(
             member_id=user,
             group_id=group,
             JoinTrainingGroup_type=join_type
         )
 
-        role = "Organizer" if join_type == JoinTrainingGroup.ORGANIZER else "Member"
+        role = _("Organizer") if join_type == JoinTrainingGroup.ORGANIZER else _("Member")
         return Response({
             'status': 1,
-            'message': f'User added as {role} to the group.'
+            'message': _('User added as {role} to the group.').format(role=role)
         }, status=status.HTTP_201_CREATED)
 
     def delete(self, request):
-        """
-        Delete a member from a group, but not if they are an organizer.
-        """
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.query_params.get('user_id')
         group_id = request.query_params.get('group_id')
 
-        # Validate inputs
         if not user_id or not group_id:
             return Response({
                 'status': 0,
-                'message': 'User ID and Group ID are required.'
+                'message': _('User ID and Group ID are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Fetch the membership record
         try:
             membership = JoinTrainingGroup.objects.get(member_id=user_id, group_id=group_id)
         except JoinTrainingGroup.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': 'Membership not found.'
+                'message': _('Membership not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the user is an organizer
         if membership.JoinTrainingGroup_type == JoinTrainingGroup.ORGANIZER:
             return Response({
                 'status': 0,
-                'message': 'Cannot delete an organizer from the group.'
+                'message': _('Cannot delete an organizer from the group.')
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Delete the member
         membership.delete()
         return Response({
             'status': 1,
-            'message': 'Member deleted successfully.'
+            'message': _('Member deleted successfully.')
         }, status=status.HTTP_200_OK)

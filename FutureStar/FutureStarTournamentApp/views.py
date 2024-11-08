@@ -225,6 +225,9 @@ class TournamentDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Fetch the tournament using the tournament_id from the query parameters
         tournament_id = request.query_params.get('tournament_id')
 
@@ -288,6 +291,9 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
     # Handle GET request to list TournamentGroupTeam instances
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         tournament_id = request.query_params.get('tournament_id')  # Get tournament ID from query params
 
         if not tournament_id:
@@ -326,7 +332,12 @@ class TournamentGroupTeamListCreateAPIView(APIView):
             'message': _('Tournament Group Teams fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
+    
+    # Handle POST request to create TournamentGroupTeam instances
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
         team_branch_id = request.data.get('team_branch_id')
 
@@ -334,86 +345,39 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
         tournament_id = request.data.get('tournament_id')
 
-        
-
         # Check if tournament exists and get its capacity
-
         try:
-
             tournament = Tournament.objects.get(id=tournament_id)
-
             tournament_capacity = int(tournament.number_of_team)
-
         except Tournament.DoesNotExist:
-
             return Response({
-
                 'status': 0,
-
                 'message': _('Tournament does not exist.'),
-
             }, status=status.HTTP_400_BAD_REQUEST)
-
-
-
         # Count all teams in the tournament with status 1
-
         current_team_count = TournamentGroupTeam.objects.filter(
-
             tournament_id=tournament_id, status=1
-
         ).count()
-
-        
-
         # Check if tournament team slots are full
-
         if current_team_count >= tournament_capacity:
-
             return Response({
-
                 'status': 0,
-
                 'message': _('All team slots in this tournament are filled.'),
-
             }, status=status.HTTP_400_BAD_REQUEST)
-
-
-
         # Check if the team is already in this group
-
         if TournamentGroupTeam.objects.filter(
-
             team_branch_id=team_branch_id, group_id=group_id, tournament_id=tournament_id
-
         ).exists():
-
             return Response({
-
                 'status': 0,
-
                 'message': _('The team is already added to this group.'),
-
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        
-
         # Check if the team is already in another group in the same tournament
-
         existing_team = TournamentGroupTeam.objects.filter(
-
             team_branch_id=team_branch_id, tournament_id=tournament_id
-
         ).first()
-
-        
-
         # Retrieve the GroupTable instance for the given group_id
-
         group_instance = get_object_or_404(GroupTable, id=group_id)
-
-        
-
         if existing_team:
 
             # Update the existing record with new data if needed
@@ -476,7 +440,12 @@ class TeamJoiningRequest(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     
+    # Handle POST request to create a new Tournament Join instance
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         team_id = request.data.get('team_id')
         tournament_id = request.data.get('tournament_id')
         
@@ -517,6 +486,9 @@ class TeamJoiningRequest(APIView):
 class TournamentGroupTeamListView(APIView):
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get the value of the 'team_list' query parameter
         team_list = request.query_params.get('team_list')
         tournament_id = request.query_params.get('tournament_id')
@@ -553,6 +525,9 @@ class TeamRejectRequest(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         team_id = request.data.get('team_id')
         tournament_id = request.data.get('tournament_id')
         
@@ -654,6 +629,9 @@ class TeamBranchSearchView(APIView):
     pagination_class = CustomBranchSearchPagination
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Extract parameters from the request
         tournament_id = request.query_params.get('tournament_id')
         search_key = request.query_params.get('search', '').strip()

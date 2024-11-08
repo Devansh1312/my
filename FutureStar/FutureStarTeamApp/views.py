@@ -143,14 +143,20 @@ class TeamViewAPI(APIView):
             activate(language)
 
         if not team_id:
-            return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0, 
+                'message': _('Team ID is required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             print(team_id)
             team_instance = Team.objects.get(id=team_id, team_founder=request.user)
             print(team_instance)
         except Team.DoesNotExist:
-            return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                'status': 0, 
+                'message': _('Team not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
 
         # Fetch the team type (category) by its ID, if provided
         team_type_id = request.data.get('team_type')
@@ -159,7 +165,10 @@ class TeamViewAPI(APIView):
                 team_type_instance = Category.objects.get(id=team_type_id)
                 team_instance.team_type = team_type_instance  # Assign the Category instance
             except Category.DoesNotExist:
-                return Response({'status': 0, 'message': _('Invalid team type provided.')}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'status': 0, 
+                    'message': _('Invalid team type provided.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
         # Update other fields from the request data
         team_instance.team_name = request.data.get('team_name', team_instance.team_name)
@@ -186,14 +195,20 @@ class TeamViewAPI(APIView):
             try:
                 team_instance.country_id = Country.objects.get(id=country_id)
             except Country.DoesNotExist:
-                return Response({'status': 0, 'message': _('Invalid country ID provided.')}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'status': 0, 
+                    'message': _('Invalid country ID provided.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
         city_id = request.data.get('city_id')
         if city_id:
             try:
                 team_instance.city_id = City.objects.get(id=city_id)  # Assuming City is your model for city
             except City.DoesNotExist:
-                return Response({'status': 0, 'message': _('Invalid city ID provided.')}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'status': 0, 
+                    'message': _('Invalid city ID provided.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
 # Save the team instance
         team_instance.phone = request.data.get('phone', team_instance.phone)
@@ -250,15 +265,25 @@ class TeamViewAPI(APIView):
         }, status=status.HTTP_200_OK)
     
     def patch(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         """API for updating team logo"""
         team_id = request.data.get('team_id')
         if not team_id:
-            return Response({'status': 0, 'message': _('Team ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0, 
+                'message': _('Team ID is required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             team_instance = Team.objects.get(id=team_id, team_founder=request.user)
         except Team.DoesNotExist:
-            return Response({'status': 0, 'message': _('Team not found.')}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                'status': 0, 
+                'message': _('Team not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
 
         if 'team_logo' in request.FILES:
             # Delete old logo if it exists
@@ -374,9 +399,16 @@ class StaffManagementView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         branch_id = request.query_params.get('branch_id')
         if not branch_id:
-            return Response({'status': 0, 'message': _('branch_id is required')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0, 
+                'message': _('branch_id is required')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         # Filter staff by type
         managerial_staff = JoinBranch.objects.filter(branch_id=branch_id, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE)
@@ -403,6 +435,10 @@ class StaffManagementView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         branch_id = request.data.get('branch_id')
         user_id = request.data.get('user_id')
         joinning_type = request.data.get('joinning_type')
@@ -522,13 +558,19 @@ class UserSearchView(APIView):
     pagination_class = CustomUserSearchPagination  # Set the pagination class
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         search_type = request.query_params.get('search_type')
         phone = request.query_params.get('phone')
         branch_id = request.query_params.get('branch_id')  # Get branch_id from request
 
         # Check for valid search_type, comparing with string values
         if search_type not in ['1', '2']:
-            return Response({'status': 0, 'message': _('Invalid search type. Must be 1 or 2.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0, 
+                'message': _('Invalid search type.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         # Initialize a queryset
         users = User.objects.none()
