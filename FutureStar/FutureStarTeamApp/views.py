@@ -113,7 +113,8 @@ class TeamViewAPI(APIView):
         if 'team_logo' in request.FILES:
             logo = request.FILES['team_logo']
             file_extension = logo.name.split('.')[-1]
-            file_name = f"team/team_logo/{team_instance.team_name}_{team_instance.id}.{file_extension}"
+            unique_suffix = get_random_string(8)
+            file_name = f"team/team_logo/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
             logo_path = default_storage.save(file_name, logo)
             team_instance.team_logo = logo_path
 
@@ -208,7 +209,7 @@ class TeamViewAPI(APIView):
             background_image = request.FILES['team_background_image']
             file_extension = background_image.name.split('.')[-1]
             unique_suffix = get_random_string(8)  # Ensure the name is unique
-            file_name = f"team/team_background_image/{team_instance.id}_{unique_suffix}.{file_extension}"
+            file_name = f"team/team_background_image/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
             background_image_path = default_storage.save(file_name, background_image)
             team_instance.team_background_image = background_image_path
 
@@ -227,7 +228,7 @@ class TeamViewAPI(APIView):
             for uniform in uniforms:
                 unique_suffix = get_random_string(8)
                 file_extension = uniform.name.split('.')[-1]
-                file_name = f"team/team_uniform/{team_instance.id}_{unique_suffix}.{file_extension}"
+                file_name = f"team/team_uniform/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
                 uniform_path = default_storage.save(file_name, uniform)
                 team_uniform_images.append(uniform_path)
 
@@ -268,7 +269,7 @@ class TeamViewAPI(APIView):
             logo = request.FILES['team_logo']
             file_extension = logo.name.split('.')[-1]
             unique_suffix = get_random_string(8)  # Generate a random suffix to ensure unique filenames
-            file_name = f"team/team_logo/{team_instance.id}_{unique_suffix}.{file_extension}"
+            file_name = f"team/team_logo/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
             logo_path = default_storage.save(file_name, logo)
             team_instance.team_logo = logo_path
 
@@ -324,7 +325,7 @@ class TeamBranchAPIView(APIView):
             # Return a success response with the created data
             return Response({
                 'status': 1,
-                'message': _('Field created successfully.'),
+                'message': _('Team Branch created successfully.'),
                 'data': TeamBranchSerializer(team_branch_instance).data
             }, status=status.HTTP_201_CREATED)
         
@@ -362,7 +363,7 @@ class TeamBranchAPIView(APIView):
         serializer = TeamBranchSerializer(team_branch_instance, context={'request': request})
         return Response({
             'status': 1,
-            'message': _('TeamBranch retrieved successfully.'),
+            'message': _('Team Branch retrieved successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
         

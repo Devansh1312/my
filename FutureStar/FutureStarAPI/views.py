@@ -2667,6 +2667,7 @@ class FieldAPIView(APIView):
 
         # Handle field creation with image upload
         serializer = FieldSerializer(data=request.data, context={'request': request})
+        user = request.user
         
         if serializer.is_valid():
             field_instance = serializer.save()
@@ -2676,8 +2677,8 @@ class FieldAPIView(APIView):
                 image = request.FILES['image']
                 # Save the new image with a structured filename
                 file_extension = image.name.split('.')[-1]
-                file_name = f"fields_images/{field_instance.field_name}_{field_instance.id}.{file_extension}"
-
+                unique_suffix = get_random_string(8)
+                file_name = f"fields_images/{user}_{field_instance.id}_{unique_suffix}.{file_extension}"
                 # Save the image and update the instance
                 image_path = default_storage.save(file_name, image)
                 field_instance.image = image_path
