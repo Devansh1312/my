@@ -35,12 +35,14 @@ class TrainingGroupSerializer(serializers.ModelSerializer):
     
     def get_group_founder(self, obj):
         user = obj.group_founder
+        if not user:
+            return None
         return {
             'username': user.username,
             'fullname': user.fullname,
             'phone': user.phone,
             'email': user.email,
-            'profile_pic': user.profile_picture.url if user.profile_picture else None,  # Use the correct field name
+            'profile_pic': user.profile_picture.url if user.profile_picture else None,
         }
     
 

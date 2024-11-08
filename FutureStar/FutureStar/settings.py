@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-x7$wh)3+(3$)13tn$!pa=x#@1%l*qdmwk%zv!x(vlvsxkwey9-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://futurestar.redspark.redspark.a2hosted.com', 'localhost', '127.0.0.1','75.101.179.30']
+ALLOWED_HOSTS = ['futurestar.redspark.redspark.a2hosted.com', 'localhost', '127.0.0.1','75.101.179.30']
 
 
 # Application definition
@@ -96,7 +96,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'FutureStar.wsgi.application'
 
-
+### Local ####
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -111,6 +111,24 @@ DATABASES = {
     }
 }
 
+
+### A2Hosting ####
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'redspar2_futurestardata2',
+#         'USER': 'redspar2_futurestar',
+#         'PASSWORD': 'redspark@1',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
+#         },
+#     }
+# }
+
+
+## AWS ####
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',

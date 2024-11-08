@@ -95,7 +95,7 @@ class TeamViewAPI(APIView):
 
         # Check if team_username already exists in either the Team or User model
         team_username = request.data.get('team_username')
-        if Team.objects.filter(team_username=team_username).exists() or User.objects.filter(username=team_username).exists():
+        if Team.objects.filter(team_username=team_username).exists() or User.objects.filter(username=team_username) or TrainingGroups.objects.filter(group_username=team_username).exists():
             return Response({
                 'status': 0, 
                 'message': _('The username is already in use either as a team username or a user username.')}, 

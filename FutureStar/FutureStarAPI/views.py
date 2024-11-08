@@ -281,7 +281,7 @@ class send_otp(APIView):
                 password = request.data.get('password')
 
                 # Check if username or phone already exists
-                if User.objects.filter(username=username).exists():
+                if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
                     return Response({
                         'status': 0,
                         'message': _('Username already exists.')
@@ -335,11 +335,13 @@ class send_otp(APIView):
 
                 # Validate if username or phone already exists if provided
                 if username and phone:
-                    if User.objects.filter(username=username).exists():
+                    # Check if username or phone already exists
+                    if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
                         return Response({
                             'status': 0,
                             'message': _('Username already exists.')
                         }, status=status.HTTP_400_BAD_REQUEST)
+
 
                     if User.objects.filter(phone=phone).exists():
                         return Response({
@@ -425,12 +427,13 @@ class verify_and_register(APIView):
                 'message': _('Invalid OTP or phone number.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the username already exists in the User table
-        if User.objects.filter(username=username).exists():
+        # Check if username already exists
+        if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
             return Response({
                 'status': 0,
                 'message': _('Username already exists.')
             }, status=status.HTTP_400_BAD_REQUEST)
+
 
         # Check if the phone already exists in the User table
         if User.objects.filter(phone=phone).exists():
@@ -2124,7 +2127,16 @@ class GallaryCreateAPIView(APIView):
                         'message': _("Album not found."),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Save the gallary entry
+            # Handle the media_file if it is provided
+            if "media_file" in request.FILES:
+                image = request.FILES["media_file"]
+                file_extension = image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                file_name = f"media_file/{creator_type}_{created_by_id}_{unique_suffix}.{file_extension}"
+                logo = default_storage.save(file_name, image)
+                serializer.validated_data["media_file"] = logo  # Save the file path in the serializer
+
+            # Save the gallery entry
             gallary = serializer.save(
                 created_by_id=created_by_id,
                 creator_type=creator_type,
@@ -2142,7 +2154,6 @@ class GallaryCreateAPIView(APIView):
             'message': _('Failed to create gallery entry.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-
 ###########gallary list latest 9 ################
 
 class LatestGallaryListAPIView(generics.ListCreateAPIView):

@@ -103,7 +103,7 @@ class TrainingGroups(models.Model):
     group_name = models.CharField(max_length=255,blank=True,null=True)
     group_username = models.CharField(max_length=255,blank=True,null=True)
     bio = models.TextField(null=True,blank=True)
-    group_founder = models.ForeignKey(User,on_delete=models.CASCADE,default=True)
+    group_founder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_founder',blank=True, null=True)  # ForeignKey to User model
 
      # New fields
     latitude = models.FloatField(default=0.0)
