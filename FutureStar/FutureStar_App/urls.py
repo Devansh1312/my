@@ -233,7 +233,8 @@ urlpatterns = [
     
     #Team list URL's
     path('team_lists/', TeamListView.as_view(), name='team_list'),
-    path('team_lists/delete/<int:pk>/', TeamDeleteview.as_view(), name='team_delete'),
+    path('team_details/', TeamDetailView.as_view(), name='team_detail'),
+
 
     #Playing Position URLS's
     path('playing_positions/', PlayingPositionListView.as_view(), name='playing_position_list'),

@@ -26,6 +26,7 @@ import sys
 from functools import wraps
 
 from FutureStarAPI.models import *
+from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 
 
@@ -5427,7 +5428,7 @@ class PostReportDeleteView(LoginRequiredMixin, View):
     
 @method_decorator(user_role_check, name='dispatch')
 class TeamListView(LoginRequiredMixin, View):
-    template_name = "Admin/MobileApp/Team_List.html"
+    template_name = "Admin/MobileApp/List_Of_Teams/Team_List.html"
     
     def get(self, request):
         teams = Team.objects.all()
@@ -5439,18 +5440,55 @@ class TeamListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Team Lists"},
             },
         )
-        
-        
+
 @method_decorator(user_role_check, name='dispatch')
-class TeamDeleteview(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        team = get_object_or_404(Team, pk=pk)
-        team.delete()
+class TeamDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/List_Of_Teams/Team_Details.html"  
+
+    def get_team_related_data(self, team):
+        branches = TeamBranch.objects.filter(team_id=team)
+        return branches
+
+    def get(self, request):
+        team = request.GET.get('team_id') 
         
-        messages.success(request, "Team deleted successfully.")
-        return redirect('team_list')
+        try:
+            branches = self.get_team_related_data(team)
 
+            return render(
+                request,
+                self.template_name,
+                {
+                    "team": team,
+                    "branches": branches,
+                    "breadcrumb": {"child": "Team Detail"},
+                },
+            )
+        except Team.DoesNotExist:
+            return redirect('Dashboard')  
 
+    def post(self, request):
+        team_id = request.POST.get('team_id')  
+        if not team_id:
+            return redirect('Dashboard')  
+
+        try:
+            team = Team.objects.get(id=team_id)
+            branches = self.get_team_related_data(team)
+
+            return render(
+                request,
+                self.template_name,
+                {
+                    "team": team,
+                    "branches": branches,
+                    "breadcrumb": {"child": "Team Detail"},
+                },
+            )
+        except Team.DoesNotExist:
+            return redirect('Dashboard')
+        
+        
 ######################### Playing Position #############################
 
 @method_decorator(user_role_check, name='dispatch')
