@@ -73,6 +73,8 @@ class CustomTournamentPagination(PageNumberPagination):
 
         return super().paginate_queryset(queryset, request, view)
 
+############################# GET TOURNAMENTS ###########################
+
 class TournamentAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -129,7 +131,72 @@ class TournamentAPIView(APIView):
             'message': _('Tournament creation failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+    
 
+
+    ############################# EDIT AND DELETE###################
+
+    def patch(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        tournament_id = request.data.get('tournament_id')
+        try:
+            tournament_instance = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TournamentSerializer(tournament_instance, data=request.data, partial=True, context={'request': request})
+        
+        if serializer.is_valid():
+            tournament_instance = serializer.save()
+
+            # Handle logo update if provided
+            if 'logo' in request.FILES:
+                logo = request.FILES['logo']
+                file_extension = logo.name.split('.')[-1]
+                file_name = f"tournament_logo/{tournament_instance.tournament_name}_{tournament_instance.id}.{file_extension}"
+                logo_path = default_storage.save(file_name, logo)
+                tournament_instance.logo = logo_path
+                tournament_instance.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Tournament updated successfully.'),
+                'data': TournamentSerializer(tournament_instance).data
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            'status': 0,
+            'message': _('Tournament update failed.'),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        tournament_id = request.query_params.get('tournament_id')
+        try:
+            tournament_instance = Tournament.objects.get(id=tournament_id)
+            tournament_instance.delete()
+            return Response({
+                'status': 1,
+                'message': _('Tournament deleted successfully.')
+            }, status=status.HTTP_204_NO_CONTENT)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+############################# TOURNAMENT DETAIL WITH ID ###########################
 class TournamentDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -163,6 +230,9 @@ class TournamentDetailAPIView(APIView):
                 'status': 0,
                 'message': _('Tournament not found.'),
             }, status=status.HTTP_404_NOT_FOUND)
+        
+############################# FETCH ONLY GROUP TABLE WITHOUT TEAM ###########################
+
 class GroupTableAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -171,8 +241,9 @@ class GroupTableAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        tournament_id = request.query_params.get('tournament_id') 
 
-        group_table=GroupTable.objects.all()
+        group_table=GroupTable.objects.filter(tournament_id=tournament_id)
         group_table_data = GroupTableSerializer(group_table, many=True).data
         
         return Response({
@@ -184,6 +255,7 @@ class GroupTableAPIView(APIView):
     
 
 
+############################# FETCH AND CREATE GROUP TEAM WITH ADDING OR UPDATING TEAM ###########################
 
 
 class TournamentGroupTeamListCreateAPIView(APIView):
@@ -231,41 +303,277 @@ class TournamentGroupTeamListCreateAPIView(APIView):
             'data': grouped_data
         }, status=status.HTTP_200_OK)
     def post(self, request, *args, **kwargs):
-        # Check if the team is already added to the same group
-        team_branch_id = request.data.get('team_branch_id')  # Assuming the team ID is in the request body
-        group_id = request.data.get('group_id')  # Assuming the group ID is in the request body
 
-        if TournamentGroupTeam.objects.filter(team_branch_id=team_branch_id, group_id=group_id).exists():
+        team_branch_id = request.data.get('team_branch_id')
+
+        group_id = request.data.get('group_id')
+
+        tournament_id = request.data.get('tournament_id')
+
+        
+
+        # Check if tournament exists and get its capacity
+
+        try:
+
+            tournament = Tournament.objects.get(id=tournament_id)
+
+            tournament_capacity = int(tournament.number_of_team)
+
+        except Tournament.DoesNotExist:
+
             return Response({
+
                 'status': 0,
+
+                'message': _('Tournament does not exist.'),
+
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+        # Count all teams in the tournament with status 1
+
+        current_team_count = TournamentGroupTeam.objects.filter(
+
+            tournament_id=tournament_id, status=1
+
+        ).count()
+
+        
+
+        # Check if tournament team slots are full
+
+        if current_team_count >= tournament_capacity:
+
+            return Response({
+
+                'status': 0,
+
+                'message': _('All team slots in this tournament are filled.'),
+
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+        # Check if the team is already in this group
+
+        if TournamentGroupTeam.objects.filter(
+
+            team_branch_id=team_branch_id, group_id=group_id, tournament_id=tournament_id
+
+        ).exists():
+
+            return Response({
+
+                'status': 0,
+
                 'message': _('The team is already added to this group.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Check if the team is already added to another group in the same tournament
-        tournament_id = request.data.get('tournament_id')  # Assuming the tournament ID is in the request body
 
-        if TournamentGroupTeam.objects.filter(team_branch_id=team_branch_id, tournament_id=tournament_id).exists():
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        
+
+        # Check if the team is already in another group in the same tournament
+
+        existing_team = TournamentGroupTeam.objects.filter(
+
+            team_branch_id=team_branch_id, tournament_id=tournament_id
+
+        ).first()
+
+        
+
+        # Retrieve the GroupTable instance for the given group_id
+
+        group_instance = get_object_or_404(GroupTable, id=group_id)
+
+        
+
+        if existing_team:
+
+            # Update the existing record with new data if needed
+
+            existing_team.group_id = group_instance
+
+            existing_team.status = 1
+
+            existing_team.save()
+
+
+
+            serializer = TournamentGroupTeamSerializer(existing_team)
+
+            return Response({
+
+                'status': 1,
+
+                'message': _('Tournament Group Team updated successfully.'),
+
+                'data': serializer.data
+
+            }, status=status.HTTP_200_OK)
+
+        
+
+        # If no existing team, create a new one
+
+        serializer = TournamentGroupTeamSerializer(data=request.data)
+
+        if serializer.is_valid():
+
+            serializer.save(group_id=group_instance, status=1)  # Set group_id and status when creating a new entry
+
+            return Response({
+
+                'status': 1,
+
+                'message': _('Tournament Group Team added successfully.'),
+
+                'data': serializer.data
+
+            }, status=status.HTTP_201_CREATED)
+
+
+
+        return Response({
+
+            'status': 0,
+
+            'message': _('Failed to create Tournament Group Team.'),
+
+            'errors': serializer.errors
+
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+############################# REQUEST TO JOIN TEAM ###########################
+
+class TeamJoiningRequest(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def post(self, request, *args, **kwargs):
+        team_id = request.data.get('team_id')
+        tournament_id = request.data.get('tournament_id')
+        
+        # Check if the tournament and team exist
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            team_branch = TeamBranch.objects.get(id=team_id)
+        except Tournament.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('The team is already added to another group in this tournament.'),
+                'message': _('Tournament does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except TeamBranch.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Team does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create a new TournamentGroupTeam entry with group_id as None and status as 0
+        tournament_group_team = TournamentGroupTeam.objects.create(
+            group_id=None,          # set group_id to null
+            team_branch_id=team_branch,
+            tournament_id=tournament,
+            status=0                 # set status to 0
+        )
+        
+        # Serialize and return the created object
+        serializer = TournamentGroupTeamSerializer(tournament_group_team)
+        return Response({
+            'status': 1,
+            'message': _('Team joining request created successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+
+############################# FETCH TEAM LISTS APPROVED,REQUESTED AND REJECTED ###########################
+
+class TournamentGroupTeamListView(APIView):
+
+    def get(self, request):
+        # Get the value of the 'team_list' query parameter
+        team_list = request.query_params.get('team_list')
+        tournament_id = request.query_params.get('tournament_id')
+
+
+        if team_list == '1':
+            # Show teams with status 1
+            teams = TournamentGroupTeam.objects.filter(
+                tournament_id=tournament_id, status=1
+            )
+        elif team_list == '2':
+            # Show teams with status 0
+              teams = TournamentGroupTeam.objects.filter(
+                    tournament_id=tournament_id, status__in=[0, 3]
+                )
+        else:
+            return Response(
+                {"error": "Invalid team_list parameter. Use 1 for active teams, 2 for inactive teams."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Serialize the filtered teams
+        serializer = TournamentGroupTeamSerializer(teams, many=True)
+        return Response({
+            'status': 1,
+            'message': _('Team Fetched successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+############################# REJECT TEAM OF GROUP ###########################
+
+class TeamRejectRequest(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def post(self, request, *args, **kwargs):
+        team_id = request.data.get('team_id')
+        tournament_id = request.data.get('tournament_id')
+        
+        # Check if the tournament and team exist
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            team_branch = TeamBranch.objects.get(id=team_id)
+            print(team_branch)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except TeamBranch.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Team does not exist.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # If validation passes, proceed to create the team-group association
-        serializer = TournamentGroupTeamSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save()
+        # Find the existing TournamentGroupTeam entry based on tournament_id and team_branch_id
+        try:
+            tournament_group_team = TournamentGroupTeam.objects.get(
+                tournament_id=tournament,
+                team_branch_id=team_branch
+            )
+        except TournamentGroupTeam.DoesNotExist:
             return Response({
-                'status': 1,
-                'message': _('Tournament Group Team Added successfully.'),
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
-        
+                'status': 0,
+                'message': _('Team is not part of the tournament or the request does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the existing entry: set group_id to None and status to 3 (rejected)
+        tournament_group_team.status = 3  # Status 3 for rejected
+        tournament_group_team.group_id = None  # Set group_id to None
+        tournament_group_team.save()
+
+        # Serialize and return the updated object
+        serializer = TournamentGroupTeamSerializer(tournament_group_team)
         return Response({
-            'status': 0,
-            'message': _('Failed to create Tournament Group Team.'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'status': 1,
+            'message': _('Team rejected successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+        
 
 ############### Custom Pagination ###############
 class CustomBranchSearchPagination(PageNumberPagination): 

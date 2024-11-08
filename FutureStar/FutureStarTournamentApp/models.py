@@ -25,6 +25,8 @@ class Tournament(models.Model):
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
     tournament_fields = models.ForeignKey(Field,blank=True,null=True,on_delete=models.CASCADE)
     logo = models.ImageField(upload_to='tournament_logo/', blank=True, null=True)  # Add image field
+    tournament_banner = models.ImageField(upload_to='tournament_logo/', blank=True, null=True)  # Add image field
+
     tournament_joining_cost = models.CharField(max_length=255,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
@@ -58,9 +60,9 @@ class TournamentGroupTeam(models.Model):
         (REJECTED, 'REJECTED'),   
     )
     id = models.AutoField(primary_key=True)
-    group_id = models.ForeignKey(GroupTable, on_delete=models.CASCADE)
+    group_id = models.ForeignKey(GroupTable, on_delete=models.CASCADE,blank=True, null=True)
     team_branch_id = models.ForeignKey(TeamBranch, on_delete=models.CASCADE,blank=True, null=True)
-    tournament_id=models.ForeignKey(Tournament,on_delete=models.CASCADE)
+    tournament_id=models.ForeignKey(Tournament,on_delete=models.CASCADE,blank=True, null=True)
     status = models.IntegerField(choices=JOINNING_TYPE_CHOICES,default=0)  
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)

@@ -31,6 +31,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             'tournament_fields',
             'tournament_fields_name',
             'logo',
+            'tournament_banner',
             'tournament_joining_cost',
             'number_of_group',  # Add number_of_group to create groups based on selection
         ]
@@ -84,7 +85,7 @@ class TournamentGroupTeamSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = TournamentGroupTeam
-        fields = ['id','group_id','group_id_name','team_branch_id','team_branch_name','team_branch_logo','tournament_id','tournament_id_name','created_at','updated_at']
+        fields = ['id','group_id','group_id_name','team_branch_id','team_branch_name','team_branch_logo','tournament_id','tournament_id_name','status','created_at','updated_at']
 
     def get_group_id_name(self, obj):
         return obj.group_id.group_name if obj.group_id else None

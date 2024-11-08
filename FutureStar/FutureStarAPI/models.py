@@ -67,7 +67,7 @@ class TeamBranch(models.Model):
     id=models.AutoField(primary_key=True)
     team_id=models.ForeignKey(Team,on_delete=models.CASCADE)
     team_name=models.CharField(max_length=200)
-    age_group_id=models.ForeignKey(AgeGroup,on_delete=models.CASCADE)
+    age_group_id=models.ForeignKey(AgeGroup,on_delete=models.CASCADE,blank=True, null=True)
     upload_image=models.ImageField(upload_to='team/team_branch/', blank=True, null=True)
     field_size=models.ForeignKey(FieldCapacity,on_delete=models.CASCADE)
     phone = models.CharField(max_length=100,blank=True,null=True)
