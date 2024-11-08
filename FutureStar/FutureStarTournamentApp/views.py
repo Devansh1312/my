@@ -49,11 +49,14 @@ class CustomTournamentPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
@@ -120,7 +123,6 @@ class TournamentAPIView(APIView):
                 logo_path = default_storage.save(file_name, logo)
                 tournament_instance.logo = logo_path
                 tournament_instance.save()
-
             # Handle logo upload
             if 'tournament_banner' in request.FILES:
                 logo = request.FILES['tournament_banner']
@@ -132,6 +134,10 @@ class TournamentAPIView(APIView):
                 tournament_instance.save()
 
             serializer.save()
+
+
+
+
             return Response({
                 'status': 1,
                 'message': _('Tournament created successfully.'),
@@ -332,8 +338,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
             'message': _('Tournament Group Teams fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
-    
-    # Handle POST request to create TournamentGroupTeam instances
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -341,43 +345,90 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
         team_branch_id = request.data.get('team_branch_id')
 
-        group_id = request.data.get('group_id')
+        group_id = request.data.get('group_id',1)
 
         tournament_id = request.data.get('tournament_id')
 
+        
+
         # Check if tournament exists and get its capacity
+
         try:
+
             tournament = Tournament.objects.get(id=tournament_id)
+
             tournament_capacity = int(tournament.number_of_team)
+
         except Tournament.DoesNotExist:
+
             return Response({
+
                 'status': 0,
+
                 'message': _('Tournament does not exist.'),
+
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
         # Count all teams in the tournament with status 1
+
         current_team_count = TournamentGroupTeam.objects.filter(
+
             tournament_id=tournament_id, status=1
+
         ).count()
+
+        
+
         # Check if tournament team slots are full
+
         if current_team_count >= tournament_capacity:
+
             return Response({
+
                 'status': 0,
+
                 'message': _('All team slots in this tournament are filled.'),
+
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
         # Check if the team is already in this group
+
         if TournamentGroupTeam.objects.filter(
+
             team_branch_id=team_branch_id, group_id=group_id, tournament_id=tournament_id
+
         ).exists():
+
             return Response({
+
                 'status': 0,
+
                 'message': _('The team is already added to this group.'),
+
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        
+
         # Check if the team is already in another group in the same tournament
+
         existing_team = TournamentGroupTeam.objects.filter(
+
             team_branch_id=team_branch_id, tournament_id=tournament_id
+
         ).first()
+
+        
+
         # Retrieve the GroupTable instance for the given group_id
+
         group_instance = get_object_or_404(GroupTable, id=group_id)
+
+        
+
         if existing_team:
 
             # Update the existing record with new data if needed
@@ -440,12 +491,10 @@ class TeamJoiningRequest(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     
-    # Handle POST request to create a new Tournament Join instance
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-
         team_id = request.data.get('team_id')
         tournament_id = request.data.get('tournament_id')
         
@@ -506,7 +555,7 @@ class TournamentGroupTeamListView(APIView):
                 )
         else:
             return Response(
-                {"error": "Invalid team_list parameter. Use 1 for active teams, 2 for inactive teams."},
+                {"error": _("Invalid team_list parameter. Use 1 for active teams, 2 for inactive teams.")},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -584,11 +633,14 @@ class CustomBranchSearchPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             page_number = request.query_params.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
@@ -671,3 +723,114 @@ class TeamBranchSearchView(APIView):
 
         # Create response with formatted paginated data
         return paginator.get_paginated_response(formatted_data)
+    
+
+
+
+class TournamentGamesOptionsAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        group_id = request.query_params.get('group_id')
+        team_a_id = request.query_params.get('team_a')
+
+        if group_id:
+            # Get teams with the selected group_id and ACCEPTED status
+            accepted_teams = TournamentGroupTeam.objects.filter(
+                group_id=group_id, 
+                status=TournamentGroupTeam.ACCEPTED
+            ).select_related('team_branch_id')
+
+            team_a_options = [
+                {'id': team.team_branch_id.id, 'name': team.team_branch_id.team_name}
+                for team in accepted_teams.exclude(team_branch_id__id=team_a_id)
+            ]
+
+            # Exclude the selected team_a from team_b options
+            if team_a_id:
+                team_b_options = [
+                    {'id': team.team_branch_id.id, 'name': team.team_branch_id.team_name}
+                    for team in accepted_teams.exclude(team_branch_id__id=team_a_id)
+                ]
+            else:
+                team_b_options = team_a_options  # Show all if team_a not selected
+
+            return Response({
+                # "team_a_options": team_a_options,
+                "team_b_options": team_b_options
+            })
+        
+        return Response({"error": "Please provide a group_id."}, status=400)
+
+
+class TournamentGamesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Initialize the serializer with the incoming data
+        serializer = TournamentGamesSerializer(data=request.data)
+        try:
+            # Check if serializer is valid
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'status': 1,
+                    'message': _('Games Created successfully.'),
+                    'data': serializer.data
+                }, status=status.HTTP_201_CREATED)
+            else:
+                # Return validation errors if serializer is invalid
+                return Response({
+                    'status': 0,
+                    'message': _('Failed to create game.'),
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            # Handle any unexpected errors
+            return Response({
+                'status': 0,
+                'message': _('An unexpected error occurred.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+    
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Fetch all games and sort them by date and time
+        games = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
+        
+        grouped_data = defaultdict(list)
+
+        for game in games:
+            game_date = game.game_date
+            day_name = game_date.strftime('%A')  # Get the day name (e.g., "Monday")
+            game_data = {
+                'team_a': game.team_a,
+                'time': f"{game.game_start_time}",
+                'team_b': game.team_b
+            }
+            grouped_data[(day_name, game_date)].append(game_data)
+
+        # Format response data
+        formatted_data = {
+            day_date[0]: {
+                "date": day_date[1].strftime('%Y-%m-%d'),
+                "games": games
+            }
+            for day_date, games in grouped_data.items()
+        }
+
+        return Response({
+            "status": 1,
+            "message": _("Games Fetched successfully."),
+            "data": formatted_data
+        }, status=status.HTTP_200_OK)
+
+

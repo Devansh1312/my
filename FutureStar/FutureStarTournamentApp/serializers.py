@@ -24,6 +24,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             'tournament_starting_date',
             'tournament_final_date',
             'number_of_team',
+            'number_of_group',
             'age_group',
             'country',
             'country_name',
@@ -34,7 +35,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             'logo',
             'tournament_banner',
             'tournament_joining_cost',
-            'number_of_group',  # Add number_of_group to create groups based on selection
+            
         ]
 
     def get_country_name(self, obj):
@@ -101,3 +102,25 @@ class TournamentGroupTeamSerializer(serializers.ModelSerializer):
         if obj.team_branch_id and obj.team_branch_id.team_id and obj.team_branch_id.team_id.team_logo:
              return obj.team_branch_id.team_id.team_logo.url
         return None
+    
+
+class TournamentGamesSerializer(serializers.ModelSerializer):
+    group_id_name = serializers.SerializerMethodField()
+    game_field_id_name = serializers.SerializerMethodField()
+  
+
+    class Meta:
+        model = TournamentGames
+        fields = [
+            'id', 'game_number', 'game_date', 'game_start_time', 'game_end_time',
+            'group_id', 'group_id_name', 'team_a', 'team_b',
+            'game_field_id', 'game_field_id_name', 'created_at', 'updated_at'
+        ]
+
+    def get_group_id_name(self, obj):
+        return obj.group_id.group_name if obj.group_id else None
+
+    def get_game_field_id_name(self, obj):
+        return obj.game_field_id.field_name if obj.game_field_id else None
+
+    

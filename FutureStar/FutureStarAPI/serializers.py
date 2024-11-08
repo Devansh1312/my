@@ -5,6 +5,8 @@ from urllib.parse import urlparse
 from FutureStarAPI.models import *
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import default_storage
+from django.utils.translation import gettext as _
+
 from django.utils.crypto import get_random_string
 
 
@@ -23,11 +25,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         phone_exists = User.objects.filter(phone=data['phone']).exists()
 
         if username_exists and phone_exists:
-            raise serializers.ValidationError("Username and phone number already exist.")
+            raise serializers.ValidationError(_("Username and phone number already exist."))
         elif username_exists:
-            raise serializers.ValidationError("Username already exists.")
+            raise serializers.ValidationError(_("Username already exists."))
         elif phone_exists:
-            raise serializers.ValidationError("Phone number already exists.")
+            raise serializers.ValidationError(_("Phone number already exists."))
         
         return data
 
@@ -60,9 +62,9 @@ class LoginSerializer(serializers.Serializer):
         # For type 1, username_or_phone and password are required
         if login_type == 1:
             if not data.get('username'):
-                errors.append("Username or phone is required for normal login.")
+                errors.append(_("Username or phone is required for normal login."))
             if not data.get('password'):
-                errors.append("Password is required for normal login.")
+                errors.append(_("Password is required for normal login."))
             
             # Check if there are any errors to report
             if errors:
@@ -72,18 +74,17 @@ class LoginSerializer(serializers.Serializer):
             # Check if the user exists with the provided username or phone
             user = User.objects.filter(username=data['username']).first() or User.objects.filter(phone=data['username']).first()
             if user is None:
-                raise serializers.ValidationError("User with this username or phone does not exist.")
+                raise serializers.ValidationError(_("User with this username or phone does not exist."))
             
             # Check if the password is correct
             if not user.check_password(data['password']):
-                raise serializers.ValidationError("Invalid password.")
+                raise serializers.ValidationError(_("Invalid password."))
 
         # For type 2 or 3, only username (email) is required
         elif login_type in [2, 3]:
             if not data.get('username'):
                 errors.append("Email is required for type 2 and type 3 login.")
-                raise serializers.ValidationError(" ".join(errors))
-
+                raise serializers.ValidationError(_(" ".join(errors)))
         return data
 
 
@@ -406,7 +407,7 @@ class GallarySerializer(serializers.ModelSerializer):
 
         # Check if media_file is provided
         if not media_file:
-            raise serializers.ValidationError("A media file (image or video) must be provided.")
+            raise serializers.ValidationError(_("A media file (image or video) must be provided."))
         
         # Generate unique file name
         file_extension = media_file.name.split('.')[-1]
@@ -418,16 +419,16 @@ class GallarySerializer(serializers.ModelSerializer):
         data['media_file'] = logo  # Update data with the saved file path
 
         # Check MIME type to determine content type
-        mime_type, _ = mimetypes.guess_type(logo)
-        if mime_type:
-            if mime_type.startswith('image/'):
-                data['content_type'] = 1  # Image type
-            elif mime_type.startswith('video/'):
-                data['content_type'] = 2  # Video type
-            else:
-                raise serializers.ValidationError("The file must be an image or video.")
-        else:
-            raise serializers.ValidationError("The file type could not be determined.")
+        # mime_type, _ = mimetypes.guess_type(logo)
+        # if mime_type:
+        #     if mime_type.startswith('image/'):
+        #         data['content_type'] = 1  # Image type
+        #     elif mime_type.startswith('video/'):
+        #         data['content_type'] = 2  # Video type
+        #     else:
+        #         raise serializers.ValidationError(_("The file must be an image or video."))
+        # else:
+        #     raise serializers.ValidationError(_("The file type could not be determined."))
 
         return data
 
@@ -464,18 +465,18 @@ class GetGallarySerializer(serializers.ModelSerializer):
     def validate(self, data):
         media_file = data.get('media_file')
         if not media_file:
-            raise serializers.ValidationError("A media file (image or video) must be provided.")
+            raise serializers.ValidationError(_("A media file (image or video) must be provided."))
         
-        mime_type, _ = mimetypes.guess_type(media_file.name)
-        if mime_type:
-            if mime_type.startswith('image/'):
-                data['content_type'] = 1
-            elif mime_type.startswith('video/'):
-                data['content_type'] = 2
-            else:
-                raise serializers.ValidationError("The file must be an image or video.")
-        else:
-            raise serializers.ValidationError("The file type could not be determined.")
+    #     mime_type, _ = mimetypes.guess_type(media_file.name)
+    #     if mime_type:
+    #         if mime_type.startswith('image/'):
+    #             data['content_type'] = 1
+    #         elif mime_type.startswith('video/'):
+    #             data['content_type'] = 2
+    #         else:
+    #             raise serializers.ValidationError(_("The file must be an image or video."))
+    #     else:
+    #         raise serializers.ValidationError(_("The file type could not be determined."))
         return data
 class DetailAlbumSerializer(serializers.ModelSerializer):
     gallary_items = GallarySerializer(many=True, source='gallery_set', read_only=True)

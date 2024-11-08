@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
+from FutureStarTrainingGroupApp.serializers import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -140,60 +141,12 @@ def get_team_data(user, request):
         team = Team.objects.get(team_founder=user)
     except Team.DoesNotExist:
         return None  # If no team exists, return None or empty dictionary as needed
+
+    # Create the serializer with the team instance and request context
+    serializer = TeamSerializer(team, context={'request': request})
     
-    # Get follower and following counts for the team
-    followers_count = FollowRequest.objects.filter(target_id=team.id, target_type=FollowRequest.TEAM_TYPE).count()
-    following_count = FollowRequest.objects.filter(created_by_id=team.id, creator_type=FollowRequest.TEAM_TYPE).count()
-    
-    # Check if the current user is following this team
-    is_follow = FollowRequest.objects.filter(
-        created_by_id=request.user.id,
-        creator_type=FollowRequest.USER_TYPE,
-        target_id=team.id,
-        target_type=FollowRequest.TEAM_TYPE
-    ).exists()
-    
-    # Get post count for the team
-    team_post_count = Post.objects.filter(created_by_id=team.id, creator_type=FollowRequest.TEAM_TYPE).count()
-    
-    return {
-        'team_id': team.id,
-        'followers_count': followers_count,
-        'following_count': following_count,
-        'post_count': team_post_count,
-        'is_follow': is_follow,
-        'creator_type': 2,
-        'team_name': team.team_name,
-        'team_username': team.team_username,
-        'team_type_id': team.team_type.id if team.team_type else None,
-        'team_type_name': team.team_type.name_en if team.team_type else None,
-        'bio': team.bio,
-        'team_establishment_date': team.team_establishment_date,
-        'team_president': team.team_president,
-        'latitude': team.latitude,
-        'longitude': team.longitude,
-        'address': team.address,
-        'house_no': team.house_no,
-        'premises': team.premises,
-        'street': team.street,
-        'city': team.city,
-        'state': team.state,
-        'country_name': team.country_name,
-        'postalCode': team.postalCode,
-        'country_code': team.country_code,
-        'country_id': team.country_id.id if team.country_id else None,
-        'country_name': team.country_id.name if team.country_id else None,
-        'city_id': team.city_id.id if team.city_id else None,
-        'city_name': team.city_id.name if team.city_id else None,
-        'phone': team.phone,
-        'email': team.email,
-        'team_logo': team.team_logo.url if team.team_logo else None,
-        'team_background_image': team.team_background_image.url if team.team_background_image else None,
-        'team_uniform': team.team_uniform,
-        'team_founder_id': team.team_founder.id if team.team_founder else None,
-        'team_founder_username': team.team_founder.username if team.team_founder else None,
-        'team_founder_profile_picture': team.team_founder.profile_picture.url if team.team_founder and team.team_founder.profile_picture else None,
-    }
+    # Return serialized team data
+    return serializer.data
 
 
 ############################################################################# Get Group Data ######################################################
@@ -205,49 +158,12 @@ def get_group_data(user, request):
         group = TrainingGroups.objects.get(group_founder=user)
     except TrainingGroups.DoesNotExist:
         return None  # If no group exists, return None or empty dictionary as needed
-    
-    # Get follower and following counts for the group
-    followers_count = FollowRequest.objects.filter(target_id=group.id, target_type=FollowRequest.GROUP_TYPE).count()
-    following_count = FollowRequest.objects.filter(created_by_id=group.id, creator_type=FollowRequest.GROUP_TYPE).count()
-    
-    # Check if the current user is following this group
-    is_follow = FollowRequest.objects.filter(
-        created_by_id=request.user.id,
-        creator_type=FollowRequest.USER_TYPE,
-        target_id=group.id,
-        target_type=FollowRequest.GROUP_TYPE
-    ).exists()
-    
-    # Get post count for the group
-    group_post_count = Post.objects.filter(created_by_id=group.id, creator_type=FollowRequest.GROUP_TYPE).count()
-    
-    return {
-        'group_id': group.id,
-        'followers_count': followers_count,
-        'following_count': following_count,
-        'post_count': group_post_count,
-        'is_follow': is_follow,
-        'creator_type': 3,
-        'group_name': group.group_name,
-        'group_username': group.group_username,
-        'bio': group.bio,
-        'group_founder': group.group_founder.id,
-        'latitude': group.latitude,
-        'longitude': group.longitude,
-        'address': group.address,
-        'house_no': group.house_no,
-        'premises': group.premises,
-        'street': group.street,
-        'city': group.city,
-        'state': group.state,
-        'country_name': group.country_name,
-        'postalCode': group.postalCode,
-        'country_code': group.country_code,
-        'phone': group.phone,
-        'group_logo': group.group_logo.url if group.group_logo else None,
-        'group_background_image': group.group_background_image.url if group.group_background_image else None,
-    }
 
+    # Create the serializer with the group instance and request context
+    serializer = TrainingGroupSerializer(group, context={'request': request})
+    
+    # Return serialized group data
+    return serializer.data
 ###################################################### Send OTP API #############################################################################################################
               
 # Generate a random 6-digit OTP
@@ -1030,13 +946,16 @@ class CustomPostPagination(PageNumberPagination):
     max_page_size = 100  # Set max size if needed
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get the page number from the body (default: 1)
         try:
             # Try to fetch and validate the page number
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             # If the page number is invalid, return a custom error response
             return Response({
@@ -1069,6 +988,9 @@ class PostLikeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         post_id = request.data.get('post_id')
 
         if not post_id:
@@ -1208,10 +1130,11 @@ class PostCreateAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Get created_by_id and creator_type from request data
+        # Get created_by_id, creator_type, and media_type from request data
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
-
+        media_type = request.data.get('media_type')
+        print(media_type)
         if not created_by_id or not creator_type:
             return Response({
                 'status': 0,
@@ -1224,9 +1147,16 @@ class PostCreateAPIView(APIView):
 
             if "image" in request.FILES:
                 image = request.FILES["image"]
-                file_extension = image.name.split('.')[-1]
+                
+                # Determine file extension based on media_type
+                file_extension = "jpg" if media_type == "1" else "mp4" if media_type == "2" else image.name.split('.')[-1]
+                print(file_extension)
+                
+                # Generate unique file name
                 unique_suffix = get_random_string(8)
                 file_name = f"post_images/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
+                print(file_name)
+                # Save the file and assign path to post.image
                 image_path = default_storage.save(file_name, image)
                 post.image = image_path
                 post.save()
@@ -1244,6 +1174,7 @@ class PostCreateAPIView(APIView):
             'message': _('Invalid data'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
@@ -1682,13 +1613,16 @@ class CustomMediaPagination(PageNumberPagination):
     max_page_size = 100  # Set max size if needed
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get the page number from the body (default: 1)
         try:
             # Try to fetch and validate the page number
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             # If the page number is invalid, return a custom error response
             return Response({
@@ -1781,7 +1715,7 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
         if not creator_type:
             return Response({
                 'status': 0,
-                'message': 'creator_type is required.'
+                'message': _('creator_type is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Convert creator_type to int and strip created_by_id if provided
@@ -1791,7 +1725,7 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
-                'message': 'creator_type and creator_type_id must be valid integers.'
+                'message': _('creator_type and creator_type_id must be valid integers.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate created_by_id based on creator_type
@@ -1801,13 +1735,13 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
             if not Team.objects.filter(id=created_by_id).exists():
                 return Response({
                     'status': 0,
-                    'message': 'For TEAM_TYPE, created_by_id must correspond to an existing Team.'
+                    'message': _('For TEAM_TYPE, created_by_id must correspond to an existing Team.')
                 }, status=status.HTTP_400_BAD_REQUEST)
         elif creator_type == Album.GROUP_TYPE:
             if not TrainingGroups.objects.filter(id=created_by_id).exists():
                 return Response({
                     'status': 0,
-                    'message': 'For GROUP_TYPE, created_by_id must correspond to an existing Group.'
+                    'message': _('For GROUP_TYPE, created_by_id must correspond to an existing Group.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Proceed with serializer validation
@@ -1835,20 +1769,20 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
                         album_instance.delete()  # Clean up the album if any media fails
                         return Response({
                             'status': 0,
-                            'message': 'Gallery entry creation failed.',
+                            'message':_('Gallery entry creation failed.'),
                             'errors': gallary_serializer.errors
                         }, status=status.HTTP_400_BAD_REQUEST)
 
             album_data = DetailAlbumSerializer(album_instance).data
             return Response({
                 'status': 1,
-                'message': 'Detailed Albums added successfully.',
+                'message': _('Detailed Albums added successfully.'),
                 'data': [album_data]
             }, status=status.HTTP_201_CREATED)
 
         return Response({
             'status': 0,
-            'message': 'Album creation failed.',
+            'message': _('Album creation failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 ########### only album list ################
@@ -1860,6 +1794,9 @@ class AlbumListAPIView(generics.ListAPIView):
     pagination_class = CustomMediaPagination 
 
     def get_queryset(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         creator_type = self.request.query_params.get('creator_type', None)
         created_by_id = self.request.query_params.get('created_by_id', None)
 
@@ -1870,9 +1807,9 @@ class AlbumListAPIView(generics.ListAPIView):
             try:
                 creator_type = int(creator_type)
                 if creator_type not in [Album.USER_TYPE, Album.TEAM_TYPE, Album.GROUP_TYPE]:
-                    raise ValueError("Invalid creator_type.")
+                    raise ValueError(_("Invalid creator_type."))
             except (ValueError, TypeError):
-                raise Exception("creator_type must be a valid integer.")
+                raise Exception(_("creator_type must be a valid integer."))
             
             queryset = queryset.filter(creator_type=creator_type)
 
@@ -1881,15 +1818,15 @@ class AlbumListAPIView(generics.ListAPIView):
                 created_by_id = int(created_by_id)
                 if creator_type == Album.TEAM_TYPE:
                     if not Team.objects.filter(id=created_by_id).exists():
-                        raise Exception("For TEAM_TYPE, created_by_id must correspond to an existing Team.")
+                        raise Exception(_("For TEAM_TYPE, created_by_id must correspond to an existing Team."))
                 elif creator_type == Album.GROUP_TYPE:
                     if not TrainingGroups.objects.filter(id=created_by_id).exists():
-                        raise Exception("For GROUP_TYPE, created_by_id must correspond to an existing Group.")
+                        raise Exception(_("For GROUP_TYPE, created_by_id must correspond to an existing Group."))
                 # For USER_TYPE, you can check if created_by_id is the logged-in user
                 elif creator_type == Album.USER_TYPE and created_by_id != self.request.user.id:
-                    raise Exception("For USER_TYPE, created_by_id must match the logged-in user.")
+                    raise Exception(_("For USER_TYPE, created_by_id must match the logged-in user."))
             except (ValueError, TypeError):
-                raise Exception("created_by_id must be a valid integer.")
+                raise Exception(_("created_by_id must be a valid integer."))
 
             queryset = queryset.filter(created_by_id=created_by_id)
 
@@ -1955,6 +1892,9 @@ class ImageGallaryListAPIView(generics.ListAPIView):
     pagination_class = CustomMediaPagination
 
     def get_queryset(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         content_type = self.request.query_params.get('content_type', 1)  # Default to images if not specified
 
         # Base queryset for images with album_id as null and content_type for images
@@ -1974,6 +1914,10 @@ class ImageGallaryListAPIView(generics.ListAPIView):
         return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
 
@@ -2013,6 +1957,9 @@ class VideoGallaryListAPIView(generics.ListAPIView):
     pagination_class = CustomMediaPagination
 
     def get_queryset(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         content_type = self.request.query_params.get('content_type', 2)  # Default to videos if not specified
         
         # Base queryset for videos with album_id as null and content_type=2 for videos
@@ -2032,6 +1979,10 @@ class VideoGallaryListAPIView(generics.ListAPIView):
         return queryset.order_by('-created_at')
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
 
@@ -2070,6 +2021,8 @@ class VideoGallaryListAPIView(generics.ListAPIView):
             'current_page': current_page
         }, status=status.HTTP_200_OK)
 
+
+###############create gallary###################
 class GallaryCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -2154,6 +2107,7 @@ class GallaryCreateAPIView(APIView):
             'message': _('Failed to create gallery entry.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 ###########gallary list latest 9 ################
 
 class LatestGallaryListAPIView(generics.ListCreateAPIView):
@@ -2162,6 +2116,9 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         creator_type = self.request.query_params.get('creator_type')
         created_by_id = self.request.query_params.get('created_by_id', self.request.user.id)
 
@@ -2178,6 +2135,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
         return queryset
 
     def get_latest_albums(self):
+
         creator_type = self.request.query_params.get('creator_type')
         created_by_id = self.request.query_params.get('created_by_id', self.request.user.id)
 
@@ -2276,6 +2234,9 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_object(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Fetch the 'id' from the request body
         id = self.request.query_params.get('gallary_id')
         if not id:
@@ -2327,6 +2288,9 @@ class AlbumDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Fetch the 'id' from the request body
         id = self.request.query_params.get('album_id')
         if not id:
@@ -2370,6 +2334,9 @@ class SponsorAPI(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         creator_type = request.query_params.get('creator_type')
         created_by_id = request.query_params.get('created_by_id')
 
@@ -2404,6 +2371,9 @@ class SponsorAPI(APIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         data = request.data
         name = data.get('name')
         url = data.get('url')
@@ -2472,6 +2442,9 @@ class SponsorDetailAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         sponsor_id = request.query_params.get('sponsor_id')
 
         if not sponsor_id:
@@ -2506,6 +2479,9 @@ class SponsorDetailAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
     def put(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         sponsor_id = request.data.get('sponsor_id')
         creator_type = request.data.get('creator_type')
         created_by_id = request.data.get('created_by_id')
@@ -2557,6 +2533,9 @@ class SponsorDetailAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
     def delete(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         sponsor_id = request.query_params.get('sponsor_id')
 
         if not sponsor_id:
@@ -2622,6 +2601,9 @@ class PostReportCreateView(generics.CreateAPIView):
         serializer.save(creator_type=creator_type, created_by_id=created_by_id)
 
     def create(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Overriding the create method to return a custom response
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -2707,6 +2689,9 @@ class UserGenderListAPIView(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get all genders
         user_genders = self.get_queryset()
         serializer = self.get_serializer(user_genders, many=True)
@@ -2752,6 +2737,9 @@ class UserRoleListAPIView(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get all genders
         user_role = self.get_queryset()
         serializer = self.get_serializer(user_role, many=True)
@@ -2809,6 +2797,9 @@ class FollowUnfollowAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)    
     def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         creator_type = request.data.get('creator_type')
         created_by_id = request.data.get('created_by_id')
         target_id = request.data.get('target_id')
@@ -2865,6 +2856,9 @@ class CustomFollowRequestPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             page_number = request.query_params.get(self.page_query_param, 1)
             self.page = int(page_number)
@@ -2911,6 +2905,9 @@ class ListFollowersAPI(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         target_id = self.request.query_params.get('created_by_id')
         target_type = self.request.query_params.get('creator_type')
         search_key = self.request.query_params.get('search_key', '')
@@ -2931,6 +2928,9 @@ class ListFollowersAPI(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get target ID and type for is_follow check
         target_id = self.request.query_params.get('created_by_id')
         target_type = self.request.query_params.get('creator_type')
@@ -2990,6 +2990,9 @@ class ListFollowingAPI(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         creator_type = self.request.query_params.get('creator_type')
         created_by_id = self.request.query_params.get('created_by_id')
         search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
@@ -3012,6 +3015,9 @@ class ListFollowingAPI(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get the paginated page object
         page = self.paginate_queryset(self.get_queryset())
         following = []
@@ -3080,6 +3086,9 @@ class EventLikeAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         event_id = request.data.get('event_id')
         creator_type = request.data.get('creator_type', EventLike.USER_TYPE)
         created_by_id = request.data.get('created_by_id', request.user.id)
@@ -3250,11 +3259,14 @@ class CustomEventPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
@@ -3296,7 +3308,7 @@ class EventsAPIView(APIView):
         except ValueError:
             return Response({
                 'status': 0,
-                'message': 'Invalid events_section value. It must be an integer.'
+                'message': _('Invalid events_section value. It must be an integer.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if events_section == 1:
@@ -3323,7 +3335,7 @@ class EventsAPIView(APIView):
         else:
             return Response({
                 'status': 0,
-                'message': 'Invalid events_section value. Allowed values are 1 or 2.'
+                'message': _('Invalid events_section value. Allowed values are 1 or 2.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Paginate the queryset
@@ -3403,6 +3415,9 @@ class EventCreateAPIView(generics.CreateAPIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         data = request.data.copy()
         data['event_organizer'] = request.user.id  # Set the event organizer to the logged-in user
 
@@ -3414,7 +3429,7 @@ class EventCreateAPIView(generics.CreateAPIView):
         if creator_type is None:
             return Response({
                 'status': 0,
-                'message': 'creator_type must be provided.'
+                'message': _('creator_type must be provided.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -3422,7 +3437,7 @@ class EventCreateAPIView(generics.CreateAPIView):
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
-                'message': 'creator_type must be a valid integer.'
+                'message': _('creator_type must be a valid integer.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Logic for handling creator_type and created_by_id
@@ -3431,7 +3446,7 @@ class EventCreateAPIView(generics.CreateAPIView):
             if created_by_id is None:
                 return Response({
                     'status': 0,
-                    'message': 'created_by_id must be provided for TEAM_TYPE.'
+                    'message': _('created_by_id must be provided for TEAM_TYPE.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -3439,7 +3454,7 @@ class EventCreateAPIView(generics.CreateAPIView):
             except (ValueError, TypeError):
                 return Response({
                     'status': 0,
-                    'message': 'created_by_id must be a valid integer.'
+                    'message': _('created_by_id must be a valid integer.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Validate if created_by_id exists in Team model
@@ -3454,7 +3469,7 @@ class EventCreateAPIView(generics.CreateAPIView):
         else:
             return Response({
                 'status': 0,
-                'message': 'Invalid creator type.'
+                'message': _('Invalid creator type.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Add validated creator_type to data
@@ -3491,6 +3506,9 @@ class UpdateEventAPIView(APIView):
 
 
     def get_object(self, event_id):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             return Event.objects.get(id=event_id, event_organizer=self.request.user)
         except Event.DoesNotExist:
@@ -3551,6 +3569,9 @@ class EventBookingDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Fetch event_id from query parameters
         event_id = request.query_params.get("event_id")
         
@@ -3620,7 +3641,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
         if creator_type is None:
             return Response({
                 'status': 0,
-                'message': 'creator_type must be provided.'
+                'message': _('creator_type must be provided.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -3628,7 +3649,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
-                'message': 'creator_type must be a valid integer.'
+                'message': _('creator_type must be a valid integer.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Logic for handling creator_type and created_by_id
@@ -3642,7 +3663,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
         else:
             return Response({
                 'status': 0,
-                'message': 'Invalid creator type.'
+                'message': _('Invalid creator type.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Prepare data for booking creation
@@ -3727,6 +3748,9 @@ class FAQListAPIView(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Get all genders
         faq = self.get_queryset()
         serializer = self.get_serializer(faq, many=True)
@@ -3744,6 +3768,9 @@ class GeneralSettingsList(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         general_settings = SystemSettings.objects.first()
 
         if not general_settings:

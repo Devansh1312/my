@@ -513,11 +513,14 @@ class CustomUserSearchPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             page_number = request.query_params.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError("Page number must be a positive integer.")
+                raise ValidationError(_("Page number must be a positive integer."))
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
@@ -542,9 +545,12 @@ class CustomUserSearchPagination(PageNumberPagination):
         return list(page)
 
     def get_paginated_response(self, data):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         return Response({
             'status': 1,
-            'message': 'Data fetched successfully.',
+            'message': _('Data fetched successfully.'),
             'total_records': self.total_records,
             'total_pages': self.total_pages,
             'current_page': self.page,
@@ -567,10 +573,7 @@ class UserSearchView(APIView):
 
         # Check for valid search_type, comparing with string values
         if search_type not in ['1', '2']:
-            return Response({
-                'status': 0, 
-                'message': _('Invalid search type.')
-                }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Invalid search type. Must be 1 or 2.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Initialize a queryset
         users = User.objects.none()

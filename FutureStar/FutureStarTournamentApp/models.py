@@ -72,3 +72,23 @@ class TournamentGroupTeam(models.Model):
     
     class Meta:
         db_table = 'futurestar_app_tournament_groupteam'
+
+
+class TournamentGames(models.Model):
+    id=models.AutoField(primary_key=True)
+    game_number=models.IntegerField(blank=True, null=True)
+    game_date=models.DateField(blank=True, null=True)
+    game_start_time=models.TimeField(blank=True, null=True)
+    game_end_time=models.TimeField(blank=True, null=True)
+    group_id=models.ForeignKey(GroupTable,on_delete=models.CASCADE,blank=True, null=True)
+    team_a=models.CharField(max_length=100,blank=True, null=True)
+    team_b=models.CharField(max_length=100,blank=True, null=True)
+    game_field_id=models.ForeignKey(Field,on_delete=models.CASCADE,blank=True, null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.game_number} - {self.game_date} - {self.group_id}'
+    
+    class Meta:
+        db_table = 'futurestar_app_tournament_games'
