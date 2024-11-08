@@ -9,17 +9,15 @@ from FutureStarAPI.models import *
 from django.core.files.images import get_image_dimensions
 
 
-
-
 class TrainingGroupSerializer(serializers.ModelSerializer):
-    post_count = serializers.SerializerMethodField()  # Adding the post count field
-    followers_count = serializers.SerializerMethodField()  # Adding the followers count field
-    following_count = serializers.SerializerMethodField()  # Adding the following count field
-    is_follow = serializers.SerializerMethodField()  # Adding the is_follow field
-    group_logo_url = serializers.SerializerMethodField()
-    group_background_image_url = serializers.SerializerMethodField()
+    post_count = serializers.SerializerMethodField()  
+    followers_count = serializers.SerializerMethodField()  
+    following_count = serializers.SerializerMethodField() 
+    is_follow = serializers.SerializerMethodField()
+    group_logo = serializers.SerializerMethodField()
+    group_background_image = serializers.SerializerMethodField()
     group_founder = serializers.SerializerMethodField()
-    creator_type = serializers.IntegerField(default=3, read_only=True)  # Static field with value 2
+    creator_type = serializers.IntegerField(default=3, read_only=True)
 
 
     class Meta:
@@ -29,7 +27,7 @@ class TrainingGroupSerializer(serializers.ModelSerializer):
             'latitude', 'longitude', 'address', 'house_no', 'premises', 'street',
             'city', 'state', 'country_name', 'postalCode', 'country_code',
             'phone', 'group_logo', 'group_background_image', 'post_count', 
-            'group_logo_url', 'group_background_image_url', 'post_count', 'followers_count', 
+            'post_count', 'followers_count', 
             'following_count', 'is_follow','creator_type'
         ]
     
@@ -46,11 +44,11 @@ class TrainingGroupSerializer(serializers.ModelSerializer):
         }
     
 
-    def get_group_logo_url(self, obj):
+    def get_group_logo(self, obj):
         """Get the URL of the group logo."""
         return obj.group_logo.url if obj.group_logo else None
 
-    def get_group_background_image_url(self, obj):
+    def get_group_background_image(self, obj):
         """Get the URL of the group background image."""
         return obj.group_background_image.url if obj.group_background_image else None
     
