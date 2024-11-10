@@ -803,22 +803,18 @@ class TournamentGamesAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Fetch all games and sort them by date and time
         games = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
+        serializer = TournamentGamesSerializer(games, many=True)
         
         grouped_data = defaultdict(list)
 
         for game in games:
             game_date = game.game_date
-            day_name = game_date.strftime('%A')  # Get the day name (e.g., "Monday")
-            game_data = {
-                'team_a': game.team_a,
-                'time': f"{game.game_start_time}",
-                'team_b': game.team_b
-            }
+            day_name = game_date.strftime('%A')
+            game_data = serializer.data  # Use the serialized data
+            
             grouped_data[(day_name, game_date)].append(game_data)
 
-        # Format response data
         formatted_data = {
             day_date[0]: {
                 "date": day_date[1].strftime('%Y-%m-%d'),
@@ -832,5 +828,3 @@ class TournamentGamesAPIView(APIView):
             "message": _("Games Fetched successfully."),
             "data": formatted_data
         }, status=status.HTTP_200_OK)
-
-

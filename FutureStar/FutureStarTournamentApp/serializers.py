@@ -107,14 +107,15 @@ class TournamentGroupTeamSerializer(serializers.ModelSerializer):
 class TournamentGamesSerializer(serializers.ModelSerializer):
     group_id_name = serializers.SerializerMethodField()
     game_field_id_name = serializers.SerializerMethodField()
-  
+    team_a_details = serializers.SerializerMethodField()
+    team_b_details = serializers.SerializerMethodField()
 
     class Meta:
         model = TournamentGames
         fields = [
             'id', 'game_number', 'game_date', 'game_start_time', 'game_end_time',
-            'group_id', 'group_id_name', 'team_a', 'team_b',
-            'game_field_id', 'game_field_id_name', 'created_at', 'updated_at'
+            'group_id', 'group_id_name', 'team_a', 'team_a_details', 'team_b', 
+            'team_b_details', 'game_field_id', 'game_field_id_name', 'created_at', 'updated_at'
         ]
 
     def get_group_id_name(self, obj):
@@ -123,4 +124,24 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
     def get_game_field_id_name(self, obj):
         return obj.game_field_id.field_name if obj.game_field_id else None
 
-    
+    def get_team_a_details(self, obj):
+        return self._get_team_details(obj, obj.team_a)
+
+    def get_team_b_details(self, obj):
+        return self._get_team_details(obj, obj.team_b)
+
+    def _get_team_details(self, obj, team_name):
+        try:
+            team_entry = TournamentGroupTeam.objects.filter(
+                group_id=obj.group_id,
+                team_branch_id__team_name=team_name,
+                status=TournamentGroupTeam.ACCEPTED
+            ).select_related('team_branch_id').first()
+            
+            if team_entry and team_entry.team_branch_id:
+                return {
+                    'name': team_entry.team_branch_id.team_name,
+                    'logo': team_entry.team_branch_id.team_logo.url if team_entry.team_branch_id.team_logo else None
+                }
+        except TournamentGroupTeam.DoesNotExist:
+            return None
