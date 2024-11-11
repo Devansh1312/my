@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from FutureStarAPI.serializers import *
+from FutureStarAPI.views import get_group_data,get_user_data
 from FutureStarTeamApp.serializers import *
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from FutureStar_App.models import *
@@ -36,10 +37,19 @@ class TeamViewAPI(APIView):
             try:
                 team = Team.objects.get(id=team_id)
                 serializer = TeamSerializer(team, context={'request': request})  # Pass request in context
+                user = request.user
+                # Fetch user data
+                user_data = get_user_data(user, request)
+                # Fetch group data
+                group_data = get_group_data(user, request)
                 return Response({
                     'status': 1,
                     'message': _('Team data retrieved successfully.'),
-                    'data': serializer.data
+                    'data': {
+                        'user': user_data,
+                        'team': serializer.data,
+                        'group': group_data
+                    }
                 }, status=status.HTTP_200_OK)
             except Team.DoesNotExist:
                 return Response({
@@ -59,7 +69,7 @@ class TeamViewAPI(APIView):
                 type_name = category.name_en
             type_data.append({
                 'id': category.id,
-                'type_name': type_name
+                'name': type_name
             })
 
         return Response({
@@ -126,11 +136,20 @@ class TeamViewAPI(APIView):
 
         # Serialize the data
         serializer = TeamSerializer(team_instance)
+        # Fetch user data
+        user_data = get_user_data(user, request)
+        # Fetch group data
+        group_data = get_group_data(user, request)
+
 
         return Response({
             'status': 1,
             'message': _('Team created successfully.'),
-            'data': serializer.data
+            'data': {
+                'user': user_data,
+                'team': serializer.data,
+                'group': group_data
+            }
         }, status=status.HTTP_201_CREATED)
 
 
@@ -309,9 +328,29 @@ class TeamViewAPI(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
     
-
-
-
+    ############### Team Delete API ###################
+    def delete(self, request, *args, **kwargs):
+        # Set language based on the 'Language' header
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Get the team_id from query parameters
+        team_id = request.query_params.get('team_id', None)
+        if not team_id:
+            return Response({
+              'status': 0,
+              'message': _('Team ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            team_instance = Team.objects.get(id=team_id, team_founder=request.user)
+            team_instance.delete()
+            return Response({
+               'status': 1,
+              'message': _('Team deleted successfully.')
+            }, status=status.HTTP_200_OK)
+        
+############# Team Branch Create API #################    
 class TeamBranchAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -558,6 +597,7 @@ class CustomUserSearchPagination(PageNumberPagination):
         })
     
 
+############### User Search View ###############
 class UserSearchView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)

@@ -320,7 +320,7 @@ class FieldSerializer(serializers.ModelSerializer):
     country_id_name = serializers.SerializerMethodField()
     class Meta:
         model = Field
-        fields = ['field_name', 'image', 'field_capacity', 'ground_type', 'country_id','country_id_name', 'city_id','city_id_name', 'latitude', 'longitude', 'address', 'house_no', 
+        fields = ['id','field_name', 'image', 'field_capacity', 'ground_type', 'country_id','country_id_name', 'city_id','city_id_name', 'latitude', 'longitude', 'address', 'house_no', 
             'premises', 'street', 'city', 'state', 'country_name', 
             'postalCode', 'country_code', 'additional_information']  # Exclude user_id
     def get_country_id_name(self, obj):
