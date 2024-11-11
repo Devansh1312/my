@@ -730,16 +730,19 @@ class TeamBranchSearchView(APIView):
 class TournamentGamesOptionsAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
+        tournament_id = request.query_params.get('tournament_id')
         group_id = request.query_params.get('group_id')
         team_a_id = request.query_params.get('team_a')
 
-        if group_id:
-            # Get teams with the selected group_id and ACCEPTED status
+        if tournament_id and group_id:
+            # Get teams with the selected tournament_id, group_id, and ACCEPTED status
             accepted_teams = TournamentGroupTeam.objects.filter(
-                group_id=group_id, 
+                tournament_id=tournament_id,
+                group_id=group_id,
                 status=TournamentGroupTeam.ACCEPTED
             ).select_related('team_branch_id')
 
+            # Get team_a options excluding the selected team_a_id
             team_a_options = [
                 {'id': team.team_branch_id.id, 'name': team.team_branch_id.team_name}
                 for team in accepted_teams.exclude(team_branch_id__id=team_a_id)
@@ -755,12 +758,11 @@ class TournamentGamesOptionsAPIView(APIView):
                 team_b_options = team_a_options  # Show all if team_a not selected
 
             return Response({
-                # "team_a_options": team_a_options,
+                "team_a_options": team_a_options,
                 "team_b_options": team_b_options
             })
         
-        return Response({"error": "Please provide a group_id."}, status=400)
-
+        return Response({"error": "Please provide both tournament_id and group_id."}, status=400)
 
 class TournamentGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -799,30 +801,85 @@ class TournamentGamesAPIView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
     
     def get(self, request, *args, **kwargs):
+        # Activate language based on the 'Language' header
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-
+        
+        # Query games and order them
         games = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
         serializer = TournamentGamesSerializer(games, many=True)
         
         grouped_data = defaultdict(list)
-
-        for game in games:
+        
+        # Organize games by day name and date
+        for game, game_data in zip(games, serializer.data):
             game_date = game.game_date
             day_name = game_date.strftime('%A')
-            game_data = serializer.data  # Use the serialized data
             
-            grouped_data[(day_name, game_date)].append(game_data)
+            # Retrieve team names based on IDs
+            team_a_branch = TeamBranch.objects.filter(id=game.team_a).first()
+            team_b_branch = TeamBranch.objects.filter(id=game.team_b).first()
 
+            # Ensure we have a valid team_a_name and team_b_name
+            team_a_name = team_a_branch.team_name if team_a_branch else None
+            team_b_name = team_b_branch.team_name if team_b_branch else None
+
+            # Retrieve team logos from Team based on team IDs in TeamBranch
+            print(team_a_branch.team_id.id)
+            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id.id else None
+            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id.id else None
+        
+            # Update game data with team names and logos
+            team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
+            team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
+
+            print(team_a_logo_path)
+            print(team_b_logo_path)
+
+            game_data.update({
+                "team_a_name": team_a_name,
+                "team_b_name": team_b_name,
+                "team_a_logo": team_a_logo_path if team_a_logo_path else None,
+                "team_b_logo": team_b_logo_path if team_b_logo_path else None,
+            })
+            grouped_data[(day_name, game_date)].append(game_data)
+        
+        # Format the response data
+           # Grouping games by (day_name, game_date) key
+       
+        # Format the response data
         formatted_data = {
-            day_date[0]: {
-                "date": day_date[1].strftime('%Y-%m-%d'),
-                "games": games
+            f"{day_name},{game_date.strftime('%Y-%m-%d')}": {
+                "games": [{
+                    "id": game['id'],
+                    "game_number": game['game_number'],
+                    "game_date": game['game_date'],
+                    "game_start_time": game['game_start_time'],
+                    "game_end_time": game['game_end_time'],
+                    "group_id": game['group_id'],
+                    "group_id_name": game['group_id_name'],
+                    "team_a": game['team_a'],
+                    "team_a_name": game['team_a_name'],
+                    "team_a_logo": game['team_a_logo'],
+
+                    "team_b": game['team_b'],
+                    
+                    "team_b_name": game['team_b_name'],
+                    "team_b_logo": game['team_b_logo'],
+
+                    "game_field_id": game['game_field_id'],
+                    "game_field_id_name": game['game_field_id_name'],
+
+                    "created_at": game['created_at'],
+                    "updated_at": game['updated_at'],
+                } for game in games]
             }
-            for day_date, games in grouped_data.items()
+            for (day_name, game_date), games in grouped_data.items()
+           
         }
 
+        
         return Response({
             "status": 1,
             "message": _("Games Fetched successfully."),
