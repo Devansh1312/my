@@ -3841,3 +3841,20 @@ class AgeGroupListAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class InjuryListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        injury = InjuryType.objects.all()
+        serializer = InjurySerializer(injury, many=True,context={'request': request})
+        return Response({
+           'status': 1,
+           'message': _('Injury fetched successfully.'),
+            'data': serializer.data,
+        }, status=status.HTTP_200_OK)

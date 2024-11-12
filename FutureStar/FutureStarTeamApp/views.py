@@ -17,6 +17,7 @@ from django.utils.crypto import get_random_string
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
+from django.conf import settings
 
 
 ################################################################## TEAM API ###############################################################################################
@@ -124,7 +125,7 @@ class TeamViewAPI(APIView):
             logo = request.FILES['team_logo']
             file_extension = logo.name.split('.')[-1]
             unique_suffix = get_random_string(8)
-            file_name = f"team/team_logo/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
+            file_name = f"team/team_logo/{team_instance.team_founder.id}_{team_instance.id}_{unique_suffix}.{file_extension}"
             logo_path = default_storage.save(file_name, logo)
             team_instance.team_logo = logo_path
 
@@ -243,7 +244,7 @@ class TeamViewAPI(APIView):
             background_image = request.FILES['team_background_image']
             file_extension = background_image.name.split('.')[-1]
             unique_suffix = get_random_string(8)  # Ensure the name is unique
-            file_name = f"team/team_background_image/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
+            file_name = f"team/team_background_image/{team_instance.team_founder.id}_{team_instance.id}_{unique_suffix}.{file_extension}"
             background_image_path = default_storage.save(file_name, background_image)
             team_instance.team_background_image = background_image_path
 
@@ -256,16 +257,20 @@ class TeamViewAPI(APIView):
                     if default_storage.exists(old_uniform):
                         default_storage.delete(old_uniform)
 
-            # Upload new team uniform with unique filenames
+            # Upload new team uniform with unique filenames and save with full paths
             uniforms = request.FILES.getlist('team_uniform')
             team_uniform_images = []
             for uniform in uniforms:
                 unique_suffix = get_random_string(8)
                 file_extension = uniform.name.split('.')[-1]
-                file_name = f"team/team_uniform/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
+                file_name = f"team/team_uniform/{team_instance.team_founder.id}_{team_instance.id}_{unique_suffix}.{file_extension}"
                 uniform_path = default_storage.save(file_name, uniform)
-                team_uniform_images.append(uniform_path)
 
+                # Use full URL path including MEDIA_URL
+                full_path = f"{settings.MEDIA_URL}{uniform_path}"
+                team_uniform_images.append(full_path)
+
+            # Save with comma-separated paths
             team_instance.team_uniform = ','.join(team_uniform_images)
 
 
@@ -313,7 +318,7 @@ class TeamViewAPI(APIView):
             logo = request.FILES['team_logo']
             file_extension = logo.name.split('.')[-1]
             unique_suffix = get_random_string(8)  # Generate a random suffix to ensure unique filenames
-            file_name = f"team/team_logo/{team_instance.team_founder}_{team_instance.id}_{unique_suffix}.{file_extension}"
+            file_name = f"team/team_logo/{team_instance.team_founder.id}_{team_instance.id}_{unique_suffix}.{file_extension}"
             logo_path = default_storage.save(file_name, logo)
             team_instance.team_logo = logo_path
 

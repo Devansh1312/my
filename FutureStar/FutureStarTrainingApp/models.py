@@ -54,8 +54,6 @@ class Training(models.Model):
         db_table = 'futurestar_app_training'
 
 
-
-
 class TrainingLike(models.Model):
     USER_TYPE = 1
     TEAM_TYPE = 2
@@ -110,6 +108,8 @@ class Training_Joined(models.Model):
   training = models.ForeignKey(Training, related_name='joined', on_delete=models.CASCADE)
   user = models.ForeignKey(User, related_name='joined_training', on_delete=models.CASCADE)
   attendance_status = models.BooleanField(default=False)
+  rating = models.IntegerField(default=0,null=True, blank=True)
+  injury_type = models.ManyToManyField(InjuryType, blank=True)  # Change to ManyToManyField
   created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
   updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
@@ -121,3 +121,16 @@ class Training_Joined(models.Model):
       unique_together = ('user', 'training')
 
 
+class Training_Feedback(models.Model):
+    training = models.ForeignKey(Training, related_name='feedback', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='feedback', on_delete=models.CASCADE)
+    feedback = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f'Feedback by {self.user} on {self.training}'
+    
+    class Meta:
+        db_table = 'futurestar_app_training_feedback'
