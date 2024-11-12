@@ -15,7 +15,7 @@
 </style>
 
 {% block title %}
-event List View
+Team Detail page
 {% endblock %}
 
 {% block content %}
@@ -33,88 +33,88 @@ event List View
             <div class="card">
                <div class="card-body">
                 <div class="container mt-5">
-                    <h3>event Details</h3>
+                    <h3>Team Details</h3>
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <strong>event Name:</strong> {{ event.event_name }}
+                            <strong>Team Name:</strong> {{ team.team_name }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>event Username:</strong> {{ event.event_username }}
+                            <strong>Team Username:</strong> {{ team.team_username }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Created By:</strong> {{ event.user_id.username }}
+                            <strong>Created By:</strong> {{ team.user_id.username }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>event Type:</strong> {{ event.event_type.name_en }}
+                            <strong>Team Type:</strong> {{ team.team_type.name_en }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Bio:</strong> {{ event.bio }}
+                            <strong>Bio:</strong> {{ team.bio }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Establishment Date:</strong> {{ event.event_establishment_date }}
+                            <strong>Establishment Date:</strong> {{ team.team_establishment_date }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>President:</strong> {{ event.event_president }}
+                            <strong>President:</strong> {{ team.team_president }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Latitude:</strong> {{ event.latitude }}
+                            <strong>Latitude:</strong> {{ team.latitude }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Longitude:</strong> {{ event.longitude }}
+                            <strong>Longitude:</strong> {{ team.longitude }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Address:</strong> {{ event.address }}
+                            <strong>Address:</strong> {{ team.address }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>House No:</strong> {{ event.house_no }}
+                            <strong>House No:</strong> {{ team.house_no }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Premises:</strong> {{ event.premises }}
+                            <strong>Premises:</strong> {{ team.premises }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Street:</strong> {{ event.street }}
+                            <strong>Street:</strong> {{ team.street }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>City:</strong> {{ event.city }}
+                            <strong>City:</strong> {{ team.city }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>State:</strong> {{ event.state }}
+                            <strong>State:</strong> {{ team.state }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Country:</strong> {{ event.country_name }}
+                            <strong>Country:</strong> {{ team.country_name }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Postal Code:</strong> {{ event.postalCode }}
+                            <strong>Postal Code:</strong> {{ team.postalCode }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Country Code:</strong> {{ event.country_code }}
+                            <strong>Country Code:</strong> {{ team.country_code }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Phone:</strong> {{ event.phone }}
+                            <strong>Phone:</strong> {{ team.phone }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Email:</strong> {{ event.email }}
+                            <strong>Email:</strong> {{ team.email }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Age Group:</strong> {{ event.age_group }}
+                            <strong>Age Group:</strong> {{ team.age_group }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Entry Fees:</strong> {{ event.entry_fees }}
+                            <strong>Entry Fees:</strong> {{ team.entry_fees }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>Branches:</strong> {{ event.branches }}
+                            <strong>Branches:</strong> {{ team.branches }}
                         </div>
                         <div class="col-md-4 mb-3">
-                            <strong>event Logo:</strong> 
-                            <img src="{{ event.event_logo.url }}" alt="event Logo" class="img-fluid">
+                            <strong>Team Logo:</strong> 
+                            <img src="{{ team.team_logo.url }}" alt="Team Logo" class="img-fluid">
                         </div>
                         <div class="col-md-4 mb-3">
                             <strong>Background Image:</strong>
-                            <img src="{{ event.event_background_image.url }}" alt="Background Image" class="img-fluid">
+                            <img src="{{ team.team_background_image.url }}" alt="Background Image" class="img-fluid">
                         </div>
                         <div class="col-md-12 mb-3">
                             <strong>Uniform:</strong>
-                            <img src="{{ event.event_uniform.url }}" alt="Uniform" class="img-fluid">
+                            <img src="{{ team.team_uniform.url }}" alt="Uniform" class="img-fluid">
                         </div>
                     </div>
                 </div>
@@ -176,16 +176,14 @@ event List View
                                                                 <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                                                     <ul style="list-style: none; padding: 0; margin: 0;">
                                                                         <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                                        
-                                                                           <a href="#" class="view-details" data-id="{{ team.id }}">View</a>
-                                                                        <form id="view-form-{{ team.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;">
-                                                                           {% csrf_token %}
-                                                                           <input type="hidden" name="team_id" value="{{ team.id }}">
-                                                                        </form>
-                        
+                                                                            <a href="#" class="view-details" data-id="{{ branch.id }}">View</a>
+                                                                            <form id="view-form-{{ branch.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;">
+                                                                                {% csrf_token %}
+                                                                                <input type="hidden" name="branch_id" value="{{ branch.id }}">
+                                                                            </form>
                                                                         </li> 
                                                                     </ul>
-                                                                </div>
+                                                                </div>                                                                
                                                             </div>
                                                         </td>
                                                         </tr>
@@ -325,8 +323,7 @@ event List View
 
 
 
-    // Toggle the visibility of the action card
-   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+    document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
         menu.addEventListener('click', function(event) {
             event.preventDefault();
             var actionCard = menu.nextElementSibling;
@@ -335,11 +332,20 @@ event List View
             document.querySelectorAll('.action-card').forEach(function(card) {
                 if (card !== actionCard) {
                     card.style.display = 'none';
-            }
+                }
+            });
         });
     });
-});
-
+    
+    document.querySelectorAll('.view-details').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var branchId = link.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + branchId);
+            form.submit(); // Submits the form programmatically
+        });
+    });
+    
 
 
 

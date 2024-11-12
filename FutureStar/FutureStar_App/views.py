@@ -5503,8 +5503,8 @@ class TeamDetailView(LoginRequiredMixin, View):
 class BranchDetailView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/List_Of_Teams/Branch_Details.html" 
 
-    def get_branch_related_data(self, team):
-        branches = TeamBranch.objects.filter(team_id=team)
+    def get_branch_related_data(self, branch):
+        branches = TeamBranch.objects.filter(id=branch.id)
         return branches
 
     def get(self, request):
@@ -5516,6 +5516,25 @@ class BranchDetailView(LoginRequiredMixin, View):
         try:
             branches = self.get_branch_related_data(branch)
 
+            return render(
+                request,
+                self.template_name,
+                {
+                    "branches": branches,
+                    "breadcrumb": {"child": "Branch Detail"},
+                },
+            )
+        except TeamBranch.DoesNotExist:
+            return redirect('Dashboard')
+    
+    def post(self, request):
+        branch_id = request.POST.get('branch_id')  # Retrieve `branch_id` from POST data
+
+        # Retrieve branch details or redirect if not found
+        branch = get_object_or_404(TeamBranch, id=branch_id)
+
+        try:
+            branches = self.get_branch_related_data(branch)
             return render(
                 request,
                 self.template_name,
