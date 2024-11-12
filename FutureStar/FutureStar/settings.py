@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'FutureStarTournamentApp',
     'FutureStarTrainingGroupApp',
     'FutureStarTrainingApp',
+    'FutureStarGameSystem',
     'sass_processor',
     'widget_tweaks',
     'corsheaders',
