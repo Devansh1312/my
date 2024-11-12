@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+{% endblock %}
+
+<style>
+   .is-invalid {
+       border-color: #dc3545;
+       background-color: #f8d7da;
+   }
+</style>
+
+{% block title %}
+event List View
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{breadcrumb.child}}</h3>
+            </div>
+         </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="container mt-5">
+                        <h3>Branch Details</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <strong>Team Name:</strong> {{ branch.team_name }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Age Group:</strong> {{ branch.age_group_id }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Field Size:</strong> {{ branch.field_size }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Phone:</strong> {{ branch.phone }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Email:</strong> {{ branch.email }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Gender:</strong> {{ branch.gender }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Address:</strong> {{ branch.address }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>House No:</strong> {{ branch.house_no }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Premises:</strong> {{ branch.premises }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Street:</strong> {{ branch.street }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>City:</strong> {{ branch.city }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>State:</strong> {{ branch.state }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Country:</strong> {{ branch.country_name }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Postal Code:</strong> {{ branch.postalCode }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Country Code:</strong> {{ branch.country_code }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Entry Fees:</strong> {{ branch.entry_fees }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Description:</strong> {{ branch.description }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Image:</strong> 
+                                {% if branch.upload_image %}
+                                    <img src="{{ branch.upload_image.url }}" alt="Branch Image" class="img-fluid">
+                                {% else %}
+                                    No Image Available
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <strong>Created At:</strong> {{ branch.created_at }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Datatable Section  -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body"> 
+                                <!-- Add tab navigation  -->
+                                <ul class="nav nav-tabs" id="dataTab" role="tablist">
+                                    <li class="nav-item">
+                                    <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">members </a>
+                                    </li>
+                                </ul>
+            
+                                <div class="tab-content" id="dataTabContent"> 
+                                    <!-- member Tab  -->
+                                    <div class="tab-pane fade show active" id="member" role="tabpanel" aria-labelledby="member-tab">
+                                    <div class="table-responsive">
+                                        <table class="display" id="member-table">
+                                            <thead> 
+                                                <tr>
+                                                <th>No</th>
+                                                <th>member Name</th>
+                                                <th>Age Group</th>
+                                                <th>Image</th>
+                                                <th>Entry Fees</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for branch in branches %}
+                                                <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ branch.event_name }}</td>
+                                                <td>{{ branch.age_group_id.name_en }}</td>
+                                                <td>
+                                                    <img src="{{ branch.upload_image }}"  width="100" height="100">
+                                                </td>                                      
+                                                <td>{{ branch.entry_fees }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+
+
+<script>
+
+
+
+
+
+    // Toggle the visibility of the action card
+   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+        menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+                if (card !== actionCard) {
+                    card.style.display = 'none';
+            }
+        });
+    });
+});
+
+
+
+
+$(document).ready(function() {
+    // Initialize datatables for both tables
+    $('#member-table').DataTable();
+    $('#sponsers-table').DataTable();
+    $('#post-table').DataTable();
+    $('#event-table').DataTable();
+    
+    // Adjust DataTables when tabs are switched
+    $('#dataTab a').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href"); 
+        if (target === "#member") {
+            $('#member-table').DataTable().columns.adjust().draw(); 
+        } 
+        else if (target === "#sponsers") {
+            $('#sponsers-table').DataTable().columns.adjust().draw(); 
+        }
+        else if (target === "#post") {
+            $('#post-table').DataTable().columns.adjust().draw(); 
+        }
+        else if (target === "#event") {
+            $('#event-table').DataTable().columns.adjust().draw(); 
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

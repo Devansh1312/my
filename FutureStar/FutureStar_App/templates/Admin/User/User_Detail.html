@@ -138,9 +138,6 @@
                            <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
                         </li>
                         <li class="nav-item">
-                           <a class="nav-link" id="organized_event-tab" data-toggle="tab" href="#organized_event" role="tab" aria-controls="organized_event" aria-selected="false">Organized Events</a>
-                        </li>
-                        <li class="nav-item">
                            <a class="nav-link" id="participated_event-tab" data-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
                         </li>
                         <li class="nav-item">
@@ -202,36 +199,6 @@
                            </div>
                         </div>
    
-                        <!--Organized Event Tab  -->
-                        <div class="tab-pane fade" id="organized_event" role="tabpanel" aria-labelledby="organized_event-tab">
-                           <div class="table-responsive">
-                              <table class="display" id="organized_event-table">
-                                 <thead>
-                                    <tr>
-                                       <th>No</th>
-                                       <th>Event Name</th>
-                                       <th>Event Description</th>
-                                       <th>Event Type</th>
-                                       <th>Event Cost</th>
-                                       <th>Event Date</th>
-                                    </tr>
-                                 </thead>
-                                 <tbody>
-                                    {% for event in events %}
-                                    <tr>
-                                       <td>{{ forloop.counter }}</td>
-                                       <td>{{ event.event_name }}</td>
-                                       <td>{{ event.event_description }}</td>
-                                       <td>{{ event.event_type }}</td>
-                                       <td>{{ event.event_cost }}</td>
-                                       <td>{{ event.event_date|date:"d-M-Y" }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                 </tbody>
-                              </table>
-                           </div>
-                        </div>
-
                         <!--Participated Event Tab  -->
                         <div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
                            <div class="table-responsive">
@@ -315,7 +282,6 @@
 $(document).ready(function() {
    // Initialize datatables for both tables
    $('#post-table').DataTable();
-   $('#organized_event-table').DataTable();
    $('#participated_event-table').DataTable();
    $('#team-table').DataTable();
 
@@ -325,9 +291,6 @@ $(document).ready(function() {
       if (target === "#post") {
          $('#post-table').DataTable().columns.adjust().draw(); 
       } 
-      else if (target === "#organized_event") {
-         $('#organized_event-table').DataTable().columns.adjust().draw(); 
-      }
       else if (target === "#participated_event") {
          $('#participated_event-table').DataTable().columns.adjust().draw(); 
       }
