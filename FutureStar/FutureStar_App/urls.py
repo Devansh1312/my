@@ -236,6 +236,13 @@ urlpatterns = [
     path('team_details/', TeamDetailView.as_view(), name='team_detail'),
     path('branch_details/', BranchDetailView.as_view(), name='branch_detail'),
 
+    
+    #User injury type URL
+    path('injurytype/', InjuryTypeListView.as_view(), name='injurytype_list'),
+    path('injurytype/create/', InjuryTypeCreateView.as_view(), name='injurytype_create'),
+    path('injurytype/update/<int:pk>/', InjuryTypeUpdateView.as_view(), name='injurytype_update'),
+    path('injurytype/delete/<int:pk>/', InjuryTypeDeleteView.as_view(), name='injurytype_delete'),
+
 
     #Playing Position URLS's
     path('playing_positions/', PlayingPositionListView.as_view(), name='playing_position_list'),

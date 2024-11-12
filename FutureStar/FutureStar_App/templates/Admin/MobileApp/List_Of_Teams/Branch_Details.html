@@ -15,7 +15,7 @@
 </style>
 
 {% block title %}
-event List View
+Branch Details
 {% endblock %}
 
 {% block content %}
@@ -108,7 +108,13 @@ event List View
                                 <!-- Add tab navigation  -->
                                 <ul class="nav nav-tabs" id="dataTab" role="tablist">
                                     <li class="nav-item">
-                                    <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">members </a>
+                                        <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">Members </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="tournament-tab" data-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="false">Joined Tournaments</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="games-tab" data-toggle="tab" href="#games" role="tab" aria-controls="games" aria-selected="false">Joined games</a>
                                     </li>
                                 </ul>
             
@@ -120,28 +126,92 @@ event List View
                                             <thead> 
                                                 <tr>
                                                 <th>No</th>
-                                                <th>member Name</th>
+                                                <th>Username</th>
                                                 <th>Age Group</th>
                                                 <th>Image</th>
-                                                <th>Entry Fees</th>
+                                                <th>Email</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for branch in branches %}
+                                                {% for member in members %}
                                                 <tr>
                                                 <td>{{ forloop.counter }}</td>
-                                                <td>{{ branch.event_name }}</td>
-                                                <td>{{ branch.age_group_id.name_en }}</td>
+                                                <td>{{ member.user_id.username }}</td>
+                                                <td>{{ member.branch_id.age_group_id.name_en }}</td>
                                                 <td>
-                                                    <img src="{{ branch.upload_image }}"  width="100" height="100">
+                                                    <img src="{{ member.user_id.profile_picture }}"  width="100" height="100">
                                                 </td>                                      
-                                                <td>{{ branch.entry_fees }}</td>
+                                                <td>{{ member.user_id.email }}</td>
                                                 </tr>
                                                 {% endfor %}
                                             </tbody>
                                         </table>
                                     </div>
                                     </div> 
+
+
+                                    <!-- tournament Tab  -->
+                                    <div class="tab-pane fade " id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
+                                        <div class="table-responsive">
+                                            <table class="display" id="tournament-table">
+                                                <thead> 
+                                                    <tr>
+                                                    <th>Tournament Name</th>
+                                                    <th>Start Date</th>
+                                                    <th>Age Group</th>
+                                                    <th>city</th>
+                                                    <th>Joining Cost</th>
+                                                    <th>city</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for tournament in tournaments %}
+                                                    <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ tournament.tournament_name }}</td>
+                                                    <td>{{ tournament.tournament_starting_date }}</td>
+                                                    <td>{{ tournament.age_group }}</td>                                                    </td>                                      
+                                                    <td>{{ tournament.tournament_joining_cost }}</td>
+                                                    <td>{{ tournament.city }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- games Tab  -->
+                                    <div class="tab-pane fade " id="games" role="tabpanel" aria-labelledby="games-tab">
+                                        <div class="table-responsive">
+                                            <table class="display" id="games-table">
+                                                <thead> 
+                                                    <tr>
+                                                    <th>ryutyk</th>
+                                                    <th>Username</th>
+                                                    <th>Age Group</th>
+                                                    <th>Image</th>
+                                                    <th>Email</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for member in members %}
+                                                    <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ member.user_id.username }}</td>
+                                                    <td>{{ member.branch_id.age_group_id.name_en }}</td>
+                                                    <td>
+                                                        <img src="{{ member.user_id.profile_picture }}"  width="100" height="100">
+                                                    </td>                                      
+                                                    <td>{{ member.user_id.email }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -189,9 +259,9 @@ event List View
 $(document).ready(function() {
     // Initialize datatables for both tables
     $('#member-table').DataTable();
-    $('#sponsers-table').DataTable();
-    $('#post-table').DataTable();
-    $('#event-table').DataTable();
+    $('#tournament-table').DataTable();
+    $('#games-table').DataTable();
+
     
     // Adjust DataTables when tabs are switched
     $('#dataTab a').on('shown.bs.tab', function (e) {
@@ -199,14 +269,11 @@ $(document).ready(function() {
         if (target === "#member") {
             $('#member-table').DataTable().columns.adjust().draw(); 
         } 
-        else if (target === "#sponsers") {
-            $('#sponsers-table').DataTable().columns.adjust().draw(); 
+        else if (target === "#tournament") {
+            $('#tournament-table').DataTable().columns.adjust().draw(); 
         }
-        else if (target === "#post") {
-            $('#post-table').DataTable().columns.adjust().draw(); 
-        }
-        else if (target === "#event") {
-            $('#event-table').DataTable().columns.adjust().draw(); 
+        else if (target === "#games") {
+            $('#games-table').DataTable().columns.adjust().draw(); 
         }
     });
 });

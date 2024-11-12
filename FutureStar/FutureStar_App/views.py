@@ -28,6 +28,7 @@ from functools import wraps
 from FutureStarAPI.models import *
 from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
+from FutureStarTournamentApp.models import *
 
 
 def user_role_check(view_func):
@@ -5504,23 +5505,27 @@ class BranchDetailView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/List_Of_Teams/Branch_Details.html" 
 
     def get_branch_related_data(self, branch):
-        branches = TeamBranch.objects.filter(id=branch.id)
-        return branches
+        branches = TeamBranch.objects.filter(team_id=branch.id)
+        members = JoinBranch.objects.filter(id=branch.id)
+        tournaments = Tournament.objects.filter(team_id=branch.id)
+        games = TournamentGames.objects.filter()
+        return branches,members,tournaments,games
 
     def get(self, request):
-        branch_id = request.GET.get('branch_id')
-        
-        # Retrieve branch details or redirect if not found
-        branch = get_object_or_404(TeamBranch, id=branch_id)
-        
+        branch = request.GET.get('team_id')
+     
         try:
-            branches = self.get_branch_related_data(branch)
+            branches, members, tournaments, games = self.get_branch_related_data(branch)
 
             return render(
                 request,
                 self.template_name,
                 {
+                    "branch": branch,
                     "branches": branches,
+                    "members": members,
+                    "tournaments": tournaments,
+                    "games": games,
                     "breadcrumb": {"child": "Branch Detail"},
                 },
             )
@@ -5528,18 +5533,20 @@ class BranchDetailView(LoginRequiredMixin, View):
             return redirect('Dashboard')
     
     def post(self, request):
-        branch_id = request.POST.get('branch_id')  # Retrieve `branch_id` from POST data
-
-        # Retrieve branch details or redirect if not found
-        branch = get_object_or_404(TeamBranch, id=branch_id)
+        branch_id = request.POST.get('branch_id')  
 
         try:
-            branches = self.get_branch_related_data(branch)
+            branch = TeamBranch.objects.get(id=branch_id)
+            branches, members, tournaments, games = self.get_branch_related_data(branch)
             return render(
                 request,
                 self.template_name,
                 {
+                    "branch": branch,
                     "branches": branches,
+                    "members": members,
+                    "tournaments": tournaments,
+                    "games": games,
                     "breadcrumb": {"child": "Branch Detail"},
                 },
             )
@@ -5626,7 +5633,7 @@ class PlayingPositionEditView(LoginRequiredMixin,View):
         return redirect("playing_position_list")
 
 
-############################################# Age Group CRUD ###############################################
+
 ################################################################# AgeGroup CRUD Views ###################################################
 @method_decorator(user_role_check, name='dispatch')
 class AgeGroupCreateView(LoginRequiredMixin, View):
@@ -5694,4 +5701,75 @@ class AgeGroupListView(LoginRequiredMixin, View):
             request,
             self.template_name,
             {"agegroup": agegroup, "breadcrumb": {"parent": "User", "child": "Age Group"}},
+        )
+
+
+
+################################################################# Injury Type CRUD Views ###################################################
+@method_decorator(user_role_check, name='dispatch')
+class InjuryTypeCreateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/InjuryType.html"
+
+    def get(self, request):
+        form = InjuryTypeForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = InjuryTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Injury Type Created successfully.")
+            return redirect("injurytype_list")
+        messages.error(
+            request,
+            "There was an error creating the age group. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class InjuryTypeUpdateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/InjuryType.html"  # Fixed template name
+
+    def get(self, request, pk):
+        injurytype = get_object_or_404(InjuryType, pk=pk)
+        form = InjuryTypeForm(instance=injurytype)
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, pk):
+        injurytype = get_object_or_404(InjuryType, pk=pk)
+        form = InjuryTypeForm(request.POST, instance=injurytype)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Injury Type Updated Successfully.")
+            return redirect("injurytype_list")
+        messages.error(
+            request,
+            "There was an error updating the injury type. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class InjuryTypeDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        injurytype = get_object_or_404(InjuryType, pk=pk)
+        injurytype.delete()
+        messages.success(request, "Injur Type Deleted Successfully.")
+        return redirect("injurytype_list")
+
+    def post(self, request, pk):
+        injurytype = get_object_or_404(InjuryType, pk=pk)
+        injurytype.delete()
+        messages.success(request, "Injury Type Deleted Successfully.")
+        return redirect("injurytype_list")
+
+@method_decorator(user_role_check, name='dispatch')
+class InjuryTypeListView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/InjuryType.html"
+
+    def get(self, request):
+        injurytype = InjuryType.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {"injurytype": injurytype, "breadcrumb": {"parent": "User", "child": "Injury Type"}},
         )
