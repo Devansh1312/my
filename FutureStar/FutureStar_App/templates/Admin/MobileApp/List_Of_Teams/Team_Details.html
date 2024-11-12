@@ -15,7 +15,7 @@
 </style>
 
 {% block title %}
-Team List View
+Team Detail page
 {% endblock %}
 
 {% block content %}
@@ -130,16 +130,16 @@ Team List View
                                         <!-- Add tab navigation  -->
                                         <ul class="nav nav-tabs" id="dataTab" role="tablist">
                                             <li class="nav-item">
-                                            <a class="nav-link active" id="branch-tab" data-toggle="tab" href="#branch" role="tab" aria-controls="branch" aria-selected="true">branch</a>
+                                            <a class="nav-link active" id="branch-tab" data-toggle="tab" href="#branch" role="tab" aria-controls="branch" aria-selected="true">Branches </a>
                                             </li>
                                             <li class="nav-item">
-                                            <a class="nav-link" id="organized_event-tab" data-toggle="tab" href="#organized_event" role="tab" aria-controls="organized_event" aria-selected="false">Organized Events</a>
+                                            <a class="nav-link" id="sponsers-tab" data-toggle="tab" href="#sponsers" role="tab" aria-controls="sponsers" aria-selected="false">Sponsers</a>
                                             </li>
                                             <li class="nav-item">
-                                            <a class="nav-link" id="participated_event-tab" data-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
+                                            <a class="nav-link" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="false">Post</a>
                                             </li>
                                             <li class="nav-item">
-                                            <a class="nav-link" id="team-tab" data-toggle="tab" href="#team" role="tab" aria-controls="team" aria-selected="false">Team</a>
+                                            <a class="nav-link" id="event-tab" data-toggle="tab" href="#event" role="tab" aria-controls="event" aria-selected="false">Event</a>
                                             </li>
                                         </ul>
                     
@@ -154,19 +154,38 @@ Team List View
                                                         <th>Branch Name</th>
                                                         <th>Age Group</th>
                                                         <th>Image</th>
-                                                        <th>Entry Fees </th>
+                                                        <th>Entry Fees</th>
+                                                        <th>Actions</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {% for branch in branches %}
                                                         <tr>
                                                         <td>{{ forloop.counter }}</td>
-                                                        <td>{{ branch.team_name }}</td>
+                                                        <td>{{ branch.event_name }}</td>
                                                         <td>{{ branch.age_group_id.name_en }}</td>
                                                         <td>
                                                             <img src="{{ branch.upload_image }}"  width="100" height="100">
                                                         </td>                                      
                                                         <td>{{ branch.entry_fees }}</td>
+                                                        <td>
+                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                                    <i data-feather="more-vertical"></i>
+                                                                </a>
+                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                                            <a href="#" class="view-details" data-id="{{ branch.id }}">View</a>
+                                                                            <form id="view-form-{{ branch.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;">
+                                                                                {% csrf_token %}
+                                                                                <input type="hidden" name="branch_id" value="{{ branch.id }}">
+                                                                            </form>
+                                                                        </li> 
+                                                                    </ul>
+                                                                </div>                                                                
+                                                            </div>
+                                                        </td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
@@ -174,10 +193,85 @@ Team List View
                                             </div>
                                             </div>
                     
-                                            <!--Organized Event Tab  -->
-                                            <div class="tab-pane fade" id="organized_event" role="tabpanel" aria-labelledby="organized_event-tab">
+                                            <!--Sponsers Event Tab  -->
+                                            <div class="tab-pane fade" id="sponsers" role="tabpanel" aria-labelledby="sponsers-tab">
                                             <div class="table-responsive">
-                                                <table class="display" id="organized_event-table">
+                                                <table class="display" id="sponsers-table">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>No</th>
+                                                        <th>Name</th>
+                                                        <th>Logo</th>
+                                                        <th>Website</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for sponsor in sponsors %}
+                                                        <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ sponsor.name }}</td>
+                                                        <td>
+                                                            <img src="{{ sponsor.upload_image }}"  width="100" height="100"> 
+                                                        </td>
+                                                        <td><a href="{{ sponsor.url }}" target="_blank">{{ sponsor.url }}</a></td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            </div>
+
+                                            <!--Post Event Tab  -->
+                                            <div class="tab-pane fade" id="post" role="tabpanel" aria-labelledby="post-tab">
+                                            <div class="table-responsive">
+                                                <table class="display" id="post-table">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>No</th>
+                                                        <th>Post Title</th>
+                                                        <th>Description</th>
+                                                        <th>Image</th>
+                                                        <th>Date Created</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for post in posts %}
+                                                        <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ post.title }}</td>
+                                                        <td>{{ post.description }}</td>
+                                                        <td>      
+                                                             {% if post.media_type == 1 %}
+                                                                    {% if post.image %}
+                                                                        <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="100">
+                                                                    {% else %}
+                                                                        No Image
+                                                                    {% endif %}
+                                                                {% elif post.media_type == 2 %}
+                                                                    {% if post.image %}
+                                                                        <video width="200" height="100" controls>
+                                                                            <source src="{{ post.image.url }}" type="video/mp4">
+                                                                            Your browser does not support the video tag.
+                                                                        </video>
+                                                                    {% else %}
+                                                                        No Video
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    No Media
+                                                                {% endif %}
+                                                        </td> 
+                                                        <td>{{ post.created_at }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            </div> 
+                                            
+                                            <!-- Event Tab  --> 
+                                            <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+                                            <div class="table-responsive">
+                                                <table class="display" id="event-table">
                                                     <thead>
                                                         <tr>
                                                         <th>No</th>
@@ -190,73 +284,13 @@ Team List View
                                                     </thead>
                                                     <tbody>
                                                         {% for event in events %}
-                                                        <tr>
+                                                        <tr> 
                                                         <td>{{ forloop.counter }}</td>
                                                         <td>{{ event.event_name }}</td>
                                                         <td>{{ event.event_description }}</td>
                                                         <td>{{ event.event_type }}</td>
                                                         <td>{{ event.event_cost }}</td>
-                                                        <td>{{ event.event_date|date:"d-M-Y" }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            </div>
-
-                                            <!--Participated Event Tab  -->
-                                            <div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
-                                            <div class="table-responsive">
-                                                <table class="display" id="participated_event-table">
-                                                    <thead>
-                                                        <tr>
-                                                        <th>No</th>
-                                                        <th>Event Name</th>
-                                                        <th>Event Type</th>
-                                                        <th>No of Tickets</th>
-                                                        <th>Total Paid</th>
-                                                        <th>Booking Date</th>
-                                                        <th>Event Date</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for event_booking in events_bookings %}
-                                                        <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ event_booking.event.event_name }}</td>
-                                                        <td>{{ event_booking.event.event_type }}</td>
-                                                        <td>{{ event_booking.ticket_amount|floatformat:0 }}</td>
-                                                        <td>{{ event_booking.total_amount }}</td>
-                                                        <td>{{ event_booking.created_at|date:"d-M-Y" }}</td>
-                                                        <td>{{ event_booking.event.event_date|date:"d-M-Y" }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            </div> 
-                                            
-                                            <!-- Team Tab  --> 
-                                            <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
-                                            <div class="table-responsive">
-                                                <table class="display" id="team-table">
-                                                    <thead>
-                                                        <tr>
-                                                        <th>No</th>
-                                                        <th>Team Name</th>
-                                                        <th>Age</th>
-                                                        <th>Joining Type</th>
-                                                        <th>Joining Date</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for teams in teams %}
-                                                        <tr> 
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ teams.branch_id.team_name }}</td>
-                                                        <td>{{ teams.branch_id.age_group_id }}</td>
-                                                        <td>{{ teams.joinning_type }}</td>
-                                                        <td>{{ teams.created_at }}</td>
+                                                        <td>{{ event.event_date }}</td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
@@ -284,12 +318,43 @@ Team List View
 
 
 <script>
+
+
+
+
+
+    document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+        menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+                if (card !== actionCard) {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    document.querySelectorAll('.view-details').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var branchId = link.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + branchId);
+            form.submit(); // Submits the form programmatically
+        });
+    });
+    
+
+
+
 $(document).ready(function() {
     // Initialize datatables for both tables
     $('#branch-table').DataTable();
-    $('#organized_event-table').DataTable();
-    $('#participated_event-table').DataTable();
-    $('#team-table').DataTable();
+    $('#sponsers-table').DataTable();
+    $('#post-table').DataTable();
+    $('#event-table').DataTable();
     
     // Adjust DataTables when tabs are switched
     $('#dataTab a').on('shown.bs.tab', function (e) {
@@ -297,14 +362,14 @@ $(document).ready(function() {
         if (target === "#branch") {
             $('#branch-table').DataTable().columns.adjust().draw(); 
         } 
-        else if (target === "#organized_event") {
-            $('#organized_event-table').DataTable().columns.adjust().draw(); 
+        else if (target === "#sponsers") {
+            $('#sponsers-table').DataTable().columns.adjust().draw(); 
         }
-        else if (target === "#participated_event") {
-            $('#participated_event-table').DataTable().columns.adjust().draw(); 
+        else if (target === "#post") {
+            $('#post-table').DataTable().columns.adjust().draw(); 
         }
-        else if (target === "#team") {
-            $('#team-table').DataTable().columns.adjust().draw(); 
+        else if (target === "#event") {
+            $('#event-table').DataTable().columns.adjust().draw(); 
         }
     });
 });

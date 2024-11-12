@@ -5447,13 +5447,16 @@ class TeamDetailView(LoginRequiredMixin, View):
 
     def get_team_related_data(self, team):
         branches = TeamBranch.objects.filter(team_id=team)
-        return branches
+        sponsors = Sponsor.objects.filter(created_by_id=team.id , creator_type = 2)
+        posts = Post.objects.filter(created_by_id=team.id, creator_type = 2)
+        events = Event.objects.filter(created_by_id=team.id, creator_type = 2)
+        return branches, sponsors, posts, events
 
     def get(self, request):
         team = request.GET.get('team_id') 
         
         try:
-            branches = self.get_team_related_data(team)
+            branches, sponsors, posts, events = self.get_team_related_data(team)
 
             return render(
                 request,
@@ -5461,6 +5464,9 @@ class TeamDetailView(LoginRequiredMixin, View):
                 {
                     "team": team,
                     "branches": branches,
+                    "sponsors": sponsors,
+                    "posts": posts,
+                    "events": events,
                     "breadcrumb": {"child": "Team Detail"},
                 },
             )
@@ -5474,7 +5480,7 @@ class TeamDetailView(LoginRequiredMixin, View):
 
         try:
             team = Team.objects.get(id=team_id)
-            branches = self.get_team_related_data(team)
+            branches, sponsors, posts, events = self.get_team_related_data(team)
 
             return render(
                 request,
@@ -5482,10 +5488,62 @@ class TeamDetailView(LoginRequiredMixin, View):
                 {
                     "team": team,
                     "branches": branches,
+                    "sponsors": sponsors,
+                    "posts": posts,
+                    "events": events,
                     "breadcrumb": {"child": "Team Detail"},
                 },
             )
         except Team.DoesNotExist:
+            return redirect('Dashboard')
+        
+        
+        
+@method_decorator(user_role_check, name='dispatch')
+class BranchDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/List_Of_Teams/Branch_Details.html" 
+
+    def get_branch_related_data(self, branch):
+        branches = TeamBranch.objects.filter(id=branch.id)
+        return branches
+
+    def get(self, request):
+        branch_id = request.GET.get('branch_id')
+        
+        # Retrieve branch details or redirect if not found
+        branch = get_object_or_404(TeamBranch, id=branch_id)
+        
+        try:
+            branches = self.get_branch_related_data(branch)
+
+            return render(
+                request,
+                self.template_name,
+                {
+                    "branches": branches,
+                    "breadcrumb": {"child": "Branch Detail"},
+                },
+            )
+        except TeamBranch.DoesNotExist:
+            return redirect('Dashboard')
+    
+    def post(self, request):
+        branch_id = request.POST.get('branch_id')  # Retrieve `branch_id` from POST data
+
+        # Retrieve branch details or redirect if not found
+        branch = get_object_or_404(TeamBranch, id=branch_id)
+
+        try:
+            branches = self.get_branch_related_data(branch)
+            return render(
+                request,
+                self.template_name,
+                {
+                    "branches": branches,
+                    "breadcrumb": {"child": "Branch Detail"},
+                },
+            )
+        except TeamBranch.DoesNotExist:
             return redirect('Dashboard')
         
         
