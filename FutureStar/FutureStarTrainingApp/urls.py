@@ -6,7 +6,9 @@ from django.shortcuts import redirect
 
 urlpatterns = [
 
-    path('api/create_training/', CreateTrainingView.as_view()),
+    path('api/training/create/', CreateTrainingView.as_view()),
+    path('api/training/update/', TrainingDetailAPIView.as_view()),
+    path('api/training/delete/', TrainingDetailAPIView.as_view()),
     path('api/open_trainings/', OpenTrainingListView.as_view()),
 
     path('api/training/detail/', TrainingDetailAPIView.as_view()),
@@ -18,6 +20,10 @@ urlpatterns = [
     path('api/training/joined/', JoinTrainingAPIView.as_view()),
 
     path('api/training/feedback/',TrainingFeedbackAPI.as_view()),
+
+    path('api/training/mytraining/',MyTrainingsView.as_view()),
+    path('api/training/jointarining/',MyJoinedTrainingsView.as_view()),
+
 
 
 
