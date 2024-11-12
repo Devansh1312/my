@@ -2692,8 +2692,17 @@ class UserGenderListAPIView(generics.ListAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        # Get all genders
-        user_genders = self.get_queryset()
+        
+        # Get the 'type' parameter from the query string (defaults to '2' if not provided)
+        gender_type = request.query_params.get('type', '2')
+
+        # If type is 1, get only the first 2 rows, else get all rows
+        if gender_type == '1':
+            user_genders = self.get_queryset()[:2]  # Limit to first 2 rows
+        else:
+            user_genders = self.get_queryset()  # Get all rows
+
+        # Serialize the data
         serializer = self.get_serializer(user_genders, many=True)
 
         # Prepare the response with genders directly under 'data'

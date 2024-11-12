@@ -105,7 +105,109 @@ class TrainingDetailAPIView(APIView):
                 'status': 0,
                 'message': _('Training not found.'),
             }, status=status.HTTP_404_NOT_FOUND)
-        
+
+###################### Edit Training ############################
+
+    def get_object(self, training_id):
+            try:
+                # Retrieve the training instance by ID
+                return Training.objects.get(id=training_id)
+            except Training.DoesNotExist:
+                return None
+            
+            
+    def patch(self, request, *args, **kwargs):
+        # Retrieve the training ID from the request data (in request.data)
+        training_id = request.data.get('training_id')
+
+        if not training_id:
+            return Response({
+                'status': 0,
+                'message': _("Training ID is required for update"),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the training instance to update
+        training_instance = self.get_object(training_id)
+
+        if not training_instance:
+            return Response({
+                'status': 0,
+                'message': _("Training not found"),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Pass the full 'request' object in the context
+        context = {'request': request}
+
+        # Initialize the serializer with the current instance and the updated data
+        serializer = TrainingSerializer(training_instance, data=request.data, partial=True, context=context)
+
+        if serializer.is_valid():
+            # Handle image saving logic if a new training photo is uploaded
+            if "training_photo" in request.FILES:
+                image = request.FILES["training_photo"]
+                file_extension = image.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
+
+                # Save the image using the default storage
+                image_path = default_storage.save(file_name, image)
+                serializer.validated_data['training_photo'] = image_path
+
+            # Save the updated training instance
+            updated_training_instance = serializer.save()
+
+            # Re-fetch the training instance with the correct context for language handling
+            updated_training_instance = Training.objects.get(id=updated_training_instance.id)
+
+            # Re-serialize the updated training instance
+            serializer = TrainingSerializer(updated_training_instance, context={'request': request})
+
+            # Return the successfully updated training data
+            return Response({
+                'status': 1,
+                'message': _("Training successfully updated"),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+
+        # If validation fails, return the errors
+        return Response({
+            'status': 0,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+###################### Delete Training ############################
+    def delete(self, request, *args, **kwargs):
+        # Retrieve the training ID from the query parameters
+        training_id = request.query_params.get('training_id')
+
+        if not training_id:
+            return Response({
+                'status': 0,
+                'message': _("Training ID is required for deletion"),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the training instance to delete
+        training_instance = self.get_object(training_id)
+
+        if not training_instance:
+            return Response({
+                'status': 0,
+                'message': _("Training not found"),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Delete the training instance
+        training_instance.delete()
+
+        # Return a success response
+        return Response({
+            'status': 1,
+            'message': _("Training successfully deleted"),
+            'data': []
+        }, status=status.HTTP_204_NO_CONTENT) 
 
 ###################### Training LIKE ##################################
 class TrainingLikeAPIView(APIView):
@@ -342,15 +444,175 @@ class OpenTrainingListView(APIView):
             training_date__gte=today  # Only future or today
         )
 
-        # Serialize the data
-        serializer = TrainingSerializer(open_trainings, many=True, context={'request': request})
+        # Initialize custom pagination
+        paginator = CustomTrainingPagination()
 
+        # Paginate the queryset
+        paginated_trainings = paginator.paginate_queryset(open_trainings, request)
+        if paginated_trainings is not None:
+            # Serialize the paginated data
+            serializer = TrainingSerializer(paginated_trainings, many=True, context={'request': request})
+
+            # Prepare the pagination data
+            pagination_data = {
+                'total_records': open_trainings.count(),
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number
+            }
+
+            # Return paginated data in the response, with the serialized data directly under 'data'
+            return Response({
+                'status': 1,
+                'message': "Open trainings retrieved successfully",
+                'data': {
+                    **pagination_data,
+                    'trainings': serializer.data  # Put serialized data directly here
+                }
+            }, status=status.HTTP_200_OK)
+
+        # If pagination is not applied, just return the serialized data
+        serializer = TrainingSerializer(open_trainings, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': "Open trainings retrieved successfully",
-            'data': serializer.data
+            'data': {
+                'total_records': open_trainings.count(),
+                'total_pages': 1,
+                'current_page': 1,
+                'trainings': serializer.data  # Put serialized data directly here
+            }
         }, status=status.HTTP_200_OK)
     
+
+
+###### My Created Training List API ######
+class MyTrainingsView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Retrieve creator_type and created_by_id from query parameters
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
+
+        # Validate input parameters
+        if not creator_type or not created_by_id:
+            return Response({
+                'status': 0,
+                'message': 'Missing creator_type or created_by_id parameter',
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch trainings that match creator_type and created_by_id
+        try:
+            creator_type = int(creator_type)
+            created_by_id = int(created_by_id)
+        except ValueError:
+            return Response({
+                'status': 0,
+                'message': 'Invalid creator_type or created_by_id',
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        trainings = Training.objects.filter(
+            creator_type=creator_type,
+            created_by_id=created_by_id
+        ).order_by('-training_date') 
+
+        # Initialize custom pagination
+        paginator = CustomTrainingPagination()
+
+        # Paginate the queryset
+        paginated_trainings = paginator.paginate_queryset(trainings, request)
+        if paginated_trainings is not None:
+            # Serialize the paginated data
+            serializer = TrainingSerializer(paginated_trainings, many=True, context={'request': request})
+
+            # Prepare the pagination data directly in 'data'
+            pagination_data = {
+                'total_records': trainings.count(),
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'data': serializer.data  # Directly add the serialized data to 'data'
+            }
+
+            # Return paginated data in the response
+            return Response({
+                'status': 1,
+                'message': 'Trainings retrieved successfully',
+                'data': pagination_data
+            }, status=status.HTTP_200_OK)
+
+        # If pagination is not applied, just return the serialized data
+        serializer = TrainingSerializer(trainings, many=True, context={'request': request})
+        return Response({
+            'status': 1,
+            'message': 'Trainings retrieved successfully',
+            'data': {
+                'total_records': trainings.count(),
+                'total_pages': 1,
+                'current_page': 1,
+                'data': serializer.data  # Directly add the serialized data to 'data'
+            }
+        }, status=status.HTTP_200_OK)
+
+    
+############ My Joined Training List API #################
+class MyJoinedTrainingsView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Get the current authenticated user
+        user = request.user
+
+        # Fetch all the trainings the user has joined and order by training_date (newest first)
+        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')
+        
+        # If the user has not joined any training, return a message
+        if not joined_trainings.exists():
+            return Response({
+                'status': 0,
+                'message': 'No joined trainings found',
+                'data': []
+            }, status=status.HTTP_200_OK)
+
+        # Get the training sessions by joining the Training model
+        trainings = [entry.training for entry in joined_trainings]
+
+        # Order the trainings by training_date (newest first)
+        trainings = sorted(trainings, key=lambda x: x.training_date, reverse=True)
+
+        # Initialize custom pagination
+        paginator = CustomTrainingPagination()
+
+        # Paginate the queryset
+        paginated_trainings = paginator.paginate_queryset(trainings, request)
+        if paginated_trainings is not None:
+            # Serialize the paginated data
+            serializer = TrainingSerializer(paginated_trainings, many=True, context={'request': request})
+
+            # Prepare the pagination data
+            pagination_data = {
+                'total_records': len(trainings),
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'data': serializer.data  # Directly place the data in 'data'
+            }
+
+            # Return paginated data in the response
+            return Response({
+                'status': 1,
+                'message': 'Joined trainings retrieved successfully',
+                'data': pagination_data
+            }, status=status.HTTP_200_OK)
+
+        # If pagination is not applied, just return the serialized data
+        serializer = TrainingSerializer(trainings, many=True, context={'request': request})
+        return Response({
+            'status': 1,
+            'message': 'Joined trainings retrieved successfully',
+            'data': {
+                'total_records': len(trainings),
+                'total_pages': 1,
+                'current_page': 1,
+                'data': serializer.data  # Directly place the data in 'data'
+            }
+        }, status=status.HTTP_200_OK)
 
 
 ############################## Join Training API ##############################

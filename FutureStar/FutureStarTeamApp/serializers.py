@@ -137,15 +137,24 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamBranchSerializer(serializers.ModelSerializer):
     age_group_name = serializers.SerializerMethodField()
     field_size_name = serializers.SerializerMethodField()
+    gender_name = serializers.SerializerMethodField()
 
     class Meta:
         model = TeamBranch
         fields = [
             'id', 'team_id', 'team_name', 'age_group_id', 'age_group_name', 'upload_image', 'field_size', 
-            'field_size_name', 'phone', 'email','gender', 'latitude', 'longitude', 'address', 'house_no', 'premises', 
+            'field_size_name', 'phone', 'email','gender','gender_name', 'latitude', 'longitude', 'address', 'house_no', 'premises', 
             'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'entry_fees', 'description', 
             'created_at', 'updated_at'
         ]
+    
+    def get_gender_name(self, obj):
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en')
+        if language == 'ar':
+            return obj.gender.name_ar
+        return obj.gender.name_en
+    
 
     def get_field_size_name(self, obj):
         return obj.field_size.name if obj.field_size else None  
