@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %}Injury Type{% endblock %}
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{breadcrumb.child}}</h3>
+            </div>
+            <div class="col-6">
+               <ol class="breadcrumb">
+                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addInjuryTypeModal">Add InjuryType</button>
+               </ol>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+         <!-- InjuryType List -->
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="display" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Injury Type (English)</th>
+                              <th>Injury Type (Arabic)</th>
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for injurytype in injurytype %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ injurytype.name_en }}</td>
+                              <td>{{ injurytype.name_ar }}</td>
+                              <td>
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                       <i data-feather="more-vertical"></i>
+                                       <!-- Three dots icon -->
+                                    </a>
+                                    <!-- Hidden card for actions -->
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                          <li style="padding: 8px 12px;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editInjuryTypeModal" data-injurytype-id="{{ injurytype.id }}" data-injurytype-name-en="{{ injurytype.name_en }}" data-injurytype-name-ar="{{ injurytype.name_ar }}">
+                                                 Edit </a>
+                                          </li>
+                                          <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteInjuryTypeModal" data-injurytype-id="{{ injurytype.id }}">
+                                                 Delete </a>
+                                          </li> -->
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Add InjuryType Modal -->
+<div class="modal fade" id="addInjuryTypeModal" tabindex="-1" aria-labelledby="addInjuryTypeModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="addInjuryTypeModalLabel">Add InjuryType</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'injurytype_create' %}" id="addInjuryTypeForm"> {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name_en" class="form-label">Injury Type (English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Injury Type (English)">
+                  <div id="addInjuryTypeEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Injury Type (Arabic)</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Arabic Injury Type">
+                  <div id="addInjuryTypeArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Add InjuryType</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Edit InjuryType Modal -->
+<div class="modal fade" id="editInjuryTypeModal" tabindex="-1" aria-labelledby="editInjuryTypeModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="editInjuryTypeModalLabel">Edit InjuryType</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'injurytype_update' pk=0 %}" id="editInjuryTypeForm"> {% csrf_token %}
+               <input type="hidden" id="editInjuryTypeId" name="id">
+               <div class="mb-3">
+                  <label for="editName_en" class="form-label">Injury Type (English)</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter Injury Type (English)">
+                  <div id="editInjuryTypeEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Injury Type (Arabic)</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Arabic Injury Type">
+                  <div id="editInjuryTypeArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Update InjuryType</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Delete InjuryType Modal -->
+<div class="modal fade" id="deleteInjuryTypeModal" tabindex="-1" aria-labelledby="deleteInjuryTypeModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="deleteInjuryTypeModalLabel">Delete InjuryType</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'injurytype_delete' pk=0 %}" id="deleteInjuryTypeForm"> {% csrf_token %}
+               <input type="hidden" id="deleteInjuryTypeId" name="id">
+               <p>Are you sure you want to delete this injurytype?</p>
+               <button type="submit" class="btn btn-danger">Delete InjuryType</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      var editInjuryTypeModal = document.getElementById('editInjuryTypeModal');
+      editInjuryTypeModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget;
+         var injurytypeId = button.getAttribute('data-injurytype-id');
+         var injurytypeNameEn = button.getAttribute('data-injurytype-name-en');
+         var injurytypeNameAr = button.getAttribute('data-injurytype-name-ar');
+         var form = document.getElementById('editInjuryTypeForm');
+         form.action = "{% url 'injurytype_update' pk='0' %}".replace('0', injurytypeId);
+         form.querySelector('#editInjuryTypeId').value = injurytypeId;
+         form.querySelector('#editName_en').value = injurytypeNameEn;
+         form.querySelector('#editName_ar').value = injurytypeNameAr;
+         // Clear any previous error messages
+         document.getElementById('editInjuryTypeEnError').textContent = '';
+         document.getElementById('editInjuryTypeArError').textContent = '';
+      });
+      var deleteInjuryTypeModal = document.getElementById('deleteInjuryTypeModal');
+      deleteInjuryTypeModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget;
+         var injurytypeId = button.getAttribute('data-injurytype-id');
+         var form = document.getElementById('deleteInjuryTypeForm');
+         form.action = "{% url 'injurytype_delete' pk='0' %}".replace('0', injurytypeId);
+         form.querySelector('#deleteInjuryTypeId').value = injurytypeId;
+      });
+      // Add InjuryType Form Validation
+      var addInjuryTypeForm = document.getElementById('addInjuryTypeForm');
+      addInjuryTypeForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('name_en');
+         var nameArInput = document.getElementById('name_ar');
+         var errorContainer = document.getElementById('addInjuryTypeEnError');
+         var errorArContainer = document.getElementById('addInjuryTypeArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous errors
+         errorContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorContainer.textContent = 'Injury Type (English) cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Injury Type (Arabic) cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+      // Edit InjuryType Form Validation
+      var editInjuryTypeForm = document.getElementById('editInjuryTypeForm');
+      editInjuryTypeForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('editName_en');
+         var nameArInput = document.getElementById('editName_ar');
+         var errorContainer = document.getElementById('editInjuryTypeEnError');
+         var errorArContainer = document.getElementById('editInjuryTypeArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous errors
+         errorContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorContainer.textContent = 'Injury Type (English) cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Injury Type (Arabic) cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   });
+</script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // Toggle the visibility of the action card
+      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+         menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                  card.style.display = 'none';
+               }
+            });
+         });
+      });
+      // Hide action card if clicking outside
+      document.addEventListener('click', function(event) {
+         var isClickInside = event.target.closest('.action-menu-container');
+         if (!isClickInside) {
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+            });
+         }
+      });
+   });
+</script>
+{% endblock %}

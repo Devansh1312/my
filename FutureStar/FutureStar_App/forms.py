@@ -79,6 +79,16 @@ class AgeGroupForm(forms.ModelForm):
             "name_ar": forms.TextInput(attrs={"placeholder": "أدخل الفئة العمرية"}),
         }
 
+class InjuryTypeForm(forms.ModelForm):
+    class Meta:
+        model = InjuryType
+        fields = ["name_en","name_ar"]
+        widgets = {
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter Injury Type "}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل نوع الإصابة"}),
+        }
+
+
 # # Gender Form
 # class GenderForm(forms.ModelForm):
 #     class Meta:
