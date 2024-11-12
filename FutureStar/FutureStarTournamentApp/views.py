@@ -16,6 +16,7 @@ from FutureStarTournamentApp.serializers import *
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from FutureStarGameSystem.models import *
 from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarAPI.models import *
@@ -773,10 +774,14 @@ class TournamentGamesAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
-        # Initialize the serializer with the incoming data
+        # Add tournament_id to the request data if it's provided
+        tournament_id = request.data.get("tournament_id")
+        
+        # if tournament_id:
+        #     request.data["tournament_id"] = tournament_id
+        
         serializer = TournamentGamesSerializer(data=request.data)
         try:
-            # Check if serializer is valid
             if serializer.is_valid():
                 serializer.save()
                 return Response({
@@ -785,7 +790,6 @@ class TournamentGamesAPIView(APIView):
                     'data': serializer.data
                 }, status=status.HTTP_201_CREATED)
             else:
-                # Return validation errors if serializer is invalid
                 return Response({
                     'status': 0,
                     'message': _('Failed to create game.'),
@@ -793,27 +797,28 @@ class TournamentGamesAPIView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
         
         except Exception as e:
-            # Handle any unexpected errors
             return Response({
                 'status': 0,
                 'message': _('An unexpected error occurred.'),
                 'error': str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def get(self, request, *args, **kwargs):
-        # Activate language based on the 'Language' header
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
         
-        # Query games and order them
-        games = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
-        serializer = TournamentGamesSerializer(games, many=True)
+        # Filter by tournament_id if provided in query params
+        tournament_id = request.query_params.get('tournament_id')
+        games_query = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
+        
+        if tournament_id:
+            games_query = games_query.filter(tournament_id=tournament_id)
+        
+        serializer = TournamentGamesSerializer(games_query, many=True)
         
         grouped_data = defaultdict(list)
-        
-        # Organize games by day name and date
-        for game, game_data in zip(games, serializer.data):
+        for game, game_data in zip(games_query, serializer.data):
             game_date = game.game_date
             day_name = game_date.strftime('%A')
             
@@ -821,67 +826,154 @@ class TournamentGamesAPIView(APIView):
             team_a_branch = TeamBranch.objects.filter(id=game.team_a).first()
             team_b_branch = TeamBranch.objects.filter(id=game.team_b).first()
 
-            # Ensure we have a valid team_a_name and team_b_name
             team_a_name = team_a_branch.team_name if team_a_branch else None
             team_b_name = team_b_branch.team_name if team_b_branch else None
 
-            # Retrieve team logos from Team based on team IDs in TeamBranch
-            print(team_a_branch.team_id.id)
-            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id.id else None
-            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id.id else None
-        
-            # Update game data with team names and logos
+            # Retrieve team logos
+            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id else None
+            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id else None
+
             team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
             team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
 
-            print(team_a_logo_path)
-            print(team_b_logo_path)
-
+            # Update game data with tournament ID and name
             game_data.update({
                 "team_a_name": team_a_name,
                 "team_b_name": team_b_name,
-                "team_a_logo": team_a_logo_path if team_a_logo_path else None,
-                "team_b_logo": team_b_logo_path if team_b_logo_path else None,
+                "team_a_logo": team_a_logo_path,
+                "team_b_logo": team_b_logo_path,
+                "tournament_id": game.tournament_id.id if game.tournament_id else None,
+                "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
             })
             grouped_data[(day_name, game_date)].append(game_data)
         
         # Format the response data
-           # Grouping games by (day_name, game_date) key
-       
-        # Format the response data
         formatted_data = {
             f"{day_name},{game_date.strftime('%Y-%m-%d')}": {
-                "games": [{
-                    "id": game['id'],
-                    "game_number": game['game_number'],
-                    "game_date": game['game_date'],
-                    "game_start_time": game['game_start_time'],
-                    "game_end_time": game['game_end_time'],
-                    "group_id": game['group_id'],
-                    "group_id_name": game['group_id_name'],
-                    "team_a": game['team_a'],
-                    "team_a_name": game['team_a_name'],
-                    "team_a_logo": game['team_a_logo'],
-
-                    "team_b": game['team_b'],
-                    
-                    "team_b_name": game['team_b_name'],
-                    "team_b_logo": game['team_b_logo'],
-
-                    "game_field_id": game['game_field_id'],
-                    "game_field_id_name": game['game_field_id_name'],
-
-                    "created_at": game['created_at'],
-                    "updated_at": game['updated_at'],
-                } for game in games]
+                "games": [
+                    {
+                        "id": game['id'],
+                        "tournament_id": game['tournament_id'],
+                        "tournament_name": game['tournament_name'],
+                        "game_number": game['game_number'],
+                        "game_date": game['game_date'],
+                        "game_start_time": game['game_start_time'],
+                        "game_end_time": game['game_end_time'],
+                        "group_id": game['group_id'],
+                        "group_id_name": game['group_id_name'],
+                        "team_a": game['team_a'],
+                        "team_a_name": game['team_a_name'],
+                        "team_a_logo": game['team_a_logo'],
+                        "team_b": game['team_b'],
+                        "team_b_name": game['team_b_name'],
+                        "team_b_logo": game['team_b_logo'],
+                        "game_field_id": game['game_field_id'],
+                        "game_field_id_name": game['game_field_id_name'],
+                        "created_at": game['created_at'],
+                        "updated_at": game['updated_at'],
+                    }
+                    for game in games
+                ]
             }
             for (day_name, game_date), games in grouped_data.items()
-           
         }
 
-        
         return Response({
             "status": 1,
             "message": _("Games Fetched successfully."),
             "data": formatted_data
+        }, status=status.HTTP_200_OK)
+    
+
+class TournamentGamesDetailAPIView(APIView):
+  
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def get(self, request, *args, **kwargs):
+        # Set language
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Get parameters from request query
+        team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')
+        tournament_id = request.query_params.get('tournament_id')
+
+        if not team_id or not game_id or not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id, game_id, and tournament_id are required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter players in Lineup by team, game, and tournament, separating by status
+        substitute_lineups = Lineup.objects.filter(
+            team_id=team_id,
+            game_id=game_id,
+            tournament_id=tournament_id,
+            lineup_status=Lineup.SUBSTITUTE
+        )
+        already_added_lineups = Lineup.objects.filter(
+            team_id=team_id,
+            game_id=game_id,
+            tournament_id=tournament_id,
+            lineup_status=Lineup.ALREADY_IN_LINEUP
+        )
+
+        # Fetch the staff types for the given team_id, including joinning_type and user details
+        staff_types = JoinBranch.objects.filter(
+            branch_id=team_id
+        ).select_related('user_id')  # Assuming JoinBranch has a foreign key to user_id
+
+        staff_data = {
+            'managerial_staff': [],
+            'coach_staff': [],
+            'medical_staff': []
+        }
+
+        for staff in staff_types:
+            staff_info = {
+                'id': staff.user_id.id,
+                'username': staff.user_id.username,
+                'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
+                'joining_type_id': staff.joinning_type,
+                'joining_type_name': staff.get_joinning_type_display()  # Assuming `get_joinning_type_display()` gives the name of the joining type
+            }
+            
+            if staff.joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE:
+                staff_data['managerial_staff'].append(staff_info)
+            elif staff.joinning_type == JoinBranch.COACH_STAFF_TYPE:
+                staff_data['coach_staff'].append(staff_info)
+            elif staff.joinning_type == JoinBranch.MEDICAL_STAFF_TYPE:
+                staff_data['medical_staff'].append(staff_info)
+
+        # Prepare response data for substitute players
+        substitute_data = [{
+            'id': lineup.player_id.id,
+            'username': lineup.player_id.username,
+            'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+            'position_1': lineup.position_1,
+            'position_2': lineup.position_2
+        } for lineup in substitute_lineups]
+
+        already_added_data = [{
+            'id': lineup.player_id.id,
+            'username': lineup.player_id.username,
+            'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+            'position_1': lineup.position_1,
+            'position_2': lineup.position_2
+        } for lineup in already_added_lineups]
+
+        # Return the response with the status and message
+        return Response({
+            'status': 1,
+            'message': _('Lineup players fetched successfully with status "ADDED".'),
+            'data': {
+                'player_added_in_lineup': already_added_data,
+                'substitute': substitute_data,
+                **staff_data
+                # Adding staff types with detailed fields to response
+            }
         }, status=status.HTTP_200_OK)
