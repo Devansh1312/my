@@ -250,14 +250,16 @@ class TeamViewAPI(APIView):
 
         # Handle team uniform update
         if 'team_uniform' in request.FILES:
-            # Delete old uniform if it exists
+            # Delete old uniforms if they exist
             if team_instance.team_uniform:
                 old_uniforms = team_instance.team_uniform.split(',')
                 for old_uniform in old_uniforms:
-                    if default_storage.exists(old_uniform):
-                        default_storage.delete(old_uniform)
+                    # Remove MEDIA_URL prefix from the path
+                    relative_old_uniform = old_uniform.replace(settings.MEDIA_URL, '')
+                    if default_storage.exists(relative_old_uniform):
+                        default_storage.delete(relative_old_uniform)
 
-            # Upload new team uniform with unique filenames and save with full paths
+            # Upload new team uniforms with unique filenames and save with full paths
             uniforms = request.FILES.getlist('team_uniform')
             team_uniform_images = []
             for uniform in uniforms:
@@ -266,7 +268,7 @@ class TeamViewAPI(APIView):
                 file_name = f"team/team_uniform/{team_instance.team_founder.id}_{team_instance.id}_{unique_suffix}.{file_extension}"
                 uniform_path = default_storage.save(file_name, uniform)
 
-                # Use full URL path including MEDIA_URL
+                # Use full URL path including MEDIA_URL for saving to the instance
                 full_path = f"{settings.MEDIA_URL}{uniform_path}"
                 team_uniform_images.append(full_path)
 
