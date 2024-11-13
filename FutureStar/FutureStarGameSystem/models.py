@@ -71,3 +71,38 @@ class PlayerJersey(models.Model):
     
     class Meta:
         db_table = 'futurestar_app_player_jersey'
+
+class OfficialsType(models.Model):
+    id=models.AutoField(primary_key=True)
+    name_en=models.CharField(max_length=200,blank=True, null=True)
+    name_ar=models.CharField(max_length=200,blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f"Officials Type {self.id} - {self.name_en} - {self.name_ar}"
+    
+    class Meta:
+        db_table = 'futurestar_app_officials_type'
+        constraints = [
+            models.UniqueConstraint(fields=['name_en', 'name_ar'], name='unique_officials_type')
+        ]
+
+
+class GameOfficials(models.Model):
+    id=models.AutoField(primary_key=True)
+    officials_type_id=models.ForeignKey(OfficialsType,on_delete=models.CASCADE)
+    game_id=models.ForeignKey(TournamentGames,on_delete=models.CASCADE)
+    official_id=models.ForeignKey(User,on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f"Game Officials {self.id} - {self.officials_type_id} - {self.official_id}"
+    
+    class Meta:
+        db_table = 'futurestar_app_game_officials'
+        constraints = [
+            models.UniqueConstraint(fields=['game_id', 'official_id'], name='unique_game_officials')
+        ]
+        
