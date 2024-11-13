@@ -42,6 +42,7 @@ class Lineup(models.Model):
 
     position_1=models.CharField(max_length=200,blank=True, null=True)
     position_2=models.CharField(max_length=200,blank=True, null=True)
+    player_ready = models.BooleanField(default=False)
 
     # Timestamps for creation and last update
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -68,12 +69,7 @@ class PlayerJersey(models.Model):
     
     class Meta:
         db_table = 'futurestar_app_player_jersey'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['lineup_players__team_id', 'lineup_players__game_id', 'lineup_players__tournament_id', 'jersey_number'],
-                name='unique_jersey_per_game_tournament_team_player'
-            )
-        ]
+       
 
     def __str__(self):
         return f"Player Jersey {self.id} - {self.lineup_players} - {self.jersey_number}"

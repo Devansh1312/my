@@ -618,6 +618,125 @@ class GameStatsLineupPlayers(APIView):
                 }
             }, status=status.HTTP_200_OK)
 
+
+class LineupPlayerStatusAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Retrieve team_id, tournament_id, and game_id from query parameters
+        team_id = request.query_params.get('team_id')
+        tournament_id = request.query_params.get('tournament_id')
+        game_id = request.query_params.get('game_id')
+
+        # Check if all required query parameters are provided
+        if not team_id or not tournament_id or not game_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id, tournament_id, and game_id are required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter lineup entries by team_id, tournament_id, game_id, and specific statuses
+        lineup_entries = Lineup.objects.filter(
+            lineup_status__in=[Lineup.SUBSTITUTE, Lineup.ALREADY_IN_LINEUP],
+            team_id=team_id,
+            tournament_id=tournament_id,
+            game_id=game_id
+        )
+
+        # If no lineup entries are found, return a not found response
+        if not lineup_entries.exists():
+            return Response({
+                'status': 0,
+                'message': _('No players found for the specified criteria.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Prepare the response data for each lineup entry, classified by lineup_status
+        added_players = []
+        substitute_players = []
+        for lineup in lineup_entries:
+            player = lineup.player_id
+            player_data = {
+                'id': lineup.id,
+                'team_id': lineup.team_id.id,
+                'team_name': lineup.team_id.team_name,  # Assuming team_name field exists in TeamBranch
+                'player_id': player.id,
+                'player_username': player.username,
+                'player_profile_picture': player.profile_picture.url if player.profile_picture else None,
+                'position_1': lineup.position_1,
+                'position_2': lineup.position_2,
+                'player_ready': lineup.player_ready,
+                'created_at': lineup.created_at,
+                'updated_at': lineup.updated_at,
+            }
+
+            # Classify players based on lineup_status
+            if lineup.lineup_status == Lineup.ALREADY_IN_LINEUP:
+                added_players.append(player_data)
+            elif lineup.lineup_status == Lineup.SUBSTITUTE:
+                substitute_players.append(player_data)
+
+        # Return the response with classified players
+        return Response({
+            'status': 1,
+            'message': _('Players fetched successfully.'),
+            'data': {
+                'added_lineup': added_players,
+                'substitute': substitute_players
+            }
+        }, status=status.HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Retrieve player_id, team_id, tournament_id, and game_id from request data
+        player_id = request.data.get('player_id')
+        team_id = request.data.get('team_id')
+        tournament_id = request.data.get('tournament_id')
+        game_id = request.data.get('game_id')
+
+        # Ensure all required fields are provided
+        if not player_id or not team_id or not tournament_id or not game_id:
+            return Response({
+                'status': 0,
+                'message': _('player_id, team_id, tournament_id, and game_id are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Try to retrieve the lineup entry
+        try:
+            lineup_entry = Lineup.objects.get(
+                player_id=player_id,
+                team_id=team_id,
+                tournament_id=tournament_id,
+                game_id=game_id
+            )
+        except Lineup.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Lineup entry not found with the specified criteria.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Toggle the player_ready status
+        lineup_entry.player_ready = not lineup_entry.player_ready
+        lineup_entry.save()
+
+        return Response({
+            'status': 1,
+            'message': _('Player ready status updated successfully.'),
+            'data': {
+                'player_id': player_id,
+                'team_id': team_id,
+                'tournament_id': tournament_id,
+                'game_id': game_id,
+                'player_ready': lineup_entry.player_ready
+            }
+        }, status=status.HTTP_200_OK)
+
 ###### Game Official Types API Views ######
 class GameOficialTypesList(APIView):
     permission_classes = [IsAuthenticated]
