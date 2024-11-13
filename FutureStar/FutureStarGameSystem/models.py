@@ -61,16 +61,22 @@ class Lineup(models.Model):
 
 class PlayerJersey(models.Model):
     id = models.AutoField(primary_key=True)
-    lineup_players=models.ForeignKey(Lineup,on_delete=models.CASCADE)
+    lineup_players = models.ForeignKey(Lineup, on_delete=models.CASCADE)
     jersey_number = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     
-    def __str__(self):
-        return f"Player Jersey {self.id} - {self.lineup_players} - {self.jersey_number}"
-    
     class Meta:
         db_table = 'futurestar_app_player_jersey'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['lineup_players__team_id', 'lineup_players__game_id', 'lineup_players__tournament_id', 'jersey_number'],
+                name='unique_jersey_per_game_tournament_team_player'
+            )
+        ]
+
+    def __str__(self):
+        return f"Player Jersey {self.id} - {self.lineup_players} - {self.jersey_number}"
 
 class OfficialsType(models.Model):
     id=models.AutoField(primary_key=True)
