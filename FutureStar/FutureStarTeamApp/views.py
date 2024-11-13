@@ -18,6 +18,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
 from django.conf import settings
+from django.db import transaction
 
 
 ################################################################## TEAM API ###############################################################################################
@@ -493,7 +494,7 @@ class StaffManagementView(APIView):
             return Response({
                 'status': 0, 
                 'message': _('branch_id, user_id, and joinning_type are required')
-                }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # Convert joinning_type to an integer and validate it
         try:
@@ -501,48 +502,66 @@ class StaffManagementView(APIView):
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
-                'message': _('Please provide a valid joinning type')
+                'message': _('Please provide a valid joining type')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate joinning_type to accept only values 1, 2, 3, or 4
         if joinning_type not in [1, 2, 3, 4]:
             return Response({
                 'status': 0,
-                'message': _('Please provide a valid joinning type.')
+                'message': _('Please provide a valid joining type.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        join_branch_data = {
-            'branch_id': branch_id,
-            'user_id': user_id,
-            'joinning_type': joinning_type
-        }
+        try:
+            with transaction.atomic():
+                # Retrieve the user
+                user = User.objects.get(id=user_id)
+                success_message = ''
 
-        serializer = JoinBranchSerializer(data=join_branch_data)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-                # Set success message based on joinning_type
-                if joinning_type in [JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE, JoinBranch.MEDICAL_STAFF_TYPE]:
-                    success_message = _('Staff added successfully.')
-                elif joinning_type == JoinBranch.PLAYER_TYPE:
-                    success_message = _('Player added successfully.')
+                # Check if joining as MANAGERIAL_STAFF and update the role if current role is 5
+                if joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE and user.role_id == 5:
+                    user.role_id = 6
+                    user.save()
+                    success_message = _('Manager added successfully, and user role updated to manager.')
+                else:
+                    # Set success message based on joinning_type
+                    if joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE:
+                        success_message = _('Staff added successfully.')
+                    elif joinning_type == JoinBranch.PLAYER_TYPE:
+                        success_message = _('Player added successfully.')
 
-                return Response({
-                    'status': 1,
-                    'message': success_message,
-                    'data': serializer.data
-                }, status=status.HTTP_201_CREATED)
-            except IntegrityError:
-                return Response({
-                    'status': 0,
-                    'message': _('User has already joined this branch.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({
-            'status': 0,
-            'message': _('Failed to add staff/player.'),
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+                # Prepare and save JoinBranch data
+                join_branch_data = {
+                    'branch_id': branch_id,
+                    'user_id': user_id,
+                    'joinning_type': joinning_type
+                }
+                serializer = JoinBranchSerializer(data=join_branch_data)
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({
+                        'status': 1,
+                        'message': success_message,
+                        'data': serializer.data
+                    }, status=status.HTTP_201_CREATED)
+                else:
+                    return Response({
+                        'status': 0,
+                        'message': _('Failed to add staff/player.'),
+                        'errors': serializer.errors
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('User not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError:
+            return Response({
+                'status': 0,
+                'message': _('User has already joined this branch.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 
