@@ -125,26 +125,26 @@ class PostCommentSerializer(serializers.ModelSerializer):
         if obj.creator_type == Post_comment.TEAM_TYPE:
             team = Team.objects.get(id=obj.created_by_id)
             return {
-                'id': team.id,
+                'created_by_id': team.id,
                 'name': team.team_name,
                 'profile_image': team.team_logo.url if team.team_logo else None,
-                'type': 'team'
+                'creator_type': 1
             }
         elif obj.creator_type == Post_comment.GROUP_TYPE:
             group = TrainingGroups.objects.get(id=obj.created_by_id)
             return {
-                'id': group.id,
+                'created_by_id': group.id,
                 'name': group.group_name,
                 'profile_image': group.group_logo.url if group.group_logo else None,
-                'type': 'group'
+                'creator_type': 2
             }
         else:  # USER_TYPE
             user = User.objects.get(id=obj.created_by_id)
             return {
-                'id': user.id,
+                'created_by_id': user.id,
                 'username': user.username,
                 'profile_image': user.profile_picture.url if user.profile_picture else None,
-                'type': 'user'
+                'creator_type': 3
             }
         return None
 
@@ -173,26 +173,26 @@ class PostSerializer(serializers.ModelSerializer):
         if obj.creator_type == Post.USER_TYPE:
             user = User.objects.get(id=obj.created_by_id)
             return {
-                'id': user.id,
+                'created_by_id': user.id,
                 'username': user.username,
                 'profile_image': user.profile_picture.url if user.profile_picture else None,
-                'type': 'user'
+                'creator_type': 1
             }
         elif obj.creator_type == Post.TEAM_TYPE:
             team = Team.objects.get(id=obj.created_by_id)
             return {
-                'id': team.id,
+                'created_by_id': team.id,
                 'username': team.team_name,
                 'profile_image': team.team_logo.url if team.team_logo else None,
-                'type': 'team'
+                'creator_type': 2
             }
         elif obj.creator_type == Post.GROUP_TYPE:
             group = TrainingGroups.objects.get(id=obj.created_by_id)
             return {
-                'id': group.id,
+                'created_by_id': group.id,
                 'username': group.group_name,
                 'profile_image': group.group_logo.url if group.group_logo else None,
-                'type': 'group'
+                'creator_type': 3
             }
         return None
 

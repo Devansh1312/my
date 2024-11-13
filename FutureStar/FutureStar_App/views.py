@@ -24,6 +24,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 import sys
 from functools import wraps
+from django.core.files.storage import FileSystemStorage
 
 from FutureStarAPI.models import *
 from FutureStar_App.models import *
@@ -259,34 +260,74 @@ class UserUpdateProfileView(View):
         else:
             # Handle profile update
             user = request.user
-            old_profile_picture = user.profile_picture
-            old_card_header = user.card_header
-
             form = UserUpdateProfileForm(
                 request.POST, instance=user, files=request.FILES
             )
             if form.is_valid():
                 # Handle profile picture update
+                # Initialize FileSystemStorage for profile pictures and card headers
+                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'profile_pics'))
+                card_fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'card_header'))
+
+                # Handle profile picture
                 if "profile_picture" in request.FILES:
-                    if old_profile_picture and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, str(old_profile_picture))
-                    ):
-                        os.remove(
-                            os.path.join(settings.MEDIA_ROOT, str(old_profile_picture))
+                    # Remove old profile picture if it exists
+                    if user.profile_picture:
+                        old_profile_picture_path = os.path.join(
+                            settings.MEDIA_ROOT, str(user.profile_picture)  # Convert to string
                         )
+                        if os.path.isfile(old_profile_picture_path):
+                            os.remove(old_profile_picture_path)
+
+                    # Save new profile picture
+                    profile_picture_file = request.FILES["profile_picture"]
+                    file_extension = profile_picture_file.name.split('.')[-1]
+                    unique_suffix = get_random_string(8)
+                    profile_picture_filename = f"{request.user.id}_{unique_suffix}.{file_extension}"
+                    fs.save(profile_picture_filename, profile_picture_file)
+                    user.profile_picture = os.path.join(
+                        "profile_pics", profile_picture_filename
+                    )
                 elif "profile_picture-clear" in request.POST:
+                    # Clear the profile picture field
+                    if user.profile_picture:
+                        old_profile_picture_path = os.path.join(
+                            settings.MEDIA_ROOT, str(user.profile_picture)  # Convert to string
+                        )
+                        if os.path.isfile(old_profile_picture_path):
+                            os.remove(old_profile_picture_path)
                     user.profile_picture = None
 
-                # Handle card header update
+                # Handle card_header
                 if "card_header" in request.FILES:
-                    if old_card_header and os.path.isfile(
-                        os.path.join(settings.MEDIA_ROOT, str(old_card_header))
-                    ):
-                        os.remove(
-                            os.path.join(settings.MEDIA_ROOT, str(old_card_header))
+                    # Remove old card header if it exists
+                    if user.card_header:
+                        old_card_header_path = os.path.join(
+                            settings.MEDIA_ROOT, str(user.card_header)  # Convert to string
                         )
+                        if os.path.isfile(old_card_header_path):
+                            os.remove(old_card_header_path)
+
+                    # Save new card header
+                    card_header_file = request.FILES["card_header"]
+                    file_extension = card_header_file.name.split('.')[-1]
+                    unique_suffix = get_random_string(8)
+                    card_header_filename = f"card_header_{unique_suffix}.{file_extension}"
+                    card_fs.save(card_header_filename, card_header_file)
+                    user.card_header = os.path.join(
+                        "card_header", card_header_filename
+                    )
                 elif "card_header-clear" in request.POST:
+                    # Clear the card header field
+                    if user.card_header:
+                        old_card_header_path = os.path.join(
+                            settings.MEDIA_ROOT, str(user.card_header)  # Convert to string
+                        )
+                        if os.path.isfile(old_card_header_path):
+                            os.remove(old_card_header_path)
                     user.card_header = None
+
+
 
                 user = form.save()
                 messages.success(request, "Your profile has been updated successfully.")
@@ -346,7 +387,9 @@ class System_Settings(LoginRequiredMixin, View):
                     if os.path.isfile(old_fav_icon_path):
                         os.remove(old_fav_icon_path)
                 fav_icon_file = request.FILES["fav_icon"]
-                fav_icon_filename = "favicon.jpg"
+                file_extension = fav_icon_file.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                fav_icon_filename = f"favicon_{unique_suffix}.{file_extension}"
                 fs.save(fav_icon_filename, fav_icon_file)
                 system_settings.fav_icon = os.path.join(
                     "System_Settings", fav_icon_filename
@@ -361,7 +404,9 @@ class System_Settings(LoginRequiredMixin, View):
                     if os.path.isfile(old_footer_logo_path):
                         os.remove(old_footer_logo_path)
                 footer_logo_file = request.FILES["footer_logo"]
-                footer_logo_filename = "footer_logo.jpg"
+                file_extension = footer_logo_file.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                footer_logo_filename = f"footer_logo_{unique_suffix}.{file_extension}"
                 fs.save(footer_logo_filename, footer_logo_file)
                 system_settings.footer_logo = os.path.join(
                     "System_Settings", footer_logo_filename
@@ -376,7 +421,9 @@ class System_Settings(LoginRequiredMixin, View):
                     if os.path.isfile(old_header_logo_path):
                         os.remove(old_header_logo_path)
                 header_logo_file = request.FILES["header_logo"]
-                header_logo_filename = "header_logo.jpg"
+                file_extension = header_logo_file.name.split('.')[-1]
+                unique_suffix = get_random_string(8)
+                header_logo_filename = f"header_logo_{unique_suffix}.{file_extension}"
                 fs.save(header_logo_filename, header_logo_file)
                 system_settings.header_logo = os.path.join(
                     "System_Settings", header_logo_filename
