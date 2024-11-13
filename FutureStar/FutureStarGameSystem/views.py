@@ -533,3 +533,25 @@ class GameStatsLineupPlayers(APIView):
                     'substitute': substitute_data,
                 }
             }, status=status.HTTP_200_OK)
+
+###### Game Official Types API Views ######
+class GameOficialTypesList(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    serializer_class = GameOficialTypeSerializer
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get all official types
+        official_types = OfficialsType.objects.all()
+
+        # Serialize the official types with language in context
+        serializer = self.serializer_class(official_types, many=True, context={'language': language})
+        # Prepare the response
+        return Response({
+           'status': 1,
+           'message': _('official types retrieved successfully.'),
+           'data': serializer.data
+        }, status=status.HTTP_200_OK)
