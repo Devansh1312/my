@@ -36,4 +36,17 @@ class LineUpSerializer(serializers.ModelSerializer):
     def get_team_name(self, obj):
    
         return obj.team_id.branch_id.team_name if obj.team_id else None
-    
+
+
+class GameOficialTypeSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OfficialsType
+        fields = ['id', 'name']  # Only include the fields you need in the response
+
+    def get_name(self, obj):
+        # Get the language from the context (set in the view)
+        language = self.context.get('language', 'en')
+        # Return the appropriate field based on language
+        return obj.name_ar if language == 'ar' else obj.name_en
