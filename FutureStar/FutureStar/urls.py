@@ -31,6 +31,8 @@ urlpatterns = [
     path('', include('FutureStarTournamentApp.urls')),  # Point to the app's API urls
     path('', include('FutureStarTrainingApp.urls')),  # Point to the app's API urls
     path('', include('FutureStarGameSystem.urls')), 
+    path('', include('FutureStarFriendlyGame.urls')), 
+
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

@@ -52,7 +52,7 @@ class TeamSerializer(serializers.ModelSerializer):
                 'id': branch.id,
                 'team_name': branch.team_name,
                 'age_group': branch.age_group_id.name_ar if language == 'ar' else branch.age_group_id.name_en if branch.age_group_id else None,
-                'gender': branch.gender.id,
+                'gender': branch.gender.id if branch.gender else None,
                 'gender_name': branch.gender.name_ar if language == 'ar' else branch.gender.name_en if branch.gender else None,
             }
             for branch in branches

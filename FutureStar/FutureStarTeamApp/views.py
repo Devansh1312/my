@@ -156,7 +156,7 @@ class TeamViewAPI(APIView):
 
 
     def put(self, request):
-        team_id = request.data.get('team_id')
+        team_id = request.data.get('created_by_id')
         print(team_id)
         user = request.user
         language = request.headers.get('Language', 'en')
@@ -284,11 +284,18 @@ class TeamViewAPI(APIView):
 
         # Serialize the data
         serializer = TeamSerializer(team_instance)
+        user_data = get_user_data(user, request)
+        # Fetch group data
+        group_data = get_group_data(user, request)
 
         return Response({
             'status': 1,
             'message': _('Team updated successfully.'),
-            'data': serializer.data
+             'data': {
+                'user': user_data,
+                'team': serializer.data,
+                'group': group_data
+            }
         }, status=status.HTTP_200_OK)
     
     def patch(self, request):
@@ -297,7 +304,7 @@ class TeamViewAPI(APIView):
             activate(language)
 
         """API for updating team logo"""
-        team_id = request.data.get('team_id')
+        team_id = request.data.get('created_by_id')
         if not team_id:
             return Response({
                 'status': 0, 
@@ -326,14 +333,22 @@ class TeamViewAPI(APIView):
             team_instance.team_logo = logo_path
 
         team_instance.save()
+        user = request.user
 
         # Serialize and return the updated data
         serializer = TeamSerializer(team_instance)
+        user_data = get_user_data(user, request)
+        # Fetch group data
+        group_data = get_group_data(user, request)
 
         return Response({
             'status': 1,
             'message': _('Team logo updated successfully.'),
-            'data': serializer.data
+            'data': {
+                'user': user_data,
+                'team': serializer.data,
+                'group': group_data
+            }
         }, status=status.HTTP_200_OK)
     
     ############### Team Delete API ###################
@@ -344,7 +359,7 @@ class TeamViewAPI(APIView):
             activate(language)
         
         # Get the team_id from query parameters
-        team_id = request.query_params.get('team_id', None)
+        team_id = request.query_params.get('created_by_id', None)
         if not team_id:
             return Response({
               'status': 0,
@@ -523,12 +538,16 @@ class StaffManagementView(APIView):
                     user.role_id = 6
                     user.save()
                     success_message = _('Manager added successfully, and user role updated to manager.')
-                else:
-                    # Set success message based on joinning_type
-                    if joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE:
-                        success_message = _('Staff added successfully.')
-                    elif joinning_type == JoinBranch.PLAYER_TYPE:
-                        success_message = _('Player added successfully.')
+
+                # Check if joining as PLAYER_TYPE and update the role to 2
+                elif joinning_type == JoinBranch.PLAYER_TYPE:
+                    user.role_id = 2
+                    user.save()
+                    success_message = _('Player added successfully, and user role updated to player.')
+
+                # Set success message for other staff types
+                elif joinning_type in [JoinBranch.COACH_STAFF_TYPE, JoinBranch.MEDICAL_STAFF_TYPE]:
+                    success_message = _('Staff added successfully.')
 
                 # Prepare and save JoinBranch data
                 join_branch_data = {
@@ -644,10 +663,18 @@ class UserSearchView(APIView):
         # Initialize a queryset
         users = User.objects.none()
 
+        ###### Search for Manager ##########
         if search_type == '1':
             users = User.objects.filter(role_id=5)
-        elif search_type == '2':
+        
+        ###### Search for Player##########
+        if search_type == '2':
             users = User.objects.filter(role_id__in=[5, 2])
+        
+        elif search_type == '3':
+            users = User.objects.filter(role_id__in=[3])
+        
+        ###### Search for Coaching Staff ##########
 
         # Filter by phone if provided
         if phone:

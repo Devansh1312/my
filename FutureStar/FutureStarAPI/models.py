@@ -72,7 +72,7 @@ class TeamBranch(models.Model):
     field_size=models.ForeignKey(FieldCapacity,on_delete=models.CASCADE)
     phone = models.CharField(max_length=100,blank=True,null=True)
     email = models.EmailField(max_length=255, blank=True, null=True)
-    gender = models.ForeignKey(UserGender,on_delete=models.CASCADE,blank=True, null=True)
+    gender = models.ForeignKey(UserGender,on_delete=models.CASCADE,null=True)
    
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)
