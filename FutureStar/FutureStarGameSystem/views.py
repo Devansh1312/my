@@ -494,10 +494,10 @@ class DeleteLineupView(APIView):
     
     def delete(self, request, *args, **kwargs):
         # Get player_id, team_id, tournament_id, and game_id from request data
-        player_id = request.data.get('player_id')
-        team_id = request.data.get('team_id')
-        tournament_id = request.data.get('tournament_id')
-        game_id = request.data.get('game_id')
+        player_id =request.query_params.get('player_id')
+        team_id = request.query_params.get('team_id')
+        tournament_id =request.query_params.get('tournament_id')
+        game_id =request.query_params.get('game_id')
 
         # Ensure all required fields are provided
         if not player_id or not team_id or not tournament_id or not game_id:
@@ -687,7 +687,7 @@ class GameOfficialsAPIView(APIView):
             officials_by_type[type_name].append({
                 'official_id': official.official_id.id,
                 'official_name': official.official_id.username,
-                'profile_pic': official.official_id.profile_pic.url if official.official_id.profile_pic else None,
+                'profile_picture': official.official_id.profile_picture.url if official.official_id.profile_picture else None,
                 'officials_type_id': official.officials_type_id.id,
             })
 
@@ -746,7 +746,7 @@ class GameOfficialsAPIView(APIView):
                 'game_id': game.id,
                 'official_id': official.id,
                 'official_name': official.username,
-                'profile_pic': official.profile_pic.url if official.profile_pic else None,
+                'profile_picture': official.profile_picture.url if official.profile_picture else None,
                 'officials_type_id': officials_type.id,
                 'officials_type_name': type_serializer.data['name']
             }
@@ -759,8 +759,8 @@ class GameOfficialsAPIView(APIView):
             activate(language)
 
         # Get game_id and official_id from request data
-        game_id = request.data.get('game_id')
-        official_id = request.data.get('official_id')
+        game_id = request.query_params.get('game_id')
+        official_id = request.query_params.get('official_id')
 
         # Ensure both game_id and official_id are provided
         if not game_id or not official_id:
