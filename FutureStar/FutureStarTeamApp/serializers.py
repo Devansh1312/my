@@ -41,9 +41,14 @@ class TeamSerializer(serializers.ModelSerializer):
         ]
 
     def get_uniforms(self, obj):
-            # Fetch all uniforms related to the team and return their URLs as a list
-            uniforms = TeamUniform.objects.filter(team_id=obj)
-            return [uniform.team_uniform_image.url for uniform in uniforms if uniform.team_uniform_image]
+        # Fetch all uniforms related to the team
+        uniforms = TeamUniform.objects.filter(team_id=obj)
+        
+        # Return a list of dictionaries containing the id and image URL
+        return [
+            {"id": uniform.id, "image": uniform.team_uniform_image.url} 
+            for uniform in uniforms if uniform.team_uniform_image
+        ]
     
     def get_branches(self, obj):
         request = self.context.get('request')

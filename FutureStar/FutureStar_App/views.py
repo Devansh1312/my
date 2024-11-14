@@ -30,6 +30,7 @@ from FutureStarAPI.models import *
 from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarTournamentApp.models import *
+from FutureStarGameSystem.models import *
 
 
 def user_role_check(view_func):
@@ -5819,4 +5820,74 @@ class InjuryTypeListView(LoginRequiredMixin, View):
             request,
             self.template_name,
             {"injurytype": injurytype, "breadcrumb": {"parent": "User", "child": "Injury Type"}},
+        )
+
+
+################################################################# Game Officials Type CRUD Views ###################################################
+@method_decorator(user_role_check, name='dispatch')
+class GameOfficialsTypeCreateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/GameOfficialsType.html"
+
+    def get(self, request):
+        form = GameOfficialsTypeForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = GameOfficialsTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Game Officials Type Created successfully.")
+            return redirect("gameofficialstype_list")
+        messages.error(
+            request,
+            "There was an error creating the age group. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class GameOfficialsTypeUpdateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/GameOfficialsType.html"  # Fixed template name
+
+    def get(self, request, pk):
+        gameofficialstype = get_object_or_404(OfficialsType, pk=pk)
+        form = GameOfficialsTypeForm(instance=gameofficialstype)
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, pk):
+        gameofficialstype = get_object_or_404(OfficialsType, pk=pk)
+        form = GameOfficialsTypeForm(request.POST, instance=gameofficialstype)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Game Officials Type Updated Successfully.")
+            return redirect("gameofficialstype_list")
+        messages.error(
+            request,
+            "There was an error updating the injury type. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class GameOfficialsTypeDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        gameofficialstype = get_object_or_404(OfficialsType, pk=pk)
+        gameofficialstype.delete()
+        messages.success(request, "Injur Type Deleted Successfully.")
+        return redirect("gameofficialstype_list")
+
+    def post(self, request, pk):
+        gameofficialstype = get_object_or_404(OfficialsType, pk=pk)
+        gameofficialstype.delete()
+        messages.success(request, "Game Officials Type Deleted Successfully.")
+        return redirect("gameofficialstype_list")
+
+@method_decorator(user_role_check, name='dispatch')
+class GameOfficialsTypeListView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/GameOfficialsType.html"
+
+    def get(self, request):
+        gameofficialstype = OfficialsType.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {"gameofficialstype": gameofficialstype, "breadcrumb": {"parent": "User", "child": "Game Officials Type"}},
         )

@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %}Game Officials Type{% endblock %}
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{breadcrumb.child}}</h3>
+            </div>
+            <div class="col-6">
+               <ol class="breadcrumb">
+                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addGameOfficialsTypeModal">Add GameOfficialsType</button>
+               </ol>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+         <!-- GameOfficialsType List -->
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="display" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Game Officials Type (English)</th>
+                              <th>Game Officials Type (Arabic)</th>
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for gameofficialstype in gameofficialstype %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ gameofficialstype.name_en }}</td>
+                              <td>{{ gameofficialstype.name_ar }}</td>
+                              <td>
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                       <i data-feather="more-vertical"></i>
+                                       <!-- Three dots icon -->
+                                    </a>
+                                    <!-- Hidden card for actions -->
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                          <li style="padding: 8px 12px;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGameOfficialsTypeModal" data-gameofficialstype-id="{{ gameofficialstype.id }}" data-gameofficialstype-name-en="{{ gameofficialstype.name_en }}" data-gameofficialstype-name-ar="{{ gameofficialstype.name_ar }}">
+                                                 Edit </a>
+                                          </li>
+                                          <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteGameOfficialsTypeModal" data-gameofficialstype-id="{{ gameofficialstype.id }}">
+                                                 Delete </a>
+                                          </li> -->
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Add GameOfficialsType Modal -->
+<div class="modal fade" id="addGameOfficialsTypeModal" tabindex="-1" aria-labelledby="addGameOfficialsTypeModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="addGameOfficialsTypeModalLabel">Add GameOfficialsType</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'gameofficialstype_create' %}" id="addGameOfficialsTypeForm"> {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name_en" class="form-label">Game Officials Type (English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Game Officials Type (English)">
+                  <div id="addGameOfficialsTypeEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Game Officials Type (Arabic)</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Arabic Game Officials Type">
+                  <div id="addGameOfficialsTypeArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Add GameOfficialsType</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Edit GameOfficialsType Modal -->
+<div class="modal fade" id="editGameOfficialsTypeModal" tabindex="-1" aria-labelledby="editGameOfficialsTypeModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="editGameOfficialsTypeModalLabel">Edit GameOfficialsType</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'gameofficialstype_update' pk=0 %}" id="editGameOfficialsTypeForm"> {% csrf_token %}
+               <input type="hidden" id="editGameOfficialsTypeId" name="id">
+               <div class="mb-3">
+                  <label for="editName_en" class="form-label">Game Officials Type (English)</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter Game Officials Type (English)">
+                  <div id="editGameOfficialsTypeEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Game Officials Type (Arabic)</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Arabic Game Officials Type">
+                  <div id="editGameOfficialsTypeArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Update GameOfficialsType</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Delete GameOfficialsType Modal -->
+<div class="modal fade" id="deleteGameOfficialsTypeModal" tabindex="-1" aria-labelledby="deleteGameOfficialsTypeModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="deleteGameOfficialsTypeModalLabel">Delete GameOfficialsType</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'gameofficialstype_delete' pk=0 %}" id="deleteGameOfficialsTypeForm"> {% csrf_token %}
+               <input type="hidden" id="deleteGameOfficialsTypeId" name="id">
+               <p>Are you sure you want to delete this gameofficialstype?</p>
+               <button type="submit" class="btn btn-danger">Delete GameOfficialsType</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      var editGameOfficialsTypeModal = document.getElementById('editGameOfficialsTypeModal');
+      editGameOfficialsTypeModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget;
+         var gameofficialstypeId = button.getAttribute('data-gameofficialstype-id');
+         var gameofficialstypeNameEn = button.getAttribute('data-gameofficialstype-name-en');
+         var gameofficialstypeNameAr = button.getAttribute('data-gameofficialstype-name-ar');
+         var form = document.getElementById('editGameOfficialsTypeForm');
+         form.action = "{% url 'gameofficialstype_update' pk='0' %}".replace('0', gameofficialstypeId);
+         form.querySelector('#editGameOfficialsTypeId').value = gameofficialstypeId;
+         form.querySelector('#editName_en').value = gameofficialstypeNameEn;
+         form.querySelector('#editName_ar').value = gameofficialstypeNameAr;
+         // Clear any previous error messages
+         document.getElementById('editGameOfficialsTypeEnError').textContent = '';
+         document.getElementById('editGameOfficialsTypeArError').textContent = '';
+      });
+      var deleteGameOfficialsTypeModal = document.getElementById('deleteGameOfficialsTypeModal');
+      deleteGameOfficialsTypeModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget;
+         var gameofficialstypeId = button.getAttribute('data-gameofficialstype-id');
+         var form = document.getElementById('deleteGameOfficialsTypeForm');
+         form.action = "{% url 'gameofficialstype_delete' pk='0' %}".replace('0', gameofficialstypeId);
+         form.querySelector('#deleteGameOfficialsTypeId').value = gameofficialstypeId;
+      });
+      // Add GameOfficialsType Form Validation
+      var addGameOfficialsTypeForm = document.getElementById('addGameOfficialsTypeForm');
+      addGameOfficialsTypeForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('name_en');
+         var nameArInput = document.getElementById('name_ar');
+         var errorContainer = document.getElementById('addGameOfficialsTypeEnError');
+         var errorArContainer = document.getElementById('addGameOfficialsTypeArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous errors
+         errorContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorContainer.textContent = 'Game Officials Type (English) cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Game Officials Type (Arabic) cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+      // Edit GameOfficialsType Form Validation
+      var editGameOfficialsTypeForm = document.getElementById('editGameOfficialsTypeForm');
+      editGameOfficialsTypeForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('editName_en');
+         var nameArInput = document.getElementById('editName_ar');
+         var errorContainer = document.getElementById('editGameOfficialsTypeEnError');
+         var errorArContainer = document.getElementById('editGameOfficialsTypeArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous errors
+         errorContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorContainer.textContent = 'Game Officials Type (English) cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Game Officials Type (Arabic) cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   });
+</script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // Toggle the visibility of the action card
+      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+         menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                  card.style.display = 'none';
+               }
+            });
+         });
+      });
+      // Hide action card if clicking outside
+      document.addEventListener('click', function(event) {
+         var isClickInside = event.target.closest('.action-menu-container');
+         if (!isClickInside) {
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+            });
+         }
+      });
+   });
+</script>
+{% endblock %}

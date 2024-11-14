@@ -243,6 +243,12 @@ urlpatterns = [
     path('injurytype/update/<int:pk>/', InjuryTypeUpdateView.as_view(), name='injurytype_update'),
     path('injurytype/delete/<int:pk>/', InjuryTypeDeleteView.as_view(), name='injurytype_delete'),
 
+    #Game Officials TypeForm URL
+    path('gameofficialstype/', GameOfficialsTypeListView.as_view(), name='gameofficialstype_list'),
+    path('gameofficialstype/create/', GameOfficialsTypeCreateView.as_view(), name='gameofficialstype_create'),
+    path('gameofficialstype/update/<int:pk>/', GameOfficialsTypeUpdateView.as_view(), name='gameofficialstype_update'),
+    path('gameofficialstype/delete/<int:pk>/', GameOfficialsTypeDeleteView.as_view(), name='gameofficialstype_delete'),
+
 
     #Playing Position URLS's
     path('playing_positions/', PlayingPositionListView.as_view(), name='playing_position_list'),
