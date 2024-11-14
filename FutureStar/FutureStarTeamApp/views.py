@@ -413,7 +413,7 @@ class TeamBranchAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('Team Branch created successfully.'),
-                'data': TeamBranchSerializer(team_branch_instance).data
+                'data': TeamBranchSerializer(team_branch_instance, context={'request': request}).data  # Include context here as well
             }, status=status.HTTP_201_CREATED)
         
         # Return an error response if validation fails

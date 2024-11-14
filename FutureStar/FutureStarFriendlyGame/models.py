@@ -22,6 +22,7 @@ class FriendlyGame(models.Model):
     assistant_refree_2nd = models.ForeignKey(User,related_name="assistant_refree_2nd", null=True,blank=True, on_delete=models.CASCADE)
     refree_4th = models.ForeignKey(User,related_name="refree_4th", null=True,blank=True, on_delete=models.CASCADE)
     game_status = models.IntegerField(default=0)
+    created_by = models.ForeignKey(User, related_name="created_by", on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     
