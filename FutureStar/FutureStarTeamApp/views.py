@@ -674,29 +674,29 @@ class UserSearchView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
         search_type = request.query_params.get('search_type')
         phone = request.query_params.get('phone')
         branch_id = request.query_params.get('branch_id')  # Get branch_id from request
 
         # Check for valid search_type, comparing with string values
-        if search_type not in ['1', '2']:
-            return Response({'status': 0, 'message': _('Invalid search type. Must be 1 or 2.')}, status=status.HTTP_400_BAD_REQUEST)
+        if search_type not in ['1', '2', '3']:  # Add '3' to support coaching staff search
+            return Response({'status': 0, 'message': _('Invalid search type. Must be 1, 2, or 3.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Initialize a queryset
         users = User.objects.none()
 
         ###### Search for Manager ##########
         if search_type == '1':
-            users = User.objects.filter(role_id=5)
+            users = User.objects.filter(role_id=5, is_deleted=False)
         
-        ###### Search for Player##########
+        ###### Search for Player ##########
         if search_type == '2':
-            users = User.objects.filter(role_id__in=[5, 2])
-        
-        elif search_type == '3':
-            users = User.objects.filter(role_id__in=[3])
+            users = User.objects.filter(role_id__in=[5, 2], is_deleted=False)
         
         ###### Search for Coaching Staff ##########
+        if search_type == '3':
+            users = User.objects.filter(role_id=3, is_deleted=False)
 
         # Filter by phone if provided
         if phone:

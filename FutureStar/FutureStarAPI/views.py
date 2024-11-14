@@ -196,20 +196,35 @@ class send_otp(APIView):
                 phone = request.data.get('phone')
                 password = request.data.get('password')
 
-                # Check if username or phone already exists
+                # Check if username or phone already exists, but allow for deleted users to register again
                 if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
                     return Response({
                         'status': 0,
                         'message': _('Username already exists.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                if User.objects.filter(phone=phone).exists():
+                # Check if phone exists and is deleted (soft deleted), allowing re-registration
+                user = User.objects.filter(phone=phone).first()
+                if user and user.is_deleted:
+                    # User is soft deleted, proceed with registration
+                    otp = generate_otp()
+                    otp_record, created = OTPSave.objects.update_or_create(
+                        phone=phone,
+                        defaults={'phone': phone, 'OTP': otp}
+                    )
+                    return Response({
+                        'status': 1,
+                        'message': _('OTP sent successfully.'),
+                        'data': otp  # For development, this is sent in the response.
+                    }, status=status.HTTP_200_OK)
+
+                elif User.objects.filter(phone=phone).exists():
                     return Response({
                         'status': 0,
                         'message': _('Phone number already exists.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                # Generate OTP and save it
+                # Generate OTP and save it if no soft-deleted user is found
                 otp = generate_otp()
                 otp_record, created = OTPSave.objects.update_or_create(
                     phone=phone,
@@ -258,6 +273,22 @@ class send_otp(APIView):
                             'message': _('Username already exists.')
                         }, status=status.HTTP_400_BAD_REQUEST)
 
+                    # Check if phone exists and is deleted (soft deleted), allowing re-registration
+                    user = User.objects.filter(phone=phone).first()
+                    if user and user.is_deleted:
+                        # User is soft deleted, proceed with registration
+                        otp = generate_otp()
+                        random_password = self.generate_random_password()
+                        otp_record, created = OTPSave.objects.update_or_create(
+                            phone=phone,
+                            defaults={'phone': phone, 'OTP': otp}
+                        )
+
+                        return Response({
+                            'status': 1,
+                            'message': _('OTP sent successfully.'),
+                            'data': otp  # Send OTP in response for development.
+                        }, status=status.HTTP_200_OK)
 
                     if User.objects.filter(phone=phone).exists():
                         return Response({
@@ -299,6 +330,116 @@ class send_otp(APIView):
 
 
 class verify_and_register(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        phone = request.data.get("phone")
+        otp_input = request.data.get("otp")
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+        device_type = request.data.get("device_type")
+        device_token = request.data.get("device_token")
+
+        # Check if phone, OTP, username, email, and password are provided
+        if not phone:
+            return Response({
+                'status': 0,
+                'message': _('Phone is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not otp_input:
+            return Response({
+                'status': 0,
+                'message': _('OTP is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not username:
+            return Response({
+                'status': 0,
+                'message': _('Username is a required field.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the OTP and phone exist in the OTPSave table
+        try:
+            otp_record = OTPSave.objects.get(phone=phone, OTP=otp_input)
+        except OTPSave.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Invalid OTP or phone number.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if username already exists
+        if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
+            return Response({
+                'status': 0,
+                'message': _('Username already exists.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the phone already exists in the User table, and is not deleted
+        user = User.objects.filter(phone=phone).first()
+        if user:
+            if user.is_deleted:
+                # User is soft deleted, proceed with registration
+                pass
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Phone number already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        if email : 
+            # Check if the email already exists in the User table
+            if User.objects.filter(email=email).exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Email already exists.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Create the user within a transaction to ensure atomicity
+            with transaction.atomic():
+                # Create the user in the User table using details from the request body
+                user = User.objects.create(
+                    username=username,
+                    phone=phone,
+                    email = email if email else None ,
+                    role_id=5,  # Assuming role_id 5 is for regular users
+                    device_type=device_type,
+                    device_token=device_token
+                )
+                user.set_password(password)
+                user.save()
+
+                # Delete OTP record after successful registration
+                otp_record.delete()
+
+                # Generate refresh and access tokens
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'status': 1,
+                    'message': _('User registered successfully'),
+                    'data': {
+                        'refresh_token': str(refresh),
+                        'access_token': str(refresh.access_token),
+                        'user':get_user_data(user, request),
+                        'team':get_team_data(user, request),
+                        'group':get_group_data(user, request),
+                        'current_type':user.current_type,
+                    }
+                }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An error occurred while registering the user.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
@@ -406,7 +547,6 @@ class verify_and_register(APIView):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -428,65 +568,86 @@ class LoginAPIView(APIView):
                 username_or_phone = serializer.validated_data['username']
                 password = serializer.validated_data['password']
 
-                user = User.objects.filter(username=username_or_phone).first() or \
-                       User.objects.filter(phone=username_or_phone).first()
+                # Check if the phone number is linked to a deleted user
+                deleted_user = User.objects.filter(phone=username_or_phone, is_deleted=True).first()
 
-                if user and user.check_password(password):
-                    if user.role == 1:
+                if deleted_user:
+                    # Phone number is associated with a deleted account, we need to allow new registration
+                    # Allow login for the newly registered user associated with the same phone number
+                    # First, check if the phone number belongs to a normal user (non-deleted)
+                    user = User.objects.filter(phone=username_or_phone, is_deleted=False).first()
+                    if not user:
                         return Response({
                             'status': 0,
-                            'message': _('You Can Not Login Here'),
+                            'message': _('This phone number is linked to a deleted account. Please register again.'),
                         }, status=status.HTTP_400_BAD_REQUEST)
 
-                    elif user.is_active:
-                        user.device_type = device_type
-                        user.device_token = device_token
-                        user.last_login = timezone.now()
-                        user.save()
+                # Now check if the phone number is linked to a normal (non-deleted) user
+                user = User.objects.filter(phone=username_or_phone, is_deleted=False).first() or \
+                       User.objects.filter(username=username_or_phone).first()
 
-                        refresh = RefreshToken.for_user(user)
-                        return Response({
-                            'status': 1,
-                            'message': _('Login successful'),
-                            'data': {
-                                'refresh_token': str(refresh),
-                                'access_token': str(refresh.access_token),
-                                'user':get_user_data(user, request),
-                                'team':get_team_data(user, request),
-                                'group':get_group_data(user, request),
-                                'current_type':user.current_type,
+                if user:
+                    if user.check_password(password):
+                        if user.role == 1:
+                            return Response({
+                                'status': 0,
+                                'message': _('You Cannot Login Here'),
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
-                            }
-                        }, status=status.HTTP_200_OK)
+                        elif user.is_active:
+                            user.device_type = device_type
+                            user.device_token = device_token
+                            user.last_login = timezone.now()
+                            user.save()
+
+                            refresh = RefreshToken.for_user(user)
+                            return Response({
+                                'status': 1,
+                                'message': _('Login successful'),
+                                'data': {
+                                    'refresh_token': str(refresh),
+                                    'access_token': str(refresh.access_token),
+                                    'user': get_user_data(user, request),
+                                    'team': get_team_data(user, request),
+                                    'group': get_group_data(user, request),
+                                    'current_type': user.current_type,
+                                }
+                            }, status=status.HTTP_200_OK)
                     else:
                         return Response({
                             'status': 0,
-                            'message': _('Account is inactive'),
+                            'message': _('Invalid credentials'),
                         }, status=status.HTTP_400_BAD_REQUEST)
+
                 else:
                     return Response({
                         'status': 0,
-                        'message': _('Invalid credentials'),
+                        'message': _('User does not exist with this username or phone.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             elif login_type in [2, 3]:
                 # Login with email, no password provided
                 email = serializer.validated_data['username']
 
-                user = User.objects.filter(email=email).first()
+                user = User.objects.filter(email=email, is_deleted=False).first()
 
                 if user:
-                    # If the user already exists, log them in
+                    # If the user already exists and is not deleted, log them in
+                    if user.is_deleted:
+                        return Response({
+                            'status': 0,
+                            'message': _('Your account has been deleted. Please contact support.'),
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
                     if user.role == 1:
                         return Response({
                             'status': 0,
-                            'message': _('You Can Not Login Here'),
+                            'message': _('You Cannot Login Here'),
                         }, status=status.HTTP_400_BAD_REQUEST)
                     elif user.is_active:
                         user.device_type = device_type
                         user.device_token = device_token
                         user.last_login = timezone.now()
-
                         user.save()
 
                         refresh = RefreshToken.for_user(user)
@@ -496,11 +657,10 @@ class LoginAPIView(APIView):
                             'data': {
                                 'refresh_token': str(refresh),
                                 'access_token': str(refresh.access_token),
-                                'user':get_user_data(user, request),
-                                'team':get_team_data(user, request),
-                                'group':get_group_data(user, request),
-                                'current_type':user.current_type,
-
+                                'user': get_user_data(user, request),
+                                'team': get_team_data(user, request),
+                                'group': get_group_data(user, request),
+                                'current_type': user.current_type,
                             }
                         }, status=status.HTTP_200_OK)
                     else:
@@ -511,22 +671,21 @@ class LoginAPIView(APIView):
                 else:
                     return Response({
                         'status': 0,
-                        'message': _("Email Does Not Exits Please Register First")
-                        }, status=status.HTTP_400_BAD_REQUEST)
+                        'message': _("Email does not exist. Please register first."),
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
         # Custom error handling
         error_message = serializer.errors.get('non_field_errors')
         if error_message:
-                return Response({
-                    'status': 0,
-                    'message': _(error_message[0])  # Ensures translation is applied
-                }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0,
+                'message': _(error_message[0])  # Ensures translation is applied
+            }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
                 'status': 0,
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]

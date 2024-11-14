@@ -246,6 +246,7 @@ class SearchMemberView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
         phone = request.query_params.get('phone')
         group_id = request.query_params.get('group_id')
 
@@ -255,11 +256,13 @@ class SearchMemberView(APIView):
                 'message': _('Group ID is required.')
             }, status=400)
 
-        users = User.objects.filter(role_id=5)
+        # Only include users who are not deleted
+        users = User.objects.filter(role_id=5, is_deleted=False)
 
         if phone:
             users = users.filter(phone__icontains=phone)
 
+        # Exclude users who have already joined the specified group
         joined_users = JoinTrainingGroup.objects.filter(group_id=group_id).values_list('member_id', flat=True)
         users = users.exclude(id__in=joined_users)
 
@@ -278,6 +281,7 @@ class SearchMemberView(APIView):
         ]
 
         return paginator.get_paginated_response(user_data)
+
 
 # Group Members View
 class GroupMembersView(APIView):

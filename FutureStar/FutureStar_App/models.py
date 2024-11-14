@@ -123,8 +123,18 @@ class PlayingPosition(models.Model):
     class Meta:
         db_table = 'futurestar_app_playing_position'
 
+class UserDeleteReason(models.Model):
+    name_en = models.TextField(blank=True,null=True)
+    name_ar = models.TextField(blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return self.name_en
+    
+    class Meta:
+        db_table = 'futurestar_app_user_delete_reason'
 
-# Custom User Model
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE = 1
     TEAM_TYPE = 2
@@ -134,40 +144,38 @@ class User(AbstractBaseUser, PermissionsMixin):
         (TEAM_TYPE, 'Team'),
         (GROUP_TYPE, 'Group'),
     )
-    current_type = models.IntegerField(choices=CURRENT_TYPE_CHOICES,default=1)  # Stores 1, 2, or 3 based on the type
+    current_type = models.IntegerField(choices=CURRENT_TYPE_CHOICES, default=1)  # Stores 1, 2, or 3 based on the type
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     username = models.CharField(max_length=150, unique=True)
-    profile_picture = models.ImageField(
-        upload_to="profile_pics/", null=True, blank=True
-    )
+    profile_picture = models.ImageField(upload_to="profile_pics/", null=True, blank=True)
     card_header = models.ImageField(upload_to="card_header/", null=True, blank=True)
-    email = models.EmailField(null=True, blank=True,unique=True)
+    email = models.EmailField(null=True, blank=True, unique=True)
     phone = models.CharField(max_length=20)
-    fullname = models.CharField(max_length=150,null=True, blank=True)
+    fullname = models.CharField(max_length=150, null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    age = models.CharField(max_length=5,null=True, blank=True)
+    age = models.CharField(max_length=5, null=True, blank=True)
     gender = models.ForeignKey(UserGender, null=True, blank=True, on_delete=models.CASCADE)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.CASCADE)
-    nationality = models.CharField(max_length=150,null=True, blank=True)
-    weight = models.CharField(max_length=150,null=True, blank=True)
-    height = models.CharField(max_length=150,null=True, blank=True)
-    main_playing_position = models.ForeignKey(PlayingPosition,null=True, blank=True, on_delete=models.CASCADE,related_name='main_position_users')
-    secondary_playing_position = models.ForeignKey(PlayingPosition, null=True, blank=True, on_delete=models.CASCADE,related_name='secondary_position_users')
-    playing_foot = models.CharField(max_length=150,null=True, blank=True)
-    favourite_local_team = models.CharField(max_length=150,null=True, blank=True)
-    favourite_team = models.CharField(max_length=150,null=True, blank=True)
-    favourite_local_player = models.CharField(max_length=150,null=True, blank=True)
-    favourite_player = models.CharField(max_length=150,null=True, blank=True)
+    nationality = models.CharField(max_length=150, null=True, blank=True)
+    weight = models.CharField(max_length=150, null=True, blank=True)
+    height = models.CharField(max_length=150, null=True, blank=True)
+    main_playing_position = models.ForeignKey(PlayingPosition, null=True, blank=True, on_delete=models.CASCADE, related_name='main_position_users')
+    secondary_playing_position = models.ForeignKey(PlayingPosition, null=True, blank=True, on_delete=models.CASCADE, related_name='secondary_position_users')
+    playing_foot = models.CharField(max_length=150, null=True, blank=True)
+    favourite_local_team = models.CharField(max_length=150, null=True, blank=True)
+    favourite_team = models.CharField(max_length=150, null=True, blank=True)
+    favourite_local_player = models.CharField(max_length=150, null=True, blank=True)
+    favourite_player = models.CharField(max_length=150, null=True, blank=True)
     otp = models.CharField(max_length=6, null=True, blank=True)  # Add this field for OTP
-    device_type = models.CharField(max_length=255,null=True,blank=True)
-    device_token = models.CharField(max_length=255,null=True,blank=True)
-    register_type = models.CharField(max_length=10,null=True,blank=True)
+    device_type = models.CharField(max_length=255, null=True, blank=True)
+    device_token = models.CharField(max_length=255, null=True, blank=True)
+    register_type = models.CharField(max_length=10, null=True, blank=True)
     password = models.CharField(max_length=255)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-    remember_token = models.CharField(max_length=255,null=True, blank=True)
+    remember_token = models.CharField(max_length=255, null=True, blank=True)
     token_created_at = models.DateTimeField(null=True, blank=True)  # Add this field
     email_verified_at = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -179,7 +187,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     referee_certificate = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    # New fields for soft delete functionality
+    is_deleted = models.BooleanField(default=False)  # Flag to mark as deleted
+    deleted_reason_id = models.ForeignKey(UserDeleteReason,on_delete=models.CASCADE,null=True, blank=True)  # ID of the reason for deletion (optional)
+    deleted_reason = models.TextField(null=True, blank=True)  # Text field to store the reason for deletion
 
     objects = UserManager()
 
@@ -188,7 +201,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-    
+
     class Meta:
         db_table = 'futurestar_app_user'
 
