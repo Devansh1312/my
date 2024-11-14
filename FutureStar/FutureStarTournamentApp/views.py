@@ -12,6 +12,7 @@ from FutureStarTournamentApp.serializers import *
 
 
 
+from django.db.models import Sum
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -803,95 +804,146 @@ class TournamentGamesAPIView(APIView):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+    
     def get(self, request, *args, **kwargs):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Filter by tournament_id if provided in query params
+        tournament_id = request.query_params.get('tournament_id')
+        games_query = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
+        
+        if tournament_id:
+            games_query = games_query.filter(tournament_id=tournament_id)
+        
+        # Serialize the game data
+        serializer = TournamentGamesSerializer(games_query, many=True)
+        
+        grouped_data = defaultdict(list)
+        
+        # Loop through each game and prepare the response data
+        for game, game_data in zip(games_query, serializer.data):
+            game_date = game.game_date
             
-            # Filter by tournament_id if provided in query params
-            tournament_id = request.query_params.get('tournament_id')
-            games_query = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
+            # Check if game_date is None before attempting to call strftime
+            if game_date:
+                day_name = game_date.strftime('%A')
+                formatted_date = game_date.strftime('%Y-%m-%d')
+            else:
+                day_name = "Unknown"
+                formatted_date = "Unknown-Date"
             
-            if tournament_id:
-                games_query = games_query.filter(tournament_id=tournament_id)
-            
-            serializer = TournamentGamesSerializer(games_query, many=True)
-            
-            grouped_data = defaultdict(list)
-            for game, game_data in zip(games_query, serializer.data):
-                game_date = game.game_date
-                
-                # Check if game_date is None before attempting to call strftime
-                if game_date:
-                    day_name = game_date.strftime('%A')
-                    formatted_date = game_date.strftime('%Y-%m-%d')
+            # Retrieve team names based on IDs
+            team_a_branch = TeamBranch.objects.filter(id=game.team_a).first()
+            team_b_branch = TeamBranch.objects.filter(id=game.team_b).first()
+
+            team_a_name = team_a_branch.team_name if team_a_branch else None
+            team_b_name = team_b_branch.team_name if team_b_branch else None
+
+            # Retrieve team logos
+            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id else None
+            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id else None
+
+            team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
+            team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
+
+            # Calculate goals for each team from PlayerGameStats
+            team_a_goal_count = PlayerGameStats.objects.filter(
+                team_id=game.team_a,
+                game_id=game.id,
+                tournament_id=game.tournament_id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            team_b_goal_count = PlayerGameStats.objects.filter(
+                team_id=game.team_b,
+                game_id=game.id,
+                tournament_id=game.tournament_id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            # Determine the game result (win, loss, draw) and finished status
+         
+            finished = request.query_params.get('finished')
+            game_number=request.query_params.get('game_number')
+            if finished is not None:
+                finished = finished.lower() in ['true', '1', 'yes']
+
+            # Check if both 'finished' and 'game_number' are provided
+            if finished and game_number:
+                # Ensure that both 'team_a_goal' and 'team_b_goal' are not None
+                if game_data.get('team_a_goal') is not None and game_data.get('team_b_goal') is not None:
+                    # Calculate the result based on goals
+                    if team_a_goal_count == team_b_goal_count:
+                        result = 'draw'
+                    elif team_a_goal_count > team_b_goal_count:
+                        result = 'Team A win'  # Team A wins
+                    else:
+                        result = 'Team B win'  # Team B wins
                 else:
-                    day_name = "Unknown"
-                    formatted_date = "Unknown-Date"
-                
-                # Retrieve team names based on IDs
-                team_a_branch = TeamBranch.objects.filter(id=game.team_a).first()
-                team_b_branch = TeamBranch.objects.filter(id=game.team_b).first()
+                    finished = False
+                    result = None
+            else:
+                finished = False
+                result = None
 
-                team_a_name = team_a_branch.team_name if team_a_branch else None
-                team_b_name = team_b_branch.team_name if team_b_branch else None
 
-                # Retrieve team logos
-                team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id else None
-                team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id else None
+            # Update game data with new information
+            game_data.update({
+                "team_a_name": team_a_name,
+                "team_b_name": team_b_name,
+                "team_a_logo": team_a_logo_path,
+                "team_b_logo": team_b_logo_path,
+                "tournament_id": game.tournament_id.id if game.tournament_id else None,
+                "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
+                "team_a_goal": team_a_goal_count,
+                "team_b_goal": team_b_goal_count,
+                "result": result,
+                "finished": finished
+            })
 
-                team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
-                team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
+            # Group games by day name and game date
+            grouped_data[(day_name, formatted_date)].append(game_data)
 
-                # Update game data with tournament ID and name
-                game_data.update({
-                    "team_a_name": team_a_name,
-                    "team_b_name": team_b_name,
-                    "team_a_logo": team_a_logo_path,
-                    "team_b_logo": team_b_logo_path,
-                    "tournament_id": game.tournament_id.id if game.tournament_id else None,
-                    "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
-                })
-
-                # Group games by day name and game date
-                grouped_data[(day_name, formatted_date)].append(game_data)
-
-            # Format the response data
-            formatted_data = {
-                f"{day_name},{formatted_date}": {
-                    "games": [
-                        {
-                            "id": game['id'],
-                            "tournament_id": game['tournament_id'],
-                            "tournament_name": game['tournament_name'],
-                            "game_number": game['game_number'],
-                            "game_date": game['game_date'],
-                            "game_start_time": game['game_start_time'],
-                            "game_end_time": game['game_end_time'],
-                            "group_id": game['group_id'],
-                            "group_id_name": game['group_id_name'],
-                            "team_a": game['team_a'],
-                            "team_a_name": game['team_a_name'],
-                            "team_a_logo": game['team_a_logo'],
-                            "team_b": game['team_b'],
-                            "team_b_name": game['team_b_name'],
-                            "team_b_logo": game['team_b_logo'],
-                            "game_field_id": game['game_field_id'],
-                            "game_field_id_name": game['game_field_id_name'],
-                            "created_at": game['created_at'],
-                            "updated_at": game['updated_at'],
-                        }
-                        for game in games
-                    ]
-                }
-                for (day_name, formatted_date), games in grouped_data.items()
+        # Format the response data
+        formatted_data = {
+            f"{day_name},{formatted_date}": {
+                "games": [
+                    {
+                        "id": game['id'],
+                        "tournament_id": game['tournament_id'],
+                        "tournament_name": game['tournament_name'],
+                        "game_number": game['game_number'],
+                        "game_date": game['game_date'],
+                        "game_start_time": game['game_start_time'],
+                        "game_end_time": game['game_end_time'],
+                        "group_id": game['group_id'],
+                        "group_id_name": game['group_id_name'],
+                        "team_a": game['team_a'],
+                        "team_a_name": game['team_a_name'],
+                        "team_a_logo": game['team_a_logo'],
+                        "team_a_goal": game['team_a_goal'],
+                        "team_b": game['team_b'],
+                        "team_b_name": game['team_b_name'],
+                        "team_b_logo": game['team_b_logo'],
+                        "team_b_goal": game['team_b_goal'],
+                        "result": game['result'],
+                        "finished": game['finished'],
+                        "game_field_id": game['game_field_id'],
+                        "game_field_id_name": game['game_field_id_name'],
+                        "created_at": game['created_at'],
+                        "updated_at": game['updated_at'],
+                    }
+                    for game in games
+                ]
             }
+            for (day_name, formatted_date), games in grouped_data.items()
+        }
 
-            return Response({
-                "status": 1,
-                "message": _("Games Fetched successfully."),
-                "data": formatted_data
-            }, status=status.HTTP_200_OK)
+        return Response({
+            "status": 1,
+            "message": _("Games Fetched successfully."),
+            "data": formatted_data
+        }, status=status.HTTP_200_OK)
 
 class TournamentGamesDetailAPIView(APIView):
   

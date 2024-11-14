@@ -77,21 +77,23 @@ class TournamentGroupTeam(models.Model):
 
 
 class TournamentGames(models.Model):
-    id=models.AutoField(primary_key=True)
-    tournament_id=models.ForeignKey(Tournament,on_delete=models.CASCADE,blank=True, null=True)
-    game_number=models.IntegerField(blank=True, null=True)
-    game_date=models.DateField(blank=True, null=True)
-    game_start_time=models.TimeField(blank=True, null=True)
-    game_end_time=models.TimeField(blank=True, null=True)
-    group_id=models.ForeignKey(GroupTable,on_delete=models.CASCADE,blank=True, null=True)
-    team_a=models.CharField(max_length=100,blank=True, null=True)
-    team_a_goal=models.IntegerField(blank=True, null=True)
-    team_b=models.CharField(max_length=100,blank=True, null=True)
-    team_b_goal=models.IntegerField(blank=True, null=True)
-    game_field_id=models.ForeignKey(Field,on_delete=models.CASCADE,blank=True, null=True)
-    created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now=True)
+    id = models.AutoField(primary_key=True)
+    tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=True, null=True)
+    game_number = models.IntegerField(blank=True, null=True)
+    game_date = models.DateField(blank=True, null=True)
+    game_start_time = models.TimeField(blank=True, null=True)
+    game_end_time = models.TimeField(blank=True, null=True)
+    group_id = models.ForeignKey(GroupTable, on_delete=models.CASCADE, blank=True, null=True)
+    team_a = models.CharField(max_length=100, blank=True, null=True)
+    team_a_goal = models.IntegerField(blank=True, null=True, default=0)
+    team_b = models.CharField(max_length=100, blank=True, null=True)
+    team_b_goal = models.IntegerField(blank=True, null=True, default=0)
+    game_field_id = models.ForeignKey(Field, on_delete=models.CASCADE, blank=True, null=True)
+    finish = models.BooleanField(default=False)  # New field to indicate if the game is finished
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+   
     def __str__(self):
         return f'{self.game_number} - {self.game_date} - {self.group_id}'
     

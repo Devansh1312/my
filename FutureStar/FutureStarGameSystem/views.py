@@ -1070,7 +1070,7 @@ class TeamGameStatsTimelineAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
-        # team_id = request.query_params.get('team_id')
+        # Retrieve query parameters
         game_id = request.query_params.get('game_id')
         tournament_id = request.query_params.get('tournament_id')
 
@@ -1078,66 +1078,41 @@ class TeamGameStatsTimelineAPIView(APIView):
         if not game_id or not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('team_id, game_id, and tournament_id are required.')
+                'message': _('game_id and tournament_id are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Retrieve the relevant PlayerGameStats objects based on the provided filters
+        # Retrieve all relevant stats related to the given game and tournament
+        # This fetches PlayerGameStats, and you can include related models like Player, Team, etc.
         team_stats = PlayerGameStats.objects.filter(
-            # team_id=team_id,
             game_id=game_id,
             tournament_id=tournament_id
-        ).order_by('updated_at')  # Ensure sorting by updated_at
+        ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')  # Add select_related for related models
 
         # Prepare a list to hold the timeline data
         stats_data = []
 
-        # Iterate over the stats to detect and distinguish updates
-        previous_stat = None
+        # Iterate over the stats and add every stat to the response, including duplicates
         for stat in team_stats:
-            if previous_stat is None:
-                # First stat, always add as 'initial'
-                stats_data.append({
-                    'id': stat.id,
-                    'player_id': stat.player_id.id,
-                    'team_id':stat.team_id.id,
-                    'goals': stat.goals,
-                    'assists': stat.assists,
-                    'own_goals': stat.own_goals,
-                    'yellow_cards': stat.yellow_cards,
-                    'red_cards': stat.red_cards,
-                    'created_at': stat.created_at,
-                    'updated_at': stat.updated_at,
-                   
-                })
-            else:
-                # Check if there is any change in the stats
-                if (previous_stat.goals != stat.goals or
-                    previous_stat.assists != stat.assists or
-                    previous_stat.own_goals != stat.own_goals or
-                    previous_stat.yellow_cards != stat.yellow_cards or
-                    previous_stat.red_cards != stat.red_cards):
-                    # Add previous stat as 'initial'
-                    
-                    # Add the current stat as 'updated'
-                    stats_data.append({
-                        'id': stat.id,
-                        'player_id': stat.player_id.id,
-                        'team_id':stat.team_id.id,
-                        'goals': stat.goals,
-                        'assists': stat.assists,
-                        'own_goals': stat.own_goals,
-                        'yellow_cards': stat.yellow_cards,
-                        'red_cards': stat.red_cards,
-                        'created_at': stat.created_at,
-                        'updated_at': stat.updated_at,
-                       
-                    })
+            stat_info = {
+                'id': stat.id,
+                'player_id': stat.player_id.id,
+                'player_name': stat.player_id.username,  # Assuming player has a 'name' field
+                'team_id': stat.team_id.id,
+                'team_name': stat.team_id.team_name,  # Assuming team has a 'name' field
+                'goals': stat.goals,
+                'assists': stat.assists,
+                'own_goals': stat.own_goals,
+                'yellow_cards': stat.yellow_cards,
+                'red_cards': stat.red_cards,
+                'created_at': stat.created_at,
+                'updated_at': stat.updated_at,
+                'substitution_in_player': stat.in_player.id if stat.in_player else None,
+                'substitution_out_player': stat.out_player.id if stat.out_player else None,
+            }
+            # Add the stat information to the list
+            stats_data.append(stat_info)
 
-            # Update the previous stat to the current one
-            previous_stat = stat
-
-     
-        # Return the response with the timeline data
+        # Return the response with all timeline data, including duplicates
         return Response({
             'status': 1,
             'message': _('Team stats timeline fetched successfully.'),
@@ -1145,68 +1120,89 @@ class TeamGameStatsTimelineAPIView(APIView):
         }, status=status.HTTP_200_OK)
 class PlayerSubstitutionAPIView(APIView):
     def post(self, request):
-        team_id = request.data.get("team_id")
-        tournament_id = request.data.get("tournament_id")
-        game_id = request.data.get("game_id")
-        player_a_id = request.data.get("player_a_id")
-        player_b_id = request.data.get("player_b_id")
+            team_id = request.data.get("team_id")
+            tournament_id = request.data.get("tournament_id")
+            game_id = request.data.get("game_id")
+            player_a_id = request.data.get("player_a_id")
+            player_b_id = request.data.get("player_b_id")
 
-        if not all([team_id, tournament_id, game_id, player_a_id, player_b_id]):
-            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+            if not all([team_id, tournament_id, game_id, player_a_id, player_b_id]):
+                return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Retrieve player A (must have status ALREADY_IN_LINEUP)
-        player_a = get_object_or_404(
-            Lineup,
-            team_id=team_id,
-            tournament_id=tournament_id,
-            game_id=game_id,
-            player_id=player_a_id,
-            lineup_status=Lineup.ALREADY_IN_LINEUP
-        )
+            try:
+                # Retrieve player A (must have status ALREADY_IN_LINEUP)
+                player_a = Lineup.objects.get(
+                    team_id=team_id,
+                    tournament_id=tournament_id,
+                    game_id=game_id,
+                    player_id=player_a_id,
+                    lineup_status=Lineup.ALREADY_IN_LINEUP
+                )
+            except Lineup.DoesNotExist:
+                return Response ({"error": "Player A not found or not in the correct lineup status."})
 
-        # Retrieve player B (must have status SUBSTITUTE)
-        player_b = get_object_or_404(
-            Lineup,
-            team_id=team_id,
-            tournament_id=tournament_id,
-            game_id=game_id,
-            player_id=player_b_id,
-            lineup_status=Lineup.SUBSTITUTE
-        )
+            try:
+                # Retrieve player B (must have status SUBSTITUTE)
+                player_b = Lineup.objects.get(
+                    team_id=team_id,
+                    tournament_id=tournament_id,
+                    game_id=game_id,
+                    player_id=player_b_id,
+                    lineup_status=Lineup.SUBSTITUTE
+                )
+            except Lineup.DoesNotExist:
+                return Response({"error": "Player B not found or not in the correct lineup status."})
 
-        # Swap positions and update statuses
-        player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
-        player_a.position_1, player_a.position_2 = None, None
+            # Swap positions and update statuses
+            player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
+            player_a.position_1, player_a.position_2 = None, None
 
-        # Update player_ready and lineup_status
-        player_a.player_ready = False
-        player_b.player_ready = True
+            # Update player_ready and lineup_status
+            player_a.player_ready = False
+            player_b.player_ready = True
 
-        player_a.lineup_status = Lineup.SUBSTITUTE
-        player_b.lineup_status = Lineup.ALREADY_IN_LINEUP
+            player_a.lineup_status = Lineup.SUBSTITUTE
+            player_b.lineup_status = Lineup.ALREADY_IN_LINEUP
 
-        # Save the updated players
-        player_a.save()
-        player_b.save()
+            # Save the updated players
 
-        return Response({
-            "message": "Player substitution successful",
-            "player_a": {
-                "id": player_a_id,
-                "position_1": player_a.position_1,
-                "position_2": player_a.position_2,
-                "player_ready": player_a.player_ready,
-                "lineup_status": player_a.lineup_status,
-            },
-            "player_b": {
-                "id": player_b_id,
-                "position_1": player_b.position_1,
-                "position_2": player_b.position_2,
-                "player_ready": player_b.player_ready,
-                "lineup_status": player_b.lineup_status,
-            }
-        }, status=status.HTTP_200_OK)
-    
+            user_a = get_object_or_404(User, id=player_a.player_id.id)  # Get User instance for player_a
+            user_b = get_object_or_404(User, id=player_b.player_id.id)  # Get User instance for player_b
+            print(player_a.player_id)
+            print(user_b)
+            # Get other related instances
+            team_branch = get_object_or_404(TeamBranch, id=team_id)
+            tournament_instance = get_object_or_404(Tournament, id=tournament_id)
+            game_instance = get_object_or_404(TournamentGames, id=game_id)
+
+            # Create a new PlayerGameStats record to log the substitution
+            player_game_stat = PlayerGameStats.objects.create(
+                team_id=team_branch,
+                game_id=game_instance,
+                tournament_id=tournament_instance,
+                in_player=user_b,  # Corrected to use the ID of player_b
+                out_player=user_a,  # Corrected to use the ID of player_a
+            )
+            print(player_game_stat)
+            player_a.save()
+            player_b.save()
+            return Response({
+                "message": "Player substitution successful",
+                "player_a": {
+                    "id": player_a_id,
+                    "position_1": player_a.position_1,
+                    "position_2": player_a.position_2,
+                    "player_ready": player_a.player_ready,
+                    "lineup_status": player_a.lineup_status,
+                },
+                "player_b": {
+                    "id": player_b_id,
+                    "position_1": player_b.position_1,
+                    "position_2": player_b.position_2,
+                    "player_ready": player_b.player_ready,
+                    "lineup_status": player_b.lineup_status,
+                }
+            }, status=status.HTTP_200_OK)
 
     def get(self, request, *args, **kwargs):
             language = request.headers.get('Language', 'en')
@@ -1258,20 +1254,61 @@ class PlayerSubstitutionAPIView(APIView):
             }, status=status.HTTP_200_OK)
     
 
-class UpdateTournamentGameGoalsAPIView(APIView):
-    def post(self, request, game_id):
-        try:
-            # Fetch the TournamentGame instance
-            game = TournamentGames.objects.get(id=game_id)
+class TeamGameGoalCountAPIView(APIView):
+        def get(self, request):
+                # Activate language if specified in the header
+                language = request.headers.get('Language', 'en')
+                if language in ['en', 'ar']:
+                    activate(language)
 
-            # Update team goals
-            game.update_team_goals()
+                    
+                team_id = request.query_params.get('team_id')
+                game_id = request.query_params.get('game_id')
+                tournament_id = request.query_params.get('tournament_id')
 
-            return Response({
-                'message': 'Team goals updated successfully',
-                'team_a_goal': game.team_a_goal,
-                'team_b_goal': game.team_b_goal
-            }, status=status.HTTP_200_OK)
-        
-        except TournamentGames.DoesNotExist:
-            return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+                # Validate required URL parameters (team_id, game_id, tournament_id)
+                if not (team_id and game_id and tournament_id):
+                    return Response({
+                        'status': 0,
+                        'message': _('team_id, game_id, and tournament_id are required.'),
+                        'data': []
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # Filter PlayerGameStats entries for the specified team, game, and tournament
+                goal_stats = PlayerGameStats.objects.filter(
+                    team_id=team_id,
+                    game_id=game_id,
+                    tournament_id=tournament_id
+                )
+                
+                # Calculate the total goals
+                total_goals = goal_stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+                try:
+                    # Fetch the TournamentGames entry
+                    tournament_game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+                    
+                    # Check if team_id matches team_a or team_b, and update the corresponding goal field
+                    if str(tournament_game.team_a) == str(team_id):
+                        tournament_game.team_a_goal = total_goals
+                    elif str(tournament_game.team_b) == str(team_id):
+                        tournament_game.team_b_goal = total_goals
+                    else:
+                        return Response({
+                            'status': 0,
+                            'message': _('team_id does not match either team_a or team_b in this game.')
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    # Save the updated goal count
+                    tournament_game.save()
+
+                    return Response({
+                        'team_id': team_id,
+                        'game_id': game_id,
+                        'tournament_id': tournament_id,
+                        'total_goals': total_goals,
+                        # 'message': _('Goal count updated successfully.')
+                    }, status=status.HTTP_200_OK)
+
+                except TournamentGames.DoesNotExist:
+                    return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
