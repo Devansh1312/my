@@ -2,7 +2,9 @@ from django.db import models
 from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarAPI.models import *
-from FutureStarTournamentApp.models import *
+# from FutureStarTournamentApp.models import *
+from FutureStarTournamentApp.models import Tournament,TournamentGames
+
 
 from django.utils import timezone
 import datetime
@@ -108,3 +110,25 @@ class GameOfficials(models.Model):
             models.UniqueConstraint(fields=['game_id', 'official_id'], name='unique_game_officials')
         ]
         
+
+class PlayerGameStats(models.Model):
+    id=models.AutoField(primary_key=True)
+    team_id = models.ForeignKey(TeamBranch, on_delete=models.CASCADE)
+    player_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    game_id = models.ForeignKey(TournamentGames, on_delete=models.CASCADE)
+    tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+
+    goals=models.IntegerField(default=0)
+    assists=models.IntegerField(default=0)
+    own_goals=models.IntegerField(default=0)
+    yellow_cards=models.IntegerField(default=0)
+    red_cards=models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f"Player Game Stats {self.id} - {self.team_id} - {self.player_id}"
+    
+    class Meta:
+        db_table = 'futurestar_app_player_game_stats'

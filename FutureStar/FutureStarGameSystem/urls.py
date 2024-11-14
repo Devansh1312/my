@@ -20,9 +20,16 @@ urlpatterns = [
     path('api/lineup/',LineupPlayers.as_view()),
     path('api/lineup/player_confirmation/status/',LineupPlayerStatusAPIView.as_view()),
     path('api/lineup/player_confirmation/status_change/',LineupPlayerStatusAPIView.as_view()),
+    path('api/lineup/player_substitute/',PlayerSubstitutionAPIView.as_view()),
 
 
     path('api/game_stats/lineup/',GameStatsLineupPlayers.as_view()),
+    path('api/game_stats/player_stats/',PlayerGameStatsAPIView.as_view()),
+    path('api/game_stats/timeline/',TeamGameStatsTimelineAPIView.as_view()),
+   
+    path('api/game_stats/scoreline/',UpdateTournamentGameGoalsAPIView.as_view()),
+    
+
 
     path('api/game_officials_type/',GameOficialTypesList.as_view()),
 

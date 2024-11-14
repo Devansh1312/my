@@ -127,6 +127,6 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
 
     def get_tournament_name(self, obj):
         # Check if group_id is set and retrieve its related tournament_id
-        if obj.group_id and obj.group_id.tournament_id:
-            return obj.group_id.tournament_id.tournament_name
+        if obj.tournament_id:
+            return obj.tournament_id.tournament_name
         return None 

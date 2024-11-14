@@ -21,6 +21,7 @@ from django.utils.crypto import get_random_string
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
+from django.db.models import Sum
 
 
 ################## participates players of particular team for particular tournament ###############
@@ -293,6 +294,9 @@ class LineupPlayers(APIView):
 
 
     def patch(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
     # Retrieve fields from the request data
         player_id = request.data.get('player_id')
         position_1 = request.data.get('position_1')
@@ -765,6 +769,8 @@ class GameOficialTypesList(APIView):
 ################### Game Officilals API Views ###################
 
 class GameOfficialsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
         # Set language from request headers
         language = request.headers.get('Language', 'en')
@@ -902,3 +908,370 @@ class GameOfficialsAPIView(APIView):
                 'status': 0,
                 'message': _('No matching official found for the given game and official ID.'),
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class PlayerGameStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+         # Set language based on the request headers
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Retrieve required identifiers from the request data
+        player_id = request.data.get('player_id')
+        team_id = request.data.get('team_id')
+        tournament_id = request.data.get('tournament_id')
+        game_id = request.data.get('game_id')
+        
+        # Validate that all necessary fields are provided
+        if not all([player_id, team_id, tournament_id, game_id]):
+            return Response({
+                'status': 0,
+                'message': _('player_id, team_id, tournament_id, and game_id are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Retrieve related model instances
+        team_instance = get_object_or_404(TeamBranch, id=team_id)
+        player_instance = get_object_or_404(User, id=player_id)
+        tournament_instance = get_object_or_404(Tournament, id=tournament_id)
+        game_instance = get_object_or_404(TournamentGames, id=game_id)
+        
+        # Retrieve stats values from request data
+        goals = int(request.data.get('goals', 0) or 0)
+        assists = int(request.data.get('assists', 0) or 0)
+        own_goals = int(request.data.get('own_goals', 0) or 0)
+        yellow_cards = int(request.data.get('yellow_cards', 0) or 0)
+        red_cards = int(request.data.get('red_cards', 0) or 0)
+        
+        # Create a new entry for each submission
+        new_stat = PlayerGameStats.objects.create(
+            player_id=player_instance,
+            team_id=team_instance,
+            tournament_id=tournament_instance,
+            game_id=game_instance,
+            goals=goals,
+            assists=assists,
+            own_goals=own_goals,
+            yellow_cards=yellow_cards,
+            red_cards=red_cards,
+        )
+        
+        # Aggregate totals for this player, team, game, and tournament combination
+        total_stats = PlayerGameStats.objects.filter(
+            player_id=player_instance,
+            team_id=team_instance,
+            tournament_id=tournament_instance,
+            game_id=game_instance
+        ).aggregate(
+            total_goals=Sum('goals'),
+            total_assists=Sum('assists'),
+            total_own_goals=Sum('own_goals'),
+            total_yellow_cards=Sum('yellow_cards'),
+            total_red_cards=Sum('red_cards')
+        )
+        
+        # Calculate the increment for each new entry
+        increment_data = {
+            'goals_increment': goals,
+            'assists_increment': assists,
+            'own_goals_increment': own_goals,
+            'yellow_cards_increment': yellow_cards,
+            'red_cards_increment': red_cards
+        }
+        
+        # Respond with the cumulative and incremental stats
+        response_data = {
+            'id': new_stat.id,
+            'team_id': team_instance.id,
+            'player_id': player_instance.id,
+            'game_id': game_instance.id,
+            'tournament_id': tournament_instance.id,
+            'total_goals': total_stats['total_goals'] or 0,
+            'total_assists': total_stats['total_assists'] or 0,
+            'total_own_goals': total_stats['total_own_goals'] or 0,
+            'total_yellow_cards': total_stats['total_yellow_cards'] or 0,
+            'total_red_cards': total_stats['total_red_cards'] or 0,
+            'incremental_data': increment_data,
+            'created_at': new_stat.created_at,
+            'updated_at': new_stat.updated_at
+        }
+        
+        message = _('Player stats recorded successfully.')
+        return Response({
+            'status': 1,
+            'message': message,
+            'data': response_data
+        }, status=status.HTTP_201_CREATED)
+
+    def get(self, request, *args, **kwargs):
+        # Set language based on the request headers
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Retrieve query parameters for filtering
+        player_id = request.query_params.get('player_id')
+        team_id = request.query_params.get('team_id')
+        tournament_id = request.query_params.get('tournament_id')
+        game_id = request.query_params.get('game_id')
+
+        # Validate that all necessary fields are provided
+        if not player_id or not team_id or not tournament_id or not game_id:
+            return Response({
+                'status': 0,
+                'message': _('player_id, team_id, tournament_id, and game_id are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Try to retrieve the player's stats entry
+        try:
+            stats = PlayerGameStats.objects.get(
+                player_id=player_id,
+                team_id=team_id,
+                tournament_id=tournament_id,
+                game_id=game_id
+            )
+        except PlayerGameStats.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Player stats not found for the specified criteria.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Prepare the stats data
+        stats_data = {
+            'id': stats.id,
+            'team_id': stats.team_id.id,
+            'player_id': stats.player_id.id,
+            'game_id': stats.game_id.id,
+            'tournament_id': stats.tournament_id.id,
+            'goals': stats.goals,
+            'assists': stats.assists,
+            'own_goals': stats.own_goals,
+            'yellow_cards': stats.yellow_cards,
+            'red_cards': stats.red_cards,
+            'created_at': stats.created_at,
+            'updated_at': stats.updated_at
+        }
+
+        # Respond with the retrieved data
+        return Response({
+            'status': 1,
+            'message': _('Player stats fetched successfully.'),
+            'data': stats_data
+        }, status=status.HTTP_200_OK)
+    
+
+
+class TeamGameStatsTimelineAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        # team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')
+        tournament_id = request.query_params.get('tournament_id')
+
+        # Validate query parameters
+        if not game_id or not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id, game_id, and tournament_id are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Retrieve the relevant PlayerGameStats objects based on the provided filters
+        team_stats = PlayerGameStats.objects.filter(
+            # team_id=team_id,
+            game_id=game_id,
+            tournament_id=tournament_id
+        ).order_by('updated_at')  # Ensure sorting by updated_at
+
+        # Prepare a list to hold the timeline data
+        stats_data = []
+
+        # Iterate over the stats to detect and distinguish updates
+        previous_stat = None
+        for stat in team_stats:
+            if previous_stat is None:
+                # First stat, always add as 'initial'
+                stats_data.append({
+                    'id': stat.id,
+                    'player_id': stat.player_id.id,
+                    'team_id':stat.team_id.id,
+                    'goals': stat.goals,
+                    'assists': stat.assists,
+                    'own_goals': stat.own_goals,
+                    'yellow_cards': stat.yellow_cards,
+                    'red_cards': stat.red_cards,
+                    'created_at': stat.created_at,
+                    'updated_at': stat.updated_at,
+                   
+                })
+            else:
+                # Check if there is any change in the stats
+                if (previous_stat.goals != stat.goals or
+                    previous_stat.assists != stat.assists or
+                    previous_stat.own_goals != stat.own_goals or
+                    previous_stat.yellow_cards != stat.yellow_cards or
+                    previous_stat.red_cards != stat.red_cards):
+                    # Add previous stat as 'initial'
+                    
+                    # Add the current stat as 'updated'
+                    stats_data.append({
+                        'id': stat.id,
+                        'player_id': stat.player_id.id,
+                        'team_id':stat.team_id.id,
+                        'goals': stat.goals,
+                        'assists': stat.assists,
+                        'own_goals': stat.own_goals,
+                        'yellow_cards': stat.yellow_cards,
+                        'red_cards': stat.red_cards,
+                        'created_at': stat.created_at,
+                        'updated_at': stat.updated_at,
+                       
+                    })
+
+            # Update the previous stat to the current one
+            previous_stat = stat
+
+     
+        # Return the response with the timeline data
+        return Response({
+            'status': 1,
+            'message': _('Team stats timeline fetched successfully.'),
+            'data': stats_data
+        }, status=status.HTTP_200_OK)
+class PlayerSubstitutionAPIView(APIView):
+    def post(self, request):
+        team_id = request.data.get("team_id")
+        tournament_id = request.data.get("tournament_id")
+        game_id = request.data.get("game_id")
+        player_a_id = request.data.get("player_a_id")
+        player_b_id = request.data.get("player_b_id")
+
+        if not all([team_id, tournament_id, game_id, player_a_id, player_b_id]):
+            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Retrieve player A (must have status ALREADY_IN_LINEUP)
+        player_a = get_object_or_404(
+            Lineup,
+            team_id=team_id,
+            tournament_id=tournament_id,
+            game_id=game_id,
+            player_id=player_a_id,
+            lineup_status=Lineup.ALREADY_IN_LINEUP
+        )
+
+        # Retrieve player B (must have status SUBSTITUTE)
+        player_b = get_object_or_404(
+            Lineup,
+            team_id=team_id,
+            tournament_id=tournament_id,
+            game_id=game_id,
+            player_id=player_b_id,
+            lineup_status=Lineup.SUBSTITUTE
+        )
+
+        # Swap positions and update statuses
+        player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
+        player_a.position_1, player_a.position_2 = None, None
+
+        # Update player_ready and lineup_status
+        player_a.player_ready = False
+        player_b.player_ready = True
+
+        player_a.lineup_status = Lineup.SUBSTITUTE
+        player_b.lineup_status = Lineup.ALREADY_IN_LINEUP
+
+        # Save the updated players
+        player_a.save()
+        player_b.save()
+
+        return Response({
+            "message": "Player substitution successful",
+            "player_a": {
+                "id": player_a_id,
+                "position_1": player_a.position_1,
+                "position_2": player_a.position_2,
+                "player_ready": player_a.player_ready,
+                "lineup_status": player_a.lineup_status,
+            },
+            "player_b": {
+                "id": player_b_id,
+                "position_1": player_b.position_1,
+                "position_2": player_b.position_2,
+                "player_ready": player_b.player_ready,
+                "lineup_status": player_b.lineup_status,
+            }
+        }, status=status.HTTP_200_OK)
+    
+
+    def get(self, request, *args, **kwargs):
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            team_id = request.query_params.get('team_id')
+            game_id = request.query_params.get('game_id')
+            tournament_id = request.query_params.get('tournament_id')
+
+            if not team_id or not game_id or not tournament_id:
+                return Response({
+                    'status': 0,
+                    'message': _('team_id, game_id, and tournament_id are required.'),
+                    'data': []
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Filter players in Lineup by team, game, and tournament, separating by status
+            
+            substitute_lineups = Lineup.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+                tournament_id=tournament_id,
+                lineup_status=Lineup.SUBSTITUTE
+            )
+           
+
+            # Prepare response data for added players
+            
+            # Prepare response data for substitute players
+            substitute_data = [{
+                'id': lineup.player_id.id,
+                'username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'position_2': lineup.position_2
+            } for lineup in substitute_lineups]
+
+           
+            # Return the response with the status and message
+            return Response({
+                'status': 1,
+                'message': _('Lineup players fetched successfully with status "ADDED".'),
+                'data': {
+                   
+                    'substitute_players': substitute_data,
+                 
+                }
+            }, status=status.HTTP_200_OK)
+    
+
+class UpdateTournamentGameGoalsAPIView(APIView):
+    def post(self, request, game_id):
+        try:
+            # Fetch the TournamentGame instance
+            game = TournamentGames.objects.get(id=game_id)
+
+            # Update team goals
+            game.update_team_goals()
+
+            return Response({
+                'message': 'Team goals updated successfully',
+                'team_a_goal': game.team_a_goal,
+                'team_b_goal': game.team_b_goal
+            }, status=status.HTTP_200_OK)
+        
+        except TournamentGames.DoesNotExist:
+            return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)

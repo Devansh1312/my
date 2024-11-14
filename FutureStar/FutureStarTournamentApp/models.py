@@ -10,6 +10,8 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
 
+from FutureStarGameSystem.models import PlayerGameStats
+
 
 
 class Tournament(models.Model):
@@ -83,7 +85,9 @@ class TournamentGames(models.Model):
     game_end_time=models.TimeField(blank=True, null=True)
     group_id=models.ForeignKey(GroupTable,on_delete=models.CASCADE,blank=True, null=True)
     team_a=models.CharField(max_length=100,blank=True, null=True)
+    team_a_goal=models.IntegerField(blank=True, null=True)
     team_b=models.CharField(max_length=100,blank=True, null=True)
+    team_b_goal=models.IntegerField(blank=True, null=True)
     game_field_id=models.ForeignKey(Field,on_delete=models.CASCADE,blank=True, null=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
