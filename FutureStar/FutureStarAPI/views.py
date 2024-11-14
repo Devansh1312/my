@@ -722,6 +722,45 @@ class LogoutAPIView(APIView):
                 'error': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
 
+################ Delete User ####################
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user  # Get the authenticated user
+        serializer = UserDeleteSerializer(data=request.data)
+
+        if serializer.is_valid():
+            deleted_reason_id = serializer.validated_data.get('deleted_reason_id')
+            deleted_reason = serializer.validated_data.get('deleted_reason')
+
+            # Check if the reason ID exists
+            delete_reason = UserDeleteReason.objects.filter(id=deleted_reason_id).first()
+            if not delete_reason:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid deletion reason ID.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Mark the user as deleted and set the reason
+            user.is_deleted = True
+            user.deleted_reason_id = deleted_reason_id
+            user.deleted_reason = deleted_reason
+            user.is_active = False  # Optionally, deactivate the user as well
+            user.save()
+
+            return Response({
+                'status': 2,
+                'message': _('Your account has been deleted successfully.')
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'status': 0,
+            'message': _('Invalid data provided.')
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 class ForgotPasswordAPIView(APIView):
     permission_classes = [AllowAny]

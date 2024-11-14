@@ -88,6 +88,11 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 
+##### Delete User Seralizer #####
+class UserDeleteSerializer(serializers.Serializer):
+    deleted_reason_id = serializers.IntegerField(required=True)
+    deleted_reason = serializers.CharField(max_length=255)
+
 class ForgotPasswordSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Adjust max_length based on your phone number format
 
