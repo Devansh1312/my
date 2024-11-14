@@ -106,15 +106,27 @@ Team Detail page
                         </div>
                         <div class="col-md-4 mb-3">
                             <strong>Team Logo:</strong> 
-                            <img src="{{ team.team_logo.url }}" alt="Team Logo" class="img-fluid">
+                            {% if team.team_logo %}
+                                <img src="{{ team.team_logo.url }}" alt="Team Logo" class="img-fluid" width="100" height="100">
+                            {% else %}
+                                No Image Available
+                            {% endif %}
                         </div>
                         <div class="col-md-4 mb-3">
                             <strong>Background Image:</strong>
-                            <img src="{{ team.team_background_image.url }}" alt="Background Image" class="img-fluid">
+                            {% if team.team_background_image %}
+                                <img src="{{ team.team_background_image.url }}" alt="Background Image" class="img-fluid" width="100" height="100">
+                            {% else %}
+                                No Image Available
+                            {% endif %}
                         </div>
                         <div class="col-md-12 mb-3">
                             <strong>Uniform:</strong>
-                            <img src="{{ team.team_uniform.url }}" alt="Uniform" class="img-fluid">
+                            {% if team.team_uniform %}
+                                <img src="{{ team.team_uniform.url }}" alt="Uniform" class="img-fluid" width="100" height="100">
+                            {% else %}
+                                No Image Available
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -165,7 +177,11 @@ Team Detail page
                                                         <td>{{ branch.event_name }}</td>
                                                         <td>{{ branch.age_group_id.name_en }}</td>
                                                         <td>
-                                                            <img src="{{ branch.upload_image }}"  width="100" height="100">
+                                                            {% if branch.upload_image %}
+                                                                <img src="{{ branch.upload_image }}"  width="100" height="100">
+                                                            {% else %}
+                                                                No Image Available
+                                                            {% endif %}
                                                         </td>                                      
                                                         <td>{{ branch.entry_fees }}</td>
                                                         <td>
@@ -211,7 +227,11 @@ Team Detail page
                                                         <td>{{ forloop.counter }}</td>
                                                         <td>{{ sponsor.name }}</td>
                                                         <td>
-                                                            <img src="{{ sponsor.upload_image }}"  width="100" height="100"> 
+                                                            {% if sponsor.upload_image %}
+                                                                <img src="{{ sponsor.upload_image }}"  width="100" height="100">
+                                                            {% else %}
+                                                                No Image Available
+                                                            {% endif %}
                                                         </td>
                                                         <td><a href="{{ sponsor.url }}" target="_blank">{{ sponsor.url }}</a></td>
                                                         </tr>

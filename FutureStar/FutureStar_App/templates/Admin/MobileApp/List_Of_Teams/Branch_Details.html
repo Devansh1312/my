@@ -139,7 +139,11 @@ Branch Details
                                                 <td>{{ member.user_id.username }}</td>
                                                 <td>{{ member.branch_id.age_group_id.name_en }}</td>
                                                 <td>
-                                                    <img src="{{ member.user_id.profile_picture }}"  width="100" height="100">
+                                                    {% if member.user_id.profile_picture %}
+                                                        <img src="{{ member.user_id.profile_picture }}"  width="100" height="100">
+                                                    {% else %}
+                                                        No Image Available
+                                                    {% endif %}
                                                 </td>                                      
                                                 <td>{{ member.user_id.email }}</td>
                                                 </tr>
@@ -188,23 +192,20 @@ Branch Details
                                             <table class="display" id="games-table">
                                                 <thead> 
                                                     <tr>
-                                                    <th>ryutyk</th>
-                                                    <th>Username</th>
-                                                    <th>Age Group</th>
-                                                    <th>Image</th>
-                                                    <th>Email</th>
+                                                    <th>Tournament Name</th>
+                                                    <th>Game Number</th>
+                                                    <th>Game Date</th>
+                                                    <th>Group Name</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {% for member in members %}
+                                                    {% for game in games %}
                                                     <tr>
                                                     <td>{{ forloop.counter }}</td>
-                                                    <td>{{ member.user_id.username }}</td>
-                                                    <td>{{ member.branch_id.age_group_id.name_en }}</td>
-                                                    <td>
-                                                        <img src="{{ member.user_id.profile_picture }}"  width="100" height="100">
-                                                    </td>                                      
-                                                    <td>{{ member.user_id.email }}</td>
+                                                    <td>{{ game.tournament_id.tournament_name }}</td>
+                                                    <td>{{ game.game_number }}</td>
+                                                    <td>{{ game.game_date }}</td>
+                                                    <td>{{ game.group_id.group_name }}</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
