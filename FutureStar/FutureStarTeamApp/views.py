@@ -249,32 +249,21 @@ class TeamViewAPI(APIView):
             background_image_path = default_storage.save(file_name, background_image)
             team_instance.team_background_image = background_image_path
 
-        # Handle team uniform update
+        # Handle team uniforms using TeamUniform model
         if 'team_uniform' in request.FILES:
-            # Delete old uniforms if they exist
-            if team_instance.team_uniform:
-                old_uniforms = team_instance.team_uniform.split(',')
-                for old_uniform in old_uniforms:
-                    # Remove MEDIA_URL prefix from the path
-                    relative_old_uniform = old_uniform.replace(settings.MEDIA_URL, '')
-                    if default_storage.exists(relative_old_uniform):
-                        default_storage.delete(relative_old_uniform)
-
-            # Upload new team uniforms with unique filenames and save with full paths
+            # Upload new uniforms and save in TeamUniform model
             uniforms = request.FILES.getlist('team_uniform')
-            team_uniform_images = []
             for uniform in uniforms:
                 unique_suffix = get_random_string(8)
                 file_extension = uniform.name.split('.')[-1]
                 file_name = f"team/team_uniform/{team_instance.team_founder.id}_{team_instance.id}_{unique_suffix}.{file_extension}"
                 uniform_path = default_storage.save(file_name, uniform)
 
-                # Use full URL path including MEDIA_URL for saving to the instance
-                full_path = f"{settings.MEDIA_URL}{uniform_path}"
-                team_uniform_images.append(full_path)
-
-            # Save with comma-separated paths
-            team_instance.team_uniform = ','.join(team_uniform_images)
+                # Save each uniform as a new instance in the TeamUniform model
+                TeamUniform.objects.create(
+                    team_id=team_instance,
+                    team_uniform_image=uniform_path
+                )
 
 
         team_instance.save()
@@ -372,7 +361,40 @@ class TeamViewAPI(APIView):
                'status': 1,
               'message': _('Team deleted successfully.')
             }, status=status.HTTP_200_OK)
+
+########################### Delete Uniforms BY ID ##################
+class DeleteUniformView(APIView):
+    def delete(self, request):
+        # Get the uniform_id from query parameters
+        uniform_id = request.query_params.get('uniform_id')
         
+        # Check if uniform_id is provided
+        if not uniform_id:
+            return Response({
+                'status': 0,
+                'message': _('Uniform ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the uniform exists
+        try:
+            uniform = TeamUniform.objects.get(id=uniform_id)
+        except TeamUniform.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Uniform not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Delete the image file from storage if it exists
+        if uniform.team_uniform_image and default_storage.exists(uniform.team_uniform_image.name):
+            default_storage.delete(uniform.team_uniform_image.name)
+        
+        # Delete the uniform instance
+        uniform.delete()
+
+        return Response({
+            'status': 1,
+            'message': _('Uniform deleted successfully.')
+        }, status=status.HTTP_200_OK)        
 ############# Team Branch Create API #################    
 class TeamBranchAPIView(APIView):
     permission_classes = [IsAuthenticated]

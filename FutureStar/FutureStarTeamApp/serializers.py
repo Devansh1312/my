@@ -27,6 +27,8 @@ class TeamSerializer(serializers.ModelSerializer):
     branches = serializers.SerializerMethodField()  # This will call our custom method for branches
     team_logo = serializers.SerializerMethodField()
     team_background_image = serializers.SerializerMethodField()
+    uniforms = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Team
@@ -35,10 +37,14 @@ class TeamSerializer(serializers.ModelSerializer):
             'team_founder_id', 'team_founder_username', 'team_founder_profile_picture','team_president', 'latitude', 'longitude', 'address', 
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'country_id', 
             'country_id_name', 'city_id', 'city_id_name', 'phone', 'email','team_logo', 
-            'team_background_image', 'team_uniform', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type','branches'
+            'team_background_image', 'uniforms', 'post_count', 'followers_count', 'following_count', 'is_follow', 'creator_type','branches'
         ]
 
-
+    def get_uniforms(self, obj):
+            # Fetch all uniforms related to the team and return their URLs as a list
+            uniforms = TeamUniform.objects.filter(team_id=obj)
+            return [uniform.team_uniform_image.url for uniform in uniforms if uniform.team_uniform_image]
+    
     def get_branches(self, obj):
         request = self.context.get('request')
         language = request.headers.get('Language', 'en') if request else 'en'

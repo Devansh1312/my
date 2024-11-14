@@ -8,6 +8,7 @@ urlpatterns = [
 
         ################# Team URL ################
         path('api/team/', TeamViewAPI.as_view()),
+        path('api/team/uniform_delete/', DeleteUniformView.as_view()),
         path('api/team_branch/', TeamBranchAPIView.as_view()),
         path('api/team_branch/create/', TeamBranchAPIView.as_view()),
         path('api/staff-management/', StaffManagementView.as_view()),

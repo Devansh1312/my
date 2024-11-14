@@ -53,7 +53,6 @@ class Team(models.Model):
    
     team_logo = models.ImageField(upload_to='team/team_logo/', blank=True, null=True)
     team_background_image = models.ImageField(upload_to='team/team_background_image/', blank=True, null=True)
-    team_uniform = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
@@ -62,6 +61,21 @@ class Team(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_team'
+
+class TeamUniform(models.Model):
+    id=models.AutoField(primary_key=True)
+    team_id=models.ForeignKey(Team,on_delete=models.CASCADE)
+    team_uniform_image = models.ImageField(upload_to='team/team_uniform/', blank=True, null=True)
+    type=models.IntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return self.team_name
+    
+    class Meta:
+        db_table = 'futurestar_app_team_uniform'
+
 
 class TeamBranch(models.Model):
     id=models.AutoField(primary_key=True)
