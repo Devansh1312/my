@@ -10,7 +10,7 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
 
-from FutureStarGameSystem.models import PlayerGameStats
+# from FutureStarGameSystem.models import *
 
 
 
