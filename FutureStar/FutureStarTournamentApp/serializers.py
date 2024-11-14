@@ -115,7 +115,7 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
         model = TournamentGames
         fields = [
             'id', 'tournament_id','tournament_name','game_number', 'game_date', 'game_start_time', 'game_end_time',
-            'group_id', 'group_id_name', 'team_a', 'team_b', 
+            'group_id', 'group_id_name', 'team_a','team_a_goal','team_b','team_b_goal', 
             'game_field_id', 'game_field_id_name', 'created_at', 'updated_at'
         ]
 

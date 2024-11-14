@@ -3,7 +3,7 @@ from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarAPI.models import *
 # from FutureStarTournamentApp.models import *
-from FutureStarTournamentApp.models import Tournament,TournamentGames
+from FutureStarTournamentApp.models import *
 
 
 from django.utils import timezone
@@ -123,6 +123,11 @@ class PlayerGameStats(models.Model):
     own_goals=models.IntegerField(default=0)
     yellow_cards=models.IntegerField(default=0)
     red_cards=models.IntegerField(default=0)
+    game_time=models.TimeField(blank=True, null=True)
+   # New fields for substitution
+    in_player = models.ForeignKey(User, related_name="in_player_subs", null=True, blank=True, on_delete=models.SET_NULL)
+    out_player = models.ForeignKey(User, related_name="out_player_subs", null=True, blank=True, on_delete=models.SET_NULL)
+    
     
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
