@@ -18,6 +18,7 @@ urlpatterns = [
 
         # Switch Current User Type 
         path('api/user/update-current-type/', UpdateCurrentTypeAPIView.as_view()),
+        path('api/user_account_delete_reasons/list/', DeleteAccountReasonsListView.as_view()),
 
 
         # For logged-in users

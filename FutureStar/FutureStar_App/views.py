@@ -5891,3 +5891,75 @@ class GameOfficialsTypeListView(LoginRequiredMixin, View):
             self.template_name,
             {"gameofficialstype": gameofficialstype, "breadcrumb": {"parent": "User", "child": "Game Officials Type"}},
         )
+
+
+
+
+################################################################# Account Delete Reason CRUD Views ###################################################
+@method_decorator(user_role_check, name='dispatch')
+class AccountDeleteReasonCreateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/AccountDeleteReason.html"
+
+    def get(self, request):
+        form = AccountDeleteReasonForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = AccountDeleteReasonForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account Delete Reason Created successfully.")
+            return redirect("accountdeletereason_list")
+        messages.error(
+            request,
+            "There was an error creating the age group. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class AccountDeleteReasonUpdateView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/AccountDeleteReason.html"  # Fixed template name
+
+    def get(self, request, pk):
+        accountdeletereason = get_object_or_404(UserDeleteReason, pk=pk)
+        form = AccountDeleteReasonForm(instance=accountdeletereason)
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, pk):
+        accountdeletereason = get_object_or_404(UserDeleteReason, pk=pk)
+        form = AccountDeleteReasonForm(request.POST, instance=accountdeletereason)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account Delete Reason Updated Successfully.")
+            return redirect("accountdeletereason_list")
+        messages.error(
+            request,
+            "There was an error updating the injury type. Please ensure all fields are filled out correctly.",
+        )
+        return render(request, self.template_name, {"form": form})
+
+@method_decorator(user_role_check, name='dispatch')
+class AccountDeleteReasonDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        accountdeletereason = get_object_or_404(UserDeleteReason, pk=pk)
+        accountdeletereason.delete()
+        messages.success(request, "Injur Type Deleted Successfully.")
+        return redirect("accountdeletereason_list")
+
+    def post(self, request, pk):
+        accountdeletereason = get_object_or_404(UserDeleteReason, pk=pk)
+        accountdeletereason.delete()
+        messages.success(request, "Account Delete Reason Deleted Successfully.")
+        return redirect("accountdeletereason_list")
+
+@method_decorator(user_role_check, name='dispatch')
+class AccountDeleteReasonListView(LoginRequiredMixin, View):
+    template_name = "Admin/General_Settings/AccountDeleteReason.html"
+
+    def get(self, request):
+        accountdeletereason = UserDeleteReason.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {"accountdeletereason": accountdeletereason, "breadcrumb": {"parent": "User", "child": "Account Delete Reason"}},
+        )

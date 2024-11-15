@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- Plugins css Ends-->
+{% endblock %}
+{% block title %}Account Delete Reason{% endblock %}
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{breadcrumb.child}}</h3>
+            </div>
+            <div class="col-6">
+               <ol class="breadcrumb">
+                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addAccountDeleteReasonModal">Add Account Delete Reason</button>
+               </ol>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+         <!-- AccountDeleteReason List -->
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="display" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Account Delete Reason (English)</th>
+                              <th>Account Delete Reason (Arabic)</th>
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for accountdeletereason in accountdeletereason %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ accountdeletereason.name_en }}</td>
+                              <td>{{ accountdeletereason.name_ar }}</td>
+                              <td>
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                       <i data-feather="more-vertical"></i>
+                                       <!-- Three dots icon -->
+                                    </a>
+                                    <!-- Hidden card for actions -->
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                          <li style="padding: 8px 12px;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editAccountDeleteReasonModal" data-accountdeletereason-id="{{ accountdeletereason.id }}" data-accountdeletereason-name-en="{{ accountdeletereason.name_en }}" data-accountdeletereason-name-ar="{{ accountdeletereason.name_ar }}">
+                                                 Edit </a>
+                                          </li>
+                                          <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteAccountDeleteReasonModal" data-accountdeletereason-id="{{ accountdeletereason.id }}">
+                                                 Delete </a>
+                                          </li> -->
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Add AccountDeleteReason Modal -->
+<div class="modal fade" id="addAccountDeleteReasonModal" tabindex="-1" aria-labelledby="addAccountDeleteReasonModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="addAccountDeleteReasonModalLabel">Add Account Delete Reason</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'accountdeletereason_create' %}" id="addAccountDeleteReasonForm"> {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name_en" class="form-label">Account Delete Reason (English)</label>
+                  <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Account Delete Reason (English)">
+                  <div id="addAccountDeleteReasonEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="name_ar" class="form-label">Account Delete Reason (Arabic)</label>
+                  <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Arabic Account Delete Reason">
+                  <div id="addAccountDeleteReasonArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Add Account Delete Reason</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Edit AccountDeleteReason Modal -->
+<div class="modal fade" id="editAccountDeleteReasonModal" tabindex="-1" aria-labelledby="editAccountDeleteReasonModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="editAccountDeleteReasonModalLabel">Edit AccountDeleteReason</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'accountdeletereason_update' pk=0 %}" id="editAccountDeleteReasonForm"> {% csrf_token %}
+               <input type="hidden" id="editAccountDeleteReasonId" name="id">
+               <div class="mb-3">
+                  <label for="editName_en" class="form-label">Account Delete Reason (English)</label>
+                  <input type="text" class="form-control" id="editName_en" name="name_en" placeholder="Enter Account Delete Reason (English)">
+                  <div id="editAccountDeleteReasonEnError" class="text-danger mt-2"></div>
+               </div>
+               <div class="mb-3">
+                  <label for="editName_ar" class="form-label">Account Delete Reason (Arabic)</label>
+                  <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Arabic Account Delete Reason">
+                  <div id="editAccountDeleteReasonArError" class="text-danger mt-2"></div>
+               </div>
+               <button type="submit" class="btn btn-primary">Update AccountDeleteReason</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Delete AccountDeleteReason Modal -->
+<div class="modal fade" id="deleteAccountDeleteReasonModal" tabindex="-1" aria-labelledby="deleteAccountDeleteReasonModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="deleteAccountDeleteReasonModalLabel">Delete AccountDeleteReason</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form method="post" action="{% url 'accountdeletereason_delete' pk=0 %}" id="deleteAccountDeleteReasonForm"> {% csrf_token %}
+               <input type="hidden" id="deleteAccountDeleteReasonId" name="id">
+               <p>Are you sure you want to delete this accountdeletereason?</p>
+               <button type="submit" class="btn btn-danger">Delete AccountDeleteReason</button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      var editAccountDeleteReasonModal = document.getElementById('editAccountDeleteReasonModal');
+      editAccountDeleteReasonModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget;
+         var accountdeletereasonId = button.getAttribute('data-accountdeletereason-id');
+         var accountdeletereasonNameEn = button.getAttribute('data-accountdeletereason-name-en');
+         var accountdeletereasonNameAr = button.getAttribute('data-accountdeletereason-name-ar');
+         var form = document.getElementById('editAccountDeleteReasonForm');
+         form.action = "{% url 'accountdeletereason_update' pk='0' %}".replace('0', accountdeletereasonId);
+         form.querySelector('#editAccountDeleteReasonId').value = accountdeletereasonId;
+         form.querySelector('#editName_en').value = accountdeletereasonNameEn;
+         form.querySelector('#editName_ar').value = accountdeletereasonNameAr;
+         // Clear any previous error messages
+         document.getElementById('editAccountDeleteReasonEnError').textContent = '';
+         document.getElementById('editAccountDeleteReasonArError').textContent = '';
+      });
+      var deleteAccountDeleteReasonModal = document.getElementById('deleteAccountDeleteReasonModal');
+      deleteAccountDeleteReasonModal.addEventListener('show.bs.modal', function(event) {
+         var button = event.relatedTarget;
+         var accountdeletereasonId = button.getAttribute('data-accountdeletereason-id');
+         var form = document.getElementById('deleteAccountDeleteReasonForm');
+         form.action = "{% url 'accountdeletereason_delete' pk='0' %}".replace('0', accountdeletereasonId);
+         form.querySelector('#deleteAccountDeleteReasonId').value = accountdeletereasonId;
+      });
+      // Add AccountDeleteReason Form Validation
+      var addAccountDeleteReasonForm = document.getElementById('addAccountDeleteReasonForm');
+      addAccountDeleteReasonForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('name_en');
+         var nameArInput = document.getElementById('name_ar');
+         var errorContainer = document.getElementById('addAccountDeleteReasonEnError');
+         var errorArContainer = document.getElementById('addAccountDeleteReasonArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous errors
+         errorContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorContainer.textContent = 'Account Delete Reason (English) cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Account Delete Reason (Arabic) cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+      // Edit AccountDeleteReason Form Validation
+      var editAccountDeleteReasonForm = document.getElementById('editAccountDeleteReasonForm');
+      editAccountDeleteReasonForm.addEventListener('submit', function(event) {
+         var nameEnInput = document.getElementById('editName_en');
+         var nameArInput = document.getElementById('editName_ar');
+         var errorContainer = document.getElementById('editAccountDeleteReasonEnError');
+         var errorArContainer = document.getElementById('editAccountDeleteReasonArError');
+         var nameEnValue = nameEnInput.value.trim();
+         var nameArValue = nameArInput.value.trim();
+         // Clear previous errors
+         errorContainer.textContent = '';
+         errorArContainer.textContent = '';
+         if (nameEnValue === '') {
+            event.preventDefault();
+            errorContainer.textContent = 'Account Delete Reason (English) cannot be empty.';
+            return false;
+         }
+         if (nameArValue === '') {
+            event.preventDefault();
+            errorArContainer.textContent = 'Account Delete Reason (Arabic) cannot be empty.';
+            return false;
+         }
+         // Additional validation for uniqueness can be handled server-side
+      });
+   });
+</script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // Toggle the visibility of the action card
+      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+         menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                  card.style.display = 'none';
+               }
+            });
+         });
+      });
+      // Hide action card if clicking outside
+      document.addEventListener('click', function(event) {
+         var isClickInside = event.target.closest('.action-menu-container');
+         if (!isClickInside) {
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+            });
+         }
+      });
+   });
+</script>
+{% endblock %}

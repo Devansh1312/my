@@ -125,6 +125,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
         replies = Post_comment.objects.filter(parent=obj).order_by('-date_created')
         return PostCommentSerializer(replies, many=True, context=self.context).data
 
+
     def get_entity(self, obj):
         # Get entity details based on creator_type
         if obj.creator_type == Post_comment.TEAM_TYPE:
@@ -779,4 +780,22 @@ class InjurySerializer(serializers.ModelSerializer):
         else:
             name = obj.name_en 
         return name
-    
+
+class DeleteAccountReasonSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserDeleteReason
+        fields = ['id', 'name']
+
+    def get_name(self, obj):
+        # Get the language from the request context
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        # Get the name based on the language, with a fallback to "Unnamed" if null
+        if language == 'ar':
+            name = obj.name_ar 
+        else:
+            name = obj.name_en 
+        return name

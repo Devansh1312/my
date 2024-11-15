@@ -98,6 +98,16 @@ class GameOfficialsTypeForm(forms.ModelForm):
             "name_ar": forms.TextInput(attrs={"placeholder": "أدخل نوع المسؤول باللغة العربية"}),
         }
 
+
+class AccountDeleteReasonForm(forms.ModelForm):
+    class Meta:
+        model = UserDeleteReason
+        fields = ["name_en", "name_ar"]
+        widgets = {
+            "name_en": forms.TextInput(attrs={"placeholder": "Enter Delete Reason in English"}),
+            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل سبب الحذف باللغة العربية"}),
+        }
+
 # # Gender Form
 # class GenderForm(forms.ModelForm):
 #     class Meta:

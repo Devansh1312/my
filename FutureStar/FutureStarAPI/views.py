@@ -722,6 +722,25 @@ class LogoutAPIView(APIView):
                 'error': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
 
+
+####################### User Acount Delete Reason LIST API ##############
+class DeleteAccountReasonsListView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        reason = UserDeleteReason.objects.all()
+        serializer = DeleteAccountReasonSerializer(reason, many=True,context={'request': request})
+        return Response({
+           'status': 1,
+           'message': _('Reasons fetched successfully.'),
+            'data': serializer.data,
+        }, status=status.HTTP_200_OK)
+
 ################ Delete User ####################
 class DeleteAccountView(APIView):
     permission_classes = [IsAuthenticated]
