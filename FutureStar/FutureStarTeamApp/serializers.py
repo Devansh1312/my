@@ -150,6 +150,7 @@ class TeamBranchSerializer(serializers.ModelSerializer):
     age_group_name = serializers.SerializerMethodField()
     field_size_name = serializers.SerializerMethodField()
     gender_name = serializers.SerializerMethodField()
+    upload_image = serializers.SerializerMethodField()
 
     class Meta:
         model = TeamBranch
@@ -160,6 +161,9 @@ class TeamBranchSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
     
+    def get_upload_image(self, obj):
+        return obj.upload_image.url if obj.upload_image else None  # Return None if no image uploaded
+
     def get_gender_name(self, obj):
         request = self.context.get('request')
         language = request.headers.get('Language', 'en')

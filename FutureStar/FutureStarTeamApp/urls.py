@@ -11,6 +11,9 @@ urlpatterns = [
         path('api/team/uniform_delete/', DeleteUniformView.as_view()),
         path('api/team_branch/', TeamBranchAPIView.as_view()),
         path('api/team_branch/create/', TeamBranchAPIView.as_view()),
+        path('api/team_branch/edit/', TeamBranchAPIView.as_view()),
+        path('api/team_branch/delete/', TeamBranchAPIView.as_view()),
+
         path('api/staff-management/', StaffManagementView.as_view()),
         path('api/search_users/', UserSearchView.as_view()),
 
