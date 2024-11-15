@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
 from FutureStarTrainingGroupApp.serializers import *
@@ -7,34 +5,27 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from FutureStarFriendlyGame.serializers import *
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarFriendlyGame.models import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-import random
 from django.utils import timezone
-import os
-from django.conf import settings
-from django.core.files.storage import default_storage
-from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
-from django.db.models import Q
 from django.utils.translation import gettext as _
-from django.db import transaction
-import string
 from rest_framework.exceptions import ValidationError
-import re
-import logging
-from django.utils.crypto import get_random_string
-from django.utils.timezone import now
+from django.db import IntegrityError
 
 
 
 class ManagerBranchDetail(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.user.id
         if not user_id:
             return Response({
@@ -84,34 +75,35 @@ class ManagerBranchDetail(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 class CreateFriendlyGame(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
     def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.user.id
-        if request.user.role.id != 6:  # Ensure the user has the required role
+        if request.user.role.id != 6:
             return Response({
                 'status': 0,
                 'message': 'User does not have the required role.',
-                
                 'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Ensure the required fields are in the request data
         game_field_id = request.data.get('game_field_id', None)
         if not game_field_id:
             return Response({
                 'status': 0,
                 'message': 'Game field ID is required.',
-                
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get the Field instance using the game_field_id
         try:
             game_field = Field.objects.get(id=game_field_id)
         except Field.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': 'Game field not found.',
-                
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -129,7 +121,6 @@ class CreateFriendlyGame(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             try:
-                # Check that the user is managerial staff for Team A
                 join_branch = JoinBranch.objects.get(
                     user_id=user_id, 
                     branch_id=team_a_id, 
@@ -137,18 +128,33 @@ class CreateFriendlyGame(APIView):
                 )
 
                 team_b_id = request.data.get('team_b', None)
-                # Save the game with both teams and the correct game field instance
-                friendly_game = serializer.save(team_a_id=team_a_id, team_b_id=team_b_id, game_field_id=game_field,created_by=request.user)
-
                 
-                return Response({
-                    'status': 1,
-                    'message': 'Friendly game created successfully.',
-                    'total_records': 1,
-                    'total_pages': 1,
-                    'current_page': 1,
-                    'data': FriendlyGameSerializer(friendly_game).data
-                }, status=status.HTTP_201_CREATED)
+                # Catch IntegrityError during save operation
+                try:
+                    friendly_game = serializer.save(
+                        team_a_id=team_a_id, 
+                        team_b_id=team_b_id, 
+                        game_field_id=game_field,
+                        created_by=request.user
+                    )
+                    return Response({
+                        'status': 1,
+                        'message': 'Friendly game created successfully.',
+                        'total_records': 1,
+                        'total_pages': 1,
+                        'current_page': 1,
+                        'data': FriendlyGameSerializer(friendly_game).data
+                    }, status=status.HTTP_201_CREATED)
+                except IntegrityError:
+                    return Response({
+                        'status': 0,
+                        'message': 'A game with these details already exists.',
+                        'total_records': 0,
+                        'total_pages': 0,
+                        'current_page': 1,
+                        'data': {}
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
             except JoinBranch.DoesNotExist:
                 return Response({
                     'status': 0,
@@ -169,7 +175,12 @@ class CreateFriendlyGame(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateFriendlyGame(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def put(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.user.id
         if request.user.role.id != 6:  # Ensure the user has the required role
             return Response({
@@ -235,7 +246,12 @@ class UpdateFriendlyGame(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 class DeleteFriendlyGame(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def delete(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user_id = request.user.id
 
         # Check if the user has the required role
@@ -280,3 +296,91 @@ class DeleteFriendlyGame(APIView):
                 'message': _('Game not found or not created by you.'),
                 'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+
+################ Pagination ##################
+# Custom Pagination class with fixed paginate_queryset
+class CustomFriendlyGamesPagination(PageNumberPagination): 
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': 'Data fetched successfully.',
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+
+        
+################ List OF Friendly Games Where Only One Team is There  #######################
+
+class ListOfFridlyGamesForJoin(APIView):
+    pagination_class = CustomFriendlyGamesPagination
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Filter games where game_status=0 and team_b is None
+        friendly_games = FriendlyGame.objects.filter(game_status=0, team_b=None)
+        
+        # Initialize pagination
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(friendly_games, request, view=self)
+
+        # If paginated queryset exists, serialize the data and return paginated response
+        if paginated_queryset is not None:
+            serializer = FriendlyGameSerializer(paginated_queryset, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        # Fallback response if no pagination
+        serializer = FriendlyGameSerializer(friendly_games, many=True)
+        return Response({
+            'status': 1,
+            'message': 'Data fetched successfully.',
+            'data': serializer.data
+        })
