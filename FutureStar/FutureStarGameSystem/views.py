@@ -50,7 +50,8 @@ class TeamPlayersAPIView(APIView):
         lineups = Lineup.objects.filter(
             team_id=team_id,
             tournament_id=tournament_id,
-            lineup_status__in=[0, None]
+            lineup_status__in=[0, None],
+            player_id__is_deleted=False  # Exclude deleted players
         ).select_related('team_id', 'player_id')
 
         # If no players are found with status null or 0, return an empty response
@@ -1069,10 +1070,12 @@ class TeamGameStatsTimelineAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
+    
     def get(self, request, *args, **kwargs):
         # Retrieve query parameters
         game_id = request.query_params.get('game_id')
         tournament_id = request.query_params.get('tournament_id')
+        include_game_time = request.query_params.get('game_time')  # Check if game_time is provided
 
         # Validate query parameters
         if not game_id or not tournament_id:
@@ -1082,11 +1085,10 @@ class TeamGameStatsTimelineAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve all relevant stats related to the given game and tournament
-        # This fetches PlayerGameStats, and you can include related models like Player, Team, etc.
         team_stats = PlayerGameStats.objects.filter(
             game_id=game_id,
             tournament_id=tournament_id
-        ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')  # Add select_related for related models
+        ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
 
         # Prepare a list to hold the timeline data
         stats_data = []
@@ -1108,6 +1110,8 @@ class TeamGameStatsTimelineAPIView(APIView):
                 'updated_at': stat.updated_at,
                 'substitution_in_player': stat.in_player.id if stat.in_player else None,
                 'substitution_out_player': stat.out_player.id if stat.out_player else None,
+                # Include game_time if include_game_time is set; otherwise, set to None
+                'game_time': stat.game_time if include_game_time else None
             }
             # Add the stat information to the list
             stats_data.append(stat_info)
