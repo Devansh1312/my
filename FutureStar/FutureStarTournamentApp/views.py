@@ -848,15 +848,16 @@ class TournamentGamesAPIView(APIView):
             team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
             team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
 
-            # Calculate goals for each team from PlayerGameStats
-            game_number = request.query_params.get('game_number')
-
-# Get the specific game based on game_number
-            game = TournamentGames.objects.filter(game_number=game_number).first()
-
-            # If the game exists
-            if game:
-                # Get the goal counts for both teams in the game
+            # Retrieve 'finished' from query params
+            finished = request.query_params.get('finished', '').lower() in ['true', '1', 'yes']
+            
+            # Initialize goal counts and result as null
+            team_a_goal_count = None
+            team_b_goal_count = None
+            result = None
+            
+            # Calculate goals for each team if the game is finished
+            if game.finished:
                 team_a_goal_count = PlayerGameStats.objects.filter(
                     team_id=game.team_a,
                     game_id=game.id,
@@ -869,30 +870,19 @@ class TournamentGamesAPIView(APIView):
                     tournament_id=game.tournament_id
                 ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-                # Retrieve 'finished' from query params and check if both teams have 0 goals
-                finished = request.query_params.get('finished', '').lower() in ['true', '1', 'yes']
-
-                if finished and team_a_goal_count == 0 and team_b_goal_count == 0:
-                    # Set the result to 'draw' if both teams have 0 goals
+                # Determine result
+                if team_a_goal_count == team_b_goal_count:
                     result = 'draw'
-                    game.team_a_goal = 0
-                    game.team_b_goal = 0
-                    game.finished = True  # Mark the game as finished
-                    game.save()  # Save the updated game
+                elif team_a_goal_count > team_b_goal_count:
+                    result = 'Team A win'
                 else:
-                    # If the goals are not both 0, calculate the result based on goals
-                    if team_a_goal_count == team_b_goal_count:
-                        result = 'draw'
-                    elif team_a_goal_count > team_b_goal_count:
-                        result = 'Team A win'
-                    else:
-                        result = 'Team B win'
+                    result = 'Team B win'
 
-                    game.result = result  # Update the result if it's not a draw
-                    game.save()  # Save the updated game
-            else:
-                # If no game was found with the given game_number
-                result = 'Game not found'
+                # Update game result
+                game.team_a_goal = team_a_goal_count
+                game.team_b_goal = team_b_goal_count
+                game.result = result
+                game.save()
 
             # Update game data with new information
             game_data.update({
@@ -905,7 +895,7 @@ class TournamentGamesAPIView(APIView):
                 "team_a_goal": team_a_goal_count,
                 "team_b_goal": team_b_goal_count,
                 "result": result,
-                "finished": finished
+                "finished": game.finished  # Ensure finished status is included
             })
 
             # Group games by day name and game date
@@ -928,12 +918,12 @@ class TournamentGamesAPIView(APIView):
                         "team_a": game['team_a'],
                         "team_a_name": game['team_a_name'],
                         "team_a_logo": game['team_a_logo'],
-                        "team_a_goal": game['team_a_goal'],
+                        "team_a_goal": game.get('team_a_goal', None),  # Null if not finished
                         "team_b": game['team_b'],
                         "team_b_name": game['team_b_name'],
                         "team_b_logo": game['team_b_logo'],
-                        "team_b_goal": game['team_b_goal'],
-                        "result": game['result'],
+                        "team_b_goal": game.get('team_b_goal', None),  # Null if not finished
+                        "result": game.get('result', None),  # Null if not finished
                         "finished": game['finished'],
                         "game_field_id": game['game_field_id'],
                         "game_field_id_name": game['game_field_id_name'],
@@ -951,6 +941,7 @@ class TournamentGamesAPIView(APIView):
             "message": _("Games Fetched successfully."),
             "data": formatted_data
         }, status=status.HTTP_200_OK)
+
 
 class TournamentGamesDetailAPIView(APIView):
   
