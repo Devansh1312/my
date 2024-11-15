@@ -849,43 +849,50 @@ class TournamentGamesAPIView(APIView):
             team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
 
             # Calculate goals for each team from PlayerGameStats
-            team_a_goal_count = PlayerGameStats.objects.filter(
-                team_id=game.team_a,
-                game_id=game.id,
-                tournament_id=game.tournament_id
-            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            game_number = request.query_params.get('game_number')
 
-            team_b_goal_count = PlayerGameStats.objects.filter(
-                team_id=game.team_b,
-                game_id=game.id,
-                tournament_id=game.tournament_id
-            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+# Get the specific game based on game_number
+            game = TournamentGames.objects.filter(game_number=game_number).first()
 
-            # Determine the game result (win, loss, draw) and finished status
-         
-            finished = request.query_params.get('finished')
-            game_number=request.query_params.get('game_number')
-            if finished is not None:
-                finished = finished.lower() in ['true', '1', 'yes']
+            # If the game exists
+            if game:
+                # Get the goal counts for both teams in the game
+                team_a_goal_count = PlayerGameStats.objects.filter(
+                    team_id=game.team_a,
+                    game_id=game.id,
+                    tournament_id=game.tournament_id
+                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-            # Check if both 'finished' and 'game_number' are provided
-            if finished and game_number:
-                # Ensure that both 'team_a_goal' and 'team_b_goal' are not None
-                if game_data.get('team_a_goal') is not None and game_data.get('team_b_goal') is not None:
-                    # Calculate the result based on goals
+                team_b_goal_count = PlayerGameStats.objects.filter(
+                    team_id=game.team_b,
+                    game_id=game.id,
+                    tournament_id=game.tournament_id
+                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+                # Retrieve 'finished' from query params and check if both teams have 0 goals
+                finished = request.query_params.get('finished', '').lower() in ['true', '1', 'yes']
+
+                if finished and team_a_goal_count == 0 and team_b_goal_count == 0:
+                    # Set the result to 'draw' if both teams have 0 goals
+                    result = 'draw'
+                    game.team_a_goal = 0
+                    game.team_b_goal = 0
+                    game.finished = True  # Mark the game as finished
+                    game.save()  # Save the updated game
+                else:
+                    # If the goals are not both 0, calculate the result based on goals
                     if team_a_goal_count == team_b_goal_count:
                         result = 'draw'
                     elif team_a_goal_count > team_b_goal_count:
-                        result = 'Team A win'  # Team A wins
+                        result = 'Team A win'
                     else:
-                        result = 'Team B win'  # Team B wins
-                else:
-                    finished = False
-                    result = None
-            else:
-                finished = False
-                result = None
+                        result = 'Team B win'
 
+                    game.result = result  # Update the result if it's not a draw
+                    game.save()  # Save the updated game
+            else:
+                # If no game was found with the given game_number
+                result = 'Game not found'
 
             # Update game data with new information
             game_data.update({

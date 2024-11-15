@@ -551,28 +551,25 @@ class GameStatsLineupPlayers(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-            team_id = request.query_params.get('team_id')
-            game_id = request.query_params.get('game_id')
-            tournament_id = request.query_params.get('tournament_id')
+        team_a_id = request.query_params.get('team_a_id')
+        team_b_id = request.query_params.get('team_b_id')
+        game_id = request.query_params.get('game_id')
+        tournament_id = request.query_params.get('tournament_id')
 
-            if not team_id or not game_id or not tournament_id:
-                return Response({
-                    'status': 0,
-                    'message': _('team_id, game_id, and tournament_id are required.'),
-                    'data': []
-                }, status=status.HTTP_400_BAD_REQUEST)
+        if not team_a_id or not team_b_id or not game_id or not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('team_a_id, team_b_id, game_id, and tournament_id are required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Filter players in Lineup by team, game, and tournament, separating by status
-            # added_lineups = Lineup.objects.filter(
-            #     team_id=team_id,
-            #     game_id=game_id,
-            #     tournament_id=tournament_id,
-            #     lineup_status=Lineup.ADDED
-            # )
+        # Fetch lineup data for both teams
+        lineup_data = {}
+        for team_id, team_key in [(team_a_id, 'team_a'), (team_b_id, 'team_b')]:
             substitute_lineups = Lineup.objects.filter(
                 team_id=team_id,
                 game_id=game_id,
@@ -586,16 +583,7 @@ class GameStatsLineupPlayers(APIView):
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
 
-            # Prepare response data for added players
-            # added_data = [{
-            #     'id': lineup.player_id.id,
-            #     'username': lineup.player_id.username,
-            #     'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-            #     'position_1': lineup.position_1,
-            #     'position_2': lineup.position_2
-            # } for lineup in added_lineups]
-
-            # Prepare response data for substitute players
+            # Prepare response data for substitute and already added players
             substitute_data = [{
                 'id': lineup.player_id.id,
                 'username': lineup.player_id.username,
@@ -612,18 +600,33 @@ class GameStatsLineupPlayers(APIView):
                 'position_2': lineup.position_2
             } for lineup in already_added_lineups]
 
-            # Return the response with the status and message
-            return Response({
-                'status': 1,
-                'message': _('Lineup players fetched successfully with status "ADDED".'),
-                'data': {
-                   
-                    'player_added_in_lineup':already_added_data,
-                    'substitute': substitute_data,
-                }
-            }, status=status.HTTP_200_OK)
+            # Retrieve managerial staff related to the given team
+            managerial_staff = JoinBranch.objects.filter(
+                branch_id=team_id,
+                joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE  # Assuming this is the constant for managerial staff type
+            ).select_related('user_id')
 
+            managerial_staff_data = [{
+                'id': staff.user_id.id,
+                'username': staff.user_id.username,
+                'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
+                'joining_type_id': staff.joinning_type,
+                'joining_type_name': staff.get_joinning_type_display()
+            } for staff in managerial_staff]
 
+            # Add the data for each team to the response
+            lineup_data[team_key] = {
+                'player_added_in_lineup': already_added_data,
+                'substitute': substitute_data,
+                'managerial_staff': managerial_staff_data
+            }
+
+        # Return the response with the status and message
+        return Response({
+            'status': 1,
+            'message': _('Lineup players and managerial staff fetched successfully for both teams.'),
+            'data': lineup_data
+        }, status=status.HTTP_200_OK)
 class LineupPlayerStatusAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
