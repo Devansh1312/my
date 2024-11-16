@@ -82,6 +82,7 @@ class Country(models.Model):
     id = models.BigAutoField(primary_key=True)
     code = models.CharField(max_length=2)
     name = models.CharField(max_length=100)
+    flag = models.ImageField(upload_to="Country_Flag/", null=True, blank=True)
     zone_id = models.IntegerField(default=0)
     country_code = models.IntegerField(null=True, blank=True)
     status = models.BooleanField(default=True, help_text='0 = InActive | 1 = Active')

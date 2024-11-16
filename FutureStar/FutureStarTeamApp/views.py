@@ -781,14 +781,17 @@ class UserSearchView(APIView):
         ###### Search for Manager ##########
         if search_type == '1':
             users = User.objects.filter(role_id=5, is_deleted=False)
-        
-        ###### Search for Player ##########
+        ###### Search for Coaching Staff ##########
         if search_type == '2':
+            users = User.objects.filter(role_id=3, is_deleted=False)
+        ####### Search For Medical Staff##################            
+        if search_type == '3':
+            users = User.objects.filter(role_id=5, is_deleted=False)
+        ###### Search for Player ##########
+        if search_type == '4':
             users = User.objects.filter(role_id__in=[5, 2], is_deleted=False)
         
-        ###### Search for Coaching Staff ##########
-        if search_type == '3':
-            users = User.objects.filter(role_id=3, is_deleted=False)
+       
 
         # Filter by phone if provided
         if phone:
@@ -812,6 +815,8 @@ class UserSearchView(APIView):
                 'profile_picture': user.profile_picture.url if user.profile_picture else None,
                 'country_id': user.country.id if user.country else None,
                 'country_name': user.country.name if user.country else None,
+                'flag': user.country.flag.url if user.country else None,
+
             }
             for user in paginated_users
         ]

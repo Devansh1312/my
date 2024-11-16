@@ -201,6 +201,9 @@ class JoinBranchSerializer(serializers.ModelSerializer):
             'phone': user.phone,
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
             'country_id': user.country.id if user.country else None,
+            'country_name': user.country.name if user.country else None,
+            'flag': user.country.flag.url if user.country else None,
+
         }
 
     def to_representation(self, instance):

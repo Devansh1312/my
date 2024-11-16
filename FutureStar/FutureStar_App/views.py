@@ -25,12 +25,15 @@ from django.template.loader import render_to_string
 import sys
 from functools import wraps
 from django.core.files.storage import FileSystemStorage
-
+import json
 from FutureStarAPI.models import *
 from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
+from django.utils.safestring import mark_safe
+from django.db.models import F, Case, When, IntegerField
+from django.utils.timezone import now
 
 
 def user_role_check(view_func):
@@ -5963,3 +5966,101 @@ class AccountDeleteReasonListView(LoginRequiredMixin, View):
             self.template_name,
             {"accountdeletereason": accountdeletereason, "breadcrumb": {"parent": "User", "child": "Account Delete Reason"}},
         )
+
+
+############################ User Assign ##########################
+@method_decorator(user_role_check, name='dispatch')
+class TournamentGamesListView(LoginRequiredMixin, View):
+    template_name = "Admin/Assign_User_Game.html"
+
+    def get(self, request):
+        # Current time to compare game date and start time
+        current_time = now()
+
+        # Retrieve tournament games with annotated order for categorizing
+        tournament_games = (
+            TournamentGames.objects.annotate(
+                assigned_user_name=F('game_statistics_handler__username'),  # Get the assigned user name
+                is_unassigned=Case(
+                    When(game_statistics_handler__isnull=True, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                is_upcoming=Case(
+                    When(game_date__gt=current_time.date(), then=1),
+                    When(game_date=current_time.date(), game_start_time__gt=current_time.time(), then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                is_passed=Case(
+                    When(game_date__lt=current_time.date(), then=1),
+                    When(game_date=current_time.date(), game_start_time__lt=current_time.time(), then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+            )
+            .order_by('-game_date', '-game_start_time', '-id')
+        )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "tournament_games": tournament_games,
+                "breadcrumb": {"child": "Tournament Games List"},
+            },
+        )
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AssignUserToGameView(LoginRequiredMixin, View):
+    def post(self, request, game_id):
+        try:
+            # Parse JSON request body
+            data = json.loads(request.body)
+            user_id = data.get('user_id')
+
+            # Validate and retrieve the game and user
+            game = get_object_or_404(TournamentGames, id=game_id)
+            user = get_object_or_404(User, id=user_id)
+
+            current_time = now()
+
+            # Check if the game date and time has passed
+            if game.game_date < current_time.date() or (
+                game.game_date == current_time.date() and game.game_start_time <= current_time.time()
+            ):
+                messages.success(
+                request,
+                f"Cannot assign user; game already started."
+            )
+                return JsonResponse(
+                    {'error': 'Cannot assign user; game already started.'}, status=400
+                )
+
+            # Assign the user to the game
+            game.game_statistics_handler = user
+            game.save()
+
+            messages.success(
+                request,
+                f"User assigned successfully!"
+            )
+
+            return JsonResponse({'message': 'User assigned successfully!'}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({'error': 'GET method not allowed'}, status=405)
+
+
+def fetch_users(request):
+    role_id = request.GET.get('role_id')
+    phone = request.GET.get('phone', '')
+
+    # Query users based on role ID and phone number filter
+    users = User.objects.filter(
+        role_id=role_id, phone__icontains=phone, is_deleted=False
+    ).values('id', 'username', 'phone')
+    return JsonResponse(list(users), safe=False)

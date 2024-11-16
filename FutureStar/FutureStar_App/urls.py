@@ -262,4 +262,11 @@ urlpatterns = [
     path('playing_positions/create/', PlayingPositionCreateView.as_view(), name='playing_position_create'),
     path('playing_positions/edit/<int:playing_position_id>/', PlayingPositionEditView.as_view(), name='playing_position_edit'),
 
+
+    path('tournament-games-list/', TournamentGamesListView.as_view(), name='tournament_games_list'),
+    path('api/users/', fetch_users, name='fetch_users'),
+    path('api/tournament-games/<int:game_id>/assign-user/', AssignUserToGameView.as_view(), name='assign_user_to_game'),
+    # path('search-users/',search_users, name='search_users'),
+    # path('assign-game-handler/',assign_game_handler, name='assign_game_handler'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
