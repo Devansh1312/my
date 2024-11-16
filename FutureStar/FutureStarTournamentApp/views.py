@@ -35,7 +35,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from django.db import transaction
+from django.db import IntegrityError, transaction
 import string
 from rest_framework.exceptions import ValidationError
 import re
@@ -777,17 +777,32 @@ class TournamentGamesAPIView(APIView):
         
         # Add tournament_id to the request data if it's provided
         tournament_id = request.data.get("tournament_id")
+        game_number=request.data.get("game_number")
+
         
-        # if tournament_id:
-        #     request.data["tournament_id"] = tournament_id
         
+            
+        if not tournament_id or not game_number:
+            return Response({
+                'status': 0,
+                'message': _('Both tournament_id and game_number are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if the game_number already exists for the given tournament_id
+        if TournamentGames.objects.filter(Q(tournament_id=tournament_id) & Q(game_number=game_number)).exists():
+            return Response({
+                'status': 0,
+                'message': _('This game number already exists for the specified tournament. Please choose a different game number.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Proceed with serializer validation and saving
         serializer = TournamentGamesSerializer(data=request.data)
         try:
             if serializer.is_valid():
                 serializer.save()
                 return Response({
                     'status': 1,
-                    'message': _('Games Created successfully.'),
+                    'message': _('Game created successfully.'),
                     'data': serializer.data
                 }, status=status.HTTP_201_CREATED)
             else:
@@ -803,128 +818,180 @@ class TournamentGamesAPIView(APIView):
                 'message': _('An unexpected error occurred.'),
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    
-
+            
+  
     def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-        
-        # Filter by tournament_id if provided in query params
-        tournament_id = request.query_params.get('tournament_id')
-        games_query = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
-        
-        if tournament_id:
-            games_query = games_query.filter(tournament_id=tournament_id)
-        
-        serializer = TournamentGamesSerializer(games_query, many=True)
-        
-        grouped_data = defaultdict(list)
-        for game, game_data in zip(games_query, serializer.data):
-            game_date = game.game_date
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Filter by tournament_id if provided in query params
+            tournament_id = request.query_params.get('tournament_id')
+            games_query = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
             
-            # Check if game_date is None before attempting to call strftime
-            if game_date:
-                day_name = game_date.strftime('%A')
-                formatted_date = game_date.strftime('%Y-%m-%d')
-            else:
-                day_name = "Unknown"
-                formatted_date = "Unknown-Date"
+            if tournament_id:
+                games_query = games_query.filter(tournament_id=tournament_id)
             
-            # Retrieve team names based on IDs
-            team_a_branch = TeamBranch.objects.filter(id=game.team_a).first()
-            team_b_branch = TeamBranch.objects.filter(id=game.team_b).first()
-
-            team_a_name = team_a_branch.team_name if team_a_branch else None
-            team_b_name = team_b_branch.team_name if team_b_branch else None
-
-            # Retrieve team logos
-            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id else None
-            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id else None
-
-            team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
-            team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
-
-            # Retrieve goals scored by teams
-            team_a_goals = PlayerGameStats.objects.filter(
-                team_id=game.team_a,
-                game_id=game.id,
-                tournament_id=game.tournament_id.id
-            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
-            team_b_goals = PlayerGameStats.objects.filter(
-                team_id=game.team_b,
-                game_id=game.id,
-                tournament_id=game.tournament_id.id
-            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
-            # Determine finish status and winner/loser if game is finished
-            finish = request.query_params.get('finish', 'false').lower() == 'true'
-            if finish:
-                if team_a_goals == team_b_goals:
-                    game.is_draw = True
-                    game.winner_id = None
-                    game.loser_id = None
+            serializer = TournamentGamesSerializer(games_query, many=True)
+            
+            grouped_data = defaultdict(list)
+            for game, game_data in zip(games_query, serializer.data):
+                game_date = game.game_date
+                
+                # Check if game_date is None before attempting to call strftime
+                if game_date:
+                    day_name = game_date.strftime('%A')
+                    formatted_date = game_date.strftime('%Y-%m-%d')
                 else:
-                    game.is_draw = False
-                    if team_a_goals > team_b_goals:
-                        game.winner_id = game.team_a
-                        game.loser_id = game.team_b
-                    else:
-                        game.winner_id = game.team_b
-                        game.loser_id = game.team_a
+                    day_name = "Unknown"
+                    formatted_date = "Unknown-Date"
+                
+                # Retrieve team names based on IDs
+                team_a_branch = TeamBranch.objects.filter(id=game.team_a).first()
+                team_b_branch = TeamBranch.objects.filter(id=game.team_b).first()
 
-                # Save updated game data
-                game.team_a_goal = team_a_goals
-                game.team_b_goal = team_b_goals
-                game.save()
+                team_a_name = team_a_branch.team_name if team_a_branch else None
+                team_b_name = team_b_branch.team_name if team_b_branch else None
 
-            # Prepare game data for response
-            game_data = {
-                "id": game.id,
-                "tournament_id": game.tournament_id.id if game.tournament_id else None,
-                "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
-                "game_number": game.game_number,
-                "game_date": game.game_date.strftime('%Y-%m-%d') if game.game_date else None,
-                "game_start_time": game.game_start_time,
-                "game_end_time": game.game_end_time,
-                "group_id": game.group_id.id if game.group_id else None,
-                "group_id_name": game.group_id.group_name if game.group_id else None,
-                "team_a": game.team_a if game.team_a else None,
-                "team_a_name": team_a_name,
-                "team_a_logo": team_a_logo_path,
-                "team_a_goal": team_a_goals,
-                "team_b": game.team_b if game.team_b else None,
-                "team_b_name": team_b_name,
-                "team_b_logo": team_b_logo_path,
-                "team_b_goal": team_b_goals,
-                "finish": finish,
-                "winner_id": game.winner_id if finish else None,
-                "loser_id": game.loser_id if finish else None,
-                "is_draw": game.is_draw if finish else None,
-                "game_field_id": game.game_field_id.id if game.game_field_id else None,
-                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
-                "created_at": game.created_at,
-                "updated_at": game.updated_at,
+                # Retrieve team logos
+                team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first() if team_a_branch and team_a_branch.team_id else None
+                team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first() if team_b_branch and team_b_branch.team_id else None
+
+                team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
+                team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
+
+                # Prepare game data for response
+                game_data = {
+                    "id": game.id,
+                    "tournament_id": game.tournament_id.id if game.tournament_id else None,
+                    "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
+                    "game_number": game.game_number,
+                    "game_date": game.game_date.strftime('%Y-%m-%d') if game.game_date else None,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                    "group_id": game.group_id.id if game.group_id else None,
+                    "group_id_name": game.group_id.group_name if game.group_id else None,
+                    "team_a": game.team_a if game.team_a else None,
+                    "team_a_name": team_a_name,
+                    "team_a_logo": team_a_logo_path,
+                    "team_a_goal": game.team_a_goal,  # Use the field from the model directly
+                    "team_b": game.team_b if game.team_b else None,
+                    "team_b_name": team_b_name,
+                    "team_b_logo": team_b_logo_path,
+                    "team_b_goal": game.team_b_goal,  # Use the field from the model directly
+                    "game_field_id": game.game_field_id.id if game.game_field_id else None,
+                    "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
+                    
+                    "finish":game.finish,
+                    "winner":game.winner_id,
+                    "loser_id":game.loser_id,
+                    "is_draw":game.is_draw,
+                  
+
+                    "created_at": game.created_at,
+                    "updated_at": game.updated_at,
+                }
+
+                # Group games by day name and formatted date
+                grouped_data[(day_name, formatted_date)].append(game_data)
+
+            # Format the response data
+            formatted_data = {
+                f"{day_name},{formatted_date}": {
+                    "games": games
+                }
+                for (day_name, formatted_date), games in grouped_data.items()
             }
 
-            # Group games by day name and formatted date
-            grouped_data[(day_name, formatted_date)].append(game_data)
+            return Response({
+                "status": 1,
+                "message": _("Games Fetched successfully."),
+                "data": formatted_data
+            }, status=status.HTTP_200_OK)
+            
+    def patch(self, request, *args, **kwargs):
+ 
+        game_id = request.data.get('game_id')  # Extract game_id from URL parameters
+        tournament_id = request.data.get('tournament_id')  # Get tournament_id from the request data
 
-        # Format the response data
-        formatted_data = {
-            f"{day_name},{formatted_date}": {
-                "games": games
-            }
-            for (day_name, formatted_date), games in grouped_data.items()
-        }
+        try:
+            # Get the game by game_id and tournament_id
+            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+            print(game)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": _("Game not found for the given tournament.")
+            }, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({
-            "status": 1,
-            "message": _("Games Fetched successfully."),
-            "data": formatted_data
-        }, status=status.HTTP_200_OK)
+        # Retrieve the goals scored by each team in the game
+        team_a_goals = PlayerGameStats.objects.filter(
+            team_id=game.team_a,
+            game_id=game.id,
+            tournament_id=game.tournament_id.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = PlayerGameStats.objects.filter(
+            team_id=game.team_b,
+            game_id=game.id,
+            tournament_id=game.tournament_id.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        # Check if the finish status is provided and is true
+        finish = request.data.get('finish', 'false').lower() == 'true'
+
+        if finish:
+            # If the game is finished, determine the result
+            if team_a_goals == 0 and team_b_goals == 0:
+                # If both teams have 0-0, set is_draw to True
+                game.is_draw = True
+            else:
+                # If one team wins, set is_draw to False
+                game.is_draw = False
+                if team_a_goals > team_b_goals:
+                    game.winner_id = game.team_a
+                    game.loser_id = game.team_b
+                else:
+                    game.winner_id = game.team_b
+                    game.loser_id = game.team_a
+
+            # Set the finish status to True and update the scores
+            game.finish = True
+            game.team_a_goal = team_a_goals
+            game.team_b_goal = team_b_goals
+            game.save()
+
+            return Response({
+                "status": 1,
+                "message": _("Game updated successfully."),
+                "data": {
+                    "id": game.id,
+                    "tournament_id": game.tournament_id.id,
+                    "is_draw": game.is_draw,
+                    "finish": game.finish,
+                    "team_a_goal": game.team_a_goal,
+                    "team_b_goal": game.team_b_goal,
+                    "winner_id": game.winner_id,
+                    "loser_id": game.loser_id,
+                }
+            }, status=status.HTTP_200_OK)
+
+        else:
+            # If finish is not true, return the current game state with null values for is_draw and finish
+            return Response({
+                "status": 1,
+                "message": _("Match is still running."),
+                "data": {
+                    "id": game.id,
+                    "tournament_id": game.tournament_id.id,
+                    "is_draw": game.is_draw if game.is_draw is not None else None,
+                    "finish": game.finish if game.finish is not None else None,
+                    "team_a_goal": game.team_a_goal,
+                    "team_b_goal": game.team_b_goal,
+                    "winner_id": game.winner_id,
+                    "loser_id": game.loser_id,
+                }
+            }, status=status.HTTP_200_OK)
 
 class TournamentGamesDetailAPIView(APIView):
   
@@ -1017,4 +1084,203 @@ class TournamentGamesDetailAPIView(APIView):
                 **staff_data
                 # Adding staff types with detailed fields to response
             }
+        }, status=status.HTTP_200_OK)
+
+
+
+class TeamUniformColorAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        serializer = TeamUniformColorSerializer(data=request.data)
+        if serializer.is_valid():
+            game_id = serializer.validated_data['game_id']
+            tournament_id = serializer.validated_data['tournament_id']
+            team_id = serializer.validated_data['team_id']
+            primary_color_player = serializer.validated_data['primary_color_player']
+            secondary_color_player = serializer.validated_data['secondary_color_player']
+            primary_color_goalkeeper = serializer.validated_data['primary_color_goalkeeper']
+            secondary_color_goalkeeper = serializer.validated_data['secondary_color_goalkeeper']
+
+            try:
+                game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+            except TournamentGames.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Game not found.'),
+                    'data': None,
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Update the uniform colors for the appropriate team
+            if team_id == game.team_a:
+                game.team_a_primary_color_player = primary_color_player
+                game.team_a_secondary_color_player = secondary_color_player
+                game.team_a_primary_color_goalkeeper = primary_color_goalkeeper
+                game.team_a_secondary_color_goalkeeper = secondary_color_goalkeeper
+            elif team_id == game.team_b:
+                game.team_b_primary_color_player = primary_color_player
+                game.team_b_secondary_color_player = secondary_color_player
+                game.team_b_primary_color_goalkeeper = primary_color_goalkeeper
+                game.team_b_secondary_color_goalkeeper = secondary_color_goalkeeper
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('The specified team_id does not match any team in this game.'),
+                    'data': None,
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            game.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Uniform Added Successfully'),
+                'data': serializer.validated_data,
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'status': 0,
+            'message': _('Invalid data.'),
+            'data': serializer.errors,
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        game_id = request.query_params.get('game_id')
+        tournament_id = request.query_params.get('tournament_id')
+        team_id = request.query_params.get('team_id')
+
+        if not game_id or not tournament_id or not team_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id, tournament_id, and team_id are required.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': None,
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Retrieve the uniform colors for the specified team
+        if team_id == game.team_a:
+            response_data = {
+                "team_id": team_id,
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+            }
+        elif team_id == game.team_b:
+            response_data = {
+                "team_id": team_id,
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+            }
+        else:
+            return Response({
+                'status': 0,
+                'message': _('The specified team_id does not match any team in this game.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'status': 1,
+            'message': _('Uniform Fetch Successfully'),
+            'data': response_data,
+        }, status=status.HTTP_200_OK)
+            
+
+class TournamentGameStatsAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Retrieve the query parameters: tournament_id, team_a_id, and team_b_id
+        tournament_id = request.query_params.get('tournament_id')
+        team_a_id = request.query_params.get('team_a_id')
+        team_b_id = request.query_params.get('team_b_id')
+
+        # Initialize the dictionary to hold statistics for each team
+        team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
+
+        # Query games based on tournament_id, team_a_id, and team_b_id
+        games = TournamentGames.objects.all()
+
+        # Apply filters based on provided query parameters
+        if tournament_id:
+            games = games.filter(tournament_id=tournament_id)
+        if team_a_id:
+            games = games.filter(team_a=team_a_id)
+        if team_b_id:
+            games = games.filter(team_b=team_b_id)
+
+        # Iterate through all the games and calculate statistics
+        for game in games:
+            if game.is_draw:
+                # Both teams have a draw
+                team_stats[game.team_a]['draws'] += 1
+                team_stats[game.team_b]['draws'] += 1
+            elif game.winner_id == game.team_a:
+                # Team A wins
+                team_stats[game.team_a]['wins'] += 1
+                team_stats[game.team_b]['losses'] += 1
+            elif game.winner_id == game.team_b:
+                # Team B wins
+                team_stats[game.team_b]['wins'] += 1
+                team_stats[game.team_a]['losses'] += 1
+
+        # Format the response in the required structure
+        response_data = {
+            "status": 1,
+            "message": "stats Fetch Successfully",
+            "data": {
+                "Team_A": team_stats.get(team_a_id, {"wins": 0, "losses": 0, "draws": 0}),
+                "Team_B": team_stats.get(team_b_id, {"wins": 0, "losses": 0, "draws": 0}),
+            }
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+class TournamentGamesh2hCompleteAPIView(APIView):
+    
+     def get(self, request, *args, **kwargs):
+        # Get the tournament_id from the query parameters
+        tournament_id = request.query_params.get('tournament_id', None)
+
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('Tournament ID is required'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter games by 'finish' field being True and by 'tournament_id'
+        games = TournamentGames.objects.filter(finish=True, tournament_id=tournament_id)
+
+        if not games.exists():
+            return Response({
+                'status': 0,
+                'message': _('No completed games found for this tournament'),
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize the data with the desired response format
+        serializer = TournamentGamesSerializer(games, many=True)
+
+        # Prepare the response data
+        response_data = serializer.data
+
+        # Return the response with status and message
+        return Response({
+            'status': 1,
+            'message': _('H2h Fetch Successfully'),
+            'data': response_data,
         }, status=status.HTTP_200_OK)
