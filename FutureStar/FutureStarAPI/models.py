@@ -23,6 +23,7 @@ class AgeGroup(models.Model):
         db_table = 'futurestar_app_age_group'
 
 class Team(models.Model):
+    id=models.AutoField(primary_key=True)
     team_name = models.CharField(max_length=255, blank=True, null=True)
     team_username = models.CharField(max_length=255, blank=True, null=True)
     team_type = models.ForeignKey(Category, on_delete=models.CASCADE, default=True)

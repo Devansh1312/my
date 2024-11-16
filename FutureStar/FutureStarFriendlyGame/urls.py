@@ -12,5 +12,7 @@ urlpatterns = [
        path('api/friendly-game/delete/', DeleteFriendlyGame.as_view()),
 
        path('api/friendly-game/list/', ListOfFridlyGamesForJoin.as_view()),
+
+       path('api/friendly-game/branch_list/', TeamBranchListView.as_view())
        
     ]

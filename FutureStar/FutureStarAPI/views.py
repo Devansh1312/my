@@ -1863,6 +1863,8 @@ class CustomMediaPagination(PageNumberPagination):
 
         # Perform standard pagination if the page is valid
         return super().paginate_queryset(queryset, request, view)
+
+        
 ###########detail album with id ################
 class DetailAlbumListAPIView(generics.ListAPIView):
     serializer_class = DetailAlbumSerializer
@@ -1914,6 +1916,9 @@ class DetailAlbumListAPIView(generics.ListAPIView):
             'data': gallary_items_serializer.data,
             'total_records': gallary_items_queryset.count()
         }, status=status.HTTP_200_OK)
+
+
+################## Create Album API ##################        
 class DetailAlbumCreateAPIView(generics.CreateAPIView):
     serializer_class = DetailAlbumSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1926,7 +1931,7 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
 
         # Extract and process creator_type and created_by_id
         creator_type = request.data.get('creator_type')
-        created_by_id = request.data.get('creator_type_id')
+        created_by_id = request.data.get('created_by_id')
 
         # Check if creator_type is provided
         if not creator_type:
@@ -1942,7 +1947,7 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
-                'message': _('creator_type and creator_type_id must be valid integers.')
+                'message': _('creator_type and created_by_id must be valid integers.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate created_by_id based on creator_type
@@ -2002,8 +2007,9 @@ class DetailAlbumCreateAPIView(generics.CreateAPIView):
             'message': _('Album creation failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-########### only album list ################
 
+
+########### only album list ################
 class AlbumListAPIView(generics.ListAPIView):
     serializer_class = AlbumSerializer
     permission_classes = [IsAuthenticated]

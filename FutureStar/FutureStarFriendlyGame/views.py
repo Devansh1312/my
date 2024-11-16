@@ -16,6 +16,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models import Q
 
 
 
@@ -36,7 +37,10 @@ class ManagerBranchDetail(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            join_branch = JoinBranch.objects.get(user_id=user_id, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE)
+            join_branch = JoinBranch.objects.get(
+                Q(joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE) | Q(joinning_type=JoinBranch.COACH_STAFF_TYPE),
+                user_id=user_id
+            )
             team_branch = TeamBranch.objects.get(id=join_branch.branch_id.id)
             
             data = {
@@ -53,9 +57,6 @@ class ManagerBranchDetail(APIView):
             return Response({
                 'status': 1,
                 'message': 'Data fetched successfully.',
-                'total_records': 1,
-                'total_pages': 1,
-                'current_page': 1,
                 'data': data
             })
 
@@ -82,8 +83,7 @@ class CreateFriendlyGame(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        user_id = request.user.id
-        if request.user.role.id != 6:
+        if request.user.role.id not in [3, 6]:
             return Response({
                 'status': 0,
                 'message': 'User does not have the required role.',
@@ -114,136 +114,127 @@ class CreateFriendlyGame(APIView):
                 return Response({
                     'status': 0,
                     'message': 'Team A is required.',
-                    'total_records': 0,
-                    'total_pages': 0,
-                    'current_page': 1,
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            try:
-                join_branch = JoinBranch.objects.get(
-                    user_id=user_id, 
-                    branch_id=team_a_id, 
-                    joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
-                )
-
-                team_b_id = request.data.get('team_b', None)
-                
-                # Catch IntegrityError during save operation
-                try:
-                    friendly_game = serializer.save(
-                        team_a_id=team_a_id, 
-                        team_b_id=team_b_id, 
-                        game_field_id=game_field,
-                        created_by=request.user
-                    )
-                    return Response({
-                        'status': 1,
-                        'message': 'Friendly game created successfully.',
-                        'total_records': 1,
-                        'total_pages': 1,
-                        'current_page': 1,
-                        'data': FriendlyGameSerializer(friendly_game).data
-                    }, status=status.HTTP_201_CREATED)
-                except IntegrityError:
-                    return Response({
-                        'status': 0,
-                        'message': 'A game with these details already exists.',
-                        'total_records': 0,
-                        'total_pages': 0,
-                        'current_page': 1,
-                        'data': {}
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-            except JoinBranch.DoesNotExist:
+            team_b_id = request.data.get('team_b')
+            if team_b_id in ["", 0]:
+                team_b_id = None
+            if team_b_id and team_b_id == team_a_id:
                 return Response({
                     'status': 0,
-                    'message': 'User is not a Managerial Staff for Team A.',
-                    'total_records': 0,
-                    'total_pages': 0,
-                    'current_page': 1,
+                    'message': _('Team B cannot be the same as Team A.'),
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
-        
+            
+            # Catch IntegrityError during save operation
+            try:
+                friendly_game = serializer.save(
+                    team_a_id=team_a_id, 
+                    team_b_id=team_b_id, 
+                    game_field_id=game_field,
+                    created_by=request.user
+                )
+                return Response({
+                    'status': 1,
+                    'message': 'Friendly game created successfully.',
+                    'data': FriendlyGameSerializer(friendly_game).data
+                }, status=status.HTTP_201_CREATED)
+            except IntegrityError:
+                return Response({
+                    'status': 0,
+                    'message': 'A game with these details already exists.',
+                    'data': {}
+                }, status=status.HTTP_400_BAD_REQUEST)
+
         return Response({
             'status': 0,
             'message': 'Invalid data.',
-            'total_records': 0,
-            'total_pages': 0,
-            'current_page': 1,
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def put(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        user_id = request.user.id
-        if request.user.role.id != 6:  # Ensure the user has the required role
+
+        # Check if the user has the required role
+        if request.user.role.id not in [3, 6]:
             return Response({
                 'status': 0,
                 'message': _('User does not have the required role.'),
-                
                 'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
+        # Retrieve and validate game_id
         game_id = request.data.get('game_id')
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Retrieve and validate team_b_id
+        team_b_id = request.data.get('team_b')
+        try:
+            team_b_id = int(team_b_id) if team_b_id else None
+            team_b_instance = TeamBranch.objects.get(id=team_b_id)  # Fetch the TeamBranch instance
+        except (ValueError, TeamBranch.DoesNotExist):
+            return Response({
+                'status': 0,
+                'message': _('Invalid or non-existent Team B ID.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            # Fetch the game instance
             game = FriendlyGame.objects.get(id=game_id)
-
-            # Check if the user is a managerial staff member of any branch
-            try:
-                join_branch = JoinBranch.objects.get(
-                    user_id=user_id, 
-                    joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
-                )
-                
-                # Check if `team_b` is empty
-                if game.team_b is None:
-                    # Assign the manager's branch to `team_b` and update game status
-                    game.team_b = join_branch.branch_id
-                    game.game_status = 1  # Set status to started
-                    game.save()
-                    data = FriendlyGameSerializer(game).data
-                    return Response({
-                        'status': 1,
-                        'message': _('Game updated successfully with manager\'s branch as Team B.'),
-                        'total_records': 1,
-                        'total_pages': 1,
-                        'current_page': 1,
-                        'data': data
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({
-                        'status': 0,
-                        'message': _('Team B is already assigned.'),
-                        'total_records': 0,
-                        'total_pages': 0,
-                        'current_page': 1,
-                        'data': {}
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-            except JoinBranch.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('User is not a Managerial Staff for any branch.'),
-                    'total_records': 0,
-                    'total_pages': 0,
-                    'current_page': 1,
-                    'data': {}
-                }, status=status.HTTP_404_NOT_FOUND)
-        
         except FriendlyGame.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Game not found.'),
-                
                 'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
+
+        # Validate team_b against team_a
+        if team_b_id == game.team_a_id:
+            return Response({
+                'status': 0,
+                'message': _('Team B cannot be the same as Team A.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the game has already started
+        if game.game_status == 1:
+            return Response({
+                'status': 0,
+                'message': _('Game is already started.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Assign team_b if not already assigned
+        if game.team_b is None:
+            game.team_b = team_b_instance  # Assign the TeamBranch instance
+            game.game_status = 1  # Set status to started
+            game.save()
+            data = FriendlyGameSerializer(game).data
+            return Response({
+                'status': 1,
+                'message': _('Game updated successfully.'),
+                'data': data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Team B is already assigned.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class DeleteFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
@@ -384,3 +375,32 @@ class ListOfFridlyGamesForJoin(APIView):
             'message': 'Data fetched successfully.',
             'data': serializer.data
         })
+    
+
+
+######################### List of all Teams for Team B  ###################
+class TeamBranchListView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        team_a_id = request.query_params.get('team_a_id',None)  # ID to exclude
+        search_key = request.query_params.get('search', '')  # Search key for team_name
+
+        # Get all branches
+        queryset = TeamBranch.objects.all()
+
+        # Exclude team_a if provided
+        if team_a_id:
+            queryset = queryset.exclude(id=team_a_id)
+
+        # Filter by team_name if search_key is provided
+        if search_key:
+            queryset = queryset.filter(team_name__icontains=search_key)
+
+        # Serialize data with pagination
+        paginator = CustomFriendlyGamesPagination()
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+        serializer = TeamBranchSearchSerializer(paginated_queryset, many=True,context={'request': request})
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)

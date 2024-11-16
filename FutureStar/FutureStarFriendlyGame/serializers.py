@@ -77,3 +77,20 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
             'username': user.username,
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
         } if user else None
+
+
+
+class TeamBranchSearchSerializer(serializers.ModelSerializer):
+    age_group_id = serializers.SerializerMethodField()
+    main_team_name = serializers.CharField(source='team_id.team_name', read_only=True)  # Fetch `team_name` from related `Team`
+
+    class Meta:
+        model = TeamBranch
+        fields = ['id', 'team_name', 'main_team_name', 'age_group_id']
+
+    def get_age_group_id(self, obj):
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        
+        if obj.age_group_id:
+            return obj.age_group_id.name if language == 'ar' else obj.age_group_id.name_en
