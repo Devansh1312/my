@@ -698,10 +698,7 @@ class StaffManagementView(APIView):
 
 
 
-
-
-################ Pagination ##################
-# Custom Pagination class with fixed paginate_queryset
+############ Custom User Search Pagination ##############
 class CustomUserSearchPagination(PageNumberPagination):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -711,6 +708,8 @@ class CustomUserSearchPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
+        # Store the request for later use in get_paginated_response
+        self.request = request  
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -743,6 +742,7 @@ class CustomUserSearchPagination(PageNumberPagination):
         return list(page)
 
     def get_paginated_response(self, data):
+        # Use self.request which was set in paginate_queryset
         language = self.request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -754,7 +754,7 @@ class CustomUserSearchPagination(PageNumberPagination):
             'current_page': self.page,
             'data': data
         })
-    
+
 
 ############### User Search View ###############
 class UserSearchView(APIView):
@@ -811,6 +811,7 @@ class UserSearchView(APIView):
                 'phone': user.phone,
                 'profile_picture': user.profile_picture.url if user.profile_picture else None,
                 'country_id': user.country.id if user.country else None,
+                'country_name': user.country.name if user.country else None,
             }
             for user in paginated_users
         ]
