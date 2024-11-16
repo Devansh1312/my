@@ -10,14 +10,14 @@ urlpatterns = [
     path('api/teamplayers/',TeamPlayersAPIView.as_view()),
     path('api/teamplayers/Add/',TeamPlayersAPIView.as_view()),
     path('api/teamplayers/jersey_no/',AddPlayerJerseyAPIView.as_view()),
+    path('api/teamplayers/delete/', TeamPlayersAPIView.as_view()),
 
-    path('api/teamplayers/delete/', DeleteLineupView.as_view()),
-    path('api/teamplayers/update/', LineupPlayers.as_view()),
+    path('api/lineup/update/', LineupPlayers.as_view()),
     path('api/lineup/reset/', LineupPlayers.as_view()),
+    path('api/lineup/',LineupPlayers.as_view()),
  
 
 
-    path('api/lineup/',LineupPlayers.as_view()),
     path('api/lineup/player_confirmation/status/',LineupPlayerStatusAPIView.as_view()),
     path('api/lineup/player_confirmation/status_change/',LineupPlayerStatusAPIView.as_view()),
     path('api/lineup/player_substitute/',PlayerSubstitutionAPIView.as_view()),

@@ -50,6 +50,8 @@ class Lineup(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    created_by_id = models.IntegerField(null=True, blank=True)
+
     # Enforcing uniqueness for the combination of player_id, game_id, tournament_id, and player_jersey_no
     class Meta:
         db_table = 'futurestar_app_lineup'
@@ -66,6 +68,7 @@ class PlayerJersey(models.Model):
     id = models.AutoField(primary_key=True)
     lineup_players = models.ForeignKey(Lineup, on_delete=models.CASCADE)
     jersey_number = models.IntegerField()
+    created_by_id = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     
@@ -127,6 +130,8 @@ class PlayerGameStats(models.Model):
    # New fields for substitution
     in_player = models.ForeignKey(User, related_name="in_player_subs", null=True, blank=True, on_delete=models.SET_NULL)
     out_player = models.ForeignKey(User, related_name="out_player_subs", null=True, blank=True, on_delete=models.SET_NULL)
+
+    created_by_id=models.IntegerField(blank=True, null=True)
     
     
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
