@@ -151,6 +151,7 @@ class TeamBranchSerializer(serializers.ModelSerializer):
     field_size_name = serializers.SerializerMethodField()
     gender_name = serializers.SerializerMethodField()
     upload_image = serializers.SerializerMethodField()
+    main_team_logo = serializers.SerializerMethodField()
 
     class Meta:
         model = TeamBranch
@@ -158,7 +159,7 @@ class TeamBranchSerializer(serializers.ModelSerializer):
             'id', 'team_id', 'team_name', 'age_group_id', 'age_group_name', 'upload_image', 'field_size', 
             'field_size_name', 'phone', 'email','gender','gender_name', 'latitude', 'longitude', 'address', 'house_no', 'premises', 
             'street', 'city', 'state', 'country_name', 'postalCode', 'country_code', 'entry_fees', 'description', 
-            'created_at', 'updated_at'
+            'created_at', 'updated_at','main_team_logo'
         ]
     
     def get_upload_image(self, obj):
@@ -171,6 +172,11 @@ class TeamBranchSerializer(serializers.ModelSerializer):
             return obj.gender.name_ar
         return obj.gender.name_en
     
+    def get_main_team_logo(self, obj):
+        # Access the related team through the foreign key
+        team = obj.team_id  # This accesses the related Team instance
+        return team.team_logo.url if team and team.team_logo else None
+
 
     def get_field_size_name(self, obj):
         return obj.field_size.name if obj.field_size else None  
