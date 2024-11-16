@@ -116,7 +116,7 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'tournament_id','tournament_name','game_number', 'game_date', 'game_start_time', 'game_end_time',
             'group_id', 'group_id_name', 'team_a','team_a_goal','team_b','team_b_goal', 
-            'game_field_id', 'game_field_id_name', 'created_at', 'updated_at'
+            'game_field_id', 'game_field_id_name', 'finish','winner_id','loser_id','is_draw' ,'created_at', 'updated_at'
         ]
 
     def get_group_id_name(self, obj):

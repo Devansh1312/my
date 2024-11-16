@@ -805,6 +805,7 @@ class TournamentGamesAPIView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     
+
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -817,12 +818,9 @@ class TournamentGamesAPIView(APIView):
         if tournament_id:
             games_query = games_query.filter(tournament_id=tournament_id)
         
-        # Serialize the game data
         serializer = TournamentGamesSerializer(games_query, many=True)
         
         grouped_data = defaultdict(list)
-        
-        # Loop through each game and prepare the response data
         for game, game_data in zip(games_query, serializer.data):
             game_date = game.game_date
             
@@ -848,90 +846,76 @@ class TournamentGamesAPIView(APIView):
             team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
             team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
 
-            # Retrieve 'finished' from query params
-            finished = request.query_params.get('finished', '').lower() in ['true', '1', 'yes']
-            
-            # Initialize goal counts and result as null
-            team_a_goal_count = None
-            team_b_goal_count = None
-            result = None
-            
-            # Calculate goals for each team if the game is finished
-            if game.finished:
-                team_a_goal_count = PlayerGameStats.objects.filter(
-                    team_id=game.team_a,
-                    game_id=game.id,
-                    tournament_id=game.tournament_id
-                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            # Retrieve goals scored by teams
+            team_a_goals = PlayerGameStats.objects.filter(
+                team_id=game.team_a,
+                game_id=game.id,
+                tournament_id=game.tournament_id.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-                team_b_goal_count = PlayerGameStats.objects.filter(
-                    team_id=game.team_b,
-                    game_id=game.id,
-                    tournament_id=game.tournament_id
-                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            team_b_goals = PlayerGameStats.objects.filter(
+                team_id=game.team_b,
+                game_id=game.id,
+                tournament_id=game.tournament_id.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-                # Determine result
-                if team_a_goal_count == team_b_goal_count:
-                    result = 'draw'
-                elif team_a_goal_count > team_b_goal_count:
-                    result = 'Team A win'
+            # Determine finish status and winner/loser if game is finished
+            finish = request.query_params.get('finish', 'false').lower() == 'true'
+            if finish:
+                if team_a_goals == team_b_goals:
+                    game.is_draw = True
+                    game.winner_id = None
+                    game.loser_id = None
                 else:
-                    result = 'Team B win'
+                    game.is_draw = False
+                    if team_a_goals > team_b_goals:
+                        game.winner_id = game.team_a
+                        game.loser_id = game.team_b
+                    else:
+                        game.winner_id = game.team_b
+                        game.loser_id = game.team_a
 
-                # Update game result
-                game.team_a_goal = team_a_goal_count
-                game.team_b_goal = team_b_goal_count
-                game.result = result
+                # Save updated game data
+                game.team_a_goal = team_a_goals
+                game.team_b_goal = team_b_goals
                 game.save()
 
-            # Update game data with new information
-            game_data.update({
-                "team_a_name": team_a_name,
-                "team_b_name": team_b_name,
-                "team_a_logo": team_a_logo_path,
-                "team_b_logo": team_b_logo_path,
+            # Prepare game data for response
+            game_data = {
+                "id": game.id,
                 "tournament_id": game.tournament_id.id if game.tournament_id else None,
                 "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
-                "team_a_goal": team_a_goal_count,
-                "team_b_goal": team_b_goal_count,
-                "result": result,
-                "finished": game.finished  # Ensure finished status is included
-            })
+                "game_number": game.game_number,
+                "game_date": game.game_date.strftime('%Y-%m-%d') if game.game_date else None,
+                "game_start_time": game.game_start_time,
+                "game_end_time": game.game_end_time,
+                "group_id": game.group_id.id if game.group_id else None,
+                "group_id_name": game.group_id.group_name if game.group_id else None,
+                "team_a": game.team_a if game.team_a else None,
+                "team_a_name": team_a_name,
+                "team_a_logo": team_a_logo_path,
+                "team_a_goal": team_a_goals,
+                "team_b": game.team_b if game.team_b else None,
+                "team_b_name": team_b_name,
+                "team_b_logo": team_b_logo_path,
+                "team_b_goal": team_b_goals,
+                "finish": finish,
+                "winner_id": game.winner_id if finish else None,
+                "loser_id": game.loser_id if finish else None,
+                "is_draw": game.is_draw if finish else None,
+                "game_field_id": game.game_field_id.id if game.game_field_id else None,
+                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
+                "created_at": game.created_at,
+                "updated_at": game.updated_at,
+            }
 
-            # Group games by day name and game date
+            # Group games by day name and formatted date
             grouped_data[(day_name, formatted_date)].append(game_data)
 
         # Format the response data
         formatted_data = {
             f"{day_name},{formatted_date}": {
-                "games": [
-                    {
-                        "id": game['id'],
-                        "tournament_id": game['tournament_id'],
-                        "tournament_name": game['tournament_name'],
-                        "game_number": game['game_number'],
-                        "game_date": game['game_date'],
-                        "game_start_time": game['game_start_time'],
-                        "game_end_time": game['game_end_time'],
-                        "group_id": game['group_id'],
-                        "group_id_name": game['group_id_name'],
-                        "team_a": game['team_a'],
-                        "team_a_name": game['team_a_name'],
-                        "team_a_logo": game['team_a_logo'],
-                        "team_a_goal": game.get('team_a_goal', None),  # Null if not finished
-                        "team_b": game['team_b'],
-                        "team_b_name": game['team_b_name'],
-                        "team_b_logo": game['team_b_logo'],
-                        "team_b_goal": game.get('team_b_goal', None),  # Null if not finished
-                        "result": game.get('result', None),  # Null if not finished
-                        "finished": game['finished'],
-                        "game_field_id": game['game_field_id'],
-                        "game_field_id_name": game['game_field_id_name'],
-                        "created_at": game['created_at'],
-                        "updated_at": game['updated_at'],
-                    }
-                    for game in games
-                ]
+                "games": games
             }
             for (day_name, formatted_date), games in grouped_data.items()
         }
@@ -941,7 +925,6 @@ class TournamentGamesAPIView(APIView):
             "message": _("Games Fetched successfully."),
             "data": formatted_data
         }, status=status.HTTP_200_OK)
-
 
 class TournamentGamesDetailAPIView(APIView):
   

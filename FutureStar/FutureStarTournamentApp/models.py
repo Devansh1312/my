@@ -90,6 +90,9 @@ class TournamentGames(models.Model):
     team_b_goal = models.IntegerField(blank=True, null=True)
     game_field_id = models.ForeignKey(Field, on_delete=models.CASCADE, blank=True, null=True)
     finish = models.BooleanField(default=False)  # New field to indicate if the game is finished
+    winner_id = models.CharField(max_length=100, blank=True, null=True)  # ID of the winning team
+    loser_id = models.CharField(max_length=100, blank=True, null=True)   # ID of the losing team
+    is_draw = models.BooleanField(default=False)  # True if the game is a draw
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
