@@ -50,7 +50,8 @@ class TeamViewAPI(APIView):
                     'data': {
                         'user': user_data,
                         'team': serializer.data,
-                        'group': group_data
+                        'group': group_data,
+                        'current_type':user.current_type,
                     }
                 }, status=status.HTTP_200_OK)
             except Team.DoesNotExist:
@@ -150,7 +151,8 @@ class TeamViewAPI(APIView):
             'data': {
                 'user': user_data,
                 'team': serializer.data,
-                'group': group_data
+                'group': group_data,
+                'current_type':user.current_type,
             }
         }, status=status.HTTP_201_CREATED)
 
@@ -283,7 +285,8 @@ class TeamViewAPI(APIView):
              'data': {
                 'user': user_data,
                 'team': serializer.data,
-                'group': group_data
+                'group': group_data,
+                'current_type': user.current_type
             }
         }, status=status.HTTP_200_OK)
     
@@ -336,7 +339,8 @@ class TeamViewAPI(APIView):
             'data': {
                 'user': user_data,
                 'team': serializer.data,
-                'group': group_data
+                'group': group_data,
+                'current_type': user.current_type
             }
         }, status=status.HTTP_200_OK)
     

@@ -4101,6 +4101,7 @@ class UserGameStatsAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', request.user.id)
+        past_years = request.query_params.get('past_years', 0)  # Default to 0 (all-time data)
 
         try:
             user_id = int(user_id)
@@ -4111,18 +4112,32 @@ class UserGameStatsAPIView(APIView):
                 "data": []
             }, status=400)
 
+        # Validate `past_years`
+        if not str(past_years).strip().isdigit():
+            return Response({
+                "status": 0,
+                "message": "Invalid value for past_years. Please provide a valid number.",
+                "data": []
+            }, status=400)
+
+        past_years = int(past_years)
+
         try:
+            # Filter based on past_years
+            date_filter = {}
+            if past_years > 0:
+                start_date = datetime.now() - timedelta(days=past_years * 365)
+                date_filter['created_at__gte'] = start_date
+
             # 1. Total goals, assists, yellow cards, red cards
-            stats = PlayerGameStats.objects.filter(player_id=user_id)
+            stats = PlayerGameStats.objects.filter(player_id=user_id, **date_filter)
             total_goals = stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
             total_assists = stats.aggregate(total_assists=Sum('assists'))['total_assists'] or 0
             total_yellow_cards = stats.aggregate(total_yellow_cards=Sum('yellow_cards'))['total_yellow_cards'] or 0
             total_red_cards = stats.aggregate(total_red_cards=Sum('red_cards'))['total_red_cards'] or 0
 
             # 2. Total games played
-            total_games_played = Lineup.objects.filter(
-                player_id=user_id,
-            ).count()
+            total_games_played = Lineup.objects.filter(player_id=user_id, **date_filter).count()
 
             # 3. Total wins, losses, draws
             user_branches = JoinBranch.objects.filter(
@@ -4131,19 +4146,21 @@ class UserGameStatsAPIView(APIView):
             ).values_list('branch_id', flat=True)
 
             total_wins = TournamentGames.objects.filter(
-                winner_id__in=user_branches
+                winner_id__in=user_branches,
+                **date_filter
             ).count()
 
             total_losses = TournamentGames.objects.filter(
-                loser_id__in=user_branches
+                loser_id__in=user_branches,
+                **date_filter
             ).count()
 
             total_draws = TournamentGames.objects.filter(
-                is_draw=True
+                is_draw=True,
+                **date_filter
             ).filter(
                 Q(team_a__in=user_branches) | Q(team_b__in=user_branches)
             ).count()
-
 
             # Response
             return Response({
@@ -4166,5 +4183,119 @@ class UserGameStatsAPIView(APIView):
             return Response({
                 "status": 0,
                 "message": "An error occurred while fetching game stats.",
+                "error": str(e)
+            }, status=500)
+
+##########  Coach Stastics ####################
+class CoachStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', request.user.id)
+        past_years = request.query_params.get('past_years', 0)  # Default to 0 (all-time data)
+
+        # Validate user_id
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return Response({
+                "status": 0,
+                "message": "Invalid user ID.",
+                "data": []
+            }, status=400)
+
+        # Validate past_years
+        try:
+            past_years = int(past_years)
+            if past_years < 0:
+                raise ValueError("past_years cannot be negative.")
+        except ValueError:
+            return Response({
+                "status": 0,
+                "message": "Invalid value for 'past_years'. Please provide a non-negative integer.",
+                "data": []
+            }, status=400)
+
+        try:
+            # Define time filter if past_years is greater than 0
+            time_filter = {}
+            if past_years > 0:
+                start_date = datetime.now() - timedelta(days=past_years * 365)
+                time_filter['created_at__gte'] = start_date
+
+            # Fetch branches where the user is "COACH_STAFF_TYPE"
+            coach_branches = JoinBranch.objects.filter(
+                user_id=user_id,
+                joinning_type=JoinBranch.COACH_STAFF_TYPE
+            ).values_list('branch_id', flat=True)
+
+            if not coach_branches:
+                return Response({
+                    "status": 0,
+                    "message": "No branches found for the provided user as coach staff.",
+                    "data": {}
+                }, status=404)
+
+            # Calculate stats for teams the coach is associated with
+            # Update this part to match the actual relation between PlayerGameStats and teams/branches
+            team_stats = PlayerGameStats.objects.filter(
+                team_id__in=coach_branches,  # Use team_id instead of team_branch_id
+                **time_filter
+            )
+
+            # Calculate total goals and assists
+            total_goals = team_stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            total_assists = team_stats.aggregate(total_assists=Sum('assists'))['total_assists'] or 0
+
+            # Total yellow and red cards
+            total_yellow_cards = team_stats.aggregate(total_yellow_cards=Sum('yellow_cards'))['total_yellow_cards'] or 0
+            total_red_cards = team_stats.aggregate(total_red_cards=Sum('red_cards'))['total_red_cards'] or 0
+
+            # Total games played
+            total_games_played = Lineup.objects.filter(
+                team_id__in=coach_branches,  # Use team_id here as well
+                **time_filter
+            ).count()
+
+            # Total wins, losses, and draws
+            total_wins = TournamentGames.objects.filter(
+                winner_id__in=coach_branches,  # Ensure correct relation with winner_id
+                **time_filter
+            ).count()
+
+            total_losses = TournamentGames.objects.filter(
+                loser_id__in=coach_branches,  # Ensure correct relation with loser_id
+                **time_filter
+            ).count()
+
+            total_draws = TournamentGames.objects.filter(
+                is_draw=True,
+                **time_filter
+            ).filter(
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches)
+            ).count()
+
+            # Response
+            return Response({
+                "status": 1,
+                "message": "Coach stats fetched successfully.",
+                "data": {
+                    "user_id": user_id,
+                    "past_years": past_years,
+                    "total_goals": total_goals,
+                    "total_assists": total_assists,
+                    "total_yellow_cards": total_yellow_cards,
+                    "total_red_cards": total_red_cards,
+                    "total_games_played": total_games_played,
+                    "total_wins": total_wins,
+                    "total_losses": total_losses,
+                    "total_draws": total_draws
+                }
+            }, status=200)
+
+        except Exception as e:
+            return Response({
+                "status": 0,
+                "message": "An error occurred while fetching coach stats.",
                 "error": str(e)
             }, status=500)
