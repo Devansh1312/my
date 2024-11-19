@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
+from FutureStarGameSystem.models import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
 from django.utils import timezone
@@ -29,6 +30,7 @@ import re
 import logging
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
+from django.db.models import Q, Sum, Count
 
 
 logger = logging.getLogger(__name__)
@@ -4090,3 +4092,80 @@ class InjuryListAPIView(APIView):
            'message': _('Injury fetched successfully.'),
             'data': serializer.data,
         }, status=status.HTTP_200_OK)
+
+
+####### User Stastics ###############
+
+class UserGameStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', request.user.id)
+
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return Response({
+                "status": 0,
+                "message": "Invalid user ID.",
+                "data": []
+            }, status=400)
+
+        try:
+            # 1. Total goals, assists, yellow cards, red cards
+            stats = PlayerGameStats.objects.filter(player_id=user_id)
+            total_goals = stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            total_assists = stats.aggregate(total_assists=Sum('assists'))['total_assists'] or 0
+            total_yellow_cards = stats.aggregate(total_yellow_cards=Sum('yellow_cards'))['total_yellow_cards'] or 0
+            total_red_cards = stats.aggregate(total_red_cards=Sum('red_cards'))['total_red_cards'] or 0
+
+            # 2. Total games played
+            total_games_played = Lineup.objects.filter(
+                player_id=user_id,
+                lineup_status__in=[1, 2]
+            ).count()
+
+            # 3. Total wins, losses, draws
+            user_branches = JoinBranch.objects.filter(
+                user_id=user_id,
+                joinning_type=JoinBranch.PLAYER_TYPE
+            ).values_list('branch_id', flat=True)
+
+            total_wins = TournamentGames.objects.filter(
+                winner_id__in=user_branches
+            ).count()
+
+            total_losses = TournamentGames.objects.filter(
+                loser_id__in=user_branches
+            ).count()
+
+            total_draws = TournamentGames.objects.filter(
+                is_draw=True
+            ).filter(
+                Q(team_a__in=user_branches) | Q(team_b__in=user_branches)
+            ).count()
+
+
+            # Response
+            return Response({
+                "status": 1,
+                "message": "User game stats fetched successfully.",
+                "data": {
+                    "user_id": user_id,
+                    "total_goals": total_goals,
+                    "total_assists": total_assists,
+                    "total_yellow_cards": total_yellow_cards,
+                    "total_red_cards": total_red_cards,
+                    "total_games_played": total_games_played,
+                    "total_wins": total_wins,
+                    "total_losses": total_losses,
+                    "total_draws": total_draws
+                }
+            }, status=200)
+
+        except Exception as e:
+            return Response({
+                "status": 0,
+                "message": "An error occurred while fetching game stats.",
+                "error": str(e)
+            }, status=500)

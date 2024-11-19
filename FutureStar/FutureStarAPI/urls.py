@@ -29,6 +29,8 @@ urlpatterns = [
         path('api/edit-profile/', EditProfileAPIView.as_view()),
         path('api/update-profile-img/', UpdateProfilePictureAPIView.as_view()),
 
+        #### Player Stastics URl ############
+        path('api/stats/player_stats/', UserGameStatsAPIView.as_view()),
 
         ## Follow Following 
         path('api/follow_unfollow/', FollowUnfollowAPI.as_view()),
