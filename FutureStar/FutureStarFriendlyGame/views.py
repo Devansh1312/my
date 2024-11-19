@@ -19,6 +19,8 @@ from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Q
 from django.db.models import Sum
+from django.db.models import Count
+
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -684,7 +686,7 @@ class FriendyGameLineupPlayers(APIView):
             if not team_id or not game_id :
                 return Response({
                     'status': 0,
-                    'message': _('team_id, game_id, and tournament_id are required.'),
+                    'message': _('team_id, game_id, are required.'),
                     'data': []
                 }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1737,376 +1739,375 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
         }, status=status.HTTP_200_OK)
     
     ####################  player substitute #####################
-# class FriendlyPlayerSubstitutionAPIView(APIView):
+class FriendlyPlayerSubstitutionAPIView(APIView):
 
-#     def _has_access(self, user, game_id=None):
-#         """
-#         Check if the user is the game_statistics_handler for the specified game and tournament.
-#         """
-#         # Check if the user is the game_statistics_handler for the given game and tournament
-#         if game_id :
-#             try:
-#                 game = FriendlyGame.objects.get(id=game_id)
-#                 if game.game_statistics_handler == user:
-#                     return True
-#             except FriendlyGame.DoesNotExist:
-#                 pass  # Game not found or doesn't match; access denied
+    def _has_access(self, user, game_id=None):
+        """
+        Check if the user is the game_statistics_handler for the specified game and tournament.
+        """
+        # Check if the user is the game_statistics_handler for the given game and tournament
+        if game_id :
+            try:
+                game = FriendlyGame.objects.get(id=game_id)
+                if game.game_statistics_handler == user:
+                    return True
+            except FriendlyGame.DoesNotExist:
+                pass  # Game not found or doesn't match; access denied
 
-#         return False
-#     def post(self, request):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
-#         team_id = request.data.get("team_id")
+        return False
+    def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        team_id = request.data.get("team_id")
       
-#         game_id = request.data.get("game_id")
-#         player_a_id = request.data.get("player_a_id")
-#         player_b_id = request.data.get("player_b_id")
+        game_id = request.data.get("game_id")
+        player_a_id = request.data.get("player_a_id")
+        player_b_id = request.data.get("player_b_id")
 
-#         if not all([team_id, tournament_id, game_id, player_a_id, player_b_id]):
-#             return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([team_id, game_id, player_a_id, player_b_id]):
+            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
         
-#         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-#             return Response({
-#                 'status': 0,
-#                 'message': _('You do not have access to this resource.'),
-#                 'data': []
-#             }, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id):
+            return Response({
+                'status': 0,
+                'message': _('You do not have access to this resource.'),
+                'data': []
+            }, status=status.HTTP_403_FORBIDDEN)
 
-#         try:
-#             # Retrieve player A (must have status ALREADY_IN_LINEUP)
-#             player_a = Lineup.objects.get(
-#                 team_id=team_id,
-#                 tournament_id=tournament_id,
-#                 game_id=game_id,
-#                 player_id=player_a_id,
-#                 lineup_status=Lineup.ALREADY_IN_LINEUP
-#             )
-#         except Lineup.DoesNotExist:
-#             return Response ({"error": "Player A not found or not in the correct lineup status."})
+        try:
+            # Retrieve player A (must have status ALREADY_IN_LINEUP)
+            player_a = FriendlyGameLineup.objects.get(
+                team_id=team_id,
+             
+                game_id=game_id,
+                player_id=player_a_id,
+                lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
+            )
+        except FriendlyGameLineup.DoesNotExist:
+            return Response ({"error": "Player A not found or not in the correct lineup status."})
 
-#         try:
-#             # Retrieve player B (must have status SUBSTITUTE)
-#             player_b = Lineup.objects.get(
-#                 team_id=team_id,
-#                 tournament_id=tournament_id,
-#                 game_id=game_id,
-#                 player_id=player_b_id,
-#                 lineup_status=Lineup.SUBSTITUTE
-#             )
-#         except Lineup.DoesNotExist:
-#             return Response({"error": "Player B not found or not in the correct lineup status."})
+        try:
+            # Retrieve player B (must have status SUBSTITUTE)
+            player_b = FriendlyGameLineup.objects.get(
+                team_id=team_id,
+               
+                game_id=game_id,
+                player_id=player_b_id,
+                lineup_status=FriendlyGameLineup.SUBSTITUTE
+            )
+        except FriendlyGameLineup.DoesNotExist:
+            return Response({"error": "Player B not found or not in the correct lineup status."})
 
-#         # Swap positions and update statuses
-#         player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
-#         player_a.position_1, player_a.position_2 = None, None
+        # Swap positions and update statuses
+        player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
+        player_a.position_1, player_a.position_2 = None, None
 
-#         # Update player_ready and lineup_status
-#         player_a.player_ready = False
-#         player_b.player_ready = True
+        # Update player_ready and lineup_status
+        player_a.player_ready = False
+        player_b.player_ready = True
 
-#         player_a.lineup_status = Lineup.SUBSTITUTE
-#         player_b.lineup_status = Lineup.ALREADY_IN_LINEUP
+        player_a.lineup_status = FriendlyGameLineup.SUBSTITUTE
+        player_b.lineup_status = FriendlyGameLineup.ALREADY_IN_LINEUP
 
-#         # Save the updated players
+        # Save the updated players
 
-#         user_a = get_object_or_404(User, id=player_a.player_id.id)  # Get User instance for player_a
-#         user_b = get_object_or_404(User, id=player_b.player_id.id)  # Get User instance for player_b
-#         # print(player_a.player_id)
-#         # print(user_b)
-#         # Get other related instances
-#         team_branch = get_object_or_404(TeamBranch, id=team_id)
-#         tournament_instance = get_object_or_404(Tournament, id=tournament_id)
-#         game_instance = get_object_or_404(TournamentGames, id=game_id)
-
-#         # Create a new PlayerGameStats record to log the substitution
-#         player_game_stat = PlayerGameStats.objects.create(
-#             team_id=team_branch,
-#             game_id=game_instance,
-#             tournament_id=tournament_instance,
-#             in_player=user_b,  # Corrected to use the ID of player_b
-#             out_player=user_a,  # Corrected to use the ID of player_a
-#             created_by_id=request.user.id
-#         )
+        user_a = get_object_or_404(User, id=player_a.player_id.id)  # Get User instance for player_a
+        user_b = get_object_or_404(User, id=player_b.player_id.id)  # Get User instance for player_b
+        # print(player_a.player_id)
+        # print(user_b)
+        # Get other related instances
+        team_branch = get_object_or_404(TeamBranch, id=team_id)
        
-#         player_a.save()
-#         player_b.save()
-#         return Response({
-#             "message": "Player substitution successful",
-#             "player_a": {
-#                 "id": player_a_id,
-#                 "position_1": player_a.position_1,
-#                 "position_2": player_a.position_2,
-#                 "player_ready": player_a.player_ready,
-#                 "lineup_status": player_a.lineup_status,
-#             },
-#             "player_b": {
-#                 "id": player_b_id,
-#                 "position_1": player_b.position_1,
-#                 "position_2": player_b.position_2,
-#                 "player_ready": player_b.player_ready,
-#                 "lineup_status": player_b.lineup_status,
-#             }
-#         }, status=status.HTTP_200_OK)
+        game_instance = get_object_or_404(FriendlyGame, id=game_id)
 
-#     def get(self, request, *args, **kwargs):   
+        # Create a new PlayerGameStats record to log the substitution
+        player_game_stat = FriendlyGamesPlayerGameStats.objects.create(
+            team_id=team_branch,
+            game_id=game_instance,
+       
+            in_player=user_b,  # Corrected to use the ID of player_b
+            out_player=user_a,  # Corrected to use the ID of player_a
+            created_by_id=request.user.id
+        )
+       
+        player_a.save()
+        player_b.save()
+        return Response({
+            "message": "Player substitution successful",
+            "player_a": {
+                "id": player_a_id,
+                "position_1": player_a.position_1,
+                "position_2": player_a.position_2,
+                "player_ready": player_a.player_ready,
+                "lineup_status": player_a.lineup_status,
+            },
+            "player_b": {
+                "id": player_b_id,
+                "position_1": player_b.position_1,
+                "position_2": player_b.position_2,
+                "player_ready": player_b.player_ready,
+                "lineup_status": player_b.lineup_status,
+            }
+        }, status=status.HTTP_200_OK)
 
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
+    def get(self, request, *args, **kwargs):   
 
-#         team_id = request.query_params.get('team_id')
-#         game_id = request.query_params.get('game_id')
-#         tournament_id = request.query_params.get('tournament_id')
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-#         if not team_id or not game_id or not tournament_id:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('team_id, game_id, and tournament_id are required.'),
-#                 'data': []
-#             }, status=status.HTTP_400_BAD_REQUEST)
+        team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')
+     
+
+        if not team_id or not game_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id, game_id are required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
         
-#         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-#             return Response({
-#                 'status': 0,
-#                 'message': _('You do not have access to this resource.'),
-#                 'data': []
-#             }, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id):
+            return Response({
+                'status': 0,
+                'message': _('You do not have access to this resource.'),
+                'data': []
+            }, status=status.HTTP_403_FORBIDDEN)
 
-#         # Filter players in Lineup by team, game, and tournament, separating by status
+        # Filter players in Lineup by team, game, and tournament, separating by status
         
-#         substitute_lineups = Lineup.objects.filter(
-#             team_id=team_id,
-#             game_id=game_id,
-#             tournament_id=tournament_id,
-#             lineup_status=Lineup.SUBSTITUTE
-#         )
+        substitute_lineups = FriendlyGameLineup.objects.filter(
+            team_id=team_id,
+            game_id=game_id,
+      
+            lineup_status=FriendlyGameLineup.SUBSTITUTE
+        )
         
 
-#         # Prepare response data for added players
+        # Prepare response data for added players
         
-#         # Prepare response data for substitute players
-#         substitute_data = [{
-#             'id': lineup.player_id.id,
-#             'username': lineup.player_id.username,
-#             'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-#             'position_1': lineup.position_1,
-#             'position_2': lineup.position_2
-#         } for lineup in substitute_lineups]
+        # Prepare response data for substitute players
+        substitute_data = [{
+            'id': lineup.player_id.id,
+            'username': lineup.player_id.username,
+            'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+            'position_1': lineup.position_1,
+            'position_2': lineup.position_2
+        } for lineup in substitute_lineups]
 
         
-#         # Return the response with the status and message
-#         return Response({
-#             'status': 1,
-#             'message': _('Lineup players fetched successfully with status "ADDED".'),
-#             'data': {
+        # Return the response with the status and message
+        return Response({
+            'status': 1,
+            'message': _('Lineup players fetched successfully with status "ADDED".'),
+            'data': {
                 
-#                 'substitute_players': substitute_data,
+                'substitute_players': substitute_data,
                 
-#             }
-#         }, status=status.HTTP_200_OK)
+            }
+        }, status=status.HTTP_200_OK)
 
 
-# class TeamGameGoalCountAPIView(APIView):
-#         def _has_access(self, user, game_id=None, tournament_id=None):
-#             """
-#             Check if the user is the game_statistics_handler for the specified game and tournament.
-#             """
-#             # Check if the user is the game_statistics_handler for the given game and tournament
-#             if game_id and tournament_id:
-#                 try:
-#                     game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
-#                     if game.game_statistics_handler == user:
-#                         return True
-#                 except TournamentGames.DoesNotExist:
-#                     pass  # Game not found or doesn't match; access denied
+class FriendlyTeamGameGoalCountAPIView(APIView):
+        def _has_access(self, user, game_id=None):
+            """
+            Check if the user is the game_statistics_handler for the specified game and tournament.
+            """
+            # Check if the user is the game_statistics_handler for the given game and tournament
+            if game_id:
+                try:
+                    game = FriendlyGame.objects.get(id=game_id)
+                    if game.game_statistics_handler == user:
+                        return True
+                except FriendlyGame.DoesNotExist:
+                    pass  # Game not found or doesn't match; access denied
 
-#             return False
+            return False
         
-#         def get(self, request):
-#                 # Activate language if specified in the header
-#             language = request.headers.get('Language', 'en')
-#             if language in ['en', 'ar']:
-#                 activate(language)
+        def get(self, request):
+                # Activate language if specified in the header
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
 
                 
-#             team_id = request.query_params.get('team_id')
-#             game_id = request.query_params.get('game_id')
-#             tournament_id = request.query_params.get('tournament_id')
+            team_id = request.query_params.get('team_id')
+            game_id = request.query_params.get('game_id')
+          
 
+            # Validate required URL parameters (team_id, game_id, tournament_id)
+            if not (team_id and game_id ):
+                return Response({
+                    'status': 0,
+                    'message': _('team_id, game_id, and  are required.'),
+                    'data': []
+                }, status=status.HTTP_400_BAD_REQUEST)
+            if not self._has_access(request.user, game_id=game_id):
+                return Response({
+                    'status': 0,
+                    'message': _('You do not have access to this resource.'),
+                    'data': []
+                }, status=status.HTTP_403_FORBIDDEN)
 
-#             # Validate required URL parameters (team_id, game_id, tournament_id)
-#             if not (team_id and game_id and tournament_id):
-#                 return Response({
-#                     'status': 0,
-#                     'message': _('team_id, game_id, and tournament_id are required.'),
-#                     'data': []
-#                 }, status=status.HTTP_400_BAD_REQUEST)
-#             if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-#                 return Response({
-#                     'status': 0,
-#                     'message': _('You do not have access to this resource.'),
-#                     'data': []
-#                 }, status=status.HTTP_403_FORBIDDEN)
-
-#             # Filter PlayerGameStats entries for the specified team, game, and tournament
-#             goal_stats = PlayerGameStats.objects.filter(
-#                 team_id=team_id,
-#                 game_id=game_id,
-#                 tournament_id=tournament_id
-#             )
+            # Filter PlayerGameStats entries for the specified team, game, and tournament
+            goal_stats = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+              
+            )
             
-#             # Calculate the total goals
-#             total_goals = goal_stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            # Calculate the total goals
+            total_goals = goal_stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-#             try:
-#                 # Fetch the TournamentGames entry
-#                 tournament_game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+            try:
+                # Fetch the TournamentGames entry
+                tournament_game = FriendlyGame.objects.get(id=game_id)
                 
-#                 # Check if team_id matches team_a or team_b, and update the corresponding goal field
-#                 if str(tournament_game.team_a) == str(team_id):
-#                     tournament_game.team_a_goal = total_goals
-#                 elif str(tournament_game.team_b) == str(team_id):
-#                     tournament_game.team_b_goal = total_goals
-#                 else:
-#                     return Response({
-#                         'status': 0,
-#                         'message': _('team_id does not match either team_a or team_b in this game.')
-#                     }, status=status.HTTP_400_BAD_REQUEST)
+                # Check if team_id matches team_a or team_b, and update the corresponding goal field
+                if str(tournament_game.team_a) == str(team_id):
+                    tournament_game.team_a_goal = total_goals
+                elif str(tournament_game.team_b) == str(team_id):
+                    tournament_game.team_b_goal = total_goals
+                else:
+                    return Response({
+                        'status': 0,
+                        'message': _('team_id does not match either team_a or team_b in this game.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-#                 # Save the updated goal count
-#                 tournament_game.save()
-#                 return Response({
-#                 'status': 1,
-#                 'message': _('Team stats fetched successfully.'),
-#                 'data':  {
-#                     'team_id': team_id,
-#                     'game_id': game_id,
-#                     'tournament_id': tournament_id,
-#                     'total_goals': total_goals,
-#                 }
-#             }, status=status.HTTP_200_OK)
+                # Save the updated goal count
+                tournament_game.save()
+                return Response({
+                'status': 1,
+                'message': _('Team stats fetched successfully.'),
+                'data':  {
+                    'team_id': team_id,
+                    'game_id': game_id,
+                  
+                    'total_goals': total_goals,
+                }
+            }, status=status.HTTP_200_OK)
                 
 
-#             except TournamentGames.DoesNotExist:
-#                 return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
+            except TournamentGames.DoesNotExist:
+                return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
 
 
-# ################### Tournament Satustics for top Goal and all ###########################
-# class TopPlayerStatsAPIView(APIView):
-#     permission_classes = [IsAuthenticated]  # Any logged-in user can access
-#     parser_classes = (JSONParser, MultiPartParser, FormParser)
+################### Tournament Satustics for top Goal and all ###########################
+class TopPlayerStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Any logged-in user can access
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-#     def get(self, request, *args, **kwargs):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-#         tournament_id = request.query_params.get('tournament_id')
+        game_id = request.query_params.get('game_id')
 
-#         if not tournament_id:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('tournament_id is required.'),
-#                 'data': []
-#             }, status=400)
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id is required.'),
+                'data': []
+            }, status=400)
 
-#         try:
-#             # Fetch stats for goals, assists, yellow cards, and red cards
-#             stats = PlayerGameStats.objects.filter(tournament_id=tournament_id)
+        try:
+            # Fetch stats for goals, assists, yellow cards, and red cards
+            stats = FriendlyGamesPlayerGameStats.objects.filter(game_id=game_id)
 
-#             top_goals = stats.values('player_id', 'team_id').annotate(total_goals=Sum('goals')).order_by('-total_goals')[:5]
-#             top_assists = stats.values('player_id', 'team_id').annotate(total_assists=Sum('assists')).order_by('-total_assists')[:5]
-#             top_yellow_cards = stats.values('player_id', 'team_id').annotate(total_yellow_cards=Sum('yellow_cards')).order_by('-total_yellow_cards')[:5]
-#             top_red_cards = stats.values('player_id', 'team_id').annotate(total_red_cards=Sum('red_cards')).order_by('-total_red_cards')[:5]
+            top_goals = stats.values('player_id', 'team_id').annotate(total_goals=Sum('goals')).order_by('-total_goals')[:5]
+            top_assists = stats.values('player_id', 'team_id').annotate(total_assists=Sum('assists')).order_by('-total_assists')[:5]
+            top_yellow_cards = stats.values('player_id', 'team_id').annotate(total_yellow_cards=Sum('yellow_cards')).order_by('-total_yellow_cards')[:5]
+            top_red_cards = stats.values('player_id', 'team_id').annotate(total_red_cards=Sum('red_cards')).order_by('-total_red_cards')[:5]
 
-#             # Fetch top 5 players based on appearances where lineup_status=3
-#             top_appearances = (
-#                 Lineup.objects.filter(tournament_id=tournament_id, lineup_status=3)
-#                 .values('player_id', 'team_id')
-#                 .annotate(appearances=Count('id'))
-#                 .order_by('-appearances')[:5]
-#             )
+            # Fetch top 5 players based on appearances where lineup_status=3
+            top_appearances = (
+                FriendlyGameLineup.objects.filter(game_id=game_id, lineup_status=3)
+                .values('player_id', 'team_id')
+                .annotate(appearances=Count('id'))
+                .order_by('-appearances')[:5]
+            )
 
-#             def format_player_data(data, stat_field):
-#                 """
-#                 Helper function to format player data with additional details.
-#                 """
-#                 formatted_data = []
-#                 for player in data:
-#                     # Fetch player username
-#                     player_instance = User.objects.filter(id=player['player_id']).first()
-#                     player_username = player_instance.username if player_instance else None
+            def format_player_data(data, stat_field):
+                """
+                Helper function to format player data with additional details.
+                """
+                formatted_data = []
+                for player in data:
+                    # Fetch player username
+                    player_instance = User.objects.filter(id=player['player_id']).first()
+                    player_username = player_instance.username if player_instance else None
 
-#                     # Fetch team and branch details
-#                     branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
-#                     if branch_instance:
-#                         branch_name = branch_instance.team_name
-#                         team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
-#                     else:
-#                         branch_name = None
-#                         team_logo = None
+                    # Fetch team and branch details
+                    branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
+                    if branch_instance:
+                        branch_name = branch_instance.team_name
+                        team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
+                    else:
+                        branch_name = None
+                        team_logo = None
 
-#                     formatted_data.append({
-#                         'player_id': player['player_id'],
-#                         'player_username': player_username,
-#                         'branch_id': player['team_id'],
-#                         'branch_name': branch_name,
-#                         'team_logo': team_logo,
-#                         'stat_value': player[stat_field]
-#                     })
+                    formatted_data.append({
+                        'player_id': player['player_id'],
+                        'player_username': player_username,
+                        'branch_id': player['team_id'],
+                        'branch_name': branch_name,
+                        'team_logo': team_logo,
+                        'stat_value': player[stat_field]
+                    })
 
-#                 return formatted_data
+                return formatted_data
 
-#             # Format appearances data
-#             def format_appearance_data(data):
-#                 """
-#                 Helper function to format appearance data.
-#                 """
-#                 formatted_data = []
-#                 for player in data:
-#                     # Fetch player username
-#                     player_instance = User.objects.filter(id=player['player_id']).first()
-#                     player_username = player_instance.username if player_instance else None
+            # Format appearances data
+            def format_appearance_data(data):
+                """
+                Helper function to format appearance data.
+                """
+                formatted_data = []
+                for player in data:
+                    # Fetch player username
+                    player_instance = User.objects.filter(id=player['player_id']).first()
+                    player_username = player_instance.username if player_instance else None
 
-#                     # Fetch team and branch details
-#                     branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
-#                     if branch_instance:
-#                         branch_name = branch_instance.team_name
-#                         team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
-#                     else:
-#                         branch_name = None
-#                         team_logo = None
+                    # Fetch team and branch details
+                    branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
+                    if branch_instance:
+                        branch_name = branch_instance.team_name
+                        team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
+                    else:
+                        branch_name = None
+                        team_logo = None
 
-#                     formatted_data.append({
-#                         'player_id': player['player_id'],
-#                         'player_username': player_username,
-#                         'branch_id': player['team_id'],
-#                         'branch_name': branch_name,
-#                         'team_logo': team_logo,
-#                         'appearances': player['appearances']
-#                     })
+                    formatted_data.append({
+                        'player_id': player['player_id'],
+                        'player_username': player_username,
+                        'branch_id': player['team_id'],
+                        'branch_name': branch_name,
+                        'team_logo': team_logo,
+                        'appearances': player['appearances']
+                    })
 
-#                 return formatted_data
+                return formatted_data
 
-#             # Prepare structured response data
-#             response_data = {
-#                 'top_goals': format_player_data(top_goals, 'total_goals'),
-#                 'top_assists': format_player_data(top_assists, 'total_assists'),
-#                 'top_yellow_cards': format_player_data(top_yellow_cards, 'total_yellow_cards'),
-#                 'top_red_cards': format_player_data(top_red_cards, 'total_red_cards'),
-#                 'top_appearances': format_appearance_data(top_appearances),
-#             }
+            # Prepare structured response data
+            response_data = {
+                'top_goals': format_player_data(top_goals, 'total_goals'),
+                'top_assists': format_player_data(top_assists, 'total_assists'),
+                'top_yellow_cards': format_player_data(top_yellow_cards, 'total_yellow_cards'),
+                'top_red_cards': format_player_data(top_red_cards, 'total_red_cards'),
+                'top_appearances': format_appearance_data(top_appearances),
+            }
 
-#             return Response({
-#                 'status': 1,
-#                 'message': _('Top players fetched successfully.'),
-#                 'data': response_data
-#             }, status=200)
+            return Response({
+                'status': 1,
+                'message': _('Top players fetched successfully.'),
+                'data': response_data
+            }, status=200)
 
-#         except Exception as e:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('An error occurred while fetching player stats.'),
-#                 'error': str(e)
-#             }, status=500)
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An error occurred while fetching player stats.'),
+                'error': str(e)
+            }, status=500)
