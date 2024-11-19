@@ -386,8 +386,9 @@ class LineupPlayers(APIView):
 
             # Prepare response data for added players
             added_data = [{
-                'id': lineup.player_id.id,
-                'username': lineup.player_id.username,
+                'id':lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'position_2': lineup.position_2
@@ -395,16 +396,18 @@ class LineupPlayers(APIView):
 
             # Prepare response data for substitute players
             substitute_data = [{
-                'id': lineup.player_id.id,
-                'username': lineup.player_id.username,
+                'id':lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'position_2': lineup.position_2
             } for lineup in substitute_lineups]
 
             already_added_data = [{
-                'id': lineup.player_id.id,
-                'username': lineup.player_id.username,
+                'id':lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'position_2': lineup.position_2
@@ -475,11 +478,12 @@ class LineupPlayers(APIView):
                 game_id=game_id,
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
-
+           
             # Prepare response data for players already added in the lineup
             already_added_data = [{
-                'id': player.player_id.id,
-                'username': player.player_id.username,
+                'id':player.id,
+                'player_id': player.player_id.id,
+                'player_username': player.player_id.username,
                 'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
                 'position_1': player.position_1,
                 'position_2': player.position_2
@@ -489,7 +493,8 @@ class LineupPlayers(APIView):
                 'status': 1,
                 'message': _('Lineup updated successfully.'),
                 'data': {
-                    'already_added': already_added_data
+                    'already_added': already_added_data,
+                 
                 }
             }, status=status.HTTP_200_OK)
 
@@ -545,21 +550,39 @@ class LineupPlayers(APIView):
                 game_id=game_id,
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
+            substitute_lineups = Lineup.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+                tournament_id=tournament_id,
+                lineup_status=Lineup.SUBSTITUTE
+            )
 
             # Prepare response data for players already added in the lineup
             already_added_data = [{
-                'id': player.player_id.id,
+                'id':player.id,
+                'player_id': player.player_id.id,
                 'username': player.player_id.username,
                 'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
                 'position_1': player.position_1,
                 'position_2': player.position_2
             } for player in already_added_lineups]
 
+            substitute_data = [{
+                'id':lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'position_2': lineup.position_2
+            } for lineup in substitute_lineups]
+
             return Response({
                 'status': 1,
                 'message': _('Lineup reset successfully.'),
                 'data': {
-                    'already_added': already_added_data
+                    'already_added': already_added_data,
+                    'substitute': substitute_data
+
                 }
             }, status=status.HTTP_200_OK)
 
@@ -731,16 +754,18 @@ class GameStatsLineupPlayers(APIView):
 
             # Prepare response data for substitute and already added players
             substitute_data = [{
-                'id': lineup.player_id.id,
-                'username': lineup.player_id.username,
+                'id':lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'position_2': lineup.position_2
             } for lineup in substitute_lineups]
 
             already_added_data = [{
-                'id': lineup.player_id.id,
-                'username': lineup.player_id.username,
+                'id':lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'position_2': lineup.position_2
@@ -753,8 +778,9 @@ class GameStatsLineupPlayers(APIView):
             ).select_related('user_id')
 
             managerial_staff_data = [{
-                'id': staff.user_id.id,
-                'username': staff.user_id.username,
+                'id':staff.id,
+                'staff_id': staff.user_id.id,
+                'staff_username': staff.user_id.username,
                 'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
                 'joining_type_id': staff.joinning_type,
                 'joining_type_name': staff.get_joinning_type_display()
@@ -1227,7 +1253,7 @@ class PlayerGameStatsAPIView(APIView):
         }, status=status.HTTP_201_CREATED)
 
     def get(self, request, *args, **kwargs):
-        # Set language based on the request headers
+    # Set language based on the request headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -1244,7 +1270,7 @@ class PlayerGameStatsAPIView(APIView):
                 'status': 0,
                 'message': _('player_id, team_id, tournament_id, and game_id are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
             return Response({
                 'status': 0,
@@ -1252,43 +1278,54 @@ class PlayerGameStatsAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Try to retrieve the player's stats entry
         try:
-            stats = PlayerGameStats.objects.get(
+            # Retrieve all matching player stats
+            stats = PlayerGameStats.objects.filter(
                 player_id=player_id,
                 team_id=team_id,
                 tournament_id=tournament_id,
                 game_id=game_id
             )
-        except PlayerGameStats.DoesNotExist:
+
+            if not stats.exists():
+                return Response({
+                    'status': 0,
+                    'message': _('Player stats not found for the specified criteria.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Prepare the stats data
+            stats_data = [
+                {
+                    'id': stat.id,
+                    'team_id': stat.team_id.id,
+                    'player_id': stat.player_id.id,
+                    'game_id': stat.game_id.id,
+                    'tournament_id': stat.tournament_id.id,
+                    'goals': stat.goals,
+                    'assists': stat.assists,
+                    'own_goals': stat.own_goals,
+                    'yellow_cards': stat.yellow_cards,
+                    'red_cards': stat.red_cards,
+                    'game_time': stat.game_time,
+                    'in_player': stat.in_player.id if stat.in_player else None,
+                    'out_player': stat.out_player.id if stat.out_player else None,
+                    'created_at': stat.created_at,
+                    'updated_at': stat.updated_at
+                } for stat in stats
+            ]
+
+            # Respond with the retrieved data
+            return Response({
+                'status': 1,
+                'message': _('Player stats fetched successfully.'),
+                'data': stats_data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
             return Response({
                 'status': 0,
-                'message': _('Player stats not found for the specified criteria.')
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        # Prepare the stats data
-        stats_data = {
-            'id': stats.id,
-            'team_id': stats.team_id.id,
-            'player_id': stats.player_id.id,
-            'game_id': stats.game_id.id,
-            'tournament_id': stats.tournament_id.id,
-            'goals': stats.goals,
-            'assists': stats.assists,
-            'own_goals': stats.own_goals,
-            'yellow_cards': stats.yellow_cards,
-            'red_cards': stats.red_cards,
-            'created_at': stats.created_at,
-            'updated_at': stats.updated_at
-        }
-
-        # Respond with the retrieved data
-        return Response({
-            'status': 1,
-            'message': _('Player stats fetched successfully.'),
-            'data': stats_data
-        }, status=status.HTTP_200_OK)
-    
+                'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TeamGameStatsTimelineAPIView(APIView):
@@ -1611,19 +1648,20 @@ class TeamGameGoalCountAPIView(APIView):
 
                 # Save the updated goal count
                 tournament_game.save()
-
                 return Response({
+                'status': 1,
+                'message': _('Team stats fetched successfully.'),
+                'data':  {
                     'team_id': team_id,
                     'game_id': game_id,
                     'tournament_id': tournament_id,
                     'total_goals': total_goals,
-                    # 'message': _('Goal count updated successfully.')
-                }, status=status.HTTP_200_OK)
+                }
+            }, status=status.HTTP_200_OK)
+                
 
             except TournamentGames.DoesNotExist:
                 return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
-
-
 
 
 ################### Tournament Satustics for top Goal and all ###########################
