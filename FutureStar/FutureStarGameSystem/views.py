@@ -23,6 +23,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
 from django.db.models import Sum
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 
 
 
@@ -1684,13 +1685,21 @@ class TopPlayerStatsAPIView(APIView):
             }, status=400)
 
         try:
+            # Fetch stats for goals, assists, yellow cards, and red cards
             stats = PlayerGameStats.objects.filter(tournament_id=tournament_id)
 
-            # Calculate top 5 players for each stat
             top_goals = stats.values('player_id', 'team_id').annotate(total_goals=Sum('goals')).order_by('-total_goals')[:5]
             top_assists = stats.values('player_id', 'team_id').annotate(total_assists=Sum('assists')).order_by('-total_assists')[:5]
             top_yellow_cards = stats.values('player_id', 'team_id').annotate(total_yellow_cards=Sum('yellow_cards')).order_by('-total_yellow_cards')[:5]
             top_red_cards = stats.values('player_id', 'team_id').annotate(total_red_cards=Sum('red_cards')).order_by('-total_red_cards')[:5]
+
+            # Fetch top 5 players based on appearances where lineup_status=3
+            top_appearances = (
+                Lineup.objects.filter(tournament_id=tournament_id, lineup_status=3)
+                .values('player_id', 'team_id')
+                .annotate(appearances=Count('id'))
+                .order_by('-appearances')[:5]
+            )
 
             def format_player_data(data, stat_field):
                 """
@@ -1722,12 +1731,44 @@ class TopPlayerStatsAPIView(APIView):
 
                 return formatted_data
 
+            # Format appearances data
+            def format_appearance_data(data):
+                """
+                Helper function to format appearance data.
+                """
+                formatted_data = []
+                for player in data:
+                    # Fetch player username
+                    player_instance = User.objects.filter(id=player['player_id']).first()
+                    player_username = player_instance.username if player_instance else None
+
+                    # Fetch team and branch details
+                    branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
+                    if branch_instance:
+                        branch_name = branch_instance.team_name
+                        team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
+                    else:
+                        branch_name = None
+                        team_logo = None
+
+                    formatted_data.append({
+                        'player_id': player['player_id'],
+                        'player_username': player_username,
+                        'branch_id': player['team_id'],
+                        'branch_name': branch_name,
+                        'team_logo': team_logo,
+                        'appearances': player['appearances']
+                    })
+
+                return formatted_data
+
             # Prepare structured response data
             response_data = {
                 'top_goals': format_player_data(top_goals, 'total_goals'),
                 'top_assists': format_player_data(top_assists, 'total_assists'),
                 'top_yellow_cards': format_player_data(top_yellow_cards, 'total_yellow_cards'),
                 'top_red_cards': format_player_data(top_red_cards, 'total_red_cards'),
+                'top_appearances': format_appearance_data(top_appearances),
             }
 
             return Response({
