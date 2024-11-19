@@ -94,3 +94,18 @@ class TeamBranchSearchSerializer(serializers.ModelSerializer):
         
         if obj.age_group_id:
             return obj.age_group_id.name if language == 'ar' else obj.age_group_id.name_en
+
+
+
+class FriendlyGameOficialTypeSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FriendlyGameOfficialsType
+        fields = ['id', 'name']  # Only include the fields you need in the response
+
+    def get_name(self, obj):
+        # Get the language from the context (set in the view)
+        language = self.context.get('language', 'en')
+        # Return the appropriate field based on language
+        return obj.name_ar if language == 'ar' else obj.name_en

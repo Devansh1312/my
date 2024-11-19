@@ -521,7 +521,7 @@ class TournamentGroupTeamListCreateAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        team_branch_id = request.data.get('team_branch_id')
+        team_branch_id = request.data.get('team_id')
 
         group_id = request.data.get('group_id',1)
 
@@ -547,32 +547,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-        # Count all teams in the tournament with status 1
-
-        current_team_count = TournamentGroupTeam.objects.filter(
-
-            tournament_id=tournament_id, status=1
-
-        ).count()
-
-        
-
-        # Check if tournament team slots are full
-
-        if current_team_count >= tournament_capacity:
-
-            return Response({
-
-                'status': 0,
-
-                'message': _('All team slots in this tournament are filled.'),
-
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-
-
         # Check if the team is already in this group
 
         if TournamentGroupTeam.objects.filter(
@@ -589,78 +563,47 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        
-
-        # Check if the team is already in another group in the same tournament
-
+        # Check if the team is already in another group in the same tournamen
         existing_team = TournamentGroupTeam.objects.filter(
-
             team_branch_id=team_branch_id, tournament_id=tournament_id
-
         ).first()
-
-        
 
         # Retrieve the GroupTable instance for the given group_id
 
         group_instance = get_object_or_404(GroupTable, id=group_id)
-
-        
-
         if existing_team:
-
             # Update the existing record with new data if needed
 
             existing_team.group_id = group_instance
-
             existing_team.status = 1
-
             existing_team.save()
-
-
 
             serializer = TournamentGroupTeamSerializer(existing_team)
 
             return Response({
-
                 'status': 1,
-
                 'message': _('Tournament Group Team updated successfully.'),
-
                 'data': serializer.data
 
             }, status=status.HTTP_200_OK)
 
-        
-
         # If no existing team, create a new one
 
         serializer = TournamentGroupTeamSerializer(data=request.data)
-
         if serializer.is_valid():
-
             serializer.save(group_id=group_instance, status=1)  # Set group_id and status when creating a new entry
 
             return Response({
 
                 'status': 1,
-
                 'message': _('Tournament Group Team added successfully.'),
-
                 'data': serializer.data
-
             }, status=status.HTTP_201_CREATED)
 
-
-
         return Response({
-
             'status': 0,
-
             'message': _('Failed to create Tournament Group Team.'),
-
             'errors': serializer.errors
-
         }, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -757,7 +700,7 @@ class TeamRequestApproved(APIView):
                 activate(language)
 
             # Extract parameters from the request
-            team_branch_id = request.data.get('team_branch_id')
+            team_branch_id = request.data.get('team_id')
             tournament_id = request.data.get('tournament_id')
 
             # Validate tournament existence and capacity
@@ -834,7 +777,7 @@ class TournamentGroupTeamListView(APIView):
         elif team_list == '2':
             # Show teams with status 0
               teams = TournamentGroupTeam.objects.filter(
-                    tournament_id=tournament_id, status__in=[0, 2]
+                    tournament_id=tournament_id, status=0
                 )
         else:
             return Response(

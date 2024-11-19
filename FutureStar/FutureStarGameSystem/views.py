@@ -806,7 +806,7 @@ class LineupPlayerStatusAPIView(APIView):
         Check if the user has access to the game based on role and official type for a specific game in a specific tournament.
         """
         # Check if the user's role is 4
-        if user.role != 4:
+        if user.role.id != 4:
             return False
 
         if game_id and tournament_id:
