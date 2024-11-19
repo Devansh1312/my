@@ -772,8 +772,8 @@ class UserSearchView(APIView):
         branch_id = request.query_params.get('branch_id')  # Get branch_id from request
 
         # Check for valid search_type, comparing with string values
-        if search_type not in ['1', '2', '3']:  # Add '3' to support coaching staff search
-            return Response({'status': 0, 'message': _('Invalid search type. Must be 1, 2, or 3.')}, status=status.HTTP_400_BAD_REQUEST)
+        if search_type not in ['1', '2', '3','4']:  # Add '3' to support coaching staff search
+            return Response({'status': 0, 'message': _('Invalid search type. Must be 1, 2, 3, or 4.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Initialize a queryset
         users = User.objects.none()

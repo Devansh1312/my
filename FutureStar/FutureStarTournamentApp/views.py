@@ -663,7 +663,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
         }, status=status.HTTP_400_BAD_REQUEST)
     
-############################# REQUEST TO JOIN TEAM ###########################
 
 class TeamJoiningRequest(APIView):
     permission_classes = [IsAuthenticated]
@@ -673,7 +672,30 @@ class TeamJoiningRequest(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        team_id = request.data.get('team_id')
+        
+        # Initialize team_id to None
+        team_id = None
+        
+        # Check if the user is a manager and retrieve their assigned branch
+        if request.user.role_id == 6:  # Assuming role_id == 6 means manager
+            try:
+                manager_branch = JoinBranch.objects.get(
+                    user_id=request.user,
+                    joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE  # Managerial staff
+                )
+                team_id = manager_branch.branch_id.id
+            except JoinBranch.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('You are not assigned as a manager to any branch.'),
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Only managers can perform this action.'),
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Proceed with the tournament joining request flow
         tournament_id = request.data.get('tournament_id')
         
         # Check if the tournament and team exist
@@ -691,9 +713,26 @@ class TeamJoiningRequest(APIView):
                 'message': _('Team does not exist.'),
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        if team_branch.age_group_id != tournament.age_group:
+            return Response({
+                'status': 0,
+                'message': _('The team\'s age group does not match the tournament\'s age group.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # existing_request = TournamentGroupTeam.objects.filter(
+        #     team_branch_id=team_branch,
+        #     tournament_id=tournament
+        # ).exists()
+        
+        # if existing_request:
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('This team has already requested to join this tournament.'),
+        #     }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Create a new TournamentGroupTeam entry with group_id as None and status as 0
         tournament_group_team = TournamentGroupTeam.objects.create(
-            group_id=None,          # set group_id to null
+               
             team_branch_id=team_branch,
             tournament_id=tournament,
             status=0                 # set status to 0
@@ -706,6 +745,72 @@ class TeamJoiningRequest(APIView):
             'message': _('Team joining request created successfully.'),
             'data': serializer.data
         }, status=status.HTTP_201_CREATED)
+
+
+class TeamRequestApproved(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Extract parameters from the request
+            team_branch_id = request.data.get('team_branch_id')
+            tournament_id = request.data.get('tournament_id')
+
+            # Validate tournament existence and capacity
+            try:
+                tournament = Tournament.objects.get(id=tournament_id)
+                tournament_capacity = int(tournament.number_of_team)
+            except Tournament.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Tournament does not exist.'),
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Count all teams in the tournament with status 1
+            current_team_count = TournamentGroupTeam.objects.filter(
+                tournament_id=tournament_id, status=1
+            ).count()
+
+            # Check if tournament team slots are full
+            if current_team_count >= tournament_capacity:
+                return Response({
+                    'status': 0,
+                    'message': _('All team slots in this tournament are filled.'),
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if the team already exists in the tournament
+            existing_team = TournamentGroupTeam.objects.filter(
+                team_branch_id=team_branch_id, tournament_id=tournament_id
+            ).first()
+
+            if existing_team:
+                # Update status to 1 if the team already exists
+                existing_team.status = 1
+                existing_team.save()
+
+                return Response({
+                    'status': 1,
+                    'message': _('Tournament Group Team status updated to accepted.'),
+                    'data': {
+                        'team_branch_id': existing_team.team_branch_id.id if existing_team.team_branch_id else None,
+                        'tournament_id': existing_team.tournament_id.id if existing_team.tournament_id else None,
+                        'status': existing_team.status,
+                    }
+                }, status=status.HTTP_200_OK)
+
+
+
+            # Handle serializer errors
+            return Response({
+            'status': 0,
+            'message': _('The team does not exist in the tournament. Please ensure the team is already added.'),
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 ############################# FETCH TEAM LISTS APPROVED,REQUESTED AND REJECTED ###########################
@@ -854,6 +959,8 @@ class CustomBranchSearchPagination(PageNumberPagination):
 
 
 ################################# Branch Search API ####################################################
+
+
 class TeamBranchSearchView(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = CustomBranchSearchPagination
@@ -881,8 +988,11 @@ class TeamBranchSearchView(APIView):
 
         if group_id:
             # Exclude teams that are already associated with the given group in this tournament
+            # and have status set to ACCEPTED
             queryset = queryset.exclude(id__in=TournamentGroupTeam.objects.filter(
-                tournament_id=tournament_id, group_id=group_id
+                tournament_id=tournament_id, 
+                group_id=group_id,
+                status=TournamentGroupTeam.ACCEPTED
             ).values_list('team_branch_id', flat=True))
 
         # Paginate the results
@@ -901,7 +1011,6 @@ class TeamBranchSearchView(APIView):
 
         # Create response with formatted paginated data
         return paginator.get_paginated_response(formatted_data)
-    
 
 
 

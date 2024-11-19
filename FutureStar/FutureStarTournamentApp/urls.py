@@ -14,6 +14,7 @@ urlpatterns = [
         
         path('api/tournament/team_request/', TeamJoiningRequest.as_view()),
         path('api/tournament/team_reject/', TeamRejectRequest.as_view()),
+        path('api/tournament/team_accept/', TeamRequestApproved.as_view()),
 
 
         path('api/tournament/detail/', TournamentDetailAPIView.as_view()),

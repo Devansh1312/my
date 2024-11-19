@@ -60,6 +60,10 @@ class TournamentSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
+    logo=serializers.SerializerMethodField()
+    tournament_banner=serializers.SerializerMethodField()
+
+    
 
 
     class Meta:
@@ -124,6 +128,14 @@ class TournamentSerializer(serializers.ModelSerializer):
     
     def get_tournament_fields_name(self, obj):
         return obj.tournament_fields.field_name if obj.tournament_fields else None  # Return field name or None
+    def get_logo(self, obj):
+        # Return the relative path of the logo
+        return obj.logo.url if obj.logo else None
+
+    def get_tournament_banner(self, obj):
+        # Return the relative path of the tournament banner
+        return obj.tournament_banner.url if obj.tournament_banner else None
+
 
     def create(self, validated_data):
         # Automatically associate the tournament with the currently logged-in user

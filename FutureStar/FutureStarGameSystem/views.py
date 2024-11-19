@@ -52,62 +52,58 @@ class TeamPlayersAPIView(APIView):
         except ObjectDoesNotExist:
             return False
     def get(self, request):
-        # Set language based on request headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-
-        # Retrieve team_id and tournament_id from query parameters
         team_id = request.query_params.get('team_id')
-        tournament_id = request.query_params.get('tournament_id')
 
-        # Validate presence of both team_id and tournament_id
-        if not team_id or not tournament_id:
+        if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id and tournament_id are required.'),
+                'message': _('team_id is required.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
-        if not self._has_access(request.user, team_id):
+
+        team_name = TeamBranch.objects.get(id=team_id)
+
+        # Fetch players in the specified team
+        players = JoinBranch.objects.filter(
+            branch_id__id=team_id,
+            joinning_type=JoinBranch.PLAYER_TYPE
+        )
+
+        if not players.exists():
             return Response({
                 'status': 0,
-                'message': _('You do not have permission to access this team.'),
-                'data': []
-            }, status=status.HTTP_403_FORBIDDEN)
-
-        # Fetch lineup entries with lineup_status as null or 0 for the given team and tournament
-        lineups = Lineup.objects.filter(
-            team_id=team_id,
-            tournament_id=tournament_id,
-            lineup_status__in=[0, None],
-            player_id__is_deleted=False  # Exclude deleted players
-        ).select_related('team_id', 'player_id')
-
-        # If no players are found with status null or 0, return an empty response
-        if not lineups.exists():
-            return Response({
-                'status': 0,
-                'message': _('No players with lineup status null or 0 found for the provided team and tournament.'),
+                'message': _('No players found for the provided team.'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Prepare response data
+        # Get user_ids of players in JoinBranch
+        player_user_ids = [player.user_id.id for player in players]
+
+        # Filter out players already in the Lineup model for the given team_id
+        excluded_player_ids = Lineup.objects.filter(
+            team_id=team_id,
+            player_id__in=player_user_ids
+        ).values_list('player_id', flat=True)
+        
+        # Get player details excluding those in the Lineup
+        lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
+
         response_data = []
         for lineup in lineups:
-            player = lineup.player_id
             response_data.append({
                 "id": lineup.id,
-                "team_id": lineup.team_id.id,
-                "team_name": lineup.team_id.team_name,
-                "player_id": player.id,
-                "player_name": player.username,
-                "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
-                "player_playing_position": player.main_playing_position.name_en if player.main_playing_position else None,
+                "team_id": team_id,
+                "team_name": team_name.team_name,
+                "player_id": lineup.id,
+                "player_name": lineup.username,
+                "player_profile_picture": lineup.profile_picture.url if lineup.profile_picture else None,
                 "created_at": lineup.created_at,
                 "updated_at": lineup.updated_at,
             })
 
-        # Return the response with fetched player details
         return Response({
             'status': 1,
             'message': _('Players fetched successfully.'),
