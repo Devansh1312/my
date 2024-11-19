@@ -473,12 +473,12 @@ class TournamentGroupTeamListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    # Handle GET request to list TournamentGroupTeam instances
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        tournament_id = request.query_params.get('tournament_id')  # Get tournament ID from query params
+
+        tournament_id = request.query_params.get('tournament_id')
 
         if not tournament_id:
             return Response({
@@ -486,36 +486,43 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 'message': _('Tournament ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filter and order TournamentGroupTeam instances by tournament_id and group_name
-        tournament_group_teams = TournamentGroupTeam.objects.filter(
-            tournament_id=tournament_id
-        ).select_related('group_id').order_by('group_id__group_name')
+        # Fetch all groups associated with the tournament
+        groups = GroupTable.objects.filter(tournament_id=tournament_id).order_by('group_name')
 
-        # Check if any teams were found for the given tournament
-        if not tournament_group_teams.exists():
+        if not groups.exists():
             return Response({
                 'status': 0,
-                'message': _('No Tournament Group Teams found for the specified tournament.')
+                'message': _('No groups found for the specified tournament.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Group teams by group_id, maintaining alphabetical order
-        grouped_teams = defaultdict(list)
-        for team in tournament_group_teams:
-            group_name = team.group_id.group_name if team.group_id else 'Unknown Group'
-            grouped_teams[group_name].append(team)
+        # Prepare the response data
+        grouped_data = []
+        for group in groups:
+            # Get all teams in the current group
+            teams = TournamentGroupTeam.objects.filter(group_id=group.id).select_related('group_id', 'team_branch_id')
 
-        # Use OrderedDict to ensure groups are ordered alphabetically in the response
-        grouped_data = OrderedDict()
-        for group_name in sorted(grouped_teams.keys()):
-            teams = grouped_teams[group_name]
-            serializer = TournamentGroupTeamSerializer(teams, many=True)
-            grouped_data[group_name] = serializer.data
+            # Serialize team data if available, otherwise an empty list
+            if teams.exists():
+                serializer = TournamentGroupTeamSerializer(teams, many=True)
+                group_teams = serializer.data
+            else:
+                group_teams = []  # Empty list for groups without teams
+
+            # Add group data with ID and teams
+            grouped_data.append({
+                "id": group.id,
+                "name": group.group_name,
+                "teams": group_teams
+            })
 
         return Response({
             'status': 1,
             'message': _('Tournament Group Teams fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
+
+
+
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -695,60 +702,67 @@ class TeamRequestApproved(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-            # Extract parameters from the request
-            team_branch_id = request.data.get('team_id')
-            tournament_id = request.data.get('tournament_id')
+        # Extract parameters from the request
+        team_branch_id = request.data.get('team_id')
+        tournament_id = request.data.get('tournament_id')
 
-            # Validate tournament existence and capacity
-            try:
-                tournament = Tournament.objects.get(id=tournament_id)
-                tournament_capacity = int(tournament.number_of_team)
-            except Tournament.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Tournament does not exist.'),
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Count all teams in the tournament with status 1
-            current_team_count = TournamentGroupTeam.objects.filter(
-                tournament_id=tournament_id, status=1
-            ).count()
-
-            # Check if tournament team slots are full
-            if current_team_count >= tournament_capacity:
-                return Response({
-                    'status': 0,
-                    'message': _('All team slots in this tournament are filled.'),
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Check if the team already exists in the tournament
-            existing_team = TournamentGroupTeam.objects.filter(
-                team_branch_id=team_branch_id, tournament_id=tournament_id
-            ).first()
-
-            if existing_team:
-                # Update status to 1 if the team already exists
-                existing_team.status = 1
-                existing_team.save()
-
-                return Response({
-                    'status': 1,
-                    'message': _('Tournament Group Team status updated to accepted.'),
-                    'data': {
-                        'team_branch_id': existing_team.team_branch_id.id if existing_team.team_branch_id else None,
-                        'tournament_id': existing_team.tournament_id.id if existing_team.tournament_id else None,
-                        'status': existing_team.status,
-                    }
-                }, status=status.HTTP_200_OK)
-
-
-
-            # Handle serializer errors
+        # Validate tournament existence and capacity
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            tournament_capacity = int(tournament.number_of_team)
+        except Tournament.DoesNotExist:
             return Response({
+                'status': 0,
+                'message': _('Tournament does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Count all teams in the tournament with status 1
+        current_team_count = TournamentGroupTeam.objects.filter(
+            tournament_id=tournament_id, status=1
+        ).count()
+
+        # Check if tournament team slots are full
+        if current_team_count >= tournament_capacity:
+            return Response({
+                'status': 0,
+                'message': _('All team slots in this tournament are filled.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch all groups associated with the tournament
+        groups = GroupTable.objects.filter(tournament_id=tournament_id)
+
+        # Check if the team already exists in the tournament
+        existing_team = TournamentGroupTeam.objects.filter(
+            team_branch_id=team_branch_id, tournament_id=tournament_id
+        ).first()
+
+        if existing_team:
+            # Update the team's status to accepted
+            existing_team.status = 1
+
+            # If the tournament has only one group, assign that group ID
+            if groups.count() == 1:
+                existing_team.group_id = groups.first()
+            
+            existing_team.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Tournament Group Team status updated to accepted.'),
+                'data': {
+                    'team_branch_id': existing_team.team_branch_id.id if existing_team.team_branch_id else None,
+                    'tournament_id': existing_team.tournament_id.id if existing_team.tournament_id else None,
+                    'group_id': existing_team.group_id.id if existing_team.group_id else None,
+                    'status': existing_team.status,
+                }
+            }, status=status.HTTP_200_OK)
+
+        # Handle cases where the team does not already exist in the tournament
+        return Response({
             'status': 0,
             'message': _('The team does not exist in the tournament. Please ensure the team is already added.'),
         }, status=status.HTTP_400_BAD_REQUEST)
@@ -912,6 +926,7 @@ class TeamBranchSearchView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         # Extract parameters from the request
         tournament_id = request.query_params.get('tournament_id')
         search_key = request.query_params.get('search', '').strip()
@@ -920,23 +935,21 @@ class TeamBranchSearchView(APIView):
         tournament = get_object_or_404(Tournament, id=tournament_id)
         age_group = tournament.age_group
 
-        # Get group_id from the query (if provided)
-        group_id = request.query_params.get('group_id')
-
         # Filter teams by age_group and search term (if provided)
         queryset = TeamBranch.objects.filter(age_group_id=age_group)
 
         if search_key:
             queryset = queryset.filter(team_name__icontains=search_key)
 
-        if group_id:
-            # Exclude teams that are already associated with the given group in this tournament
-            # and have status set to ACCEPTED
-            queryset = queryset.exclude(id__in=TournamentGroupTeam.objects.filter(
-                tournament_id=tournament_id, 
-                group_id=group_id,
-                status=TournamentGroupTeam.ACCEPTED
-            ).values_list('team_branch_id', flat=True))
+        # Filter teams based on TournamentGroupTeam conditions
+        # Only include teams where no group is assigned (`group_id` is null) and the status is REJECTED
+        queryset = queryset.exclude(
+            id__in=TournamentGroupTeam.objects.filter(
+                tournament_id=tournament_id,
+                group_id__isnull=False,  # Exclude teams already assigned to a group
+                status=TournamentGroupTeam.ACCEPTED  # Status = REJECTED
+            ).values_list('team_branch_id', flat=True)
+        )
 
         # Paginate the results
         paginator = self.pagination_class()
@@ -954,6 +967,7 @@ class TeamBranchSearchView(APIView):
 
         # Create response with formatted paginated data
         return paginator.get_paginated_response(formatted_data)
+
 
 
 

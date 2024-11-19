@@ -31,6 +31,8 @@ urlpatterns = [
 
         #### Player Stastics URl ############
         path('api/stats/player_stats/', UserGameStatsAPIView.as_view()),
+        path('api/stats/coach_stats/', CoachStatsAPIView.as_view()),
+
 
         ## Follow Following 
         path('api/follow_unfollow/', FollowUnfollowAPI.as_view()),
