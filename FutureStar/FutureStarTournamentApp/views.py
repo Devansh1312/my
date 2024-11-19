@@ -777,7 +777,7 @@ class TournamentGroupTeamListView(APIView):
         elif team_list == '2':
             # Show teams with status 0
               teams = TournamentGroupTeam.objects.filter(
-                    tournament_id=tournament_id, status=0
+                    tournament_id=tournament_id, status__in=[0, 2] 
                 )
         else:
             return Response(
