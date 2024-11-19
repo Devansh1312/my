@@ -1622,3 +1622,85 @@ class TeamGameGoalCountAPIView(APIView):
 
             except TournamentGames.DoesNotExist:
                 return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+################### Tournament Satustics for top Goal and all ###########################
+class TopPlayerStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Any logged-in user can access
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        tournament_id = request.query_params.get('tournament_id')
+
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('tournament_id is required.'),
+                'data': []
+            }, status=400)
+
+        try:
+            stats = PlayerGameStats.objects.filter(tournament_id=tournament_id)
+
+            # Calculate top 5 players for each stat
+            top_goals = stats.values('player_id', 'team_id').annotate(total_goals=Sum('goals')).order_by('-total_goals')[:5]
+            top_assists = stats.values('player_id', 'team_id').annotate(total_assists=Sum('assists')).order_by('-total_assists')[:5]
+            top_yellow_cards = stats.values('player_id', 'team_id').annotate(total_yellow_cards=Sum('yellow_cards')).order_by('-total_yellow_cards')[:5]
+            top_red_cards = stats.values('player_id', 'team_id').annotate(total_red_cards=Sum('red_cards')).order_by('-total_red_cards')[:5]
+
+            def format_player_data(data, stat_field):
+                """
+                Helper function to format player data with additional details.
+                """
+                formatted_data = []
+                for player in data:
+                    # Fetch player username
+                    player_instance = User.objects.filter(id=player['player_id']).first()
+                    player_username = player_instance.username if player_instance else None
+
+                    # Fetch team and branch details
+                    branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
+                    if branch_instance:
+                        branch_name = branch_instance.team_name
+                        team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
+                    else:
+                        branch_name = None
+                        team_logo = None
+
+                    formatted_data.append({
+                        'player_id': player['player_id'],
+                        'player_username': player_username,
+                        'branch_id': player['team_id'],
+                        'branch_name': branch_name,
+                        'team_logo': team_logo,
+                        'stat_value': player[stat_field]
+                    })
+
+                return formatted_data
+
+            # Prepare structured response data
+            response_data = {
+                'top_goals': format_player_data(top_goals, 'total_goals'),
+                'top_assists': format_player_data(top_assists, 'total_assists'),
+                'top_yellow_cards': format_player_data(top_yellow_cards, 'total_yellow_cards'),
+                'top_red_cards': format_player_data(top_red_cards, 'total_red_cards'),
+            }
+
+            return Response({
+                'status': 1,
+                'message': _('Top players fetched successfully.'),
+                'data': response_data
+            }, status=200)
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An error occurred while fetching player stats.'),
+                'error': str(e)
+            }, status=500)

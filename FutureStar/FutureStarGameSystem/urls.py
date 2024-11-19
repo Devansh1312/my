@@ -39,10 +39,7 @@ urlpatterns = [
     path('api/game-officials/add/', GameOfficialsAPIView.as_view()),
     path('api/game-officials/remove/', GameOfficialsAPIView.as_view()),
 
-   
 
 
-
-
-
+    path('api/top_player_stats/', TopPlayerStatsAPIView.as_view()),
     ]
