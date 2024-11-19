@@ -41,6 +41,11 @@ urlpatterns = [
 
         path('api/search-team-branches/', TeamBranchSearchView.as_view()),
 
+        ####### Like Coment API ###############
+        path('api/tournaments/like/', TournamentLikeAPIView.as_view()),
+        path('api/tournaments/comments/', TournamentCommentAPIView.as_view()),  # New API for paginated comments
+        path('api/tournaments/comments/create/', TournamentCommentCreateAPIView.as_view()),
+
 
 
 

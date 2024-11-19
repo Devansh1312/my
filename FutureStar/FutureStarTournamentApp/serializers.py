@@ -10,11 +10,57 @@ from django.core.files.images import get_image_dimensions
 
 
 
+class TournamentCommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+    entity = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Tournament_comment
+        fields = ['id', 'created_by_id', 'creator_type', 'tournament', 'parent', 'comment', 'date_created', 'replies', 'entity']
+
+    def get_replies(self, obj):
+        # Only fetch replies (children) where parent is the current comment (obj)
+        replies = Tournament_comment.objects.filter(parent=obj).order_by('-date_created')
+        return TournamentCommentSerializer(replies, many=True, context=self.context).data
+
+
+    def get_entity(self, obj):
+        # Get entity details based on creator_type
+        if obj.creator_type == Tournament_comment.TEAM_TYPE:
+            team = Team.objects.get(id=obj.created_by_id)
+            return {
+                'created_by_id': team.id,
+                'name': team.team_name,
+                'profile_image': team.team_logo.url if team.team_logo else None,
+                'creator_type': 1
+            }
+        elif obj.creator_type == Tournament_comment.GROUP_TYPE:
+            group = TrainingGroups.objects.get(id=obj.created_by_id)
+            return {
+                'created_by_id': group.id,
+                'name': group.group_name,
+                'profile_image': group.group_logo.url if group.group_logo else None,
+                'creator_type': 2
+            }
+        else:  # USER_TYPE
+            user = User.objects.get(id=obj.created_by_id)
+            return {
+                'created_by_id': user.id,
+                'username': user.username,
+                'profile_image': user.profile_picture.url if user.profile_picture else None,
+                'creator_type': 3
+            }
+        return None
+
 
 class TournamentSerializer(serializers.ModelSerializer):
     city_name = serializers.SerializerMethodField()  # To show city name
     country_name = serializers.SerializerMethodField()  # To show country name
     tournament_fields_name = serializers.SerializerMethodField()  # To show field name
+    comments = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Tournament
@@ -35,8 +81,40 @@ class TournamentSerializer(serializers.ModelSerializer):
             'logo',
             'tournament_banner',
             'tournament_joining_cost',
+            'is_like',
+            'like_count',
+            'comments',
             
         ]
+    
+    def get_like_count(self, obj):
+        return TournamentLike.objects.filter(tournament=obj).count()
+
+
+    def get_comments(self, obj):
+        # Always return the count of top-level comments
+        return Tournament_comment.objects.filter(tournament=obj, parent=None).count()
+    
+    def get_is_like(self, obj):
+        request = self.context.get('request')
+        if request:
+            # Retrieve creator_type and created_by_id from request data or query parameters
+            creator_type = request.data.get('creator_type') or request.query_params.get('creator_type')
+            created_by_id = request.data.get('created_by_id') or request.query_params.get('created_by_id')
+
+            # Use default values if neither request data nor query parameters provide valid values
+            creator_type = int(creator_type) if creator_type not in [None, '', '0'] else TournamentLike.USER_TYPE
+            created_by_id = int(created_by_id) if created_by_id not in [None, '', '0'] else request.user.id
+
+            # Check if a like exists for the given tournament, creator_type, and created_by_id
+            if TournamentLike.objects.filter(
+                tournament=obj,
+                created_by_id=created_by_id,
+                creator_type=creator_type
+            ).exists():
+                return True
+
+        return False
 
     def get_country_name(self, obj):
         return obj.country.name if obj.country else None  # Return country name or None

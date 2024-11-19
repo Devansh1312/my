@@ -78,6 +78,182 @@ class CustomTournamentPagination(PageNumberPagination):
 
         return super().paginate_queryset(queryset, request, view)
 
+
+
+
+###################### POST LIKE ##################################
+class TournamentLikeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        tournament_id = request.data.get('tournament_id')
+
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('Tournament ID is required.')
+            }, status=400)
+
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament not found.')
+            }, status=404)
+
+        # Toggle like/unlike
+        creator_type = request.data.get('creator_type')
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user ID
+
+        tournament_like, created = TournamentLike.objects.get_or_create(created_by_id=created_by_id, tournament=tournament, creator_type=creator_type)
+        
+        if not created:
+            # If the user already liked the tournament, unlike it (delete the like)
+            tournament_like.delete()
+            message = _('Tournament unliked successfully.')
+        else:
+            message = _('Tournament liked successfully.')
+
+        # Serialize the tournament data with comments set to empty
+        serializer = TournamentSerializer(tournament, context={'request': request})
+        
+        # Return the full tournament data with an empty comment list
+        return Response({
+            'status': 1,
+            'message': message,
+            'data': serializer.data
+        }, status=200)
+
+
+################################ Get comment API #############################
+class TournamentCommentPagination(CustomTournamentPagination):
+    def paginate_queryset(self, queryset, request, view=None):
+        return super().paginate_queryset(queryset, request, view)
+
+class TournamentCommentAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Validate tournament_id from request data
+        tournament_id = request.data.get('tournament_id')
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('Tournament ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get only top-level comments (parent=None) for the tournament
+        top_level_comments = Tournament_comment.objects.filter(tournament=tournament, parent=None).order_by('-date_created')
+
+        # Paginate the comments
+        paginator = TournamentCommentPagination()
+        paginated_comments = paginator.paginate_queryset(top_level_comments, request)
+
+        # If pagination fails or no comments are found
+        if paginated_comments is None:
+            return Response({
+                'status': 1,
+                'message': _('No comments found for this tournament.'),
+                'data': {
+                    'total_records': 0,
+                    'total_pages': 0,
+                    'current_page': 1,
+                    'results': []
+                }
+            }, status=status.HTTP_200_OK)
+
+        # Serialize the paginated comments
+        serializer = TournamentCommentSerializer(paginated_comments, many=True, context={'request': request})
+
+        # Return paginated response
+        return Response({
+            'status': 1,
+            'message': _('Comments fetched successfully.'),
+            'data': serializer.data,
+            'total_records': top_level_comments.count(),
+            'total_pages': paginator.page.paginator.num_pages,
+            'current_page': paginator.page.number,
+        }, status=status.HTTP_200_OK)
+
+
+
+######################## COMMNET CREATE API ###########################
+class TournamentCommentCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        data = request.data
+        tournament_id = data.get('tournament_id')
+        comment_text = data.get('comment')
+        parent_id = data.get('parent_id')
+        created_by_id = data.get('created_by_id')
+        creator_type = data.get('creator_type')
+
+        # Validate the required fields
+        if not tournament_id or not comment_text or not created_by_id or not creator_type:
+            return Response({
+                'status': 0,
+                'message': _('tournament_id, comment, created_by_id and creator_type are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Validate parent comment if provided
+        parent_comment = None
+        if parent_id:
+            try:
+                parent_comment = Tournament_comment.objects.get(id=parent_id)
+            except Tournament_comment.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Parent comment not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+        # Create the comment using the new fields
+        comment = Tournament_comment.objects.create(
+            created_by_id=created_by_id,
+            creator_type=creator_type,
+            tournament=tournament,
+            comment=comment_text,
+            parent=parent_comment
+        )
+
+        return Response({
+            'status': 1,
+            'message': _('Comment created successfully.'),
+            'data': TournamentCommentSerializer(comment).data
+        }, status=status.HTTP_201_CREATED)
+
+
+
 ############################# GET TOURNAMENTS ###########################
 
 class TournamentAPIView(APIView):

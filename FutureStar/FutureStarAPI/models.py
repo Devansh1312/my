@@ -234,7 +234,7 @@ class PostView(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_post_view'
-        unique_together = ('created_by_id', 'post')  # Ensure one view per user/team/group per post
+        unique_together = ('created_by_id','creator_type','post')  # Ensure one view per user/team/group per post
 
 class PostLike(models.Model):
     USER_TYPE = 1
@@ -256,7 +256,7 @@ class PostLike(models.Model):
 
     class Meta:
         db_table = 'futurestar_app_post_like'
-        unique_together = ('created_by_id', 'post')  # Ensure one like per user/team/group per post
+        unique_together = ('created_by_id','creator_type','post')  # Ensure one like per user/team/group per post
 
 
 class Field(models.Model):
