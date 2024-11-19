@@ -4122,7 +4122,6 @@ class UserGameStatsAPIView(APIView):
             # 2. Total games played
             total_games_played = Lineup.objects.filter(
                 player_id=user_id,
-                lineup_status__in=[1, 2]
             ).count()
 
             # 3. Total wins, losses, draws
