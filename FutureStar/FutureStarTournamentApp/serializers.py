@@ -182,9 +182,14 @@ class TournamentGroupTeamSerializer(serializers.ModelSerializer):
         fields = ['id','group_id','group_id_name','team_branch_id','team_branch_name','team_branch_logo','tournament_id','tournament_id_name','country_name', 'status','created_at','updated_at']
 
     def get_country_name(self, obj):
-        if obj.team_branch_id and obj.team_branch_id.team_id and obj.team_branch_id.team_id.country_id.name:
-             return obj.team_branch_id.team_id.country_id.name
+        try:
+            # Safely access nested relationships
+            if obj.team_branch_id and obj.team_branch_id.team_id and obj.team_branch_id.team_id.country_id:
+                return obj.team_branch_id.team_id.country_id.name
+        except AttributeError:
+            pass
         return None
+
 
     def get_group_id_name(self, obj):
         return obj.group_id.group_name if obj.group_id else None
