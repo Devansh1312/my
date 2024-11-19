@@ -251,10 +251,11 @@ class TeamPlayersAPIView(APIView):
     
     def delete(self, request, *args, **kwargs):
         # Get player_id, team_id, tournament_id, and game_id from request data
-        player_id =request.query_params.get('player_id')
-        team_id = request.query_params.get('team_id')
-        tournament_id =request.query_params.get('tournament_id')
-        game_id =request.query_params.get('game_id')
+        team_id = request.data.get('team_id')
+        player_id = request.data.get('player_id')
+        game_id = request.data.get('game_id')
+        tournament_id = request.data.get('tournament_id')
+
 
         # Ensure all required fields are provided
         if not player_id or not team_id or not tournament_id or not game_id:
