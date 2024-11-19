@@ -834,7 +834,7 @@ class TournamentGroupTeamListView(APIView):
         elif team_list == '2':
             # Show teams with status 0
               teams = TournamentGroupTeam.objects.filter(
-                    tournament_id=tournament_id, status__in=[0, 3]
+                    tournament_id=tournament_id, status__in=[0, 2]
                 )
         else:
             return Response(
@@ -892,7 +892,7 @@ class TeamRejectRequest(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Update the existing entry: set group_id to None and status to 3 (rejected)
-        tournament_group_team.status = 3  # Status 3 for rejected
+        tournament_group_team.status = 2  # Status 2 for rejected
         tournament_group_team.group_id = None  # Set group_id to None
         tournament_group_team.save()
 
