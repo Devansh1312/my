@@ -177,7 +177,7 @@ class TeamPlayersAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Validate team_id matches team_a or team_b in the game
-        if team_id != game.team_a and team_id != game.team_b:
+        if team_id != game.team_a.id and team_id != game.team_b.id:
             return Response({
                 'status': 0,
                 'message': _('The specified team is not part of this game.'),
@@ -1757,9 +1757,12 @@ class TeamGameGoalCountAPIView(APIView):
                 tournament_game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
                 
                 # Check if team_id matches team_a or team_b, and update the corresponding goal field
-                if str(tournament_game.team_a) == str(team_id):
+                if int(tournament_game.team_a.id) == int(team_id):
+                    # print(int(tournament_game.team_a.id) == int(team_id))
                     tournament_game.team_a_goal = total_goals
-                elif str(tournament_game.team_b) == str(team_id):
+                elif int(tournament_game.team_b.id) == int(team_id):
+                    # print(int(tournament_game.team_b.id) == int(team_id))
+
                     tournament_game.team_b_goal = total_goals
                 else:
                     return Response({

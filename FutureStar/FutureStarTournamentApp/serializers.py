@@ -273,35 +273,32 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
                   'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo']
 
     def get_team_a_logo(self, obj):
-        # Retrieve the logo for team A
-        team_a_branch = TeamBranch.objects.filter(id=obj.team_a).first()
-        if team_a_branch and team_a_branch.team_id:
-            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first()
+        # Access the logo for team A through select_related to avoid extra queries
+        if obj.team_a and obj.team_a.team_id:
+            team_a_logo = obj.team_a.team_id.team_logo
             return f"/media/{team_a_logo}" if team_a_logo else None
         return None
 
     def get_team_b_logo(self, obj):
-        # Retrieve the logo for team B
-        team_b_branch = TeamBranch.objects.filter(id=obj.team_b).first()
-        if team_b_branch and team_b_branch.team_id:
-            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first()
+        # Access the logo for team B through select_related to avoid extra queries
+        if obj.team_b and obj.team_b.team_id:
+            team_b_logo = obj.team_b.team_id.team_logo
             return f"/media/{team_b_logo}" if team_b_logo else None
         return None
 
     def get_team_a_name(self, obj):
-        # Retrieve the team name for team A
-        team_a_branch = TeamBranch.objects.filter(id=obj.team_a).first()
-        return team_a_branch.team_name if team_a_branch else None
+        # Access the team name for team A
+        return obj.team_a.team_name if obj.team_a else None
 
     def get_team_b_name(self, obj):
-        # Retrieve the team name for team B
-        team_b_branch = TeamBranch.objects.filter(id=obj.team_b).first()
-        return team_b_branch.team_name if team_b_branch else None
+        # Access the team name for team B
+        return obj.team_b.team_name if obj.team_b else None
 
     def get_game_field_name(self, obj):
-        # Retrieve the field name where the game is played
-        game_field = Field.objects.filter(id=obj.game_field_id.id).first()
-        return game_field.field_name if game_field else None
+        # Access the field name directly
+        return obj.game_field_id.field_name if obj.game_field_id else None
+    
+
     
 
 class DetailedTournamentGroupTeamSerializer(serializers.ModelSerializer):
