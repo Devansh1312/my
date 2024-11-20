@@ -2904,6 +2904,84 @@ class FieldAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+################ Pagination ##################
+class CustomFieldsPagination(PageNumberPagination):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+
+        if language in ['en', 'ar']:
+            activate(language)
+
+        try:
+            # Get the 'page' query parameter
+            page_number = request.query_params.get('page', '1')  # Default to '1' if missing
+            # Treat blank or null as '1'
+            page_number = 1 if not page_number.strip() else int(page_number)
+
+            self.page = page_number
+            if self.page < 1:
+                raise ValidationError("Page number must be a positive integer.")
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': 'Fields fetched successfully.',
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+
+class ListFieldsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomFieldsPagination
+
+    def get(self, request, *args, **kwargs):
+        # Set language from request headers
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Fetch all fields ordered by the latest creation
+        fields_queryset = Field.objects.all().order_by('-created_at')
+
+        # Apply pagination
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(fields_queryset, request, view=self)
+
+        # Serialize paginated data
+        serializer = FieldSerializer(paginated_queryset, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
 
 
 ##################################################################### User Gender List API View ##############################################################################

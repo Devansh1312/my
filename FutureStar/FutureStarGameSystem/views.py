@@ -985,12 +985,140 @@ class GameOficialTypesList(APIView):
     
 
 
+############################### Game Officilas Search API #########################
+
+############ Custom User Search Pagination ##############
+class OfflicialSearchPaggination(PageNumberPagination):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        # Store the request for later use in get_paginated_response
+        self.request = request  
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError(_("Page number must be a positive integer."))
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        # Use self.request which was set in paginate_queryset
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        return Response({
+            'status': 1,
+            'message': _('Data fetched successfully.'),
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+
+
+############### User Search View ###############
+class OfficialSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = OfflicialSearchPaggination  # Set the pagination class
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        search_type = request.query_params.get('search_type')
+        phone = request.query_params.get('phone')
+        game_id = request.query_params.get('game_id')  # Get branch_id from request
+
+        # Check for valid search_type, comparing with string values
+        if search_type not in ['1', '2', '3','4']:  # Add '3' to support coaching staff search
+            return Response({'status': 0, 'message': _('Invalid search type. Must be 1, 2, 3, or 4.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Initialize a queryset
+        users = User.objects.none()
+
+        ###### Search for Manager ##########
+        if search_type == '1':
+            users = User.objects.filter(role_id=5, is_deleted=False)
+        ###### Search for Coaching Staff ##########
+        if search_type == '2':
+            users = User.objects.filter(role_id=3, is_deleted=False)
+        ####### Search For Medical Staff##################            
+        if search_type == '3':
+            users = User.objects.filter(role_id=5, is_deleted=False)
+        ###### Search for Player ##########
+        if search_type == '4':
+            users = User.objects.filter(role_id__in=[5, 2], is_deleted=False)
+        
+       
+
+        # Filter by phone if provided
+        if phone:
+            users = users.filter(phone__icontains=phone)
+
+        # Exclude users who have already joined the specified branch
+        if game_id:
+            joined_users = JoinBranch.objects.filter(game_id=game_id).values_list('user_id', flat=True)
+            users = users.exclude(id__in=joined_users)
+
+        # Apply pagination
+        paginator = self.pagination_class()
+        paginated_users = paginator.paginate_queryset(users, request)
+
+        # Construct the response data manually
+        user_data = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'phone': user.phone,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                'country_id': user.country.id if user.country else None,
+                'country_name': user.country.name if user.country else None,
+                'flag': user.country.flag.url if user.country else None,
+
+            }
+            for user in paginated_users
+        ]
+
+        # Return paginated response with custom data
+        return paginator.get_paginated_response(user_data)
 
 ################### Game Officilals API Views ###################
 
 class GameOfficialsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def get(self, request, *args, **kwargs):
         # Set language from request headers
         language = request.headers.get('Language', 'en')
@@ -1009,38 +1137,39 @@ class GameOfficialsAPIView(APIView):
         # Check if the game exists
         game = get_object_or_404(TournamentGames, id=game_id)
 
-        # Fetch all officials for the given game, grouped by officials type
-        game_officials = GameOfficials.objects.filter(game_id=game_id)
-        if not game_officials.exists():
-            return Response({
-                'status': 0,
-                'message': _('No officials found for the specified game.'),
-                'data': []
-            }, status=status.HTTP_404_NOT_FOUND)
+        # Fetch all official types
+        all_official_types = OfficialsType.objects.all()
 
-        # Organize officials by their type
+        # Fetch assigned officials for the given game
+        assigned_game_officials = GameOfficials.objects.filter(game_id=game_id)
+
+        # Prepare the response data, grouping by official type
         officials_by_type = {}
-        for official in game_officials:
+        for official_type in all_official_types:
             # Serialize the official type
-            type_serializer = GameOficialTypeSerializer(official.officials_type_id, context={'language': language})
+            type_serializer = GameOficialTypeSerializer(official_type, context={'language': language})
             type_name = type_serializer.data['name']
 
-            if type_name not in officials_by_type:
-                officials_by_type[type_name] = []
+            # Filter assigned officials for the current official type
+            assigned_officials = assigned_game_officials.filter(officials_type_id=official_type)
 
-            # Add official details including profile picture
-            officials_by_type[type_name].append({
-                'official_id': official.official_id.id,
-                'official_name': official.official_id.username,
-                'profile_picture': official.official_id.profile_picture.url if official.official_id.profile_picture else None,
-                'officials_type_id': official.officials_type_id.id,
-            })
+            # Prepare list of assigned officials or an empty list if none
+            officials_by_type[type_name] = [
+                {
+                    'official_id': official.official_id.id,
+                    'official_name': official.official_id.username,
+                    'profile_picture': official.official_id.profile_picture.url if official.official_id.profile_picture else None,
+                    'officials_type_id': official.officials_type_id.id,
+                }
+                for official in assigned_officials
+            ]
 
         return Response({
             'status': 1,
             'message': _('Officials retrieved successfully.'),
             'data': officials_by_type
         }, status=status.HTTP_200_OK)
+
 
     def post(self, request, *args, **kwargs):
         # Set language from request headers

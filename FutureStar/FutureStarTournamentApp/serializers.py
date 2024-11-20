@@ -88,6 +88,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             'is_like',
             'like_count',
             'comments',
+            'team_id',
             
         ]
     
