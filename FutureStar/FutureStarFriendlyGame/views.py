@@ -362,12 +362,18 @@ class ListOfFridlyGamesForJoin(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Filter games where game_status=0 and team_b is None
-        friendly_games = FriendlyGame.objects.filter(game_status=0, team_b=None)
-        
+        # First fetch games where game_status=0 and team_b is None
+        primary_games = FriendlyGame.objects.filter(game_status=0, team_b=None)
+
+        # Then fetch all other games excluding the primary games
+        other_games = FriendlyGame.objects.exclude(id__in=primary_games.values_list('id', flat=True))
+
+        # Combine the querysets
+        all_games = list(primary_games) + list(other_games)
+
         # Initialize pagination
         paginator = self.pagination_class()
-        paginated_queryset = paginator.paginate_queryset(friendly_games, request, view=self)
+        paginated_queryset = paginator.paginate_queryset(all_games, request, view=self)
 
         # If paginated queryset exists, serialize the data and return paginated response
         if paginated_queryset is not None:
@@ -375,15 +381,13 @@ class ListOfFridlyGamesForJoin(APIView):
             return paginator.get_paginated_response(serializer.data)
 
         # Fallback response if no pagination
-        serializer = FriendlyGameSerializer(friendly_games, many=True)
+        serializer = FriendlyGameSerializer(all_games, many=True)
         return Response({
             'status': 1,
             'message': 'Data fetched successfully.',
             'data': serializer.data
         })
     
-
-
 ######################### List of all Teams for Team B  ###################
 class TeamBranchListView(APIView):
     permission_classes = [IsAuthenticated]

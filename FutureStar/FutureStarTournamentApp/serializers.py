@@ -159,15 +159,14 @@ class TournamentSerializer(serializers.ModelSerializer):
         return tournament
 
 
-
 class GroupTableSerializer(serializers.ModelSerializer):
-    tournament_id_name = serializers.SerializerMethodField() 
+    name = serializers.SerializerMethodField() 
     class Meta:
         model = GroupTable
-        fields = ['id','tournament_id','tournament_id_name','group_name','created_at','updated_at']
-
-    def get_tournament_id_name(self, obj):
-        return obj.tournament_id.tournament_name if obj.tournament_id else None
+        fields = ['id','name']
+        
+    def get_name(self,obj):
+        return obj.group_name if obj.group_name else None
 
 class TournamentGroupTeamSerializer(serializers.ModelSerializer):
     group_id_name = serializers.SerializerMethodField()
