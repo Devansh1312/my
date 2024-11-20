@@ -185,6 +185,70 @@ class TournamentGames(models.Model):
     team_b_primary_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
     team_b_secondary_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
 
+    #GAME_STATS
+    #General
+    general_team_a_possession=models.FloatField(blank=True, null=True,default=0.0)
+    general_team_a_interception=models.IntegerField(blank=True, null=True,default=0)
+    general_team_a_offside=models.IntegerField(blank=True, null=True,default=0)
+    general_team_a_corner=models.IntegerField(blank=True, null=True,default=0)
+
+    general_team_b_possession=models.FloatField(blank=True, null=True,default=0.0)
+    general_team_b_interception=models.IntegerField(blank=True, null=True,default=0)
+    general_team_b_offside=models.IntegerField(blank=True, null=True,default=0)
+    general_team_b_corner=models.IntegerField(blank=True, null=True,default=0)
+
+
+    #defence
+    defence_team_a_possession=models.FloatField(blank=True, null=True,default=0.0)
+    defence_team_a_interception=models.IntegerField(blank=True, null=True,default=0)
+    defence_team_a_offside=models.IntegerField(blank=True, null=True,default=0)
+    defence_team_a_corner=models.IntegerField(blank=True, null=True,default=0)
+
+    defence_team_b_possession=models.FloatField(blank=True, null=True,default=0.0)
+    defence_team_b_interception=models.IntegerField(blank=True, null=True,default=0)
+    defence_team_b_offside=models.IntegerField(blank=True, null=True,default=0)
+    defence_team_b_corner=models.IntegerField(blank=True, null=True,default=0)
+
+
+    #distribution
+    distribution_team_a_possession=models.FloatField(blank=True, null=True,default=0.0)
+    distribution_team_a_interception=models.IntegerField(blank=True, null=True,default=0)
+    distribution_team_a_offside=models.IntegerField(blank=True, null=True,default=0)
+    distribution_team_a_corner=models.IntegerField(blank=True, null=True,default=0)
+
+    distribution_team_b_possession=models.FloatField(blank=True, null=True,default=0.0)
+    distribution_team_b_interception=models.IntegerField(blank=True, null=True,default=0)
+    distribution_team_b_offside=models.IntegerField(blank=True, null=True,default=0)
+    distribution_team_b_corner=models.IntegerField(blank=True, null=True,default=0)
+
+
+    #attack
+    attack_team_a_possession=models.FloatField(blank=True, null=True,default=0.0)
+    attack_team_a_interception=models.IntegerField(blank=True, null=True,default=0)
+    attack_team_a_offside=models.IntegerField(blank=True, null=True,default=0)
+    attack_team_a_corner=models.IntegerField(blank=True, null=True,default=0)
+
+    attack_team_b_possession=models.FloatField(blank=True, null=True,default=0.0)
+    attack_team_b_interception=models.IntegerField(blank=True, null=True,default=0)
+    attack_team_b_offside=models.IntegerField(blank=True, null=True,default=0)
+    attack_team_b_corner=models.IntegerField(blank=True, null=True,default=0)
+
+    #discipline
+    discipline_team_a_possession=models.FloatField(blank=True, null=True,default=0.0)
+    discipline_team_a_interception=models.IntegerField(blank=True, null=True,default=0)
+    discipline_team_a_offside=models.IntegerField(blank=True, null=True,default=0)
+    discipline_team_a_corner=models.IntegerField(blank=True, null=True,default=0)
+
+    discipline_team_b_possession=models.FloatField(blank=True, null=True,default=0.0)
+    discipline_team_b_interception=models.IntegerField(blank=True, null=True,default=0)
+    discipline_team_b_offside=models.IntegerField(blank=True, null=True,default=0)
+    discipline_team_b_corner=models.IntegerField(blank=True, null=True,default=0)
+
+
+
+
+
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
