@@ -2284,3 +2284,118 @@ class FriendlyTournamentGamesDetailAPIView(APIView):
                 # Adding staff types with detailed fields to response
             }
         }, status=status.HTTP_200_OK)
+    
+    
+
+class FriendlyGameUniformColorAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        serializer = FriendlyTeamUniformColorSerializer(data=request.data)
+        if serializer.is_valid():
+            game_id = serializer.validated_data['game_id']
+            team_id = serializer.validated_data['team_id']
+            primary_color_player = serializer.validated_data['primary_color_player']
+            secondary_color_player = serializer.validated_data['secondary_color_player']
+            primary_color_goalkeeper = serializer.validated_data['primary_color_goalkeeper']
+            secondary_color_goalkeeper = serializer.validated_data['secondary_color_goalkeeper']
+
+            try:
+                game = FriendlyGame.objects.get(id=game_id)
+            except FriendlyGame.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Game not found.'),
+                    'data': None,
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Update the uniform colors for the appropriate team
+            if team_id == str(game.team_a.id):
+                game.team_a_primary_color_player = primary_color_player
+                game.team_a_secondary_color_player = secondary_color_player
+                game.team_a_primary_color_goalkeeper = primary_color_goalkeeper
+                game.team_a_secondary_color_goalkeeper = secondary_color_goalkeeper
+            elif team_id == str(game.team_b.id):
+                game.team_b_primary_color_player = primary_color_player
+                game.team_b_secondary_color_player = secondary_color_player
+                game.team_b_primary_color_goalkeeper = primary_color_goalkeeper
+                game.team_b_secondary_color_goalkeeper = secondary_color_goalkeeper
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('The specified team_id does not match any team in this game.'),
+                    'data': None,
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            game.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Uniform colors updated successfully'),
+                'data': serializer.validated_data,
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'status': 0,
+            'message': _('Invalid data.'),
+            'data': serializer.errors,
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        game_id = request.query_params.get('game_id')
+        team_id = request.query_params.get('team_id')
+
+        if not game_id or not team_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id and team_id are required.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': None,
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Retrieve the uniform colors for the specified team
+        if team_id == str(game.team_a.id):
+            response_data = {
+                "team_id": team_id,
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+            }
+        elif team_id == str(game.team_b.id):
+            response_data = {
+                "team_id": team_id,
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+            }
+        else:
+            return Response({
+                'status': 0,
+                'message': _('The specified team_id does not match any team in this game.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'status': 1,
+            'message': _('Uniform colors retrieved successfully'),
+            'data': response_data,
+        }, status=status.HTTP_200_OK)

@@ -109,3 +109,69 @@ class FriendlyGameOficialTypeSerializer(serializers.ModelSerializer):
         language = self.context.get('language', 'en')
         # Return the appropriate field based on language
         return obj.name_ar if language == 'ar' else obj.name_en
+    
+
+class FriendlyTeamUniformColorSerializer(serializers.Serializer):
+    game_id = serializers.IntegerField()
+    team_id = serializers.CharField()  # Can be either team_a or team_b
+    primary_color_player = serializers.CharField(max_length=255, required=True)
+    secondary_color_player = serializers.CharField(max_length=255, required=True)
+    primary_color_goalkeeper = serializers.CharField(max_length=255, required=True)
+    secondary_color_goalkeeper = serializers.CharField(max_length=255, required=True)
+
+    def validate(self, data):
+        game_id = data.get('game_id')
+        team_id = data.get('team_id')
+
+        try:
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            raise serializers.ValidationError("Invalid game specified.")
+
+        if team_id not in [game.team_a.id, game.team_b.id]:
+            raise serializers.ValidationError("The specified team_id does not match any team in this game.")
+        
+        return data
+
+class FiendlyTournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
+    team_a_logo = serializers.SerializerMethodField()
+    team_b_logo = serializers.SerializerMethodField()
+    team_a_name = serializers.SerializerMethodField()
+    team_b_name = serializers.SerializerMethodField()
+    game_field_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TournamentGames
+        fields = ['id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal', 
+                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo']
+
+    def get_team_a_logo(self, obj):
+        # Retrieve the logo for team A
+        team_a_branch = TeamBranch.objects.filter(id=obj.team_a).first()
+        if team_a_branch and team_a_branch.team_id:
+            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first()
+            return f"/media/{team_a_logo}" if team_a_logo else None
+        return None
+
+    def get_team_b_logo(self, obj):
+        # Retrieve the logo for team B
+        team_b_branch = TeamBranch.objects.filter(id=obj.team_b).first()
+        if team_b_branch and team_b_branch.team_id:
+            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first()
+            return f"/media/{team_b_logo}" if team_b_logo else None
+        return None
+
+    def get_team_a_name(self, obj):
+        # Retrieve the team name for team A
+        team_a_branch = TeamBranch.objects.filter(id=obj.team_a).first()
+        return team_a_branch.team_name if team_a_branch else None
+
+    def get_team_b_name(self, obj):
+        # Retrieve the team name for team B
+        team_b_branch = TeamBranch.objects.filter(id=obj.team_b).first()
+        return team_b_branch.team_name if team_b_branch else None
+
+    def get_game_field_name(self, obj):
+        # Retrieve the field name where the game is played
+        game_field = Field.objects.filter(id=obj.game_field_id.id).first()
+        return game_field.field_name if game_field else None
