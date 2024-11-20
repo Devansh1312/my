@@ -30,9 +30,9 @@ urlpatterns = [
         path('api/update-profile-img/', UpdateProfilePictureAPIView.as_view()),
 
         #### Player Stastics URl ############
-        path('api/stats/player_stats/', UserGameStatsAPIView.as_view()),
-        path('api/stats/coach_stats/', CoachStatsAPIView.as_view()),
-        path('api/stats/refree_stats/', RefreeGameStatsAPIView.as_view()),
+        path('api/stats/player_stats/', UserRoleStatsAPIView.as_view()),
+        # path('api/stats/coach_stats/', CoachStatsAPIView.as_view()),
+        # path('api/stats/refree_stats/', RefreeGameStatsAPIView.as_view()),
 
 
 
