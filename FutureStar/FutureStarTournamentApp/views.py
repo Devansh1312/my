@@ -266,7 +266,7 @@ class TournamentAPIView(APIView):
             activate(language)
         
         paginator = CustomTournamentPagination()
-        tournaments = Tournament.objects.all()
+        tournaments = Tournament.objects.all().order_by('-created_at')
 
         paginated_tournaments = paginator.paginate_queryset(tournaments, request, view=self)
         if paginated_tournaments is None:
