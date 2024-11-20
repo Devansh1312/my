@@ -340,7 +340,16 @@ class FieldSerializer(serializers.ModelSerializer):
         # Automatically associate the field with the currently logged-in user
         user = self.context['request'].user
         return Field.objects.create(user_id=user, **validated_data)
+
+
+class FieldDetailSerializer(serializers.ModelSerializer):
+    name= serializers.SerializerMethodField()
+    class Meta:
+        model = Field
+        fields = ['id','name']  # Exclude user_id
     
+    def get_name(self,obj):
+        return obj.field_name
 
 class UserGenderSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()

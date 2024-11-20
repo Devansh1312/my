@@ -2979,7 +2979,7 @@ class ListFieldsAPIView(APIView):
         paginated_queryset = paginator.paginate_queryset(fields_queryset, request, view=self)
 
         # Serialize paginated data
-        serializer = FieldSerializer(paginated_queryset, many=True)
+        serializer = FieldDetailSerializer(paginated_queryset, many=True)
         return paginator.get_paginated_response(serializer.data)
 
 

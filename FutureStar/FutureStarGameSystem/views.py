@@ -1056,39 +1056,33 @@ class OfficialSearchView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
+        # Get search_type and phone from query parameters
         search_type = request.query_params.get('search_type')
         phone = request.query_params.get('phone')
-        game_id = request.query_params.get('game_id')  # Get branch_id from request
+        game_id = request.query_params.get('game_id')  # Get game_id from request
 
-        # Check for valid search_type, comparing with string values
-        if search_type not in ['1', '2', '3','4']:  # Add '3' to support coaching staff search
-            return Response({'status': 0, 'message': _('Invalid search type. Must be 1, 2, 3, or 4.')}, status=status.HTTP_400_BAD_REQUEST)
+        # Validate search_type: must be between 1 and 10
+        if not search_type or not search_type.isdigit() or int(search_type) not in range(1, 11):
+            return Response({'status': 0, 'message': _('Invalid search type. Must be between 1 and 10.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Initialize a queryset
-        users = User.objects.none()
+        search_type = int(search_type)  # Convert search_type to an integer for logic
+        users = User.objects.none()  # Initialize an empty queryset
 
-        ###### Search for Manager ##########
-        if search_type == '1':
-            users = User.objects.filter(role_id=5, is_deleted=False)
-        ###### Search for Coaching Staff ##########
-        if search_type == '2':
-            users = User.objects.filter(role_id=3, is_deleted=False)
-        ####### Search For Medical Staff##################            
-        if search_type == '3':
-            users = User.objects.filter(role_id=5, is_deleted=False)
-        ###### Search for Player ##########
-        if search_type == '4':
-            users = User.objects.filter(role_id__in=[5, 2], is_deleted=False)
-        
-       
+        # Apply logic based on search_type
+        if search_type == 1:
+            users = User.objects.filter(role_id=5, is_deleted=False)  # Role 5 for search_type 1
+        elif search_type in [2, 3, 4, 5]:
+            users = User.objects.filter(role_id=4, is_deleted=False)  # Role 4 for search_type 2-5
+        elif search_type in [6, 7, 8, 9, 10]:
+            users = User.objects.filter(role_id=5, is_deleted=False)  # Role 5 for search_type 6-10
 
         # Filter by phone if provided
         if phone:
             users = users.filter(phone__icontains=phone)
 
-        # Exclude users who have already joined the specified branch
+        # Exclude users who have already joined the specified game
         if game_id:
-            joined_users = JoinBranch.objects.filter(game_id=game_id).values_list('user_id', flat=True)
+            joined_users = GameOfficials.objects.filter(game_id=game_id).values_list('official_id', flat=True)
             users = users.exclude(id__in=joined_users)
 
         # Apply pagination
@@ -1105,13 +1099,13 @@ class OfficialSearchView(APIView):
                 'country_id': user.country.id if user.country else None,
                 'country_name': user.country.name if user.country else None,
                 'flag': user.country.flag.url if user.country else None,
-
             }
             for user in paginated_users
         ]
 
         # Return paginated response with custom data
         return paginator.get_paginated_response(user_data)
+
 
 ################### Game Officilals API Views ###################
 
