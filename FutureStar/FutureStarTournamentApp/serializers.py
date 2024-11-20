@@ -302,3 +302,31 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
         # Retrieve the field name where the game is played
         game_field = Field.objects.filter(id=obj.game_field_id.id).first()
         return game_field.field_name if game_field else None
+    
+
+class DetailedTournamentGroupTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TournamentGroupTeam
+        fields = [
+            'id',
+            'group_id',
+            'team_branch_id',
+            'tournament_id',
+            'status',
+            'created_at',
+            'updated_at',
+        ]
+
+    def to_representation(self, instance):
+        # Get the base representation from the serializer
+        data = super().to_representation(instance)
+        
+        # Access related fields
+        data.update({
+            'group_id_name': instance.group_id.group_name if instance.group_id else None,
+            'team_branch_name': instance.team_branch_id.team_name if instance.team_branch_id else None,
+            'team_branch_logo': instance.team_branch_id.team_id.team_logo.url if instance.team_branch_id and instance.team_branch_id.team_id.team_logo else None,
+            'tournament_id_name': instance.tournament_id.tournament_name if instance.tournament_id else None,
+            'country_name': instance.team_branch_id.country_name if instance.team_branch_id and hasattr(instance.team_branch_id, 'country_name') else None,
+        })
+        return data

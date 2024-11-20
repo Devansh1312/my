@@ -33,6 +33,7 @@ urlpatterns = [
 
 
         path('api/tournament/games/options/', TournamentGamesOptionsAPIView.as_view()),
+        path('api/group_table/test_team/', TestTournamentGroupTeamsAPIView.as_view()),
 
 
 

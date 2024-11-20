@@ -1561,3 +1561,82 @@ class TournamentGamesh2hCompleteAPIView(APIView):
             'message': _('H2h Fetch Successfully'),
             'data': response_data,
         }, status=status.HTTP_200_OK)
+     
+
+
+class TestTournamentGroupTeamsAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        tournament_id = request.query_params.get('tournament_id')
+
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('Tournament ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        groups = GroupTable.objects.filter(tournament_id=tournament_id).order_by('group_name')
+
+        if not groups.exists():
+            return Response({
+                'status': 0,
+                'message': _('No groups found for the specified tournament.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        grouped_data = []
+        for group in groups:
+            teams = TournamentGroupTeam.objects.filter(group_id=group.id).select_related(
+                'group_id', 'team_branch_id', 'tournament_id'
+            )
+
+            team_stats = []
+            for team in teams:
+                team_id = team.team_branch_id.id if team.team_branch_id else None
+                games = TournamentGames.objects.filter(
+                    Q(team_a=team_id) | Q(team_b=team_id),
+                    group_id=group.id,
+                    finish=True
+                )
+
+                match_played = games.count()
+               
+                total_goals = (
+                        (games.filter(team_a=team_id).aggregate(goals=Sum('team_a_goal'))['goals'] or 0) +
+                        (games.filter(team_b=team_id).aggregate(goals=Sum('team_b_goal'))['goals'] or 0)
+                    )
+                total_losses = games.filter(loser_id=team_id).count()
+                total_wins = games.filter(winner_id=team_id).count()
+                total_losses = games.filter(loser_id=team_id).count()
+                total_draws = games.filter(is_draw=True).filter(
+                    Q(team_a=team_id) | Q(team_b=team_id)
+                ).count()
+                points = total_wins  # 1 point for a win, 0 for losses and draws
+
+                serializer = DetailedTournamentGroupTeamSerializer(team)
+                team_data = serializer.data
+                team_data.update({
+                    "match_played": match_played,
+                    "total_goals": total_goals,
+                    "total_wins": total_wins,
+                    "total_losses": total_losses,
+                    "total_draws": total_draws,
+                    "points": points,
+                })
+                team_stats.append(team_data)
+
+            sorted_team_stats = sorted(team_stats, key=lambda x: x['points'], reverse=True)
+
+            grouped_data.append({
+                "id": group.id,
+                "name": group.group_name,
+                "teams": sorted_team_stats
+            })
+
+        return Response({
+            'status': 1,
+            'message': _('Tournament Group Teams fetched successfully.'),
+            'data': grouped_data
+        }, status=status.HTTP_200_OK)
