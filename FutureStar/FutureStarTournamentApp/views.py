@@ -960,9 +960,10 @@ class TeamBranchSearchView(APIView):
         # Format the paginated data to include branch_id, team_name, and team_logo
         formatted_data = [
             {
-                "branch_id": branch.id,
+                "id": branch.id,
                 "team_name": branch.team_name,
-                "team_logo": branch.upload_image.url if branch.upload_image else None
+                "team_logo": branch.upload_image.url if branch.upload_image else None,
+                "country_name": branch.team_id.country_id.name if branch.team_id.country_id else None
             }
             for branch in paginated_data
         ]
@@ -975,41 +976,72 @@ class TeamBranchSearchView(APIView):
 
 
 class TournamentGamesOptionsAPIView(APIView):
-
     def get(self, request, *args, **kwargs):
         tournament_id = request.query_params.get('tournament_id')
         group_id = request.query_params.get('group_id')
         team_a_id = request.query_params.get('team_a')
 
-        if tournament_id and group_id:
-            # Get teams with the selected tournament_id, group_id, and ACCEPTED status
+        # Validate tournament_id
+        if not tournament_id:
+            return Response({
+                'status': 0,
+                'error': "Please provide a valid tournament_id."
+            }, status=400)
+
+        # Convert parameters to integers or handle blank/null cases
+        try:
+            tournament_id = int(tournament_id)
+        except ValueError:
+            return Response({
+                'status': 0,
+                'error': "Invalid tournament_id provided."
+            }, status=400)
+
+        try:
+            group_id = int(group_id) if group_id else None
+        except ValueError:
+            return Response({
+                'status': 0,
+                'error': "Invalid group_id provided."
+            }, status=400)
+
+        try:
+            team_a_id = int(team_a_id) if team_a_id else None
+        except ValueError:
+            team_a_id = None  # If invalid, treat as not provided
+
+        # Query accepted teams
+        if group_id:
+            # Case 2: Both tournament_id and group_id provided
             accepted_teams = TournamentGroupTeam.objects.filter(
                 tournament_id=tournament_id,
                 group_id=group_id,
                 status=TournamentGroupTeam.ACCEPTED
             ).select_related('team_branch_id')
+        else:
+            # Case 1: Only tournament_id provided
+            accepted_teams = TournamentGroupTeam.objects.filter(
+                tournament_id=tournament_id,
+                status=TournamentGroupTeam.ACCEPTED
+            ).select_related('team_branch_id')
 
-            # Get team_a options excluding the selected team_a_id
-            team_a_options = [
-                {'id': team.team_branch_id.id, 'name': team.team_branch_id.team_name}
-                for team in accepted_teams.exclude(team_branch_id__id=team_a_id)
-            ]
+        # Prepare team options excluding team_a_id
+        team_a_options = [
+            {'id': team.team_branch_id.id, 'name': team.team_branch_id.team_name}
+            for team in accepted_teams.exclude(team_branch_id__id=team_a_id)
+        ]
 
-            # Exclude the selected team_a from team_b options
-            if team_a_id:
-                team_b_options = [
-                    {'id': team.team_branch_id.id, 'name': team.team_branch_id.team_name}
-                    for team in accepted_teams.exclude(team_branch_id__id=team_a_id)
-                ]
-            else:
-                team_b_options = team_a_options  # Show all if team_a not selected
+        team_b_options = team_a_options  # Same options for team B
 
-            return Response({
+        return Response({
+            'status': 1,
+            'message': _('Options Fetched Successfully'),
+            'data': {
                 "team_a_options": team_a_options,
                 "team_b_options": team_b_options
-            })
-        
-        return Response({"error": "Please provide both tournament_id and group_id."}, status=400)
+            }
+        })
+
 
 class TournamentGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]

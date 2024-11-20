@@ -4299,3 +4299,48 @@ class CoachStatsAPIView(APIView):
                 "message": "An error occurred while fetching coach stats.",
                 "error": str(e)
             }, status=500)
+
+
+class RefreeGameStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get the current user
+        user_id = request.query_params.get('user_id', request.user.id)
+
+        # Fetch all game IDs where the user is a Game Official with officials_type_id in [2, 3, 4, 5]
+        game_ids = GameOfficials.objects.filter(
+            official_id=user_id,
+            officials_type_id__id__in=[2, 3, 4, 5]
+        ).values_list('game_id', flat=True)
+
+        # Check if the user is not a referee in any game
+        if not game_ids.exists():
+            return Response({
+                "status": 0,
+                "message": "The user is not a referee in any games.",
+            }, status=404)
+        
+        # Get the count of games where the user is an official
+        games_count = len(game_ids)
+
+        # Fetch the total yellow and red cards for the games where the user is an official
+        cards_stats = PlayerGameStats.objects.filter(game_id__in=game_ids).aggregate(
+            total_yellow_cards=Sum('yellow_cards'),
+            total_red_cards=Sum('red_cards')
+        )
+
+        # Ensure null values are replaced with 0
+        total_yellow_cards = cards_stats['total_yellow_cards'] or 0
+        total_red_cards = cards_stats['total_red_cards'] or 0
+
+        # Response
+        return Response({
+            "status": 1,
+            "message": "User game stats fetched successfully.",
+            "data": {
+                "games_count": games_count,
+                "total_yellow_cards": total_yellow_cards,
+                "total_red_cards": total_red_cards,
+            }
+        })

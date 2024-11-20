@@ -32,7 +32,7 @@ urlpatterns = [
 
 
 
-        path('api/tournament/games/options/', TournamentGamesDetailAPIView.as_view()),
+        path('api/tournament/games/options/', TournamentGamesOptionsAPIView.as_view()),
 
 
 
