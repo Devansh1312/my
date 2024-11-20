@@ -923,6 +923,7 @@ class TeamBranchSearchView(APIView):
     pagination_class = CustomBranchSearchPagination
 
     def get(self, request):
+        # Get the preferred language from headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -933,23 +934,24 @@ class TeamBranchSearchView(APIView):
 
         # Validate and fetch the tournament
         tournament = get_object_or_404(Tournament, id=tournament_id)
-        age_group = tournament.age_group
+        if tournament is None:
+            return Response({
+                'status': 0,
+                'message': _('Tournament does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filter teams by age_group and search term (if provided)
-        queryset = TeamBranch.objects.filter(age_group_id=age_group)
-
-        if search_key:
-            queryset = queryset.filter(team_name__icontains=search_key)
-
-        # Filter teams based on TournamentGroupTeam conditions
-        # Only include teams where no group is assigned (`group_id` is null) and the status is REJECTED
-        queryset = queryset.exclude(
+        # Base queryset to filter team branches associated with the tournament
+        queryset = TeamBranch.objects.filter(
             id__in=TournamentGroupTeam.objects.filter(
                 tournament_id=tournament_id,
-                group_id__isnull=False,  # Exclude teams already assigned to a group
-                status=TournamentGroupTeam.ACCEPTED  # Status = REJECTED
+                group_id__isnull=True,  # Include only teams not assigned to any group
+                status=TournamentGroupTeam.ACCEPTED  # Status = ACCEPTED
             ).values_list('team_branch_id', flat=True)
         )
+
+        # Apply search filter if `search_key` is provided
+        if search_key:
+            queryset = queryset.filter(team_name__icontains=search_key)
 
         # Paginate the results
         paginator = self.pagination_class()
@@ -967,6 +969,7 @@ class TeamBranchSearchView(APIView):
 
         # Create response with formatted paginated data
         return paginator.get_paginated_response(formatted_data)
+
 
 
 
