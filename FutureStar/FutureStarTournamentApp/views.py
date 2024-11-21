@@ -1953,28 +1953,25 @@ class TestTournamentGroupTeamsAPIView(APIView):
             'data': grouped_data
         }, status=status.HTTP_200_OK)
 
+
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user = request.user
 
-        print(user)
-
-        # Check if the user has role 6 or 3
+        # Check if the user has the required role
         if user.role_id not in [6, 3]:
             return Response({
                 "status": 0,
                 "message": "User does not have the required role."
             }, status=400)
 
-        # Get branches (team IDs) where the user has joined as COACH_STAFF_TYPE or MANAGERIAL_STAFF_TYPE
+        # Get branches (team IDs) where the user has joined as COACH or MANAGER
         branches = JoinBranch.objects.filter(
             user_id=user,
             joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
         ).values_list('branch_id', flat=True)
-
-        print(branches)
 
         if not branches:
             return Response({
@@ -1985,11 +1982,10 @@ class UpcomingGameView(APIView):
         # Calculate the time threshold
         one_hour_ago = now() - timedelta(hours=1)
 
-        # Filter upcoming games for these branches
+        # Filter games
         friendly_games = FriendlyGame.objects.filter(
             Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
             Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
-            team_a_id__in=branches,
             finish=False,
         ).order_by('game_date', 'game_start_time')
 
@@ -2000,41 +1996,34 @@ class UpcomingGameView(APIView):
         ).order_by('game_date', 'game_start_time')
 
         # Combine and sort games
-        upcoming_games = sorted(
-            list(friendly_games) + list(tournament_games),
-            key=lambda game: (game.game_date, game.game_start_time)
-        )
+        all_games = list(friendly_games) + list(tournament_games)
+        all_games = sorted(all_games, key=lambda game: (game.game_date, game.game_start_time))
 
-        # Prepare the response data
-        response_data = []
-        for game in upcoming_games:
-            # Check which team is associated with the user
-            if game.team_a.id in branches:
-                game_data = {
-                    "game_type": "Friendly" if isinstance(game, FriendlyGame) else "Tournament",
-                    "team_id": game.team_a.id if game.team_a.id in branches else game.team_b.id,
-                    "game_details": {
-                        "game_id": game.id,
-                        "team_name": game.team_a.team_name,
-                        "opponent_team_name": game.team_b.team_name if game.team_a.id in branches else game.team_a.team_name,
-                        "game_date": game.game_date,
-                        "game_start_time": game.game_start_time,
-                        "game_end_time": game.game_end_time,
-                        "status": "Upcoming"
-                    }
-                }
-                # Add tournament ID if it's a tournament game
-                if isinstance(game, TournamentGames):
-                    game_data["game_details"]["tournament_id"] = game.tournament_id.id if game.tournament_id else None
+        # Get the first upcoming game if available
+        if all_games:
+            game = all_games[0]
+            game_type = "Friendly" if isinstance(game, FriendlyGame) else "Tournament"
+            team_id = game.team_a.id if game.team_a.id in branches else game.team_b.id
+            game_details = {
+                "game_id": game.id,
+                "team_name": game.team_a.team_name if game.team_a.id in branches else game.team_b.team_name,
+                "opponent_team_name": game.team_b.team_name if game.team_a.id in branches else game.team_a.team_name,
+                "game_date": game.game_date,
+                "game_start_time": game.game_start_time,
+                "game_end_time": game.game_end_time,
+                "status": "Upcoming",
+            }
+            if game_type == "Tournament":
+                game_details["tournament_id"] = game.tournament_id.id if game.tournament_id else None
 
-                response_data.append(game_data)
-                break  # Return the first game only
-
-        if response_data:
             return Response({
                 "status": 1,
                 "message": "Upcoming game fetched successfully.",
-                "data": response_data
+                "data": {
+                    "game_type": game_type,
+                    "team_id": team_id,
+                    "game_details": game_details
+                }
             }, status=200)
 
         return Response({

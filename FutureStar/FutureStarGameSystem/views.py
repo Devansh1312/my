@@ -56,6 +56,8 @@ class TeamPlayersAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')  # Added game_id to filter
+        tournament_id = request.query_params.get('tournament_id')  # Added tournament_id to filter
 
         if not team_id:
             return Response({
@@ -64,7 +66,21 @@ class TeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        team_name = TeamBranch.objects.get(id=team_id)
+        if not game_id or not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id and tournament_id are required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            team_name = TeamBranch.objects.get(id=team_id)
+        except TeamBranch.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Team not found.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
 
         # Fetch players in the specified team
         players = JoinBranch.objects.filter(
@@ -82,7 +98,7 @@ class TeamPlayersAPIView(APIView):
         # Get user_ids of players in JoinBranch
         player_user_ids = [player.user_id.id for player in players]
 
-        # Filter out players already in the Lineup model for the given team_id
+        # Fetch all players excluding those already in the Lineup model
         excluded_player_ids = Lineup.objects.filter(
             team_id=team_id,
             player_id__in=player_user_ids
@@ -92,16 +108,24 @@ class TeamPlayersAPIView(APIView):
         lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
 
         response_data = []
-        for lineup in lineups:
+        for player in lineups:
+            # Fetch player's jersey number if they exist in the Lineup for the same game and tournament
+            lineup_entry = Lineup.objects.filter(
+                player_id=player.id,
+                game_id=game_id,
+                tournament_id=tournament_id
+            ).first()
+            
             response_data.append({
-                "id": lineup.id,
+                "id": player.id,
                 "team_id": team_id,
                 "team_name": team_name.team_name,
-                "player_id": lineup.id,
-                "player_name": lineup.username,
-                "player_profile_picture": lineup.profile_picture.url if lineup.profile_picture else None,
-                "created_at": lineup.created_at,
-                "updated_at": lineup.updated_at,
+                "player_id": player.id,
+                "player_name": player.username,
+                "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
+                "jersey_number": lineup_entry.player_jersey_no if lineup_entry else None,  # Add jersey number or None
+                "created_at": player.created_at,
+                "updated_at": player.updated_at,
             })
 
         return Response({
@@ -109,6 +133,7 @@ class TeamPlayersAPIView(APIView):
             'message': _('Players fetched successfully.'),
             'data': response_data
         }, status=status.HTTP_200_OK)
+
     
 ################## added players of particular team for particular tournament for particular games ###############
 
