@@ -22,6 +22,7 @@ from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarAPI.models import *
 from FutureStarTournamentApp.models import *
+from FutureStarFriendlyGame.models import *
 
 
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -42,6 +43,17 @@ import re
 import logging
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
+
+
+
+from datetime import timedelta
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.utils.timezone import now
+from django.db.models import Q
+
+
 
 class CustomTournamentPagination(PageNumberPagination):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1020,6 +1032,57 @@ class TournamentGamesOptionsAPIView(APIView):
 
 
 
+############### Custom Pagination ###############
+class CustomGameListPagination(PageNumberPagination): 
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError(_("Page number must be a positive integer."))
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': _('Games fetched successfully.'),
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+
 
 
 class TournamentGamesAPIView(APIView):
@@ -1075,88 +1138,90 @@ class TournamentGamesAPIView(APIView):
                     
   
     def get(self, request, *args, **kwargs):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-            # Filter by tournament_id if provided in query params
-            tournament_id = request.query_params.get('tournament_id')
-            games_query = TournamentGames.objects.all().order_by('game_date', 'game_start_time')
+        # Filter by tournament_id if provided in query params
+        tournament_id = request.query_params.get('tournament_id')
+        games_query = TournamentGames.objects.all().order_by('-game_date', '-game_start_time')
 
-            if tournament_id:
-                games_query = games_query.filter(tournament_id=tournament_id)
+        if tournament_id:
+            games_query = games_query.filter(tournament_id=tournament_id)
 
-            serializer = TournamentGamesSerializer(games_query, many=True)
-            
-            grouped_data = defaultdict(list)
-            for game, game_data in zip(games_query, serializer.data):
-                game_date = game.game_date
-                
-                if game_date:
-                    day_name = game_date.strftime('%A')
-                    formatted_date = game_date.strftime('%Y-%m-%d')
-                else:
-                    day_name = "Unknown"
-                    formatted_date = "Unknown-Date"
+        # Paginate the queryset
+        paginator = CustomGameListPagination()
+        paginated_games = paginator.paginate_queryset(games_query, request)
 
-                # Retrieve team names and logos based on ForeignKey relationships
-                team_a_branch = game.team_a  # This will automatically get the related TeamBranch object
-                team_b_branch = game.team_b
+        grouped_data = defaultdict(list)
+        for game in paginated_games:  # Use paginated data
+            game_date = game.game_date
 
-                team_a_name = team_a_branch.team_name if team_a_branch else None
-                team_b_name = team_b_branch.team_name if team_b_branch else None
+            if game_date:
+                day_name = game_date.strftime('%A')
+                formatted_date = game_date.strftime('%Y-%m-%d')
+            else:
+                day_name = "Unknown"
+                formatted_date = "Unknown-Date"
 
-                # Retrieve team logos
-                team_a_logo = team_a_branch.team_id.team_logo if team_a_branch and team_a_branch.team_id else None
-                team_b_logo = team_b_branch.team_id.team_logo if team_b_branch and team_b_branch.team_id else None
+            # Retrieve team names and logos based on ForeignKey relationships
+            team_a_branch = game.team_a
+            team_b_branch = game.team_b
 
-                team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
-                team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
+            team_a_name = team_a_branch.team_name if team_a_branch else None
+            team_b_name = team_b_branch.team_name if team_b_branch else None
 
-                # Prepare game data for response
-                game_data = {
-                    "id": game.id,
-                    "tournament_id": game.tournament_id.id if game.tournament_id else None,
-                    "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
-                    "game_number": game.game_number,
-                    "game_date": game.game_date.strftime('%Y-%m-%d') if game.game_date else None,
-                    "game_start_time": game.game_start_time,
-                    "game_end_time": game.game_end_time,
-                    "group_id": game.group_id.id if game.group_id else None,
-                    "group_id_name": game.group_id.group_name if game.group_id else None,
-                    "team_a": game.team_a.id if game.team_a else None,  # Include team ID
-                    "team_a_name": team_a_name,
-                    "team_a_logo": team_a_logo_path,
-                    "team_a_goal": game.team_a_goal,  # Use the field from the model directly
-                    "team_b": game.team_b.id if game.team_b else None,  # Include team ID
-                    "team_b_name": team_b_name,
-                    "team_b_logo": team_b_logo_path,
-                    "team_b_goal": game.team_b_goal,  # Use the field from the model directly
-                    "game_field_id": game.game_field_id.id if game.game_field_id else None,
-                    "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
-                    "finish": game.finish,
-                    "winner": game.winner_id,
-                    "loser_id": game.loser_id,
-                    "is_draw": game.is_draw,
-                    "created_at": game.created_at,
-                    "updated_at": game.updated_at,
-                }
+            team_a_logo = team_a_branch.team_id.team_logo if team_a_branch and team_a_branch.team_id else None
+            team_b_logo = team_b_branch.team_id.team_logo if team_b_branch and team_b_branch.team_id else None
 
-                # Group games by day name and formatted date
-                grouped_data[(day_name, formatted_date)].append(game_data)
+            team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
+            team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
 
-            formatted_data = {
-                f"{day_name},{formatted_date}": {
-                    "games": games
-                }
-                for (day_name, formatted_date), games in grouped_data.items()
+            # Prepare game data for response
+            game_data = {
+                "id": game.id,
+                "tournament_id": game.tournament_id.id if game.tournament_id else None,
+                "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
+                "game_number": game.game_number,
+                "game_date": game.game_date.strftime('%Y-%m-%d') if game.game_date else None,
+                "game_start_time": game.game_start_time,
+                "game_end_time": game.game_end_time,
+                "group_id": game.group_id.id if game.group_id else None,
+                "group_id_name": game.group_id.group_name if game.group_id else None,
+                "team_a": game.team_a.id if game.team_a else None,
+                "team_a_name": team_a_name,
+                "team_a_logo": team_a_logo_path,
+                "team_a_goal": game.team_a_goal,
+                "team_b": game.team_b.id if game.team_b else None,
+                "team_b_name": team_b_name,
+                "team_b_logo": team_b_logo_path,
+                "team_b_goal": game.team_b_goal,
+                "game_field_id": game.game_field_id.id if game.game_field_id else None,
+                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
+                "finish": game.finish,
+                "winner": game.winner_id,
+                "loser_id": game.loser_id,
+                "is_draw": game.is_draw,
+                "created_at": game.created_at,
+                "updated_at": game.updated_at,
             }
 
-            return Response({
-                "status": 1,
-                "message": _("Games Fetched successfully."),
-                "data": formatted_data
-            }, status=status.HTTP_200_OK)
+            # Group games by day name and formatted date
+            grouped_data[f"{day_name},{formatted_date}"].append(game_data)
+
+        # Prepare the final formatted data
+        formatted_data = []
+        for date, games in grouped_data.items():
+            # Skip empty game lists
+            if games:
+                formatted_data.append({
+                    "date": date,
+                    "games": games
+                })
+
+        # Return paginated response
+        return paginator.get_paginated_response(formatted_data)
+
             
     def patch(self, request, *args, **kwargs):
  
@@ -1629,3 +1694,94 @@ class TestTournamentGroupTeamsAPIView(APIView):
             'message': _('Tournament Group Teams fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
+
+
+
+class UpcomingGameView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        print(user)
+
+        # Check if the user has role 6 or 3
+        if user.role_id not in [6, 3]:
+            return Response({
+                "status": 0,
+                "message": "User does not have the required role."
+            }, status=400)
+
+        # Get branches (team IDs) where the user has joined as COACH_STAFF_TYPE or MANAGERIAL_STAFF_TYPE
+        branches = JoinBranch.objects.filter(
+            user_id=user,
+            joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
+        ).values_list('branch_id', flat=True)
+
+        print(branches)
+
+        if not branches:
+            return Response({
+                "status": 0,
+                "message": "User has not joined any branches as required staff type."
+            }, status=400)
+
+        # Calculate the time threshold
+        one_hour_ago = now() - timedelta(hours=1)
+
+        # Filter upcoming games for these branches
+        friendly_games = FriendlyGame.objects.filter(
+            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+            Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
+            team_a_id__in=branches,
+            finish=False,
+        ).order_by('game_date', 'game_start_time')
+
+        tournament_games = TournamentGames.objects.filter(
+            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+            Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
+            finish=False,
+        ).order_by('game_date', 'game_start_time')
+
+        # Combine and sort games
+        upcoming_games = sorted(
+            list(friendly_games) + list(tournament_games),
+            key=lambda game: (game.game_date, game.game_start_time)
+        )
+
+        # Prepare the response data
+        response_data = []
+        for game in upcoming_games:
+            # Check which team is associated with the user
+            if game.team_a.id in branches:
+                game_data = {
+                    "game_type": "Friendly" if isinstance(game, FriendlyGame) else "Tournament",
+                    "team_id": game.team_a.id if game.team_a.id in branches else game.team_b.id,
+                    "game_details": {
+                        "game_id": game.id,
+                        "team_name": game.team_a.team_name,
+                        "opponent_team_name": game.team_b.team_name if game.team_a.id in branches else game.team_a.team_name,
+                        "game_date": game.game_date,
+                        "game_start_time": game.game_start_time,
+                        "game_end_time": game.game_end_time,
+                        "status": "Upcoming"
+                    }
+                }
+                # Add tournament ID if it's a tournament game
+                if isinstance(game, TournamentGames):
+                    game_data["game_details"]["tournament_id"] = game.tournament_id.id if game.tournament_id else None
+
+                response_data.append(game_data)
+                break  # Return the first game only
+
+        if response_data:
+            return Response({
+                "status": 1,
+                "message": "Upcoming game fetched successfully.",
+                "data": response_data
+            }, status=200)
+
+        return Response({
+            "status": 0,
+            "message": "No upcoming games found for the user's team."
+        }, status=200)

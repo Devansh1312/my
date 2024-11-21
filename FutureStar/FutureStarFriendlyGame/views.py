@@ -50,14 +50,8 @@ class ManagerBranchDetail(APIView):
             team_branch = TeamBranch.objects.get(id=join_branch.branch_id.id)
             
             data = {
-                'team_id': team_branch.id,
-                'team_name': team_branch.team_name,
-                'field_size': team_branch.field_size.id,
-                'address': team_branch.address,
-                'phone': team_branch.phone,
-                'email': team_branch.email,
-                'latitude': team_branch.latitude,
-                'longitude': team_branch.longitude,
+                'id': team_branch.id,
+                'name': team_branch.team_name
             }
 
             return Response({
@@ -392,8 +386,9 @@ class ListOfFridlyGamesForJoin(APIView):
 class TeamBranchListView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def get(self, request, *args, **kwargs):
-        team_a_id = request.query_params.get('team_a_id',None)  # ID to exclude
+        team_a_id = request.query_params.get('team_a_id', None)  # ID to exclude
         search_key = request.query_params.get('search', '')  # Search key for team_name
 
         # Get all branches
@@ -407,13 +402,18 @@ class TeamBranchListView(APIView):
         if search_key:
             queryset = queryset.filter(team_name__icontains=search_key)
 
-        # Serialize data with pagination
-        paginator = CustomFriendlyGamesPagination()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = TeamBranchSearchSerializer(paginated_queryset, many=True,context={'request': request})
+        # Order by team_name alphabetically
+        queryset = queryset.order_by('team_name')
 
-        # Return paginated response
-        return paginator.get_paginated_response(serializer.data)
+        # Serialize data
+        serializer = TeamBranchSearchSerializer(queryset, many=True, context={'request': request})
+
+        # Return response
+        return Response({
+            "status": 1,
+            "message": _("Teams fetched successfully."),
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
 
 ################## participates players of particular team for particular tournament ###############
 class FriendlyGameTeamPlayersAPIView(APIView):
