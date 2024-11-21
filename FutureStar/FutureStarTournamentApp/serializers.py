@@ -238,7 +238,7 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
 class TeamUniformColorSerializer(serializers.Serializer):
     game_id = serializers.IntegerField()
     tournament_id = serializers.IntegerField()
-    team_id = serializers.CharField()  # Can be either team_a or team_b
+    team_id = serializers.IntegerField()  # Can be either team_a or team_b
     primary_color_player = serializers.CharField(max_length=255, required=True)
     secondary_color_player = serializers.CharField(max_length=255, required=True)
     primary_color_goalkeeper = serializers.CharField(max_length=255, required=True)
@@ -254,7 +254,7 @@ class TeamUniformColorSerializer(serializers.Serializer):
         except TournamentGames.DoesNotExist:
             raise serializers.ValidationError("Invalid game or tournament specified.")
         
-        if team_id not in [game.team_a, game.team_b]:
+        if team_id not in [game.team_a.id, game.team_b.id]:
             raise serializers.ValidationError("The specified team_id does not match any team in this game.")
         
         return data

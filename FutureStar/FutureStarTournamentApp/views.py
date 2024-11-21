@@ -11,6 +11,7 @@ from FutureStarTeamApp.serializers import *
 from FutureStarTournamentApp.serializers import *
 
 
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db.models import Sum
 
@@ -658,16 +659,16 @@ class TeamJoiningRequest(APIView):
                 'message': _('The team\'s age group does not match the tournament\'s age group.'),
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # existing_request = TournamentGroupTeam.objects.filter(
-        #     team_branch_id=team_branch,
-        #     tournament_id=tournament
-        # ).exists()
+        existing_request = TournamentGroupTeam.objects.filter(
+            team_branch_id=team_branch,
+            tournament_id=tournament
+        ).exists()
         
-        # if existing_request:
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('This team has already requested to join this tournament.'),
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+        if existing_request:
+            return Response({
+                'status': 0,
+                'message': _('This team has already requested to join this tournament.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Create a new TournamentGroupTeam entry with group_id as None and status as 0
         tournament_group_team = TournamentGroupTeam.objects.create(
@@ -1404,20 +1405,48 @@ class TournamentGamesDetailAPIView(APIView):
 class TeamUniformColorAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def _has_access(self, user, team_id):
+        """
+        Check if the user has the required role and valid membership in the team.
+        """
+        if user.role.id not in [3, 6]:  # Restrict roles
+            return False
+
+        try:
+            JoinBranch.objects.get(
+                branch_id_id=team_id,
+                user_id=user,
+                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE],
+            )
+            return True
+        except ObjectDoesNotExist:
+            return False
+
     def post(self, request):
+        # Activate language preference
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
         serializer = TeamUniformColorSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid():
-            game_id = serializer.validated_data['game_id']
-            tournament_id = serializer.validated_data['tournament_id']
-            team_id = serializer.validated_data['team_id']
-            primary_color_player = serializer.validated_data['primary_color_player']
-            secondary_color_player = serializer.validated_data['secondary_color_player']
-            primary_color_goalkeeper = serializer.validated_data['primary_color_goalkeeper']
-            secondary_color_goalkeeper = serializer.validated_data['secondary_color_goalkeeper']
+            validated_data = serializer.validated_data
+            game_id = validated_data['game_id']
+            tournament_id = validated_data['tournament_id']
+            team_id = validated_data['team_id']
+            primary_color_player = validated_data['primary_color_player']
+            secondary_color_player = validated_data['secondary_color_player']
+            primary_color_goalkeeper = validated_data['primary_color_goalkeeper']
+            secondary_color_goalkeeper = validated_data['secondary_color_goalkeeper']
+
+            if not self._has_access(request.user, team_id):
+                return Response({
+                    'status': 0,
+                    'message': _('Access denied. You do not have permission for this team.'),
+                    'data': None,
+                }, status=status.HTTP_403_FORBIDDEN)
 
             try:
                 game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
@@ -1428,7 +1457,7 @@ class TeamUniformColorAPIView(APIView):
                     'data': None,
                 }, status=status.HTTP_404_NOT_FOUND)
 
-            # Update the uniform colors for the appropriate team
+            # Update uniform colors for the matched team
             if team_id == game.team_a.id:
                 game.team_a_primary_color_player = primary_color_player
                 game.team_a_secondary_color_player = secondary_color_player
@@ -1459,6 +1488,38 @@ class TeamUniformColorAPIView(APIView):
             'message': _('Invalid data.'),
             'data': serializer.errors,
         }, status=status.HTTP_400_BAD_REQUEST)
+    
+class FetchTeamUniformColorAPIView(APIView):
+    def _has_access(self, user, game_id=None, tournament_id=None):
+        """
+        Check if the user has access to the game based on role and official type for a specific game in a specific tournament.
+        """
+        # Check if the user's role is 4
+        if user.role.id != 4:
+            return False
+
+        if game_id and tournament_id:
+            try:
+                # Check if the game exists for the given tournament
+                game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
+
+                # Check if the user is associated with the game as an official with specific types
+                official = GameOfficials.objects.filter(
+                    game_id_id=game_id,
+                    official_id=user,
+                    officials_type_id__in=[2, 3, 4, 5]  # Allowed official types
+                ).exists()
+
+                if official:
+                    return True
+
+            except TournamentGames.DoesNotExist:
+                pass  # Game not found or doesn't match; access denied
+            except GameOfficials.DoesNotExist:
+                pass  # Official entry not found or doesn't match; access denied
+
+        # Default to denying access
+        return False
 
     def get(self, request):
         language = request.headers.get('Language', 'en')
@@ -1475,6 +1536,12 @@ class TeamUniformColorAPIView(APIView):
                 'message': _('game_id, tournament_id, and team_id are required.'),
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
+        if not self._has_access(request.user, team_id):
+                return Response({
+                    'status': 0,
+                    'message': _('Access denied. You do not have permission for this team.'),
+                    'data': None,
+                }, status=status.HTTP_403_FORBIDDEN)
 
         try:
             game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
@@ -1514,6 +1581,186 @@ class TeamUniformColorAPIView(APIView):
             'message': _('Uniform Fetch Successfully'),
             'data': response_data,
         }, status=status.HTTP_200_OK)
+class TeamUniformColorAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def _has_access(self, user, team_id):
+        """
+        Check if the user has the required role and valid membership in the team.
+        """
+        if user.role.id not in [3, 6]:  # Restrict roles
+            return False
+
+        try:
+            JoinBranch.objects.get(
+                branch_id_id=team_id,
+                user_id=user,
+                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE],
+            )
+            return True
+        except ObjectDoesNotExist:
+            return False
+
+    def post(self, request):
+        # Activate language preference
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        serializer = TeamUniformColorSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            game_id = validated_data['game_id']
+            tournament_id = validated_data['tournament_id']
+            team_id = validated_data['team_id']
+            primary_color_player = validated_data['primary_color_player']
+            secondary_color_player = validated_data['secondary_color_player']
+            primary_color_goalkeeper = validated_data['primary_color_goalkeeper']
+            secondary_color_goalkeeper = validated_data['secondary_color_goalkeeper']
+
+            if not self._has_access(request.user, team_id):
+                return Response({
+                    'status': 0,
+                    'message': _('Access denied. You do not have permission for this team.'),
+                    'data': None,
+                }, status=status.HTTP_403_FORBIDDEN)
+
+            try:
+                game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+            except TournamentGames.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Game not found.'),
+                    'data': None,
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Update uniform colors for the matched team
+            if team_id == game.team_a.id:
+                game.team_a_primary_color_player = primary_color_player
+                game.team_a_secondary_color_player = secondary_color_player
+                game.team_a_primary_color_goalkeeper = primary_color_goalkeeper
+                game.team_a_secondary_color_goalkeeper = secondary_color_goalkeeper
+            elif team_id == game.team_b.id:
+                game.team_b_primary_color_player = primary_color_player
+                game.team_b_secondary_color_player = secondary_color_player
+                game.team_b_primary_color_goalkeeper = primary_color_goalkeeper
+                game.team_b_secondary_color_goalkeeper = secondary_color_goalkeeper
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('The specified team_id does not match any team in this game.'),
+                    'data': None,
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            game.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Uniform Added Successfully'),
+                'data': serializer.validated_data,
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'status': 0,
+            'message': _('Invalid data.'),
+            'data': serializer.errors,
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+class FetchTeamUniformColorAPIView(APIView):
+    def _has_access(self, user, game_id=None, tournament_id=None):
+        """
+        Check if the user has access to the game based on role and official type for a specific game in a specific tournament.
+        """
+        # Check if the user's role is 4
+        if user.role.id != 4:
+            return False
+
+        if game_id and tournament_id:
+            try:
+                # Check if the game exists for the given tournament
+                game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
+
+                # Check if the user is associated with the game as an official with specific types
+                official = GameOfficials.objects.filter(
+                    game_id_id=game_id,
+                    official_id=user,
+                    officials_type_id__in=[2, 3, 4, 5]  # Allowed official types
+                ).exists()
+
+                if official:
+                    return True
+
+            except TournamentGames.DoesNotExist:
+                pass  # Game not found or doesn't match; access denied
+            except GameOfficials.DoesNotExist:
+                pass  # Official entry not found or doesn't match; access denied
+
+        # Default to denying access
+        return False
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        game_id = request.query_params.get('game_id')
+        tournament_id = request.query_params.get('tournament_id')
+        team_id = request.query_params.get('team_id')
+
+        if not game_id or not tournament_id or not team_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id, tournament_id, and team_id are required.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not self._has_access(request.user, team_id):
+                return Response({
+                    'status': 0,
+                    'message': _('Access denied. You do not have permission for this team.'),
+                    'data': None,
+                }, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': None,
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Retrieve the uniform colors for the specified team
+        if team_id == game.team_a.id:
+            response_data = {
+                "team_id": team_id,
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+            }
+        elif team_id == game.team_b.id:
+            response_data = {
+                "team_id": team_id,
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+            }
+        else:
+            return Response({
+                'status': 0,
+                'message': _('The specified team_id does not match any team in this game.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'status': 1,
+            'message': _('Uniform Fetch Successfully'),
+            'data': response_data,
+        }, status=status.HTTP_200_OK)
+            
             
 
 
@@ -1628,6 +1875,7 @@ class TestTournamentGroupTeamsAPIView(APIView):
                 'message': _('Tournament ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Fetch all groups associated with the tournament
         groups = GroupTable.objects.filter(tournament_id=tournament_id).order_by('group_name')
 
         if not groups.exists():
@@ -1638,38 +1886,48 @@ class TestTournamentGroupTeamsAPIView(APIView):
 
         grouped_data = []
         for group in groups:
-             
-            teams = TournamentGroupTeam.objects.filter(group_id=group.id,  tournament_id=tournament_id).select_related(
-                'group_id', 'team_branch_id', 'tournament_id'
-            )
+            # Fetch teams in the current group
+            teams = TournamentGroupTeam.objects.filter(
+                group_id=group.id,
+                tournament_id=tournament_id
+            ).select_related('group_id', 'team_branch_id')
 
             team_stats = []
             for team in teams:
                 team_id = team.team_branch_id.id if team.team_branch_id else None
+
+                # Query games where the team is either team_a or team_b, and the game is finished
                 games = TournamentGames.objects.filter(
-                    Q(team_a=team_id) | Q(team_b=team_id),
+                    (Q(team_a=team_id) | Q(team_b=team_id)),
                     group_id=group.id,
                     tournament_id=tournament_id,
                     finish=True
                 )
-               
 
                 match_played = games.count()
-               
-                total_goals = (
-                        (games.filter(team_a=team_id).aggregate(goals=Sum('team_a_goal'))['goals'] or 0) +
-                        (games.filter(team_b=team_id).aggregate(goals=Sum('team_b_goal'))['goals'] or 0)
-                    )
-                total_losses = games.filter(loser_id=team_id).count()
+
+                # Calculate total goals for the team (sum of goals scored in games where the team is involved)
+                total_goals = games.aggregate(
+                    total_goals_a=Sum('team_a_goal'),
+                    total_goals_b=Sum('team_b_goal')
+                )
+                total_goals_scored = total_goals['total_goals_a'] or 0
+                total_goals_conceded = total_goals['total_goals_b'] or 0
+                total_goals = total_goals_scored + total_goals_conceded
+
+                # Total wins, losses, and draws
                 total_wins = games.filter(winner_id=team_id).count()
                 total_losses = games.filter(loser_id=team_id).count()
-                total_draws = games.filter(is_draw=True).filter(
-                    Q(team_a=team_id) | Q(team_b=team_id)
-                ).count()
-                points = total_wins  # 1 point for a win, 0 for losses and draws
+                total_draws = games.filter(is_draw=True).count()
 
+                # Points calculation: 1 point per win
+                points = total_wins  # 1 point per win, 0 for draw and loss
+
+                # Serialize the team data
                 serializer = DetailedTournamentGroupTeamSerializer(team)
                 team_data = serializer.data
+
+                # Update the serialized data with additional statistics
                 team_data.update({
                     "match_played": match_played,
                     "total_goals": total_goals,
@@ -1680,22 +1938,20 @@ class TestTournamentGroupTeamsAPIView(APIView):
                 })
                 team_stats.append(team_data)
 
-            sorted_team_stats = sorted(team_stats, key=lambda x: x['points'], reverse=True)
+            # Sort teams by points (descending), and use total goals as a tie-breaker
+            sorted_team_stats = sorted(team_stats, key=lambda x: (x['points'], x['total_goals']), reverse=True)
 
             grouped_data.append({
-                "id": group.id,
-                "name": group.group_name,
+                "group_id": group.id,
+                "group_name": group.group_name,
                 "teams": sorted_team_stats
             })
 
-
         return Response({
             'status': 1,
-            'message': _('Tournament Group Teams fetched successfully.'),
+            'message': _('Tournament Group Points Table fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
-
-
 
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
