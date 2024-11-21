@@ -451,7 +451,7 @@ class OpenTrainingListView(APIView):
         paginated_trainings = paginator.paginate_queryset(open_trainings, request)
         if paginated_trainings is not None:
             # Serialize the paginated data
-            serializer = TrainingSerializer(paginated_trainings, many=True, context={'request': request})
+            serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
             # Prepare the pagination data
             pagination_data = {
@@ -471,7 +471,7 @@ class OpenTrainingListView(APIView):
             }, status=status.HTTP_200_OK)
 
         # If pagination is not applied, just return the serialized data
-        serializer = TrainingSerializer(open_trainings, many=True, context={'request': request})
+        serializer = TrainingListSerializer(open_trainings, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': "Open trainings retrieved successfully",
@@ -523,7 +523,7 @@ class MyTrainingsView(APIView):
         paginated_trainings = paginator.paginate_queryset(trainings, request)
         if paginated_trainings is not None:
             # Serialize the paginated data
-            serializer = TrainingSerializer(paginated_trainings, many=True, context={'request': request})
+            serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
             # Prepare the pagination data directly in 'data'
             pagination_data = {
@@ -541,7 +541,7 @@ class MyTrainingsView(APIView):
             }, status=status.HTTP_200_OK)
 
         # If pagination is not applied, just return the serialized data
-        serializer = TrainingSerializer(trainings, many=True, context={'request': request})
+        serializer = TrainingListSerializer(trainings, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': 'Trainings retrieved successfully',
@@ -584,7 +584,7 @@ class MyJoinedTrainingsView(APIView):
         paginated_trainings = paginator.paginate_queryset(trainings, request)
         if paginated_trainings is not None:
             # Serialize the paginated data
-            serializer = TrainingSerializer(paginated_trainings, many=True, context={'request': request})
+            serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
             # Prepare the pagination data
             pagination_data = {
@@ -602,7 +602,7 @@ class MyJoinedTrainingsView(APIView):
             }, status=status.HTTP_200_OK)
 
         # If pagination is not applied, just return the serialized data
-        serializer = TrainingSerializer(trainings, many=True, context={'request': request})
+        serializer = TrainingListSerializer(trainings, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': 'Joined trainings retrieved successfully',
