@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+{% endblock %}
+
+<style>
+   .is-invalid {
+       border-color: #dc3545;
+       background-color: #f8d7da;
+   }
+</style>
+
+{% block title %}
+Tournament Games
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{ breadcrumb.child }}</h3>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="display" id="basic-1">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Tournament Name</th>
+                                <th>Game Number</th>
+                                <th>Game Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game in games %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ game.tournament_id.name }}</td>
+                                <td>{{ game.game_number }}</td>
+                                <td>{{ game.game_date }}</td>
+                                <td>
+                                    <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                        <!-- View Game Modal Trigger -->
+                                        <a href="#" class="three-dots-menu" onclick="openViewModal({{ game.id }})">
+                                            <i data-feather="eye"></i>
+                                        </a>
+                                        <!-- Edit Game Modal Trigger -->
+                                        <a href="#" class="three-dots-menu" onclick="openEditModal({{ game.id }})">
+                                            <i data-feather="more-vertical"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- View Game Modal -->
+<div id="viewGameModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">View Game</h5>
+                <button type="button" class="close" onclick="closeViewModal()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="viewFormContent">
+                <!-- Content will be loaded dynamically here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Game Modal -->
+<div id="editGameModal" class="modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Game</h5>
+                <button type="button" class="close" onclick="closeEditModal()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editGameForm" method="post">
+                    {% csrf_token %}
+                    <div id="editFormContent"></div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+
+<script>
+    // Open View Modal and load game details
+    function openViewModal(gameId) {
+        const modal = document.getElementById("viewGameModal");
+        modal.style.display = "block";
+
+        fetch(`/games/view/${gameId}/`)
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Failed to load view form.');
+                }
+            })
+            .then(html => {
+                document.getElementById("viewFormContent").innerHTML = html;
+            })
+            .catch(error => {
+                console.error("Error loading view form:", error);
+                alert("Could not load form. Please try again later.");
+                closeViewModal();
+            });
+    }
+
+    // Close View Modal
+    function closeViewModal() {
+        const modal = document.getElementById("viewGameModal");
+        modal.style.display = "none";
+        document.getElementById("viewFormContent").innerHTML = "";
+    }
+
+    // Open Edit Modal and load game details for editing
+    function openEditModal(gameId) {
+        const modal = document.getElementById("editGameModal");
+        modal.style.display = "block";
+
+        fetch(`/games/edit/${gameId}/`)
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Failed to load form.');
+                }
+            })
+            .then(html => {
+                document.getElementById("editFormContent").innerHTML = html;
+            })
+            .catch(error => {
+                console.error("Error loading form:", error);
+                alert("Could not load form. Please try again later.");
+                closeEditModal();
+            });
+    }
+
+    // Close Edit Modal
+    function closeEditModal() {
+        const modal = document.getElementById("editGameModal");
+        modal.style.display = "none";
+        document.getElementById("editFormContent").innerHTML = "";
+    }
+
+    // Handle form submission for editing game
+    document.getElementById("editGameForm")?.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Failed to update game. Check the form for errors.");
+            }
+        })
+        .catch(error => {
+            console.error("Error submitting form:", error);
+            alert("An error occurred. Please try again.");
+        });
+    });
+</script>
+{% endblock %}

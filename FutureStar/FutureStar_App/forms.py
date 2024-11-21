@@ -7,6 +7,7 @@ from FutureStarGameSystem.models import OfficialsType
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import password_validation
 from FutureStarAPI.models import MobileDashboardBanner,PlayingPosition
+from FutureStarTournamentApp.models import TournamentGames
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
@@ -107,6 +108,98 @@ class AccountDeleteReasonForm(forms.ModelForm):
             "name_en": forms.TextInput(attrs={"placeholder": "Enter Delete Reason in English"}),
             "name_ar": forms.TextInput(attrs={"placeholder": "أدخل سبب الحذف باللغة العربية"}),
         }
+
+
+class TournamentGameForm(forms.ModelForm):
+    class Meta:
+        model = TournamentGames
+        fields = [
+            # General stats
+            'general_team_a_possession', 'general_team_a_interception', 
+            'general_team_a_offside', 'general_team_a_corner',
+            'general_team_b_possession', 'general_team_b_interception', 
+            'general_team_b_offside', 'general_team_b_corner',
+            # Defence stats
+            'defence_team_a_possession', 'defence_team_a_interception',
+            'defence_team_a_offside', 'defence_team_a_corner',
+            'defence_team_b_possession', 'defence_team_b_interception',
+            'defence_team_b_offside', 'defence_team_b_corner',
+            # Distribution stats
+            'distribution_team_a_possession', 'distribution_team_a_interception',
+            'distribution_team_a_offside', 'distribution_team_a_corner',
+            'distribution_team_b_possession', 'distribution_team_b_interception',
+            'distribution_team_b_offside', 'distribution_team_b_corner',
+            # Attack stats
+            'attack_team_a_possession', 'attack_team_a_interception',
+            'attack_team_a_offside', 'attack_team_a_corner',
+            'attack_team_b_possession', 'attack_team_b_interception',
+            'attack_team_b_offside', 'attack_team_b_corner',
+            # Discipline stats
+            'discipline_team_a_possession', 'discipline_team_a_interception',
+            'discipline_team_a_offside', 'discipline_team_a_corner',
+            'discipline_team_b_possession', 'discipline_team_b_interception',
+            'discipline_team_b_offside', 'discipline_team_b_corner',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+
+        if instance:
+            team_a_name = instance.team_a.team_name if instance.team_a else "Team A"
+            team_b_name = instance.team_b.team_name if instance.team_b else "Team B"
+
+            # Update labels for team A stats
+            self.fields['general_team_a_possession'].label = f"{team_a_name} General Possession"
+            self.fields['general_team_a_interception'].label = f"{team_a_name} General Interceptions"
+            self.fields['general_team_a_offside'].label = f"{team_a_name} General Offsides"
+            self.fields['general_team_a_corner'].label = f"{team_a_name} General Corners"
+
+            self.fields['defence_team_a_possession'].label = f"{team_a_name} Defence Possession"
+            self.fields['defence_team_a_interception'].label = f"{team_a_name} Defence Interceptions"
+            self.fields['defence_team_a_offside'].label = f"{team_a_name} Defence Offsides"
+            self.fields['defence_team_a_corner'].label = f"{team_a_name} Defence Corners"
+
+            self.fields['distribution_team_a_possession'].label = f"{team_a_name} Distribution Possession"
+            self.fields['distribution_team_a_interception'].label = f"{team_a_name} Distribution Interceptions"
+            self.fields['distribution_team_a_offside'].label = f"{team_a_name} Distribution Offsides"
+            self.fields['distribution_team_a_corner'].label = f"{team_a_name} Distribution Corners"
+
+            self.fields['attack_team_a_possession'].label = f"{team_a_name} Attack Possession"
+            self.fields['attack_team_a_interception'].label = f"{team_a_name} Attack Interceptions"
+            self.fields['attack_team_a_offside'].label = f"{team_a_name} Attack Offsides"
+            self.fields['attack_team_a_corner'].label = f"{team_a_name} Attack Corners"
+
+            self.fields['discipline_team_a_possession'].label = f"{team_a_name} Discipline Possession"
+            self.fields['discipline_team_a_interception'].label = f"{team_a_name} Discipline Interceptions"
+            self.fields['discipline_team_a_offside'].label = f"{team_a_name} Discipline Offsides"
+            self.fields['discipline_team_a_corner'].label = f"{team_a_name} Discipline Corners"
+
+            # Update labels for team B stats
+            self.fields['general_team_b_possession'].label = f"{team_b_name} General Possession"
+            self.fields['general_team_b_interception'].label = f"{team_b_name} General Interceptions"
+            self.fields['general_team_b_offside'].label = f"{team_b_name} General Offsides"
+            self.fields['general_team_b_corner'].label = f"{team_b_name} General Corners"
+
+            self.fields['defence_team_b_possession'].label = f"{team_b_name} Defence Possession"
+            self.fields['defence_team_b_interception'].label = f"{team_b_name} Defence Interceptions"
+            self.fields['defence_team_b_offside'].label = f"{team_b_name} Defence Offsides"
+            self.fields['defence_team_b_corner'].label = f"{team_b_name} Defence Corners"
+
+            self.fields['distribution_team_b_possession'].label = f"{team_b_name} Distribution Possession"
+            self.fields['distribution_team_b_interception'].label = f"{team_b_name} Distribution Interceptions"
+            self.fields['distribution_team_b_offside'].label = f"{team_b_name} Distribution Offsides"
+            self.fields['distribution_team_b_corner'].label = f"{team_b_name} Distribution Corners"
+
+            self.fields['attack_team_b_possession'].label = f"{team_b_name} Attack Possession"
+            self.fields['attack_team_b_interception'].label = f"{team_b_name} Attack Interceptions"
+            self.fields['attack_team_b_offside'].label = f"{team_b_name} Attack Offsides"
+            self.fields['attack_team_b_corner'].label = f"{team_b_name} Attack Corners"
+
+            self.fields['discipline_team_b_possession'].label = f"{team_b_name} Discipline Possession"
+            self.fields['discipline_team_b_interception'].label = f"{team_b_name} Discipline Interceptions"
+            self.fields['discipline_team_b_offside'].label = f"{team_b_name} Discipline Offsides"
+            self.fields['discipline_team_b_corner'].label = f"{team_b_name} Discipline Corners"
 
 # # Gender Form
 # class GenderForm(forms.ModelForm):

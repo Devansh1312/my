@@ -6064,3 +6064,69 @@ def fetch_users(request):
         role_id=role_id, phone__icontains=phone, is_deleted=False
     ).values('id', 'username', 'phone')
     return JsonResponse(list(users), safe=False)
+
+
+
+
+################################# Finished Games ##################
+class TournamentGameListView(View):
+    template_name = "Admin/Games/ListOfGames.html"
+
+    def get(self, request):
+        games = TournamentGames.objects.filter(finish=True).select_related('tournament_id')
+        return render(
+            request,
+            self.template_name,
+            {
+                "games": games,
+                "breadcrumb": {"parent": "Tournaments", "child": "Games"},
+            },
+        )
+
+    def post(self, request):
+        """
+        Handles the form submission for editing games.
+        """
+        game_id = request.POST.get('game_id')
+        game = get_object_or_404(TournamentGames, pk=game_id)
+        form = TournamentGameForm(request.POST, instance=game)
+
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True, "message": "Game updated successfully."})
+        else:
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
+
+    def get_game_data(self, request, game_id):
+        """
+        Handles AJAX requests to get game details.
+        """
+        game = get_object_or_404(TournamentGames, pk=game_id)
+        form = TournamentGameForm(instance=game)
+        return render(request, "Admin/Games/ListOfGames.html", {"form": form, "game": game})
+    
+
+class TournamentGameView(View):
+    template_name = "Admin/Games/ListOfGames.html"
+
+    def get(self, request, pk):
+        game = get_object_or_404(TournamentGames, pk=pk)
+        return render(request, self.template_name, {"game": game})
+
+class TournamentGameEditView(View):
+    template_name = "Admin/Games/edit_form.html"  # Separate template for the form
+
+    def get(self, request, pk):
+        game = get_object_or_404(TournamentGames, pk=pk)
+        form = TournamentGameForm(instance=game)
+        if request.is_ajax():
+            return render(request, self.template_name, {"form": form})
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    def post(self, request, pk):
+        game = get_object_or_404(TournamentGames, pk=pk)
+        form = TournamentGameForm(request.POST, instance=game)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True, "message": "Game updated successfully."})
+        return JsonResponse({"success": False, "errors": form.errors}, status=400)

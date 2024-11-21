@@ -269,4 +269,10 @@ urlpatterns = [
     # path('search-users/',search_users, name='search_users'),
     # path('assign-game-handler/',assign_game_handler, name='assign_game_handler'),
 
+    path('games/', TournamentGameListView.as_view(), name='games_list'),
+    path('game-edit/<int:pk>/', TournamentGameEditView.as_view(), name='game_edit'),
+    path('game-view/<int:game_id>/', TournamentGameView.as_view(), name='game_view'),
+
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
