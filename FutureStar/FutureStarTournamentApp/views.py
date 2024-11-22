@@ -1091,51 +1091,60 @@ class TournamentGamesAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        # Set language
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-            tournament_id = request.data.get("tournament_id")
-            game_number = request.data.get("game_number")
-            team_a = request.data.get("team_a")  # New field
-            team_b = request.data.get("team_b")  # New field
+        # Extract data from the request
+        tournament_id = request.data.get("tournament_id")
+        game_number = request.data.get("game_number")
+        team_a = request.data.get("team_a")  # New field
+        team_b = request.data.get("team_b")  # New field
+        group_id = request.data.get("group_id")  # Optional field
 
-            if not tournament_id or not game_number or not team_a or not team_b:
+        # Validate required fields
+        if not tournament_id or not game_number or not team_a or not team_b:
+            return Response({
+                'status': 0,
+                'message': _('Both tournament_id, game_number, team_a, and team_b are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the game_number already exists for the given tournament_id
+        if TournamentGames.objects.filter(Q(tournament_id=tournament_id) & Q(game_number=game_number)).exists():
+            return Response({
+                'status': 0,
+                'message': _('This game number already exists for the specified tournament. Please choose a different game number.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Handle group_id == 0 and set it to None
+        if group_id == 0 or group_id == "0":
+            request.data["group_id"] = None
+
+        # Proceed with serializer validation and saving
+        serializer = TournamentGamesSerializer(data=request.data)
+        try:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'status': 1,
+                    'message': _('Game created successfully.'),
+                    'data': serializer.data
+                }, status=status.HTTP_201_CREATED)
+            else:
                 return Response({
                     'status': 0,
-                    'message': _('Both tournament_id, game_number, team_a, and team_b are required.')
+                    'message': _('Failed to create game.'),
+                    'errors': serializer.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Check if the game_number already exists for the given tournament_id
-            if TournamentGames.objects.filter(Q(tournament_id=tournament_id) & Q(game_number=game_number)).exists():
-                return Response({
-                    'status': 0,
-                    'message': _('This game number already exists for the specified tournament. Please choose a different game number.')
-                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An unexpected error occurred.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            # Proceed with serializer validation and saving
-            serializer = TournamentGamesSerializer(data=request.data)
-            try:
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response({
-                        'status': 1,
-                        'message': _('Game created successfully.'),
-                        'data': serializer.data
-                    }, status=status.HTTP_201_CREATED)
-                else:
-                    return Response({
-                        'status': 0,
-                        'message': _('Failed to create game.'),
-                        'errors': serializer.errors
-                    }, status=status.HTTP_400_BAD_REQUEST)
-            
-            except Exception as e:
-                return Response({
-                    'status': 0,
-                    'message': _('An unexpected error occurred.'),
-                    'error': str(e)
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
   
     def get(self, request, *args, **kwargs):
