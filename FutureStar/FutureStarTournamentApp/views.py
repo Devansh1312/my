@@ -482,124 +482,124 @@ class GroupTableAPIView(APIView):
 ############################# FETCH AND CREATE GROUP TEAM WITH ADDING OR UPDATING TEAM ###########################
 
 
-class TournamentGroupTeamListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
+# class TournamentGroupTeamListCreateAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def get(self, request, *args, **kwargs):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+#     def get(self, request, *args, **kwargs):
+#             language = request.headers.get('Language', 'en')
+#             if language in ['en', 'ar']:
+#                 activate(language)
 
-            tournament_id = request.query_params.get('tournament_id')
+#             tournament_id = request.query_params.get('tournament_id')
 
-            if not tournament_id:
-                return Response({
-                    'status': 0,
-                    'message': _('Tournament ID is required.')
-                }, status=status.HTTP_400_BAD_REQUEST)
+#             if not tournament_id:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('Tournament ID is required.')
+#                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Fetch all groups associated with the tournament
-            groups = GroupTable.objects.filter(tournament_id=tournament_id).order_by('group_name')
+#             # Fetch all groups associated with the tournament
+#             groups = GroupTable.objects.filter(tournament_id=tournament_id).order_by('group_name')
 
-            if not groups.exists():
-                return Response({
-                    'status': 0,
-                    'message': _('No groups found for the specified tournament.')
-                }, status=status.HTTP_404_NOT_FOUND)
+#             if not groups.exists():
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('No groups found for the specified tournament.')
+#                 }, status=status.HTTP_404_NOT_FOUND)
 
-            # Prepare the response data
-            grouped_data = []
-            for group in groups:
-                # Get all teams in the current group
-                teams = TournamentGroupTeam.objects.filter(
-                    group_id=group.id,
-                    tournament_id=tournament_id
-                ).select_related('group_id', 'team_branch_id')
+#             # Prepare the response data
+#             grouped_data = []
+#             for group in groups:
+#                 # Get all teams in the current group
+#                 teams = TournamentGroupTeam.objects.filter(
+#                     group_id=group.id,
+#                     tournament_id=tournament_id
+#                 ).select_related('group_id', 'team_branch_id')
 
-                # Serialize team data if available, otherwise an empty list
-                if teams.exists():
-                    serializer = TournamentGroupTeamSerializer(teams, many=True)
-                    group_teams = serializer.data
-                else:
-                    group_teams = []  # Empty list for groups without teams
+#                 # Serialize team data if available, otherwise an empty list
+#                 if teams.exists():
+#                     serializer = TournamentGroupTeamSerializer(teams, many=True)
+#                     group_teams = serializer.data
+#                 else:
+#                     group_teams = []  # Empty list for groups without teams
 
-                # Add group data with ID and teams
-                grouped_data.append({
-                    "id": group.id,
-                    "name": group.group_name,
-                    "teams": group_teams
-                })
+#                 # Add group data with ID and teams
+#                 grouped_data.append({
+#                     "id": group.id,
+#                     "name": group.group_name,
+#                     "teams": group_teams
+#                 })
 
-            return Response({
-                'status': 1,
-                'message': _('Tournament Group Teams fetched successfully.'),
-                'data': grouped_data
-            }, status=status.HTTP_200_OK)
+#             return Response({
+#                 'status': 1,
+#                 'message': _('Tournament Group Teams fetched successfully.'),
+#                 'data': grouped_data
+#             }, status=status.HTTP_200_OK)
 
-########### Join Team In Group Via Add Button ##############
-    def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
+# ########### Join Team In Group Via Add Button ##############
+#     def post(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
 
-        team_branch_id = request.data.get('team_id')
-        group_id = request.data.get('group_id')
-        tournament_id = request.data.get('tournament_id')
+#         team_branch_id = request.data.get('team_id')
+#         group_id = request.data.get('group_id')
+#         tournament_id = request.data.get('tournament_id')
 
-        if not (team_branch_id and group_id and tournament_id):
-            return Response({
-                'status': 0,
-                'message': _('team_id, group_id, and tournament_id are required.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         if not (team_branch_id and group_id and tournament_id):
+#             return Response({
+#                 'status': 0,
+#                 'message': _('team_id, group_id, and tournament_id are required.'),
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate tournament existence
-        try:
-            tournament = Tournament.objects.get(id=tournament_id)
-        except Tournament.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Tournament does not exist.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         # Validate tournament existence
+#         try:
+#             tournament = Tournament.objects.get(id=tournament_id)
+#         except Tournament.DoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Tournament does not exist.'),
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate group existence and its relation to the tournament
-        try:
-            group_instance = GroupTable.objects.get(id=group_id, tournament_id=tournament_id)
-        except GroupTable.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('The provided group does not belong to the specified tournament.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         # Validate group existence and its relation to the tournament
+#         try:
+#             group_instance = GroupTable.objects.get(id=group_id, tournament_id=tournament_id)
+#         except GroupTable.DoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('The provided group does not belong to the specified tournament.'),
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        with transaction.atomic():
-            # Check if the team already exists in the tournament
-            existing_assignment = TournamentGroupTeam.objects.filter(
-                team_branch_id=team_branch_id, tournament_id=tournament_id
-            ).first()
+#         with transaction.atomic():
+#             # Check if the team already exists in the tournament
+#             existing_assignment = TournamentGroupTeam.objects.filter(
+#                 team_branch_id=team_branch_id, tournament_id=tournament_id
+#             ).first()
 
-            if existing_assignment:
-                # If the team already has a group assigned (not NULL), show an error message
-                if existing_assignment.group_id:
-                    return Response({
-                        'status': 0,
-                        'message': _('The team is already assigned to another group in this tournament.'),
-                    }, status=status.HTTP_400_BAD_REQUEST)
+#             if existing_assignment:
+#                 # If the team already has a group assigned (not NULL), show an error message
+#                 if existing_assignment.group_id:
+#                     return Response({
+#                         'status': 0,
+#                         'message': _('The team is already assigned to another group in this tournament.'),
+#                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                # If group_id is NULL, update the record
-                existing_assignment.group_id = group_instance
-                existing_assignment.status = 1  # Update the status if required
-                existing_assignment.save(update_fields=['group_id', 'status', 'updated_at'])
-                return Response({
-                    'status': 1,
-                    'message': _('Tournament Group Team updated successfully.'),
-                    'data': TournamentGroupTeamSerializer(existing_assignment).data
-                }, status=status.HTTP_200_OK)
+#                 # If group_id is NULL, update the record
+#                 existing_assignment.group_id = group_instance
+#                 existing_assignment.status = 1  # Update the status if required
+#                 existing_assignment.save(update_fields=['group_id', 'status', 'updated_at'])
+#                 return Response({
+#                     'status': 1,
+#                     'message': _('Tournament Group Team updated successfully.'),
+#                     'data': TournamentGroupTeamSerializer(existing_assignment).data
+#                 }, status=status.HTTP_200_OK)
 
-            # If no existing assignment, return an error
-            return Response({
-                'status': 0,
-                'message': _('No existing assignment found to update.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+#             # If no existing assignment, return an error
+#             return Response({
+#                 'status': 0,
+#                 'message': _('No existing assignment found to update.'),
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
 
     
@@ -1861,7 +1861,12 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class TestTournamentGroupTeamsAPIView(APIView):
+############################# FETCH AND CREATE GROUP TEAM WITH ADDING OR UPDATING TEAM ###########################
+
+class TournamentGroupTeamListCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -1952,7 +1957,6 @@ class TestTournamentGroupTeamsAPIView(APIView):
             'message': _('Tournament Group Points Table fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
-
 
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
