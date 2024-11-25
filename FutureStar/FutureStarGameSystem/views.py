@@ -654,8 +654,47 @@ class AddPlayerJerseyAPIView(APIView):
         game_id = request.data.get('game_id')
         tournament_id = request.data.get('tournament_id')
         players_data = request.data.get('players', [])  # Expecting a list of {player_id, jersey_number}
-        print(type(team_id))
 
+        # Initialize response data for validations
+        validation_errors = []
+
+        # Validate team_id
+        if not team_id:
+            validation_errors.append({
+                'field': 'team_id',
+                'message': _('team_id is required.')
+            })
+
+        # Validate game_id
+        if not game_id:
+            validation_errors.append({
+                'field': 'game_id',
+                'message': _('game_id is required.')
+            })
+
+        # Validate tournament_id
+        if not tournament_id:
+            validation_errors.append({
+                'field': 'tournament_id',
+                'message': _('tournament_id is required.')
+            })
+
+        # Validate players_data
+        if not isinstance(players_data, list) or len(players_data) == 0:
+            validation_errors.append({
+                'field': 'players',
+                'message': _('players (list of player_id and jersey_number) are required and must not be empty.')
+            })
+
+        # If there are validation errors, return them
+        if validation_errors:
+            return Response({
+                'status': 0,
+                'message': _('Validation errors occurred.'),
+                'errors': validation_errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check user access to the team
         if not self._has_access(request.user, team_id):
             return Response({
                 'status': 0,
@@ -663,21 +702,12 @@ class AddPlayerJerseyAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Validate required fields
-        if not team_id or not game_id or not tournament_id or not isinstance(players_data, list) or len(players_data) == 0:
-            return Response({
-                'status': 0,
-                'message': _('team_id, game_id, tournament_id, and players (list of player_id and jersey_number) are required.'),
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Initialize response data
+        # Process players
         response_data = []
 
         for player in players_data:
             player_id = player.get('player_id')
             jersey_number = player.get('jersey_number', 0)  # Default to 0 if not provided
-           
 
             if not player_id:
                 response_data.append({
@@ -742,37 +772,31 @@ class AddPlayerJerseyAPIView(APIView):
                 })
                 continue
 
-            # Check for duplicate jersey numbers
-            
-            if jersey_number != 0 and Lineup.objects.filter(
-                team_id=team,
-                game_id=game,
-                tournament_id=tournament,
-                player_ready=False,
-                player_id__isnull=False,
-                playerjersey=jersey_number
-            ).exists():
-                response_data.append({
-                    'player_id': player_id,
-                    'status': 0,
-                    'message': _('This jersey number is already assigned to another player in the lineup.')
-                })
-                continue
+            # Check if jersey number is already assigned in the current lineup
+            if jersey_number != 0:
+                existing_jersey = PlayerJersey.objects.filter(
+                    lineup_players__team_id=team,
+                    lineup_players__game_id=game,
+                    jersey_number=jersey_number
+                ).first()
 
-            # Create or update lineup entry
-            try:
+                if existing_jersey:
+                    # Set the existing jersey number to null before assigning it to the new player
+                    existing_jersey.jersey_number = None
+                    existing_jersey.save()
+
+                # Create or update lineup entry
+                try:
                     lineup, created = Lineup.objects.update_or_create(
                         player_id=player.user_id,
                         team_id=team,
                         game_id=game,
                         tournament_id=tournament,
                         defaults={
-                            'lineup_status': 0,  # Set status as 0
                             'player_ready': False,  # Player is not ready
                             'created_by_id': request.user.id,
                         }
                     )
-
 
                     # Now, create or update the PlayerJersey instance
                     if jersey_number != 0:
@@ -789,17 +813,56 @@ class AddPlayerJerseyAPIView(APIView):
                         'team_id': team.id,
                         'game_id': game.id,
                         'tournament_id': tournament.id,
-                        'jersey_number': jersey_number,  # Now we can return the correct jersey number
+                        'jersey_number': jersey_number,  # Return the jersey number
                         'status': 1,
                         'message': _('Jersey number added, and player added to lineup with status 0.')
                     })
 
-            except IntegrityError:
-                response_data.append({
-                    'player_id': player_id,
-                    'status': 0,
-                    'message': _('An error occurred while adding the player to the lineup.')
-                })
+                except IntegrityError:
+                    response_data.append({
+                        'player_id': player_id,
+                        'status': 0,
+                        'message': _('An error occurred while adding the player to the lineup.')
+                    })
+            else:
+                # Handle case where jersey_number is 0 by setting it to null
+                try:
+                    lineup, created = Lineup.objects.update_or_create(
+                        player_id=player.user_id,
+                        team_id=team,
+                        game_id=game,
+                        tournament_id=tournament,
+                        defaults={
+                            'player_ready': False,  # Player is not ready
+                            'created_by_id': request.user.id,
+                        }
+                    )
+
+                    # Set jersey number to null
+                    player_jersey, created_jersey = PlayerJersey.objects.update_or_create(
+                        lineup_players=lineup,
+                        defaults={
+                            'jersey_number': None,  # Explicitly set to null
+                            'created_by_id': request.user.id
+                        }
+                    )
+
+                    response_data.append({
+                        'player_id': player.user_id.id,
+                        'team_id': team.id,
+                        'game_id': game.id,
+                        'tournament_id': tournament.id,
+                        'jersey_number': None,  # Indicate null jersey number in the response
+                        'status': 1,
+                        'message': _('Jersey number Deleted')
+                    })
+
+                except IntegrityError:
+                    response_data.append({
+                        'player_id': player_id,
+                        'status': 0,
+                        'message': _('An error occurred while adding the player to the lineup.')
+                    })
 
         # Return response
         return Response({

@@ -67,7 +67,7 @@ class Lineup(models.Model):
 class PlayerJersey(models.Model):
     id = models.AutoField(primary_key=True)
     lineup_players = models.ForeignKey(Lineup, on_delete=models.CASCADE)
-    jersey_number = models.IntegerField()
+    jersey_number = models.IntegerField(null=True, blank=True)
     created_by_id = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
