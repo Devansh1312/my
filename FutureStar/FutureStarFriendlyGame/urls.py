@@ -18,7 +18,7 @@ urlpatterns = [
 
       path('api/friendlygames/teamplayers/', FriendlyGameTeamPlayersAPIView.as_view()),
       path('api/friendlygames/teamplayers/add/', FriendlyGameTeamPlayersAPIView.as_view()),
-      path('api/friendlygames/teamplayers/jersey_no/', AddPlayerJerseyAPIView.as_view()),
+      path('api/friendlygames/teamplayers/jersey_no/', FriendlyAddPlayerJerseyAPIView.as_view()),
       path('api/friendlygames/teamplayers/remove/', FriendlyGameTeamPlayersAPIView.as_view()),
 
       # Lineup Management

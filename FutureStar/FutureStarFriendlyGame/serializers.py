@@ -80,6 +80,17 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
 
 
 
+class MyFriendlyGameSerializer(serializers.ModelSerializer):
+    team_a_name = serializers.CharField(source='team_a.name', read_only=True)
+    team_a_logo = serializers.ImageField(source='team_a.logo', read_only=True)
+    team_b_name = serializers.CharField(source='team_b.name', read_only=True)
+    team_b_logo = serializers.ImageField(source='team_b.logo', read_only=True)
+    game_field_id_name = serializers.CharField(source='game_field_id.name', read_only=True)
+
+    class Meta:
+        model = FriendlyGame
+        fields = '__all__'
+
 class TeamBranchSearchSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
 

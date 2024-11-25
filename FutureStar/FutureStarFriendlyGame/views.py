@@ -924,8 +924,7 @@ class FriendlyGameLineupPlayers(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 # ################## Add player jersey of particular team of particular games in particular tournament ###############
-        
-class AddPlayerJerseyAPIView(APIView):
+class FriendlyAddPlayerJerseyAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -954,71 +953,141 @@ class AddPlayerJerseyAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        # Get player_id, team_id, tournament_id, game_id, and jersey_number from request data
-        player_id = request.data.get('player_id')
+
+        # Extract required fields
         team_id = request.data.get('team_id')
         game_id = request.data.get('game_id')
-        jersey_number = request.data.get('jersey_number')
+        players_data = request.data.get('players', [])  # Expecting a list of {player_id, jersey_number}
 
-        # Check if the user has the required permissions
         if not self._has_access(request.user, team_id):
             return Response({
                 'status': 0,
-                'message': _('You do not have the required permissions to perform this action.'),
+                'message': _('You do not have permission to access this team.'),
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
-        
-        
-        # Ensure all required fields are provided
-        if not player_id or not team_id  or not game_id or not jersey_number:
+
+        # Validate required fields
+        if not team_id or not game_id or not isinstance(players_data, list) or len(players_data) == 0:
             return Response({
                 'status': 0,
-                'message': _('player_id, team_id, game_id, and jersey_number are required.'),
+                'message': _('team_id, game_id, and players (list of player_id and jersey_number) are required.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Check if the player exists in the Lineup model for the given team_id, tournament_id, and game_id
-        try:
-            lineup = FriendlyGameLineup.objects.get(player_id=player_id, team_id=team_id, game_id=game_id)
-        except FriendlyGameLineup.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('The specified player does not exist in the lineup for the given team, tournament, and game.'),
-                'data': []
-            }, status=status.HTTP_404_NOT_FOUND)
-        
-        # Check if a jersey number is already assigned for the given combination
-        if FriendlyGamePlayerJersey.objects.filter(
-            lineup_players=lineup,
-            lineup_players__team_id=team_id,
-            lineup_players__game_id=game_id,
-            jersey_number=jersey_number
-        ).exists():
-            return Response({
-                'status': 0,
-                'message': _('This jersey number is already assigned to another player in the lineup for the specified team, game, and tournament.'),
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Create and save the PlayerJersey entry
-        player_jersey = FriendlyGamePlayerJersey.objects.create(
-            lineup_players=lineup,
-            jersey_number=jersey_number,
-            created_by_id=request.user.id 
-        )
-        
-        # Return success response with player and jersey details
+
+        # Initialize response data
+        response_data = []
+
+        for player in players_data:
+            player_id = player.get('player_id')
+            jersey_number = player.get('jersey_number', 0)  # Default to 0 if not provided
+
+            if not player_id:
+                response_data.append({
+                    'player_id': None,
+                    'status': 0,
+                    'message': _('player_id is required.')
+                })
+                continue
+
+            # Validate team, player, tournament, and game existence
+            try:
+                team = TeamBranch.objects.get(id=team_id)
+            except TeamBranch.DoesNotExist:
+                response_data.append({
+                    'player_id': player_id,
+                    'status': 0,
+                    'message': _('The specified team does not exist.')
+                })
+                continue
+
+         
+
+            try:
+                game = FriendlyGame.objects.get(id=game_id)
+            except FriendlyGame.DoesNotExist:
+                response_data.append({
+                    'player_id': player_id,
+                    'status': 0,
+                    'message': _('The specified game does not exist.')
+                })
+                continue
+
+            # Validate that the team is part of the game
+            if team_id != game.team_a.id and team_id != game.team_b.id:
+                response_data.append({
+                    'player_id': player_id,
+                    'status': 0,
+                    'message': _('The specified team is not part of this game.')
+                })
+                continue
+
+            # Validate the player is part of the team
+            try:
+                player = JoinBranch.objects.get(
+                    branch_id=team_id,
+                    joinning_type=JoinBranch.PLAYER_TYPE,
+                    user_id=player_id
+                )
+            except JoinBranch.DoesNotExist:
+                response_data.append({
+                    'player_id': player_id,
+                    'status': 0,
+                    'message': _('The specified player is not part of this team.')
+                })
+                continue
+
+            # Check for duplicate jersey numbers
+            if jersey_number != 0 and FriendlyGameLineup.objects.filter(
+                team_id=team,
+                game_id=game,
+                player_ready=False,
+                player_id__isnull=False,
+                jersey_number=jersey_number
+            ).exists():
+                response_data.append({
+                    'player_id': player_id,
+                    'status': 0,
+                    'message': _('This jersey number is already assigned to another player in the lineup.')
+                })
+                continue
+
+            # Create or update lineup entry
+            try:
+                lineup, created = FriendlyGameLineup.objects.update_or_create(
+                    player_id=player.user_id,
+                    team_id=team,
+                    game_id=game,
+                    
+                    defaults={
+                        'lineup_status': 0,  # Set status as 0
+                        'player_ready': False,  # Player is not ready
+                        'created_by_id': request.user.id,
+                        'jersey_number': jersey_number if jersey_number != 0 else None  # Null if jersey number is 0
+                    }
+                )
+                response_data.append({
+                    'player_id': player.user_id.id,
+                    'team_id': team.id,
+                    'game_id': game.id,
+                    
+                    'jersey_number': lineup.jersey_number,
+                    'status': 1,
+                    'message': _('Jersey number added, and player added to lineup with status 0.')
+                })
+            except IntegrityError:
+                response_data.append({
+                    'player_id': player_id,
+                    'status': 0,
+                    'message': _('An error occurred while adding the player to the lineup.')
+                })
+
+        # Return response
         return Response({
             'status': 1,
-            'message': _('Jersey number added successfully for the player.'),
-            'data': {
-                'player_id': lineup.player_id.id,
-                'team_id': lineup.team_id.id,
-                'game_id': lineup.game_id.id,
-                'jersey_number': player_jersey.jersey_number
-            }
-        }, status=status.HTTP_201_CREATED)
+            'message': _('Processed all players successfully.'),
+            'data': response_data
+        }, status=status.HTTP_200_OK)
+
 
 # ################## Players games stats in tournament ###############
 
