@@ -53,6 +53,11 @@ urlpatterns = [
         path('api/tournaments/comments/create/', TournamentCommentCreateAPIView.as_view()),
 
         path('api/upcoming/games/', UpcomingGameView.as_view()),
+        path('api/my_games/', FetchMyGamesAPIView.as_view()),
+        path('api/all_games/', FetchMyGamesAPIView.as_view()),
+
+
+
 
 
 

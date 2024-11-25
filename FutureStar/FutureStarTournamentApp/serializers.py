@@ -266,11 +266,14 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
     team_a_name = serializers.SerializerMethodField()
     team_b_name = serializers.SerializerMethodField()
     game_field_name = serializers.SerializerMethodField()
-    
+    team_a_position = serializers.SerializerMethodField()
+    team_b_position = serializers.SerializerMethodField()
+
     class Meta:
         model = TournamentGames
         fields = ['id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal', 
-                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo']
+                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo',
+                  'team_a_position', 'team_b_position']
 
     def get_team_a_logo(self, obj):
         # Access the logo for team A through select_related to avoid extra queries
@@ -287,19 +290,38 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
         return None
 
     def get_team_a_name(self, obj):
-        # Access the team name for team A
         return obj.team_a.team_name if obj.team_a else None
 
     def get_team_b_name(self, obj):
-        # Access the team name for team B
         return obj.team_b.team_name if obj.team_b else None
 
     def get_game_field_name(self, obj):
-        # Access the field name directly
         return obj.game_field_id.field_name if obj.game_field_id else None
+
+    def get_team_a_position(self, obj):
+        # Fetch the position of team A from context
+        team_positions = self.context.get('team_positions', {})
+        return team_positions.get(obj.team_a.id, None) if obj.team_a else None
+
+    def get_team_b_position(self, obj):
+        # Fetch the position of team B from context
+        team_positions = self.context.get('team_positions', {})
+        return team_positions.get(obj.team_b.id, None) if obj.team_b else None
     
 
-    
+class TournamentGameSerializer(serializers.ModelSerializer):
+    tournament_name = serializers.CharField(source='tournament_id.name', read_only=True)
+    group_id_name = serializers.CharField(source='group_id.name', read_only=True)
+    team_a_name = serializers.CharField(source='team_a.name', read_only=True)
+    team_a_logo = serializers.ImageField(source='team_a.logo', read_only=True)
+    team_b_name = serializers.CharField(source='team_b.name', read_only=True)
+    team_b_logo = serializers.ImageField(source='team_b.logo', read_only=True)
+    game_field_id_name = serializers.CharField(source='game_field_id.name', read_only=True)
+
+    class Meta:
+        model = TournamentGames
+        fields = '__all__'
+
 
 class DetailedTournamentGroupTeamSerializer(serializers.ModelSerializer):
     class Meta:
