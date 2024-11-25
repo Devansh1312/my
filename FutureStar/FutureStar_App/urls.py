@@ -269,9 +269,8 @@ urlpatterns = [
     # path('search-users/',search_users, name='search_users'),
     # path('assign-game-handler/',assign_game_handler, name='assign_game_handler'),
 
-    path('games/', TournamentGameListView.as_view(), name='games_list'),
-    path('game-edit/', TournamentGameEditView.as_view(), name='game_edit'),
-    # path('game-view/', TournamentGameView.as_view(), name='game_view'),
+    path('games/', TournamentGameStatsView.as_view(), name='games_list'),
+    path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
 
 
 

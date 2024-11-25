@@ -7,15 +7,8 @@
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 {% endblock %}
 
-<style>
-   .is-invalid {
-       border-color: #dc3545;
-       background-color: #f8d7da;
-   }
-</style>
-
 {% block title %}
-Tournament Games
+Tournament Games Stats
 {% endblock %}
 
 {% block content %}
@@ -33,13 +26,14 @@ Tournament Games
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="display" id="basic-1">
+                            <table class="display" id="stats-table">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Tournament Name</th>
+                                        <th>Tournament</th>
                                         <th>Game Number</th>
-                                        <th>Game Date</th>
+                                        <th>Team A</th>
+                                        <th>Team B</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -49,61 +43,15 @@ Tournament Games
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ game.tournament_id.tournament_name }}</td>
                                         <td>{{ game.game_number }}</td>
-                                        <td>{{ game.game_date }}</td>
+                                        <td>{{ game.team_a.team_name }}</td>
+                                        <td>{{ game.team_b.team_name }}</td>
                                         <td>
-                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                <a href="#" class="three-dots-menu">
-                                                    <i data-feather="more-vertical"></i>
-                                                </a>
-                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                                      
-                                                        <!-- View Button -->
-                                                        <li style="padding: 8px 12px; border-bottom: 1px solid #eee;">
-                                                            <a style="font-size: large;" href="#" class="view-game-btn" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#viewGameModal"
-                                                                data-game-id="{{ game.id }}" 
-                                                                data-game-number="{{ game.game_number }}"
-                                                                data-game-date="{{ game.game_date }}" 
-                                                                data-game-start-time="{{ game.game_start_time }}" 
-                                                                data-game-end-time="{{ game.game_end_time }}" 
-                                                                data-team-a="{{ game.team_a.team_name }}" 
-                                                                data-team-a-goal="{{ game.team_a_goal }}" 
-                                                                data-team-b="{{ game.team_b.team_name  }}" 
-                                                                data-team-b-goal="{{ game.team_b_goal }}">
-                                                                View
-                                                            </a>
-                                                            <form id="view-form-{{ game.id }}" method="post" action="#" style="display: none;">
-                                                                {% csrf_token %}
-                                                                <input type="hidden" name="game_id" value="{{ game.id }}">
-                                                            </form>
-                                                        </li>
-                                                        <!-- Edit Button -->
-                                                        <li style="padding: 8px 12px;">
-                                                            <a style="font-size: large;" href="#" class="edit-game-btn" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#editGameModal"
-                                                                data-game-id="{{ game.id }}" 
-                                                                data-game-number="{{ game.game_number }}"
-                                                                data-game-date="{{ game.game_date }}" 
-                                                                data-game-start-time="{{ game.game_start_time }}" 
-                                                                data-game-end-time="{{ game.game_end_time }}" 
-                                                                data-team-a="{{ game.team_a.id  }}" 
-                                                                data-team-a-goal="{{ game.team_a_goal }}" 
-                                                                data-team-b="{{ game.team_b.id  }}" 
-                                                                data-team-b-goal="{{ game.team_b_goal }}">
-                                                                Edit
-                                                            </a>
-                                                            <form id="edit-form-{{ game.id }}" method="post" action="{% url 'game_edit' %}" style="display: none;">
-                                                                {% csrf_token %}
-                                                                <input type="hidden" name="game_id" value="{{ game.id }}">
-                                                            </form>
-                                                        </li>
-                                                        
-                                                    </ul>
-                                                </div>
-                                            </div>
+                                            <a href="#" class="btn btn-primary btn-sm edit-stats-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editStatsModal"
+                                                data-game-id="{{ game.id }}">
+                                                Edit Stats
+                                            </a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -117,81 +65,12 @@ Tournament Games
     </div>
 </div>
 
-
-<!-- View Game Modal -->
-<div class="modal fade" id="viewGameModal" tabindex="-1" aria-labelledby="viewGameModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- Edit Stats Modal -->
+<div class="modal fade" id="editStatsModal" tabindex="-1" aria-labelledby="editStatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewGameModalLabel">View Game Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Game Number:</strong> <span id="viewGameNumber"></span></p>
-                <p><strong>Game Date:</strong> <span id="viewGameDate"></span></p>
-                <p><strong>Start Time:</strong> <span id="viewGameStartTime"></span></p>
-                <p><strong>End Time:</strong> <span id="viewGameEndTime"></span></p>
-                <p><strong>Team A:</strong> <span id="viewTeamA"></span> (<span id="viewTeamAGoal"></span>)</p>
-                <p><strong>Team B:</strong> <span id="viewTeamB"></span> (<span id="viewTeamBGoal"></span>)</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Game Modal -->
-<div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editGameModalLabel">Edit Game Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post" id="editGameForm" action="{% url 'game_edit' %}">
-                    {% csrf_token %}
-                    <input type="hidden" id="editGameId" name="id" />
-                    <div class="mb-3">
-                        <label for="editGameNumber" class="form-label">Game Number</label>
-                        <input type="text" class="form-control" id="editGameNumber" name="game_number">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editGameDate" class="form-label">Game Date</label>
-                        <input type="date" class="form-control" id="editGameDate" name="game_date">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editGameStartTime" class="form-label">Start Time</label>
-                        <input type="time" class="form-control" id="editGameStartTime" name="game_start_time">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editGameEndTime" class="form-label">End Time</label>
-                        <input type="time" class="form-control" id="editGameEndTime" name="game_end_time">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTeamA" class="form-label">Team A</label>
-                        <select class="form-control" id="editTeamA" name="team_a">
-                            {% for team in teams %}
-                            <option value="{{ team.id }}">{{ team.team_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTeamAGoal" class="form-label">Team A Goals</label>
-                        <input type="number" class="form-control" id="editTeamAGoal" name="team_a_goal">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTeamB" class="form-label">Team B</label>
-                        <select class="form-control" id="editTeamB" name="team_b">
-                            {% for team in teams %}
-                            <option value="{{ team.id }}">{{ team.team_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTeamBGoal" class="form-label">Team B Goals</label>
-                        <input type="number" class="form-control" id="editTeamBGoal" name="team_b_goal">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
+            <div class="modal-body" id="modalContent">
+                <!-- Dynamic content will be loaded here -->
             </div>
         </div>
     </div>
@@ -199,77 +78,40 @@ Tournament Games
 
 
 {% endblock %}
-
 
 {% block script %}
-<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
-<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
-<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
-
-
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.edit-stats-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const gameId = this.dataset.gameId;
 
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // View Modal Data Population
-        document.querySelectorAll('.view-game-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.getElementById('viewGameNumber').textContent = this.dataset.gameNumber;
-                document.getElementById('viewGameDate').textContent = this.dataset.gameDate;
-                document.getElementById('viewGameStartTime').textContent = this.dataset.gameStartTime;
-                document.getElementById('viewGameEndTime').textContent = this.dataset.gameEndTime;
-                document.getElementById('viewTeamA').textContent = this.dataset.teamA;
-                document.getElementById('viewTeamAGoal').textContent = this.dataset.teamAGoal;
-                document.getElementById('viewTeamB').textContent = this.dataset.teamB;
-                document.getElementById('viewTeamBGoal').textContent = this.dataset.teamBGoal;
-            });
-        });
-    
-        // Edit Modal Data Population
-        document.querySelectorAll('.edit-game-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.getElementById('editGameId').value = this.dataset.gameId;
-                document.getElementById('editGameNumber').value = this.dataset.gameNumber;
-                document.getElementById('editGameDate').value = this.dataset.gameDate;
-                document.getElementById('editGameStartTime').value = this.dataset.gameStartTime;
-                document.getElementById('editGameEndTime').value = this.dataset.gameEndTime;
-                document.getElementById('editTeamA').value = this.dataset.teamA;
-                document.getElementById('editTeamAGoal').value = this.dataset.teamAGoal;
-                document.getElementById('editTeamB').value = this.dataset.teamB;
-                document.getElementById('editTeamBGoal').value = this.dataset.teamBGoal;
-            });
+            // Make an AJAX request to fetch the form
+            fetch(`/games/edit/${gameId}/`)
+                .then(response => response.json())  // Ensure response is parsed as JSON
+                .then(data => {
+                    if (data.html) {
+                        // Inject the fetched HTML into the modal content div
+                        document.getElementById('modalContent').innerHTML = data.html;
+                        // Manually trigger the modal to show after content is loaded
+                        $('#editStatsModal').modal('show');
+                    } else if (data.error) {
+                        // Handle errors by showing an alert or error modal
+                        alert(data.error);  // You can replace this with your custom error handling
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading the game stats form:", error);
+                });
         });
     });
 
-
-    $(document).ready(function() {
-        $('#basic-1').DataTable();
-    });
-
-    // Toggle the visibility of the action card
-    document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-        menu.addEventListener('click', function(event) {
-            event.preventDefault();
-            var actionCard = menu.nextElementSibling;
-            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-            // Close other open action cards
-            document.querySelectorAll('.action-card').forEach(function(card) {
-                if (card !== actionCard) {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
+    // Initialize DataTable
+    $('#stats-table').DataTable();
+});
+console.log("Game ID:", gameId);  // Log the game ID to ensure it's correct
 
 
-    // Close the action card when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.action-menu-container')) {
-            document.querySelectorAll('.action-card').forEach(function(card) {
-                card.style.display = 'none';
-            });
-        }
-    });
 </script>
 {% endblock %}
-

@@ -34,6 +34,7 @@ from FutureStarGameSystem.models import *
 from django.utils.safestring import mark_safe
 from django.db.models import F, Case, When, IntegerField
 from django.utils.timezone import now
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def user_role_check(view_func):
@@ -6094,28 +6095,55 @@ def fetch_users(request):
 #             form.save()
 #             return JsonResponse({"success": True, "message": "Game updated successfully."})
 #         return JsonResponse({"success": False, "errors": form.errors}, status=400)
-
-
 @method_decorator(user_role_check, name='dispatch')
-class TournamentGameListView(LoginRequiredMixin, View):
+class TournamentGameStatsView(LoginRequiredMixin, View):
     template_name = "Admin/Games/ListOfGames.html"
 
     def get(self, request):
-        games = TournamentGames.objects.all().select_related('tournament_id', 'group_id', 'team_a', 'team_b', 'game_field_id')
+        games = TournamentGames.objects.all().select_related('tournament_id', 'team_a', 'team_b')
         return render(
             request,
             self.template_name,
-            {"games": games, "breadcrumb": {"parent": "Tournament", "child": "Games"}}
+            {"games": games, "breadcrumb": {"parent": "Tournament", "child": "Game Stats"}}
         )
-        
 @method_decorator(user_role_check, name='dispatch')
-class TournamentGameEditView(LoginRequiredMixin, View):
-    def post(self, request):
-        form = TournamentGameForm(request.POST)
+class TournamentGameEditStatsView(LoginRequiredMixin, View):
+    template_name = "Admin/Games/EditGameStatsModal.html"
+
+    def get(self, request, game_id):
+        try:
+            # Get the game object based on ID
+            game = TournamentGames.objects.get(id=game_id)
+            form = TournamentGameForm(instance=game)
+            
+            # Check if the request is AJAX (indicated by 'X-Requested-With' header)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Render the form as a string and return as JSON response
+                html = render_to_string(self.template_name, {'form': form, 'game': game})
+                return JsonResponse({'html': html})  # Return HTML as JSON object
+            
+            # Non-AJAX request, return regular response (optional, for regular page load)
+            return render(request, 'Admin/Games/EditGameStatsModal.html', {'form': form, 'game': game})
+        
+        except ObjectDoesNotExist:
+            # Return an error message as JSON if game is not found
+            return JsonResponse({'error': 'Game not found'}, status=404)
+
+        except Exception as e:
+            # Handle other unexpected exceptions and return the error as JSON
+            return JsonResponse({'error': str(e)}, status=500)
+        
+    def post(self, request, game_id):
+        try:
+            game = TournamentGames.objects.get(id=game_id)
+        except TournamentGames.DoesNotExist:
+            return redirect('games_list')  # Redirect if game does not exist
+
+        form = TournamentGameForm(request.POST, instance=game)
         if form.is_valid():
-            game = TournamentGames.objects.get(id=request.POST.get('id'))
-            for field in form.cleaned_data:
-                setattr(game, field, form.cleaned_data[field])
-            game.save()
-            return JsonResponse({'success': True, 'message': 'Game updated successfully!'})
-        return JsonResponse({'success': False, 'errors': form.errors})
+            form.save()
+            messages.success(request, 'Stats updated successfully!')
+            return JsonResponse({'success': True})
+        else:
+            html = render_to_string(self.template_name, {'form': form, 'game': game})
+            return JsonResponse({'success': False, 'html': html})
