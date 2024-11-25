@@ -270,8 +270,8 @@ urlpatterns = [
     # path('assign-game-handler/',assign_game_handler, name='assign_game_handler'),
 
     path('games/', TournamentGameListView.as_view(), name='games_list'),
-    path('game-edit/<int:pk>/', TournamentGameEditView.as_view(), name='game_edit'),
-    path('game-view/<int:game_id>/', TournamentGameView.as_view(), name='game_view'),
+    path('game-edit/', TournamentGameEditView.as_view(), name='game_edit'),
+    # path('game-view/', TournamentGameView.as_view(), name='game_view'),
 
 
 
