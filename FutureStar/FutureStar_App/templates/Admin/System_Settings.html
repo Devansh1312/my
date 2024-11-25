@@ -247,6 +247,82 @@
                         </div>
                     </div>
                     <div class="row" style="margin-bottom: 10px;">
+                        <h4>Mobile Settings</h4>
+                    </div>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+                    
+                    <!-- Splash Screen -->
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="splash_screen">Splash Screen</label>
+                                <input class="form-control btn-pill" id="splash_screen" name="splash_screen" type="file">
+                                {% if system_settings.splash_screen %}
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.splash_screen }}" alt="Splash Screen" style="width: 35px; height: 121px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Intro 1 Image -->
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="intro1_image">Intro 1 Image</label>
+                                <input class="form-control btn-pill" id="intro1_image" name="intro1_image" type="file">
+                                {% if system_settings.intro1_image %}
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.intro1_image }}" alt="Intro 1 Image" style="width: 35px; height: 121px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    
+                        <!-- Intro 2 Image -->
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="intro2_image">Intro 2 Image</label>
+                                <input class="form-control btn-pill" id="intro2_image" name="intro2_image" type="file">
+                                {% if system_settings.intro2_image %}
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.intro2_image }}" alt="Intro 2 Image" style="width: 35px; height: 121px;">
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    
+                        <!-- Intro 3 Image -->
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="intro3_image">Intro 3 Image</label>
+                                <input class="form-control btn-pill" id="intro3_image" name="intro3_image" type="file">
+                                {% if system_settings.intro3_image %}
+                                    <img src="{{ MEDIA_URL }}{{ system_settings.intro3_image }}" alt="Intro 3 Image" style="width: 35px; height: 121px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    
+                        <!-- Intro 1 Text -->
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="intro1_text">Intro 1 Text</label>
+                                <input class="form-control btn-pill" id="intro1_text" name="intro1_text" type="text" value="{{ system_settings.intro1_text }}">
+                            </div>
+                        </div>
+                    
+                        <!-- Intro 2 Text -->
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="intro2_text">Intro 2 Text</label>
+                                <input class="form-control btn-pill" id="intro2_text" name="intro2_text" type="text" value="{{ system_settings.intro2_text }}">
+                            </div>
+                        </div>
+                    
+                        <!-- Intro 3 Text -->
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="intro3_text">Intro 3 Text</label>
+                                <input class="form-control btn-pill" id="intro3_text" name="intro3_text" type="text" value="{{ system_settings.intro3_text }}">
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="row" style="margin-bottom: 10px;">
                         <h4>Other Settings</h4>
                     </div>
                     <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>

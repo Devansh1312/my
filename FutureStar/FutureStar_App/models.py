@@ -233,6 +233,18 @@ class SystemSettings(models.Model):
     proffesioan_team_members = models.CharField(max_length=30,null=True, blank=True)
     awards_winning = models.CharField(max_length=30,null=True, blank=True)
 
+    splash_screen = models.CharField(max_length=255, null=True, blank=True)
+    intro1_image = models.CharField(max_length=255, null=True, blank=True)
+    intro2_image = models.CharField(max_length=255, null=True, blank=True)
+    intro3_image = models.CharField(max_length=255, null=True, blank=True)
+
+    intro1_text = models.CharField(max_length=255, null=True, blank=True)
+    intro2_text = models.CharField(max_length=255, null=True, blank=True)
+    intro3_text = models.CharField(max_length=255, null=True, blank=True)
+
+
+
+
     def __str__(self):
         return self.website_name_english
     

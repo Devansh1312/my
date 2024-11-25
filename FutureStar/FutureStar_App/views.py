@@ -374,125 +374,91 @@ class System_Settings(LoginRequiredMixin, View):
         if not system_settings:
             system_settings = SystemSettings()
 
-        fs = FileSystemStorage(
-            location=os.path.join(settings.MEDIA_ROOT, "System_Settings")
-        )
+        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "System_Settings"))
 
         errors = {}
         success = False
 
         try:
-            # Handle fav_icon
-            if "fav_icon" in request.FILES:
-                if system_settings.fav_icon:
-                    old_fav_icon_path = os.path.join(
-                        settings.MEDIA_ROOT, system_settings.fav_icon
-                    )
-                    if os.path.isfile(old_fav_icon_path):
-                        os.remove(old_fav_icon_path)
-                fav_icon_file = request.FILES["fav_icon"]
-                file_extension = fav_icon_file.name.split('.')[-1]
-                unique_suffix = get_random_string(8)
-                fav_icon_filename = f"favicon_{unique_suffix}.{file_extension}"
-                fs.save(fav_icon_filename, fav_icon_file)
-                system_settings.fav_icon = os.path.join(
-                    "System_Settings", fav_icon_filename
-                )
+            # Handle file uploads: Fav Icon, Footer Logo, Header Logo, and Images
+            file_fields = {
+                "fav_icon": "fav_icon",
+                "footer_logo": "footer_logo",
+                "header_logo": "header_logo",
+                "splash_screen": "splash_screen",
+                "intro1_image": "intro1_image",
+                "intro2_image": "intro2_image",  # Corrected the typo in code
+                "intro3_image": "intro3_image",
+            }
 
-            # Handle footer_logo
-            if "footer_logo" in request.FILES:
-                if system_settings.footer_logo:
-                    old_footer_logo_path = os.path.join(
-                        settings.MEDIA_ROOT, system_settings.footer_logo
-                    )
-                    if os.path.isfile(old_footer_logo_path):
-                        os.remove(old_footer_logo_path)
-                footer_logo_file = request.FILES["footer_logo"]
-                file_extension = footer_logo_file.name.split('.')[-1]
-                unique_suffix = get_random_string(8)
-                footer_logo_filename = f"footer_logo_{unique_suffix}.{file_extension}"
-                fs.save(footer_logo_filename, footer_logo_file)
-                system_settings.footer_logo = os.path.join(
-                    "System_Settings", footer_logo_filename
-                )
+            for field_name, field_label in file_fields.items():
+                if field_name in request.FILES:
+                    field_file = request.FILES[field_name]
+                    current_file = getattr(system_settings, field_label, None)
 
-            # Handle header_logo
-            if "header_logo" in request.FILES:
-                if system_settings.header_logo:
-                    old_header_logo_path = os.path.join(
-                        settings.MEDIA_ROOT, system_settings.header_logo
-                    )
-                    if os.path.isfile(old_header_logo_path):
-                        os.remove(old_header_logo_path)
-                header_logo_file = request.FILES["header_logo"]
-                file_extension = header_logo_file.name.split('.')[-1]
-                unique_suffix = get_random_string(8)
-                header_logo_filename = f"header_logo_{unique_suffix}.{file_extension}"
-                fs.save(header_logo_filename, header_logo_file)
-                system_settings.header_logo = os.path.join(
-                    "System_Settings", header_logo_filename
-                )
+                    # Remove old file if it exists
+                    if current_file:
+                        old_file_path = os.path.join(settings.MEDIA_ROOT, current_file)
+                        if os.path.isfile(old_file_path):
+                            os.remove(old_file_path)
 
-            # Validate and save other fields
-            system_settings.website_name_english = request.POST.get(
-                "website_name_english"
-            )
-            system_settings.website_name_arabic = request.POST.get(
-                "website_name_arabic"
-            )
-            system_settings.phone = request.POST.get("phone")
-            system_settings.email = request.POST.get("email")
-            system_settings.address = request.POST.get("address")
-            system_settings.currency_symbol = request.POST.get("currency_symbol")
-            system_settings.event_convenience_fee = request.POST.get("event_convenience_fee")
-            system_settings.instagram = request.POST.get("instagram")
-            system_settings.facebook = request.POST.get("facebook")
-            system_settings.twitter = request.POST.get("twitter")
-            system_settings.linkedin = request.POST.get("linkedin")
-            system_settings.pinterest = request.POST.get("pinterest")
-            system_settings.happy_user = request.POST.get("happy_user")
-            system_settings.line_of_code = request.POST.get("line_of_code")
-            system_settings.downloads = request.POST.get("downloads")
-            system_settings.app_rate = request.POST.get("app_rate")
-            system_settings.years_of_experience = request.POST.get(
-                "years_of_experience"
-            )
-            system_settings.project_completed = request.POST.get("project_completed")
-            system_settings.proffesioan_team_members = request.POST.get(
-                "proffesioan_team_members"
-            )
-            system_settings.awards_winning = request.POST.get("awards_winning")
+                    # Save the new file
+                    file_extension = field_file.name.split('.')[-1]
+                    unique_suffix = get_random_string(8)
+                    file_filename = f"{field_label}_{unique_suffix}.{file_extension}"
+                    fs.save(file_filename, field_file)
+                    setattr(system_settings, field_label, os.path.join("System_Settings", file_filename))
 
-            fields = {
+            # Handle text fields: intro1_text, intro2_text, intro3_text
+            text_fields = ['intro1_text', 'intro2_text', 'intro3_text']
+            for field_name in text_fields:
+                field_value = request.POST.get(field_name)
+                if field_value:
+                    setattr(system_settings, field_name, field_value)
+
+            # Handle other settings fields from request.POST
+            settings_fields = {
                 "website_name_english": "This field is required.",
                 "website_name_arabic": "This field is required.",
                 "phone": "This field is required.",
                 "email": "This field is required.",
                 "address": "This field is required.",
+                "currency_symbol": "This field is required.",
+                "event_convenience_fee": "This field is required.",
                 "happy_user": "This field is required.",
                 "line_of_code": "This field is required.",
                 "downloads": "This field is required.",
                 "app_rate": "This field is required.",
-                "currency_symbol": "This field is required.",
-                "event_convenience_fee":"This field is required.",
+                "instagram": None,
+                "facebook": None,
+                "twitter": None,
+                "linkedin": None,
+                "pinterest": None,
+                "years_of_experience": None,
+                "project_completed": None,
+                "proffesioan_team_members": None,
+                "awards_winning": None,
             }
 
-            for field, error_message in fields.items():
-                if not getattr(system_settings, field):
+            for field, error_message in settings_fields.items():
+                field_value = request.POST.get(field)
+                if not field_value and error_message:
                     errors[field] = error_message
+                else:
+                    setattr(system_settings, field, field_value)
 
-            # Add additional validations as needed
-
+            # Check if there are any errors
             if errors:
                 messages.error(request, "Please correct the errors below.")
             else:
                 system_settings.save()
                 success = True
-                messages.success(request, "System settings Updated Successfully.")
+                messages.success(request, "System settings updated successfully.")
 
         except Exception as e:
             messages.error(request, f"An error occurred: {e}")
 
+        # Handle the response based on errors or success
         if errors:
             return render(
                 request,
@@ -500,10 +466,7 @@ class System_Settings(LoginRequiredMixin, View):
                 {
                     "system_settings": system_settings,
                     "MEDIA_URL": settings.MEDIA_URL,
-                    "breadcrumb": {
-                        "parent": "Admin",
-                        "child": "System Settings",
-                    },
+                    "breadcrumb": {"parent": "Admin", "child": "System Settings"},
                     "errors": errors,
                 },
             )
@@ -511,6 +474,7 @@ class System_Settings(LoginRequiredMixin, View):
             return redirect("System_Settings")
         else:
             return redirect("System_Settings")
+
 
 
 #######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
