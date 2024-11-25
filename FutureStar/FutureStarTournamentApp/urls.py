@@ -25,8 +25,8 @@ urlpatterns = [
         path('api/tournament/games/update/', TournamentGamesAPIView.as_view()),
 
         path('api/games/team_uniform/', TeamUniformColorAPIView.as_view()),
-        path('api/games/fetch_team_uniform/', FetchTeamUniformColorAPIView.as_view()),
-
+        path('api/games/refree/fetch_team_uniform/', FetchTeamUniformColorAPIView.as_view()),
+        path('api/games/uniform_fetch/',GameUniformColorAPIView.as_view()),
 
 
 

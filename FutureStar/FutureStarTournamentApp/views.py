@@ -1410,13 +1410,20 @@ class TournamentGamesDetailAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-################################ Get Uniform API when Screen Call ######################
+################################ Get Uniform API when first Screen Call ######################
 class GameUniformColorAPIView(APIView):
     def get(self, request, *args, **kwargs):
         team_id = request.query_params.get('team_id')
         tournament_id = request.query_params.get('tournament_id')
         game_id = request.query_params.get('game_id')
-
+        user_role = request.user.role.id
+        if user_role not in [3, 6]:
+            return Response({
+            'status': 0,
+            'message': _('Access denied. You do not have the necessary role for this action.'),
+            'data': None,
+        }, status=status.HTTP_403_FORBIDDEN)
+        
         try:
             game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
         except TournamentGames.DoesNotExist:
@@ -1457,6 +1464,9 @@ class GameUniformColorAPIView(APIView):
 
 
 ############################### Uniform Color APIS #########################################
+
+####### Uniform Color Set Post APi ##############
+
 class TeamUniformColorAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1542,7 +1552,9 @@ class TeamUniformColorAPIView(APIView):
             'message': _('Invalid data.'),
             'data': serializer.errors,
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+############ Fetch both team uniform using refree #######################
 class FetchTeamUniformColorAPIView(APIView):
     def _has_access(self, user, game_id=None, tournament_id=None):
         """
@@ -1582,22 +1594,22 @@ class FetchTeamUniformColorAPIView(APIView):
 
         game_id = request.query_params.get('game_id')
         tournament_id = request.query_params.get('tournament_id')
-        team_id = request.query_params.get('team_id')
 
-        if not game_id or not tournament_id or not team_id:
+        if not game_id or not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('game_id, tournament_id, and team_id are required.'),
+                'message': _('game_id and tournament_id are required.'),
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
-        if not self._has_access(request.user, team_id):
-                return Response({
-                    'status': 0,
-                    'message': _('Access denied. You do not have permission for this team.'),
-                    'data': None,
-                }, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+            return Response({
+                'status': 0,
+                'message': _('Access denied. You do not have permission for this game.'),
+                'data': None,
+            }, status=status.HTTP_403_FORBIDDEN)
 
         try:
+            # Fetch the game based on the tournament and game ID
             game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
         except TournamentGames.DoesNotExist:
             return Response({
@@ -1606,216 +1618,37 @@ class FetchTeamUniformColorAPIView(APIView):
                 'data': None,
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Retrieve the uniform colors for the specified team
-        if team_id == game.team_a.id:
-            response_data = {
-                "team_id": team_id,
-                "primary_color_player": game.team_a_primary_color_player,
-                "secondary_color_player": game.team_a_secondary_color_player,
-                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
-            }
-        elif team_id == game.team_b.id:
-            response_data = {
-                "team_id": team_id,
-                "primary_color_player": game.team_b_primary_color_player,
-                "secondary_color_player": game.team_b_secondary_color_player,
-                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
-            }
-        else:
-            return Response({
-                'status': 0,
-                'message': _('The specified team_id does not match any team in this game.'),
-                'data': None,
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Retrieve the team information for team_a and team_b
+        team_a_data = {
+            "team_id": game.team_a.id,
+            "team_name": game.team_a.team_name,  # Assuming the `TeamBranch` model has a `name` field
+            "primary_color_player": game.team_a_primary_color_player,
+            "secondary_color_player": game.team_a_secondary_color_player,
+            "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+            "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+        }
+
+        team_b_data = {
+            "team_id": game.team_b.id,
+            "team_name": game.team_b.team_name,  # Assuming the `TeamBranch` model has a `name` field
+            "primary_color_player": game.team_b_primary_color_player,
+            "secondary_color_player": game.team_b_secondary_color_player,
+            "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+            "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+        }
 
         return Response({
             'status': 1,
-            'message': _('Uniform Fetch Successfully'),
-            'data': response_data,
+            'message': _('Uniform information fetched successfully.'),
+            'data': {
+                'team_a': team_a_data,
+                'team_b': team_b_data
+            },
         }, status=status.HTTP_200_OK)
-class TeamUniformColorAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def _has_access(self, user, team_id):
-        """
-        Check if the user has the required role and valid membership in the team.
-        """
-        if user.role.id not in [3, 6]:  # Restrict roles
-            return False
-
-        try:
-            JoinBranch.objects.get(
-                branch_id_id=team_id,
-                user_id=user,
-                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE],
-            )
-            return True
-        except ObjectDoesNotExist:
-            return False
-
-    def post(self, request):
-        # Activate language preference
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        serializer = TeamUniformColorSerializer(data=request.data)
-        if serializer.is_valid():
-            validated_data = serializer.validated_data
-            game_id = validated_data['game_id']
-            tournament_id = validated_data['tournament_id']
-            team_id = validated_data['team_id']
-            primary_color_player = validated_data['primary_color_player']
-            secondary_color_player = validated_data['secondary_color_player']
-            primary_color_goalkeeper = validated_data['primary_color_goalkeeper']
-            secondary_color_goalkeeper = validated_data['secondary_color_goalkeeper']
-
-            if not self._has_access(request.user, team_id):
-                return Response({
-                    'status': 0,
-                    'message': _('Access denied. You do not have permission for this team.'),
-                    'data': None,
-                }, status=status.HTTP_403_FORBIDDEN)
-
-            try:
-                game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
-            except TournamentGames.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Game not found.'),
-                    'data': None,
-                }, status=status.HTTP_404_NOT_FOUND)
-
-            # Update uniform colors for the matched team
-            if team_id == game.team_a.id:
-                game.team_a_primary_color_player = primary_color_player
-                game.team_a_secondary_color_player = secondary_color_player
-                game.team_a_primary_color_goalkeeper = primary_color_goalkeeper
-                game.team_a_secondary_color_goalkeeper = secondary_color_goalkeeper
-            elif team_id == game.team_b.id:
-                game.team_b_primary_color_player = primary_color_player
-                game.team_b_secondary_color_player = secondary_color_player
-                game.team_b_primary_color_goalkeeper = primary_color_goalkeeper
-                game.team_b_secondary_color_goalkeeper = secondary_color_goalkeeper
-            else:
-                return Response({
-                    'status': 0,
-                    'message': _('The specified team_id does not match any team in this game.'),
-                    'data': None,
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            game.save()
-
-            return Response({
-                'status': 1,
-                'message': _('Uniform Added Successfully'),
-                'data': serializer.validated_data,
-            }, status=status.HTTP_200_OK)
-
-        return Response({
-            'status': 0,
-            'message': _('Invalid data.'),
-            'data': serializer.errors,
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-class FetchTeamUniformColorAPIView(APIView):
-    def _has_access(self, user, game_id=None, tournament_id=None):
-        """
-        Check if the user has access to the game based on role and official type for a specific game in a specific tournament.
-        """
-        # Check if the user's role is 4
-        if user.role.id != 4:
-            return False
-
-        if game_id and tournament_id:
-            try:
-                # Check if the game exists for the given tournament
-                game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
-
-                # Check if the user is associated with the game as an official with specific types
-                official = GameOfficials.objects.filter(
-                    game_id_id=game_id,
-                    official_id=user,
-                    officials_type_id__in=[2, 3, 4, 5]  # Allowed official types
-                ).exists()
-
-                if official:
-                    return True
-
-            except TournamentGames.DoesNotExist:
-                pass  # Game not found or doesn't match; access denied
-            except GameOfficials.DoesNotExist:
-                pass  # Official entry not found or doesn't match; access denied
-
-        # Default to denying access
-        return False
-
-    def get(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        game_id = request.query_params.get('game_id')
-        tournament_id = request.query_params.get('tournament_id')
-        team_id = request.query_params.get('team_id')
-
-        if not game_id or not tournament_id or not team_id:
-            return Response({
-                'status': 0,
-                'message': _('game_id, tournament_id, and team_id are required.'),
-                'data': None,
-            }, status=status.HTTP_400_BAD_REQUEST)
-        if not self._has_access(request.user, team_id):
-                return Response({
-                    'status': 0,
-                    'message': _('Access denied. You do not have permission for this team.'),
-                    'data': None,
-                }, status=status.HTTP_403_FORBIDDEN)
-
-        try:
-            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
-        except TournamentGames.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Game not found.'),
-                'data': None,
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        # Retrieve the uniform colors for the specified team
-        if team_id == game.team_a.id:
-            response_data = {
-                "team_id": team_id,
-                "primary_color_player": game.team_a_primary_color_player,
-                "secondary_color_player": game.team_a_secondary_color_player,
-                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
-            }
-        elif team_id == game.team_b.id:
-            response_data = {
-                "team_id": team_id,
-                "primary_color_player": game.team_b_primary_color_player,
-                "secondary_color_player": game.team_b_secondary_color_player,
-                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
-            }
-        else:
-            return Response({
-                'status': 0,
-                'message': _('The specified team_id does not match any team in this game.'),
-                'data': None,
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({
-            'status': 1,
-            'message': _('Uniform Fetch Successfully'),
-            'data': response_data,
-        }, status=status.HTTP_200_OK)
             
 
-
+################################
 class TournamentGameStatsAPIView(APIView):
     def get(self, request, *args, **kwargs):
         # Retrieve the query parameters: tournament_id, team_a_id, and team_b_id
