@@ -1410,7 +1410,53 @@ class TournamentGamesDetailAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+################################ Get Uniform API when Screen Call ######################
+class GameUniformColorAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        team_id = request.query_params.get('team_id')
+        tournament_id = request.query_params.get('tournament_id')
+        game_id = request.query_params.get('game_id')
 
+        try:
+            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('The specified game does not exist.'),
+                'data': None
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        data = {}
+
+        if game.team_a.id == int(team_id):
+            data = {
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper
+            }
+        elif game.team_b.id == int(team_id):
+            data = {
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper
+            }
+        else:
+            return Response({
+                'status': 0,
+                'message': _('The specified team_id does not match any team in this game.'),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'status': 1,
+            'message': _('Colors retrieved successfully.'),
+            'data': data
+        }, status=status.HTTP_200_OK)
+
+
+############################### Uniform Color APIS #########################################
 class TeamUniformColorAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
