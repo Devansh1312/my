@@ -439,78 +439,111 @@ class FriendlyGameTeamPlayersAPIView(APIView):
             return False
 
     def get(self, request):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-        team_id = request.query_params.get('team_id')
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
 
-        if not team_id:
+            team_id = request.query_params.get('team_id')
+            game_id = request.query_params.get('game_id')  # Added game_id to filter
+         
+            if not team_id:
+                return Response({
+                    'status': 0,
+                    'message': _('team_id is required.'),
+                    'data': []
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not game_id or not team_id:
+                return Response({
+                    'status': 0,
+                    'message': _('game_id and team_id are required.'),
+                    'data': []
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                team_name = TeamBranch.objects.get(id=team_id)
+            except TeamBranch.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Team not found.'),
+                    'data': []
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Fetch players in the specified team
+            players = JoinBranch.objects.filter(
+                branch_id__id=team_id,
+                joinning_type=JoinBranch.PLAYER_TYPE
+            )
+
+            if not players.exists():
+                return Response({
+                    'status': 0,
+                    'message': _('No players found for the provided team.'),
+                    'data': []
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Get user_ids of players in JoinBranch
+            player_user_ids = [player.user_id.id for player in players]
+
+            # Fetch all players excluding those already in the Lineup model
+            excluded_player_ids = FriendlyGameLineup.objects.filter(
+                team_id=team_id,
+                player_id__in=player_user_ids,
+                lineup_status=FriendlyGameLineup.ADDED
+            ).values_list('player_id', flat=True)
+
+            # Get player details excluding those in the Lineup
+            lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
+
+            response_data = []
+            for player in lineups:
+                # Fetch player's lineup entry for the game and tournament
+                lineup_entry = FriendlyGameLineup.objects.filter(
+                    player_id=player.id,
+                    game_id=game_id,
+               
+                ).first()
+
+                # Fetch jersey number from PlayerJersey model
+                jersey_number = None
+                if lineup_entry:
+                    # Query PlayerJersey model using the reverse relationship
+                    jersey_entry = FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup_entry).first()
+                    jersey_number = jersey_entry.jersey_number if jersey_entry else None
+
+                response_data.append({
+                    "id": player.id,
+                    "team_id": team_id,
+                    "team_name": team_name.team_name,
+                    "player_id": player.id,
+                    "player_name": player.username,
+                    "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
+                    "jersey_number": jersey_number,  # Jersey number from PlayerJersey
+                    "created_at": player.created_at,
+                    "updated_at": player.updated_at,
+                })
+
             return Response({
-                'status': 0,
-                'message': _('team_id is required.'),
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        team_name = TeamBranch.objects.get(id=team_id)
-
-        # Fetch players in the specified team
-        players = JoinBranch.objects.filter(
-            branch_id__id=team_id,
-            joinning_type=JoinBranch.PLAYER_TYPE
-        )
-
-        if not players.exists():
-            return Response({
-                'status': 0,
-                'message': _('No players found for the provided team.'),
-                'data': []
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        # Get user_ids of players in JoinBranch
-        player_user_ids = [player.user_id.id for player in players]
-
-        # Filter out players already in the Lineup model for the given team_id
-        excluded_player_ids = FriendlyGameLineup.objects.filter(
-            team_id=team_id,
-            player_id__in=player_user_ids
-        ).values_list('player_id', flat=True)
-        
-        # Get player details excluding those in the Lineup
-        lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
-
-        response_data = []
-        for lineup in lineups:
-            response_data.append({
-                "id": lineup.id,
-                "team_id": team_id,
-                "team_name": team_name.team_name,
-                "player_id": lineup.id,
-                "player_name": lineup.username,
-                "player_profile_picture": lineup.profile_picture.url if lineup.profile_picture else None,
-                "created_at": lineup.created_at,
-                "updated_at": lineup.updated_at,
-            })
-
-        return Response({
-            'status': 1,
-            'message': _('Players fetched successfully.'),
-            'data': response_data
-        }, status=status.HTTP_200_OK)
+                'status': 1,
+                'message': _('Players fetched successfully.'),
+                'data': response_data
+            }, status=status.HTTP_200_OK) 
     
 
     def post(self, request, *args, **kwargs):
-        """
-        Add a player to the lineup for a specific game and team.
-        """
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract required fields
         team_id = request.data.get('team_id')
         player_id = request.data.get('player_id')
         game_id = request.data.get('game_id')
-        team_id=int(team_id)
+        
+        team_id = int(team_id)
 
+        # Validate permissions
         if not self._has_access(request.user, team_id):
             return Response({
                 'status': 0,
@@ -518,6 +551,7 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
+        # Validate team existence
         try:
             team = TeamBranch.objects.get(id=team_id)
         except TeamBranch.DoesNotExist:
@@ -527,6 +561,7 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
+        # Validate player joined in the same team
         try:
             player = JoinBranch.objects.get(
                 branch_id__id=team_id,
@@ -540,74 +575,97 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
+        # Validate tournament existence
+     
+        # Validate game existence for the given tournament
         try:
             game = FriendlyGame.objects.get(id=game_id)
         except FriendlyGame.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('The specified game does not exist.'),
+                'message': _('The specified game does not exist in this tournament.'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
-        
-        if team_id != game.team_a.id and team_id != game.team_b.id:
-            print(type(game.team_a.id))
-            print(type(game.team_a.id))
 
+        # Validate team_id matches team_a or team_b in the game
+        if team_id != game.team_a.id and team_id != game.team_b.id:
             return Response({
                 'status': 0,
                 'message': _('The specified team is not part of this game.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if FriendlyGameLineup.objects.filter(player_id=player.user_id, game_id=game).exists():
+        # Check if the player already exists in the lineup
+        try:
+            lineup = FriendlyGameLineup.objects.get(
+                player_id=player.user_id,
+                game_id=game,
+                team_id=team
+            )
+        except FriendlyGameLineup.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('This player is already added to the lineup for this game.'),
+                'message': _('The player has not been assigned a jersey number yet.'),
                 'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_404_NOT_FOUND)
 
-        player_count = FriendlyGameLineup.objects.filter(team_id=team, game_id=game).count()
-        lineup_status = FriendlyGameLineup.SUBSTITUTE if player_count >= 11 else FriendlyGameLineup.ADDED
+        # # Check if the lineup already has a jersey number assigned
+        # if not lineup.position_1 and not lineup.position_2:
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('The player does not have a valid position or jersey number in the lineup.'),
+        #         'data': []
+        #     }, status=status.HTTP_400_BAD_REQUEST)
 
-        lineup = FriendlyGameLineup.objects.create(
-            team_id=team,
-            player_id=player.user_id,
-            game_id=game,
-            lineup_status=lineup_status,
-            created_by_id=request.user.id
-        )
+        # Update lineup status based on current lineup size
+        existing_players = FriendlyGameLineup.objects.filter(team_id=team, game_id=game)
+        player_count = existing_players.filter(lineup_status=FriendlyGameLineup.ADDED).count()
 
+        if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
+            lineup_status = lineup.lineup_status  # Keep the status as ALREADY_IN_LINEUP
+        else:
+            lineup_status = FriendlyGameLineup.SUBSTITUTE if player_count >= 11 else FriendlyGameLineup.ADDED
+
+        # Update the lineup entry
+        lineup.lineup_status = lineup_status
+        lineup.player_ready = True  # Set player ready to true
+        lineup.save()
+
+        # Return success response
         return Response({
             'status': 1,
-            'message': _('Player added to lineup successfully.'),
+            'message': _('Lineup updated successfully.'),
             'data': {
                 'team_id': team.id,
                 'team_name': team.team_name,
                 'player_id': player.user_id.id,
-                'player_name': player.user_id.username,
+                'player_name': player.user_id.username,  # Adjust field if different
+               
                 'game_id': game.id,
                 'game_number': game.game_number,
-                'status': 'ADDED' if lineup_status == FriendlyGameLineup.ADDED else 'SUBSTITUTE'
+                'lineup_status': 'ADDED' if lineup_status == FriendlyGameLineup.ADDED else 'SUBSTITUTE'
             }
         }, status=status.HTTP_200_OK)
 
+    
+
+################## Remove players of particular team for particular tournament for particular games ###############
+    
     def delete(self, request, *args, **kwargs):
-        """
-        Remove a player from the lineup for a specific game and team.
-        """
-        team_id = request.data.get('team_id')
-        player_id = request.data.get('player_id')
-        game_id = request.data.get('game_id')
+        # Get player_id, team_id, tournament_id, and game_id from request data
+        team_id = request.query_params.get('team_id')
+        player_id = request.query_params.get('player_id')
+        game_id = request.query_params.get('game_id')
       
 
-
+        # Ensure all required fields are provided
         if not player_id or not team_id or not game_id:
             return Response({
                 'status': 0,
                 'message': _('player_id, team_id, and game_id are required.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
-
+        
         if not self._has_access(request.user, team_id):
             return Response({
                 'status': 0,
@@ -615,13 +673,16 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
+        # Try to retrieve the lineup entry with provided criteria
         lineup = FriendlyGameLineup.objects.filter(
             player_id=player_id,
             team_id=team_id,
+         
             game_id=game_id,
-            lineup_status=FriendlyGameLineup.ADDED
+            lineup_status=FriendlyGameLineup.ADDED  # Only consider entries that are currently added
         ).first()
 
+        # Check if the lineup entry exists
         if lineup is None:
             return Response({
                 'status': 0,
@@ -629,20 +690,26 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-        lineup.lineup_status = 0  # REMOVED
-        lineup.created_by_id = request.user.id
+        # Update the lineup status to REMOVED (0)
+        lineup.lineup_status = 0  # 0 represents "REMOVED"
+        lineup.created_by_id = request.user.id  # Add created_by_id when deleting
+   
         lineup.save()
+
+        # Prepare the response data with lineup details
+        response_data = {
+            'player_id': lineup.player_id.id,
+            'team_id': lineup.team_id.id,
+            'game_id': lineup.game_id.id,
+            'lineup_status': lineup.lineup_status  # This will now be 0 (REMOVED)
+        }
 
         return Response({
             'status': 1,
             'message': _('Lineup entries removed successfully.'),
-            'data': {
-                'player_id': lineup.player_id.id,
-                'team_id': lineup.team_id.id,
-                'game_id': lineup.game_id.id,
-                'lineup_status': lineup.lineup_status
-            }
+            'data': response_data
         }, status=status.HTTP_200_OK)
+
     
 ################## Added Players ###############
 

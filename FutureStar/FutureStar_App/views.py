@@ -6106,6 +6106,7 @@ class TournamentGameStatsView(LoginRequiredMixin, View):
             self.template_name,
             {"games": games, "breadcrumb": {"parent": "Tournament", "child": "Game Stats"}}
         )
+
 @method_decorator(user_role_check, name='dispatch')
 class TournamentGameEditStatsView(LoginRequiredMixin, View):
     template_name = "Admin/Games/EditGameStatsModal.html"
@@ -6115,7 +6116,7 @@ class TournamentGameEditStatsView(LoginRequiredMixin, View):
             # Get the game object based on ID
             game = TournamentGames.objects.get(id=game_id)
             form = TournamentGameForm(instance=game)
-            
+
             # Check if the request is AJAX (indicated by 'X-Requested-With' header)
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 # Render the form as a string and return as JSON response
@@ -6145,5 +6146,6 @@ class TournamentGameEditStatsView(LoginRequiredMixin, View):
             messages.success(request, 'Stats updated successfully!')
             return JsonResponse({'success': True})
         else:
+            # Return the form with errors as HTML
             html = render_to_string(self.template_name, {'form': form, 'game': game})
             return JsonResponse({'success': False, 'html': html})
