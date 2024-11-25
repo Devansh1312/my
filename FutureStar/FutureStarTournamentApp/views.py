@@ -1439,7 +1439,6 @@ class TeamUniformColorAPIView(APIView):
             activate(language)
 
         serializer = TeamUniformColorSerializer(data=request.data)
-        print(serializer)
         if serializer.is_valid():
             validated_data = serializer.validated_data
             game_id = validated_data['game_id']
@@ -1618,7 +1617,6 @@ class TeamUniformColorAPIView(APIView):
             activate(language)
 
         serializer = TeamUniformColorSerializer(data=request.data)
-        print(serializer)
         if serializer.is_valid():
             validated_data = serializer.validated_data
             game_id = validated_data['game_id']
@@ -2004,12 +2002,55 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
-
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
-        user = request.user
+        user = request.user.id
+        # Calculate the time threshold
+        one_hour_ago = now() - timedelta(hours=1)
 
+        # Fetch all games where the user is the statistics handler
+        tournament_games = TournamentGames.objects.filter(
+            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+            game_statistics_handler=user,
+            finish=False
+        ).order_by('game_date', 'game_start_time')
+
+        friendly_games = FriendlyGame.objects.filter(
+            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+            game_statistics_handler=user,
+            finish=False
+        ).order_by('game_date', 'game_start_time')
+
+        # Combine the games into a single list
+        all_games = list(tournament_games) + list(friendly_games)
+        # Sort by game_date and game_start_time
+        all_games = sorted(all_games, key=lambda game: (game.game_date, game.game_start_time))
+
+        # Get the first game if available
+        if all_games:
+            first_game = all_games[0]
+            game_type = "Tournament" if isinstance(first_game, TournamentGames) else "Friendly"
+
+            response_data = {
+                "status": 1,
+                "message": f"User is assigned as a statistics handler for an upcoming {game_type} game.",
+                "data": {
+                    "game_type": game_type,
+                    "game_id": first_game.id,
+                    "team_a": first_game.team_a.id if first_game.team_a else None,
+                    "team_b": first_game.team_b.id if first_game.team_b else None,
+                }
+            }
+
+            # Include tournament ID for tournament games
+            if game_type == "Tournament":
+                response_data["data"]["tournament_id"] = first_game.tournament_id.id if first_game.tournament_id else None
+
+            return Response(response_data, status=200)
+        
+        user = request.user
         # Check if the user has the required role
-        if user.role_id not in [6, 3]:
+        if user.role_id not in [6, 3, 4]:
             return Response({
                 "status": 0,
                 "message": "User does not have the required role."
@@ -2026,9 +2067,6 @@ class UpcomingGameView(APIView):
                 "status": 0,
                 "message": "User has not joined any branches as required staff type."
             }, status=400)
-
-        # Calculate the time threshold
-        one_hour_ago = now() - timedelta(hours=1)
 
         # Filter games
         friendly_games = FriendlyGame.objects.filter(

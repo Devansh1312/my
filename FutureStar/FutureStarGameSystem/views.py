@@ -233,13 +233,13 @@ class TeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the lineup already has a jersey number assigned
-        if not lineup.position_1 and not lineup.position_2:
-            return Response({
-                'status': 0,
-                'message': _('The player does not have a valid position or jersey number in the lineup.'),
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # # Check if the lineup already has a jersey number assigned
+        # if not lineup.position_1 and not lineup.position_2:
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('The player does not have a valid position or jersey number in the lineup.'),
+        #         'data': []
+        #     }, status=status.HTTP_400_BAD_REQUEST)
 
         # Update lineup status based on current lineup size
         existing_players = Lineup.objects.filter(team_id=team, game_id=game)
@@ -278,10 +278,10 @@ class TeamPlayersAPIView(APIView):
     
     def delete(self, request, *args, **kwargs):
         # Get player_id, team_id, tournament_id, and game_id from request data
-        team_id = request.data.get('team_id')
-        player_id = request.data.get('player_id')
-        game_id = request.data.get('game_id')
-        tournament_id = request.data.get('tournament_id')
+        team_id = request.query_params.get('team_id')
+        player_id = request.query_params.get('player_id')
+        game_id = request.query_params.get('game_id')
+        tournament_id = request.query_params.get('tournament_id')
 
 
         # Ensure all required fields are provided
