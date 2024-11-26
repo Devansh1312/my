@@ -1,12 +1,140 @@
 {% load static %}
 {% load custom_filters %}
 
+<head>
+    <style>
+        /* General form styling */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
 
+        /* Label styling */
+        .form-label {
+            flex: 0 0 30%;
+            max-width: 30%;
+            font-weight: bold;
+            margin-bottom: .5rem;
+            padding-right: 15px;
+            text-align: right;
+            word-wrap: break-word;
+            white-space: normal;
+        }
 
+        /* Input fields styling */
+        input.form-control, select.form-control, textarea.form-control {
+            flex: 0 0 70%;
+            max-width: 70%;
+            padding: .5rem;
+            border-radius: .25rem;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Focus effect on inputs */
+        input.form-control:focus, select.form-control:focus, textarea.form-control:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
+            outline: none;
+        }
+
+        /* Error message styling */
+        .invalid-feedback {
+            font-size: 0.875em;
+            color: red;
+            margin-top: 0.25rem;
+            padding-left: 5px;
+        }
+
+        /* Margin for the form fields */
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Button styling */
+        .btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: .25rem;
+            background-color: #007bff;
+            border: 1px solid #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .form-label, .form-control {
+                flex: 0 0 100%;
+                max-width: 100%;
+                text-align: left;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Large form labels */
+        @media (max-width: 1024px) {
+            .form-label {
+                flex: 0 0 40%;
+                max-width: 40%;
+            }
+
+            input.form-control, select.form-control, textarea.form-control {
+                flex: 0 0 60%;
+                max-width: 60%;
+            }
+        }
+
+        /* Helper text styling */
+        .form-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
 <div class="modal-body">
     <form id="updateStatsForm" method="POST" action="{% url 'edit_game_stats' game.id %}">
         {% csrf_token %}
-        {{ form.as_p }}  <!-- Render form fields -->
+
+        <div class="row">
+            <!-- Loop through the fields and display them horizontally -->
+            {% for field in form %}
+                <div class="col-md-6 mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}
+                        {% if field.name == 'name' %}
+                            <small class="text-muted">(Required)</small>
+                        {% endif %}
+                    </label>
+                    {{ field }} <!-- Render each form field -->
+                    
+                    {% if field.name == 'downside' %}
+                        <small class="form-text">
+                            Please provide any potential downsides or risks associated.
+                        </small>
+                    {% endif %}
+                    
+                    <div class="invalid-feedback">
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
 </div>
