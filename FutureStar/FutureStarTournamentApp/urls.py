@@ -56,8 +56,8 @@ urlpatterns = [
         path('api/my_games/', FetchMyGamesAPIView.as_view()),
         path('api/all_games/', FetchAllGamesAPIView.as_view()),
 
-
-
+        ########## Tournaments Game Stats ######################
+        path('api/tournament/game_detail_stats/', TeamGameDetailStatsAPIView.as_view()),
 
 
 

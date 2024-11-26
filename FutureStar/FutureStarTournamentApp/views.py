@@ -1651,6 +1651,9 @@ class FetchTeamUniformColorAPIView(APIView):
 ################################
 class TournamentGameStatsAPIView(APIView):
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Retrieve the query parameters: tournament_id, team_a_id, and team_b_id
         tournament_id = request.query_params.get('tournament_id')
         team_a_id = request.query_params.get('team_a_id')
@@ -1688,7 +1691,7 @@ class TournamentGameStatsAPIView(APIView):
         # Format the response in the required structure
         response_data = {
             "status": 1,
-            "message": "Stats fetched successfully",
+            "message": _('Stats fetched successfully'),
             "data": {
                 "Team_A": team_stats.get(int(team_a_id), {"wins": 0, "losses": 0, "draws": 0}),
                 "Team_B": team_stats.get(int(team_b_id), {"wins": 0, "losses": 0, "draws": 0}),
@@ -1699,6 +1702,9 @@ class TournamentGameStatsAPIView(APIView):
     
 class TournamentGamesh2hCompleteAPIView(APIView):
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         tournament_id = request.query_params.get('tournament_id', None)
         team_a_id = request.query_params.get('team_a_id', None)
         team_b_id = request.query_params.get('team_b_id', None)
@@ -1884,6 +1890,9 @@ class UpcomingGameView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user = request.user
         user_id = user.id
         user_role = user.role.id  # Assuming `role` is a related field
@@ -2028,7 +2037,7 @@ class UpcomingGameView(APIView):
         return Response(
             {
                 "status": 0,
-                "message": "No upcoming games found for the user.",
+                "message": _('No upcoming games found for the user.'),
             },
             status=200,
         )
@@ -2042,6 +2051,9 @@ class FetchMyGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user = request.user
 
         # Ensure user is authenticated
@@ -2156,6 +2168,9 @@ class FetchAllGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         user = request.user
 
         # Ensure user is authenticated
@@ -2256,3 +2271,107 @@ class FetchAllGamesAPIView(APIView):
             "current_page": page,
             "data": response_data[start:end],
         })
+
+
+
+############################ Tournaments Game Stats  API ########################################
+class TeamGameDetailStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # Activate language settings based on header
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Extract and validate query parameters
+            game_id = request.query_params.get('game_id')
+            tournament_id = request.query_params.get('tournament_id')
+
+            if not tournament_id:
+                return Response(
+                    {'status': 0, 'message': _('tournament_id is required.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if not game_id:
+                return Response(
+                    {'status': 0, 'message': _('game_id is required.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Fetch the game object
+            game = TournamentGames.objects.filter(
+                id=game_id,
+                tournament_id=tournament_id
+            ).select_related('team_a', 'team_b').first()
+
+            if not game:
+                return Response(
+                    {'status': 0, 'message': _('Game not found with the given criteria.')},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Prepare response data
+            def format_team_data(team, prefix):
+                return {
+                    f"{prefix}_id": team.id if team else None,
+                    f"{prefix}_name": team.team_name if team else None
+                }
+
+            def format_stats(prefix, game):
+                return {
+                    "possession": getattr(game, f"{prefix}_possession", 0.0),
+                    "interception": getattr(game, f"{prefix}_interception", 0),
+                    "offside": getattr(game, f"{prefix}_offside", 0),
+                    "corner": getattr(game, f"{prefix}_corner", 0),
+                }
+
+            response_data = {
+                **format_team_data(game.team_a, "team_a"),
+                **format_team_data(game.team_b, "team_b"),
+                "statistics": {
+                    "General": {
+                        "team_a": format_stats("general_team_a", game),
+                        "team_b": format_stats("general_team_b", game)
+                    },
+                    "Defence": {
+                        "team_a": format_stats("defence_team_a", game),
+                        "team_b": format_stats("defence_team_b", game)
+                    },
+                    "Distribution": {
+                        "team_a": format_stats("distribution_team_a", game),
+                        "team_b": format_stats("distribution_team_b", game)
+                    },
+                    "Attack": {
+                        "team_a": format_stats("attack_team_a", game),
+                        "team_b": format_stats("attack_team_b", game)
+                    },
+                    "Discipline": {
+                        "team_a": format_stats("discipline_team_a", game),
+                        "team_b": format_stats("discipline_team_b", game)
+                    }
+                }
+            }
+
+            # Return success response
+            return Response(
+                {
+                    "status": 1,
+                    "message": _("Game detail stats fetched successfully."),
+                    "data": response_data,
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {
+                    "status": 0,
+                    "message": _("An unexpected error occurred. Please try again later."),
+                    "error": str(e),  # Optional: Remove in production for security
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
