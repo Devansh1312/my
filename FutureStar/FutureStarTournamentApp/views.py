@@ -1882,119 +1882,157 @@ class TournamentGroupTeamListCreateAPIView(APIView):
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def get(self, request, *args, **kwargs):
-        user = request.user.id
-        # Calculate the time threshold
+        user = request.user
+        user_id = user.id
+        user_role = user.role.id  # Assuming `role` is a related field
         one_hour_ago = now() - timedelta(hours=1)
 
-        # Fetch all games where the user is the statistics handler
-        tournament_games = TournamentGames.objects.filter(
-            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
-            game_statistics_handler=user,
-            finish=False
-        ).order_by('game_date', 'game_start_time')
+        all_games = []
 
-        friendly_games = FriendlyGame.objects.filter(
-            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
-            game_statistics_handler=user,
-            finish=False
-        ).order_by('game_date', 'game_start_time')
+        # Condition 1: Statistics Handler
+        if user_role == 5:  # Role for Statistics Handler
+            tournament_games = TournamentGames.objects.filter(
+                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                game_statistics_handler=user_id,
+                finish=False
+            ).order_by('game_date', 'game_start_time')
 
-        # Combine the games into a single list
-        all_games = list(tournament_games) + list(friendly_games)
-        # Sort by game_date and game_start_time
+            friendly_games = FriendlyGame.objects.filter(
+                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                game_statistics_handler=user_id,
+                finish=False
+            ).order_by('game_date', 'game_start_time')
+
+            all_games += list(tournament_games) + list(friendly_games)
+
+        # Condition 2: Role 6/3 (Coach/Manager in a Branch)
+        if user_role in [6, 3]:
+            branches = JoinBranch.objects.filter(
+                user_id=user_id,
+                joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
+            ).values_list('branch_id', flat=True)
+
+            if branches:
+                tournament_games = TournamentGames.objects.filter(
+                    Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                    Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
+                    finish=False
+                ).order_by('game_date', 'game_start_time')
+
+                friendly_games = FriendlyGame.objects.filter(
+                    Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                    Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
+                    finish=False
+                ).order_by('game_date', 'game_start_time')
+
+                all_games += list(tournament_games) + list(friendly_games)
+
+        # Condition 3: Role 4 (Game Official)
+        if user_role == 4:
+            tournament_games = TournamentGames.objects.filter(
+                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                finish=False,
+                gameofficials__official_id=user_id,
+                gameofficials__officials_type_id__in=[2, 3, 4, 5]
+            ).order_by('game_date', 'game_start_time')
+
+            friendly_games = FriendlyGame.objects.filter(
+                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                finish=False,
+                friendlygamegameofficials__official_id=user_id,
+                friendlygamegameofficials__officials_type_id__in=[2, 3, 4, 5]
+            ).order_by('game_date', 'game_start_time')
+
+            all_games += list(tournament_games) + list(friendly_games)
+
+        # Combine and sort all games
         all_games = sorted(all_games, key=lambda game: (game.game_date, game.game_start_time))
 
-        # Get the first game if available
+        # Response for the first game
         if all_games:
             first_game = all_games[0]
+
+            # Role 6/3-specific response
+            if user_role in [6, 3]:
+                branches = list(branches)
+                game_type = "Friendly" if isinstance(first_game, FriendlyGame) else "Tournament"
+                team_id = (
+                    first_game.team_a.id
+                    if first_game.team_a.id in branches
+                    else first_game.team_b.id
+                )
+                game_details = {
+                    "game_id": first_game.id,
+                    "team_name": (
+                        first_game.team_a.team_name
+                        if first_game.team_a.id in branches
+                        else first_game.team_b.team_name
+                    ),
+                    "opponent_team_name": (
+                        first_game.team_b.team_name
+                        if first_game.team_a.id in branches
+                        else first_game.team_a.team_name
+                    ),
+                    "game_date": first_game.game_date,
+                    "game_start_time": first_game.game_start_time,
+                    "game_end_time": first_game.game_end_time,
+                    "user_role": user_role,
+                    "status": "Upcoming",
+                }
+                if game_type == "Tournament":
+                    game_details["tournament_id"] = (
+                        first_game.tournament_id.id if first_game.tournament_id else None
+                    )
+
+                return Response(
+                    {
+                        "status": 1,
+                        "message": "Upcoming game fetched successfully.",
+                        "data": {
+                            "game_type": game_type,
+                            "team_id": team_id,
+                            "game_details": game_details,
+                        },
+                    },
+                    status=200,
+                )
+
+            # Default response for other roles
             game_type = "Tournament" if isinstance(first_game, TournamentGames) else "Friendly"
 
             response_data = {
                 "status": 1,
-                "message": f"User is assigned as a statistics handler for an upcoming {game_type} game.",
+                "message": f"Upcoming {game_type} game fetched successfully.",
                 "data": {
                     "game_type": game_type,
                     "game_id": first_game.id,
-                    "team_a": first_game.team_a.id if first_game.team_a else None,
-                    "team_b": first_game.team_b.id if first_game.team_b else None,
-                }
+                    "team_a": {
+                        "id": first_game.team_a.id if first_game.team_a else None,
+                        "name": first_game.team_a.team_name if first_game.team_a else None,
+                    },
+                    "team_b": {
+                        "id": first_game.team_b.id if first_game.team_b else None,
+                        "name": first_game.team_b.team_name if first_game.team_b else None,
+                    },
+                    "user_role": user_role,
+                },
             }
 
-            # Include tournament ID for tournament games
             if game_type == "Tournament":
                 response_data["data"]["tournament_id"] = first_game.tournament_id.id if first_game.tournament_id else None
 
             return Response(response_data, status=200)
-        
-        user = request.user
-        # Check if the user has the required role
-        if user.role_id not in [6, 3, 4]:
-            return Response({
+
+        return Response(
+            {
                 "status": 0,
-                "message": "User does not have the required role."
-            }, status=400)
+                "message": "No upcoming games found for the user.",
+            },
+            status=200,
+        )
 
-        # Get branches (team IDs) where the user has joined as COACH or MANAGER
-        branches = JoinBranch.objects.filter(
-            user_id=user,
-            joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
-        ).values_list('branch_id', flat=True)
-
-        if not branches:
-            return Response({
-                "status": 0,
-                "message": "User has not joined any branches as required staff type."
-            }, status=400)
-
-        # Filter games
-        friendly_games = FriendlyGame.objects.filter(
-            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
-            Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
-            finish=False,
-        ).order_by('game_date', 'game_start_time')
-
-        tournament_games = TournamentGames.objects.filter(
-            Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
-            Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
-            finish=False,
-        ).order_by('game_date', 'game_start_time')
-
-        # Combine and sort games
-        all_games = list(friendly_games) + list(tournament_games)
-        all_games = sorted(all_games, key=lambda game: (game.game_date, game.game_start_time))
-
-        # Get the first upcoming game if available
-        if all_games:
-            game = all_games[0]
-            game_type = "Friendly" if isinstance(game, FriendlyGame) else "Tournament"
-            team_id = game.team_a.id if game.team_a.id in branches else game.team_b.id
-            game_details = {
-                "game_id": game.id,
-                "team_name": game.team_a.team_name if game.team_a.id in branches else game.team_b.team_name,
-                "opponent_team_name": game.team_b.team_name if game.team_a.id in branches else game.team_a.team_name,
-                "game_date": game.game_date,
-                "game_start_time": game.game_start_time,
-                "game_end_time": game.game_end_time,
-                "status": "Upcoming",
-            }
-            if game_type == "Tournament":
-                game_details["tournament_id"] = game.tournament_id.id if game.tournament_id else None
-
-            return Response({
-                "status": 1,
-                "message": "Upcoming game fetched successfully.",
-                "data": {
-                    "game_type": game_type,
-                    "team_id": team_id,
-                    "game_details": game_details
-                }
-            }, status=200)
-
-        return Response({
-            "status": 0,
-            "message": "No upcoming games found for the user's team."
-        }, status=200)
 
 
 

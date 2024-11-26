@@ -1228,11 +1228,13 @@ class LineupPlayerStatusAPIView(APIView):
                 if lineup.lineup_status == Lineup.ALREADY_IN_LINEUP:
                     team_a_added_players.append({
                         **player_data,
+                        'team_id': game.team_a.id,
                         'team_name': game.team_a.team_name,  # Assuming `team_name` field exists in `TeamBranch`
                     })
                 elif lineup.lineup_status == Lineup.SUBSTITUTE:
                     team_a_substitute_players.append({
                         **player_data,
+                        'team_id': game.team_a.id,
                         'team_name': game.team_a.team_name,  # Assuming `team_name` field exists in `TeamBranch`
                     })
 
@@ -1241,11 +1243,13 @@ class LineupPlayerStatusAPIView(APIView):
                 if lineup.lineup_status == Lineup.ALREADY_IN_LINEUP:
                     team_b_added_players.append({
                         **player_data,
+                        'team_id': game.team_b.id,
                         'team_name': game.team_b.team_name,  # Assuming `team_name` field exists in `TeamBranch`
                     })
                 elif lineup.lineup_status == Lineup.SUBSTITUTE:
                     team_b_substitute_players.append({
                         **player_data,
+                        'team_id': game.team_b.id,
                         'team_name': game.team_b.team_name,  # Assuming `team_name` field exists in `TeamBranch`
                     })
 
@@ -1255,10 +1259,14 @@ class LineupPlayerStatusAPIView(APIView):
             'message': _('Players fetched successfully.'),
             'data': {
                 'team_a': {
+                    'team_id': game.team_a.id,
+                    'team_name': game.team_a.team_name, 
                     'added_players': team_a_added_players,
                     'substitute_players': team_a_substitute_players,
                 },
                 'team_b': {
+                    'team_id': game.team_b.id,
+                    'team_name': game.team_b.team_name, 
                     'added_players': team_b_added_players,
                     'substitute_players': team_b_substitute_players,
                 }
