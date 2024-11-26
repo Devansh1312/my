@@ -22,6 +22,10 @@ urlpatterns = [
     path('api/lineup/player_confirmation/status_change/',LineupPlayerStatusAPIView.as_view()),
     path('api/lineup/player_substitute/',PlayerSubstitutionAPIView.as_view()),
 
+    path('api/lineup/swap_position/', SwapPositionView.as_view()),
+    path('api/lineup/fetch_position/', SwapPositionView.as_view()),
+
+
 
     path('api/game_stats/lineup/',GameStatsLineupPlayers.as_view()),
     path('api/game_stats/player_stats/',PlayerGameStatsAPIView.as_view()),

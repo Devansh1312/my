@@ -50,3 +50,9 @@ class GameOficialTypeSerializer(serializers.ModelSerializer):
         language = self.context.get('language', 'en')
         # Return the appropriate field based on language
         return obj.name_ar if language == 'ar' else obj.name_en
+    
+
+class SwapPositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lineup
+        fields = ['id', 'team_id', 'player_id', 'game_id', 'tournament_id', 'lineup_status', 'position_1']

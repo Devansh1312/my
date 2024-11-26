@@ -2003,6 +2003,8 @@ class TeamGameStatsTimelineAPIView(APIView):
             'data': stats_data
         }, status=status.HTTP_200_OK)
 class PlayerSubstitutionAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, game_id=None, tournament_id=None):
         """
@@ -2155,6 +2157,8 @@ class PlayerSubstitutionAPIView(APIView):
    
 
     def get(self, request, *args, **kwargs):   
+        permission_classes = [IsAuthenticated]
+        parser_classes = (JSONParser, MultiPartParser, FormParser)
 
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -2227,8 +2231,107 @@ class PlayerSubstitutionAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
+##################### Swap Position ######################
+class SwapPositionView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
+    
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get data from request
+        player_id = request.data.get('player_id')  # ID of the player to swap
+        target_position = request.data.get('target_position')  # The target position to swap with
+        team_id = request.data.get('team_id')  # Team ID of the player
+        game_id = request.data.get('game_id')  # Game ID for the context
+        
+        if not player_id or target_position is None or not team_id or not game_id:
+            return Response({"detail": "Player ID, target position, team ID, and game ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get the player's lineup entry, ensuring that it belongs to the correct team and game
+        player_lineup = get_object_or_404(Lineup, player_id=player_id, team_id=team_id, game_id=game_id)
+        
+        # Check if the player's lineup status is ALREADY_IN_LINEUP (status = 3)
+        if player_lineup.lineup_status != Lineup.ALREADY_IN_LINEUP:
+            return Response({"detail": "Player must have in starting 11 lineup to swap positions."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if there's already a player in the target position within the same game and team
+        target_lineup = Lineup.objects.filter(game_id=game_id, team_id=team_id, position_1=target_position).first()
+        
+        if target_lineup:
+            if target_lineup.lineup_status != Lineup.ALREADY_IN_LINEUP:
+                return Response({
+                    'status': 0,
+                    'message': _('The player in the target position must also be in the starting 11 lineup to swap positions.'),
+                    'data': {}
+                }, status=status.HTTP_400_BAD_REQUEST)
+            # Swap positions between the two players
+            original_position = player_lineup.position_1
+            player_lineup.position_1 = target_position
+            target_lineup.position_1 = original_position
+            
+            # Save both updated lineups
+            player_lineup.save()
+            target_lineup.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Positions swapped successfully.'),
+                'data': {
+                    "player_1": SwapPositionSerializer(player_lineup).data,
+                    "player_2": SwapPositionSerializer(target_lineup).data
+                }
+            }, status=status.HTTP_200_OK)
+
+        else:
+            # If no player exists at the target position, just update the player's position
+            player_lineup.position_1 = target_position
+            player_lineup.save()
+            
+            return Response({
+                'status': 1,
+                'message': _('Player position updated successfully.'),
+                'data': {
+                    "player": SwapPositionSerializer(player_lineup).data
+                }
+            }, status=status.HTTP_200_OK)
+
+        
+       
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get team_id and game_id from request
+        team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')
+        
+        # Validate that team_id and game_id are provided
+        if not team_id or not game_id:
+            return Response({"detail": "Team ID and Game ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Filter lineups based on team_id and game_id
+        lineups = Lineup.objects.filter(team_id=team_id, game_id=game_id, lineup_status=Lineup.ALREADY_IN_LINEUP)
+        
+        # If no lineups are found, return an appropriate message
+        if not lineups.exists():
+            return Response({"detail": "No lineups found for the provided team and game."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Serialize the lineups
+        serializer = SwapPositionSerializer(lineups, many=True)
+        
+        return Response({
+            'status': 1,
+            'message': _('Lineups retrieved successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+########################### Team Goal Stats ####################
 class TeamGameGoalCountAPIView(APIView):
+        permission_classes = [IsAuthenticated]
+        parser_classes = (JSONParser, MultiPartParser, FormParser)
         def _has_access(self, user, game_id=None, tournament_id=None):
             """
             Check if the user is the game_statistics_handler for the specified game and tournament.
