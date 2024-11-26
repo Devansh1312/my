@@ -2016,21 +2016,25 @@ class UpcomingGameView(APIView):
                 "message": f"Upcoming {game_type} game fetched successfully.",
                 "data": {
                     "game_type": game_type,
-                    "game_id": first_game.id,
-                    "team_a": {
-                        "id": first_game.team_a.id if first_game.team_a else None,
-                        "name": first_game.team_a.team_name if first_game.team_a else None,
-                    },
-                    "team_b": {
-                        "id": first_game.team_b.id if first_game.team_b else None,
-                        "name": first_game.team_b.team_name if first_game.team_b else None,
-                    },
-                    "user_role": user_role,
+                    "game_details": {
+                        "game_id": first_game.id,
+                        "team_a": {
+                            "id": first_game.team_a.id if first_game.team_a else None,
+                            "name": first_game.team_a.team_name if first_game.team_a else None,
+                        },
+                        "team_b": {
+                            "id": first_game.team_b.id if first_game.team_b else None,
+                            "name": first_game.team_b.team_name if first_game.team_b else None,
+                        },
+                        "user_role": user_role,
+                        "tournament_id": first_game.tournament_id.id if first_game.tournament_id else None  # Move it here
+                    }
                 },
             }
 
-            if game_type == "Tournament":
-                response_data["data"]["tournament_id"] = first_game.tournament_id.id if first_game.tournament_id else None
+
+            # if game_type == "Tournament":
+            #     response_data["data"]["tournament_id"] = first_game.tournament_id.id if first_game.tournament_id else None
 
             return Response(response_data, status=200)
 
@@ -2332,27 +2336,25 @@ class TeamGameDetailStatsAPIView(APIView):
             response_data = {
                 **format_team_data(game.team_a, "team_a"),
                 **format_team_data(game.team_b, "team_b"),
-                "statistics": {
-                    "General": {
-                        "team_a": format_stats("general_team_a", game),
-                        "team_b": format_stats("general_team_b", game)
-                    },
-                    "Defence": {
-                        "team_a": format_stats("defence_team_a", game),
-                        "team_b": format_stats("defence_team_b", game)
-                    },
-                    "Distribution": {
-                        "team_a": format_stats("distribution_team_a", game),
-                        "team_b": format_stats("distribution_team_b", game)
-                    },
-                    "Attack": {
-                        "team_a": format_stats("attack_team_a", game),
-                        "team_b": format_stats("attack_team_b", game)
-                    },
-                    "Discipline": {
-                        "team_a": format_stats("discipline_team_a", game),
-                        "team_b": format_stats("discipline_team_b", game)
-                    }
+                "General": {
+                    "team_a": format_stats("general_team_a", game),
+                    "team_b": format_stats("general_team_b", game)
+                },
+                "Defence": {
+                    "team_a": format_stats("defence_team_a", game),
+                    "team_b": format_stats("defence_team_b", game)
+                },
+                "Distribution": {
+                    "team_a": format_stats("distribution_team_a", game),
+                    "team_b": format_stats("distribution_team_b", game)
+                },
+                "Attack": {
+                    "team_a": format_stats("attack_team_a", game),
+                    "team_b": format_stats("attack_team_b", game)
+                },
+                "Discipline": {
+                    "team_a": format_stats("discipline_team_a", game),
+                    "team_b": format_stats("discipline_team_b", game)
                 }
             }
 
