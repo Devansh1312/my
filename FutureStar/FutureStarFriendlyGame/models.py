@@ -80,7 +80,7 @@ class FriendlyGameLineup(models.Model):
     
 
     # Status field (1 for added, 2 for substitute)
-    lineup_status = models.IntegerField(choices=TEAMLINEUP_TYPE_CHOICES,default=1)
+    lineup_status = models.IntegerField(choices=TEAMLINEUP_TYPE_CHOICES,default=0)
 
     position_1=models.CharField(max_length=200,blank=True, null=True)
     position_2=models.CharField(max_length=200,blank=True, null=True)

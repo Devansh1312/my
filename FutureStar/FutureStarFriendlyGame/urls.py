@@ -19,7 +19,7 @@ urlpatterns = [
       path('api/friendlygames/teamplayers/', FriendlyGameTeamPlayersAPIView.as_view()),
       path('api/friendlygames/teamplayers/add/', FriendlyGameTeamPlayersAPIView.as_view()),
       path('api/friendlygames/teamplayers/jersey_no/', FriendlyAddPlayerJerseyAPIView.as_view()),
-      path('api/friendlygames/teamplayers/remove/', FriendlyGameTeamPlayersAPIView.as_view()),
+      path('api/friendlygames/teamplayers/delete/', FriendlyGameTeamPlayersAPIView.as_view()),
 
       # Lineup Management
       path('api/friendlygames/lineup/', FriendlyGameLineupPlayers.as_view()),
@@ -49,9 +49,14 @@ urlpatterns = [
       # Friendly Game Stats
       path('api/friendlygames/stats/', FriendlyGameStatsAPIView.as_view(), name='friendly_game_stats'),
       path('api/friendlygames/h2h/completed/', FriendlyGamesh2hCompleteAPIView.as_view(), name='friendly_games_completed'),
-      path('api/friendlygames/team_uniform/', FriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
 
-      
+
+      # Team Uniform Management
+      path('api/friendlygames/team_uniform/create/', FriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
+      path('api/friendlygames/team_uniform/', FetchFriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
+
+      path('api/friendlygames/uniform_fetch/',FriendlyGameUniformAPIView.as_view()),
+
 
 
    ]

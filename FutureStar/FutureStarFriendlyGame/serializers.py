@@ -128,7 +128,7 @@ class FriendlyTeamUniformColorSerializer(serializers.Serializer):
     def validate(self, data):
         game_id = data.get('game_id')
         team_id = data.get('team_id')
-
+        team_id = int(team_id)
         try:
             game = FriendlyGame.objects.get(id=game_id)
         except FriendlyGame.DoesNotExist:

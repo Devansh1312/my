@@ -416,6 +416,7 @@ class TeamBranchListView(APIView):
         }, status=status.HTTP_200_OK)
 
 ################## participates players of particular team for particular tournament ###############
+
 class FriendlyGameTeamPlayersAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -424,11 +425,11 @@ class FriendlyGameTeamPlayersAPIView(APIView):
         """
         Check if the user has the required role and valid membership in the team.
         """
-        if user.role.id not in [3, 6]:  # Allowed roles: Managerial and Coach
+        if user.role.id not in [3, 6]:
             return False
 
         try:
-            # Verify if the user is part of the team as managerial or coach staff
+            # Check if the user is part of the team with managerial or coach staff type
             JoinBranch.objects.get(
                 branch_id_id=team_id,
                 user_id=user,
@@ -439,96 +440,96 @@ class FriendlyGameTeamPlayersAPIView(APIView):
             return False
 
     def get(self, request):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-            team_id = request.query_params.get('team_id')
-            game_id = request.query_params.get('game_id')  # Added game_id to filter
-         
-            if not team_id:
-                return Response({
-                    'status': 0,
-                    'message': _('team_id is required.'),
-                    'data': []
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            if not game_id or not team_id:
-                return Response({
-                    'status': 0,
-                    'message': _('game_id and team_id are required.'),
-                    'data': []
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                team_name = TeamBranch.objects.get(id=team_id)
-            except TeamBranch.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Team not found.'),
-                    'data': []
-                }, status=status.HTTP_404_NOT_FOUND)
-
-            # Fetch players in the specified team
-            players = JoinBranch.objects.filter(
-                branch_id__id=team_id,
-                joinning_type=JoinBranch.PLAYER_TYPE
-            )
-
-            if not players.exists():
-                return Response({
-                    'status': 0,
-                    'message': _('No players found for the provided team.'),
-                    'data': []
-                }, status=status.HTTP_404_NOT_FOUND)
-
-            # Get user_ids of players in JoinBranch
-            player_user_ids = [player.user_id.id for player in players]
-
-            # Fetch all players excluding those already in the Lineup model
-            excluded_player_ids = FriendlyGameLineup.objects.filter(
-                team_id=team_id,
-                player_id__in=player_user_ids,
-                lineup_status=FriendlyGameLineup.ADDED
-            ).values_list('player_id', flat=True)
-
-            # Get player details excluding those in the Lineup
-            lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
-
-            response_data = []
-            for player in lineups:
-                # Fetch player's lineup entry for the game and tournament
-                lineup_entry = FriendlyGameLineup.objects.filter(
-                    player_id=player.id,
-                    game_id=game_id,
-               
-                ).first()
-
-                # Fetch jersey number from PlayerJersey model
-                jersey_number = None
-                if lineup_entry:
-                    # Query PlayerJersey model using the reverse relationship
-                    jersey_entry = FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup_entry).first()
-                    jersey_number = jersey_entry.jersey_number if jersey_entry else None
-
-                response_data.append({
-                    "id": player.id,
-                    "team_id": team_id,
-                    "team_name": team_name.team_name,
-                    "player_id": player.id,
-                    "player_name": player.username,
-                    "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
-                    "jersey_number": jersey_number,  # Jersey number from PlayerJersey
-                    "created_at": player.created_at,
-                    "updated_at": player.updated_at,
-                })
-
+        team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')  # Game ID to filter
+        
+        if not team_id:
             return Response({
-                'status': 1,
-                'message': _('Players fetched successfully.'),
-                'data': response_data
-            }, status=status.HTTP_200_OK) 
-    
+                'status': 0,
+                'message': _('team_id is required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate `game_id`
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id is required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            team_name = TeamBranch.objects.get(id=team_id)
+        except TeamBranch.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Team not found.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Fetch players belonging to the specified team
+        players = JoinBranch.objects.filter(
+            branch_id__id=team_id,
+            joinning_type=JoinBranch.PLAYER_TYPE
+        )
+
+        if not players.exists():
+            return Response({
+                'status': 0,
+                'message': _('No players found for the provided team.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the IDs of all players
+        player_user_ids = [player.user_id.id for player in players]
+
+        # Exclude players already added to the lineup for the specified game
+        excluded_player_ids = FriendlyGameLineup.objects.filter(
+            team_id=team_id,
+            player_id__in=player_user_ids,
+            game_id=game_id,
+            lineup_status=FriendlyGameLineup.ADDED
+        ).values_list('player_id', flat=True)
+
+        # Fetch player details excluding those in the lineup
+        lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
+
+        response_data = []
+        for player in lineups:
+            # Fetch player's lineup entry for the game
+            lineup_entry = FriendlyGameLineup.objects.filter(
+                player_id=player.id,
+                game_id=game_id
+            ).first()
+
+            # Fetch jersey number from FriendlyPlayerJersey model (if applicable)
+            jersey_number = None
+            if lineup_entry:
+                jersey_entry = FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup_entry).first()
+                jersey_number = jersey_entry.jersey_number if jersey_entry else None
+
+            response_data.append({
+                "id": player.id,
+                "team_id": team_id,
+                "team_name": team_name.team_name,
+                "player_id": player.id,
+                "player_name": player.username,
+                "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
+                "jersey_number": jersey_number,  # Jersey number from FriendlyPlayerJersey
+                "created_at": player.created_at,
+                "updated_at": player.updated_at,
+            })
+
+        return Response({
+            'status': 1,
+            'message': _('Players fetched successfully.'),
+            'data': response_data
+        }, status=status.HTTP_200_OK)
+
 
     def post(self, request, *args, **kwargs):
         # Set language
@@ -540,8 +541,16 @@ class FriendlyGameTeamPlayersAPIView(APIView):
         team_id = request.data.get('team_id')
         player_id = request.data.get('player_id')
         game_id = request.data.get('game_id')
-        
-        team_id = int(team_id)
+
+        # Convert team_id to integer if necessary
+        try:
+            team_id = int(team_id)
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Invalid team_id.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate permissions
         if not self._has_access(request.user, team_id):
@@ -575,15 +584,13 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Validate tournament existence
-     
-        # Validate game existence for the given tournament
+        # Validate game existence
         try:
             game = FriendlyGame.objects.get(id=game_id)
         except FriendlyGame.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('The specified game does not exist in this tournament.'),
+                'message': _('The specified game does not exist.'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -603,33 +610,29 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 team_id=team
             )
         except FriendlyGameLineup.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('The player has not been assigned a jersey number yet.'),
-                'data': []
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        # # Check if the lineup already has a jersey number assigned
-        # if not lineup.position_1 and not lineup.position_2:
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('The player does not have a valid position or jersey number in the lineup.'),
-        #         'data': []
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+            lineup = None
 
         # Update lineup status based on current lineup size
         existing_players = FriendlyGameLineup.objects.filter(team_id=team, game_id=game)
         player_count = existing_players.filter(lineup_status=FriendlyGameLineup.ADDED).count()
 
-        if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
-            lineup_status = lineup.lineup_status  # Keep the status as ALREADY_IN_LINEUP
+        if lineup:
+            # If the player is already in the lineup, update their status
+            if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
+                lineup_status = lineup.lineup_status  # Keep the status as ALREADY_IN_LINEUP
+            else:
+                lineup_status = FriendlyGameLineup.SUBSTITUTE if player_count >= 11 else FriendlyGameLineup.ADDED
+            lineup.lineup_status = lineup_status
+            lineup.save()
         else:
+            # Add a new player to the lineup
             lineup_status = FriendlyGameLineup.SUBSTITUTE if player_count >= 11 else FriendlyGameLineup.ADDED
-
-        # Update the lineup entry
-        lineup.lineup_status = lineup_status
-        lineup.player_ready = True  # Set player ready to true
-        lineup.save()
+            lineup = FriendlyGameLineup.objects.create(
+                player_id=player.user_id,
+                game_id=game,
+                team_id=team,
+                lineup_status=lineup_status
+            )
 
         # Return success response
         return Response({
@@ -639,33 +642,43 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'team_id': team.id,
                 'team_name': team.team_name,
                 'player_id': player.user_id.id,
-                'player_name': player.user_id.username,  # Adjust field if different
-               
+                'player_name': player.user_id.username,  # Adjust field if necessary
                 'game_id': game.id,
-                'game_number': game.game_number,
+                'game_name': game.game_name,
                 'lineup_status': 'ADDED' if lineup_status == FriendlyGameLineup.ADDED else 'SUBSTITUTE'
             }
         }, status=status.HTTP_200_OK)
 
-    
 
-################## Remove players of particular team for particular tournament for particular games ###############
-    
     def delete(self, request, *args, **kwargs):
-        # Get player_id, team_id, tournament_id, and game_id from request data
+        # Extract parameters from query string
         team_id = request.query_params.get('team_id')
         player_id = request.query_params.get('player_id')
         game_id = request.query_params.get('game_id')
-      
 
         # Ensure all required fields are provided
-        if not player_id or not team_id or not game_id:
+        if not team_id:
             return Response({
                 'status': 0,
-                'message': _('player_id, team_id, and game_id are required.'),
+                'message': _('team_id is required.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        if not player_id:
+            return Response({
+                'status': 0,
+                'message': _('player_id is required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id is required.'),
+                'data': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate user access to the team
         if not self._has_access(request.user, team_id):
             return Response({
                 'status': 0,
@@ -673,11 +686,10 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Try to retrieve the lineup entry with provided criteria
+        # Try to retrieve the lineup entry based on provided criteria
         lineup = FriendlyGameLineup.objects.filter(
             player_id=player_id,
             team_id=team_id,
-         
             game_id=game_id,
             lineup_status=FriendlyGameLineup.ADDED  # Only consider entries that are currently added
         ).first()
@@ -693,10 +705,9 @@ class FriendlyGameTeamPlayersAPIView(APIView):
         # Update the lineup status to REMOVED (0)
         lineup.lineup_status = 0  # 0 represents "REMOVED"
         lineup.created_by_id = request.user.id  # Add created_by_id when deleting
-   
         lineup.save()
 
-        # Prepare the response data with lineup details
+        # Prepare response data with lineup details
         response_data = {
             'player_id': lineup.player_id.id,
             'team_id': lineup.team_id.id,
@@ -704,11 +715,13 @@ class FriendlyGameTeamPlayersAPIView(APIView):
             'lineup_status': lineup.lineup_status  # This will now be 0 (REMOVED)
         }
 
+        # Return success response
         return Response({
             'status': 1,
             'message': _('Lineup entries removed successfully.'),
             'data': response_data
         }, status=status.HTTP_200_OK)
+
 
     
 ################## Added Players ###############
@@ -999,13 +1012,10 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
         """
         Check if the user has the required role and valid membership in the team.
         """
-        # Check if the user has role 6
         if user.role.id not in [3, 6]:
             return False
 
-        # Check if the user is part of the team with joinning_type = 1 (Managerial Staff)
         try:
-            # We check if the joinning_type is either Managerial Staff or Coach Staff
             JoinBranch.objects.get(
                 branch_id_id=team_id,
                 user_id=user,
@@ -1026,6 +1036,38 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
         game_id = request.data.get('game_id')
         players_data = request.data.get('players', [])  # Expecting a list of {player_id, jersey_number}
 
+        # Initialize response data for validations
+        validation_errors = []
+
+        # Validate team_id
+        if not team_id:
+            validation_errors.append({
+                'field': 'team_id',
+                'message': _('team_id is required.')
+            })
+
+        # Validate game_id
+        if not game_id:
+            validation_errors.append({
+                'field': 'game_id',
+                'message': _('game_id is required.')
+            })
+
+        # Validate players_data
+        if not isinstance(players_data, list) or len(players_data) == 0:
+            validation_errors.append({
+                'field': 'players',
+                'message': _('Players details are required.')
+            })
+
+        if validation_errors:
+            return Response({
+                'status': 0,
+                'message': _('Validation errors occurred.'),
+                'errors': validation_errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check user access to the team
         if not self._has_access(request.user, team_id):
             return Response({
                 'status': 0,
@@ -1033,15 +1075,7 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Validate required fields
-        if not team_id or not game_id or not isinstance(players_data, list) or len(players_data) == 0:
-            return Response({
-                'status': 0,
-                'message': _('team_id, game_id, and players (list of player_id and jersey_number) are required.'),
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Initialize response data
+        # Process players
         response_data = []
 
         for player in players_data:
@@ -1056,7 +1090,7 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
                 })
                 continue
 
-            # Validate team, player, tournament, and game existence
+            # Validate team and player existence
             try:
                 team = TeamBranch.objects.get(id=team_id)
             except TeamBranch.DoesNotExist:
@@ -1067,24 +1101,22 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
                 })
                 continue
 
-         
-
             try:
                 game = FriendlyGame.objects.get(id=game_id)
             except FriendlyGame.DoesNotExist:
                 response_data.append({
                     'player_id': player_id,
                     'status': 0,
-                    'message': _('The specified game does not exist.')
+                    'message': _('The specified friendly game does not exist.')
                 })
                 continue
 
-            # Validate that the team is part of the game
+            # Validate that the team is part of the friendly game
             if team_id != game.team_a.id and team_id != game.team_b.id:
                 response_data.append({
                     'player_id': player_id,
                     'status': 0,
-                    'message': _('The specified team is not part of this game.')
+                    'message': _('The specified team is not part of this friendly game.')
                 })
                 continue
 
@@ -1103,55 +1135,94 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
                 })
                 continue
 
-            # Check for duplicate jersey numbers
-            if jersey_number != 0 and FriendlyGameLineup.objects.filter(
-                team_id=team,
-                game_id=game,
-                player_ready=False,
-                player_id__isnull=False,
-                jersey_number=jersey_number
-            ).exists():
-                response_data.append({
-                    'player_id': player_id,
-                    'status': 0,
-                    'message': _('This jersey number is already assigned to another player in the lineup.')
-                })
-                continue
+            # Check if jersey number is already assigned in the current lineup
+            if jersey_number != 0:
+                existing_jersey = FriendlyGamePlayerJersey.objects.filter(
+                    lineup_players__team_id=team,
+                    lineup_players__game_id=game,
+                    jersey_number=jersey_number
+                ).first()
 
-            # Create or update lineup entry
-            try:
-                lineup, created = FriendlyGameLineup.objects.update_or_create(
-                    player_id=player.user_id,
-                    team_id=team,
-                    game_id=game,
-                    
-                    defaults={
-                        'lineup_status': 0,  # Set status as 0
-                        'player_ready': False,  # Player is not ready
-                        'created_by_id': request.user.id,
-                        'jersey_number': jersey_number if jersey_number != 0 else None  # Null if jersey number is 0
-                    }
-                )
-                response_data.append({
-                    'player_id': player.user_id.id,
-                    'team_id': team.id,
-                    'game_id': game.id,
-                    
-                    'jersey_number': lineup.jersey_number,
-                    'status': 1,
-                    'message': _('Jersey number added, and player added to lineup with status 0.')
-                })
-            except IntegrityError:
-                response_data.append({
-                    'player_id': player_id,
-                    'status': 0,
-                    'message': _('An error occurred while adding the player to the lineup.')
-                })
+                if existing_jersey:
+                    # Set the existing jersey number to null before assigning it to the new player
+                    existing_jersey.jersey_number = None
+                    existing_jersey.save()
+
+                try:
+                    lineup, created = FriendlyGameLineup.objects.update_or_create(
+                        player_id=player.user_id,
+                        team_id=team,
+                        game_id=game,
+                        defaults={
+                            'player_ready': False,
+                            'created_by_id': request.user.id,
+                        }
+                    )
+
+                    # Now, create or update the PlayerJersey instance
+                    player_jersey, created_jersey = FriendlyGamePlayerJersey.objects.update_or_create(
+                        lineup_players=lineup,
+                        defaults={
+                            'jersey_number': jersey_number,
+                            'created_by_id': request.user.id
+                        }
+                    )
+
+                    response_data.append({
+                        'player_id': player.user_id.id,
+                        'team_id': team.id,
+                        'game_id': game.id,
+                        'jersey_number': jersey_number,
+                        'status': 1,
+                        'message': _('Jersey Number added Successfully')
+                    })
+
+                except IntegrityError:
+                    response_data.append({
+                        'player_id': player_id,
+                        'status': 0,
+                        'message': _('An error occurred while adding the player to the lineup.')
+                    })
+            else:
+                try:
+                    lineup, created = FriendlyGameLineup.objects.update_or_create(
+                        player_id=player.user_id,
+                        team_id=team,
+                        game_id=game,
+                        defaults={
+                            'player_ready': False,
+                            'created_by_id': request.user.id,
+                        }
+                    )
+
+                    player_jersey, created_jersey = FriendlyGamePlayerJersey.objects.update_or_create(
+                        lineup_players=lineup,
+                        defaults={
+                            'jersey_number': None,
+                            'created_by_id': request.user.id
+                        }
+                    )
+
+                    response_data.append({
+                        'player_id': player.user_id.id,
+                        'team_id': team.id,
+                        'game_id': game.id,
+                        'jersey_number': None,
+                        'status': 1,
+                        'message': _('Jersey number deleted.')
+                    })
+
+                except IntegrityError:
+                    response_data.append({
+                        'player_id': player_id,
+                        'status': 0,
+                        'message': _('An error occurred while adding the player to the lineup.')
+                    })
 
         # Return response
         return Response({
             'status': 1,
-            'message': _('Processed all players successfully.'),
+            'message': _('Jersey Numbers Updated Successfully'),
             'data': response_data
         }, status=status.HTTP_200_OK)
 
@@ -1265,22 +1336,22 @@ class FriendlyGameStatsLineupPlayers(APIView):
         }, status=status.HTTP_200_OK)
 
 
+
 class FriendlyGameLineupPlayerStatusAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, game_id=None):
         """
-        Check if the user has access to the game based on role and official type for a specific game in a specific tournament.
+        Check if the user has access to the game based on role and official type.
         """
         # Check if the user's role is 4
-        print(user.role)
         if user.role.id != 4:
             return False
 
         if game_id:
             try:
-                # Check if the game exists for the given tournament
+                # Check if the game exists for the friendly game
                 game = FriendlyGame.objects.get(id=game_id)
 
                 # Check if the user is associated with the game as an official with specific types
@@ -1305,36 +1376,42 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        # Retrieve team_id, tournament_id, and game_id from query parameters
-        team_id = request.query_params.get('team_id')
-      
+
+        # Retrieve game_id from query parameters
         game_id = request.query_params.get('game_id')
 
-        # Check if all required query parameters are provided
-        if not team_id or not game_id:
+        # Check if game_id is provided
+        if not game_id:
             return Response({
                 'status': 0,
-                'message': _('team_id, and game_id are required.'),
+                'message': _('game_id is required.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not self._has_access(request.user, game_id):
-                return Response({
-                    'status': 0,
-                    'message': _('Access denied. You do not have permission to view this game.'),
-                    'data': []
-                }, status=status.HTTP_403_FORBIDDEN)
 
-        # Filter lineup entries by team_id, tournament_id, game_id, and specific statuses
+        # Check if the user has access to this game
+        if not self._has_access(request.user, game_id):
+            return Response({
+                'status': 0,
+                'message': _('Access denied. You do not have permission to view this game.'),
+                'data': []
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Retrieve the game details from FriendlyGame
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Fetch all lineup entries based on game_id
         lineup_entries = FriendlyGameLineup.objects.filter(
-            lineup_status__in=[FriendlyGameLineup.SUBSTITUTE, FriendlyGameLineup.ALREADY_IN_LINEUP],
-            team_id=team_id,
-          
-            game_id=game_id
+            game_id=game_id,
+            lineup_status__in=[FriendlyGameLineup.SUBSTITUTE, FriendlyGameLineup.ALREADY_IN_LINEUP]
         )
 
-        # If no lineup entries are found, return a not found response
         if not lineup_entries.exists():
             return Response({
                 'status': 0,
@@ -1342,15 +1419,15 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Prepare the response data for each lineup entry, classified by lineup_status
-        added_players = []
-        substitute_players = []
+        # Classify players based on team_a and team_b, and further classify by lineup_status
+        team_a_added_players = []
+        team_a_substitute_players = []
+        team_b_added_players = []
+        team_b_substitute_players = []
+
         for lineup in lineup_entries:
             player = lineup.player_id
             player_data = {
-                'id': lineup.id,
-                'team_id': lineup.team_id.id,
-                'team_name': lineup.team_id.team_name,  # Assuming team_name field exists in TeamBranch
                 'player_id': player.id,
                 'player_username': player.username,
                 'player_profile_picture': player.profile_picture.url if player.profile_picture else None,
@@ -1361,50 +1438,101 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 'updated_at': lineup.updated_at,
             }
 
-            # Classify players based on lineup_status
-            if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
-                added_players.append(player_data)
-            elif lineup.lineup_status == FriendlyGameLineup.SUBSTITUTE:
-                substitute_players.append(player_data)
+            # Classify the player based on the team
+            if lineup.team_id == game.team_a:
+                # Further classify by lineup status
+                if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
+                    team_a_added_players.append({
+                        **player_data,
+                        'team_id': game.team_a.id,
+                        'team_name': game.team_a.team_name,  # Assuming `team_name` field exists in `TeamBranch`
+                    })
+                elif lineup.lineup_status == FriendlyGameLineup.SUBSTITUTE:
+                    team_a_substitute_players.append({
+                        **player_data,
+                        'team_id': game.team_a.id,
+                        'team_name': game.team_a.team_name,  # Assuming `team_name` field exists in `TeamBranch`
+                    })
 
-        # Return the response with classified players
+            elif lineup.team_id == game.team_b:
+                # Further classify by lineup status
+                if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
+                    team_b_added_players.append({
+                        **player_data,
+                        'team_id': game.team_b.id,
+                        'team_name': game.team_b.team_name,  # Assuming `team_name` field exists in `TeamBranch`
+                    })
+                elif lineup.lineup_status == FriendlyGameLineup.SUBSTITUTE:
+                    team_b_substitute_players.append({
+                        **player_data,
+                        'team_id': game.team_b.id,
+                        'team_name': game.team_b.team_name,  # Assuming `team_name` field exists in `TeamBranch`
+                    })
+
+        # Return the response with players classified into team_a and team_b and also by lineup status
         return Response({
             'status': 1,
             'message': _('Players fetched successfully.'),
             'data': {
-                'added_lineup': added_players,
-                'substitute': substitute_players
+                'team_a': {
+                    'team_id': game.team_a.id,
+                    'team_name': game.team_a.team_name, 
+                    'added_players': team_a_added_players,
+                    'substitute_players': team_a_substitute_players,
+                },
+                'team_b': {
+                    'team_id': game.team_b.id,
+                    'team_name': game.team_b.team_name, 
+                    'added_players': team_b_added_players,
+                    'substitute_players': team_b_substitute_players,
+                }
             }
         }, status=status.HTTP_200_OK)
+
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        # Retrieve player_id, team_id, tournament_id, and game_id from request data
+
+        # Retrieve player_id, team_id, and game_id from request data
         player_id = request.data.get('player_id')
         team_id = request.data.get('team_id')
-      
         game_id = request.data.get('game_id')
 
-        # Ensure all required fields are provided
-        if not player_id or not team_id  or not game_id:
+        # Validate player_id
+        if not player_id:
             return Response({
                 'status': 0,
-                'message': _('player_id, team_id, and game_id are required.')
+                'message': _('player_id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate team_id
+        if not team_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id is required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate game_id
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id is required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the user has access to the game
         if not self._has_access(request.user, game_id):
-                return Response({
-                    'status': 0,
-                    'message': _('Access denied. You do not have permission to view this game.'),
-                    'data': []
-                }, status=status.HTTP_403_FORBIDDEN)
+            return Response({
+                'status': 0,
+                'message': _('Access denied. You do not have permission to view this game.'),
+                'data': []
+            }, status=status.HTTP_403_FORBIDDEN)
 
         # Try to retrieve the lineup entry
         try:
             lineup_entry = FriendlyGameLineup.objects.get(
                 player_id=player_id,
                 team_id=team_id,
-            
                 game_id=game_id
             )
         except FriendlyGameLineup.DoesNotExist:
@@ -1424,11 +1552,11 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             'data': {
                 'player_id': player_id,
                 'team_id': team_id,
-                
                 'game_id': game_id,
                 'player_ready': lineup_entry.player_ready
             }
         }, status=status.HTTP_200_OK)
+
 
 # ###### Game Official Types API Views ######
 class FriendlyGameOficialTypesList(APIView):
@@ -2420,12 +2548,78 @@ class FriendlyTournamentGamesDetailAPIView(APIView):
                 # Adding staff types with detailed fields to response
             }
         }, status=status.HTTP_200_OK)
+
+
+################################ Get Uniform API when first Screen Call by manager ######################
+class FriendlyGameUniformAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')
+        user_role = request.user.role.id
+        if user_role not in [3, 6]:
+            return Response({
+            'status': 0,
+            'message': _('Access denied. You do not have the necessary role for this action.'),
+            'data': None,
+        }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('The specified game does not exist.'),
+                'data': None
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        data = {}
+
+        if game.team_a.id == int(team_id):
+            data = {
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper
+            }
+        elif game.team_b.id == int(team_id):
+            data = {
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper
+            }
+        else:
+            return Response({
+                'status': 0,
+                'message': _('The specified team_id does not match any team in this game.'),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'status': 1,
+            'message': _('Colors retrieved successfully.'),
+            'data': data
+        }, status=status.HTTP_200_OK)
     
-    
+######################################### Create Uniform API by Manager #############################
 
 class FriendlyGameUniformColorAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def _has_access(self, user, team_id):
+        if user.role.id not in [3, 6]:  # Restrict to roles Manager/Coach
+            return False
+
+        try:
+            JoinBranch.objects.get(
+                branch_id_id=team_id,
+                user_id=user,
+                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE],
+            )
+            return True
+        except ObjectDoesNotExist:
+            return False
 
     def post(self, request):
         language = request.headers.get('Language', 'en')
@@ -2434,12 +2628,20 @@ class FriendlyGameUniformColorAPIView(APIView):
 
         serializer = FriendlyTeamUniformColorSerializer(data=request.data)
         if serializer.is_valid():
-            game_id = serializer.validated_data['game_id']
-            team_id = serializer.validated_data['team_id']
-            primary_color_player = serializer.validated_data['primary_color_player']
-            secondary_color_player = serializer.validated_data['secondary_color_player']
-            primary_color_goalkeeper = serializer.validated_data['primary_color_goalkeeper']
-            secondary_color_goalkeeper = serializer.validated_data['secondary_color_goalkeeper']
+            validated_data = serializer.validated_data
+            game_id = validated_data['game_id']
+            team_id = validated_data['team_id']
+            primary_color_player = validated_data['primary_color_player']
+            secondary_color_player = validated_data['secondary_color_player']
+            primary_color_goalkeeper = validated_data['primary_color_goalkeeper']
+            secondary_color_goalkeeper = validated_data['secondary_color_goalkeeper']
+            print(team_id)
+            if not self._has_access(request.user, team_id):
+                return Response({
+                    'status': 0,
+                    'message': _('Access denied. You do not have permission for this team.'),
+                    'data': None,
+                }, status=status.HTTP_403_FORBIDDEN)
 
             try:
                 game = FriendlyGame.objects.get(id=game_id)
@@ -2449,14 +2651,15 @@ class FriendlyGameUniformColorAPIView(APIView):
                     'message': _('Game not found.'),
                     'data': None,
                 }, status=status.HTTP_404_NOT_FOUND)
-
-            # Update the uniform colors for the appropriate team
-            if team_id == str(game.team_a.id):
+            
+            team_id = int(team_id)
+            # Update uniform colors for the matched team
+            if team_id == game.team_a.id:
                 game.team_a_primary_color_player = primary_color_player
                 game.team_a_secondary_color_player = secondary_color_player
                 game.team_a_primary_color_goalkeeper = primary_color_goalkeeper
                 game.team_a_secondary_color_goalkeeper = secondary_color_goalkeeper
-            elif team_id == str(game.team_b.id):
+            elif team_id == game.team_b.id:
                 game.team_b_primary_color_player = primary_color_player
                 game.team_b_secondary_color_player = secondary_color_player
                 game.team_b_primary_color_goalkeeper = primary_color_goalkeeper
@@ -2472,7 +2675,7 @@ class FriendlyGameUniformColorAPIView(APIView):
 
             return Response({
                 'status': 1,
-                'message': _('Uniform colors updated successfully'),
+                'message': _('Uniform Added Successfully'),
                 'data': serializer.validated_data,
             }, status=status.HTTP_200_OK)
 
@@ -2481,6 +2684,30 @@ class FriendlyGameUniformColorAPIView(APIView):
             'message': _('Invalid data.'),
             'data': serializer.errors,
         }, status=status.HTTP_400_BAD_REQUEST)
+    
+
+######## Refree Uniform Fetch API #####################    
+class FetchFriendlyGameUniformColorAPIView(APIView):
+    def _has_access(self, user, game_id=None):
+        if user.role.id != 4:  # Restrict to Referee role
+            return False
+
+        if game_id:
+            try:
+                # Check if the user is associated with the game as an official with specific types
+                official = FriendlyGameGameOfficials.objects.filter(
+                    game_id_id=game_id,
+                    official_id=user,
+                    officials_type_id__in=[2, 3, 4, 5]  # Allowed official types
+                ).exists()
+
+                if official:
+                    return True
+
+            except FriendlyGame.DoesNotExist:
+                pass  # Game not found; access denied
+
+        return False
 
     def get(self, request):
         language = request.headers.get('Language', 'en')
@@ -2488,14 +2715,20 @@ class FriendlyGameUniformColorAPIView(APIView):
             activate(language)
 
         game_id = request.query_params.get('game_id')
-        team_id = request.query_params.get('team_id')
 
-        if not game_id or not team_id:
+        if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id and team_id are required.'),
+                'message': _('game_id is required.'),
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not self._has_access(request.user, game_id=game_id):
+            return Response({
+                'status': 0,
+                'message': _('Access denied. You do not have permission for this game.'),
+                'data': None,
+            }, status=status.HTTP_403_FORBIDDEN)
 
         try:
             game = FriendlyGame.objects.get(id=game_id)
@@ -2506,32 +2739,29 @@ class FriendlyGameUniformColorAPIView(APIView):
                 'data': None,
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Retrieve the uniform colors for the specified team
-        if team_id == str(game.team_a.id):
-            response_data = {
-                "team_id": team_id,
-                "primary_color_player": game.team_a_primary_color_player,
-                "secondary_color_player": game.team_a_secondary_color_player,
-                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
-            }
-        elif team_id == str(game.team_b.id):
-            response_data = {
-                "team_id": team_id,
-                "primary_color_player": game.team_b_primary_color_player,
-                "secondary_color_player": game.team_b_secondary_color_player,
-                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
-            }
-        else:
-            return Response({
-                'status': 0,
-                'message': _('The specified team_id does not match any team in this game.'),
-                'data': None,
-            }, status=status.HTTP_400_BAD_REQUEST)
+        team_a_data = {
+            "team_id": game.team_a.id,
+            "team_name": game.team_a.team_name,
+            "primary_color_player": game.team_a_primary_color_player,
+            "secondary_color_player": game.team_a_secondary_color_player,
+            "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+            "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+        }
+
+        team_b_data = {
+            "team_id": game.team_b.id,
+            "team_name": game.team_b.team_name,
+            "primary_color_player": game.team_b_primary_color_player,
+            "secondary_color_player": game.team_b_secondary_color_player,
+            "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+            "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+        }
 
         return Response({
             'status': 1,
-            'message': _('Uniform colors retrieved successfully'),
-            'data': response_data,
+            'message': _('Uniform information fetched successfully.'),
+            'data': {
+                'team_a': team_a_data,
+                'team_b': team_b_data
+            },
         }, status=status.HTTP_200_OK)
