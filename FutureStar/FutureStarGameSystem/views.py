@@ -2106,23 +2106,35 @@ class PlayerSubstitutionAPIView(APIView):
 
         user_a = get_object_or_404(User, id=player_a.player_id.id)  # Get User instance for player_a
         user_b = get_object_or_404(User, id=player_b.player_id.id)  # Get User instance for player_b
+        print(user_a)
+        print(user_b)
         # Get other related instances
         team_branch = get_object_or_404(TeamBranch, id=team_id)
+        print(team_branch)
         tournament_instance = get_object_or_404(Tournament, id=tournament_id)
+        print(tournament_instance)
         game_instance = get_object_or_404(TournamentGames, id=game_id)
-
-        # Create a new PlayerGameStats record to log the substitution
-        player_game_stat = PlayerGameStats.objects.create(
-            team_id=team_branch,
-            game_id=game_instance,
-            tournament_id=tournament_instance,
-            in_player=user_b,  # Corrected to use the ID of player_b
-            out_player=user_a,  # Corrected to use the ID of player_a
-            created_by_id=request.user.id
-        )
-       
+        print(game_instance)
+        try:
+            # Create a new PlayerGameStats record to log the substitution
+            player_game_stat = PlayerGameStats.objects.create(
+                team_id=team_branch,
+                game_id=game_instance,
+                tournament_id=tournament_instance,
+                player_id=user_b if user_b else user_a,
+                in_player=user_b,  # Corrected to use the ID of player_b
+                out_player=user_a,  # Corrected to use the ID of player_a
+                created_by_id=request.user.id
+            )
+        except IntegrityError as e:
+                return Response({
+                    "error": _("Failed to log player substitution."),
+                    "details": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         player_a.save()
         player_b.save()
+        print(player_a)
+        print(player_b)
         return Response({
             "message": _("Player substitution successful"),
             "player_a": {
@@ -2140,6 +2152,7 @@ class PlayerSubstitutionAPIView(APIView):
                 "lineup_status": player_b.lineup_status,
             }
         }, status=status.HTTP_200_OK)
+   
 
     def get(self, request, *args, **kwargs):   
 
