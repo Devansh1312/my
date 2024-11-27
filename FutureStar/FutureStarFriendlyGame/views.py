@@ -1430,7 +1430,16 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('No players found for the specified criteria.'),
-                'data': {}
+                'data': {
+                    'team_a': {
+                    'added_players': [],
+                    'substitute_players': [],
+                },
+                'team_b': {
+                    'added_players': [],
+                    'substitute_players': [],
+                }
+                }
             }, status=status.HTTP_200_OK)
 
         # Classify players based on team_a and team_b, and further classify by lineup_status
@@ -1571,6 +1580,134 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
+
+
+
+
+
+
+############################### Game Officilas Search API #########################
+
+############ Custom User Search Pagination ##############
+class FriendlyOfflicialSearchPaggination(PageNumberPagination):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        # Store the request for later use in get_paginated_response
+        self.request = request  
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError(_("Page number must be a positive integer."))
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        # Use self.request which was set in paginate_queryset
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        return Response({
+            'status': 1,
+            'message': _('Data fetched successfully.'),
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+
+############### User Search View ###############
+class FriendlyOfficialSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = FriendlyOfflicialSearchPaggination  # Set the pagination class
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Get search_type and phone from query parameters
+        search_type = request.query_params.get('search_type')
+        phone = request.query_params.get('phone')
+        game_id = request.query_params.get('game_id')  # Get game_id from request
+
+        # Validate search_type: must be between 1 and 10
+        if not search_type or not search_type.isdigit() or int(search_type) not in range(1, 11):
+            return Response({
+                'status': 0, 
+                'message': _('Invalid search type.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        search_type = int(search_type)  # Convert search_type to an integer for logic
+        users = User.objects.none()  # Initialize an empty queryset
+
+        # Apply logic based on search_type
+        if search_type == 1:
+            users = User.objects.filter(role_id=5, is_deleted=False)  # Role 5 for search_type 1
+        elif search_type in [2, 3, 4, 5]:
+            users = User.objects.filter(role_id=4, is_deleted=False)  # Role 4 for search_type 2-5
+        elif search_type in [6, 7, 8, 9, 10]:
+            users = User.objects.filter(role_id=5, is_deleted=False)  # Role 5 for search_type 6-10
+
+        # Filter by phone if provided
+        if phone:
+            users = users.filter(phone__icontains=phone)
+
+        # Exclude users who have already joined the specified game
+        if game_id:
+            joined_users = FriendlyGameGameOfficials.objects.filter(game_id=game_id).values_list('official_id', flat=True)
+            users = users.exclude(id__in=joined_users)
+
+        # Apply pagination
+        paginator = self.pagination_class()
+        paginated_users = paginator.paginate_queryset(users, request)
+
+        # Construct the response data manually
+        user_data = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'phone': user.phone,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                'country_id': user.country.id if user.country else None,
+                'country_name': user.country.name if user.country else None,
+                'flag': user.country.flag.url if user.country else None,
+            }
+            for user in paginated_users
+        ]
+
+        # Return paginated response with custom data
+        return paginator.get_paginated_response(user_data)
 
 # ###### Game Official Types API Views ######
 class FriendlyGameOficialTypesList(APIView):

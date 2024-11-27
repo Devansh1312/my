@@ -1213,7 +1213,16 @@ class LineupPlayerStatusAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('No players found for the specified criteria.'),
-                'data': {}
+                'data': {
+                    'team_a': {
+                    'added_players': [],
+                    'substitute_players': [],
+                },
+                'team_b': {
+                    'added_players': [],
+                    'substitute_players': [],
+                }
+                }
             }, status=status.HTTP_200_OK)
 
         # Classify players based on team_a and team_b, and further classify by lineup_status
