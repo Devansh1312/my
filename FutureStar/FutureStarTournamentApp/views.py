@@ -2027,8 +2027,9 @@ class UpcomingGameView(APIView):
                             "name": first_game.team_b.team_name if first_game.team_b else None,
                         },
                         "user_role": user_role,
-                        "tournament_id": first_game.tournament_id.id if first_game.tournament_id else None  # Move it here
-                    }
+                        # Add "tournament_id" only if game_type is "Tournament"
+                        **({"tournament_id": first_game.tournament_id.id} if game_type == "Tournament" and first_game.tournament_id else {})
+                    },
                 },
             }
 
@@ -2107,6 +2108,7 @@ class FetchMyGamesAPIView(APIView):
                 "is_draw": game.is_draw,
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
+                "game_type":"Tournament",
             })
         
         for game in friendly_games:
@@ -2137,6 +2139,7 @@ class FetchMyGamesAPIView(APIView):
                 "is_draw": game.is_draw,
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
+                "game_type":"Friendly",
             })
         
         # Format the response
@@ -2218,6 +2221,7 @@ class FetchAllGamesAPIView(APIView):
                 "is_draw": game.is_draw,
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
+                "game_type":"Tournament",
             })
         
         for game in friendly_games:
@@ -2248,6 +2252,7 @@ class FetchAllGamesAPIView(APIView):
                 "is_draw": game.is_draw,
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
+                "game_type":"Friendly",
             })
         
         # Format the response
@@ -2275,7 +2280,6 @@ class FetchAllGamesAPIView(APIView):
             "current_page": page,
             "data": response_data[start:end],
         })
-
 
 
 ############################ Tournaments Game Stats  API ########################################

@@ -802,7 +802,9 @@ class FriendlyGameLineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2
+                'position_2': lineup.position_2,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None
+
             } for lineup in added_lineups]
 
             # Prepare response data for substitute players
@@ -812,7 +814,8 @@ class FriendlyGameLineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2
+                'position_2': lineup.position_2,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in substitute_lineups]
 
             already_added_data = [{
@@ -821,7 +824,8 @@ class FriendlyGameLineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2
+                'position_2': lineup.position_2,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in already_added_lineups]
 
             # Return the response with the status and message
@@ -897,7 +901,8 @@ class FriendlyGameLineupPlayers(APIView):
                 'player_username': player.player_id.username,
                 'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
                 'position_1': player.position_1,
-                'position_2': player.position_2
+                'position_2': player.position_2,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=player).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=player).exists() else None
             } for player in already_added_lineups]
 
             return Response({
@@ -975,7 +980,8 @@ class FriendlyGameLineupPlayers(APIView):
                 'username': player.player_id.username,
                 'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
                 'position_1': player.position_1,
-                'position_2': player.position_2
+                'position_2': player.position_2,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=player).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=player).exists() else None
             } for player in already_added_lineups]
 
             substitute_data = [{
@@ -984,7 +990,8 @@ class FriendlyGameLineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2
+                'position_2': lineup.position_2,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in substitute_lineups]
 
             return Response({
