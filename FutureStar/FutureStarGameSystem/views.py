@@ -1754,6 +1754,15 @@ class PlayerGameStatsAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
         
+        game_instance = get_object_or_404(TournamentGames, id=game_id)
+        if game_instance.finish==True:  # Explicitly check if the game is finished
+            return Response({
+                'status': 0,
+                'message': _('Cannot add stats for a finished game.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        
         # Retrieve related model instances
         team_instance = get_object_or_404(TeamBranch, id=team_id)
         player_instance = get_object_or_404(User, id=player_id)
