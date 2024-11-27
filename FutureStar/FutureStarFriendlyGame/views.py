@@ -492,7 +492,10 @@ class FriendlyGameTeamPlayersAPIView(APIView):
             team_id=team_id,
             player_id__in=player_user_ids,
             game_id=game_id,
-            lineup_status=FriendlyGameLineup.ADDED
+            lineup_status__in=[
+                FriendlyGameLineup.ADDED,
+                FriendlyGameLineup.ALREADY_IN_LINEUP
+            ]
         ).values_list('player_id', flat=True)
 
         # Fetch player details excluding those in the lineup
@@ -506,9 +509,11 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 game_id=game_id
             ).first()
 
-            # Fetch jersey number from FriendlyPlayerJersey model (if applicable)
+            # Fetch lineup status and jersey number from FriendlyGameLineup and FriendlyGamePlayerJersey
+            lineup_status = None
             jersey_number = None
             if lineup_entry:
+                lineup_status = lineup_entry.lineup_status
                 jersey_entry = FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup_entry).first()
                 jersey_number = jersey_entry.jersey_number if jersey_entry else None
 
@@ -520,9 +525,11 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 "player_name": player.username,
                 "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
                 "jersey_number": jersey_number,  # Jersey number from FriendlyPlayerJersey
+                "lineup_status": lineup_status,  # Include lineup status
                 "created_at": player.created_at,
                 "updated_at": player.updated_at,
             })
+
 
         return Response({
             'status': 1,

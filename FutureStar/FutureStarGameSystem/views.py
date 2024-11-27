@@ -112,8 +112,12 @@ class TeamPlayersAPIView(APIView):
             excluded_player_ids = Lineup.objects.filter(
                 team_id=team_id,
                 player_id__in=player_user_ids,
-                lineup_status=Lineup.ADDED
+                lineup_status__in=[
+                    Lineup.ADDED,
+                    Lineup.ALREADY_IN_LINEUP
+                ]
             ).values_list('player_id', flat=True)
+
 
             # Get player details excluding those in the Lineup
             lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
@@ -127,10 +131,11 @@ class TeamPlayersAPIView(APIView):
                     tournament_id=tournament_id
                 ).first()
 
-                # Fetch jersey number from PlayerJersey model
+                # Fetch lineup status and jersey number from Lineup and PlayerJersey
+                lineup_status = None
                 jersey_number = None
                 if lineup_entry:
-                    # Query PlayerJersey model using the reverse relationship
+                    lineup_status = lineup_entry.lineup_status
                     jersey_entry = PlayerJersey.objects.filter(lineup_players=lineup_entry).first()
                     jersey_number = jersey_entry.jersey_number if jersey_entry else None
 
@@ -142,9 +147,11 @@ class TeamPlayersAPIView(APIView):
                     "player_name": player.username,
                     "player_profile_picture": player.profile_picture.url if player.profile_picture else None,
                     "jersey_number": jersey_number,  # Jersey number from PlayerJersey
+                    "lineup_status": lineup_status,  # Include lineup status
                     "created_at": player.created_at,
                     "updated_at": player.updated_at,
                 })
+
 
             return Response({
                 'status': 1,
