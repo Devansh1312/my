@@ -1700,10 +1700,9 @@ class FetchTeamUniformColorAPIView(APIView):
 
 #         return Response(response_data, status=status.HTTP_200_OK)
 
-from django.utils.timezone import now
-from collections import defaultdict
-from django.db.models import Q
 
+
+############### Tournament Games h2h  API View ####################
 class TournamentGamesh2hCompleteAPIView(APIView):
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -1734,7 +1733,7 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         if not all_games.exists():
             return Response({
                 'status': 0,
-                'message': _('No completed games found for this tournament'),
+                'message': _('No games found for this tournament'),
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Calculate standings for all teams
@@ -1774,12 +1773,6 @@ class TournamentGamesh2hCompleteAPIView(APIView):
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
         ).order_by('-game_start_time')[:5]  # Get the latest 5 games by game_start_time
 
-        if not h2h_games.exists():
-            return Response({
-                'status': 0,
-                'message': _('No completed games found between the selected teams in this tournament'),
-            }, status=status.HTTP_404_NOT_FOUND)
-
         # Prepare stats
         team_a_stats = team_stats.get(int(team_a_id), {'wins': 0, 'losses': 0, 'draws': 0})
         team_b_stats = team_stats.get(int(team_b_id), {'wins': 0, 'losses': 0, 'draws': 0})
@@ -1796,18 +1789,23 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         }
 
         # Serialize H2H games
-        serializer = TournamentGamesHead2HeadSerializer(
-            h2h_games, many=True, context={'tournament_id': tournament_id, 'team_positions': team_positions}
-        )
+        if h2h_games.exists():
+            serializer = TournamentGamesHead2HeadSerializer(
+                h2h_games, many=True, context={'tournament_id': tournament_id, 'team_positions': team_positions}
+            )
+            recent_meetings = serializer.data
+        else:
+            recent_meetings = []  # Return an empty list if no games are found
 
         return Response({
             'status': 1,
             'message': _('H2H Fetch Successfully'),
             'data': {
                 "stats": stats,
-                "recent_meetings": serializer.data
+                "recent_meetings": recent_meetings
             }
         }, status=status.HTTP_200_OK)
+
 
 
 
