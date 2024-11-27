@@ -1767,7 +1767,7 @@ class TournamentGamesh2hCompleteAPIView(APIView):
 
         # Query games for H2H view (recent meetings)
         h2h_games = TournamentGames.objects.filter(
-            game_finish=True,  # Filter only by game_finish for recent meetings
+            finish=True,  # Filter only by game_finish for recent meetings
             tournament_id=tournament_id
         ).filter(
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
