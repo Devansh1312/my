@@ -1649,63 +1649,67 @@ class FetchTeamUniformColorAPIView(APIView):
             
 
 ################################
-class TournamentGameStatsAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-        # Retrieve the query parameters: tournament_id, team_a_id, and team_b_id
-        tournament_id = request.query_params.get('tournament_id')
-        team_a_id = request.query_params.get('team_a_id')
-        team_b_id = request.query_params.get('team_b_id')
+# class TournamentGameStatsAPIView(APIView):
+#     def get(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
+#         # Retrieve the query parameters: tournament_id, team_a_id, and team_b_id
+#         tournament_id = request.query_params.get('tournament_id')
+#         team_a_id = request.query_params.get('team_a_id')
+#         team_b_id = request.query_params.get('team_b_id')
 
-        # Initialize the dictionary to hold statistics for each team
-        team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
+#         # Initialize the dictionary to hold statistics for each team
+#         team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
 
-        # Query games based on tournament_id, team_a_id, and team_b_id
-        games = TournamentGames.objects.all()
+#         # Query games based on tournament_id, team_a_id, and team_b_id
+#         games = TournamentGames.objects.all()
 
-        # Apply filters based on provided query parameters
-        if tournament_id:
-            games = games.filter(tournament_id=tournament_id)
-        if team_a_id:
-            games = games.filter(team_a__id=team_a_id)
-        if team_b_id:
-            games = games.filter(team_b__id=team_b_id)
+#         # Apply filters based on provided query parameters
+#         if tournament_id:
+#             games = games.filter(tournament_id=tournament_id)
+#         if team_a_id:
+#             games = games.filter(team_a__id=team_a_id)
+#         if team_b_id:
+#             games = games.filter(team_b__id=team_b_id)
 
-        # Iterate through all the games and calculate statistics
-        for game in games:
-            if game.is_draw:
-                # Both teams have a draw
-                team_stats[game.team_a.id]['draws'] += 1
-                team_stats[game.team_b.id]['draws'] += 1
-            elif game.winner_id == game.team_a.id:
-                # Team A wins
-                team_stats[game.team_a.id]['wins'] += 1
-                team_stats[game.team_b.id]['losses'] += 1
-            elif game.winner_id == game.team_b.id:
-                # Team B wins
-                team_stats[game.team_b.id]['wins'] += 1
-                team_stats[game.team_a.id]['losses'] += 1
+#         # Iterate through all the games and calculate statistics
+#         for game in games:
+#             if game.is_draw:
+#                 # Both teams have a draw
+#                 team_stats[game.team_a.id]['draws'] += 1
+#                 team_stats[game.team_b.id]['draws'] += 1
+#             elif game.winner_id == game.team_a.id:
+#                 # Team A wins
+#                 team_stats[game.team_a.id]['wins'] += 1
+#                 team_stats[game.team_b.id]['losses'] += 1
+#             elif game.winner_id == game.team_b.id:
+#                 # Team B wins
+#                 team_stats[game.team_b.id]['wins'] += 1
+#                 team_stats[game.team_a.id]['losses'] += 1
 
-        # Format the response in the required structure
-        response_data = {
-            "status": 1,
-            "message": _('Stats fetched successfully'),
-            "data": {
-                "Team_A": team_stats.get(int(team_a_id), {"wins": 0, "losses": 0, "draws": 0}),
-                "Team_B": team_stats.get(int(team_b_id), {"wins": 0, "losses": 0, "draws": 0}),
-            }
-        }
+#         # Format the response in the required structure
+#         response_data = {
+#             "status": 1,
+#             "message": _('Stats fetched successfully'),
+#             "data": {
+#                 "Team_A": team_stats.get(int(team_a_id), {"wins": 0, "losses": 0, "draws": 0}),
+#                 "Team_B": team_stats.get(int(team_b_id), {"wins": 0, "losses": 0, "draws": 0}),
+#             }
+#         }
 
-        return Response(response_data, status=status.HTTP_200_OK)
-    
+#         return Response(response_data, status=status.HTTP_200_OK)
+
+from django.utils.timezone import now
+from collections import defaultdict
+from django.db.models import Q
+
 class TournamentGamesh2hCompleteAPIView(APIView):
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
+
         tournament_id = request.query_params.get('tournament_id', None)
         team_a_id = request.query_params.get('team_a', None)
         team_b_id = request.query_params.get('team_b', None)
@@ -1715,16 +1719,16 @@ class TournamentGamesh2hCompleteAPIView(APIView):
                 'status': 0,
                 'message': _('Tournament ID is required'),
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         if not team_a_id or not team_b_id:
             return Response({
                 'status': 0,
                 'message': _('Both Team A and Team B IDs are required'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Query all games in the tournament
+        # Query all completed games in the tournament (for stats)
         all_games = TournamentGames.objects.filter(
-            finish=True, tournament_id=tournament_id
+            tournament_id=tournament_id
         )
 
         if not all_games.exists():
@@ -1761,14 +1765,14 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         standings.sort(key=lambda x: x['points'], reverse=True)  # Sort by points descending
         team_positions = {team['team_id']: index + 1 for index, team in enumerate(standings)}
 
-        # Query games for H2H view
+        # Query games for H2H view (recent meetings)
         h2h_games = TournamentGames.objects.filter(
-            finish=True,
+            game_finish=True,  # Filter only by game_finish for recent meetings
             tournament_id=tournament_id
         ).filter(
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
-        )
+        ).order_by('-game_start_time')[:5]  # Get the latest 5 games by game_start_time
 
         if not h2h_games.exists():
             return Response({
@@ -1804,6 +1808,8 @@ class TournamentGamesh2hCompleteAPIView(APIView):
                 "recent_meetings": serializer.data
             }
         }, status=status.HTTP_200_OK)
+
+
 
 
 ############################# FETCH AND CREATE GROUP TEAM WITH ADDING OR UPDATING TEAM ###########################
