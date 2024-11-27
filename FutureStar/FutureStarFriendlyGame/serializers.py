@@ -139,48 +139,53 @@ class FriendlyTeamUniformColorSerializer(serializers.Serializer):
         
         return data
 
-class FiendlyTournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
-    team_a_logo = serializers.SerializerMethodField()
-    team_b_logo = serializers.SerializerMethodField()
-    team_a_name = serializers.SerializerMethodField()
-    team_b_name = serializers.SerializerMethodField()
-    game_field_name = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = TournamentGames
-        fields = ['id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal', 
-                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo']
+# class FiendlyTournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
+#     team_a_logo = serializers.SerializerMethodField()
+#     team_b_logo = serializers.SerializerMethodField()
+#     team_a_name = serializers.SerializerMethodField()
+#     team_b_name = serializers.SerializerMethodField()
+#     game_field_name = serializers.SerializerMethodField()
+#     type = serializers.SerializerMethodField()  # New field to indicate the game type
 
-    def get_team_a_logo(self, obj):
-        # Retrieve the logo for team A
-        team_a_branch = TeamBranch.objects.filter(id=obj.team_a).first()
-        if team_a_branch and team_a_branch.team_id:
-            team_a_logo = Team.objects.filter(id=team_a_branch.team_id.id).values_list('team_logo', flat=True).first()
-            return f"/media/{team_a_logo}" if team_a_logo else None
-        return None
+#     class Meta:
+#         fields = [
+#             'id',
+#             'team_a_name',
+#             'team_b_name',
+#             'team_a_goal',
+#             'team_b_goal',
+#             'game_field_name',
+#             'game_date',
+#             'team_a_logo',
+#             'team_b_logo',
+#             'type'  # Include the game type in the output
+#         ]
 
-    def get_team_b_logo(self, obj):
-        # Retrieve the logo for team B
-        team_b_branch = TeamBranch.objects.filter(id=obj.team_b).first()
-        if team_b_branch and team_b_branch.team_id:
-            team_b_logo = Team.objects.filter(id=team_b_branch.team_id.id).values_list('team_logo', flat=True).first()
-            return f"/media/{team_b_logo}" if team_b_logo else None
-        return None
+#     def get_team_a_logo(self, obj):
+#         # Access the logo for team A
+#         if obj.team_a and hasattr(obj.team_a, 'team_id') and obj.team_a.team_id.team_logo:
+#             return f"/media/{obj.team_a.team_id.team_logo}"
+#         return None
 
-    def get_team_a_name(self, obj):
-        # Retrieve the team name for team A
-        team_a_branch = TeamBranch.objects.filter(id=obj.team_a).first()
-        return team_a_branch.team_name if team_a_branch else None
+#     def get_team_b_logo(self, obj):
+#         # Access the logo for team B
+#         if obj.team_b and hasattr(obj.team_b, 'team_id') and obj.team_b.team_id.team_logo:
+#             return f"/media/{obj.team_b.team_id.team_logo}"
+#         return None
 
-    def get_team_b_name(self, obj):
-        # Retrieve the team name for team B
-        team_b_branch = TeamBranch.objects.filter(id=obj.team_b).first()
-        return team_b_branch.team_name if team_b_branch else None
+#     def get_team_a_name(self, obj):
+#         return obj.team_a.team_name if obj.team_a else None
 
-    def get_game_field_name(self, obj):
-        # Retrieve the field name where the game is played
-        game_field = Field.objects.filter(id=obj.game_field_id.id).first()
-        return game_field.field_name if game_field else None
+#     def get_team_b_name(self, obj):
+#         return obj.team_b.team_name if obj.team_b else None
+
+#     def get_game_field_name(self, obj):
+#         return obj.game_field_id.field_name if obj.game_field_id else None
+
+#     def get_type(self, obj):
+#         # Determine the type based on the model
+#         return "Tournament" if isinstance(obj, TournamentGames) else "Friendly"
+
     
 
 class FriendlyGameSwapPositionSerializer(serializers.ModelSerializer):

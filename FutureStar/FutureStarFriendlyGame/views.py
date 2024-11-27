@@ -2745,37 +2745,107 @@ class FriendlyGameStatsAPIView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
+from itertools import chain
+from operator import attrgetter
+
 class FriendlyGamesh2hCompleteAPIView(APIView):
     def get(self, request, *args, **kwargs):
-        # Retrieve query parameters
-        team_a_id = request.query_params.get('team_a_id', None)
-        team_b_id = request.query_params.get('team_b_id', None)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-        # Filter games by 'finish' field being True
-        games = FriendlyGame.objects.filter(finish=True)
+        team_a_id = request.query_params.get('team_a', None)
+        team_b_id = request.query_params.get('team_b', None)
 
-        # Apply additional filters
-        if team_a_id:
-            games = games.filter(team_a_id=team_a_id)
-        if team_b_id:
-            games = games.filter(team_b_id=team_b_id)
-
-        # Check if any games exist
-        if not games.exists():
+        if not team_a_id or not team_b_id:
             return Response({
                 'status': 0,
-                'message': _("No completed friendly games found for the given teams"),
-            }, status=status.HTTP_404_NOT_FOUND)
+                'message': _('Both Team A and Team B IDs are required'),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Serialize the data
-        serializer = FriendlyGameSerializer(games, many=True)
+        # Query all games from both tables
+        tournament_games = TournamentGames.objects.filter(
+            Q(team_a_id=team_a_id) | Q(team_b_id=team_a_id) |
+            Q(team_a_id=team_b_id) | Q(team_b_id=team_b_id)
+        )
 
-        # Prepare response data
+        friendly_games = FriendlyGame.objects.filter(
+            Q(team_a_id=team_a_id) | Q(team_b_id=team_a_id) |
+            Q(team_a_id=team_b_id) | Q(team_b_id=team_b_id)
+        )
+
+        # Combine games for statistics
+        all_games = chain(tournament_games, friendly_games)
+
+        # Calculate stats
+        team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
+
+        for game in all_games:
+            if game.is_draw:
+                if game.team_a and game.team_b:
+                    team_stats[game.team_a.id]['draws'] += 1
+                    team_stats[game.team_b.id]['draws'] += 1
+            else:
+                if game.winner_id and game.loser_id:
+                    team_stats[int(game.winner_id)]['wins'] += 1
+                    team_stats[int(game.loser_id)]['losses'] += 1
+
+        # Stats output
+        team_a_stats = team_stats.get(int(team_a_id), {'wins': 0, 'losses': 0, 'draws': 0})
+        team_b_stats = team_stats.get(int(team_b_id), {'wins': 0, 'losses': 0, 'draws': 0})
+
+        stats = {
+            "team_a_win": team_a_stats['wins'],
+            "team_b_win": team_b_stats['wins'],
+            "team_a_lose": team_a_stats['losses'],
+            "team_b_lose": team_b_stats['losses'],
+            "team_a_draw": team_a_stats['draws'],
+            "team_b_draw": team_b_stats['draws'],
+        }
+
+        # Query recent meetings
+        recent_tournament_games = TournamentGames.objects.filter(
+            (Q(team_a_id=team_a_id) & Q(team_b_id=team_b_id)) |
+            (Q(team_a_id=team_b_id) & Q(team_b_id=team_a_id)),
+             finish=True
+        ).order_by('-game_start_time')
+
+        recent_friendly_games = FriendlyGame.objects.filter(
+            (Q(team_a_id=team_a_id) & Q(team_b_id=team_b_id)) |
+            (Q(team_a_id=team_b_id) & Q(team_b_id=team_a_id)),
+            finish=True
+        ).order_by('-game_start_time')
+
+        # Combine and sort by start time
+        recent_games = sorted(
+            chain(recent_tournament_games, recent_friendly_games),
+            key=attrgetter('game_start_time'), reverse=True
+        )[:5]
+
+        # Serialize recent games
+        recent_meetings = []
+        for game in recent_games:
+            game_data = {
+                'id': game.id,
+                'team_a_name': game.team_a.team_name if game.team_a else None,
+                'team_b_name': game.team_b.team_name if game.team_b else None,
+                'team_a_goal': game.team_a_goal,
+                'team_b_goal': game.team_b_goal,
+                'game_date': game.game_date,
+                'game_field_name': game.game_field_id.field_name if game.game_field_id else None,
+                'type': 'Tournament' if isinstance(game, TournamentGames) else 'Friendly'
+            }
+            recent_meetings.append(game_data)
+
         return Response({
             'status': 1,
-            'message': _("Friendly games fetched successfully"),
-            'data': serializer.data,
+            'message': _('H2H Fetch Successfully'),
+            'data': {
+                "stats": stats,
+                "recent_meetings": recent_meetings
+            }
         }, status=status.HTTP_200_OK)
+
 
 
 
