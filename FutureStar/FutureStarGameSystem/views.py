@@ -1943,71 +1943,89 @@ class TeamGameStatsTimelineAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        # Retrieve query parameters
+
         game_id = request.query_params.get('game_id')
         tournament_id = request.query_params.get('tournament_id')
-        include_game_time = request.query_params.get('game_time')  # Check if game_time is provided
+        include_game_time = request.query_params.get('game_time')
 
-        # Validate game_id
         if not game_id:
-            return Response({
-                'status': 0,
-                'message': _('game_id is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('game_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate tournament_id
         if not tournament_id:
-            return Response({
-                'status': 0,
-                'message': _('tournament_id is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('tournament_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': []}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Fetch game and calculate total goals for both teams
+            tournament_game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+            team_a_goals = PlayerGameStats.objects.filter(team_id=tournament_game.team_a.id, game_id=game_id, tournament_id=tournament_id).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            team_b_goals = PlayerGameStats.objects.filter(team_id=tournament_game.team_b.id, game_id=game_id, tournament_id=tournament_id).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            team_stats = PlayerGameStats.objects.filter(game_id=game_id, tournament_id=tournament_id).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
+
+            stats_data_a = []
+            stats_data_b = []
+
+            for stat in team_stats:
+                stat_info = {
+                    'id': stat.id,
+                    'player_id': stat.player_id.id,
+                    'player_name': stat.player_id.username,
+                    'team_id': stat.team_id.id,
+                    'team_name': stat.team_id.team_name,
+                    'goals': stat.goals,
+                    'assists': stat.assists,
+                    'own_goals': stat.own_goals,
+                    'yellow_cards': stat.yellow_cards,
+                    'red_cards': stat.red_cards,
+                    'created_at': stat.created_at,
+                    'updated_at': stat.updated_at,
+                    'substitution_in_player': stat.in_player.id if stat.in_player else None,
+                    'substitution_out_player': stat.out_player.id if stat.out_player else None,
+                    'game_time': stat.game_time if include_game_time else None
+                }
+                if stat.team_id.id == tournament_game.team_a.id:
+                    stats_data_a.append(stat_info)
+                elif stat.team_id.id == tournament_game.team_b.id:
+                    stats_data_b.append(stat_info)
+
+            return Response({
+                'status': 1,
+                'message': _('Team stats timeline fetched successfully.'),
+                'data': {
+                    'game_id': game_id,
+                    'tournament_id': tournament_id,
+                    'goals': [
+                            {
+                                'team_a_id': tournament_game.team_a.id,
+                                'team_a_name': tournament_game.team_a.team_name,
+                                'team_a_total_goals': team_a_goals,
+                                'team_a_logo': tournament_game.team_a.team_id.team_logo.url if tournament_game.team_a.team_id.team_logo else None
+                            },
+                            {
+                                'team_b_id': tournament_game.team_b.id,
+                                'team_b_name': tournament_game.team_b.team_name,
+                                'team_b_total_goals': team_b_goals,
+                                'team_b_logo': tournament_game.team_b.team_id.team_logo.url if tournament_game.team_b.team_id.team_logo else None
+                            }
+                        ],
+                    'timeline': {
+                        'team_a': stats_data_a,
+                        'team_b': stats_data_b
+                    }
+                }
+            }, status=status.HTTP_200_OK)
+
+        except TournamentGames.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('You do not have access to this resource.'),
+                'message': _('Game not found.'),
                 'data': []
-            }, status=status.HTTP_403_FORBIDDEN)
+            }, status=status.HTTP_404_NOT_FOUND)
 
-        # Retrieve all relevant stats related to the given game and tournament
-        team_stats = PlayerGameStats.objects.filter(
-            game_id=game_id,
-            tournament_id=tournament_id
-        ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
-
-        # Prepare a list to hold the timeline data
-        stats_data = []
-
-        # Iterate over the stats and add every stat to the response, including duplicates
-        for stat in team_stats:
-            stat_info = {
-                'id': stat.id,
-                'player_id': stat.player_id.id,
-                'player_name': stat.player_id.username,  # Assuming player has a 'name' field
-                'team_id': stat.team_id.id,
-                'team_name': stat.team_id.team_name,  # Assuming team has a 'name' field
-                'goals': stat.goals,
-                'assists': stat.assists,
-                'own_goals': stat.own_goals,
-                'yellow_cards': stat.yellow_cards,
-                'red_cards': stat.red_cards,
-                'created_at': stat.created_at,
-                'updated_at': stat.updated_at,
-                'substitution_in_player': stat.in_player.id if stat.in_player else None,
-                'substitution_out_player': stat.out_player.id if stat.out_player else None,
-                # Include game_time if include_game_time is set; otherwise, set to None
-                'game_time': stat.game_time if include_game_time else None
-            }
-            # Add the stat information to the list
-            stats_data.append(stat_info)
-
-        # Return the response with all timeline data, including duplicates
-        return Response({
-            'status': 1,
-            'message': _('Team stats timeline fetched successfully.'),
-            'data': stats_data
-        }, status=status.HTTP_200_OK)
+#################### player substitute ######################
 class PlayerSubstitutionAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
