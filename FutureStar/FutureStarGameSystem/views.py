@@ -249,14 +249,6 @@ class TeamPlayersAPIView(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # # Check if the lineup already has a jersey number assigned
-        # if not lineup.position_1 and not lineup.position_2:
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('The player does not have a valid position or jersey number in the lineup.'),
-        #         'data': []
-        #     }, status=status.HTTP_400_BAD_REQUEST)
-
         # Update lineup status based on current lineup size
         existing_players = Lineup.objects.filter(team_id=team, game_id=game)
         player_count = existing_players.filter(lineup_status=Lineup.ADDED).count()
@@ -265,6 +257,9 @@ class TeamPlayersAPIView(APIView):
             lineup_status = lineup.lineup_status  # Keep the status as ALREADY_IN_LINEUP
         else:
             lineup_status = Lineup.SUBSTITUTE if player_count >= 11 else Lineup.ADDED
+
+        # Determine if reload is needed
+        reload = player_count >= 11  # Reload is true if count is 11 or more
 
         # Update the lineup entry
         lineup.lineup_status = lineup_status
@@ -283,9 +278,11 @@ class TeamPlayersAPIView(APIView):
                 'tournament_name': tournament.tournament_name,
                 'game_id': game.id,
                 'game_number': game.game_number,
-                'lineup_status': 'ADDED' if lineup_status == Lineup.ADDED else 'SUBSTITUTE'
+                'lineup_status': 'ADDED' if lineup_status == Lineup.ADDED else 'SUBSTITUTE',
+                'reload': reload
             }
         }, status=status.HTTP_200_OK)
+
 
     
 

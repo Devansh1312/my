@@ -641,6 +641,9 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 lineup_status=lineup_status
             )
 
+        # Determine if reload is needed
+        reload = player_count >= 11  # Reload is true if count is 11 or more
+
         # Return success response
         return Response({
             'status': 1,
@@ -652,7 +655,8 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'player_name': player.user_id.username,  # Adjust field if necessary
                 'game_id': game.id,
                 'game_name': game.game_name,
-                'lineup_status': 'ADDED' if lineup_status == FriendlyGameLineup.ADDED else 'SUBSTITUTE'
+                'lineup_status': 'ADDED' if lineup_status == FriendlyGameLineup.ADDED else 'SUBSTITUTE',
+                'reload': reload
             }
         }, status=status.HTTP_200_OK)
 
