@@ -1940,6 +1940,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
 
 class FriendlyPlayerGameStatsTimelineAPIView(APIView):
+
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -1963,46 +1964,26 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        # Retrieve query parameters
+
         game_id = request.query_params.get('game_id')
         
-        # Validate query parameters
-        if not game_id:
-            return Response({
-                'status': 0,
-                'message': _('game_id is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Check user access
+        if not game_id:
+            return Response({'status': 0, 'message': _('game_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+
         if not self._has_access(request.user, game_id=game_id):
-            return Response({
-                'status': 0,
-                'message': _('You do not have access to this resource.'),
-                'data': []
-            }, status=status.HTTP_403_FORBIDDEN)
+            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': []}, status=status.HTTP_403_FORBIDDEN)
 
         try:
-            # Fetch the friendly game details
+            # Fetch game and calculate total goals for both teams
             friendly_game = FriendlyGame.objects.get(id=game_id)
+            team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(team_id=friendly_game.team_a.id, game_id=game_id).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(team_id=friendly_game.team_b.id, game_id=game_id).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-            # Calculate total goals for both teams
-            team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
-                team_id=friendly_game.team_a.id,
-                game_id=game_id
-            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+            team_stats = FriendlyGamesPlayerGameStats.objects.filter(game_id=game_id).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
 
-            team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
-                team_id=friendly_game.team_b.id,
-                game_id=game_id
-            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
-            # Fetch player stats for the game
-            team_stats = FriendlyGamesPlayerGameStats.objects.filter(
-                game_id=game_id
-            ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
-
-            # Separate stats by team
             stats_data_a = []
             stats_data_b = []
 
@@ -2024,45 +2005,45 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
                     'substitution_out_player': stat.out_player.id if stat.out_player else None,
                     'game_time': stat.game_time if stat.game_time else None
                 }
-
                 if stat.team_id.id == friendly_game.team_a.id:
                     stats_data_a.append(stat_info)
                 elif stat.team_id.id == friendly_game.team_b.id:
                     stats_data_b.append(stat_info)
 
-            # Return the response with team stats and timeline
             return Response({
                 'status': 1,
                 'message': _('Team stats timeline fetched successfully.'),
                 'data': {
                     'game_id': game_id,
+                 
                     'goals': [
-                        {
-                            'team_a_id': friendly_game.team_a.id,
-                            'team_a_name': friendly_game.team_a.team_name,
-                            'team_a_total_goals': team_a_goals,
-                            'team_a_logo': friendly_game.team_a.team_id.team_logo.url if friendly_game.team_a.team_id.team_logo else None
-                        },
-                        {
-                            'team_b_id': friendly_game.team_b.id,
-                            'team_b_name': friendly_game.team_b.team_name,
-                            'team_b_total_goals': team_b_goals,
-                            'team_b_logo': friendly_game.team_b.team_id.team_logo.url if friendly_game.team_b.team_id.team_logo else None
-                        }
-                    ],
+                            {
+                                'team_a_id': friendly_game.team_a.id,
+                                'team_a_name': friendly_game.team_a.team_name,
+                                'team_a_total_goals': team_a_goals,
+                                'team_a_logo': friendly_game.team_a.team_id.team_logo.url if friendly_game.team_a.team_id.team_logo else None
+                            },
+                            {
+                                'team_b_id': friendly_game.team_b.id,
+                                'team_b_name': friendly_game.team_b.team_name,
+                                'team_b_total_goals': team_b_goals,
+                                'team_b_logo': friendly_game.team_b.team_id.team_logo.url if friendly_game.team_b.team_id.team_logo else None
+                            }
+                        ],
                     'timeline': {
                         'team_a': stats_data_a,
                         'team_b': stats_data_b
                     }
                 }
             }, status=status.HTTP_200_OK)
-        
-        except FriendlyGame.DoesNotExist:
+
+        except TournamentGames.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Game not found.'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
+
 
     
     ####################  player substitute #####################
@@ -2092,8 +2073,33 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
         player_a_id = request.data.get("player_a_id")
         player_b_id = request.data.get("player_b_id")
 
-        if not all([team_id, game_id, player_a_id, player_b_id]):
-            return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+        # Validate each field individually
+        if not team_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        
+
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not player_a_id:
+            return Response({
+                'status': 0,
+                'message': _('player_a_id is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not player_b_id:
+            return Response({
+                'status': 0,
+                'message': _('player_b_id is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         
         if not self._has_access(request.user, game_id=game_id):
             return Response({
@@ -2106,25 +2112,25 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
             # Retrieve player A (must have status ALREADY_IN_LINEUP)
             player_a = FriendlyGameLineup.objects.get(
                 team_id=team_id,
-             
+                
                 game_id=game_id,
                 player_id=player_a_id,
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
             )
         except FriendlyGameLineup.DoesNotExist:
-            return Response ({"error": "Player A not found or not in the correct lineup status."})
+           return Response({"error": _("Player A not found or not in the correct lineup status.")})
 
         try:
             # Retrieve player B (must have status SUBSTITUTE)
             player_b = FriendlyGameLineup.objects.get(
                 team_id=team_id,
-               
+                
                 game_id=game_id,
                 player_id=player_b_id,
                 lineup_status=FriendlyGameLineup.SUBSTITUTE
             )
         except FriendlyGameLineup.DoesNotExist:
-            return Response({"error": "Player B not found or not in the correct lineup status."})
+            return Response({"error": _("Player B not found or not in the correct lineup status.")})
 
         # Swap positions and update statuses
         player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
@@ -2141,27 +2147,34 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
 
         user_a = get_object_or_404(User, id=player_a.player_id.id)  # Get User instance for player_a
         user_b = get_object_or_404(User, id=player_b.player_id.id)  # Get User instance for player_b
-        # print(player_a.player_id)
-        # print(user_b)
+        print(user_a)
+        print(user_b)
         # Get other related instances
         team_branch = get_object_or_404(TeamBranch, id=team_id)
+        print(team_branch)
        
-        game_instance = get_object_or_404(FriendlyGame, id=game_id)
-
-        # Create a new PlayerGameStats record to log the substitution
-        player_game_stat = FriendlyGamesPlayerGameStats.objects.create(
-            team_id=team_branch,
-            game_id=game_instance,
-       
-            in_player=user_b,  # Corrected to use the ID of player_b
-            out_player=user_a,  # Corrected to use the ID of player_a
-            created_by_id=request.user.id
-        )
-       
+        game_instance = get_object_or_404(TournamentGames, id=game_id)
+        print(game_instance)
+        try:
+            # Create a new PlayerGameStats record to log the substitution
+            player_game_stat = FriendlyGamesPlayerGameStats.objects.create(
+                team_id=team_branch,
+                game_id=game_instance,
+              
+                player_id=user_b if user_b else user_a,
+                in_player=user_b,  # Corrected to use the ID of player_b
+                out_player=user_a,  # Corrected to use the ID of player_a
+                created_by_id=request.user.id
+            )
+        except IntegrityError as e:
+                return Response({
+                    "error": _("Failed to log player substitution."),
+                    "details": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         player_a.save()
         player_b.save()
         return Response({
-            "message": "Player substitution successful",
+            "message": _("Player substitution successful"),
             "player_a": {
                 "id": player_a_id,
                 "position_1": player_a.position_1,
@@ -2177,6 +2190,8 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
                 "lineup_status": player_b.lineup_status,
             }
         }, status=status.HTTP_200_OK)
+   
+
 
     def get(self, request, *args, **kwargs):   
 
@@ -2237,12 +2252,16 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
 
 
 class FriendlyTeamGameGoalCountAPIView(APIView):
+   
+
+        permission_classes = [IsAuthenticated]
+        parser_classes = (JSONParser, MultiPartParser, FormParser)
         def _has_access(self, user, game_id=None):
             """
             Check if the user is the game_statistics_handler for the specified game and tournament.
             """
             # Check if the user is the game_statistics_handler for the given game and tournament
-            if game_id:
+            if game_id :
                 try:
                     game = FriendlyGame.objects.get(id=game_id)
                     if game.game_statistics_handler == user:
@@ -2254,70 +2273,171 @@ class FriendlyTeamGameGoalCountAPIView(APIView):
         
         def get(self, request):
                 # Activate language if specified in the header
+           
+    # Activate language if specified in the header
             language = request.headers.get('Language', 'en')
             if language in ['en', 'ar']:
                 activate(language)
 
-                
-            team_id = request.query_params.get('team_id')
+            # Extract parameters from request
             game_id = request.query_params.get('game_id')
-          
-
-            # Validate required URL parameters (team_id, game_id, tournament_id)
-            if not (team_id and game_id ):
+    
+            # Validate required parameters
+            if not game_id:
                 return Response({
                     'status': 0,
-                    'message': _('team_id, game_id, and  are required.'),
+                    'message': _('game_id is required.'),
                     'data': []
                 }, status=status.HTTP_400_BAD_REQUEST)
-            if not self._has_access(request.user, game_id=game_id):
-                return Response({
-                    'status': 0,
-                    'message': _('You do not have access to this resource.'),
-                    'data': []
-                }, status=status.HTTP_403_FORBIDDEN)
 
-            # Filter PlayerGameStats entries for the specified team, game, and tournament
-            goal_stats = FriendlyGamesPlayerGameStats.objects.filter(
-                team_id=team_id,
-                game_id=game_id,
-              
-            )
-            
-            # Calculate the total goals
-            total_goals = goal_stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
+       
             try:
-                # Fetch the TournamentGames entry
-                tournament_game = FriendlyGame.objects.get(id=game_id)
-                
-                # Check if team_id matches team_a or team_b, and update the corresponding goal field
-                if str(tournament_game.team_a) == str(team_id):
-                    tournament_game.team_a_goal = total_goals
-                elif str(tournament_game.team_b) == str(team_id):
-                    tournament_game.team_b_goal = total_goals
-                else:
-                    return Response({
-                        'status': 0,
-                        'message': _('team_id does not match either team_a or team_b in this game.')
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                # Fetch the game using game_id and tournament_id
+                friendly_game = FriendlyGame.objects.get(id=game_id)
 
-                # Save the updated goal count
-                tournament_game.save()
-                return Response({
-                'status': 1,
-                'message': _('Team stats fetched successfully.'),
-                'data':  {
-                    'team_id': team_id,
-                    'game_id': game_id,
+                # Calculate total goals for both teams
+                team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+                    team_id=friendly_game.team_a.id,
+                    game_id=game_id,
                   
-                    'total_goals': total_goals,
-                }
-            }, status=status.HTTP_200_OK)
-                
+                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+                team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+                    team_id=friendly_game.team_b.id,
+                    game_id=game_id,
+                   
+                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+                # Update and save the total goals for each team
+                friendly_game.team_a_goal = team_a_goals
+                friendly_game.team_b_goal = team_b_goals
+                friendly_game.save()
+
+                # Return both teams' goal information
+                return Response({
+                    'status': 1,
+                    'message': _('Team stats fetched successfully.'),
+                    'data': {
+                        'game_id': game_id,
+                  
+                        'team_a': {
+                            'id': friendly_game.team_a.id,
+                            'name': friendly_game.team_a.team_name,
+                            'total_goals': team_a_goals
+                        },
+                        'team_b': {
+                            'id': friendly_game.team_b.id,
+                            'name': friendly_game.team_b.team_name,
+                            'total_goals': team_b_goals
+                        }
+                    }
+                }, status=status.HTTP_200_OK)
 
             except TournamentGames.DoesNotExist:
-                return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
+                return Response({
+                    'status': 0,
+                    'message': _('Game not found.'),
+                    'data': []
+                }, status=status.HTTP_404_NOT_FOUND)
+
+
+################# player Swap position ########################
+class FriendlyGameSwapPositionView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get data from request
+        player_id = request.data.get('player_id')  # ID of the player to swap
+        target_position = request.data.get('target_position')  # The target position to swap with
+        team_id = request.data.get('team_id')  # Team ID of the player
+        game_id = request.data.get('game_id')  # Game ID for the context
+        
+        if not player_id or target_position is None or not team_id or not game_id:
+            return Response({"detail": "Player ID, target position, team ID, and game ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get the player's lineup entry, ensuring that it belongs to the correct team and game
+        player_lineup = get_object_or_404(FriendlyGameLineup, player_id=player_id, team_id=team_id, game_id=game_id)
+        
+        # Check if the player's lineup status is ALREADY_IN_LINEUP (status = 3)
+        if player_lineup.lineup_status != FriendlyGameLineup.ALREADY_IN_LINEUP:
+            return Response({"detail": "Player must have in starting 11 lineup to swap positions."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if there's already a player in the target position within the same game and team
+        target_lineup = FriendlyGameLineup.objects.filter(game_id=game_id, team_id=team_id, position_1=target_position).first()
+        
+        if target_lineup:
+            if target_lineup.lineup_status != FriendlyGameLineup.ALREADY_IN_LINEUP:
+                return Response({
+                    'status': 0,
+                    'message': _('The player in the target position must also be in the starting 11 lineup to swap positions.'),
+                    'data': {}
+                }, status=status.HTTP_400_BAD_REQUEST)
+            # Swap positions between the two players
+            original_position = player_lineup.position_1
+            player_lineup.position_1 = target_position
+            target_lineup.position_1 = original_position
+            
+            # Save both updated lineups
+            player_lineup.save()
+            target_lineup.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Positions swapped successfully.'),
+                'data': {
+                    "player_1": FriendlyGameSwapPositionSerializer(player_lineup).data,
+                    "player_2": FriendlyGameSwapPositionSerializer(target_lineup).data
+                }
+            }, status=status.HTTP_200_OK)
+
+        else:
+            # If no player exists at the target position, just update the player's position
+            player_lineup.position_1 = target_position
+            player_lineup.save()
+            
+            return Response({
+                'status': 1,
+                'message': _('Player position updated successfully.'),
+                'data': {
+                    "player": FriendlyGameSwapPositionSerializer(player_lineup).data
+                }
+            }, status=status.HTTP_200_OK)
+
+        
+       
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get team_id and game_id from request
+        team_id = request.query_params.get('team_id')
+        game_id = request.query_params.get('game_id')
+        
+        # Validate that team_id and game_id are provided
+        if not team_id or not game_id:
+            return Response({"detail": "Team ID and Game ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Filter lineups based on team_id and game_id
+        lineups = FriendlyGameLineup.objects.filter(team_id=team_id, game_id=game_id, lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP)
+        
+        # If no lineups are found, return an appropriate message
+        if not lineups.exists():
+            return Response({"detail": "No lineups found for the provided team and game."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Serialize the lineups
+        serializer = FriendlyGameSwapPositionSerializer(lineups, many=True)
+        
+        return Response({
+            'status': 1,
+            'message': _('Lineups retrieved successfully.'),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
 
 
 ################### Tournament Satustics for top Goal and all ###########################

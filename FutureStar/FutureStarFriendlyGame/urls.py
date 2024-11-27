@@ -25,6 +25,9 @@ urlpatterns = [
       path('api/friendlygames/lineup/', FriendlyGameLineupPlayers.as_view()),
       path('api/friendlygames/lineup/player_substitute/', FriendlyPlayerSubstitutionAPIView.as_view()),
 
+      path('api/friendlygames/lineup/swap_position/', FriendlyGameSwapPositionView.as_view()),
+      path('api/friendlygames/lineup/fetch_position/', FriendlyGameSwapPositionView.as_view()),
+
       path('api/friendlygames/lineup/update/', FriendlyGameLineupPlayers.as_view()),
       path('api/friendlygames/lineup/reset/', FriendlyGameLineupPlayers.as_view()),
       path('api/friendlygames/lineup/player_confirmation/status/', FriendlyGameLineupPlayerStatusAPIView.as_view()),

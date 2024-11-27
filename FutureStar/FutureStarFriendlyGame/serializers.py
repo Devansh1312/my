@@ -181,3 +181,9 @@ class FiendlyTournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
         # Retrieve the field name where the game is played
         game_field = Field.objects.filter(id=obj.game_field_id.id).first()
         return game_field.field_name if game_field else None
+    
+
+class FriendlyGameSwapPositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FriendlyGameLineup
+        fields = ['id', 'team_id', 'player_id', 'game_id', 'lineup_status', 'position_1']
