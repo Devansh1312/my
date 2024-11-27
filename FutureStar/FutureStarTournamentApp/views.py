@@ -1705,6 +1705,7 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
         tournament_id = request.query_params.get('tournament_id', None)
         team_a_id = request.query_params.get('team_a', None)
         team_b_id = request.query_params.get('team_b', None)
@@ -1775,23 +1776,33 @@ class TournamentGamesh2hCompleteAPIView(APIView):
                 'message': _('No completed games found between the selected teams in this tournament'),
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Serialize H2H games with team positions
-        serializer = TournamentGamesHead2HeadSerializer(
-            h2h_games, 
-            many=True, 
-            context={
-                'tournament_id': tournament_id,
-                'team_positions': team_positions,
-                'team_stats': team_stats
-            }
-        )
+        # Prepare stats
+        team_a_stats = team_stats.get(int(team_a_id), {'wins': 0, 'losses': 0, 'draws': 0})
+        team_b_stats = team_stats.get(int(team_b_id), {'wins': 0, 'losses': 0, 'draws': 0})
 
+        stats = {
+            "team_a_position": team_positions.get(int(team_a_id), None),
+            "team_b_position": team_positions.get(int(team_b_id), None),
+            "team_a_win": team_a_stats['wins'],
+            "team_b_win": team_b_stats['wins'],
+            "team_a_lose": team_a_stats['losses'],
+            "team_b_lose": team_b_stats['losses'],
+            "team_a_draw": team_a_stats['draws'],
+            "team_b_draw": team_b_stats['draws'],
+        }
+
+        # Serialize H2H games
+        serializer = TournamentGamesHead2HeadSerializer(
+            h2h_games, many=True, context={'tournament_id': tournament_id, 'team_positions': team_positions}
+        )
 
         return Response({
             'status': 1,
             'message': _('H2H Fetch Successfully'),
-            'data': serializer.data,
-            'standings': standings  # Include standings in the response
+            'data': {
+                "stats": stats,
+                "recent_meetings": serializer.data
+            }
         }, status=status.HTTP_200_OK)
 
 
