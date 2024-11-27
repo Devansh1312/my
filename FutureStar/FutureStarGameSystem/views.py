@@ -2355,24 +2355,17 @@ class TeamGameGoalCountAPIView(APIView):
         
         def get(self, request):
                 # Activate language if specified in the header
+           
+    # Activate language if specified in the header
             language = request.headers.get('Language', 'en')
             if language in ['en', 'ar']:
                 activate(language)
 
-                
-            team_id = request.query_params.get('team_id')
+            # Extract parameters from request
             game_id = request.query_params.get('game_id')
             tournament_id = request.query_params.get('tournament_id')
 
-
-            # Validate each URL parameter individually
-            if not team_id:
-                return Response({
-                    'status': 0,
-                    'message': _('team_id is required.'),
-                    'data': []
-                }, status=status.HTTP_400_BAD_REQUEST)
-
+            # Validate required parameters
             if not game_id:
                 return Response({
                     'status': 0,
@@ -2387,55 +2380,54 @@ class TeamGameGoalCountAPIView(APIView):
                     'data': []
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-                return Response({
-                    'status': 0,
-                    'message': _('You do not have access to this resource.'),
-                    'data': []
-                }, status=status.HTTP_403_FORBIDDEN)
-
-            # Filter PlayerGameStats entries for the specified team, game, and tournament
-            goal_stats = PlayerGameStats.objects.filter(
-                team_id=team_id,
-                game_id=game_id,
-                tournament_id=tournament_id
-            )
-            
-            # Calculate the total goals
-            total_goals = goal_stats.aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
             try:
-                # Fetch the TournamentGames entry
+                # Fetch the game using game_id and tournament_id
                 tournament_game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
-                
-                # Check if team_id matches team_a or team_b, and update the corresponding goal field
-                if int(tournament_game.team_a.id) == int(team_id):
-                    tournament_game.team_a_goal = total_goals
-                elif int(tournament_game.team_b.id) == int(team_id):
-                    tournament_game.team_b_goal = total_goals
-                else:
-                    return Response({
-                        'status': 0,
-                        'message': _('team_id does not match either team_a or team_b in this game.')
-                    }, status=status.HTTP_400_BAD_REQUEST)
 
-                # Save the updated goal count
+                # Calculate total goals for both teams
+                team_a_goals = PlayerGameStats.objects.filter(
+                    team_id=tournament_game.team_a.id,
+                    game_id=game_id,
+                    tournament_id=tournament_id
+                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+                team_b_goals = PlayerGameStats.objects.filter(
+                    team_id=tournament_game.team_b.id,
+                    game_id=game_id,
+                    tournament_id=tournament_id
+                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+                # Update and save the total goals for each team
+                tournament_game.team_a_goal = team_a_goals
+                tournament_game.team_b_goal = team_b_goals
                 tournament_game.save()
+
+                # Return both teams' goal information
                 return Response({
-                'status': 1,
-                'message': _('Team stats fetched successfully.'),
-                'data':  {
-                    'team_id': team_id,
-                    'game_id': game_id,
-                    'tournament_id': tournament_id,
-                    'total_goals': total_goals,
-                }
-            }, status=status.HTTP_200_OK)
-                
+                    'status': 1,
+                    'message': _('Team stats fetched successfully.'),
+                    'data': {
+                        'game_id': game_id,
+                        'tournament_id': tournament_id,
+                        'team_a': {
+                            'id': tournament_game.team_a.id,
+                            'name': tournament_game.team_a.team_name,
+                            'total_goals': team_a_goals
+                        },
+                        'team_b': {
+                            'id': tournament_game.team_b.id,
+                            'name': tournament_game.team_b.team_name,
+                            'total_goals': team_b_goals
+                        }
+                    }
+                }, status=status.HTTP_200_OK)
 
             except TournamentGames.DoesNotExist:
-                return Response({'error': _('Game not found')}, status=status.HTTP_404_NOT_FOUND)
-
+                return Response({
+                    'status': 0,
+                    'message': _('Game not found.'),
+                    'data': []
+                }, status=status.HTTP_404_NOT_FOUND)
 
 ################### Tournament Satustics for top Goal and all ###########################
 class TopPlayerStatsAPIView(APIView):
