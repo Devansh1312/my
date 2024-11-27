@@ -1204,10 +1204,10 @@ class LineupPlayerStatusAPIView(APIView):
 
         if not lineup_entries.exists():
             return Response({
-                'status': 0,
+                'status': 1,
                 'message': _('No players found for the specified criteria.'),
-                'data': []
-            }, status=status.HTTP_404_NOT_FOUND)
+                'data': {}
+            }, status=status.HTTP_200_OK)
 
         # Classify players based on team_a and team_b, and further classify by lineup_status
         team_a_added_players = []

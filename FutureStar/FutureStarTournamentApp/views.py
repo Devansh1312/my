@@ -1706,8 +1706,8 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         tournament_id = request.query_params.get('tournament_id', None)
-        team_a_id = request.query_params.get('team_a_id', None)
-        team_b_id = request.query_params.get('team_b_id', None)
+        team_a_id = request.query_params.get('team_a', None)
+        team_b_id = request.query_params.get('team_b', None)
 
         if not tournament_id:
             return Response({
