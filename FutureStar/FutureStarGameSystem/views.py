@@ -1946,8 +1946,7 @@ class TeamGameStatsTimelineAPIView(APIView):
 
         game_id = request.query_params.get('game_id')
         tournament_id = request.query_params.get('tournament_id')
-        include_game_time = request.query_params.get('game_time')
-
+        
         if not game_id:
             return Response({'status': 0, 'message': _('game_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1984,7 +1983,7 @@ class TeamGameStatsTimelineAPIView(APIView):
                     'updated_at': stat.updated_at,
                     'substitution_in_player': stat.in_player.id if stat.in_player else None,
                     'substitution_out_player': stat.out_player.id if stat.out_player else None,
-                    'game_time': stat.game_time if include_game_time else None
+                    'game_time': stat.game_time if stat.game_time else None
                 }
                 if stat.team_id.id == tournament_game.team_a.id:
                     stats_data_a.append(stat_info)

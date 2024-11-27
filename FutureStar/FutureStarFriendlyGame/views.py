@@ -1956,18 +1956,18 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
         # Retrieve query parameters
         game_id = request.query_params.get('game_id')
-      
-        include_game_time = request.query_params.get('game_time')  # Check if game_time is provided
-
+        
         # Validate query parameters
-        if not game_id :
+        if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id are required.')
+                'message': _('game_id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check user access
         if not self._has_access(request.user, game_id=game_id):
             return Response({
                 'status': 0,
@@ -1975,44 +1975,88 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
                 'data': []
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Retrieve all relevant stats related to the given game and tournament
-        team_stats = FriendlyGamesPlayerGameStats.objects.filter(
-            game_id=game_id,
-            
-        ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
+        try:
+            # Fetch the friendly game details
+            friendly_game = FriendlyGame.objects.get(id=game_id)
 
-        # Prepare a list to hold the timeline data
-        stats_data = []
+            # Calculate total goals for both teams
+            team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id=friendly_game.team_a.id,
+                game_id=game_id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-        # Iterate over the stats and add every stat to the response, including duplicates
-        for stat in team_stats:
-            stat_info = {
-                'id': stat.id,
-                'player_id': stat.player_id.id,
-                'player_name': stat.player_id.username,  # Assuming player has a 'name' field
-                'team_id': stat.team_id.id,
-                'team_name': stat.team_id.team_name,  # Assuming team has a 'name' field
-                'goals': stat.goals,
-                'assists': stat.assists,
-                'own_goals': stat.own_goals,
-                'yellow_cards': stat.yellow_cards,
-                'red_cards': stat.red_cards,
-                'created_at': stat.created_at,
-                'updated_at': stat.updated_at,
-                'substitution_in_player': stat.in_player.id if stat.in_player else None,
-                'substitution_out_player': stat.out_player.id if stat.out_player else None,
-                # Include game_time if include_game_time is set; otherwise, set to None
-                'game_time': stat.game_time if include_game_time else None
-            }
-            # Add the stat information to the list
-            stats_data.append(stat_info)
+            team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id=friendly_game.team_b.id,
+                game_id=game_id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-        # Return the response with all timeline data, including duplicates
-        return Response({
-            'status': 1,
-            'message': _('Team stats timeline fetched successfully.'),
-            'data': stats_data
-        }, status=status.HTTP_200_OK)
+            # Fetch player stats for the game
+            team_stats = FriendlyGamesPlayerGameStats.objects.filter(
+                game_id=game_id
+            ).select_related('player_id', 'team_id', 'in_player', 'out_player').order_by('updated_at')
+
+            # Separate stats by team
+            stats_data_a = []
+            stats_data_b = []
+
+            for stat in team_stats:
+                stat_info = {
+                    'id': stat.id,
+                    'player_id': stat.player_id.id,
+                    'player_name': stat.player_id.username,
+                    'team_id': stat.team_id.id,
+                    'team_name': stat.team_id.team_name,
+                    'goals': stat.goals if stat.goals != 0 else None,
+                    'assists': stat.assists if stat.assists != 0 else None,
+                    'own_goals': stat.own_goals if stat.own_goals != 0 else None,
+                    'yellow_cards': stat.yellow_cards if stat.yellow_cards != 0 else None,
+                    'red_cards': stat.red_cards if stat.red_cards != 0 else None,
+                    'created_at': stat.created_at,
+                    'updated_at': stat.updated_at,
+                    'substitution_in_player': stat.in_player.id if stat.in_player else None,
+                    'substitution_out_player': stat.out_player.id if stat.out_player else None,
+                    'game_time': stat.game_time if stat.game_time else None
+                }
+
+                if stat.team_id.id == friendly_game.team_a.id:
+                    stats_data_a.append(stat_info)
+                elif stat.team_id.id == friendly_game.team_b.id:
+                    stats_data_b.append(stat_info)
+
+            # Return the response with team stats and timeline
+            return Response({
+                'status': 1,
+                'message': _('Team stats timeline fetched successfully.'),
+                'data': {
+                    'game_id': game_id,
+                    'goals': [
+                        {
+                            'team_a_id': friendly_game.team_a.id,
+                            'team_a_name': friendly_game.team_a.team_name,
+                            'team_a_total_goals': team_a_goals,
+                            'team_a_logo': friendly_game.team_a.team_id.team_logo.url if friendly_game.team_a.team_id.team_logo else None
+                        },
+                        {
+                            'team_b_id': friendly_game.team_b.id,
+                            'team_b_name': friendly_game.team_b.team_name,
+                            'team_b_total_goals': team_b_goals,
+                            'team_b_logo': friendly_game.team_b.team_id.team_logo.url if friendly_game.team_b.team_id.team_logo else None
+                        }
+                    ],
+                    'timeline': {
+                        'team_a': stats_data_a,
+                        'team_b': stats_data_b
+                    }
+                }
+            }, status=status.HTTP_200_OK)
+        
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+
     
     ####################  player substitute #####################
 class FriendlyPlayerSubstitutionAPIView(APIView):
