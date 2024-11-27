@@ -268,22 +268,31 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
     game_field_name = serializers.SerializerMethodField()
     team_a_position = serializers.SerializerMethodField()
     team_b_position = serializers.SerializerMethodField()
+    team_a_win = serializers.SerializerMethodField()
+    team_b_win = serializers.SerializerMethodField()
+    team_a_lose = serializers.SerializerMethodField()
+    team_b_lose = serializers.SerializerMethodField()
+    team_a_draw = serializers.SerializerMethodField()
+    team_b_draw = serializers.SerializerMethodField()
 
     class Meta:
         model = TournamentGames
-        fields = ['id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal', 
-                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo',
-                  'team_a_position', 'team_b_position']
+        fields = [
+            'id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal',
+            'game_date', 'team_a_logo', 'team_b_logo',
+            'team_a_position', 'team_b_position',
+            'team_a_win', 'team_b_win',
+            'team_a_lose', 'team_b_lose',
+            'team_a_draw', 'team_b_draw'
+        ]
 
     def get_team_a_logo(self, obj):
-        # Access the logo for team A through select_related to avoid extra queries
         if obj.team_a and obj.team_a.team_id:
             team_a_logo = obj.team_a.team_id.team_logo
             return f"/media/{team_a_logo}" if team_a_logo else None
         return None
 
     def get_team_b_logo(self, obj):
-        # Access the logo for team B through select_related to avoid extra queries
         if obj.team_b and obj.team_b.team_id:
             team_b_logo = obj.team_b.team_id.team_logo
             return f"/media/{team_b_logo}" if team_b_logo else None
@@ -295,18 +304,38 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
     def get_team_b_name(self, obj):
         return obj.team_b.team_name if obj.team_b else None
 
-    def get_game_field_name(self, obj):
-        return obj.game_field_id.field_name if obj.game_field_id else None
-
     def get_team_a_position(self, obj):
-        # Fetch the position of team A from context
         team_positions = self.context.get('team_positions', {})
         return team_positions.get(obj.team_a.id, None) if obj.team_a else None
 
     def get_team_b_position(self, obj):
-        # Fetch the position of team B from context
         team_positions = self.context.get('team_positions', {})
         return team_positions.get(obj.team_b.id, None) if obj.team_b else None
+
+    def get_team_a_win(self, obj):
+        stats = self.context.get('team_stats', {})
+        return stats.get(obj.team_a.id, {}).get('wins', 0)
+
+    def get_team_b_win(self, obj):
+        stats = self.context.get('team_stats', {})
+        return stats.get(obj.team_b.id, {}).get('wins', 0)
+
+    def get_team_a_lose(self, obj):
+        stats = self.context.get('team_stats', {})
+        return stats.get(obj.team_a.id, {}).get('losses', 0)
+
+    def get_team_b_lose(self, obj):
+        stats = self.context.get('team_stats', {})
+        return stats.get(obj.team_b.id, {}).get('losses', 0)
+
+    def get_team_a_draw(self, obj):
+        stats = self.context.get('team_stats', {})
+        return stats.get(obj.team_a.id, {}).get('draws', 0)
+
+    def get_team_b_draw(self, obj):
+        stats = self.context.get('team_stats', {})
+        return stats.get(obj.team_b.id, {}).get('draws', 0)
+
     
 
 class TournamentGameSerializer(serializers.ModelSerializer):

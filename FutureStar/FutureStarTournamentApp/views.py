@@ -1777,8 +1777,15 @@ class TournamentGamesh2hCompleteAPIView(APIView):
 
         # Serialize H2H games with team positions
         serializer = TournamentGamesHead2HeadSerializer(
-            h2h_games, many=True, context={'tournament_id': tournament_id, 'team_positions': team_positions}
+            h2h_games, 
+            many=True, 
+            context={
+                'tournament_id': tournament_id,
+                'team_positions': team_positions,
+                'team_stats': team_stats
+            }
         )
+
 
         return Response({
             'status': 1,
