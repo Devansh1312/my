@@ -2847,9 +2847,8 @@ class FriendlyGamesh2hCompleteAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-
-
-class FriendlyTournamentGamesDetailAPIView(APIView):
+############### Friendly Game Detail API for Both Team LineUp See ####################
+class FriendlyGamesDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -2860,81 +2859,113 @@ class FriendlyTournamentGamesDetailAPIView(APIView):
             activate(language)
 
         # Get parameters from request query
-        team_id = request.query_params.get('team_id')
         game_id = request.query_params.get('game_id')
 
-        if not team_id or not game_id:
+        if not game_id:
             return Response({
                 'status': 0,
-                'message': _('team_id and game_id are required.'),
+                'message': _('game_id is required.'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filter players in FriendlyGameLineup by team and game, separating by status
-        substitute_lineups = FriendlyGameLineup.objects.filter(
-            team_id=team_id,
-            game_id=game_id,
-            lineup_status=FriendlyGameLineup.SUBSTITUTE
-        )
-        already_added_lineups = FriendlyGameLineup.objects.filter(
-            team_id=team_id,
-            game_id=game_id,
-            lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
-        )
+        try:
+            # Fetch the friendly game
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Friendly game not found.'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
 
-        # Fetch the staff types for the given team_id, including joining_type and user details
-        staff_types = JoinBranch.objects.filter(
-            branch_id=team_id
-        ).select_related('user_id')  # Assuming JoinBranch has a foreign key to user_id
+        # Helper function to fetch team data
+        def fetch_team_data(team):
+            if not team:
+                return None
 
-        staff_data = {
-            'managerial_staff': [],
-            'coach_staff': [],
-            'medical_staff': []
-        }
+            # Filter players in Lineup by team and game, separating by status
+            substitute_lineups = FriendlyGameLineup.objects.filter(
+                team_id=team.id,
+                game_id=game_id,
+                lineup_status=FriendlyGameLineup.SUBSTITUTE
+            )
+            already_added_lineups = FriendlyGameLineup.objects.filter(
+                team_id=team.id,
+                game_id=game_id,
+                lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
+            )
 
-        for staff in staff_types:
-            staff_info = {
-                'id': staff.user_id.id,
-                'username': staff.user_id.username,
-                'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
-                'joining_type_id': staff.joinning_type,
-                'joining_type_name': staff.get_joinning_type_display()  # Assuming `get_joinning_type_display()` gives the name of the joining type
+            # Fetch the staff types for the given team_id
+            staff_types = JoinBranch.objects.filter(branch_id=team.id).select_related('user_id', 'user_id__country')
+
+            staff_data = {
+                'managerial_staff': [],
+                'coach_staff': [],
+                'medical_staff': []
             }
 
-            if staff.joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE:
-                staff_data['managerial_staff'].append(staff_info)
-            elif staff.joinning_type == JoinBranch.COACH_STAFF_TYPE:
-                staff_data['coach_staff'].append(staff_info)
-            elif staff.joinning_type == JoinBranch.MEDICAL_STAFF_TYPE:
-                staff_data['medical_staff'].append(staff_info)
+            def get_user_country_data(user):
+                """Helper to get country name and flag."""
+                return {
+                    'country_name': user.country.name if user.country else None,
+                    'country_flag': user.country.flag.url if user.country and user.country.flag else None
+                }
 
-        # Prepare response data for substitute players
-        substitute_data = [{
-            'id': lineup.player_id.id,
-            'username': lineup.player_id.username,
-            'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-            'position_1': lineup.position_1,
-            'position_2': lineup.position_2
-        } for lineup in substitute_lineups]
+            for staff in staff_types:
+                user = staff.user_id
+                country_data = get_user_country_data(user)
 
-        already_added_data = [{
-            'id': lineup.player_id.id,
-            'username': lineup.player_id.username,
-            'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-            'position_1': lineup.position_1,
-            'position_2': lineup.position_2
-        } for lineup in already_added_lineups]
+                staff_info = {
+                    'id': user.id,
+                    'username': user.username,
+                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                    'joining_type_id': staff.joinning_type,
+                    'joining_type_name': staff.get_joinning_type_display(),
+                    **country_data
+                }
 
-        # Return the response with the status and message
-        return Response({
-            'status': 1,
-            'message': _('Lineup players fetched successfully with status "ADDED".'),
-            'data': {
+                if staff.joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE:
+                    staff_data['managerial_staff'].append(staff_info)
+                elif staff.joinning_type == JoinBranch.COACH_STAFF_TYPE:
+                    staff_data['coach_staff'].append(staff_info)
+                elif staff.joinning_type == JoinBranch.MEDICAL_STAFF_TYPE:
+                    staff_data['medical_staff'].append(staff_info)
+
+            # Prepare response data for players
+            def get_player_data(lineup):
+                user = lineup.player_id
+                country_data = get_user_country_data(user)
+                return {
+                    'id': user.id,
+                    'username': user.username,
+                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                    'position_1': lineup.position_1,
+                    'position_2': lineup.position_2,
+                    **country_data
+                }
+
+            substitute_data = [get_player_data(lineup) for lineup in substitute_lineups]
+            already_added_data = [get_player_data(lineup) for lineup in already_added_lineups]
+
+            return {
+                'team_id': team.id,
+                'team_name': team.team_name,
                 'player_added_in_lineup': already_added_data,
                 'substitute': substitute_data,
                 **staff_data
-                # Adding staff types with detailed fields to response
+            }
+
+        # Fetch data for team A and team B
+        team_a_data = fetch_team_data(game.team_a)
+        team_b_data = fetch_team_data(game.team_b)
+
+        # Return the response
+        return Response({
+            'status': 1,
+            'message': _('Lineup players fetched successfully.'),
+            'data': {
+                'team_a': team_a_data,
+                'team_b': team_b_data
             }
         }, status=status.HTTP_200_OK)
 

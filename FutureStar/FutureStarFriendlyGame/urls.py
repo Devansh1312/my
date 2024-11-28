@@ -49,7 +49,7 @@ urlpatterns = [
 
       # Player Stats & Tournament Details
       path('api/friendlygames/top_player_stats/', FriendlyGameTopPlayerStatsAPIView.as_view()),
-      path('api/friendlygames/tournament/details/', FriendlyTournamentGamesDetailAPIView.as_view()),
+      path('api/friendlygames/games/details/', FriendlyGamesDetailAPIView.as_view()),
 
       # Friendly Game Stats
       path('api/friendlygames/stats/', FriendlyGameStatsAPIView.as_view(), name='friendly_game_stats'),
