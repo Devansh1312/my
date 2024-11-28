@@ -414,6 +414,62 @@ class TeamBranchListView(APIView):
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
+####################### Fetch Friendly Games Detail #####################
+
+class FriendlyGameDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        game_id = request.query_params.get('game_id')
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the game object
+            game = get_object_or_404(FriendlyGame, id=game_id)
+            
+            # Calculate duration (if both start and end times are available)
+            duration = None
+            if game.game_start_time and game.game_end_time:
+                duration = datetime.combine(game.game_date, game.game_end_time) - datetime.combine(game.game_date, game.game_start_time)
+
+            # Create custom response data
+            data = {
+                "team_a_id":game.team_a.id,
+
+                "team_a_name": game.team_a.team_name if game.team_a else None,
+                "team_b_id":game.team_b.id,
+                "team_b_name": game.team_b.team_name if game.team_b else None,
+                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
+                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
+                "game_field_id": game.game_field_id.id,
+
+                "game_field": game.game_field_id.field_name if game.game_field_id else None,
+                "timing":game.game_start_time,
+                "date":game.game_date,
+            
+                "duration": str(duration) if duration else None,
+            }
+
+            return Response({
+                'status': 1,
+                'message': _('Game details fetched successfully.'),
+                'data': data,
+            }, status=status.HTTP_200_OK)
+
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+            }, status=status.HTTP_404_NOT_FOUND)
+
 ################## participates players of particular team for particular tournament ###############
 
 class FriendlyGameTeamPlayersAPIView(APIView):
@@ -2012,16 +2068,25 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         # Retrieve query parameters for filtering
         player_id = request.query_params.get('player_id')
         team_id = request.query_params.get('team_id')
-       
+    
         game_id = request.query_params.get('game_id')
 
-        # Validate that all necessary fields are provided
-        if not player_id or not team_id  or not game_id:
-            return Response({
-                'status': 0,
-                'message': _('player_id, team_id, and game_id are required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Validate required parameters
+        required_params = {
+            'player_id': player_id,
+            'team_id': team_id,
+          
+            'game_id': game_id
+        }
+        
+        for key, value in required_params.items():
+            if not value:
+                return Response({
+                    'status': 0,
+                    'message': _(f'{key} is required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check access rights
         if not self._has_access(request.user, game_id=game_id):
             return Response({
                 'status': 0,
@@ -2034,7 +2099,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
             stats = FriendlyGamesPlayerGameStats.objects.filter(
                 player_id=player_id,
                 team_id=team_id,
-                
+              
                 game_id=game_id
             )
 
@@ -2044,32 +2109,35 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                     'message': _('Player stats not found for the specified criteria.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
-            # Prepare the stats data
-            stats_data = [
-                {
-                    'id': stat.id,
-                    'team_id': stat.team_id.id,
-                    'player_id': stat.player_id.id,
-                    'game_id': stat.game_id.id,
-                 
-                    'goals': stat.goals,
-                    'assists': stat.assists,
-                    'own_goals': stat.own_goals,
-                    'yellow_cards': stat.yellow_cards,
-                    'red_cards': stat.red_cards,
-                    'game_time': stat.game_time,
-                    'in_player': stat.in_player.id if stat.in_player else None,
-                    'out_player': stat.out_player.id if stat.out_player else None,
-                    'created_at': stat.created_at,
-                    'updated_at': stat.updated_at
-                } for stat in stats
-            ]
+            # Calculate totals
+            totals = stats.aggregate(
+                total_goals=Sum('goals'),
+                total_assists=Sum('assists'),
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
 
-            # Respond with the retrieved data
+            # Format the response data
+            total_stats = {
+                'id': stats.first().id,  # Assuming IDs are uniform for aggregated data
+                'team_id': stats.first().team_id.id,
+                'player_id': stats.first().player_id.id,
+                'game_id': stats.first().game_id.id,
+              
+                'goals': totals['total_goals'] or 0,
+                'assists': totals['total_assists'] or 0,
+                'yellow_cards': totals['total_yellow_cards'] or 0,
+                'red_cards': totals['total_red_cards'] or 0,
+                'game_time': stats.first().game_time,  # If total time is not needed, take first
+                'created_at': stats.first().created_at,
+                'updated_at': stats.first().updated_at
+            }
+
+            # Respond with the formatted data
             return Response({
                 'status': 1,
                 'message': _('Player stats fetched successfully.'),
-                'data': stats_data
+                'data': [total_stats]
             }, status=status.HTTP_200_OK)
 
         except Exception as e:

@@ -6,10 +6,12 @@ from django.shortcuts import redirect
 
 urlpatterns = [
 
-      path('api/friendly-game/create/', CreateFriendlyGame.as_view()),
-      path('api/friendly-game/update/', UpdateFriendlyGame.as_view()),
-      path('api/friendly-game/team_list_of_manager/', ManagerBranchDetail.as_view()),
-      path('api/friendly-game/delete/', DeleteFriendlyGame.as_view()),
+      path('api/friendlygames/create/', CreateFriendlyGame.as_view()),
+      path('api/friendlygames/update/', UpdateFriendlyGame.as_view()),
+      path('api/friendlygames/team_list_of_manager/', ManagerBranchDetail.as_view()),
+      path('api/friendlygames/delete/', DeleteFriendlyGame.as_view()),
+      path('api/friendlygames/detail/', FriendlyGameDetailAPIView.as_view()),
+
 
       path('api/friendly-game/list/', ListOfFridlyGamesForJoin.as_view()),
 
