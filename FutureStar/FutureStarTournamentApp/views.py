@@ -659,32 +659,39 @@ class TeamJoiningRequest(APIView):
                 'message': _('The team\'s age group does not match the tournament\'s age group.'),
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Check for an existing request (either REQUESTED or ACCEPTED)
         existing_request = TournamentGroupTeam.objects.filter(
             team_branch_id=team_branch,
             tournament_id=tournament
-        ).exists()
+        ).first()  # Get the first matching record (if any)
         
         if existing_request:
-            return Response({
-                'status': 0,
-                'message': _('This team has already requested to join this tournament.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+            # If the request is rejected, we can either update or create a new one
+            if existing_request.status == TournamentGroupTeam.REJECTED:
+                existing_request.status = TournamentGroupTeam.REQUESTED  # Revert to requested status
+                existing_request.save()  # Save the updated request
+                tournament_group_team = existing_request
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('This team has already requested or is already accepted into the tournament.'),
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # If no existing request found, create a new one
+            tournament_group_team = TournamentGroupTeam.objects.create(
+                team_branch_id=team_branch,
+                tournament_id=tournament,
+                status=TournamentGroupTeam.REQUESTED  # Set status to REQUESTED (0)
+            )
         
-        # Create a new TournamentGroupTeam entry with group_id as None and status as 0
-        tournament_group_team = TournamentGroupTeam.objects.create(
-               
-            team_branch_id=team_branch,
-            tournament_id=tournament,
-            status=0                 # set status to 0
-        )
-        
-        # Serialize and return the created object
+        # Serialize and return the created or updated object
         serializer = TournamentGroupTeamSerializer(tournament_group_team)
         return Response({
             'status': 1,
-            'message': _('Team joining request created successfully.'),
+            'message': _('Team joining request created successfully.' if not existing_request else _('Team joining request updated successfully.')),
             'data': serializer.data
         }, status=status.HTTP_201_CREATED)
+
 
 
 class TeamRequestApproved(APIView):

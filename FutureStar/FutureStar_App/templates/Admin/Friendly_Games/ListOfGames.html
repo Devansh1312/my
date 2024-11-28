@@ -143,7 +143,6 @@ Friendly Game Stats
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Stats updated successfully');
                         $('#editStatsModal').modal('hide');
                         location.reload();  // Reload or refresh the table
                     } else {
