@@ -139,7 +139,6 @@ class FriendlyGameLineup(models.Model):
     lineup_status = models.IntegerField(choices=TEAMLINEUP_TYPE_CHOICES,default=0)
 
     position_1=models.CharField(max_length=200,blank=True, null=True)
-    position_2=models.CharField(max_length=200,blank=True, null=True)
     player_ready = models.BooleanField(default=False)
 
     # Timestamps for creation and last update

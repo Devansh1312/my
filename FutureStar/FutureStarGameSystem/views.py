@@ -476,7 +476,6 @@ class LineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in added_lineups]
 
@@ -487,7 +486,6 @@ class LineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in substitute_lineups]
 
@@ -497,7 +495,6 @@ class LineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in already_added_lineups]
 
@@ -522,7 +519,6 @@ class LineupPlayers(APIView):
     # Retrieve fields from the request data
         player_id = request.data.get('player_id')
         position_1 = request.data.get('position_1')
-        position_2 = request.data.get('position_2')
         team_id = request.data.get('team_id')
         tournament_id = request.data.get('tournament_id')
         game_id = request.data.get('game_id')
@@ -547,13 +543,6 @@ class LineupPlayers(APIView):
             return Response({
                 'status': 0,
                 'message': _('position_1 is required.'),
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate position_2
-        if not position_2:
-            return Response({
-                'status': 0,
-                'message': _('position_2 is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate team_id
@@ -590,7 +579,6 @@ class LineupPlayers(APIView):
             # Update lineup details
             lineup.lineup_status = Lineup.ALREADY_IN_LINEUP  # Set status to ALREADY_IN_LINEUP
             lineup.position_1 = position_1
-            lineup.position_2 = position_2
             lineup.created_by_id = user.id  # Add created_by_id when updating the lineup
      
             lineup.save()
@@ -610,7 +598,6 @@ class LineupPlayers(APIView):
                 'player_username': player.player_id.username,
                 'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
                 'position_1': player.position_1,
-                'position_2': player.position_2,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=player).first().jersey_number if PlayerJersey.objects.filter(lineup_players=player).exists() else None
             } for player in already_added_lineups]
 
@@ -685,7 +672,6 @@ class LineupPlayers(APIView):
             # Reset lineup details
             lineup.lineup_status = Lineup.ADDED  # Set status back to ADDED
             lineup.position_1 = None
-            lineup.position_2 = None
             lineup.created_by_id = request.user.id  # Reset created_by_id when resetting the lineup
 
             lineup.save()
@@ -711,7 +697,6 @@ class LineupPlayers(APIView):
                 'username': player.player_id.username,
                 'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
                 'position_1': player.position_1,
-                'position_2': player.position_2,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=player).first().jersey_number if PlayerJersey.objects.filter(lineup_players=player).exists() else None
             } for player in already_added_lineups]
 
@@ -721,7 +706,6 @@ class LineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None
             } for lineup in substitute_lineups]
 
@@ -1088,7 +1072,6 @@ class GameStatsLineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2
             } for lineup in substitute_lineups]
 
             already_added_data = [{
@@ -1097,7 +1080,6 @@ class GameStatsLineupPlayers(APIView):
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2
             } for lineup in already_added_lineups]
 
             # Retrieve managerial staff related to the given team
@@ -1243,7 +1225,6 @@ class LineupPlayerStatusAPIView(APIView):
                 'player_username': player.username,
                 'player_profile_picture': player.profile_picture.url if player.profile_picture else None,
                 'position_1': lineup.position_1,
-                'position_2': lineup.position_2,
                 'player_ready': lineup.player_ready,
                 'created_at': lineup.created_at,
                 'updated_at': lineup.updated_at,
@@ -2137,8 +2118,8 @@ class PlayerSubstitutionAPIView(APIView):
             return Response({"error": _("Player B not found or not in the correct lineup status.")})
 
         # Swap positions and update statuses
-        player_b.position_1, player_b.position_2 = player_a.position_1, player_a.position_2
-        player_a.position_1, player_a.position_2 = None, None
+        player_b.position_1 = player_a.position_1
+        player_a.position_1 = None
 
         # Update player_ready and lineup_status
         player_a.player_ready = False
@@ -2185,14 +2166,12 @@ class PlayerSubstitutionAPIView(APIView):
             "player_a": {
                 "id": player_a_id,
                 "position_1": player_a.position_1,
-                "position_2": player_a.position_2,
                 "player_ready": player_a.player_ready,
                 "lineup_status": player_a.lineup_status,
             },
             "player_b": {
                 "id": player_b_id,
                 "position_1": player_b.position_1,
-                "position_2": player_b.position_2,
                 "player_ready": player_b.player_ready,
                 "lineup_status": player_b.lineup_status,
             }
@@ -2259,7 +2238,6 @@ class PlayerSubstitutionAPIView(APIView):
             'username': lineup.player_id.username,
             'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
             'position_1': lineup.position_1,
-            'position_2': lineup.position_2
         } for lineup in substitute_lineups]
 
         
