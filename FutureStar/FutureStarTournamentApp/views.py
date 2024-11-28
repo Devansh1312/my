@@ -1414,7 +1414,6 @@ class TournamentGamesDetailAPIView(APIView):
                     'username': user.username,
                     'profile_picture': user.profile_picture.url if user.profile_picture else None,
                     'position_1': lineup.position_1,
-                    'position_2': lineup.position_2,
                     **country_data
                 }
 
