@@ -913,12 +913,11 @@ class FriendlyGameLineupPlayers(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-    # Retrieve fields from the request data
-        player_id = request.data.get('player_id')
-        position_1 = request.data.get('position_1')
+
+        # Retrieve fields from the request data
         team_id = request.data.get('team_id')
-       
         game_id = request.data.get('game_id')
+        positions = request.data.get('positions', [])  # List of {player_id, position_1}
 
         # Check if the user has the required permissions
         user = request.user
@@ -928,61 +927,107 @@ class FriendlyGameLineupPlayers(APIView):
                 'message': _('You do not have the required permissions to perform this action.'),
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Validate that all necessary fields are provided
-        if not player_id or not position_1 or not team_id  or not game_id:
+        # Validate team_id and game_id
+        if not team_id:
             return Response({
                 'status': 0,
-                'message': _('player_id, position_1,team_id, and game_id are required.'),
+                'message': _('Team ID is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            # Fetch lineup by player_id, team_id, tournament_id, and game_id
-            lineup = FriendlyGameLineup.objects.get(
-                player_id=player_id,
-                team_id=team_id,
-             
-                game_id=game_id
-            )
-            
-            # Update lineup details
-            lineup.lineup_status = FriendlyGameLineup.ALREADY_IN_LINEUP  # Set status to ALREADY_IN_LINEUP
-            lineup.position_1 = position_1
-            lineup.created_by_id = user.id  # Add created_by_id when updating the lineup
-     
-            lineup.save()
-
-            # Fetch all players in the team that are already added to the lineup for the same tournament and game
-            already_added_lineups = FriendlyGameLineup.objects.filter(
-                team_id=team_id,
-              
-                game_id=game_id,
-                lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
-            )
-           
-            # Prepare response data for players already added in the lineup
-            already_added_data = [{
-                'id':player.id,
-                'player_id': player.player_id.id,
-                'player_username': player.player_id.username,
-                'profile_picture': player.player_id.profile_picture.url if player.player_id.profile_picture else None,
-                'position_1': player.position_1,
-                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=player).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=player).exists() else None
-            } for player in already_added_lineups]
-
-            return Response({
-                'status': 1,
-                'message': _('Lineup updated successfully.'),
-                'data': {
-                    'already_added': already_added_data,
-                 
-                }
-            }, status=status.HTTP_200_OK)
-
-        except FriendlyGameLineup.DoesNotExist:
+        if not game_id:
             return Response({
                 'status': 0,
-                'message': _('Lineup not found for the given player_id, team_id, and game_id.'),
-            }, status=status.HTTP_404_NOT_FOUND)
+                'message': _('Game ID is required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate positions data
+        if not positions or not isinstance(positions, list):
+            return Response({
+                'status': 0,
+                'message': _('Positions data must be a list of player details.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        errors = []  # To store errors for specific players
+
+        for position_data in positions:
+            player_id = position_data.get('player_id')
+            position_1 = position_data.get('position_1')
+
+            if not player_id or position_1 is None:  # Allow position_1 to be 0
+                errors.append({
+                    'player_id': player_id,
+                    'message': _('Both player_id and position_1 are required.'),
+                })
+                continue
+
+            try:
+                # Fetch lineup by player_id, team_id, and game_id
+                lineup = FriendlyGameLineup.objects.get(
+                    player_id=player_id,
+                    team_id=team_id,
+                    game_id=game_id
+                )
+
+                # Update lineup details based on position_1 value
+                if position_1 == "0":
+                    lineup.position_1 = None  # Set position_1 to NULL
+                    lineup.lineup_status = FriendlyGameLineup.ADDED  # Set status to ADDED
+                else:
+                    lineup.position_1 = position_1
+                    lineup.lineup_status = FriendlyGameLineup.ALREADY_IN_LINEUP  # Set status to ALREADY_IN_LINEUP
+
+                lineup.created_by_id = user.id  # Set the updated user
+                lineup.save()
+
+            except FriendlyGameLineup.DoesNotExist:
+                errors.append({
+                    'player_id': player_id,
+                    'message': _('Lineup not found for this player.')
+                })
+
+        # Fetch updated data for the response
+        added_lineups = FriendlyGameLineup.objects.filter(
+            team_id=team_id,
+            game_id=game_id,
+            lineup_status=FriendlyGameLineup.ADDED
+        )
+        substitute_lineups = FriendlyGameLineup.objects.filter(
+            team_id=team_id,
+            game_id=game_id,
+            lineup_status=FriendlyGameLineup.SUBSTITUTE
+        )
+        already_added_lineups = FriendlyGameLineup.objects.filter(
+            team_id=team_id,
+            game_id=game_id,
+            lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
+        )
+
+        # Prepare data for response
+        def prepare_lineup_data(lineups):
+            return [{
+                'id': lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None
+            } for lineup in lineups]
+
+        added_data = prepare_lineup_data(added_lineups)
+        substitute_data = prepare_lineup_data(substitute_lineups)
+        already_added_data = prepare_lineup_data(already_added_lineups)
+
+        # Prepare final response
+        return Response({
+            'status': 1 if not errors else 0,
+            'message': _('Playing 11 Updated Successfully') if not errors else _('Some players could not be updated.'),
+            'data': {
+                'added': added_data,
+                'substitute': substitute_data,
+                'player_added_in_lineup': already_added_data,
+            }
+        }, status=status.HTTP_200_OK if not errors else status.HTTP_400_BAD_REQUEST)
+
   
 #     ################## Remove Players TO STARTING 11 map Drag n Drop ###############
 
