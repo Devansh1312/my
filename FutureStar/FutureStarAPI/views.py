@@ -1314,7 +1314,11 @@ class PostListAPIView(generics.ListAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         queryset = self.get_queryset()
+        
+        # Count posts for this created_by_id and creator_type
+        post_count = queryset.count()
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -1326,6 +1330,7 @@ class PostListAPIView(generics.ListAPIView):
                 'status': 1,
                 'message': _('Posts fetched successfully.'),
                 'data': serializer.data,
+                'post_count': post_count,  # Add post_count here
                 'total_records': total_records,
                 'total_pages': total_pages,
                 'current_page': self.paginator.page.number
@@ -1335,9 +1340,9 @@ class PostListAPIView(generics.ListAPIView):
         return Response({
             'status': 1,
             'message': _('Posts fetched successfully.'),
-            'data': serializer.data
+            'data': serializer.data,
+            'post_count': post_count  # Add post_count here
         }, status=status.HTTP_200_OK)
-
 
 ######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
