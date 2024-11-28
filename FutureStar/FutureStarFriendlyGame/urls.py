@@ -37,7 +37,6 @@ urlpatterns = [
       path('api/friendlygames/game_stats/lineup/', FriendlyGameStatsLineupPlayers.as_view()),
       path('api/friendlygames/game_stats/player_stats/', FriendlyPlayerGameStatsAPIView.as_view()),
       path('api/friendlygames/game_stats/timeline/', FriendlyPlayerGameStatsTimelineAPIView.as_view()),
-      path('api/friendlygames/game_stats/team_stats/', FriendlyTeamGameGoalCountAPIView.as_view()),
 
       # Game Officials Management
       path('api/friendlygames/game_officials/type/', FriendlyGameOficialTypesList.as_view()),  # Typo fixed
@@ -48,12 +47,11 @@ urlpatterns = [
 
 
       # Player Stats & Tournament Details
-      path('api/friendlygames/top_player_stats/', FriendlyGameTopPlayerStatsAPIView.as_view()),
       path('api/friendlygames/games/details/', FriendlyGamesDetailAPIView.as_view()),
 
       # Friendly Game Stats
-      path('api/friendlygames/stats/', FriendlyGameStatsAPIView.as_view(), name='friendly_game_stats'),
       path('api/friendlygames/h2h/completed/', FriendlyGamesh2hCompleteAPIView.as_view(), name='friendly_games_completed'),
+      path('api/friendlygames/game_detail_stats/', FriendlyTeamGameDetailStatsAPIView.as_view(), name='friendly_game_stats'),
 
 
       # Team Uniform Management

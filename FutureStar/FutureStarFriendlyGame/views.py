@@ -20,9 +20,8 @@ from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Q
 from django.db.models import Sum
-from django.db.models import Count
-
-
+from itertools import chain
+from operator import attrgetter
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -2391,97 +2390,6 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-
-class FriendlyTeamGameGoalCountAPIView(APIView):
-   
-
-        permission_classes = [IsAuthenticated]
-        parser_classes = (JSONParser, MultiPartParser, FormParser)
-        def _has_access(self, user, game_id=None):
-            """
-            Check if the user is the game_statistics_handler for the specified game and tournament.
-            """
-            # Check if the user is the game_statistics_handler for the given game and tournament
-            if game_id :
-                try:
-                    game = FriendlyGame.objects.get(id=game_id)
-                    if game.game_statistics_handler == user:
-                        return True
-                except FriendlyGame.DoesNotExist:
-                    pass  # Game not found or doesn't match; access denied
-
-            return False
-        
-        def get(self, request):
-                # Activate language if specified in the header
-           
-    # Activate language if specified in the header
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
-
-            # Extract parameters from request
-            game_id = request.query_params.get('game_id')
-    
-            # Validate required parameters
-            if not game_id:
-                return Response({
-                    'status': 0,
-                    'message': _('game_id is required.'),
-                    'data': []
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-       
-            try:
-                # Fetch the game using game_id and tournament_id
-                friendly_game = FriendlyGame.objects.get(id=game_id)
-
-                # Calculate total goals for both teams
-                team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
-                    team_id=friendly_game.team_a.id,
-                    game_id=game_id,
-                  
-                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
-                team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
-                    team_id=friendly_game.team_b.id,
-                    game_id=game_id,
-                   
-                ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
-
-                # Update and save the total goals for each team
-                friendly_game.team_a_goal = team_a_goals
-                friendly_game.team_b_goal = team_b_goals
-                friendly_game.save()
-
-                # Return both teams' goal information
-                return Response({
-                    'status': 1,
-                    'message': _('Team stats fetched successfully.'),
-                    'data': {
-                        'game_id': game_id,
-                  
-                        'team_a': {
-                            'id': friendly_game.team_a.id,
-                            'name': friendly_game.team_a.team_name,
-                            'total_goals': team_a_goals
-                        },
-                        'team_b': {
-                            'id': friendly_game.team_b.id,
-                            'name': friendly_game.team_b.team_name,
-                            'total_goals': team_b_goals
-                        }
-                    }
-                }, status=status.HTTP_200_OK)
-
-            except TournamentGames.DoesNotExist:
-                return Response({
-                    'status': 0,
-                    'message': _('Game not found.'),
-                    'data': []
-                }, status=status.HTTP_404_NOT_FOUND)
-
-
 ################# player Swap position ########################
 class FriendlyGameSwapPositionView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2580,174 +2488,7 @@ class FriendlyGameSwapPositionView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-
-################### Tournament Satustics for top Goal and all ###########################
-class FriendlyGameTopPlayerStatsAPIView(APIView):
-    permission_classes = [IsAuthenticated]  # Any logged-in user can access
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-
-    def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-
-        game_id = request.query_params.get('game_id')
-
-        if not game_id:
-            return Response({
-                'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
-            }, status=400)
-
-        try:
-            # Fetch stats for goals, assists, yellow cards, and red cards
-            stats = FriendlyGamesPlayerGameStats.objects.filter(game_id=game_id)
-
-            top_goals = stats.values('player_id', 'team_id').annotate(total_goals=Sum('goals')).order_by('-total_goals')[:5]
-            top_assists = stats.values('player_id', 'team_id').annotate(total_assists=Sum('assists')).order_by('-total_assists')[:5]
-            top_yellow_cards = stats.values('player_id', 'team_id').annotate(total_yellow_cards=Sum('yellow_cards')).order_by('-total_yellow_cards')[:5]
-            top_red_cards = stats.values('player_id', 'team_id').annotate(total_red_cards=Sum('red_cards')).order_by('-total_red_cards')[:5]
-
-            # Fetch top 5 players based on appearances where lineup_status=3
-            top_appearances = (
-                FriendlyGameLineup.objects.filter(game_id=game_id, lineup_status=3)
-                .values('player_id', 'team_id')
-                .annotate(appearances=Count('id'))
-                .order_by('-appearances')[:5]
-            )
-
-            def format_player_data(data, stat_field):
-                """
-                Helper function to format player data with additional details.
-                """
-                formatted_data = []
-                for player in data:
-                    # Fetch player username
-                    player_instance = User.objects.filter(id=player['player_id']).first()
-                    player_username = player_instance.username if player_instance else None
-
-                    # Fetch team and branch details
-                    branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
-                    if branch_instance:
-                        branch_name = branch_instance.team_name
-                        team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
-                    else:
-                        branch_name = None
-                        team_logo = None
-
-                    formatted_data.append({
-                        'player_id': player['player_id'],
-                        'player_username': player_username,
-                        'branch_id': player['team_id'],
-                        'branch_name': branch_name,
-                        'team_logo': team_logo,
-                        'stat_value': player[stat_field]
-                    })
-
-                return formatted_data
-
-            # Format appearances data
-            def format_appearance_data(data):
-                """
-                Helper function to format appearance data.
-                """
-                formatted_data = []
-                for player in data:
-                    # Fetch player username
-                    player_instance = User.objects.filter(id=player['player_id']).first()
-                    player_username = player_instance.username if player_instance else None
-
-                    # Fetch team and branch details
-                    branch_instance = TeamBranch.objects.filter(id=player['team_id']).select_related('team_id').first()
-                    if branch_instance:
-                        branch_name = branch_instance.team_name
-                        team_logo = branch_instance.team_id.team_logo.url if branch_instance.team_id.team_logo else None
-                    else:
-                        branch_name = None
-                        team_logo = None
-
-                    formatted_data.append({
-                        'player_id': player['player_id'],
-                        'player_username': player_username,
-                        'branch_id': player['team_id'],
-                        'branch_name': branch_name,
-                        'team_logo': team_logo,
-                        'appearances': player['appearances']
-                    })
-
-                return formatted_data
-
-            # Prepare structured response data
-            response_data = {
-                'top_goals': format_player_data(top_goals, 'total_goals'),
-                'top_assists': format_player_data(top_assists, 'total_assists'),
-                'top_yellow_cards': format_player_data(top_yellow_cards, 'total_yellow_cards'),
-                'top_red_cards': format_player_data(top_red_cards, 'total_red_cards'),
-                'top_appearances': format_appearance_data(top_appearances),
-            }
-
-            return Response({
-                'status': 1,
-                'message': _('Top players fetched successfully.'),
-                'data': response_data
-            }, status=200)
-
-        except Exception as e:
-            return Response({
-                'status': 0,
-                'message': _('An error occurred while fetching player stats.'),
-                'error': str(e)
-            }, status=500)
-
-
-
-
-class FriendlyGameStatsAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        # Retrieve the query parameters
-        team_a_id = request.query_params.get('team_a_id')
-        team_b_id = request.query_params.get('team_b_id')
-
-        # Initialize the dictionary to hold statistics for each team
-        team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
-
-        # Query all Friendly Games
-        games = FriendlyGame.objects.all()
-
-        # Apply filters based on provided query parameters
-        if team_a_id:
-            games = games.filter(team_a_id=team_a_id)
-        if team_b_id:
-            games = games.filter(team_b_id=team_b_id)
-
-        # Iterate through games and calculate statistics
-        for game in games:
-            if game.is_draw:
-                team_stats[game.team_a.id]['draws'] += 1
-                team_stats[game.team_b.id]['draws'] += 1
-            elif game.winner_id == str(game.team_a.id):
-                team_stats[game.team_a.id]['wins'] += 1
-                team_stats[game.team_b.id]['losses'] += 1
-            elif game.winner_id == str(game.team_b.id):
-                team_stats[game.team_b.id]['wins'] += 1
-                team_stats[game.team_a.id]['losses'] += 1
-
-        # Prepare response data
-        response_data = {
-            "status": 1,
-            "message": _("Friendly game stats fetched successfully"),
-            "data": {
-                "Team_A": team_stats.get(int(team_a_id), {"wins": 0, "losses": 0, "draws": 0}) if team_a_id else None,
-                "Team_B": team_stats.get(int(team_b_id), {"wins": 0, "losses": 0, "draws": 0}) if team_b_id else None,
-            }
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
-
-
-from itertools import chain
-from operator import attrgetter
-
+############################# Frindly Game H2H With Recent Meetings With Game Stats ################################################
 class FriendlyGamesh2hCompleteAPIView(APIView):
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -2846,6 +2587,98 @@ class FriendlyGamesh2hCompleteAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
+
+
+
+############################ FriendlyGame Game Stats  API ########################################
+class FriendlyTeamGameDetailStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # Activate language settings based on header
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Extract and validate query parameters
+            game_id = request.query_params.get('game_id')
+
+            if not game_id:
+                return Response(
+                    {'status': 0, 'message': _('game_id is required.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Fetch the friendly game object
+            game = FriendlyGame.objects.filter(id=game_id).select_related('team_a', 'team_b').first()
+
+            if not game:
+                return Response(
+                    {'status': 0, 'message': _('Game not found with the given criteria.')},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Prepare response data
+            def format_team_data(team, prefix):
+                return {
+                    f"{prefix}_id": team.id if team else None,
+                    f"{prefix}_name": team.team_name if team else None
+                }
+
+            def format_stats(prefix, game):
+                return {
+                    "possession": getattr(game, f"{prefix}_possession", 0.0),
+                    "interception": getattr(game, f"{prefix}_interception", 0),
+                    "offside": getattr(game, f"{prefix}_offside", 0),
+                    "corner": getattr(game, f"{prefix}_corner", 0),
+                }
+
+            response_data = {
+                **format_team_data(game.team_a, "team_a"),
+                **format_team_data(game.team_b, "team_b"),
+                "General": {
+                    "team_a": format_stats("general_team_a", game),
+                    "team_b": format_stats("general_team_b", game)
+                },
+                "Defence": {
+                    "team_a": format_stats("defence_team_a", game),
+                    "team_b": format_stats("defence_team_b", game)
+                },
+                "Distribution": {
+                    "team_a": format_stats("distribution_team_a", game),
+                    "team_b": format_stats("distribution_team_b", game)
+                },
+                "Attack": {
+                    "team_a": format_stats("attack_team_a", game),
+                    "team_b": format_stats("attack_team_b", game)
+                },
+                "Discipline": {
+                    "team_a": format_stats("discipline_team_a", game),
+                    "team_b": format_stats("discipline_team_b", game)
+                }
+            }
+
+            # Return success response
+            return Response(
+                {
+                    "status": 1,
+                    "message": _("Game detail stats fetched successfully."),
+                    "data": response_data,
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {
+                    "status": 0,
+                    "message": _("An unexpected error occurred. Please try again later."),
+                    "error": str(e),  # Optional: Remove in production for security
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 ############### Friendly Game Detail API for Both Team LineUp See ####################
 class FriendlyGamesDetailAPIView(APIView):

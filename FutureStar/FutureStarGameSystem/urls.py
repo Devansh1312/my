@@ -31,12 +31,6 @@ urlpatterns = [
     path('api/game_stats/player_stats/',PlayerGameStatsAPIView.as_view()),
     path('api/game_stats/timeline/',TeamGameStatsTimelineAPIView.as_view()),
     
-   
-    path('api/game_stats/team_stats/',TeamGameGoalCountAPIView.as_view()),
-    
-    
-
-
     path('api/game_officials_type/',GameOficialTypesList.as_view()),
 
 
