@@ -31,6 +31,8 @@ from FutureStar_App.models import *
 from FutureStarTeamApp.models import *
 from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
+from FutureStarFriendlyGame.models import *
+
 from django.utils.safestring import mark_safe
 from django.db.models import F, Case, When, IntegerField
 from django.utils.timezone import now
@@ -5933,7 +5935,7 @@ class AccountDeleteReasonListView(LoginRequiredMixin, View):
         )
 
 
-############################ User Assign ##########################
+############################ Tournamnet Game User Assign ##########################
 @method_decorator(user_role_check, name='dispatch')
 class TournamentGamesListView(LoginRequiredMixin, View):
     template_name = "Admin/Assign_User_Game.html"
@@ -6031,70 +6033,99 @@ def fetch_users(request):
     return JsonResponse(list(users), safe=False)
 
 
+############################ Friendly Game User Assign ##########################
+@method_decorator(user_role_check, name='dispatch')
+class FriendlyGamesListView(LoginRequiredMixin, View):
+    template_name = "Admin/Assign_User_Friendly.html"
+
+    def get(self, request):
+        # Current time to compare game date and start time
+        current_time = now()
+
+        # Retrieve friendly games with annotated order for categorizing
+        friendly_games = (
+            FriendlyGame.objects.annotate(
+                assigned_user_name=F('game_statistics_handler__username'),  # Get the assigned user name
+                is_unassigned=Case(
+                    When(game_statistics_handler__isnull=True, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                is_upcoming=Case(
+                    When(game_date__gt=current_time.date(), then=1),
+                    When(game_date=current_time.date(), game_start_time__gt=current_time.time(), then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                is_passed=Case(
+                    When(game_date__lt=current_time.date(), then=1),
+                    When(game_date=current_time.date(), game_start_time__lt=current_time.time(), then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+            )
+            .order_by('-game_date', '-game_start_time', '-id')
+        )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "friendly_games": friendly_games,
+                "breadcrumb": {"child": "Friendly Games List"},
+            },
+        )
 
 
-################################# Finished Games ##################
-# class TournamentGameListView(View):
-#     template_name = "Admin/Games/ListOfGames.html"
+@method_decorator(csrf_exempt, name='dispatch')
+class AssignUserToFriendlyGameView(LoginRequiredMixin, View):
+    def post(self, request, game_id):
+        try:
+            # Parse JSON request body
+            data = json.loads(request.body)
+            user_id = data.get('user_id')
 
-#     def get(self, request):
-#         games = TournamentGames.objects.filter(finish=True).select_related('tournament_id')
-#         return render(
-#             request,
-#             self.template_name,
-#             {
-#                 "games": games,
-#                 "breadcrumb": {"parent": "Tournaments", "child": "Games"},
-#             },
-#         )
+            # Validate and retrieve the game and user
+            game = get_object_or_404(FriendlyGame, id=game_id)
+            user = get_object_or_404(User, id=user_id)
 
-#     def post(self, request):
-#         """
-#         Handles the form submission for editing games.
-#         """
-#         game_id = request.POST.get('game_id')
-#         game = get_object_or_404(TournamentGames, pk=game_id)
-#         form = TournamentGameForm(request.POST, instance=game)
+            current_time = now()
 
-#         if form.is_valid():
-#             form.save()
-#             return JsonResponse({"success": True, "message": "Game updated successfully."})
-#         else:
-#             return JsonResponse({"success": False, "errors": form.errors}, status=400)
+            # Check if the game date and time has passed
+            if game.game_date < current_time.date() or (
+                game.game_date == current_time.date() and game.game_start_time <= current_time.time()
+            ):
+                messages.success(
+                    request,
+                    f"Cannot assign user; game already started."
+                )
+                return JsonResponse(
+                    {'error': 'Cannot assign user; game already started.'}, status=400
+                )
 
-#     def get_game_data(self, request, game_id):
-#         """
-#         Handles AJAX requests to get game details.
-#         """
-#         game = get_object_or_404(TournamentGames, pk=game_id)
-#         form = TournamentGameForm(instance=game)
-#         return render(request, "Admin/Games/ListOfGames.html", {"form": form, "game": game})
-    
+            # Assign the user to the game
+            game.game_statistics_handler = user
+            game.save()
 
-# class TournamentGameView(View):
-#     template_name = "Admin/Games/ListOfGames.html"
+            messages.success(
+                request,
+                f"User assigned successfully!"
+            )
 
-#     def get(self, request, pk):
-#         game = get_object_or_404(TournamentGames, pk=pk)
-#         return render(request, self.template_name, {"game": game})
+            return JsonResponse({'message': 'User assigned successfully!'}, status=200)
 
-# class TournamentGameEditView(View):
-#     template_name = "Admin/Games/edit_form.html"  # Separate template for the form
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
-#     def get(self, request, pk):
-#         game = get_object_or_404(TournamentGames, pk=pk)
-#         form = TournamentGameForm(instance=game)
-#         if request.is_ajax():
-#             return render(request, self.template_name, {"form": form})
-#         return JsonResponse({"error": "Invalid request"}, status=400)
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({'error': 'GET method not allowed'}, status=405)
 
-#     def post(self, request, pk):
-#         game = get_object_or_404(TournamentGames, pk=pk)
-#         form = TournamentGameForm(request.POST, instance=game)
-#         if form.is_valid():
-#             form.save()
-#             return JsonResponse({"success": True, "message": "Game updated successfully."})
-#         return JsonResponse({"success": False, "errors": form.errors}, status=400)
+
+
+
+
+############################ Tournamemt Games State Add ####################################
+
 @method_decorator(user_role_check, name='dispatch')
 class TournamentGameStatsView(LoginRequiredMixin, View):
     template_name = "Admin/Games/ListOfGames.html"
@@ -6149,3 +6180,55 @@ class TournamentGameEditStatsView(LoginRequiredMixin, View):
             # Return the form with errors as HTML
             html = render_to_string(self.template_name, {'form': form, 'game': game})
             return JsonResponse({'success': False, 'html': html})
+
+############################ Friendly Games State Add ####################################
+
+
+@method_decorator(user_role_check, name='dispatch')
+class FriendlyGameStatsView(LoginRequiredMixin, View):
+    template_name = "Admin/Friendly_Games/ListOfGames.html"
+
+    def get(self, request):
+        # Fetch friendly games, adjust the query based on your model relationships
+        games = FriendlyGame.objects.all().select_related('team_a', 'team_b')
+        return render(
+            request,
+            self.template_name,
+            {"games": games, "breadcrumb": {"parent": "Friendly Games", "child": "Game Stats"}}
+        )
+
+@method_decorator(user_role_check, name='dispatch')
+class FriendlyGameEditStatsView(LoginRequiredMixin, View):
+    template_name = "Admin/Friendly_Games/EditGameStatsModal.html"
+
+    def get(self, request, game_id):
+        try:
+            game = FriendlyGame.objects.get(id=game_id)
+            form = FriendlyGameForm(instance=game)
+
+            # Check if the request is AJAX (indicated by 'X-Requested-With' header)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                html = render_to_string(self.template_name, {'form': form, 'game': game})
+                return JsonResponse({'html': html})
+            return render(request, self.template_name, {'form': form, 'game': game})
+        
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'Game not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def post(self, request, game_id):
+        try:
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return redirect('friendly_games_list_stats')
+
+        form = FriendlyGameForm(request.POST, instance=game)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Stats updated successfully!')
+            return JsonResponse({'success': True})
+        else:
+            html = render_to_string(self.template_name, {'form': form, 'game': game})
+            return JsonResponse({'success': False, 'html': html})
+

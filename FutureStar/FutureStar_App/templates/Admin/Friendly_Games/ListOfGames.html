@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+{% endblock %}
+
+{% block title %}
+Friendly Game Stats
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>{{ breadcrumb.child }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display" id="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Friendly Game</th>
+                                        <th>Game Number</th>
+                                        <th>Team A</th>
+                                        <th>Team B</th>
+                                        <th colspan="2">Game Date & time</th>
+                                        <th>Game Created By</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in games %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ game.game_name }}</td>
+                                        <td>{{ game.game_number }}</td>
+                                        <td>{{ game.team_a.team_name }}</td>
+                                        <td>{{ game.team_b.team_name }}</td>
+                                        <td>{{ game.game_date }}</td>
+                                        <td>{{ game.game_start_time }}</td>
+                                        <td>{{ game.created_by.username }}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-primary btn-sm edit-stats-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editStatsModal"
+                                                data-game-id="{{ game.id }}">
+                                                Edit Stats
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Stats Modal -->
+<div class="modal fade" id="editStatsModal" tabindex="-1" aria-labelledby="editStatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStatsModalLabel">Edit Game Stats</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<!-- Include jQuery if not already included -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize DataTable
+        $('#stats-table').DataTable();
+
+        // Handle Edit Stats Button Click
+        document.querySelectorAll('.edit-stats-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const gameId = this.dataset.gameId;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;  // CSRF token from page
+                
+                // Make an AJAX request to fetch the form
+                fetch(`/friendly-games/edit/${gameId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken  // Send CSRF token here
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html) {
+                        document.getElementById('modalContent').innerHTML = data.html;
+                        $('#editStatsModal').modal('show');
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error("Error loading the game stats form:", error));
+            });
+        });
+
+        // Handle form submission (for saving updated stats)
+        document.addEventListener('submit', (e) => {
+            if (e.target.id === 'updateStatsForm') {
+                e.preventDefault();  // Prevent the form from submitting normally
+                
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;  // Get CSRF token
+                
+                const formData = new FormData(e.target);  // Collect form data
+                
+                // Send the form data via AJAX to update stats
+                fetch(e.target.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken  // CSRF token in header
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Stats updated successfully');
+                        $('#editStatsModal').modal('hide');
+                        location.reload();  // Reload or refresh the table
+                    } else {
+                        alert('Failed to update stats: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error updating stats:', error));
+            }
+        });
+    });
+</script>
+{% endblock %}

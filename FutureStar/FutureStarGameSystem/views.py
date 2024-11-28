@@ -251,15 +251,21 @@ class TeamPlayersAPIView(APIView):
 
         # Update lineup status based on current lineup size
         existing_players = Lineup.objects.filter(team_id=team, game_id=game)
-        player_count = existing_players.filter(lineup_status=Lineup.ADDED).count()
+        
+        # Count players with ADDED or ALREADY_IN_LINEUP status
+        added_or_in_lineup_count = existing_players.filter(
+            lineup_status__in=[Lineup.ADDED, Lineup.ALREADY_IN_LINEUP]
+        ).count()
 
+        # If the player is already in the lineup as ALREADY_IN_LINEUP, keep their status
         if lineup.lineup_status == Lineup.ALREADY_IN_LINEUP:
-            lineup_status = lineup.lineup_status  # Keep the status as ALREADY_IN_LINEUP
+            lineup_status = lineup.lineup_status
         else:
-            lineup_status = Lineup.SUBSTITUTE if player_count >= 11 else Lineup.ADDED
+            # If combined count >= 11, mark as SUBSTITUTE, otherwise ADD player to lineup
+            lineup_status = Lineup.SUBSTITUTE if added_or_in_lineup_count >= 11 else Lineup.ADDED
 
         # Determine if reload is needed
-        reload = player_count >= 11  # Reload is true if count is 11 or more
+        reload = added_or_in_lineup_count >= 11  # Reload if there are 11 or more players
 
         # Update the lineup entry
         lineup.lineup_status = lineup_status
@@ -279,9 +285,11 @@ class TeamPlayersAPIView(APIView):
                 'game_id': game.id,
                 'game_number': game.game_number,
                 'lineup_status': 'ADDED' if lineup_status == Lineup.ADDED else 'SUBSTITUTE',
+                'count': added_or_in_lineup_count + 1,
                 'reload': reload
             }
         }, status=status.HTTP_200_OK)
+
 
 
     

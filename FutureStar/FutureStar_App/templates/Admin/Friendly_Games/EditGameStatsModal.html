@@ -2,7 +2,7 @@
 {% load custom_filters %}
 
 <div class="modal-body">
-    <form id="updateStatsForm" method="POST" action="{% url 'edit_game_stats' game.id %}">
+    <form id="updateStatsForm" method="POST" action="{% url 'edit_friendly_game_stats' game.id %}">
         {% csrf_token %}
         {{ form.as_p }}  <!-- Render form fields -->
         <button type="submit" class="btn btn-primary">Save Changes</button>

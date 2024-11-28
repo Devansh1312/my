@@ -16,7 +16,7 @@ from datetime import timedelta
 
 class Tournament(models.Model):
 
-    team_id = models.ForeignKey(TeamBranch,null=True, blank=True, on_delete=models.CASCADE)
+    team_id = models.ForeignKey(Team,null=True, blank=True, on_delete=models.CASCADE)
     tournament_name = models.CharField(max_length=255,blank=True,null=True)
     tournament_starting_date = models.DateField(blank=True,null=True)
     tournament_final_date = models.DateField(blank=True,null=True)

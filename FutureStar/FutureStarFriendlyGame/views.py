@@ -676,19 +676,21 @@ class FriendlyGameTeamPlayersAPIView(APIView):
 
         # Update lineup status based on current lineup size
         existing_players = FriendlyGameLineup.objects.filter(team_id=team, game_id=game)
-        player_count = existing_players.filter(lineup_status=FriendlyGameLineup.ADDED).count()
+        added_or_in_lineup_count = existing_players.filter(
+            lineup_status__in=[FriendlyGameLineup.ADDED, FriendlyGameLineup.ALREADY_IN_LINEUP]
+        ).count()
 
         if lineup:
             # If the player is already in the lineup, update their status
             if lineup.lineup_status == FriendlyGameLineup.ALREADY_IN_LINEUP:
                 lineup_status = lineup.lineup_status  # Keep the status as ALREADY_IN_LINEUP
             else:
-                lineup_status = FriendlyGameLineup.SUBSTITUTE if player_count >= 11 else FriendlyGameLineup.ADDED
+                lineup_status = FriendlyGameLineup.SUBSTITUTE if added_or_in_lineup_count >= 11 else FriendlyGameLineup.ADDED
             lineup.lineup_status = lineup_status
             lineup.save()
         else:
             # Add a new player to the lineup
-            lineup_status = FriendlyGameLineup.SUBSTITUTE if player_count >= 11 else FriendlyGameLineup.ADDED
+            lineup_status = FriendlyGameLineup.SUBSTITUTE if added_or_in_lineup_count >= 11 else FriendlyGameLineup.ADDED
             lineup = FriendlyGameLineup.objects.create(
                 player_id=player.user_id,
                 game_id=game,
@@ -697,7 +699,7 @@ class FriendlyGameTeamPlayersAPIView(APIView):
             )
 
         # Determine if reload is needed
-        reload = player_count >= 11  # Reload is true if count is 11 or more
+        reload = added_or_in_lineup_count >= 11  # Reload if there are 11 or more players
 
         # Return success response
         return Response({
@@ -709,11 +711,13 @@ class FriendlyGameTeamPlayersAPIView(APIView):
                 'player_id': player.user_id.id,
                 'player_name': player.user_id.username,  # Adjust field if necessary
                 'game_id': game.id,
-                'game_name': game.game_name,
+                'game_name': game.game_name,  # Adjust field if necessary
                 'lineup_status': 'ADDED' if lineup_status == FriendlyGameLineup.ADDED else 'SUBSTITUTE',
-                'reload': reload
+                'reload': reload,
+                'count': added_or_in_lineup_count + 1  # Include the current player in the count
             }
         }, status=status.HTTP_200_OK)
+
 
 
     def delete(self, request, *args, **kwargs):

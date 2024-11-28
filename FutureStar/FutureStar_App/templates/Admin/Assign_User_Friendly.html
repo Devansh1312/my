@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <!-- Plugins css Ends-->
 {% endblock %}
-{% block title %}Tournament Games{% endblock %}
+{% block title %}Friendly Games{% endblock %}
 {% block content %}
 <div class="page-body">
     <div class="container-fluid">
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="row">
-            <!-- Tournament Games List (Single Table) -->
+            <!-- Friendly Games List (Single Table) -->
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
@@ -27,27 +27,27 @@
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Tournament Name</th>
+                                        <th>Friendly Game Name</th>
                                         <th>Game Number</th>
                                         <th colspan="2">Teams</th>
                                         <th colspan="2">Game Date & time</th>
-                                        <th colspan="2" >Created By Team & user</th>
+                                        <th>Game Created By</th>
                                         <th>Assigned User</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for game in tournament_games %}
+                                    {% for game in friendly_games %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ game.tournament_id.tournament_name }}</td>
+                                        <td>{{ game.game_name }}</td>
                                         <td>{{ game.game_number }}</td>
                                         <td>{{ game.team_a.team_name }}</td>
                                         <td>{{ game.team_b.team_name }}</td>
                                         <td>{{ game.game_date }}</td>
                                         <td>{{ game.game_start_time }}</td>
-                                        <td>{{ game.tournament_id.team_id.team_name }}</td>
-                                        <td>{{ game.tournament_id.team_id.team_founder.username }}</td>
+                                        <td>{{ game.created_by.username }}</td>
+
                                         <td>{{ game.assigned_user_name }}</td>
                                         <td>
                                             {% if game.is_upcoming == 1 %}
@@ -139,7 +139,7 @@
             return;
         }
 
-        const response = await fetch(`/api/tournament-games/${currentGameId}/assign-user/`, {
+        const response = await fetch(`/api/friendly-games/${currentGameId}/assign-user/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -263,15 +263,24 @@ urlpatterns = [
     path('playing_positions/edit/<int:playing_position_id>/', PlayingPositionEditView.as_view(), name='playing_position_edit'),
 
 
+    ############# Assign user for Tournament #################
     path('tournament-games-list/', TournamentGamesListView.as_view(), name='tournament_games_list'),
-    path('api/users/', fetch_users, name='fetch_users'),
+    path('api/assignd_users_search/', fetch_users, name='fetch_users'),
     path('api/tournament-games/<int:game_id>/assign-user/', AssignUserToGameView.as_view(), name='assign_user_to_game'),
-    # path('search-users/',search_users, name='search_users'),
-    # path('assign-game-handler/',assign_game_handler, name='assign_game_handler'),
 
+    ########### Assign user for Freindly #########################
+    # Friendly Games
+    path('friendly-games-list/', FriendlyGamesListView.as_view(), name='friendly_games_list'),
+    path('api/friendly-games/<int:game_id>/assign-user/', AssignUserToFriendlyGameView.as_view(), name='assign_user_to_friendly_game'),
+
+
+    ################## Tournament Game States Add URLS ############################
     path('games/', TournamentGameStatsView.as_view(), name='games_list'),
     path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
 
+    ################## Friendly Game States Add URLS ############################
+    path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
+    path('friendly-games/edit/<int:game_id>/', FriendlyGameEditStatsView.as_view(), name='edit_friendly_game_stats'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
