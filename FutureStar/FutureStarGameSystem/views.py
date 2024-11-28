@@ -62,24 +62,24 @@ class TeamPlayersAPIView(APIView):
             if not team_id:
                 return Response({
                     'status': 0,
-                    'message': _('team_id is required.'),
-                    'data': []
+                    'message': _('Team id is required.'),
+                    'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Separate validation for game_id
             if not game_id:
                 return Response({
                     'status': 0,
-                    'message': _('game_id is required.'),
-                    'data': []
+                    'message': _('Game id is required.'),
+                    'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Separate validation for tournament_id
             if not tournament_id:
                 return Response({
                     'status': 0,
-                    'message': _('tournament_id is required.'),
-                    'data': []
+                    'message': _('Tournament id is required.'),
+                    'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -89,7 +89,7 @@ class TeamPlayersAPIView(APIView):
                 return Response({
                     'status': 0,
                     'message': _('Team not found.'),
-                    'data': []
+                    'data': {}
                 }, status=status.HTTP_404_NOT_FOUND)
 
             # Fetch players in the specified team
@@ -102,7 +102,7 @@ class TeamPlayersAPIView(APIView):
                 return Response({
                     'status': 0,
                     'message': _('No players found for the provided team.'),
-                    'data': []
+                    'data': {}
                 }, status=status.HTTP_404_NOT_FOUND)
 
             # Get user_ids of players in JoinBranch
@@ -179,7 +179,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have permission to access this team.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Validate team existence
@@ -189,7 +189,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('The specified team does not exist.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Validate player joined in the same team
@@ -203,7 +203,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('The specified player is not part of this team.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Validate tournament existence
@@ -213,7 +213,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('The specified tournament does not exist.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Validate game existence for the given tournament
@@ -223,7 +223,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('The specified game does not exist in this tournament.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Validate team_id matches team_a or team_b in the game
@@ -231,7 +231,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('The specified team is not part of this game.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the player already exists in the lineup
@@ -246,7 +246,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('The player has not been assigned a jersey number yet.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Update lineup status based on current lineup size
@@ -308,29 +308,29 @@ class TeamPlayersAPIView(APIView):
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.'),
-                'data': []
+                'message': _('Team id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
-                'data': []
+                'message': _('Tournament id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
+                'message': _('Game id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not player_id:
             return Response({
                 'status': 0,
-                'message': _('player_id is required.'),
-                'data': []
+                'message': _('Player id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         
@@ -338,7 +338,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have permission to access this team.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Try to retrieve the lineup entry with provided criteria
@@ -355,7 +355,7 @@ class TeamPlayersAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('No matching active lineup entries found.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Update the lineup status to REMOVED (0)
@@ -428,24 +428,24 @@ class LineupPlayers(APIView):
             if not team_id:
                 return Response({
                     'status': 0,
-                    'message': _('team_id is required.'),
-                    'data': []
+                    'message': _('Team id is required.'),
+                    'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Validate game_id
             if not game_id:
                 return Response({
                     'status': 0,
-                    'message': _('game_id is required.'),
-                    'data': []
+                    'message': _('Game id is required.'),
+                    'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Validate tournament_id
             if not tournament_id:
                 return Response({
                     'status': 0,
-                    'message': _('tournament_id is required.'),
-                    'data': []
+                    'message': _('Tournament id is required.'),
+                    'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -535,35 +535,35 @@ class LineupPlayers(APIView):
         if not player_id:
             return Response({
                 'status': 0,
-                'message': _('player_id is required.'),
+                'message': _('Player id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate position_1
         if not position_1:
             return Response({
                 'status': 0,
-                'message': _('position_1 is required.'),
+                'message': _('Position 1 is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate team_id
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.'),
+                'message': _('Team id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate tournament_id
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
+                'message': _('Tournament id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate game_id
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
+                'message': _('Game id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -629,28 +629,28 @@ class LineupPlayers(APIView):
         if not player_id:
             return Response({
                 'status': 0,
-                'message': _('player_id is required.'),
+                'message': _('Player id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate team_id
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.'),
+                'message': _('Team id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate tournament_id
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
+                'message': _('Tournament id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate game_id
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
+                'message': _('Game id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
           
@@ -770,21 +770,21 @@ class AddPlayerJerseyAPIView(APIView):
         if not team_id:
             validation_errors.append({
                 'field': 'team_id',
-                'message': _('team_id is required.')
+                'message': _('Team id is required.')
             })
 
         # Validate game_id
         if not game_id:
             validation_errors.append({
                 'field': 'game_id',
-                'message': _('game_id is required.')
+                'message': _('Game id is required.')
             })
 
         # Validate tournament_id
         if not tournament_id:
             validation_errors.append({
                 'field': 'tournament_id',
-                'message': _('tournament_id is required.')
+                'message': _('Tournament id is required.')
             })
 
         # Validate players_data
@@ -807,7 +807,7 @@ class AddPlayerJerseyAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have permission to access this team.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Process players
@@ -821,7 +821,7 @@ class AddPlayerJerseyAPIView(APIView):
                 response_data.append({
                     'player_id': None,
                     'status': 0,
-                    'message': _('player_id is required.')
+                    'message': _('Player id is required.')
                 })
                 continue
 
@@ -1014,39 +1014,39 @@ class GameStatsLineupPlayers(APIView):
         if not team_a_id:
             return Response({
                 'status': 0,
-                'message': _('team_a_id is required.'),
-                'data': []
+                'message': _('Team A id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate team_b_id
         if not team_b_id:
             return Response({
                 'status': 0,
-                'message': _('team_b_id is required.'),
-                'data': []
+                'message': _('Team B id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate game_id
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
+                'message': _('Game id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate tournament_id
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
-                'data': []
+                'message': _('Tournament id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
             return Response({
                 'status': 0,
                 'message': _('You do not have access to this resource.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Fetch lineup data for both teams
@@ -1107,7 +1107,7 @@ class GameStatsLineupPlayers(APIView):
         # Return the response with the status and message
         return Response({
             'status': 1,
-            'message': _('Lineup players and managerial staff fetched successfully for both teams.'),
+            'message': _('Lineup players and manager fetched successfully for both teams.'),
             'data': lineup_data
         }, status=status.HTTP_200_OK)
     
@@ -1160,15 +1160,15 @@ class LineupPlayerStatusAPIView(APIView):
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
-                'data': []
+                'message': _('Tournament id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
+                'message': _('Game id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the user has access to this game (can be simplified depending on access logic)
@@ -1176,7 +1176,7 @@ class LineupPlayerStatusAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('Access denied. You do not have permission to view this game.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         try:
@@ -1186,7 +1186,7 @@ class LineupPlayerStatusAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('Game not found for the given tournament.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Fetch all lineup entries based on game_id and tournament_id
@@ -1297,35 +1297,35 @@ class LineupPlayerStatusAPIView(APIView):
         if not player_id:
             return Response({
                 'status': 0,
-                'message': _('player_id is required.'),
+                'message': _('Player id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate team_id
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.'),
+                'message': _('Team id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate tournament_id
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
+                'message': _('Tournament id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate game_id
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
+                'message': _('Game id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not self._has_access(request.user, game_id, tournament_id):
                 return Response({
                     'status': 0,
                     'message': _('Access denied. You do not have permission to view this game.'),
-                    'data': []
+                    'data': {}
                 }, status=status.HTTP_403_FORBIDDEN)
 
         # Try to retrieve the lineup entry
@@ -1409,7 +1409,7 @@ class OfflicialSearchPaggination(PageNumberPagination):
             return Response({
                 'status': 0,
                 'message': _('Page not found.'),
-                'data': []
+                'data': {}
             }, status=400)
 
         paginator = self.django_paginator_class(queryset, self.get_page_size(request))
@@ -1422,7 +1422,7 @@ class OfflicialSearchPaggination(PageNumberPagination):
             return Response({
                 'status': 0,
                 'message': _('Page not found.'),
-                'data': []
+                'data': {}
             }, status=400)
 
         self.paginated_data = page
@@ -1526,7 +1526,7 @@ class GameOfficialsAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('game_id is required.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the game exists
@@ -1581,8 +1581,8 @@ class GameOfficialsAPIView(APIView):
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
+                'message': _('Game id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate official_id
@@ -1590,7 +1590,7 @@ class GameOfficialsAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('official_id is required.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate officials_type_id
@@ -1598,7 +1598,7 @@ class GameOfficialsAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('officials_type_id is required.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -1612,7 +1612,7 @@ class GameOfficialsAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('This official is already assigned to this game.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Create the new GameOfficial entry
@@ -1653,16 +1653,16 @@ class GameOfficialsAPIView(APIView):
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
+                'message': _('Game id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate official_id
         if not official_id:
             return Response({
                 'status': 0,
-                'message': _('official_id is required.'),
-                'data': []
+                'message': _('Official is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -1717,28 +1717,28 @@ class PlayerGameStatsAPIView(APIView):
         if not player_id:
             return Response({
                 'status': 0,
-                'message': _('player_id is required.')
+                'message': _('Player id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate team_id
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.')
+                'message': _('Team id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate tournament_id
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.')
+                'message': _('Tournament is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Validate game_id
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.')
+                'message': _('Game id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
        
@@ -1746,7 +1746,7 @@ class PlayerGameStatsAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have access to this resource.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
         
         game_instance = get_object_or_404(TournamentGames, id=game_id)
@@ -1864,7 +1864,7 @@ class PlayerGameStatsAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have access to this resource.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         try:
@@ -1949,13 +1949,13 @@ class TeamGameStatsTimelineAPIView(APIView):
         tournament_id = request.query_params.get('tournament_id')
         
         if not game_id:
-            return Response({'status': 0, 'message': _('game_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Game id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         if not tournament_id:
-            return Response({'status': 0, 'message': _('tournament_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Tournament id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': []}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch game and calculate total goals for both teams
@@ -2022,7 +2022,7 @@ class TeamGameStatsTimelineAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('Game not found.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
 #################### player substitute ######################
@@ -2058,31 +2058,31 @@ class PlayerSubstitutionAPIView(APIView):
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.')
+                'message': _('Team id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.')
+                'message': _('Tournament id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.')
+                'message': _('Game id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not player_a_id:
             return Response({
                 'status': 0,
-                'message': _('player_a_id is required.')
+                'message': _('Player A id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not player_b_id:
             return Response({
                 'status': 0,
-                'message': _('player_b_id is required.')
+                'message': _('Player B id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         
@@ -2090,7 +2090,7 @@ class PlayerSubstitutionAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have access to this resource.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         try:
@@ -2194,22 +2194,22 @@ class PlayerSubstitutionAPIView(APIView):
         if not team_id:
             return Response({
                 'status': 0,
-                'message': _('team_id is required.'),
-                'data': []
+                'message': _('Team id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': []
+                'message': _('Game id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
-                'data': []
+                'message': _('Tournament id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         
@@ -2217,7 +2217,7 @@ class PlayerSubstitutionAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('You do not have access to this resource.'),
-                'data': []
+                'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Filter players in Lineup by team, game, and tournament, separating by status
@@ -2269,15 +2269,27 @@ class SwapPositionView(APIView):
         game_id = request.data.get('game_id')  # Game ID for the context
         
         if not player_id or target_position is None or not team_id or not game_id:
-            return Response({"detail": "Player ID, target position, team ID, and game ID are required."}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {
+                    "status": 0,
+                    "message": _("Player ID, target position, team ID, and game ID are required."),
+                    "data": {}
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         # Get the player's lineup entry, ensuring that it belongs to the correct team and game
         player_lineup = get_object_or_404(Lineup, player_id=player_id, team_id=team_id, game_id=game_id)
         
         # Check if the player's lineup status is ALREADY_IN_LINEUP (status = 3)
         if player_lineup.lineup_status != Lineup.ALREADY_IN_LINEUP:
-            return Response({"detail": "Player must have in starting 11 lineup to swap positions."}, status=status.HTTP_400_BAD_REQUEST)
-        
+                return Response(
+                    {
+                        "status": 0,
+                        "message": _("Player must have in starting 11 lineup to swap positions."),
+                        "data": {}
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+    )
         # Check if there's already a player in the target position within the same game and team
         target_lineup = Lineup.objects.filter(game_id=game_id, team_id=team_id, position_1=target_position).first()
         
@@ -2331,15 +2343,28 @@ class SwapPositionView(APIView):
         
         # Validate that team_id and game_id are provided
         if not team_id or not game_id:
-            return Response({"detail": "Team ID and Game ID are required."}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {
+                    "status": 0,
+                    "message": _("Team ID and Game ID are required."),
+                    "data": {}
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+                
         # Filter lineups based on team_id and game_id
         lineups = Lineup.objects.filter(team_id=team_id, game_id=game_id, lineup_status=Lineup.ALREADY_IN_LINEUP)
         
         # If no lineups are found, return an appropriate message
         if not lineups.exists():
-            return Response({"detail": "No lineups found for the provided team and game."}, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response(
+                {
+                    "status": 0,
+                    "message": _("No lineups found for the provided team and game."),
+                    "data": {}
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )        
         # Serialize the lineups
         serializer = SwapPositionSerializer(lineups, many=True)
         
@@ -2365,8 +2390,8 @@ class TopPlayerStatsAPIView(APIView):
         if not tournament_id:
             return Response({
                 'status': 0,
-                'message': _('tournament_id is required.'),
-                'data': []
+                'message': _('Tournament id is required.'),
+                'data': {}
             }, status=400)
 
         try:
