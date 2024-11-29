@@ -639,23 +639,225 @@ class DefaultUserList(LoginRequiredMixin, View):
 class UserDetailView(LoginRequiredMixin, View):
     template_name = "Admin/User/User_Detail.html"
     
-    def get_user_related_data(self, user):
+
+    def get_user_related_data(self, user, time_filter=None):
+        """
+        Fetch user-related data such as posts, events, and stats based on role.
+        """
         posts = Post.objects.filter(created_by_id=user.id, creator_type=Post.USER_TYPE)
         events = Event.objects.filter(event_organizer=user)
         event_bookings = EventBooking.objects.filter(created_by_id=user.id, creator_type=EventBooking.USER_TYPE)
         teams = JoinBranch.objects.filter(user_id=user.id)
-        return posts, events, event_bookings, teams
+
+        # Initialize stats
+        stats = {}
+
+        if user.role.id == 2:
+            stats = self.get_player_stats(user, time_filter)
+        elif user.role.id==3:
+            stats = self.get_coach_stats(user, time_filter)
+        elif user.role.id == 4:
+            stats = self.get_referee_stats(user, time_filter)
+        
+        return posts, events, event_bookings, teams, stats
+
+    def get_player_stats(self, user, time_filter):
+        """
+        Fetch player-specific stats, including total wins, losses, draws, games played, goals, assists, and cards.
+        """
+        try:
+            # Fetch the team the user is associated with
+            team = JoinBranch.objects.filter(user_id=user.id).first()
+            if not team:
+                return {
+                    "status": 0,
+                    "message": "User is not associated with any team.",
+                }
+
+            team_id = team.branch_id
+
+               # Ensure time_filter is a valid dictionary
+            time_filter = time_filter or {}
+
+            # Fetch the games the player's team participated in
+            games = TournamentGames.objects.filter(
+                (Q(team_a=team_id) | Q(team_b=team_id)),
+                finish=True,
+                **time_filter
+            )
+            # Total matches played
+            total_games_played = games.count()
+
+            # Total goals scored and conceded by the team
+            total_goals = games.aggregate(
+                total_goals_a=Sum('team_a_goal'),
+                total_goals_b=Sum('team_b_goal')
+            )
+            total_goals_scored = total_goals['total_goals_a'] or 0
+            total_goals_conceded = total_goals['total_goals_b'] or 0
+            total_goals = total_goals_scored + total_goals_conceded
+
+            # Total assists (assuming "team_a_assists" and "team_b_assists" fields exist)
+            total_assists = PlayerGameStats.objects.filter(
+                    game_id__in=games.values_list('id', flat=True)
+                ).aggregate(
+                    total_assists=Sum('assists')  # Adjust based on actual field name
+                )
+            total_assists_scored = total_assists['total_assists'] or 0
+
+            # Total wins, losses, and draws
+            total_wins = games.filter(winner_id=team_id).count()
+            total_losses = games.filter(loser_id=team_id).count()
+            total_draws = games.filter(is_draw=True).count()
+
+            # Total yellow and red cards
+            cards_stats = PlayerGameStats.objects.filter(
+                game_id__in=games.values_list('id', flat=True)
+            ).aggregate(
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
+            total_yellow_cards = cards_stats['total_yellow_cards'] or 0
+            total_red_cards = cards_stats['total_red_cards'] or 0
+
+            return {
+                "matchplayed": total_games_played,
+                "win": total_wins,
+                "loss": total_losses,
+                "draw": total_draws,
+                "goals": total_goals,
+                "assists": total_assists_scored,
+                "yellow_card": total_yellow_cards,
+                "red": total_red_cards,
+            }
+
+        except Exception as e:
+            return {
+                "status": 0,
+                "message": "Failed to fetch player stats.",
+                "error": str(e),
+            }
+
+    def get_coach_stats(self, user, time_filter):
+        """
+        Fetch coach-specific stats, including total wins, losses, draws, games played, and cards.
+        """
+        try:
+            # Get the teams the coach is associated with
+            coach_branches = JoinBranch.objects.filter(
+                user_id=user.id,
+                joinning_type=JoinBranch.COACH_STAFF_TYPE
+            ).values_list('branch_id', flat=True)
+
+            # Get the games for those teams in the tournament
+            time_filter = time_filter or {}
+
+            # Fetch the games the player's team participated in
+          
+            games = TournamentGames.objects.filter(
+                (Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches)),
+                finish=True,  # Only finished games
+                **time_filter
+            )
+
+            # Total matches played
+            total_games_played = games.count()
+
+            # Total goals scored and conceded by teams the coach is managing
+            total_goals = games.aggregate(
+                total_goals_a=Sum('team_a_goal'),
+                total_goals_b=Sum('team_b_goal')
+            )
+            total_goals_scored = total_goals['total_goals_a'] or 0
+            total_goals_conceded = total_goals['total_goals_b'] or 0
+            total_goals = total_goals_scored + total_goals_conceded
+
+            # Total wins, losses, and draws
+            total_wins = games.filter(winner_id__in=coach_branches).count()
+            total_losses = games.filter(loser_id__in=coach_branches).count()
+            total_draws = games.filter(is_draw=True).count()
+
+            # Total yellow and red cards (similar to the player stats)
+            cards_stats = PlayerGameStats.objects.filter(
+                game_id__in=games.values_list('id', flat=True)
+            ).aggregate(
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
+            total_yellow_cards = cards_stats['total_yellow_cards'] or 0
+            total_red_cards = cards_stats['total_red_cards'] or 0
+
+            return {
+                "matchplayed": total_games_played,
+                "win": total_wins,
+                "loss": total_losses,
+                "draw": total_draws,
+                "yellow_card": total_yellow_cards,
+                "red": total_red_cards,
+            }
+
+        except Exception as e:
+            return {
+                "status": 0,
+                "message": "Failed to fetch coach stats.",
+                "error": str(e),
+            }
+
+    def get_referee_stats(self, user, time_filter):
+        """
+        Fetch referee-specific stats, including total games officiated and cards.
+        """
+        try:
+            time_filter = time_filter or {}
+
+            # Get the games the referee officiated
+            game_ids = GameOfficials.objects.filter(
+                official_id=user.id,
+                officials_type_id__in=[2, 3, 4, 5],  # Relevant official types
+                **time_filter
+            ).values_list('game_id', flat=True)  # Correct field name
+
+            games_count = len(game_ids)
+
+
+            # Calculate yellow and red cards for the games the referee officiated
+            cards_stats = PlayerGameStats.objects.filter(
+                game_id__in=game_ids, **time_filter
+            ).aggregate(
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
+            total_yellow_cards = cards_stats['total_yellow_cards'] or 0
+            total_red_cards = cards_stats['total_red_cards'] or 0
+
+            return {
+                "matchplayed": games_count,
+                "yellow_card": total_yellow_cards,
+                "red": total_red_cards,
+            }
+
+        except Exception as e:
+            return {
+                "status": 0,
+                "message": "Failed to fetch referee stats.",
+                "error": str(e),
+            }
 
     def get(self, request):
         user_id = request.GET.get('user_id') 
+    
+        print(f"User ID: {user_id}")  # Debug line
         if not user_id:
             return redirect('Dashboard') 
         try:
             user = User.objects.get(id=user_id)
-            posts, events, event_bookings, teams = self.get_user_related_data(user)
+            posts, events, event_bookings, teams, stats = self.get_user_related_data(user)
             source_page = request.GET.get("source_page")
             title = request.GET.get("title")
             role = user.role_id  
+
+            print(stats)
+
 
             return render(
                 request,
@@ -669,6 +871,7 @@ class UserDetailView(LoginRequiredMixin, View):
                     "events": events,
                     "events_bookings": event_bookings, 
                     "teams": teams,
+                    "stats": stats,  # Add stats to context
                 },
             )
         except User.DoesNotExist:
@@ -676,14 +879,17 @@ class UserDetailView(LoginRequiredMixin, View):
 
     def post(self, request):
         user_id = request.POST.get('user_id')
+        print("pOST",user_id)
         if not user_id:
             return redirect('Dashboard')  
         try:
             user = User.objects.get(id=user_id)
-            posts, events, event_bookings, teams = self.get_user_related_data(user)
+            # Now unpack all 5 values: posts, events, event_bookings, teams, and stats
+            posts, events, event_bookings, teams, stats = self.get_user_related_data(user)
             source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id  
+            print(stats)
 
             return render(
                 request,
@@ -697,11 +903,16 @@ class UserDetailView(LoginRequiredMixin, View):
                     "events": events,
                     "events_bookings": event_bookings, 
                     "teams": teams,
+                    "stats": stats,  # Include stats in the context if needed
                 },
             )
         except User.DoesNotExist:
-            return redirect('Dashboard') 
+            return redirect('Dashboard')
  
+        
+
+
+
         
 ##############################################  User Category Type Module  ################################################
 # Category CRUD Views
@@ -6374,3 +6585,62 @@ class FriendlyGameEditStatsView(LoginRequiredMixin, View):
             html = render_to_string(self.template_name, {'form': form, 'game': game})
             return JsonResponse({'success': False, 'html': html})
 
+
+
+
+
+###################### User apply for coach or rafree ###########
+class UserRoleAppliedListView(LoginRequiredMixin, View):
+    template_name = "Admin/User/user_apply_list.html"
+
+    def get(self, request, *args, **kwargs):
+        # Filter users based on role = 5 and is_coach or is_referee
+        coach_users = User.objects.filter(role__id=5, is_coach=True)
+        referee_users = User.objects.filter(role__id=5, is_referee=True)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "coach_users": coach_users,
+                "referee_users": referee_users,
+                "breadcrumb": {"parent": "User Role Management", "child": "User Role Apply List"}
+            }
+        )
+
+    def post(self, request, *args, **kwargs):
+        # Load the JSON data from the request
+        data = json.loads(request.body)
+
+        action = data.get('action')
+        user_id = data.get('user_id')
+
+        try:
+            user = User.objects.get(id=user_id)
+
+            if action == 'approve':
+                if user.is_referee:
+                    user.role_id = 4  # Change role to referee
+                elif user.is_coach:
+                    user.role_id = 3  # Change role to coach
+
+                # Reset is_coach and is_referee
+                user.is_coach = False
+                user.is_referee = False
+
+            elif action == 'reject':
+                # Reject action: Set certificate to null, reset role and flags
+                user.coach_certificate = None
+                user.referee_certificate = None
+                user.is_coach = False
+                user.is_referee = False
+                user.role_id = 5  # Set to default role
+
+            # Save the user after the changes
+            user.save()
+
+            # Return success response
+            return JsonResponse({'status': 'success'})
+
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)

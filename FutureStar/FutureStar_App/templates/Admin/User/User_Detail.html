@@ -122,11 +122,77 @@
                            </div>
                         </div>
                      </div>
-                  </div>
-               </div>
-            </div>
-         </div>
+                 
 
+                     <div class="card-header">
+                        <h4 class="card-title mb-0">Stats Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% if stats %}
+                                <div class="row">
+                                    {% if user.role.id == 2 %} <!-- Player Role -->
+                                        <div class="col-4 label-value">
+                                            <p>Games Played: {{ stats.matchplayed }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Wins: {{ stats.win }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Losses: {{ stats.loss }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Draws: {{ stats.draw }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Goals: {{ stats.goals }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Assists: {{ stats.assists }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Yellow Cards: {{ stats.yellow_card }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Red Cards: {{ stats.red }}</p>
+                                        </div>
+                                    {% elif user.role.id == 3 %} <!-- Coach Role -->
+                                        <div class="col-4 label-value">
+                                            <p>Games Played: {{ stats.matchplayed }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Wins: {{ stats.win }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Losses: {{ stats.loss }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Draws: {{ stats.draw }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Yellow Cards: {{ stats.yellow_card }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Red Cards: {{ stats.red }}</p>
+                                        </div>
+                                    {% elif user.role.id == 4 %} <!-- Referee Role -->
+                                        <div class="col-4 label-value">
+                                            <p>Games Officiated: {{ stats.matchplayed }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Yellow Cards: {{ stats.yellow_card }}</p>
+                                        </div>
+                                        <div class="col-4 label-value">
+                                            <p>Red Cards: {{ stats.red }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <p>No statistics available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+        
          <!-- Datatable Section -->
          <div class="row">
             <div class="col-sm-12">

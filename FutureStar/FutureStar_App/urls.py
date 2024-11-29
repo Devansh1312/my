@@ -279,8 +279,13 @@ urlpatterns = [
     path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
 
     ################## Friendly Game States Add URLS ############################
+  
     path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
-    path('friendly-games/edit/<int:game_id>/', FriendlyGameEditStatsView.as_view(), name='edit_friendly_game_stats'),
+    path('friendly-games/edit/<int:game_id>/', FriendlyGameEditStatsView.as_view(), name='friendlygame_edit_game_stats'),
+
+
+    ################# User Apply role list ##################
+    path('user_apply_list/',UserRoleAppliedListView.as_view(),name='user_apply_list'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
