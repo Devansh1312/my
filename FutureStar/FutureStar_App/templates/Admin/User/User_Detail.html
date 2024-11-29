@@ -7,6 +7,10 @@
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> -->
+
+
 <!-- Plugins css Ends-->
 
 <style>
@@ -31,6 +35,15 @@
         display: inline-block;
         margin-top: 20px;
     }
+
+    .widget-1 {
+      background-size: cover;
+      margin-bottom: 25px;
+      background-color: #ffffff;
+      box-shadow: 0 0 6px 2px #00000026;
+      border-radius: 9px;
+      margin-left: 44px;
+  }
 </style>
 {% endblock %}
 
@@ -44,45 +57,100 @@
             <div class="row">
                <!-- Profile Information -->
                <div class="col-xl-12">
-                  <div class="card">
+                  
                      <div class="card-header">
                         <h4 class="card-title mb-0">Profile Details</h4>
                      </div>
                      <div class="card-body">
-                        <div class="profile-info text-center mb-3">
-                           <img class="img-70 rounded-circle" alt="Profile Picture" src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/images/user/7.jpg' %}{% endif %}">
+                        <div class="info">
+                            <div class="row g-3">
+                                <!-- Left Column -->
+                                <div class="col-sm-6 col-xl-4 order-sm-1 order-xl-0">
+                                    <div class="row g-3 mb-3"><!-- Added spacing here -->
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-envelope"></i> Full Name</h6>
+                                                <span>{{ user.fullname }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-calendar-days"></i> Date of Birth</h6>
+                                                <span>{{ user.date_of_birth|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-envelope"></i> Email</h6>
+                                                <span>{{ user.email|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-calendar-days"></i> Nationality</h6>
+                                                <span>{{ user.nationality|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <!-- Middle Column -->
+                               
+                                <div class="col-sm-12 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center">
+                                   <img src="{{ user.profile_picture.url|default:'path/to/default-image.jpg' }}" 
+                                        alt="Profile Picture" 
+                                        class="rounded-circle" 
+                                        style="width: 50px; height: 50px; object-fit: cover;">
+                                
+                                 <!-- Username and Role in a row -->
+                                 <div class="w-100 mb-3 text-center">
+                                     <div class="title mb-1">
+                                         <a target="_blank" href="">{{ user.username }}</a>
+                                     </div>
+                                     <div class="desc">{{ user.role.name_en }}</div>
+                                 </div>
+                 
+                                 <!-- Profile Picture above Username -->
+                                 
+                             </div>
+                                <!-- Right Column -->
+                                <div class="col-sm-6 col-xl-4 order-sm-2 order-xl-2">
+                                    <div class="row g-3 mb-3"><!-- Added spacing here -->
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-phone"></i> Phone</h6>
+                                                <span>{{ user.phone|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-location-arrow"></i> Gender</h6>
+                                                <span>{{ user.gender.name|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-phone"></i> Country</h6>
+                                                <span>{{ user.country.name|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="ttl-info text-start">
+                                                <h6><i class="fa-solid fa-location-arrow"></i> City</h6>
+                                                <span>{{ user.city.name|default:"None" }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="row">
-                           <div class="col-4 label-value">
-                              <p>Full Name:{{ user.fullname }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Role: {{ user.role.name_en }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Date of Birth: {{ user.date_of_birth|default:"None" }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Email: {{ user.email|default:"None" }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Phone: {{ user.phone|default:"None" }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Gender: {{ user.gender.name|default:"None" }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Country: {{ user.country.name|default:"None" }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>City: {{ user.city.name|default:"None" }}</p>
-                           </div>
-                           <div class="col-4 label-value">
-                              <p>Nationality: {{ user.nationality|default:"None" }}</p>
-                           </div>
-                        </div>
-                     </div>
-                  
+                        <hr>
+                    </div>
+                    
                      <div class="card-header">
                         <h4 class="card-title mb-0">Additional Information</h4>
                      </div>
@@ -127,71 +195,383 @@
                      <div class="card-header">
                         <h4 class="card-title mb-0">Stats Information</h4>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            {% if stats %}
-                                <div class="row">
-                                    {% if user.role.id == 2 %} <!-- Player Role -->
-                                        <div class="col-4 label-value">
-                                            <p>Games Played: {{ stats.matchplayed }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Wins: {{ stats.win }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Losses: {{ stats.loss }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Draws: {{ stats.draw }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Goals: {{ stats.goals }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Assists: {{ stats.assists }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Yellow Cards: {{ stats.yellow_card }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Red Cards: {{ stats.red }}</p>
-                                        </div>
-                                    {% elif user.role.id == 3 %} <!-- Coach Role -->
-                                        <div class="col-4 label-value">
-                                            <p>Games Played: {{ stats.matchplayed }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Wins: {{ stats.win }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Losses: {{ stats.loss }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Draws: {{ stats.draw }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Yellow Cards: {{ stats.yellow_card }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Red Cards: {{ stats.red }}</p>
-                                        </div>
-                                    {% elif user.role.id == 4 %} <!-- Referee Role -->
-                                        <div class="col-4 label-value">
-                                            <p>Games Officiated: {{ stats.matchplayed }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Yellow Cards: {{ stats.yellow_card }}</p>
-                                        </div>
-                                        <div class="col-4 label-value">
-                                            <p>Red Cards: {{ stats.red }}</p>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <p>No statistics available.</p>
-                            {% endif %}
+                     {% if stats %}
+                     
+                     <div class="row">
+                        {% if user.role.id == 2 %} <!-- Player Role -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195"> {{ stats.matchplayed }}</span></h4><span class="f-light">Games Played</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- win -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195"> {{ stats.win }}</span></h4><span class="f-light">Wins</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- loss -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195"> {{ stats.loss }}</span></h4><span class="f-light">Loss</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- draw -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195">{{ stats.draw }}</span></h4><span class="f-light">Draw</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- goals -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195">{{ stats.goals }}</span></h4><span class="f-light">goals</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- assists -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195">{{ stats.assists }}</span></h4><span class="f-light">Assists</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           
+                           <!-- yellow_card -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195">{{ stats.yellow_card }}</span></h4><span class="f-light">yellow card</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- red -->
+
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195">{{ stats.red }}</span></h4><span class="f-light">red cards</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+
+                        {% elif user.role.id == 3 %} <!-- Coach Role -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195"> {{ stats.matchplayed }}</span></h4><span class="f-light">Games Played</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- win -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195"> {{ stats.win }}</span></h4><span class="f-light">Wins</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- loss -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195"> {{ stats.loss }}</span></h4><span class="f-light">Loss</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                           <!-- draw -->
+                           <div class=" col-3 widget-1">
+                              <div class="card-body">
+                              <div class="widget-content">
+                                 <div class="widget-round secondary">
+                                    <div class="bg-round">
+                                    <svg>
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                    </svg>
+                                    <svg class="half-circle svg-fill">
+                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                    </svg>
+                                    </div>
+                                 </div>
+                                 <div> 
+                                    <h4><span class="counter" data-target="45195">{{ stats.draw }}</span></h4><span class="f-light">Draw</span>
+                                 </div>
+                              </div>
+                              
+                              </div>
+                           </div>
+                              <!-- yellow_card -->
+                              <div class=" col-3 widget-1">
+                                 <div class="card-body">
+                                 <div class="widget-content">
+                                    <div class="widget-round secondary">
+                                       <div class="bg-round">
+                                       <svg>
+                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                       </svg>
+                                       <svg class="half-circle svg-fill">
+                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                       </svg>
+                                       </div>
+                                    </div>
+                                    <div> 
+                                       <h4><span class="counter" data-target="45195">{{ stats.yellow_card }}</span></h4><span class="f-light">yellow card</span>
+                                    </div>
+                                 </div>
+                                 
+                                 </div>
+                              </div>
+                              <!-- red -->
+   
+                              <div class=" col-3 widget-1">
+                                 <div class="card-body">
+                                 <div class="widget-content">
+                                    <div class="widget-round secondary">
+                                       <div class="bg-round">
+                                       <svg>
+                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                       </svg>
+                                       <svg class="half-circle svg-fill">
+                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                       </svg>
+                                       </div>
+                                    </div>
+                                    <div> 
+                                       <h4><span class="counter" data-target="45195">{{ stats.red }}</span></h4><span class="f-light">red cards</span>
+                                    </div>
+                                 </div>
+                                 
+                                 </div>
+                              </div>
+                              {% elif user.role.id == 4 %}
+                                    <div class=" col-3 widget-1">
+                                       <div class="card-body">
+                                       <div class="widget-content">
+                                          <div class="widget-round secondary">
+                                             <div class="bg-round">
+                                             <svg>
+                                                <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                             </svg>
+                                             <svg class="half-circle svg-fill">
+                                                <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                             </svg>
+                                             </div>
+                                          </div>
+                                          <div> 
+                                             <h4><span class="counter" data-target="45195"> {{ stats.matchplayed }}</span></h4><span class="f-light">Games Officiated</span>
+                                          </div>
+                                       </div>
+                                       
+                                       </div>
+                                    </div>
+                                    <!-- yellow_card -->
+                                 <div class=" col-3 widget-1">
+                                    <div class="card-body">
+                                    <div class="widget-content">
+                                       <div class="widget-round secondary">
+                                          <div class="bg-round">
+                                          <svg>
+                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                          </svg>
+                                          <svg class="half-circle svg-fill">
+                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                          </svg>
+                                          </div>
+                                       </div>
+                                       <div> 
+                                          <h4><span class="counter" data-target="45195">{{ stats.yellow_card }}</span></h4><span class="f-light">yellow card</span>
+                                       </div>
+                                    </div>
+                                    
+                                    </div>
+                                 </div>
+                                 <!-- red -->
+
+                                 <div class=" col-3 widget-1">
+                                    <div class="card-body">
+                                    <div class="widget-content">
+                                       <div class="widget-round secondary">
+                                          <div class="bg-round">
+                                          <svg>
+                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
+                                          </svg>
+                                          <svg class="half-circle svg-fill">
+                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
+                                          </svg>
+                                          </div>
+                                       </div>
+                                       <div> 
+                                          <h4><span class="counter" data-target="45195">{{ stats.red }}</span></h4><span class="f-light">red cards</span>
+                                       </div>
+                                    </div>
+                                    
+                                    </div>
+                                 </div>
+                                 
+                        {% endif %}
                         </div>
-                    </div>
+                    {% else %}
+                        <p>No statistics available.</p>
+                    {% endif %}
+
+               </div>
+            </div>
+         </div>
+         </div>
+
         
          <!-- Datatable Section -->
          <div class="row">
@@ -331,8 +711,10 @@
                </div>
             </div>
          </div>
-      </div>
-   </div>
+         </div>
+         
+    
+  
 {% endblock %}
 
 {% block scriptcontent %}

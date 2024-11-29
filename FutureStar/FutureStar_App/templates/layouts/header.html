@@ -122,21 +122,24 @@
                 </div>
               </li> --> 
               <li class="profile-nav onhover-dropdown pe-0 py-0">
-                  {% if user.profile_picture %}
-                    <div class="media profile-media"><img class="b-r-10 profile-img" src="{{ user.profile_picture.url }}" alt="" style="width: 35px; height: 35px;">
+                  {% if request.user.profile_picture %}
+                    <div class="media profile-media"><img class="b-r-10 profile-img" src="{{ request.user.profile_picture.url }}" alt="" style="width: 35px; height: 35px;">
                   {% else %}
                     <div class="media profile-media"><img class="b-r-10 profile-img" src="{% static 'assets/images/dashboard/profile.jpg' %}" alt="">
                   {% endif %}
 
-                  {% if request.user.is_authenticated %}
-                    <div class="media-body">{{user.username}}<span></span>
-
-                  {% else %}
-                    <div class="media-body">User<span></span>
-                  {% endif %}
+                  <div class="media-body">
+                    {% if request.user.is_authenticated %}
+                        {{ request.user.username }} <span></span>
+                    {% else %}
+                        User <span></span>
+                    {% endif %}
+                    <p class="mb-0 font-roboto">
+                        {{ request.user.role.name_en }} 
+                        <i class="middle fa fa-angle-down"></i>
+                    </p>
+                </div>
                 
-                    <p class="mb-0 font-roboto">{{user.role.name_en}} <i class="middle fa fa-angle-down"></i></p>
-                  </div>
                 </div>
                 <ul class="profile-dropdown onhover-show-div">
                 <a href="{% url 'user_profile' %}" >
