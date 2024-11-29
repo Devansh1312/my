@@ -32,10 +32,11 @@ from FutureStarTeamApp.models import *
 from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
+from FutureStarTrainingApp.models import *
 from django.db.models import F, Case, When, IntegerField,Sum,Q
 from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Sum
+from django.db.models import Sum,Count
 
 
 def user_role_check(view_func):
@@ -194,7 +195,33 @@ class Dashboard(LoginRequiredMixin, View):
     redirect_field_name = "redirect_to"
 
     def get(self, request, *args, **kwargs):
-        context = {"breadcrumb": {"parent": "Admin", "child": "Dashboard"}}
+        # Count of users based on role
+        user_counts = User.objects.values('role_id').annotate(count=Count('id'))
+        user_count_by_role = {role_id: count for role_id, count in user_counts.values('role_id', 'count')}
+        
+        # Counts for each model
+        team_count = Team.objects.count()
+        team_branch_count = TeamBranch.objects.count()
+        post_count = Post.objects.count()
+        event_count = Event.objects.count()
+        friendly_game_count = FriendlyGame.objects.count()
+        tournament_count = Tournament.objects.count()
+        tournament_games_count = TournamentGames.objects.count()
+        training_count = Training.objects.count()
+
+        context = {
+            "breadcrumb": {"parent": "Admin", "child": "Dashboard"},
+            "user_count_by_role": user_count_by_role,  # Role-wise user counts
+            "team_count": team_count,
+            "team_branch_count": team_branch_count,
+            "post_count": post_count,
+            "event_count": event_count,
+            "friendly_game_count": friendly_game_count,
+            "tournament_count": tournament_count,
+            "tournament_games_count": tournament_games_count,
+            "training_count": training_count,
+        }
+
         return render(request, "Admin/Dashboard.html", context)
 
 
