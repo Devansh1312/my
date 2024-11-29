@@ -1,348 +1,276 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-{% load static %}
-{% load sass_tags %}
-
-{% block css %}
-<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-{% endblock %}
-
-<style>
-   .is-invalid {
-       border-color: #dc3545;
-       background-color: #f8d7da;
-   }
-</style>
-
-{% block title %}
-Team Detail page
-{% endblock %}
-
-{% block content %}
-<div class="page-body">
-   <div class="container-fluid">
-      <div class="page-title">
-         <div class="row">
-            <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
+{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% load sass_tags %} {% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}"> {% endblock %} <style>
+    .is-invalid {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+    }
+</style> {% block title %} Team Detail page {% endblock %} {% block content %} <div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>{{breadcrumb.child}}</h3>
+                </div>
             </div>
-         </div>
-      </div>
-      <div class="row">
-         <div class="col-sm-12">
-            <div class="card">
-               <div class="card-body">
-                <div class="container mt-5">
-                    <h3>Team Details</h3>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <strong>Team Name:</strong> {{ team.team_name }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Team Username:</strong> {{ team.team_username }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Created By:</strong> {{ team.user_id.username }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Team Type:</strong> {{ team.team_type.name_en }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Bio:</strong> {{ team.bio }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Establishment Date:</strong> {{ team.team_establishment_date }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>President:</strong> {{ team.team_president }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Latitude:</strong> {{ team.latitude }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Longitude:</strong> {{ team.longitude }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Address:</strong> {{ team.address }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>House No:</strong> {{ team.house_no }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Premises:</strong> {{ team.premises }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Street:</strong> {{ team.street }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>City:</strong> {{ team.city }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>State:</strong> {{ team.state }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Country:</strong> {{ team.country_name }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Postal Code:</strong> {{ team.postalCode }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Country Code:</strong> {{ team.country_code }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Phone:</strong> {{ team.phone }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Email:</strong> {{ team.email }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Age Group:</strong> {{ team.age_group }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Entry Fees:</strong> {{ team.entry_fees }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Branches:</strong> {{ team.branches }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Team Logo:</strong> 
-                            {% if team.team_logo %}
-                                <img src="{{ team.team_logo.url }}" alt="Team Logo" class="img-fluid" width="100" height="100">
-                            {% else %}
-                                No Image Available
-                            {% endif %}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong>Background Image:</strong>
-                            {% if team.team_background_image %}
-                                <img src="{{ team.team_background_image.url }}" alt="Background Image" class="img-fluid" width="100" height="100">
-                            {% else %}
-                                No Image Available
-                            {% endif %}
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <strong>Uniform:</strong>
-                            {% if team.team_uniform %}
-                                <img src="{{ team.team_uniform.url }}" alt="Uniform" class="img-fluid" width="100" height="100">
-                            {% else %}
-                                No Image Available
-                            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="container mt-5">
+                            <h3>Team Details</h3>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <strong>Team Name:</strong> {{ team.team_name }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Team Username:</strong> {{ team.team_username }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Created By:</strong> {{ team.user_id.username }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Team Type:</strong> {{ team.team_type.name_en }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Bio:</strong> {{ team.bio }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Establishment Date:</strong> {{ team.team_establishment_date }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>President:</strong> {{ team.team_president }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Latitude:</strong> {{ team.latitude }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Longitude:</strong> {{ team.longitude }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Address:</strong> {{ team.address }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>House No:</strong> {{ team.house_no }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Premises:</strong> {{ team.premises }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Street:</strong> {{ team.street }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>City:</strong> {{ team.city }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>State:</strong> {{ team.state }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Country:</strong> {{ team.country_name }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Postal Code:</strong> {{ team.postalCode }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Country Code:</strong> {{ team.country_code }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Phone:</strong> {{ team.phone }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Email:</strong> {{ team.email }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Age Group:</strong> {{ team.age_group }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Entry Fees:</strong> {{ team.entry_fees }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Branches:</strong> {{ team.branches }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Team Logo:</strong> {% if team.team_logo %} <img src="{{ team.team_logo.url }}" alt="Team Logo" class="img-fluid" width="100" height="100"> {% else %} No Image Available {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <strong>Background Image:</strong> {% if team.team_background_image %} <img src="{{ team.team_background_image.url }}" alt="Background Image" class="img-fluid" width="100" height="100"> {% else %} No Image Available {% endif %}
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <strong>Uniform:</strong> {% if team.team_uniform %} <img src="{{ team.team_uniform.url }}" alt="Uniform" class="img-fluid" width="100" height="100"> {% else %} No Image Available {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                </div>
-
-
-
-                        <!-- Datatable Section  -->
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="card">
-                                    <div class="card-body"> 
-                                        <!-- Add tab navigation  -->
-                                        <ul class="nav nav-tabs" id="dataTab" role="tablist">
-                                            <li class="nav-item">
-                                            <a class="nav-link active" id="branch-tab" data-toggle="tab" href="#branch" role="tab" aria-controls="branch" aria-selected="true">Branches </a>
-                                            </li>
-                                            <li class="nav-item">
-                                            <a class="nav-link" id="sponsers-tab" data-toggle="tab" href="#sponsers" role="tab" aria-controls="sponsers" aria-selected="false">Sponsers</a>
-                                            </li>
-                                            <li class="nav-item">
-                                            <a class="nav-link" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="false">Post</a>
-                                            </li>
-                                            <li class="nav-item">
-                                            <a class="nav-link" id="event-tab" data-toggle="tab" href="#event" role="tab" aria-controls="event" aria-selected="false">Event</a>
-                                            </li>
-                                        </ul>
-                    
-                                        <div class="tab-content" id="dataTabContent"> 
-                                            <!-- branch Tab  -->
-                                            <div class="tab-pane fade show active" id="branch" role="tabpanel" aria-labelledby="branch-tab">
+                    <!-- Datatable Section  -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Add tab navigation  -->
+                                    <ul class="nav nav-tabs" id="dataTab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="branch-tab" data-toggle="tab" href="#branch" role="tab" aria-controls="branch" aria-selected="true"> Branches <span class="badge badge-info">{{ branches_count }}</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="sponsers-tab" data-toggle="tab" href="#sponsers" role="tab" aria-controls="sponsers" aria-selected="false"> Sponsors <span class="badge badge-info">{{ sponsors_count }}</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="false"> Posts <span class="badge badge-info">{{ posts_count }}</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="event-tab" data-toggle="tab" href="#event" role="tab" aria-controls="event" aria-selected="false"> Events <span class="badge badge-info">{{ events_count }}</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="dataTabContent">
+                                        <!-- branch Tab  -->
+                                        <div class="tab-pane fade show active" id="branch" role="tabpanel" aria-labelledby="branch-tab">
                                             <div class="table-responsive">
                                                 <table class="display" id="branch-table">
-                                                    <thead> 
+                                                    <thead>
                                                         <tr>
-                                                        <th>No</th>
-                                                        <th>Branch Name</th>
-                                                        <th>Age Group</th>
-                                                        <th>Image</th>
-                                                        <th>Entry Fees</th>
-                                                        <th>Actions</th>
+                                                            <th>No</th>
+                                                            <th>Branch Name</th>
+                                                            <th>Age Group</th>
+                                                            <!-- <th>Image</th> -->
+                                                            <th>Entry Fees</th>
+                                                            <th>Actions</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        {% for branch in branches %}
-                                                        <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ branch.event_name }}</td>
-                                                        <td>{{ branch.age_group_id.name_en }}</td>
-                                                        <td>
-                                                            {% if branch.upload_image %}
-                                                                <img src="{{ branch.upload_image }}"  width="100" height="100">
-                                                            {% else %}
-                                                                No Image Available
-                                                            {% endif %}
-                                                        </td>                                      
-                                                        <td>{{ branch.entry_fees }}</td>
-                                                        <td>
-                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                    <i data-feather="more-vertical"></i>
-                                                                </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                                            <a href="#" class="view-details" data-id="{{ branch.id }}">View</a>
-                                                                            <form id="view-form-{{ branch.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;">
-                                                                                {% csrf_token %}
-                                                                                <input type="hidden" name="branch_id" value="{{ branch.id }}">
-                                                                            </form>
-                                                                        </li> 
-                                                                    </ul>
-                                                                </div>                                                                
-                                                            </div>
-                                                        </td>
-                                                        </tr>
-                                                        {% endfor %}
+                                                    <tbody> 
+                                                        {% for branch in branches %} <tr>
+                                                            <td>{{ forloop.counter }}</td>
+                                                            <td>{{ branch.team_name }}</td>
+                                                            <td>{{ branch.age_group_id.name_en }}</td>
+                                                            <td>{% if branch.entry_fees %} {{entry_fees}} {% else %} None {% endif %}</td>
+                                                            <td>
+                                                                <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                                        <i data-feather="more-vertical"></i>
+                                                                    </a>
+                                                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                            <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                                                <a href="#" class="view-details" data-id="{{ branch.id }}">View</a>
+                                                                                <form id="view-form-{{ branch.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;"> {% csrf_token %} <input type="hidden" name="branch_id" value="{{ branch.id }}">
+                                                                                </form>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr> 
+                                                        {% endfor %} 
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            </div>
-                    
-                                            <!--Sponsers Event Tab  -->
-                                            <div class="tab-pane fade" id="sponsers" role="tabpanel" aria-labelledby="sponsers-tab">
+                                        </div>
+                                        <!--Sponsers Event Tab  -->
+                                        <div class="tab-pane fade" id="sponsers" role="tabpanel" aria-labelledby="sponsers-tab">
                                             <div class="table-responsive">
                                                 <table class="display" id="sponsers-table">
                                                     <thead>
                                                         <tr>
-                                                        <th>No</th>
-                                                        <th>Name</th>
-                                                        <th>Logo</th>
-                                                        <th>Website</th>
+                                                            <th>No</th>
+                                                            <th>Name</th>
+                                                            <th>Logo</th>
+                                                            <th>Website</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        {% for sponsor in sponsors %}
-                                                        <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ sponsor.name }}</td>
-                                                        <td>
-                                                            {% if sponsor.upload_image %}
-                                                                <img src="{{ sponsor.upload_image }}"  width="100" height="100">
-                                                            {% else %}
-                                                                No Image Available
-                                                            {% endif %}
-                                                        </td>
-                                                        <td><a href="{{ sponsor.url }}" target="_blank">{{ sponsor.url }}</a></td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
+                                                    <tbody> {% for sponsor in sponsors %} <tr>
+                                                            <td>{{ forloop.counter }}</td>
+                                                            <td>{{ sponsor.name }}</td>
+                                                            <td> {% if sponsor.upload_image %} <img src="{{ sponsor.upload_image }}" width="100" height="100"> {% else %} No Image Available {% endif %} </td>
+                                                            <td>
+                                                                <a href="{{ sponsor.url }}" target="_blank">{{ sponsor.url }}</a>
+                                                            </td>
+                                                        </tr> {% endfor %} </tbody>
                                                 </table>
                                             </div>
-                                            </div>
-
-                                            <!--Post Event Tab  -->
-                                            <div class="tab-pane fade" id="post" role="tabpanel" aria-labelledby="post-tab">
+                                        </div>
+                                        <!--Post Event Tab  -->
+                                        <!-- Post Event Tab -->
+                                        <div class="tab-pane fade" id="post" role="tabpanel" aria-labelledby="post-tab">
                                             <div class="table-responsive">
                                                 <table class="display" id="post-table">
                                                     <thead>
                                                         <tr>
-                                                        <th>No</th>
-                                                        <th>Post Title</th>
-                                                        <th>Description</th>
-                                                        <th>Image</th>
-                                                        <th>Date Created</th>
+                                                            <th>No</th>
+                                                            <th>Post Title</th>
+                                                            <th>Description</th>
+                                                            <th>Comments</th>
+                                                            <th>Likes</th>
+                                                            <th>Views</th>
+                                                            <th>Date Created</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        {% for post in posts %}
-                                                        <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ post.title }}</td>
-                                                        <td>{{ post.description }}</td>
-                                                        <td>      
-                                                             {% if post.media_type == 1 %}
-                                                                    {% if post.image %}
-                                                                        <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="100">
-                                                                    {% else %}
-                                                                        No Image
-                                                                    {% endif %}
-                                                                {% elif post.media_type == 2 %}
-                                                                    {% if post.image %}
-                                                                        <video width="200" height="100" controls>
-                                                                            <source src="{{ post.image.url }}" type="video/mp4">
-                                                                            Your browser does not support the video tag.
-                                                                        </video>
-                                                                    {% else %}
-                                                                        No Video
-                                                                    {% endif %}
-                                                                {% else %}
-                                                                    No Media
-                                                                {% endif %}
-                                                        </td> 
-                                                        <td>{{ post.created_at }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
+                                                    <tbody> {% for post_data in posts_with_counts %} <tr>
+                                                            <td>{{ forloop.counter }}</td>
+                                                            <td>{{ post_data.post.title }}</td>
+                                                            <td>{{ post_data.post.description }}</td>
+                                                            <td>{{ post_data.comments_count }}</td>
+                                                            <!-- Comment count -->
+                                                            <td>{{ post_data.likes_count }}</td>
+                                                            <!-- Like count -->
+                                                            <td>{{ post_data.views_count }}</td>
+                                                            <!-- View count -->
+                                                            <td>{{ post_data.post.created_at }}</td>
+                                                        </tr> {% endfor %} </tbody>
                                                 </table>
                                             </div>
-                                            </div> 
-                                            
-                                            <!-- Event Tab  --> 
-                                            <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+                                        </div>
+                                        <!-- Event Tab  -->
+                                        <!-- Event Tab -->
+                                        <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
                                             <div class="table-responsive">
                                                 <table class="display" id="event-table">
                                                     <thead>
                                                         <tr>
-                                                        <th>No</th>
-                                                        <th>Event Name</th>
-                                                        <th>Event Description</th>
-                                                        <th>Event Type</th>
-                                                        <th>Event Cost</th>
-                                                        <th>Event Date</th>
+                                                            <th>No</th>
+                                                            <th>Event Name</th>
+                                                            <th>Event Description</th>
+                                                            <th>Event Type</th>
+                                                            <th>Event Cost</th>
+                                                            <th>Event Date</th>
+                                                            <th>Tickets Sold</th> <!-- New column for ticket sales -->
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {% for event in events %}
-                                                        <tr> 
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ event.event_name }}</td>
-                                                        <td>{{ event.event_description }}</td>
-                                                        <td>{{ event.event_type }}</td>
-                                                        <td>{{ event.event_cost }}</td>
-                                                        <td>{{ event.event_date }}</td>
+                                                        {% for item in events_with_sales %}
+                                                        <tr>
+                                                            <td>{{ forloop.counter }}</td>
+                                                            <td>{{ item.event.event_name }}</td>
+                                                            <td>{{ item.event.event_description }}</td>
+                                                            <td>{{ item.event.event_type }}</td>
+                                                            <td>{{ item.event.event_cost }}</td>
+                                                            <td>{{ item.event.event_date }}</td>
+                                                            <td>{{ item.total_tickets_sold }}</td> <!-- Display ticket sales -->
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            </div> 
                                         </div>
+
+
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
             </div>
-         </div>
-      </div>
-   </div>
-</div>
-{% endblock %}
-
-{% block script %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        </div>
+    </div>
+</div> {% endblock %} {% block script %} <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
-
-
 <script>
-
-
-
-
-
     document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
         menu.addEventListener('click', function(event) {
             event.preventDefault();
@@ -356,7 +284,6 @@ Team Detail page
             });
         });
     });
-    
     document.querySelectorAll('.view-details').forEach(function(link) {
         link.addEventListener('click', function(event) {
             event.preventDefault();
@@ -365,35 +292,24 @@ Team Detail page
             form.submit(); // Submits the form programmatically
         });
     });
-    
-
-
-
-$(document).ready(function() {
-    // Initialize datatables for both tables
-    $('#branch-table').DataTable();
-    $('#sponsers-table').DataTable();
-    $('#post-table').DataTable();
-    $('#event-table').DataTable();
-    
-    // Adjust DataTables when tabs are switched
-    $('#dataTab a').on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr("href"); 
-        if (target === "#branch") {
-            $('#branch-table').DataTable().columns.adjust().draw(); 
-        } 
-        else if (target === "#sponsers") {
-            $('#sponsers-table').DataTable().columns.adjust().draw(); 
-        }
-        else if (target === "#post") {
-            $('#post-table').DataTable().columns.adjust().draw(); 
-        }
-        else if (target === "#event") {
-            $('#event-table').DataTable().columns.adjust().draw(); 
-        }
+    $(document).ready(function() {
+        // Initialize datatables for both tables
+        $('#branch-table').DataTable();
+        $('#sponsers-table').DataTable();
+        $('#post-table').DataTable();
+        $('#event-table').DataTable();
+        // Adjust DataTables when tabs are switched
+        $('#dataTab a').on('shown.bs.tab', function(e) {
+            var target = $(e.target).attr("href");
+            if (target === "#branch") {
+                $('#branch-table').DataTable().columns.adjust().draw();
+            } else if (target === "#sponsers") {
+                $('#sponsers-table').DataTable().columns.adjust().draw();
+            } else if (target === "#post") {
+                $('#post-table').DataTable().columns.adjust().draw();
+            } else if (target === "#event") {
+                $('#event-table').DataTable().columns.adjust().draw();
+            }
+        });
     });
-});
-</script>
-
-
-{% endblock %}
+</script> {% endblock %}

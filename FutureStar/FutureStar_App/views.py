@@ -37,6 +37,7 @@ from django.utils.safestring import mark_safe
 from django.db.models import F, Case, When, IntegerField
 from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 
 
 def user_role_check(view_func):
@@ -5460,22 +5461,55 @@ class TeamListView(LoginRequiredMixin, View):
             },
         )
 
-@method_decorator(user_role_check, name='dispatch')
 class TeamDetailView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/List_Of_Teams/Team_Details.html"  
 
     def get_team_related_data(self, team):
         branches = TeamBranch.objects.filter(team_id=team)
-        sponsors = Sponsor.objects.filter(created_by_id=team.id , creator_type = 2)
-        posts = Post.objects.filter(created_by_id=team.id, creator_type = 2)
-        events = Event.objects.filter(created_by_id=team.id, creator_type = 2)
-        return branches, sponsors, posts, events
+        sponsors = Sponsor.objects.filter(created_by_id=team.id, creator_type=2)
+        posts = Post.objects.filter(created_by_id=team.id, creator_type=2)
+        events = Event.objects.filter(created_by_id=team.id, creator_type=2)
+
+        # Get the counts of each related model
+        branches_count = branches.count()
+        sponsors_count = sponsors.count()
+        posts_count = posts.count()
+        events_count = events.count()
+
+        # Get post comment, like, and view counts
+        posts_with_counts = []
+        for post in posts:
+            comments_count = post.comments.count()
+            likes_count = post.likes.count()
+            views_count = post.views.count()
+
+            posts_with_counts.append({
+                'post': post,
+                'comments_count': comments_count,
+                'likes_count': likes_count,
+                'views_count': views_count
+            })
+
+        # Calculate ticket sales for each event
+        events_with_sales = []
+        for event in events:
+            total_tickets_sold = EventBooking.objects.filter(event=event).aggregate(total=Sum('tickets'))['total'] or 0
+            events_with_sales.append({
+                'event': event,
+                'total_tickets_sold': total_tickets_sold
+            })
+
+        return branches, sponsors, posts_with_counts, events_with_sales, branches_count, sponsors_count, posts_count, events_count
 
     def get(self, request):
-        team = request.GET.get('team_id') 
+        team_id = request.GET.get('team_id')
         
+        if not team_id:
+            return redirect('Dashboard')
+
         try:
-            branches, sponsors, posts, events = self.get_team_related_data(team)
+            team = Team.objects.get(id=team_id)
+            branches, sponsors, posts_with_counts, events_with_sales, branches_count, sponsors_count, posts_count, events_count = self.get_team_related_data(team)
 
             return render(
                 request,
@@ -5483,14 +5517,19 @@ class TeamDetailView(LoginRequiredMixin, View):
                 {
                     "team": team,
                     "branches": branches,
+                    "branches_count": branches_count,
                     "sponsors": sponsors,
-                    "posts": posts,
-                    "events": events,
+                    "sponsors_count": sponsors_count,
+                    "posts_with_counts": posts_with_counts,
+                    "events_with_sales": events_with_sales,  # Pass events with ticket sales
+                    "events_count": events_count,
+                    "posts_count": posts_count,
                     "breadcrumb": {"child": "Team Detail"},
                 },
             )
         except Team.DoesNotExist:
-            return redirect('Dashboard')  
+            return redirect('Dashboard')
+  
 
     def post(self, request):
         team_id = request.POST.get('team_id')  
@@ -5499,7 +5538,7 @@ class TeamDetailView(LoginRequiredMixin, View):
 
         try:
             team = Team.objects.get(id=team_id)
-            branches, sponsors, posts, events = self.get_team_related_data(team)
+            branches, sponsors, posts_with_counts, events_with_sales, branches_count, sponsors_count, posts_count, events_count = self.get_team_related_data(team)
 
             return render(
                 request,
@@ -5507,16 +5546,19 @@ class TeamDetailView(LoginRequiredMixin, View):
                 {
                     "team": team,
                     "branches": branches,
+                    "branches_count": branches_count,
                     "sponsors": sponsors,
-                    "posts": posts,
-                    "events": events,
+                    "sponsors_count": sponsors_count,
+                    "posts_with_counts": posts_with_counts,  # Pass the posts with counts
+                    "events_with_sales": events_with_sales,  # Pass events with ticket sales
+                    "events_count": events_count,
+                    "posts_count" : posts_count,
                     "breadcrumb": {"child": "Team Detail"},
                 },
             )
         except Team.DoesNotExist:
             return redirect('Dashboard')
-        
-        
+
         
 @method_decorator(user_role_check, name='dispatch')
 class BranchDetailView(LoginRequiredMixin, View):
@@ -6182,7 +6224,7 @@ class TournamentGameEditStatsView(LoginRequiredMixin, View):
             return JsonResponse({'success': False, 'html': html})
 
 ############################ Friendly Games State Add ####################################
-
+    
 
 @method_decorator(user_role_check, name='dispatch')
 class FriendlyGameStatsView(LoginRequiredMixin, View):

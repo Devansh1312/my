@@ -506,7 +506,7 @@ class Event(models.Model):
     event_organizer=models.ForeignKey(User, on_delete=models.CASCADE)
     event_name=models.CharField(max_length=255, blank=True, null=True)
     event_type=models.ForeignKey(EventType, on_delete=models.CASCADE)
-    event_date=models.DateTimeField(blank=True, null=True)
+    event_date=models.DateField(blank=True, null=True)
     event_start_time=models.TimeField(blank=True, null=True)
     event_end_time=models.TimeField(blank=True, null=True)
     event_image=models.ImageField(upload_to='event_images/', blank=True, null=True)
