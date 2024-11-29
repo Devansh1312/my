@@ -32,9 +32,7 @@ from FutureStarTeamApp.models import *
 from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
-
-from django.utils.safestring import mark_safe
-from django.db.models import F, Case, When, IntegerField
+from django.db.models import F, Case, When, IntegerField,Sum,Q
 from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
@@ -5469,6 +5467,7 @@ class TeamDetailView(LoginRequiredMixin, View):
         sponsors = Sponsor.objects.filter(created_by_id=team.id, creator_type=2)
         posts = Post.objects.filter(created_by_id=team.id, creator_type=2)
         events = Event.objects.filter(created_by_id=team.id, creator_type=2)
+        uniforms = TeamUniform.objects.filter(team_id=team)
 
         # Get the counts of each related model
         branches_count = branches.count()
@@ -5499,7 +5498,8 @@ class TeamDetailView(LoginRequiredMixin, View):
                 'total_tickets_sold': total_tickets_sold
             })
 
-        return branches, sponsors, posts_with_counts, events_with_sales, branches_count, sponsors_count, posts_count, events_count
+        return branches, sponsors, posts_with_counts, events_with_sales, uniforms, branches_count, sponsors_count, posts_count, events_count
+
 
     def get(self, request):
         team_id = request.GET.get('team_id')
@@ -5509,7 +5509,7 @@ class TeamDetailView(LoginRequiredMixin, View):
 
         try:
             team = Team.objects.get(id=team_id)
-            branches, sponsors, posts_with_counts, events_with_sales, branches_count, sponsors_count, posts_count, events_count = self.get_team_related_data(team)
+            branches, sponsors, posts_with_counts, events_with_sales, uniforms, branches_count, sponsors_count, posts_count, events_count = self.get_team_related_data(team)
 
             return render(
                 request,
@@ -5524,6 +5524,7 @@ class TeamDetailView(LoginRequiredMixin, View):
                     "events_with_sales": events_with_sales,  # Pass events with ticket sales
                     "events_count": events_count,
                     "posts_count": posts_count,
+                    "uniforms": uniforms,  # Pass uniforms
                     "breadcrumb": {"child": "Team Detail"},
                 },
             )
@@ -5538,7 +5539,7 @@ class TeamDetailView(LoginRequiredMixin, View):
 
         try:
             team = Team.objects.get(id=team_id)
-            branches, sponsors, posts_with_counts, events_with_sales, branches_count, sponsors_count, posts_count, events_count = self.get_team_related_data(team)
+            branches, sponsors, posts_with_counts, events_with_sales, uniforms, branches_count, sponsors_count, posts_count, events_count = self.get_team_related_data(team)
 
             return render(
                 request,
@@ -5549,69 +5550,141 @@ class TeamDetailView(LoginRequiredMixin, View):
                     "branches_count": branches_count,
                     "sponsors": sponsors,
                     "sponsors_count": sponsors_count,
-                    "posts_with_counts": posts_with_counts,  # Pass the posts with counts
+                    "posts_with_counts": posts_with_counts,
                     "events_with_sales": events_with_sales,  # Pass events with ticket sales
                     "events_count": events_count,
-                    "posts_count" : posts_count,
+                    "posts_count": posts_count,
+                    "uniforms": uniforms,  # Pass uniforms
                     "breadcrumb": {"child": "Team Detail"},
                 },
             )
         except Team.DoesNotExist:
             return redirect('Dashboard')
 
-        
+################### Branch Detail page Of Listing ######################        
 @method_decorator(user_role_check, name='dispatch')
 class BranchDetailView(LoginRequiredMixin, View):
-    template_name = "Admin/MobileApp/List_Of_Teams/Branch_Details.html" 
+    template_name = "Admin/MobileApp/List_Of_Teams/Branch_Details.html"
 
-    def get_branch_related_data(self, branch):
-        branches = TeamBranch.objects.filter(team_id=branch.id)
-        members = JoinBranch.objects.filter(id=branch.id)
-        tournaments = Tournament.objects.filter(team_id=branch.id)
-        games = TournamentGames.objects.filter()
-        return branches,members,tournaments,games
-
-    def get(self, request):
-        branch = request.GET.get('team_id')
-     
-        try:
-            branches, members, tournaments, games = self.get_branch_related_data(branch)
-
-            return render(
-                request,
-                self.template_name,
-                {
-                    "branch": branch,
-                    "branches": branches,
-                    "members": members,
-                    "tournaments": tournaments,
-                    "games": games,
-                    "breadcrumb": {"child": "Branch Detail"},
-                },
-            )
-        except TeamBranch.DoesNotExist:
-            return redirect('Dashboard')
-    
-    def post(self, request):
-        branch_id = request.POST.get('branch_id')  
-
+    def get_branch_related_data(self, branch_id):
         try:
             branch = TeamBranch.objects.get(id=branch_id)
-            branches, members, tournaments, games = self.get_branch_related_data(branch)
+
+            # Get related staff and players
+            staff_members = JoinBranch.objects.filter(branch_id=branch.id, joinning_type__in=[1, 2, 3])
+            players = JoinBranch.objects.filter(branch_id=branch.id, joinning_type=4)
+
+            # Get all tournaments related to the branch
+            tournaments = Tournament.objects.filter(team_id=branch.team_id)
+            games = TournamentGames.objects.filter()
+
+            # Friendly game statistics for the branch (both as team_a and team_b)
+            friendly_games_as_team_a = FriendlyGame.objects.filter(team_a=branch)
+            friendly_games_as_team_b = FriendlyGame.objects.filter(team_b=branch)
+
+            # Count total games, wins, losses, draws, goals, and assists
+            total_games = (friendly_games_as_team_a | friendly_games_as_team_b).count()
+
+            total_wins = (friendly_games_as_team_a.filter(finish=True, winner_id=branch.id) |
+                          friendly_games_as_team_b.filter(finish=True, winner_id=branch.id)).count()
+
+            total_losses = (friendly_games_as_team_a.filter(finish=True, loser_id=branch.id) |
+                            friendly_games_as_team_b.filter(finish=True, loser_id=branch.id)).count()
+
+            total_draws = (friendly_games_as_team_a.filter(finish=True, is_draw=True) |
+                           friendly_games_as_team_b.filter(finish=True, is_draw=True)).count()
+
+            # Goals scored in friendly games (count goals for both teams)
+            total_goals_team_a = friendly_games_as_team_a.aggregate(total_goals=Sum('team_a_goal'))['total_goals'] or 0
+            total_goals_team_b = friendly_games_as_team_b.aggregate(total_goals=Sum('team_b_goal'))['total_goals'] or 0
+            total_goals = total_goals_team_a + total_goals_team_b
+
+            # Assists (assuming assists are tracked in your models, if not, set to 0)
+            total_assists = 0  # Placeholder if no assists field is available
+
+            # Now, also calculate for TournamentGames (both as team_a and team_b)
+            tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch)
+            tournament_games_as_team_b = TournamentGames.objects.filter(team_b=branch)
+
+            total_games_tournament = games.count()
+
+            total_wins_tournament = (tournament_games_as_team_a.filter(finish=True, winner_id=branch.id) |
+                                     tournament_games_as_team_b.filter(finish=True, winner_id=branch.id)).count()
+
+            total_losses_tournament = (tournament_games_as_team_a.filter(finish=True, loser_id=branch.id) |
+                                       tournament_games_as_team_b.filter(finish=True, loser_id=branch.id)).count()
+
+            total_draws_tournament = (tournament_games_as_team_a.filter(finish=True, is_draw=True) |
+                                      tournament_games_as_team_b.filter(finish=True, is_draw=True)).count()
+
+            total_goals_tournament_team_a = tournament_games_as_team_a.aggregate(total_goals=Sum('team_a_goal'))['total_goals'] or 0
+            total_goals_tournament_team_b = tournament_games_as_team_b.aggregate(total_goals=Sum('team_b_goal'))['total_goals'] or 0
+            total_goals_tournament = total_goals_tournament_team_a + total_goals_tournament_team_b
+
+            # Add up the statistics from both models
+            total_games_combined = total_games + total_games_tournament
+            total_wins_combined = total_wins + total_wins_tournament
+            total_losses_combined = total_losses + total_losses_tournament
+            total_draws_combined = total_draws + total_draws_tournament
+            total_goals_combined = total_goals + total_goals_tournament
+            total_assists_combined = total_assists  # Combine assists if applicable
+
+            member_count = staff_members.count() + players.count()
+            tournament_count = tournaments.count()
+            game_count = games.count()
+
+            return {
+                'branch': branch,
+                'staff_members': staff_members,
+                'players': players,
+                'tournaments': tournaments,
+                'games': games,
+                'member_count': member_count,
+                'tournament_count': tournament_count,
+                'game_count': game_count,
+                'total_games': total_games_combined,
+                'total_wins': total_wins_combined,
+                'total_losses': total_losses_combined,
+                'total_draws': total_draws_combined,
+                'total_goals': total_goals_combined,
+                'total_assists': total_assists_combined,
+            }
+        except TeamBranch.DoesNotExist:
+            raise ValueError("Branch not found")
+        
+    def get(self, request):
+        branch_id = request.GET.get('team_id')
+        try:
+            branch_data = self.get_branch_related_data(branch_id)
+
             return render(
                 request,
                 self.template_name,
                 {
-                    "branch": branch,
-                    "branches": branches,
-                    "members": members,
-                    "tournaments": tournaments,
-                    "games": games,
+                    **branch_data,
                     "breadcrumb": {"child": "Branch Detail"},
                 },
             )
-        except TeamBranch.DoesNotExist:
-            return redirect('Dashboard')
+        except ValueError:
+            return redirect("Dashboard")
+
+
+    def post(self, request):
+        branch_id = request.POST.get('branch_id')  # `branch_id` is a string here
+        try:
+            branch_data = self.get_branch_related_data(branch_id)
+
+            return render(
+                request,
+                self.template_name,
+                {
+                    **branch_data,
+                    "breadcrumb": {"child": "Branch Detail"},
+                },
+            )
+        except ValueError:
+            return redirect("Dashboard")
+
         
         
 ######################### Playing Position #############################

@@ -57,15 +57,6 @@ Branch Details
                                 <strong>Address:</strong> {{ branch.address }}
                             </div>
                             <div class="col-md-4 mb-3">
-                                <strong>House No:</strong> {{ branch.house_no }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Premises:</strong> {{ branch.premises }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Street:</strong> {{ branch.street }}
-                            </div>
-                            <div class="col-md-4 mb-3">
                                 <strong>City:</strong> {{ branch.city }}
                             </div>
                             <div class="col-md-4 mb-3">
@@ -87,15 +78,27 @@ Branch Details
                                 <strong>Description:</strong> {{ branch.description }}
                             </div>
                             <div class="col-md-4 mb-3">
+                                <strong>Created At:</strong> {{ branch.created_at }}
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <strong>Image:</strong> 
                                 {% if branch.upload_image %}
-                                    <img src="{{ branch.upload_image.url }}" alt="Branch Image" class="img-fluid">
+                                    <img src="{{ branch.upload_image.url }}" alt="Branch Image" class="img-fluid" style="height: 100px; width: 200px;">
                                 {% else %}
                                     No Image Available
                                 {% endif %}
-                            </div>
+                            </div>                            
+                        </div>
+                        <br>
+                        <h3>Team static</h3>
+                        <div class="row">
                             <div class="col-md-4 mb-3">
-                                <strong>Created At:</strong> {{ branch.created_at }}
+                                <p><strong>Total Games Played:</strong> {{ total_games }}</p>
+                                <p><strong>Total Wins:</strong> {{ total_wins }}</p>
+                                <p><strong>Total Losses:</strong> {{ total_losses }}</p>
+                                <p><strong>Total Draws:</strong> {{ total_draws }}</p>
+                                <p><strong>Total Goals:</strong> {{ total_goals }}</p>
+                                <p><strong>Total Assists:</strong> {{ total_assists }}</p>
                             </div>
                         </div>
                     </div>
@@ -108,52 +111,93 @@ Branch Details
                                 <!-- Add tab navigation  -->
                                 <ul class="nav nav-tabs" id="dataTab" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">Members </a>
+                                        <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">
+                                            Staff Members <span class="badge badge-info">{{ staff_members|length }}</span>
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="tournament-tab" data-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="false">Joined Tournaments</a>
+                                        <a class="nav-link" id="player-tab" data-toggle="tab" href="#player" role="tab" aria-controls="player" aria-selected="false">
+                                            Players <span class="badge badge-info">{{ players|length }}</span>
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="games-tab" data-toggle="tab" href="#games" role="tab" aria-controls="games" aria-selected="false">Joined games</a>
+                                        <a class="nav-link" id="tournament-tab" data-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="false">
+                                            Joined Tournaments <span class="badge badge-info">{{ tournament_count }}</span>
+                                        </a>
                                     </li>
-                                </ul>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="games-tab" data-toggle="tab" href="#games" role="tab" aria-controls="games" aria-selected="false">
+                                            Tournament Joined Games <span class="badge badge-info">{{ game_count }}</span>
+                                        </a>
+                                    </li>
+                                </ul>                                
             
                                 <div class="tab-content" id="dataTabContent"> 
-                                    <!-- member Tab  -->
+                                    <!-- Staff Members Tab -->
                                     <div class="tab-pane fade show active" id="member" role="tabpanel" aria-labelledby="member-tab">
-                                    <div class="table-responsive">
-                                        <table class="display" id="member-table">
-                                            <thead> 
-                                                <tr>
-                                                <th>No</th>
-                                                <th>Username</th>
-                                                <th>Age Group</th>
-                                                <th>Image</th>
-                                                <th>Email</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for member in members %}
-                                                <tr>
-                                                <td>{{ forloop.counter }}</td>
-                                                <td>{{ member.user_id.username }}</td>
-                                                <td>{{ member.branch_id.age_group_id.name_en }}</td>
-                                                <td>
-                                                    {% if member.user_id.profile_picture %}
-                                                        <img src="{{ member.user_id.profile_picture }}"  width="100" height="100">
-                                                    {% else %}
-                                                        No Image Available
-                                                    {% endif %}
-                                                </td>                                      
-                                                <td>{{ member.user_id.email }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="display" id="staff-member-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Mobile</th>
+                                                        <th>Role</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for member in staff_members %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ member.user_id.username }}</td>
+                                                        <td>
+                                                            {% if member.user_id and member.user_id.email %}
+                                                                {{ member.user_id.email }}
+                                                            {% else %}
+                                                                None
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>{{ member.user_id.phone }}</td>
+                                                        <td>{{ member.get_joinning_type_display }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                    </div> 
 
-
+                                    <!-- Players Tab -->
+                                    <div class="tab-pane fade" id="player" role="tabpanel" aria-labelledby="player-tab">
+                                        <div class="table-responsive">
+                                            <table class="display" id="player-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Mobile</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for player in players %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ player.user_id.username }}</td>
+                                                        <td>
+                                                            {% if player.user_id and player.user_id.email %}
+                                                                {{ player.user_id.email }}
+                                                            {% else %}
+                                                                None
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>{{ player.user_id.phone }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                     <!-- tournament Tab  -->
                                     <div class="tab-pane fade " id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
                                         <div class="table-responsive">
@@ -183,9 +227,6 @@ Branch Details
                                             </table>
                                         </div>
                                     </div>
-
-
-
                                     <!-- games Tab  -->
                                     <div class="tab-pane fade " id="games" role="tabpanel" aria-labelledby="games-tab">
                                         <div class="table-responsive">
@@ -235,11 +276,6 @@ Branch Details
 
 
 <script>
-
-
-
-
-
     // Toggle the visibility of the action card
    document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
         menu.addEventListener('click', function(event) {
@@ -255,30 +291,27 @@ Branch Details
     });
 });
 
-
-
-
-$(document).ready(function() {
-    // Initialize datatables for both tables
-    $('#member-table').DataTable();
+$(document).ready(function () {
+    $('#staff-member-table').DataTable();
+    $('#player-table').DataTable();
     $('#tournament-table').DataTable();
     $('#games-table').DataTable();
 
-    
-    // Adjust DataTables when tabs are switched
+    // Adjust tables when tabs are switched
     $('#dataTab a').on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr("href"); 
-        if (target === "#member") {
-            $('#member-table').DataTable().columns.adjust().draw(); 
-        } 
-        else if (target === "#tournament") {
-            $('#tournament-table').DataTable().columns.adjust().draw(); 
-        }
-        else if (target === "#games") {
-            $('#games-table').DataTable().columns.adjust().draw(); 
+        var target = $(e.target).attr('href');
+        if (target === '#member') {
+            $('#staff-member-table').DataTable().columns.adjust().draw();
+        } else if (target === '#player') {
+            $('#player-table').DataTable().columns.adjust().draw();
+        } else if (target === '#tournament') {
+            $('#tournament-table').DataTable().columns.adjust().draw();
+        } else if (target === '#games') {
+            $('#games-table').DataTable().columns.adjust().draw();
         }
     });
 });
+
 </script>
 
 

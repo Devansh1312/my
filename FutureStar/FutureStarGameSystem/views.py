@@ -2011,7 +2011,9 @@ class TeamGameStatsTimelineAPIView(APIView):
                     'created_at': stat.created_at,
                     'updated_at': stat.updated_at,
                     'substitution_in_player': stat.in_player.id if stat.in_player else None,
+                    'substitution_in_player_name': stat.in_player.username if stat.in_player else None,
                     'substitution_out_player': stat.out_player.id if stat.out_player else None,
+                    'substitution_out_player_name': stat.out_player.username if stat.out_player else None,
                     'game_time': stat.game_time if stat.game_time else None
                 }
                 if stat.team_id.id == tournament_game.team_a.id:
