@@ -9,6 +9,7 @@
 
 -----------------------------------------------------------------------------------
  */
+/* // *** utils *** */
 :root {
   --theme-deafult: #7366ff;
   --theme-secondary: #f73164;
@@ -53,6 +54,7 @@ body[class='dark-only'] {
   --view-grid-bg: var(--light-bg);
   --view-border-marker: #2c2c45d4; }
 
+/* // *** base *** */
 /**=====================
      Reset css start
 ==========================**/
@@ -2232,6 +2234,7 @@ fieldset .input-group-lg .touchspin {
 /**=====================
     Typography css Ends
 ==========================**/
+/* //  *** components *** */
 /**=====================
     24. According CSS start
 ==========================**/
@@ -8511,6 +8514,7 @@ th {
 /**=====================
      Scrollbar CSS Ends
 ==========================**/
+/* //	*** pages *** */
 /**=====================
     46. Blog CSS start
 ==========================**/
@@ -22350,6 +22354,7 @@ button[data-toggle="dropdown"]:hover ~ .dropdown-menu {
   min-width: 300px;
   top: 35px; }
 
+/* // *** layout *** / */
 /**=====================
      47. Footer CSS Start
 ==========================**/

@@ -1759,7 +1759,7 @@ class ProfileTypeView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Set profile type flags and store certificates
-        if profile_type == '3':  # Profile type for coach
+        if profile_type == 3:  # Profile type for coach
             user.is_coach = True
             user.is_referee = False
 
@@ -1779,7 +1779,7 @@ class ProfileTypeView(APIView):
 
             user.coach_certificate = ','.join(coach_certificates)
 
-        elif profile_type == '4':  # Profile type for referee
+        elif profile_type == 4:  # Profile type for referee
             user.is_referee = True
             user.is_coach = False
 

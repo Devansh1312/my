@@ -43,36 +43,40 @@
                              </td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                       <i data-feather="more-vertical"></i>
-                                       <!-- Three dots icon -->
+                                    <!-- Three dots menu trigger -->
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)" style="display: flex; align-items: center; justify-content: center;">
+                                        <i data-feather="more-vertical"></i> <!-- Icon for three dots -->
                                     </a>
-                                    <!-- Hidden card for actions -->
+                                
+                                    <!-- Action card for menu items -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                       <ul style="list-style: none; padding: 0; margin: 0;">
-                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
-                                             <a href="#" class="toggle-status" data-id="{{ user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
-                                                {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
-                                             </a>
-                                             <form id="status-form-{{ user.id }}" method="post" action="{% url 'user_toggle_status' pk=user.id %}" style="display: none;">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="source_page" value="coach_list">
-                                                <input type="hidden" name="title" value="Coach">
-                                                <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
-                                             </form>
-                                          </li>
-                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
-                                             <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
-                                             <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
-                                                 {% csrf_token %}
-                                                 <input type="hidden" name="user_id" value="{{ user.id }}">
-                                                 <input type="hidden" name="source_page" value="coach_list">
-                                                 <input type="hidden" name="title" value="Coach">
-                                             </form>
-                                         </li>
-                                       </ul>
+                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                            <!-- Toggle Status -->
+                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                                <a href="#" class="toggle-status" data-id="{{ user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                                    {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                                </a>
+                                                <form id="status-form-{{ user.id }}" method="post" action="{% url 'user_toggle_status' pk=user.id %}" style="display: none;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="source_page" value="coach_list">
+                                                    <input type="hidden" name="title" value="Coach">
+                                                    <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                                </form>
+                                            </li>
+                                
+                                            <!-- View Details -->
+                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                                <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
+                                                <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <input type="hidden" name="source_page" value="coach_list">
+                                                    <input type="hidden" name="title" value="Coach">
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </div>
-                                 </div>
+                                </div>
                               </td>
                            </tr> {% endfor %} </tbody>
                      </table>
