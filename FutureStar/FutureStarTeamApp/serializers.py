@@ -65,11 +65,29 @@ class TeamSerializer(serializers.ModelSerializer):
                 'age_group': branch.age_group_id.name_ar if language == 'ar' else branch.age_group_id.name_en if branch.age_group_id else None,
                 'gender': branch.gender.id if branch.gender else None,
                 'gender_name': branch.gender.name_ar if language == 'ar' else branch.gender.name_en if branch.gender else None,
+                'upload_image': branch.upload_image.url if branch.upload_image else None,
+                'field_size': branch.field_size.id if branch.field_size else None,
+                'phone': branch.phone,
+                'email': branch.email,
+                'latitude': branch.latitude,
+                'longitude': branch.longitude,
+                'address': branch.address,
+                'house_no': branch.house_no,
+                'premises': branch.premises,
+                'street': branch.street,
+                'city': branch.city,
+                'state': branch.state,
+                'country_name': branch.country_name,
+                'postalCode': branch.postalCode,
+                'country_code': branch.country_code,
+                'entry_fees': branch.entry_fees,
+                'description': branch.description,
             }
             for branch in branches
         ]
 
         return branch_data
+
     
     def get_team_logo(self, obj):
         # Return only the relative URL for the team logo if it exists
