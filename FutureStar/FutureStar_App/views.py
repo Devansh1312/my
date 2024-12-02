@@ -197,8 +197,9 @@ class Dashboard(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         # Count of users based on role
         user_counts = User.objects.values('role_id').annotate(count=Count('id'))
-        user_count_by_role = {role_id: count for role_id, count in user_counts.values('role_id', 'count')}
-        
+        print(user_counts)  # Debugging print statement to check the output
+        user_count_by_role = {user['role_id']: user['count'] for user in user_counts}
+
         # Counts for each model
         team_count = Team.objects.count()
         team_branch_count = TeamBranch.objects.count()
@@ -223,6 +224,7 @@ class Dashboard(LoginRequiredMixin, View):
         }
 
         return render(request, "Admin/Dashboard.html", context)
+
 
 
 # Logout Module
