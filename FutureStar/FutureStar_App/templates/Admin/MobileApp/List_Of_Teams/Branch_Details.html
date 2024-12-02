@@ -12,6 +12,14 @@
        border-color: #dc3545;
        background-color: #f8d7da;
    }
+   .widget-1 {
+      background-size: cover;
+      margin-bottom: 25px;
+      background-color: #ffffff;
+      box-shadow: 0 0 6px 2px #00000026;
+      border-radius: 9px;
+      margin-left: 44px;
+   }
 </style>
 
 {% block title %}
@@ -20,20 +28,14 @@ Branch Details
 
 {% block content %}
 <div class="page-body">
-   <div class="container-fluid">
-      <div class="page-title">
-         <div class="row">
-            <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
-            </div>
-         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="container mt-5">
-                        <h3>Branch Details</h3>
+    <div class="container-fluid">
+        <div class="page-title"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <button onclick="history.back()" class="btn btn-secondary" style="float: right;">Back</button>
+                        <h3>Team Details</h3>
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <strong>Team Name:</strong> {{ branch.team_name }}
@@ -92,15 +94,120 @@ Branch Details
                         <br>
                         <h3>Team static</h3>
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <p><strong>Total Games Played:</strong> {{ total_games }}</p>
-                                <p><strong>Total Wins:</strong> {{ total_wins }}</p>
-                                <p><strong>Total Losses:</strong> {{ total_losses }}</p>
-                                <p><strong>Total Draws:</strong> {{ total_draws }}</p>
-                                <p><strong>Total Goals:</strong> {{ total_goals }}</p>
-                                <p><strong>Total Assists:</strong> {{ total_assists }}</p>
+                            <!-- Games Played -->
+                            <div class="col-4 widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round">
+                                            <div class="bg-round">
+                                                <i class="fa fa-futbol-o"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>
+                                                <span class="counter">{{ total_games }}</span>
+                                            </h4>
+                                            <span class="f-light">Games Played</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        
+                            <!-- Wins -->
+                            <div class="col-4 widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round">
+                                            <div class="bg-round">
+                                                <i class="fa fa-trophy"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>
+                                                <span class="counter">{{ total_wins }}</span>
+                                            </h4>
+                                            <span class="f-light">Wins</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Losses -->
+                            <div class="col-4 widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round">
+                                            <div class="bg-round">
+                                                <i class="fa fa-times-circle"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>
+                                                <span class="counter">{{ total_losses }}</span>
+                                            </h4>
+                                            <span class="f-light">Losses</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Draws -->
+                            <div class="col-4 widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round">
+                                            <div class="bg-round">
+                                                <i class="fa fa-handshake-o"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>
+                                                <span class="counter">{{ total_draws }}</span>
+                                            </h4>
+                                            <span class="f-light">Draws</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Goals -->
+                            <div class="col-4 widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round">
+                                            <div class="bg-round">
+                                                <i class="fa fa-soccer-ball-o"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>
+                                                <span class="counter">{{ total_goals }}</span>
+                                            </h4>
+                                            <span class="f-light">Goals</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Assists -->
+                            <div class="col-4 widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round">
+                                            <div class="bg-round">
+                                                <i class="fa fa-forward"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>
+                                                <span class="counter">{{ total_assists }}</span>
+                                            </h4>
+                                            <span class="f-light">Assists</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
                     </div>
                 </div>
                 <!-- Datatable Section  -->

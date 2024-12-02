@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}User Role Apply Management{% endblock %}
+{% load custom_filters %}  <!-- Load the custom filter -->
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <h3>{{ breadcrumb.child }}</h3>
+
+        <div style="margin-top: 20px;" class="user-profile">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card hovercard text-center overflow-hidden">
+                        <div class="info">
+                            <div class="row">
+                                <!-- User Details Section -->
+                                <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
+                                    <div class="ttl-info text-start">
+                                        <h6><i class="fa fa-user"></i> First Name</h6>
+                                        <span>{{ user.first_name }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
+                                    <div class="ttl-info text-start">
+                                        <h6><i class="fa fa-user"></i> Last Name</h6>
+                                        <span>{{ user.last_name }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
+                                    <div class="ttl-info text-start">
+                                        <h6><i class="fa fa-phone"></i> Mobile</h6>
+                                        <span>{{ user.phone }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
+                                    <div class="ttl-info text-start">
+                                        <h6><i class="fa fa-envelope"></i> Email</h6>
+                                        <span>{{ user.email }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
+                                    <div class="ttl-info text-start">
+                                        <h6><i class="fa fa-calendar"></i> Username</h6>
+                                        <span>{{ user.username }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
+                                    <div class="ttl-info text-start">
+                                        <h6><i class="fa fa-id-card"></i> Applied Role</h6>
+                                        <span>
+                                            {% if user.is_coach %} Coach {% elif user.is_referee %} Referee {% else %} None {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single Card with Certificates and Action Buttons -->
+            <div class="card">
+                <div class="card-body">
+                    <!-- Display Certificates -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h5>Certificates</h5>
+                            <ul class="list-group">
+                                {% for certificate in user.certificates.all %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <!-- Display File Name using the custom filter -->
+                                            <span>{{ certificate.certificate_file.name|get_filename }}</span>
+                                            <span>
+                                                <a href="{{ certificate.certificate_file.url }}" target="_blank" class="btn btn-primary btn-sm">View</a>
+                                                <a href="{{ certificate.certificate_file.url }}" download class="btn btn-success btn-sm">Download</a>
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>                    
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <form method="post" action="{% url 'user_role_action' %}" style="margin-top: 15px;">
+                        {% csrf_token %}
+                        <!-- Hidden Input for User ID -->
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                    
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Approve and Reject Buttons (Left) -->
+                            <div>
+                                <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                                <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                            </div>
+                    
+                            <!-- Back Button (Right) -->
+                            <div>
+                                <button onclick="window.history.back();" class="btn btn-secondary">Back</button>
+                            </div>
+                        </div>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

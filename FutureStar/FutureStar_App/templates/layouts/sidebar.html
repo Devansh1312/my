@@ -71,6 +71,14 @@
                         <a href="{% url 'default_user_list' %}">Default User List</a>
                      </li>
                      <li>
+                        <a href="{% url 'user_apply_list' %}">
+                            Coach/Referee Approval
+                            {% if pending_approval_count %}
+                              <span style="right: 5px; top: 0px; color: aliceblue; "  class="badge badge-danger">{{ pending_approval_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>                    
+                     <li>
                         <a href="{% url 'accountdeletereason_list' %}">User Delete Reasons List</a>
                      </li>
                   </ul>

@@ -6,19 +6,14 @@
     }
 </style> {% block title %} Team Detail page {% endblock %} {% block content %} <div class="page-body">
     <div class="container-fluid">
-        <div class="page-title">
-            <div class="row">
-                <div class="col-6">
-                    <h3>{{breadcrumb.child}}</h3>
-                </div>
-            </div>
-        </div>
+        <div class="page-title"></div>
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
+                        <button onclick="history.back()" class="btn btn-secondary" style="float: right;">Back</button>
+                        <h3>Team Details</h3>
                         <div class="container mt-5">
-                            <h3>Team Details</h3>
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <strong>Team Name:</strong> {{ team.team_name }}

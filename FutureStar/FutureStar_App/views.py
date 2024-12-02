@@ -6596,7 +6596,6 @@ class UserRoleAppliedListView(LoginRequiredMixin, View):
     template_name = "Admin/User/user_apply_list.html"
 
     def get(self, request, *args, **kwargs):
-        # Filter users based on role = 5 and is_coach or is_referee
         coach_users = User.objects.filter(role__id=5, is_coach=True)
         referee_users = User.objects.filter(role__id=5, is_referee=True)
 
@@ -6609,40 +6608,70 @@ class UserRoleAppliedListView(LoginRequiredMixin, View):
                 "breadcrumb": {"parent": "User Role Management", "child": "User Role Apply List"}
             }
         )
+class UserRoleActionView(LoginRequiredMixin, View):
+    template_name = "Admin/User/user_role_action.html"
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # Get user_id from the GET parameters (form data sent with GET)
+            user_id = request.GET.get('user_id')  
+            
+            if user_id:  # Ensure a user_id exists in the request
+                user = User.objects.get(id=user_id)
+                
+                # Check if the user is either a coach or a referee
+                if not user.is_coach and not user.is_referee:
+                    messages.error(request, 'User not found.')
+                    return redirect('user_apply_list')
+
+                return render(
+                    request,
+                    self.template_name,
+                    {
+                        'user': user,
+                        'breadcrumb': {"parent": "User Role Management", "child": "User Role Management"}
+                    }
+                )
+            else:
+                messages.error(request, 'User ID is missing.')
+                return redirect('user_apply_list')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+            return redirect('user_apply_list')
+
 
     def post(self, request, *args, **kwargs):
-        # Load the JSON data from the request
-        data = json.loads(request.body)
-
-        action = data.get('action')
-        user_id = data.get('user_id')
+        action = request.POST.get('action')
+        user_id = request.POST.get('user_id')  # Get user_id from form data
 
         try:
             user = User.objects.get(id=user_id)
 
+            # Check if the user is either a coach or a referee
+            if not user.is_coach and not user.is_referee:
+                messages.error(request, 'User not found.')
+                return redirect('user_apply_list')
+
             if action == 'approve':
                 if user.is_referee:
                     user.role_id = 4  # Change role to referee
+                    user.is_referee = True
                 elif user.is_coach:
                     user.role_id = 3  # Change role to coach
-
-                # Reset is_coach and is_referee
-                user.is_coach = False
-                user.is_referee = False
-
+                    user.is_coach = True
+                messages.success(request, f"Role for {user.username} has been approved.")
             elif action == 'reject':
-                # Reject action: Set certificate to null, reset role and flags
-                user.coach_certificate = None
-                user.referee_certificate = None
+                # Delete all certificates associated with the user
+                UserCertificate.objects.filter(user=user).delete()
                 user.is_coach = False
                 user.is_referee = False
                 user.role_id = 5  # Set to default role
-
-            # Save the user after the changes
+                messages.success(request, f"Role for {user.username} has been rejected.")
+            
             user.save()
-
-            # Return success response
-            return JsonResponse({'status': 'success'})
+            return redirect('user_apply_list')
 
         except User.DoesNotExist:
+            messages.error(request, 'User not found.')
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)

@@ -15,12 +15,13 @@
 
 <div class="page-body">
     <div class="container-fluid">
-        {% include "layouts/breadcrumb.html" %}
+        <div class="page-title"></div>
         <div class="card">
             <form class="form theme-form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="card-body">
                     <div>
+                        <button onclick="return backtolist()" class="btn btn-secondary" style="float: right;">Back</button>
                         <h1 style="font-size:25px">CMS Advertise Page Edit</h1>
                     </div>    
 

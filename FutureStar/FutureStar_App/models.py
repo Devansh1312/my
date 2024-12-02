@@ -183,9 +183,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     is_coach = models.BooleanField(default=False)
-    coach_certificate = models.TextField(null=True, blank=True)
     is_referee = models.BooleanField(default=False)
-    referee_certificate = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -205,6 +203,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'futurestar_app_user'
+
+
+class CertificateType(models.TextChoices):
+    COACH = 'coach', 'Coach'
+    REFEREE = 'referee', 'Referee'
+
+
+class UserCertificate(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certificates')
+    certificate_type = models.CharField(max_length=20, choices=CertificateType.choices)
+    certificate_file = models.FileField(upload_to='certificates/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.certificate_type}'
+
+    class Meta:
+        db_table = 'futurestar_app_user_certificate'
+
 
 
 # System Settings Model

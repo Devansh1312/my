@@ -1,7 +1,5 @@
-# core/context_processors.py
-
 from django.conf import settings
-from .models import SystemSettings  
+from .models import SystemSettings, User
 
 def system_settings(request):
     try:
@@ -21,6 +19,9 @@ def system_settings(request):
             if system_settings.header_logo:
                 header_logo_url = settings.MEDIA_URL + system_settings.header_logo
 
+        # Get the total count of coach users and referee users combined
+        pending_approval_count = User.objects.filter(role__id=5, is_coach=True).count() + User.objects.filter(role__id=5, is_referee=True).count()
+
     except SystemSettings.DoesNotExist:
         system_settings = None
 
@@ -29,4 +30,5 @@ def system_settings(request):
         'fav_icon': fav_icon_url,
         'footer_logo': footer_logo_url,
         'header_logo': header_logo_url,
+        'pending_approval_count': pending_approval_count,
     }

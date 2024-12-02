@@ -1,25 +1,10 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-{% load static %}
-{% load sass_tags %}
-
-{% block css %}
-<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-{% endblock %}
-
-<style>
+{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% load sass_tags %} {% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}"> {% endblock %} <style>
    .is-invalid {
-       border-color: #dc3545;
-       background-color: #f8d7da;
+      border-color: #dc3545;
+      background-color: #f8d7da;
    }
-</style>
-
-{% block title %}
-Team List View
-{% endblock %}
-
-{% block content %}
-<div class="page-body">
+</style> {% block title %} Team List View {% endblock %} {% block content %} <div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
@@ -33,77 +18,73 @@ Team List View
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                    <table class="display" id="basic-1">
+                     <table class="display" id="basic-1">
                         <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Team Name</th> 
-                                <th>Team User Name</th>
-                                <th>Created By</th>
-                                <th>Actions</th>
-                            </tr>
+                           <tr>
+                              <th>No.</th>
+                              <th>Team Name</th>
+                              <th>Team User Name</th>
+                              <th>Created By</th>
+                              <th>Actions</th>
+                           </tr>
                         </thead>
-                        <tbody>
-                            {% for team in teams %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ team.team_name }}</td>
-                                <td>{{ team.team_username }}</td>
-                                <td>{{ team.user_id.username }}</td>
-                                <td>
-                                    <!-- Action buttons -->
-
-                                    <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                        <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                            <i data-feather="more-vertical"></i>
-                                        </a>
-                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                            <ul style="list-style: none; padding: 0; margin: 0;">
-                                                <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                    <a href="#" class="view-report-btn"
-                                                        data-team-name="{{ team.team_name }}"
-                                                        data-team-username="{{ team.team_username }}"
-                                                        data-created-by="{{ team.user_id.username }}"
-                                                        data-team-type="{{ team.team_type.name_en }}"
-                                                        data-bio="{{ team.bio }}"
-                                                        data-establishment-date="{{ team.team_establishment_date }}"
-                                                        data-team-president="{{ team.team_president }}"
-                                                        data-latitude="{{ team.latitude }}"
-                                                        data-longitude="{{ team.longitude }}"
-                                                        data-address="{{ team.address }}"
-                                                        data-house-no="{{ team.house_no }}"
-                                                        data-premises="{{ team.premises }}"
-                                                        data-street="{{ team.street }}"
-                                                        data-city="{{ team.city }}"
-                                                        data-state="{{ team.state }}"
-                                                        data-country-name="{{ team.country_name }}"
-                                                        data-postal-code="{{ team.postalCode }}"
-                                                        data-country-code="{{ team.country_code }}"
-                                                        data-phone="{{ team.phone }}"
-                                                        data-email="{{ team.email }}"
-                                                        data-age-group="{{ team.age_group }}"
-                                                        data-entry-fees="{{ team.entry_fees }}"
-                                                        data-branches="{{ team.branches }}"
-                                                        data-team-logo="{{ team.team_logo.url }}"
-                                                        data-team-background-image="{{ team.team_background_image.url }}"
-                                                        data-team-uniform="{{ team.team_uniform.url }}"
-                                                        data-bs-toggle="modal" data-bs-target="#viewTeamModal">
-                                                        View
-                                                    </a>
-                                                </li>
-                                                <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                    <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTeamModal" data-team-id="{{ team.id }}">
-                                                       Delete 
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
+                        <tbody> {% for team in teams %} <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ team.team_name }}</td>
+                              <td>{{ team.team_username }}</td>
+                              <td>{{ team.user_id.username }}</td>
+                              <td>
+                                 <!-- Action buttons -->
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                    <!-- Three dots menu trigger -->
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                       <i data-feather="more-vertical"></i>
+                                    </a>
+                                    <!-- Action card -->
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                          <!-- View action -->
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: 16px;">
+                                             <a href="#" class="view-report-btn" 
+                                             data-team-name="{{ team.team_name }}" 
+                                             data-team-username="{{ team.team_username }}" 
+                                             data-created-by="{{ team.user_id.username }}" 
+                                             data-team-type="{{ team.team_type.name_en }}" 
+                                             data-bio="{{ team.bio }}" 
+                                             data-establishment-date="{{ team.team_establishment_date }}"
+                                             data-team-president="{{ team.team_president }}" 
+                                             data-latitude="{{ team.latitude }}" 
+                                             data-longitude="{{ team.longitude }}" 
+                                             data-address="{{ team.address }}" 
+                                             data-house-no="{{ team.house_no }}" 
+                                             data-premises="{{ team.premises }}" 
+                                             data-street="{{ team.street }}" 
+                                             data-city="{{ team.city }}" 
+                                             data-state="{{ team.state }}" 
+                                             data-country-name="{{ team.country_name }}" 
+                                             data-postal-code="{{ team.postalCode }}" 
+                                             data-country-code="{{ team.country_code }}" 
+                                             data-phone="{{ team.phone }}" 
+                                             data-email="{{ team.email }}" 
+                                             data-age-group="{{ team.age_group }}" 
+                                             data-entry-fees="{{ team.entry_fees }}" 
+                                             data-branches="{{ team.branches }}" 
+                                             data-team-logo="{{ team.team_logo.url }}" 
+                                             data-team-background-image="{{ team.team_background_image.url }}" 
+                                             data-team-uniform="{{ team.team_uniform.url }}" 
+                                             data-bs-toggle="modal" data-bs-target="#viewTeamModal"> 
+                                             View </a>
+                                          </li>
+                                          <!-- Delete action -->
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: 16px;">
+                                             <a href="#" style="font-size: 16px;" data-bs-toggle="modal" data-bs-target="#deleteTeamModal" data-team-id="{{ team.id }}"> Delete </a>
+                                          </li>
+                                       </ul>
                                     </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                 </div>
+                              </td>
+                           </tr> {% endfor %} </tbody>
+                     </table>
                   </div>
                </div>
             </div>
@@ -111,138 +92,131 @@ Team List View
       </div>
    </div>
 </div>
-
-
-
 <!-- View Team Modal -->
 <div class="modal fade bd-example-modal-lg" id="viewTeamModal" tabindex="-1" aria-labelledby="viewTeamModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-       <div class="modal-content shadow-lg border-0 rounded">
-          <div class="modal-header bg-primary text-white">
-             <h5 class="modal-title" id="viewTeamModalLabel">Team Details</h5>
-             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body p-4">
-             <div class="row">
-                <!-- Team Details Section -->
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Team Name:</label>
-                   <span id="teamName"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Team Username:</label>
-                   <span id="teamUsername"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Created By:</label>
-                   <span id="createdBy"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Team Type:</label>
-                   <span id="teamType"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Bio:</label>
-                   <span id="bio"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Establishment Date:</label>
-                   <span id="establishmentDate"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">President:</label>
-                   <span id="teamPresident"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Latitude:</label>
-                   <span id="latitude"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Longitude:</label>
-                   <span id="longitude"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Address:</label>
-                   <span id="address"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">House No:</label>
-                   <span id="houseNo"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Premises:</label>
-                   <span id="premises"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Street:</label>
-                   <span id="street"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">City:</label>
-                   <span id="city"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">State:</label>
-                   <span id="state"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Country:</label>
-                   <span id="country"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Postal Code:</label>
-                   <span id="postalCode"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Country Code:</label>
-                   <span id="countryCode"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Phone:</label>
-                   <span id="phone"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Email:</label>
-                   <span id="email"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Age Group:</label>
-                   <span id="ageGroup"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Entry Fees:</label>
-                   <span id="entryFees"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Branches:</label>
-                   <span id="branches"></span>
-                </div>
-             </div>
-             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Team Logo:</label>
-                    <img id="teamLogoPreview" src="" alt="Team Logo" class="img-fluid">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Background Image:</label>
-                    <img id="teamBackgroundImagePreview" src="" alt="Background Image" class="img-fluid">
-                </div>
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-bold">Uniform:</label>
-                    <img id="teamUniformPreview" src="" alt="Uniform" class="img-fluid">
-                </div>
-             </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-       </div>
-    </div>
- </div>
- 
-
-
-
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content shadow-lg border-0 rounded">
+         <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="viewTeamModalLabel">Team Details</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body p-4">
+            <div class="row">
+               <!-- Team Details Section -->
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Team Name:</label>
+                  <span id="teamName"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Team Username:</label>
+                  <span id="teamUsername"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Created By:</label>
+                  <span id="createdBy"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Team Type:</label>
+                  <span id="teamType"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Bio:</label>
+                  <span id="bio"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Establishment Date:</label>
+                  <span id="establishmentDate"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">President:</label>
+                  <span id="teamPresident"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Latitude:</label>
+                  <span id="latitude"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Longitude:</label>
+                  <span id="longitude"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Address:</label>
+                  <span id="address"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">House No:</label>
+                  <span id="houseNo"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Premises:</label>
+                  <span id="premises"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Street:</label>
+                  <span id="street"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">City:</label>
+                  <span id="city"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">State:</label>
+                  <span id="state"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Country:</label>
+                  <span id="country"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Postal Code:</label>
+                  <span id="postalCode"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Country Code:</label>
+                  <span id="countryCode"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Phone:</label>
+                  <span id="phone"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Email:</label>
+                  <span id="email"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Age Group:</label>
+                  <span id="ageGroup"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Entry Fees:</label>
+                  <span id="entryFees"></span>
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Branches:</label>
+                  <span id="branches"></span>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Team Logo:</label>
+                  <img id="teamLogoPreview" src="" alt="Team Logo" class="img-fluid">
+               </div>
+               <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Background Image:</label>
+                  <img id="teamBackgroundImagePreview" src="" alt="Background Image" class="img-fluid">
+               </div>
+               <div class="col-md-12 mb-3">
+                  <label class="form-label fw-bold">Uniform:</label>
+                  <img id="teamUniformPreview" src="" alt="Uniform" class="img-fluid">
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
 <!-- Delete Team Modal -->
 <div class="modal fade" id="deleteTeamModal" tabindex="-1" aria-labelledby="deleteTeamModalLabel" aria-hidden="true">
    <div class="modal-dialog">
@@ -252,115 +226,94 @@ Team List View
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'team_delete' 0 %}" id="deleteTeamForm">
-                {% csrf_token %}
-                <input type="hidden" id="deleteTeamId" name="id">
-                <p>Are you sure you want to delete this Team?</p>
-                <button type="submit" class="btn btn-danger">Delete Team</button>
-             </form>
+            <form method="post" action="{% url 'team_delete' 0 %}" id="deleteTeamForm"> {% csrf_token %} <input type="hidden" id="deleteTeamId" name="id">
+               <p>Are you sure you want to delete this Team?</p>
+               <button type="submit" class="btn btn-danger">Delete Team</button>
+            </form>
          </div>
       </div>
    </div>
-</div>
-
-{% endblock %}
-
-{% block script %}
-<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+</div> {% endblock %} {% block script %} <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
-
-
 <script>
    document.addEventListener('DOMContentLoaded', function() {
-
-    // Delete Report Modal
-    var deleteTeamModal = document.getElementById('deleteTeamModal');
-    if (deleteTeamModal) {
-        deleteTeamModal.addEventListener('show.bs.modal', function(event) {
+      // Delete Report Modal
+      var deleteTeamModal = document.getElementById('deleteTeamModal');
+      if (deleteTeamModal) {
+         deleteTeamModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Button that triggered the modal
             var teamId = button.getAttribute('data-team-id'); // Extract info from data-* attributes
             var deleteForm = document.getElementById('deleteTeamForm');
             deleteForm.action = "{% url 'team_delete' 0 %}".replace('0', teamId); // Set action URL
             document.getElementById('deleteTeamId').value = teamId; // Set team ID in hidden input
-        });
-    }
-});
+         });
+      }
+   });
    // view report data
    document.querySelectorAll('.view-report-btn').forEach(function(button) {
-   button.addEventListener('click', function() {
-       const teamData = {
-           teamName: this.getAttribute('data-team-name'),
-           teamUsername: this.getAttribute('data-team-username'),
-           createdBy: this.getAttribute('data-created-by'),
-           teamType: this.getAttribute('data-team-type'),
-           bio: this.getAttribute('data-bio'),
-           establishmentDate: this.getAttribute('data-establishment-date'),
-           teamPresident: this.getAttribute('data-team-president'),
-           latitude: this.getAttribute('data-latitude'),
-           longitude: this.getAttribute('data-longitude'),
-           address: this.getAttribute('data-address'),
-           houseNo: this.getAttribute('data-house-no'),
-           premises: this.getAttribute('data-premises'),
-           street: this.getAttribute('data-street'),
-           city: this.getAttribute('data-city'),
-           state: this.getAttribute('data-state'),
-           country: this.getAttribute('data-country-name'),
-           postalCode: this.getAttribute('data-postal-code'),
-           countryCode: this.getAttribute('data-country-code'),
-           phone: this.getAttribute('data-phone'),
-           email: this.getAttribute('data-email'),
-           ageGroup: this.getAttribute('data-age-group'),
-           entryFees: this.getAttribute('data-entry-fees'),
-           branches: this.getAttribute('data-branches'),
-           teamLogo: this.getAttribute('data-team-logo'),
-           teamBackgroundImage: this.getAttribute('data-team-background-image'),
-           teamUniform: this.getAttribute('data-team-uniform')
-       };
-
-       for (const [id, value] of Object.entries(teamData)) {
-        const element = document.getElementById(id);
-        if (element.tagName === 'IMG') {
-            element.src = value || ''; 
-        } else {
-            element.textContent = value;
-        }
-    }
-
-    const viewTeamModal = new bootstrap.Modal(document.getElementById('viewTeamModal'));
-    viewTeamModal.show();
+      button.addEventListener('click', function() {
+         const teamData = {
+            teamName: this.getAttribute('data-team-name'),
+            teamUsername: this.getAttribute('data-team-username'),
+            createdBy: this.getAttribute('data-created-by'),
+            teamType: this.getAttribute('data-team-type'),
+            bio: this.getAttribute('data-bio'),
+            establishmentDate: this.getAttribute('data-establishment-date'),
+            teamPresident: this.getAttribute('data-team-president'),
+            latitude: this.getAttribute('data-latitude'),
+            longitude: this.getAttribute('data-longitude'),
+            address: this.getAttribute('data-address'),
+            houseNo: this.getAttribute('data-house-no'),
+            premises: this.getAttribute('data-premises'),
+            street: this.getAttribute('data-street'),
+            city: this.getAttribute('data-city'),
+            state: this.getAttribute('data-state'),
+            country: this.getAttribute('data-country-name'),
+            postalCode: this.getAttribute('data-postal-code'),
+            countryCode: this.getAttribute('data-country-code'),
+            phone: this.getAttribute('data-phone'),
+            email: this.getAttribute('data-email'),
+            ageGroup: this.getAttribute('data-age-group'),
+            entryFees: this.getAttribute('data-entry-fees'),
+            branches: this.getAttribute('data-branches'),
+            teamLogo: this.getAttribute('data-team-logo'),
+            teamBackgroundImage: this.getAttribute('data-team-background-image'),
+            teamUniform: this.getAttribute('data-team-uniform')
+         };
+         for (const [id, value] of Object.entries(teamData)) {
+            const element = document.getElementById(id);
+            if (element.tagName === 'IMG') {
+               element.src = value || '';
+            } else {
+               element.textContent = value;
+            }
+         }
+         const viewTeamModal = new bootstrap.Modal(document.getElementById('viewTeamModal'));
+         viewTeamModal.show();
+      });
    });
-});
-
-  
-   
-   
-
    // Toggle the visibility of the action card
    document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-       menu.addEventListener('click', function(event) {
-           event.preventDefault();
-           var actionCard = menu.nextElementSibling;
-           actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-           // Close other open action cards
-           document.querySelectorAll('.action-card').forEach(function(card) {
-               if (card !== actionCard) {
-                   card.style.display = 'none';
-               }
-           });
-       });
+      menu.addEventListener('click', function(event) {
+         event.preventDefault();
+         var actionCard = menu.nextElementSibling;
+         actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+         // Close other open action cards
+         document.querySelectorAll('.action-card').forEach(function(card) {
+            if (card !== actionCard) {
+               card.style.display = 'none';
+            }
+         });
+      });
    });
-
    // Hide action card if clicking outside
    document.addEventListener('click', function(event) {
-       var isClickInside = event.target.closest('.action-menu-container');
-       if (!isClickInside) {
-           document.querySelectorAll('.action-card').forEach(function(card) {
-               card.style.display = 'none';
-           });
-       }
+      var isClickInside = event.target.closest('.action-menu-container');
+      if (!isClickInside) {
+         document.querySelectorAll('.action-card').forEach(function(card) {
+            card.style.display = 'none';
+         });
+      }
    });
-</script>
-
-
-{% endblock %}
+</script> {% endblock %}

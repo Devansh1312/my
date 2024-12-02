@@ -1,4 +1,5 @@
 from django import template
+import os
 
 register = template.Library()
 
@@ -16,3 +17,11 @@ def get_language_field(value, lang):
     """
     field_name = f"{value}_{lang}"
     return getattr(value, field_name, "")
+
+
+@register.filter
+def get_filename(value):
+    """
+    Returns the file name from a file path.
+    """
+    return os.path.basename(value)

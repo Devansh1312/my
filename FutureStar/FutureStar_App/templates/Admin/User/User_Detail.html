@@ -1,723 +1,627 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
-{% load static %}
-{% load sass_tags %}
-
-{% block css %}
+{% extends 'base.html' %} {% load custom_filters %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> -->
-
-
 <!-- Plugins css Ends-->
-
 <style>
-    .profile-info .label-value {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 5px 0;
-    }
+   .profile-info .label-value {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+   }
 
-    .card-header, .card-body {
-        padding: 1.5rem;
-    }
+   .card-header,
+   .card-body {
+      padding: 1.5rem;
+   }
 
-    .card-footer {
-        text-align: right;
-        padding: 1rem;
-    }
+   .card-footer {
+      text-align: right;
+      padding: 1rem;
+   }
 
-    /* Ensure the back button is at the end of the large card */
-    .card-footer a.btn-secondary {
-        display: inline-block;
-        margin-top: 20px;
-    }
+   /* Ensure the back button is at the end of the large card */
+   .card-footer a.btn-secondary {
+      display: inline-block;
+      margin-top: 20px;
+   }
 
-    .widget-1 {
+   .widget-1 {
       background-size: cover;
       margin-bottom: 25px;
       background-color: #ffffff;
       box-shadow: 0 0 6px 2px #00000026;
       border-radius: 9px;
       margin-left: 44px;
-  }
-</style>
-{% endblock %}
-
-{% block title %} {{title}} | Page {% endblock %}
-
-{% block content %}
-<div class="page-body">
-      <!-- Big Card -->
-      <div class="card" style="margin-top:100px;">
-         <div class="card-body">
-            <div class="row">
-               <!-- Profile Information -->
-               <div class="col-xl-12">
-                  
-                     <div class="card-header">
-                        <h4 class="card-title mb-0">Profile Details</h4>
-                     </div>
-                     <div class="card-body">
-                        <div class="info">
-                            <div class="row g-3">
-                                <!-- Left Column -->
-                                <div class="col-sm-6 col-xl-4 order-sm-1 order-xl-0">
-                                    <div class="row g-3 mb-3"><!-- Added spacing here -->
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-envelope"></i> Full Name</h6>
-                                                <span>{{ user.fullname }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-calendar-days"></i> Date of Birth</h6>
-                                                <span>{{ user.date_of_birth|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-envelope"></i> Email</h6>
-                                                <span>{{ user.email|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-calendar-days"></i> Nationality</h6>
-                                                <span>{{ user.nationality|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                    
-                                <!-- Middle Column -->
-                               
-                                <div class="col-sm-12 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center">
-                                   <img src="{{ user.profile_picture.url|default:'path/to/default-image.jpg' }}" 
-                                        alt="Profile Picture" 
-                                        class="rounded-circle" 
-                                        style="width: 50px; height: 50px; object-fit: cover;">
-                                
-                                 <!-- Username and Role in a row -->
-                                 <div class="w-100 mb-3 text-center">
-                                     <div class="title mb-1">
-                                         <a target="_blank" href="">{{ user.username }}</a>
-                                     </div>
-                                     <div class="desc">{{ user.role.name_en }}</div>
+   }
+</style> {% endblock %} {% block title %} {{title}} | Page {% endblock %} {% block content %} <div class="page-body">
+   <!-- Big Card -->
+   <div class="card" style="margin-top:100px;">
+      <div class="card-body">
+         <div class="row">
+            <!-- Profile Information -->
+            <div class="col-xl-12">
+               <div class="card-header d-flex justify-content-between align-items-center">
+                  <h4 class="card-title mb-0">Profile Details</h4>
+                  <!-- Back Button -->
+                  <button class="btn btn-secondary btn-sm" onclick="history.back();">
+                      <i class="fa fa-arrow-left"></i> Back
+                  </button>
+              </div>
+               <div class="card-body">
+                  <div class="info">
+                     <div class="row g-3">
+                        <!-- Left Column -->
+                        <div class="col-sm-6 col-xl-4 order-sm-1 order-xl-0">
+                           <div class="row g-3 mb-3">
+                              <!-- Added spacing here -->
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-user"></i> Full Name
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.fullname }}</span>
                                  </div>
-                 
-                                 <!-- Profile Picture above Username -->
-                                 
-                             </div>
-                                <!-- Right Column -->
-                                <div class="col-sm-6 col-xl-4 order-sm-2 order-xl-2">
-                                    <div class="row g-3 mb-3"><!-- Added spacing here -->
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-phone"></i> Phone</h6>
-                                                <span>{{ user.phone|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-location-arrow"></i> Gender</h6>
-                                                <span>{{ user.gender.name|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-phone"></i> Country</h6>
-                                                <span>{{ user.country.name|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="ttl-info text-start">
-                                                <h6><i class="fa-solid fa-location-arrow"></i> City</h6>
-                                                <span>{{ user.city.name|default:"None" }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-birthday-cake"></i> Date of Birth
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.date_of_birth|default:"None" }}</span>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="row g-3">
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-envelope"></i> Email
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.email|default:"None" }}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-flag"></i> Nationality
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.nationality|default:"None" }}</span>
+                                 </div>
+                              </div>
+                           </div>
                         </div>
-                        <hr>
-                    </div>
-                    
-                     <div class="card-header">
-                        <h4 class="card-title mb-0">Additional Information</h4>
-                     </div>
-                     <div class="card-body">
-                        <div class="row">
-                           <div class="col-md-4 label-value">
-                              <p>Weight: {{ user.weight|default:"None" }}</p>
+                        <!-- Middle Column -->
+                        <div class="col-sm-12 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center">
+                           <img src="{{ user.profile_picture.url|default:'path/to/default-image.jpg' }}" alt="Profile Picture" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                           <!-- Username and Role in a row -->
+                           <div class="w-100 mb-3 text-center">
+                              <div class="title mb-1">
+                                 <a target="_blank" href="">{{ user.username }}</a>
+                              </div>
+                              <div class="desc">
+                                 <i class="fa fa-briefcase"></i> {{ user.role.name_en }}
+                              </div>
+                              <!-- Updated icon -->
                            </div>
-                           <div class="col-md-4 label-value">
-                              <p>Height: {{ user.height|default:"None" }}</p>
+                        </div>
+                        <!-- Right Column -->
+                        <div class="col-sm-6 col-xl-4 order-sm-2 order-xl-2">
+                           <div class="row g-3 mb-3">
+                              <!-- Added spacing here -->
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-phone"></i> Phone
+                                    </h6>
+                                    <span>{{ user.phone|default:"None" }}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-venus-mars"></i> Gender
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.gender.name|default:"None" }}</span>
+                                 </div>
+                              </div>
                            </div>
-                           <div class="col-md-4 label-value">
-                              <p>Main Playing Position: {{ user.main_playing_position|default:"None" }}</p>
-                           </div>
-                           <div class="col-md-4 label-value">
-                              <p>Secondary Playing Position: {{ user.secondary_playing_position|default:"None" }}</p>
-                           </div>
-                           <div class="col-md-4 label-value">
-                              <p>Playing Foot: {{ user.playing_foot|default:"None" }}</p>
-                           </div>
-                           <div class="col-md-4 label-value">
-                              <p>Favourite Local Team: {{ user.favourite_local_team|default:"None" }}</p>
-                           </div>
-                           <div class="col-md-4 label-value">
-                              <p>Favourite Team: {{ user.favourite_team|default:"None" }}</p>
-                           </div>
-                           <div class="col-md-4 label-value">
-                              <p>Favourite Local Player: {{ user.favourite_local_player|default:"None" }}</p>
-                           </div>
-                           <div class="col-md-4 label-value">
-                              <p>Favourite Player: {{ user.favourite_player|default:"None" }}</p>
-                           </div>
-                           <!-- Bio on its own line -->
-                           <div class="col-12">
-                              <label>Bio:</label>
-                              <p>{{ user.bio|default:"None" }}</p>
+                           <div class="row g-3">
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-globe"></i> Country
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.country.name|default:"None" }}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-building"></i> City
+                                    </h6>
+                                    <!-- Updated icon -->
+                                    <span>{{ user.city.name|default:"None" }}</span>
+                                 </div>
+                              </div>
                            </div>
                         </div>
                      </div>
-                 
-
-                     <div class="card-header">
-                        <h4 class="card-title mb-0">Stats Information</h4>
-                    </div>
-                     {% if stats %}
-                     
-                     <div class="row">
-                        {% if user.role.id == 2 %} <!-- Player Role -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195"> {{ stats.matchplayed }}</span></h4><span class="f-light">Games Played</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- win -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195"> {{ stats.win }}</span></h4><span class="f-light">Wins</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- loss -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195"> {{ stats.loss }}</span></h4><span class="f-light">Loss</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- draw -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195">{{ stats.draw }}</span></h4><span class="f-light">Draw</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- goals -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195">{{ stats.goals }}</span></h4><span class="f-light">goals</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- assists -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195">{{ stats.assists }}</span></h4><span class="f-light">Assists</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           
-                           <!-- yellow_card -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195">{{ stats.yellow_card }}</span></h4><span class="f-light">yellow card</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- red -->
-
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195">{{ stats.red }}</span></h4><span class="f-light">red cards</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-
-                        {% elif user.role.id == 3 %} <!-- Coach Role -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195"> {{ stats.matchplayed }}</span></h4><span class="f-light">Games Played</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- win -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195"> {{ stats.win }}</span></h4><span class="f-light">Wins</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- loss -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195"> {{ stats.loss }}</span></h4><span class="f-light">Loss</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                           <!-- draw -->
-                           <div class=" col-3 widget-1">
-                              <div class="card-body">
-                              <div class="widget-content">
-                                 <div class="widget-round secondary">
-                                    <div class="bg-round">
-                                    <svg>
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                    </svg>
-                                    <svg class="half-circle svg-fill">
-                                       <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                    </svg>
-                                    </div>
-                                 </div>
-                                 <div> 
-                                    <h4><span class="counter" data-target="45195">{{ stats.draw }}</span></h4><span class="f-light">Draw</span>
-                                 </div>
-                              </div>
-                              
-                              </div>
-                           </div>
-                              <!-- yellow_card -->
-                              <div class=" col-3 widget-1">
-                                 <div class="card-body">
-                                 <div class="widget-content">
-                                    <div class="widget-round secondary">
-                                       <div class="bg-round">
-                                       <svg>
-                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                       </svg>
-                                       <svg class="half-circle svg-fill">
-                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                       </svg>
-                                       </div>
-                                    </div>
-                                    <div> 
-                                       <h4><span class="counter" data-target="45195">{{ stats.yellow_card }}</span></h4><span class="f-light">yellow card</span>
-                                    </div>
-                                 </div>
-                                 
-                                 </div>
-                              </div>
-                              <!-- red -->
-   
-                              <div class=" col-3 widget-1">
-                                 <div class="card-body">
-                                 <div class="widget-content">
-                                    <div class="widget-round secondary">
-                                       <div class="bg-round">
-                                       <svg>
-                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                       </svg>
-                                       <svg class="half-circle svg-fill">
-                                          <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                       </svg>
-                                       </div>
-                                    </div>
-                                    <div> 
-                                       <h4><span class="counter" data-target="45195">{{ stats.red }}</span></h4><span class="f-light">red cards</span>
-                                    </div>
-                                 </div>
-                                 
-                                 </div>
-                              </div>
-                              {% elif user.role.id == 4 %}
-                                    <div class=" col-3 widget-1">
-                                       <div class="card-body">
-                                       <div class="widget-content">
-                                          <div class="widget-round secondary">
-                                             <div class="bg-round">
-                                             <svg>
-                                                <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                             </svg>
-                                             <svg class="half-circle svg-fill">
-                                                <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                             </svg>
-                                             </div>
-                                          </div>
-                                          <div> 
-                                             <h4><span class="counter" data-target="45195"> {{ stats.matchplayed }}</span></h4><span class="f-light">Games Officiated</span>
-                                          </div>
-                                       </div>
-                                       
-                                       </div>
-                                    </div>
-                                    <!-- yellow_card -->
-                                 <div class=" col-3 widget-1">
-                                    <div class="card-body">
-                                    <div class="widget-content">
-                                       <div class="widget-round secondary">
-                                          <div class="bg-round">
-                                          <svg>
-                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                          </svg>
-                                          <svg class="half-circle svg-fill">
-                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                          </svg>
-                                          </div>
-                                       </div>
-                                       <div> 
-                                          <h4><span class="counter" data-target="45195">{{ stats.yellow_card }}</span></h4><span class="f-light">yellow card</span>
-                                       </div>
-                                    </div>
-                                    
-                                    </div>
-                                 </div>
-                                 <!-- red -->
-
-                                 <div class=" col-3 widget-1">
-                                    <div class="card-body">
-                                    <div class="widget-content">
-                                       <div class="widget-round secondary">
-                                          <div class="bg-round">
-                                          <svg>
-                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#c-revenue"> </use>
-                                          </svg>
-                                          <svg class="half-circle svg-fill">
-                                             <use href="/cuba/cubaapp/static/assets/svg/icon-sprite.svg#halfcircle"></use>
-                                          </svg>
-                                          </div>
-                                       </div>
-                                       <div> 
-                                          <h4><span class="counter" data-target="45195">{{ stats.red }}</span></h4><span class="f-light">red cards</span>
-                                       </div>
-                                    </div>
-                                    
-                                    </div>
-                                 </div>
-                                 
-                        {% endif %}
-                        </div>
-                    {% else %}
-                        <p>No statistics available.</p>
-                    {% endif %}
-
+                  </div>
+                  <hr>
                </div>
+               <div class="card-header">
+                  <h4 class="card-title mb-0">Additional Information</h4>
+               </div>
+               <div class="card-body">
+                  <div class="info">
+                     <div class="row g-3">
+                        <!-- Left Column -->
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-balance-scale"></i> Weight
+                                 <!-- FA4 equivalent for weight -->
+                              </h6>
+                              <span>{{ user.weight|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-arrows-v"></i> Height
+                                 <!-- FA4 equivalent for height -->
+                              </h6>
+                              <span>{{ user.height|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-soccer-ball-o"></i> Main Playing Position
+                                 <!-- FA4 equivalent -->
+                              </h6>
+                              <span>{{ user.main_playing_position|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-soccer-ball-o"></i> Secondary Playing Position
+                                 <!-- FA4 equivalent -->
+                              </h6>
+                              <span>{{ user.secondary_playing_position|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-chevron-circle-right"></i> Playing Foot
+                                 <!-- FA4 equivalent -->
+                              </h6>
+                              <span>{{ user.playing_foot|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-home"></i> Favourite Local Team
+                              </h6>
+                              <span>{{ user.favourite_local_team|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-users"></i> Favourite Team
+                              </h6>
+                              <span>{{ user.favourite_team|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-user"></i> Favourite Local Player
+                              </h6>
+                              <span>{{ user.favourite_local_player|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-4">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-user"></i> Favourite Player
+                              </h6>
+                              <span>{{ user.favourite_player|default:"None" }}</span>
+                           </div>
+                        </div>
+                        <div class="col-md-6">
+                           <div class="ttl-info text-start">
+                              <h6>
+                                 <i class="fa fa-comment"></i> Bio
+                              </h6>
+                              <span>{{ user.bio|default:"None" }}</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <hr>
+               </div>
+               {% if user.role.id == 2 or user.role.id == 3 or user.role.id == 4 %}
+               <div class="card-header">
+                     <h4 class="card-title mb-0">Stats Information</h4>
+                  </div> 
+                  {% if stats %} 
+                  <div class="row"> 
+                     {% if user.role.id == 2 %}
+                     <!-- Player Role -->
+                     <!-- Games Played -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-futbol-o"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.matchplayed }}</span>
+                                 </h4>
+                                 <span class="f-light">Games Played</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Wins -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-trophy"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.win }}</span>
+                                 </h4>
+                                 <span class="f-light">Wins</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Losses -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-times-circle"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.loss }}</span>
+                                 </h4>
+                                 <span class="f-light">Losses</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Draws -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-handshake-o"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.draw }}</span>
+                                 </h4>
+                                 <span class="f-light">Draws</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Goals -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-soccer-ball-o"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.goals }}</span>
+                                 </h4>
+                                 <span class="f-light">Goals</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Assists -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-forward"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.assists }}</span>
+                                 </h4>
+                                 <span class="f-light">Assists</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Yellow Cards -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-square yellow"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.yellow_card }}</span>
+                                 </h4>
+                                 <span class="f-light">Yellow Cards</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Red Cards -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-square red"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.red }}</span>
+                                 </h4>
+                                 <span class="f-light">Red Cards</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div> {% elif user.role.id == 3 %}
+                     <!-- Coach Role -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-user"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.matchplayed }}</span>
+                                 </h4>
+                                 <span class="f-light">Games Coached</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Wins -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-trophy"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.win }}</span>
+                                 </h4>
+                                 <span class="f-light">Wins</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Losses -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-times-circle"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.loss }}</span>
+                                 </h4>
+                                 <span class="f-light">Losses</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div> {% elif user.role.id == 4 %}
+                     <!-- Referee Role -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-whistle"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.matchplayed }}</span>
+                                 </h4>
+                                 <span class="f-light">Games Officiated</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Yellow Cards -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-square yellow"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.yellow_card }}</span>
+                                 </h4>
+                                 <span class="f-light">Yellow Cards Given</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Red Cards -->
+                     <div class="col-3 widget-1">
+                        <div class="card-body">
+                           <div class="widget-content">
+                              <div class="widget-round">
+                                 <div class="bg-round">
+                                    <i class="fa fa-square red"></i>
+                                 </div>
+                              </div>
+                              <div>
+                                 <h4>
+                                    <span class="counter">{{ stats.red }}</span>
+                                 </h4>
+                                 <span class="f-light">Red Cards Given</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div> {% endif %}
+                  </div> 
+                  {% else %}
+                  <p>No statistics available.</p>
+                  {% endif %}
+               {% endif %}
             </div>
          </div>
-         </div>
-
-        
-         <!-- Datatable Section -->
-         <div class="row">
-            <div class="col-sm-12">
-               <div class="card">
-                  <div class="card-body">
-                     <!-- Add tab navigation -->
-                     <ul class="nav nav-tabs" id="dataTab" role="tablist">
-                        <li class="nav-item">
-                           <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
-                        </li>
-                        <li class="nav-item">
-                           <a class="nav-link" id="participated_event-tab" data-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
-                        </li>
-                        <li class="nav-item">
-                           <a class="nav-link" id="team-tab" data-toggle="tab" href="#team" role="tab" aria-controls="team" aria-selected="false">Team</a>
-                        </li>
-                     </ul>
-   
-                     <div class="tab-content" id="dataTabContent">
-                        <!-- Post Tab  -->
-                        <div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
-                           <div class="table-responsive">
-                              <table class="display" id="post-table">
-                                 <thead>
-                                    <tr>
-                                       <th>No</th>
-                                       <th>Post Title</th>
-                                       <th>Description</th>
-                                       <th>Image</th>
-                                       <th>date created</th>
-                                    </tr>
-                                 </thead>
-                                 <tbody>
-                                    {% for post in posts %}
-                                    <tr>
-                                       <td>{{ forloop.counter }}</td>
-                                       <td>{{ post.title }}</td>
-                                       <td>
-                                          {% if post.creator_type == post.USER_TYPE %}
-                                              {{ post.description }}
-                                          {% else %}
-                                             invalid
-                                          {% endif %}
-                                       </td>
-                                       <td>
-                                          {% if post.media_type == 1 %}
-                                              {% if post.image %}
-                                                  <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="100">
-                                              {% else %}
-                                                  No Image
-                                              {% endif %}
-                                          {% elif post.media_type == 2 %}
-                                              {% if post.image %}
-                                                  <video width="200" height="100" controls>
-                                                      <source src="{{ post.image.url }}" type="video/mp4">
-                                                      Your browser does not support the video tag.
-                                                  </video>
-                                              {% else %}
-                                                  No Video
-                                              {% endif %}
-                                          {% else %}
-                                              No Media
-                                          {% endif %}
-                                      </td>                                      
-                                       <td>{{ post.date_created|date:"d-M-Y" }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                 </tbody>
-                              </table>
-                           </div>
-                        </div>
-   
-                        <!--Participated Event Tab  -->
-                        <div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
-                           <div class="table-responsive">
-                              <table class="display" id="participated_event-table">
-                                 <thead>
-                                    <tr>
-                                       <th>No</th>
-                                       <th>Event Name</th>
-                                       <th>Event Type</th>
-                                       <th>No of Tickets</th>
-                                       <th>Total Paid</th>
-                                       <th>Booking Date</th>
-                                       <th>Event Date</th>
-                                    </tr>
-                                 </thead>
-                                 <tbody>
-                                    {% for event_booking in events_bookings %}
-                                    <tr>
-                                       <td>{{ forloop.counter }}</td>
-                                       <td>{{ event_booking.event.event_name }}</td>
-                                       <td>{{ event_booking.event.event_type }}</td>
-                                       <td>{{ event_booking.ticket_amount|floatformat:0 }}</td>
-                                       <td>{{ event_booking.total_amount }}</td>
-                                       <td>{{ event_booking.created_at|date:"d-M-Y" }}</td>
-                                       <td>{{ event_booking.event.event_date|date:"d-M-Y" }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                 </tbody>
-                              </table>
-                           </div>
-                        </div>
-                        
-                        <!-- Team Tab  -->
-                        <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
-                           <div class="table-responsive">
-                              <table class="display" id="team-table">
-                                 <thead>
-                                    <tr>
-                                       <th>No</th>
-                                       <th>Team Name</th>
-                                       <th>Age</th>
-                                       <th>Joining Type</th>
-                                       <th>Joining Date</th>
-                                    </tr>
-                                 </thead>
-                                 <tbody>
-                                    {% for teams in teams %}
-                                    <tr> 
-                                       <td>{{ forloop.counter }}</td>
-                                       <td>{{ teams.branch_id.team_name }}</td>
-                                       <td>{{ teams.branch_id.age_group_id }}</td>
-                                       <td>{{ teams.joinning_type }}</td>
-                                       <td>{{ teams.created_at }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                 </tbody>
-                              </table>
-                           </div>
-                        </div>
-
-
+      </div>
+   </div>
+   <!-- Datatable Section -->
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="card">
+            <div class="card-body">
+               <!-- Add tab navigation -->
+               <ul class="nav nav-tabs" id="dataTab" role="tablist">
+                  <li class="nav-item">
+                     <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" id="participated_event-tab" data-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" id="team-tab" data-toggle="tab" href="#team" role="tab" aria-controls="team" aria-selected="false">Team</a>
+                  </li>
+               </ul>
+               <div class="tab-content" id="dataTabContent">
+                  <!-- Post Tab  -->
+                  <div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
+                     <div class="table-responsive">
+                        <table class="display" id="post-table">
+                           <thead>
+                              <tr>
+                                 <th>No</th>
+                                 <th>Post Title</th>
+                                 <th>Description</th>
+                                 <th>Image</th>
+                                 <th>date created</th>
+                              </tr>
+                           </thead>
+                           <tbody> {% for post in posts %} <tr>
+                                 <td>{{ forloop.counter }}</td>
+                                 <td>{{ post.title }}</td>
+                                 <td> {% if post.creator_type == post.USER_TYPE %} {{ post.description }} {% else %} invalid {% endif %} </td>
+                                 <td> {% if post.media_type == 1 %} {% if post.image %} <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="100"> {% else %} No Image {% endif %} {% elif post.media_type == 2 %} {% if post.image %} <video width="200" height="100" controls>
+                                       <source src="{{ post.image.url }}" type="video/mp4"> Your browser does not support the video tag.
+                                    </video> {% else %} No Video {% endif %} {% else %} No Media {% endif %} </td>
+                                 <td>{{ post.date_created|date:"d-M-Y" }}</td>
+                              </tr> {% endfor %} </tbody>
+                        </table>
+                     </div>
+                  </div>
+                  <!--Participated Event Tab  -->
+                  <div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
+                     <div class="table-responsive">
+                        <table class="display" id="participated_event-table">
+                           <thead>
+                              <tr>
+                                 <th>No</th>
+                                 <th>Event Name</th>
+                                 <th>Event Type</th>
+                                 <th>No of Tickets</th>
+                                 <th>Total Paid</th>
+                                 <th>Booking Date</th>
+                                 <th>Event Date</th>
+                              </tr>
+                           </thead>
+                           <tbody> {% for event_booking in events_bookings %} <tr>
+                                 <td>{{ forloop.counter }}</td>
+                                 <td>{{ event_booking.event.event_name }}</td>
+                                 <td>{{ event_booking.event.event_type }}</td>
+                                 <td>{{ event_booking.ticket_amount|floatformat:0 }}</td>
+                                 <td>{{ event_booking.total_amount }}</td>
+                                 <td>{{ event_booking.created_at|date:"d-M-Y" }}</td>
+                                 <td>{{ event_booking.event.event_date|date:"d-M-Y" }}</td>
+                              </tr> {% endfor %} </tbody>
+                        </table>
+                     </div>
+                  </div>
+                  <!-- Team Tab  -->
+                  <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+                     <div class="table-responsive">
+                        <table class="display" id="team-table">
+                           <thead>
+                              <tr>
+                                 <th>No</th>
+                                 <th>Team Name</th>
+                                 <th>Age</th>
+                                 <th>Joining Type</th>
+                                 <th>Joining Date</th>
+                              </tr>
+                           </thead>
+                           <tbody> {% for teams in teams %} <tr>
+                                 <td>{{ forloop.counter }}</td>
+                                 <td>{{ teams.branch_id.team_name }}</td>
+                                 <td>{{ teams.branch_id.age_group_id }}</td>
+                                 <td>{{ teams.get_joinning_type_display }}</td>
+                                 <td>{{ teams.created_at }}</td>
+                              </tr> {% endfor %} </tbody>
+                        </table>
                      </div>
                   </div>
                </div>
             </div>
          </div>
-         </div>
-         
-    
-  
-{% endblock %}
-
-{% block scriptcontent %}
+      </div>
+   </div>
+</div> {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
@@ -725,28 +629,22 @@
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <!-- Plugins JS Ends-->
-
 <script>
-$(document).ready(function() {
-   // Initialize datatables for both tables
-   $('#post-table').DataTable();
-   $('#participated_event-table').DataTable();
-   $('#team-table').DataTable();
-
-   // Adjust DataTables when tabs are switched
-   $('#dataTab a').on('shown.bs.tab', function (e) {
-      var target = $(e.target).attr("href"); 
-      if (target === "#post") {
-         $('#post-table').DataTable().columns.adjust().draw(); 
-      } 
-      else if (target === "#participated_event") {
-         $('#participated_event-table').DataTable().columns.adjust().draw(); 
-      }
-      else if (target === "#team") {
-         $('#team-table').DataTable().columns.adjust().draw(); 
-      }
+   $(document).ready(function() {
+      // Initialize datatables for both tables
+      $('#post-table').DataTable();
+      $('#participated_event-table').DataTable();
+      $('#team-table').DataTable();
+      // Adjust DataTables when tabs are switched
+      $('#dataTab a').on('shown.bs.tab', function(e) {
+         var target = $(e.target).attr("href");
+         if (target === "#post") {
+            $('#post-table').DataTable().columns.adjust().draw();
+         } else if (target === "#participated_event") {
+            $('#participated_event-table').DataTable().columns.adjust().draw();
+         } else if (target === "#team") {
+            $('#team-table').DataTable().columns.adjust().draw();
+         }
+      });
    });
-});
-</script>
-
-{% endblock %}
+</script> {% endblock %}

@@ -6,8 +6,11 @@
 {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- DataTables CSS (loaded locally) -->
+<link rel="stylesheet" href="{% static 'assets/css/datatables/jquery.dataTables.min.css' %}">
 <!-- Plugins css Ends-->
 {% endblock %}
+
 <style>
    .is-invalid {
       border-color: #dc3545;
@@ -56,7 +59,6 @@ User Role Apply Management
                                     <th>Full Name</th>
                                     <th>Profile Type Applied</th>
                                     <th>Date</th>
-                                    <th>Certificate</th>
                                     <th>Actions</th>
                                  </tr>
                               </thead>
@@ -66,30 +68,14 @@ User Role Apply Management
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ user.first_name }} {{ user.last_name }}</td>
                                     <td>Coach</td>
-                                    <td>{{ user.created_at|date:"Y-m-d H:i" }}</td>
-                                    <td>{{ user.coach_certificate }}</td>
+                                    <td>{{ user.updated_at|date:"Y-m-d H:i" }}</td>
                                     <td>
-                                       <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                          <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                             <i data-feather="more-vertical"></i>
-                                          </a>
-                                          <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                             <ul style="list-style: none; padding: 0; margin: 0;">
-                                                <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                    <a href="#" class="view-user-btn" 
-                                                        data-user-id="{{ user.id }}" 
-                                                        data-user-fullname="{{ user.first_name }} {{ user.last_name }}" 
-                                                        data-user-coach-certificate="{{ user.coach_certificate }}" 
-                                                        data-user-role="Coach" 
-                                                        data-user-date="{{ user.created_at|date:'Y-m-d H:i' }}"> 
-                                                        View 
-                                                    </a>
-                                                 
-                                                </li>
-                                             </ul>
-                                          </div>
-                                       </div>
-                                    </td>
+                                        <form action="{% url 'user_role_action'%}" method="get">
+                                           <!-- {% csrf_token %} -->
+                                           <input type="hidden" name="user_id" value="{{ user.id }}">
+                                           <button type="submit" class="btn btn-info">View</button>
+                                        </form>
+                                     </td>                                     
                                  </tr>
                                  {% endfor %}
                               </tbody>
@@ -106,7 +92,6 @@ User Role Apply Management
                                     <th>Full Name</th>
                                     <th>Profile Type Applied</th>
                                     <th>Date</th>
-                                    <th>Certificate</th>
                                     <th>Actions</th>
                                  </tr>
                               </thead>
@@ -116,31 +101,14 @@ User Role Apply Management
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ user.first_name }} {{ user.last_name }}</td>
                                     <td>Referee</td>
-                                    <td>{{ user.created_at|date:"Y-m-d H:i" }}</td>
-                                    <td>{{ user.referee_certificate }}</td>
+                                    <td>{{ user.updated_at|date:"Y-m-d H:i" }}</td>
                                     <td>
-                                       <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                          <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                             <i data-feather="more-vertical"></i>
-                                          </a>
-                                          <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                             <ul style="list-style: none; padding: 0; margin: 0;">
-                                                <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                    <a href="#" class="view-user-btn" 
-                                                    data-user-id="{{ user.id }}" 
-                                                    data-user-fullname="{{ user.first_name }} {{ user.last_name }}" 
-                                                    data-user-referee-certificate="{{ user.referee_certificate }}" 
-                                                    data-user-role="Referee" 
-                                                    data-user-date="{{ user.created_at|date:'Y-m-d H:i' }}"> 
-                                                    View 
-                                                 </a>
-                                                 
-
-                                                </li>
-                                             </ul>
-                                          </div>
-                                       </div>
-                                    </td>
+                                        <form action="{% url 'user_role_action'%}" method="get">
+                                           <!-- {% csrf_token %} -->
+                                           <input type="hidden" name="user_id" value="{{ user.id }}">
+                                           <button type="submit" class="btn btn-info">View</button>
+                                        </form>
+                                    </td>                                     
                                  </tr>
                                  {% endfor %}
                               </tbody>
@@ -154,44 +122,6 @@ User Role Apply Management
       </div>
    </div>
 </div>
-
-<!-- View User Modal -->
-<div class="modal fade bd-example-modal-lg" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content shadow-lg border-0 rounded">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="viewUserModalLabel">User Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Full Name:</label>
-                        <span id="userFullname"></span>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Certificate:</label>
-                        <span id="userCertificate"></span>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Applied Role:</label>
-                        <span id="userRole"></span>
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Date Applied:</label>
-                        <span id="userDate"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="approveButton">Approve</button>
-                <button type="button" class="btn btn-danger" id="rejectButton">Reject</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block script %}
@@ -215,158 +145,6 @@ $(document).ready(function() {
         "ordering": true
     });
 });
-
-// View User Modal
-document.querySelectorAll('.view-user-btn').forEach(function(button) {
-    button.addEventListener('click', function() {
-        // Fetch the user data from the data attributes
-        const userId = this.getAttribute('data-user-id');
-        const fullname = this.getAttribute('data-user-fullname');
-        const certificate = this.getAttribute('data-user-coach-certificate') || this.getAttribute('data-user-referee-certificate');
-        const role = this.getAttribute('data-user-role');
-        const date = this.getAttribute('data-user-date');
-
-        // Populate the modal with the user data
-        document.getElementById('userFullname').textContent = fullname;
-        document.getElementById('userCertificate').textContent = certificate;
-        document.getElementById('userRole').textContent = role;
-        document.getElementById('userDate').textContent = date;
-
-        // Set the user ID for the approve and reject buttons
-        document.getElementById('approveButton').setAttribute('data-user-id', userId);
-        document.getElementById('rejectButton').setAttribute('data-user-id', userId);
-
-        // Show the modal
-        const viewUserModal = new bootstrap.Modal(document.getElementById('viewUserModal'));
-        viewUserModal.show();
-    });
-});
-// Approve user action
-document.getElementById('approveButton')?.addEventListener('click', function() {
-    const userId = this.getAttribute('data-user-id');
-    const action = 'approve';
-
-    // Send AJAX request to approve
-    fetch("{% url 'user_apply_list' %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({ action: action, user_id: userId }) // Send as JSON
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('User Approved!');
-            location.reload(); // Reload the page to see changes
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-
-// Reject user action
-document.getElementById('rejectButton')?.addEventListener('click', function() {
-    const userId = this.getAttribute('data-user-id');
-    const action = 'reject';
-
-    // Send AJAX request to reject
-    fetch("{% url 'user_apply_list' %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({ action: action, user_id: userId }) // Send as JSON
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('User Rejected!');
-            location.reload(); // Reload the page to see changes
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-// Toggle the visibility of the action card
-document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-    menu.addEventListener('click', function(event) {
-        event.preventDefault();
-        var actionCard = menu.nextElementSibling;
-        actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-        // Close other open action cards
-        document.querySelectorAll('.action-card').forEach(function(card) {
-            if (card !== actionCard) {
-                card.style.display = 'none';
-            }
-        });
-    });
-});
-
-// Hide action card if clicking outside
-document.addEventListener('click', function(event) {
-    var isClickInside = event.target.closest('.action-menu-container');
-    if (!isClickInside) {
-        document.querySelectorAll('.action-card').forEach(function(card) {
-            card.style.display = 'none';
-        });
-    }
-});
 </script>
-<!-- <script>
-    // Approve user
-    document.querySelectorAll('.approve-btn').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-            const userId = this.getAttribute('data-user-id');
-            const action = 'approve';
-
-            // Send AJAX request
-            fetch("{% url 'user_apply_list' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({ action: action, user_id: userId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('User Approved!');
-                    location.reload(); // Reload the page to see changes
-                }
-            });
-        });
-    });
-
-    // Reject user
-    document.querySelectorAll('.reject-btn').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-            const userId = this.getAttribute('data-user-id');
-            const action = 'reject';
-
-            // Send AJAX request
-            fetch("{% url 'user_apply_list' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({ action: action, user_id: userId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('User Rejected!');
-                    location.reload(); // Reload the page to see changes
-                }
-            });
-        });
-    });
-</script> -->
 
 {% endblock %}

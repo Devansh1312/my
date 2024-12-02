@@ -285,7 +285,9 @@ urlpatterns = [
 
 
     ################# User Apply role list ##################
-    path('user_apply_list/',UserRoleAppliedListView.as_view(),name='user_apply_list'),
+    path('user/role/apply/', UserRoleAppliedListView.as_view(), name='user_apply_list'),
+    path('user/role/action/', UserRoleActionView.as_view(), name='user_role_action'),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   
