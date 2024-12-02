@@ -18,10 +18,8 @@ urlpatterns = [
     #Login URL
     path('adminlogin/', LoginFormView,name="adminlogin"),
 
-
     #Dashboard URL
     path('Dashboard/', Dashboard.as_view(),name="Dashboard"),
-
 
     #Logout URL
     path('logout/', logout_view, name='logout'),  # Add the logout path here
@@ -33,7 +31,6 @@ urlpatterns = [
     #System Settings Page
     path('System-Settings/', System_Settings.as_view(),name="System_Settings"),
 
-
     #User List URL
     path('players/', PlayerListView.as_view(), name='player_list'),
     path('coach/', CoachListView.as_view(), name='coach_list'),
@@ -42,19 +39,14 @@ urlpatterns = [
     path('user/', UserDetailView.as_view(), name='user_detail'),
 
 
-
-
     # path('users/<int:user_id>/edit/', UserEditView.as_view(), name='user_edit'),
     # path('users/<int:user_id>/update/', UserEditView.as_view(), name='user_update'),
     # path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user_delete'),
     path('user/<int:pk>/toggle-status/', ToggleUserStatusView.as_view(), name='user_toggle_status'),
 
-
     #User Profile
     path('user_profile/',UserProfileView.as_view(),name='user_profile'),
     path('edit_profile/', UserUpdateProfileView.as_view(), name='edit_profile'),
-
-
     
     #User Role URL
     path('roles/', RoleListView.as_view(), name='role_list'),
@@ -68,13 +60,11 @@ urlpatterns = [
     path('agegroup/update/<int:pk>/', AgeGroupUpdateView.as_view(), name='agegroup_update'),
     path('agegroup/delete/<int:pk>/', AgeGroupDeleteView.as_view(), name='agegroup_delete'),
 
-    
     #Category List URL
     path('categories/', CategoryListView.as_view(), name='category_list'),
     path('categories/create/', CategoryCreateView.as_view(), name='category_create'),
     path('categories/update/<int:pk>/', CategoryUpdateView.as_view(), name='category_update'),
     path('categories/delete/<int:pk>/', CategoryDeleteView.as_view(), name='category_delete'),
-
 
     # #Gender Role URL
     # path('gender/', GenderListView.as_view(), name='gender_list'),
@@ -159,7 +149,6 @@ urlpatterns = [
     path('cms-dashboardpage/',cms_dashboard.as_view(),name="cms_dashboard"),
     path('cms_dashboarddetail/',savedashdetail,name="savedashdetail"),
 
-
     #cms home page
     path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
     path('savehomepage/',savehomedetail,name="savehomepage"),
@@ -235,7 +224,6 @@ urlpatterns = [
     path('team_lists/', TeamListView.as_view(), name='team_list'),
     path('team_details/', TeamDetailView.as_view(), name='team_detail'),
     path('branch_details/', BranchDetailView.as_view(), name='branch_detail'),
-
     
     #User injury type URL
     path('injurytype/', InjuryTypeListView.as_view(), name='injurytype_list'),
@@ -256,7 +244,6 @@ urlpatterns = [
     path('accountdeletereason/delete/<int:pk>/', AccountDeleteReasonDeleteView.as_view(), name='accountdeletereason_delete'),
 
 
-
     #Playing Position URLS's
     path('playing_positions/', PlayingPositionListView.as_view(), name='playing_position_list'),
     path('playing_positions/create/', PlayingPositionCreateView.as_view(), name='playing_position_create'),
@@ -273,7 +260,6 @@ urlpatterns = [
     path('friendly-games-list/', FriendlyGamesListView.as_view(), name='friendly_games_list'),
     path('api/friendly-games/<int:game_id>/assign-user/', AssignUserToFriendlyGameView.as_view(), name='assign_user_to_friendly_game'),
 
-
     ################## Tournament Game States Add URLS ############################
     path('games/', TournamentGameStatsView.as_view(), name='games_list'),
     path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
@@ -283,11 +269,8 @@ urlpatterns = [
     path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
     path('friendly-games/edit/<int:game_id>/', FriendlyGameEditStatsView.as_view(), name='friendlygame_edit_game_stats'),
 
-
     ################# User Apply role list ##################
     path('user/role/apply/', UserRoleAppliedListView.as_view(), name='user_apply_list'),
     path('user/role/action/', UserRoleActionView.as_view(), name='user_role_action'),
-
-
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   

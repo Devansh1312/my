@@ -197,7 +197,6 @@ class Dashboard(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         # Count of users based on role
         user_counts = User.objects.values('role_id').annotate(count=Count('id'))
-        print(user_counts)  # Debugging print statement to check the output
         user_count_by_role = {user['role_id']: user['count'] for user in user_counts}
 
         # Counts for each model
@@ -848,7 +847,6 @@ class UserDetailView(LoginRequiredMixin, View):
     def get(self, request):
         user_id = request.GET.get('user_id') 
     
-        print(f"User ID: {user_id}")  # Debug line
         if not user_id:
             return redirect('Dashboard') 
         try:
@@ -858,7 +856,7 @@ class UserDetailView(LoginRequiredMixin, View):
             title = request.GET.get("title")
             role = user.role_id  
 
-            print(stats)
+           
 
 
             return render(
@@ -891,7 +889,7 @@ class UserDetailView(LoginRequiredMixin, View):
             source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id  
-            print(stats)
+           
 
             return render(
                 request,
@@ -5277,7 +5275,7 @@ class cms_Login(LoginRequiredMixin, View):
 def savelogindetail(request):
         try:
             if request.method == "POST":
-                print("hello")
+                
                 #text
                 heading_title_en  = request.POST.get('login-title-en')
                 heading_title_ar  = request.POST.get('login-title-ar')
@@ -5347,7 +5345,7 @@ class cms_registration(LoginRequiredMixin, View):
 def saveregdetail(request):
         try:
             if request.method == "POST":
-                print("hello")
+                
                 #text
                 heading_title_en  = request.POST.get('reg-title-en')
                 heading_title_ar  = request.POST.get('reg-title-ar')
@@ -5417,7 +5415,6 @@ class cms_dashboard(LoginRequiredMixin, View):
 def savedashdetail(request):
         try:
             if request.method == "POST":
-                print("hello")
                 #text
                 heading_en  = request.POST.get('dash-title-en')
                 heading_ar  = request.POST.get('dash-title-ar')
@@ -5672,7 +5669,6 @@ class PostReportListView(LoginRequiredMixin, View):
 class PostReportDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         report = get_object_or_404(PostReport, pk=pk)
-        print(pk)
         post = report.post_id
         
         post.delete()

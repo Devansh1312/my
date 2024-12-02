@@ -62,7 +62,8 @@ class TeamSerializer(serializers.ModelSerializer):
             {
                 'id': branch.id,
                 'team_name': branch.team_name,
-                'age_group': branch.age_group_id.name_ar if language == 'ar' else branch.age_group_id.name_en if branch.age_group_id else None,
+                'age_group_id': branch.age_group_id.id,
+                'age_group_name': branch.age_group_id.name_ar if language == 'ar' else branch.age_group_id.name_en if branch.age_group_id else None,
                 'gender': branch.gender.id if branch.gender else None,
                 'gender_name': branch.gender.name_ar if language == 'ar' else branch.gender.name_en if branch.gender else None,
                 'upload_image': branch.upload_image.url if branch.upload_image else None,
