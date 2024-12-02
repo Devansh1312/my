@@ -260,14 +260,24 @@ urlpatterns = [
     path('friendly-games-list/', FriendlyGamesListView.as_view(), name='friendly_games_list'),
     path('api/friendly-games/<int:game_id>/assign-user/', AssignUserToFriendlyGameView.as_view(), name='assign_user_to_friendly_game'),
 
-    ################## Tournament Game States Add URLS ############################
+  
+  ################## Tournament Game States Add URLS ############################
     path('games/', TournamentGameStatsView.as_view(), name='games_list'),
-    path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
+    # path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
+    path('tournament-games/<int:pk>/update-stats/', UpdateGameStatsView.as_view(), name='update_game_stats'),
+    path('tournament-games/<int:game_id>/details/', TournamentGameDetailView.as_view(), name='game_detail'),
+
+
 
     ################## Friendly Game States Add URLS ############################
   
     path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
     path('friendly-games/edit/<int:game_id>/', FriendlyGameEditStatsView.as_view(), name='friendlygame_edit_game_stats'),
+
+    path('friendly-games/<int:game_id>/details/', FriendlyGameDetailView.as_view(), name='friendly_game_detail'),
+
+
+
 
     ################# User Apply role list ##################
     path('user/role/apply/', UserRoleAppliedListView.as_view(), name='user_apply_list'),

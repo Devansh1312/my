@@ -6329,6 +6329,50 @@ class TournamentGamesListView(LoginRequiredMixin, View):
             },
         )
 
+@method_decorator(user_role_check, name='dispatch')
+class UpdateGameStatsView(View):
+
+    def post(self, request, *args, **kwargs):
+        team = request.POST.get('team')
+        changes = json.loads(request.POST.get('changes', '{}'))  # Parse JSON string
+
+        pk = kwargs.get('pk')  # Get the primary key (ID) of the game
+        game = get_object_or_404(TournamentGames, pk=pk)
+
+        # Check if 'changes' is a valid dictionary
+        if not isinstance(changes, dict):
+            return JsonResponse({"success": False, "error": "Invalid changes format."})
+
+        # Define valid fields based on the model
+        valid_fields = [field.name for field in TournamentGames._meta.get_fields()]
+
+        # Process the changes
+        for field_name, new_value in changes.items():
+            if field_name not in valid_fields:
+                return JsonResponse({"success": False, "error": f"Invalid field name: {field_name}"})
+            
+            # Update the game object with the new value
+            setattr(game, field_name, new_value)
+
+        # Save the game object with updated stats
+        try:
+            game.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+        
+    def get(self, request, pk):
+        game = get_object_or_404(TournamentGames, pk=pk)
+        
+        # Create a dictionary to hold the form fields and their values
+        game_data = {}
+
+        for field in TournamentGameForm().fields:
+            game_data[field] = getattr(game, field, None)
+
+        return JsonResponse(game_data)
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AssignUserToGameView(LoginRequiredMixin, View):
     def post(self, request, game_id):
@@ -6671,3 +6715,93 @@ class UserRoleActionView(LoginRequiredMixin, View):
         except User.DoesNotExist:
             messages.error(request, 'User not found.')
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+
+
+
+
+########################## Game Detail ############################
+@method_decorator(user_role_check, name='dispatch')
+class TournamentGameDetailView(LoginRequiredMixin, View):
+  
+    def get(self, request, game_id):
+        game = get_object_or_404(TournamentGames, id=game_id)
+        
+        # Get lineups for both teams
+        team_a_lineup = Lineup.objects.filter(game_id=game, team_id=game.team_a).order_by('lineup_status')
+        team_b_lineup = Lineup.objects.filter(game_id=game, team_id=game.team_b).order_by('lineup_status')
+        
+        # Get officials for the game
+        game_officials = GameOfficials.objects.filter(game_id=game)
+        
+        # Prepare a list of officials with their data (name, profile picture, type)
+        officials_data = []
+        for official in game_officials:
+            official_user = official.official_id
+            official_type = official.officials_type_id
+
+            print(official.official_id.profile_picture.url)
+            
+            officials_data.append({
+                'fullname': f"{official_user.first_name} {official_user.last_name}",
+                'username': f"{official_user.username}",
+
+                'profile_picture': official_user.profile_picture.url if official_user.profile_picture else None,
+                'official_type': official_type.name_en  # Assuming you want the English name
+            })
+        
+        context = {
+            "game": game,
+            "breadcrumb": {
+                "parent": "Tournament Games",
+                "child": f"Game {game.game_number} Details"
+            },
+            "team_a_lineup": team_a_lineup,
+            "team_b_lineup": team_b_lineup,
+            "officials_data": officials_data,
+        }
+        
+        return render(request, "Admin/Games/game_detail.html", context)
+
+################################# friendly game detail #######################################
+@method_decorator(user_role_check, name='dispatch')
+class FriendlyGameDetailView(LoginRequiredMixin, View):
+  
+    def get(self, request, game_id):
+        game = get_object_or_404(FriendlyGame, id=game_id)
+        
+        # Get lineups for both teams
+        team_a_lineup = FriendlyGameLineup.objects.filter(game_id=game, team_id=game.team_a).order_by('lineup_status')
+        team_b_lineup = FriendlyGameLineup.objects.filter(game_id=game, team_id=game.team_b).order_by('lineup_status')
+        
+        # Get officials for the game
+        game_officials = FriendlyGameGameOfficials.objects.filter(game_id=game)
+        
+        # Prepare a list of officials with their data (name, profile picture, type)
+        officials_data = []
+        for official in game_officials:
+            official_user = official.official_id
+            official_type = official.officials_type_id
+
+            
+            
+            officials_data.append({
+                'fullname': f"{official_user.first_name} {official_user.last_name}",
+                'username': f"{official_user.username}",
+
+                'profile_picture': official_user.profile_picture.url if official_user.profile_picture else None,
+                'official_type': official_type.name_en  # Assuming you want the English name
+            })
+        
+        context = {
+            "game": game,
+            "breadcrumb": {
+                "parent": "Friendly Games",
+                "child": f"Game {game.game_number} Details"
+            },
+            "team_a_lineup": team_a_lineup,
+            "team_b_lineup": team_b_lineup,
+            "officials_data": officials_data,
+        }
+        
+        return render(request, "Admin/Friendly_Games/friendly_game_detail.html", context)
+

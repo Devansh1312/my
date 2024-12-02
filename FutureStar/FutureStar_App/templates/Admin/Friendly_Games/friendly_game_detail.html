@@ -1,0 +1,590 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Plugins css Ends-->
+<style>
+    .profile-info .label-value {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+    }
+
+    .card-header, .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-footer {
+        text-align: right;
+        padding: 1rem;
+    }
+
+    .widget-1 {
+        background-size: cover;
+        margin-bottom: 25px;
+        background-color: #ffffff;
+        box-shadow: 0 0 6px 2px #00000026;
+        border-radius: 9px;
+        margin-left: 44px;
+    }
+
+    /* Card layout adjustments */
+    .game-card {
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .game-card .team-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .game-card .team-info div {
+        flex: 1;
+    }
+
+    .game-card .team-info img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 5px;
+    }
+
+    .game-card .team-info span {
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .game-card .game-time {
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .game-card .game-field {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: normal;
+    }
+
+    /* Make the table responsive */
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}
+
+{% block title %}
+    {{ breadcrumb.child|default:"Tournament Game" }}
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-6">
+                <h3>{{ breadcrumb.child }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Card -->
+     <div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="game-card">
+                <div class="team-info">
+                    <!-- Left Side: Team A Logo and Name -->
+                    <div class="team-a">
+                        <img src="{{ game.team_a.team_id.team_logo.url|default:'path/to/default-logo.png' }}" alt="Team A Logo">
+                        <span>{{ game.team_a.team_name }}</span>
+                    </div>
+
+                    <!-- Center: Game Time or Score -->
+                    <div class="game-time">
+                        {% if game.finish %}
+                            <span>{{ game.team_a_goal }} - {{ game.team_b_goal }}</span>
+                        {% else %}
+                            <span>{{ game.game_start_time|default:"Not Available" }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Right Side: Team B Logo and Name -->
+                    <div class="team-b">
+                        <img src="{{ game.team_b.team_id.team_logo.url|default:'path/to/default-logo.png' }}" alt="Team B Logo">
+                        <span>{{ game.team_b.team_name }}</span>
+                    </div>
+                </div>
+
+                <!-- Game Field -->
+                <div class="game-field">
+                    <span>{{ game.game_field_id.field_name|default:"Not Available" }}</span>
+                </div>
+            </div>
+        </div>
+
+            <!-- Tab Navigation -->
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="gameTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="lineup-tab" data-toggle="tab" href="#lineup" role="tab" aria-controls="lineup" aria-selected="true">Lineup</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="officials-tab" data-toggle="tab" href="#officials" role="tab" aria-controls="officials" aria-selected="false">Officials</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="false">Stats</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="gameTabsContent">
+                        <!-- Lineup Tab -->
+                        <div class="tab-pane show active" id="lineup" role="tabpanel" aria-labelledby="lineup-tab">
+                            <ul class="nav nav-tabs" id="lineupTabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="team-a-lineup-tab" data-toggle="tab" href="#teamdata_a_lineup" role="tab" aria-controls="teamdata_a_lineup" aria-selected="true">Team A Lineup</a>
+
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="team-b-lineup-tab" data-toggle="tab" href="#teamdata_b_lineup" role="tab" aria-controls="teamdata_b_lineup" aria-selected="false">Team B Lineup</a>
+
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="lineupTabsContent">
+                                <!-- Team A Lineup -->
+                                <div class="tab-pane fade show active" id="teamdata_a_lineup" role="tabpanel">
+                                    <br>
+                                    <h5>Starting 11</h5>
+                                    <table id="team-a-starting" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Player Name</th>
+                                                <th>Jersey Number</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for lineup in team_a_lineup %}
+                                            {% if lineup.lineup_status == 3 %}
+                                            <tr>
+                                                <td>{{ lineup.player_id.username }}</td>
+                                                <td>
+                                                    {% if lineup.player_id.playerjersey_set.first %}
+                                                    {{ lineup.player_id.playerjersey_set.first.jersey_number }}
+                                                    {% else %}
+                                                    Not Assigned
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <br>
+                    
+                                    <h5>Substitute Players</h5>
+                                    <table id="team-a-substitute" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Player Name</th>
+                                                <th>Jersey Number</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for lineup in team_a_lineup %}
+                                            {% if lineup.lineup_status == 2 %}
+                                            <tr>
+                                                <td>{{ lineup.player_id.username }}</td>
+                                                <td>
+                                                    {% if lineup.player_id.playerjersey_set.first %}
+                                                    {{ lineup.player_id.playerjersey_set.first.jersey_number }}
+                                                    {% else %}
+                                                    Not Assigned
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                    
+                                <!-- Team B Lineup -->
+                                <div class="tab-pane fade" id="teamdata_b_lineup" role="tabpanel">
+                                    <br>
+                                    <h5>Starting 11</h5>
+                                    <table id="team-b-starting" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Player Name</th>
+                                                <th>Jersey Number</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for lineup in team_b_lineup %}
+                                            {% if lineup.lineup_status == 3 %}
+                                            <tr>
+                                                <td>{{ lineup.player_id.username }}</td>
+                                                <td>
+                                                    {% if lineup.player_id.playerjersey_set.first %}
+                                                    {{ lineup.player_id.playerjersey_set.first.jersey_number }}
+                                                    {% else %}
+                                                    Not Assigned
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <br>
+                               
+                    
+                                    <h5>Substitute Players</h5>
+                                    <table id="team-b-substitute" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Player Name</th>
+                                                <th>Jersey Number</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for lineup in team_b_lineup %}
+                                            {% if lineup.lineup_status == 2 %}
+                                            <tr>
+                                                <td>{{ lineup.player_id.username }}</td>
+                                                <td>
+                                                    {% if lineup.player_id.playerjersey_set.first %}
+                                                    {{ lineup.player_id.playerjersey_set.first.jersey_number }}
+                                                    {% else %}
+                                                    Not Assigned
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                            
+                     
+              
+                        <!-- officials -->
+                        <div class="tab-pane" id="officials" role="tabpanel" aria-labelledby="officials-tab">
+                            <br>
+                            <h5>Officials Information</h5>
+                       
+                        
+                            <table id="official_table" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Official FullName</th>
+                                        <th>Official Username</th>
+
+                                        <th>Role</th>
+                                        <!-- <th>Profile Picture</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for official in officials_data %}
+                                        <tr>
+                                            <td>{{ official.fullname }}</td>
+                                            <td>{{ official.username }}</td>
+
+                                            <td>{{ official.official_type }}</td>
+                                            <!-- <td>
+                                                {% if official.profile_picture %}
+                                                    <img src="{{ official.profile_picture }}" alt="{{ official.fullname }}" class="official-profile-picture" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% else %}
+                                                {{ official.profile_picture.url }}
+                                                {% endif %}
+                                            </td> -->
+                                           
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="3">No officials available for this game.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+              <!-- Stats Tab -->
+<div class="tab-pane" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+    <ul class="nav nav-tabs" id="statsTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="team-a-stats-tab" data-toggle="tab" href="#team-a-stats" role="tab" aria-controls="team-a-stats" aria-selected="true">Team A Stats</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="team-b-stats-tab" data-toggle="tab" href="#team-b-stats" role="tab" aria-controls="team-b-stats" aria-selected="false">Team B Stats</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="statsTabsContent">
+        <!-- Team A Stats -->
+        <div class="tab-pane show active" id="team-a-stats" role="tabpanel" aria-labelledby="team-a-stats-tab">
+            <br>
+            <h5>Team A Match Stats</h5>
+            <table class="table" id="gamestats_team_a">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Team A</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Possession</td>
+                        <td>{{ game.general_team_a_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Interceptions</td>
+                        <td>{{ game.general_team_a_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Offside</td>
+                        <td>{{ game.general_team_a_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Corner Kicks</td>
+                        <td>{{ game.general_team_a_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Defensive Possession</td>
+                        <td>{{ game.defence_team_a_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defensive Interceptions</td>
+                        <td>{{ game.defence_team_a_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defensive Offside</td>
+                        <td>{{ game.defence_team_a_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defensive Corners</td>
+                        <td>{{ game.defence_team_a_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Distribution Possession</td>
+                        <td>{{ game.distribution_team_a_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Distribution Interceptions</td>
+                        <td>{{ game.distribution_team_a_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Distribution Offside</td>
+                        <td>{{ game.distribution_team_a_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Distribution Corners</td>
+                        <td>{{ game.distribution_team_a_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Attacking Possession</td>
+                        <td>{{ game.attack_team_a_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacking Interceptions</td>
+                        <td>{{ game.attack_team_a_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacking Offside</td>
+                        <td>{{ game.attack_team_a_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacking Corners</td>
+                        <td>{{ game.attack_team_a_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Discipline Possession</td>
+                        <td>{{ game.discipline_team_a_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Discipline Interceptions</td>
+                        <td>{{ game.discipline_team_a_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Discipline Offside</td>
+                        <td>{{ game.discipline_team_a_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Discipline Corners</td>
+                        <td>{{ game.discipline_team_a_corner }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Team B Stats -->
+        <div class="tab-pane" id="team-b-stats" role="tabpanel" aria-labelledby="team-b-stats-tab">
+            <h5>Team B Match Stats</h5>
+            <table class="table" id="gamestats_team_b">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Team B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Possession</td>
+                        <td>{{ game.general_team_b_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Interceptions</td>
+                        <td>{{ game.general_team_b_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Offside</td>
+                        <td>{{ game.general_team_b_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Corner Kicks</td>
+                        <td>{{ game.general_team_b_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Defensive Possession</td>
+                        <td>{{ game.defence_team_b_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defensive Interceptions</td>
+                        <td>{{ game.defence_team_b_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defensive Offside</td>
+                        <td>{{ game.defence_team_b_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Defensive Corners</td>
+                        <td>{{ game.defence_team_b_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Distribution Possession</td>
+                        <td>{{ game.distribution_team_b_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Distribution Interceptions</td>
+                        <td>{{ game.distribution_team_b_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Distribution Offside</td>
+                        <td>{{ game.distribution_team_b_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Distribution Corners</td>
+                        <td>{{ game.distribution_team_b_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Attacking Possession</td>
+                        <td>{{ game.attack_team_b_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacking Interceptions</td>
+                        <td>{{ game.attack_team_b_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacking Offside</td>
+                        <td>{{ game.attack_team_b_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacking Corners</td>
+                        <td>{{ game.attack_team_b_corner }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Discipline Possession</td>
+                        <td>{{ game.discipline_team_b_possession }}</td>
+                    </tr>
+                    <tr>
+                        <td>Discipline Interceptions</td>
+                        <td>{{ game.discipline_team_b_interception }}</td>
+                    </tr>
+                    <tr>
+                        <td>Discipline Offside</td>
+                        <td>{{ game.discipline_team_b_offside }}</td>
+                    </tr>
+                    <tr>
+                        <td>Discipline Corners</td>
+                        <td>{{ game.discipline_team_b_corner }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+                </div>
+                </div>
+
+                </div>
+</div>
+     </div>
+</div>
+{% endblock %}
+
+
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize DataTables
+        $('#team-a-starting').DataTable();
+        $('#team-a-substitute').DataTable();
+        $('#team-b-starting').DataTable();
+        $('#team-b-substitute').DataTable();
+        $('#team-b-substitute').DataTable();
+        $('#official_table').DataTable();
+        $('#gamestats_team_a').DataTable();
+        $('#gamestats_team_b').DataTable();
+
+
+    
+        // Re-draw DataTables when tab is shown
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+        });
+    });
+</script>
+
+{% endblock %}

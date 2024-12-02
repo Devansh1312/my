@@ -34,6 +34,10 @@
                                         <th colspan="2" >Created By Team & user</th>
                                         <th>Assigned User</th>
                                         <th>Actions</th>
+                                        <th>Edit stats</th>
+                                        <th>Detail View</th>
+
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,6 +64,16 @@
                                                         Change User
                                                     </button>
                                                 {% endif %}
+                                                <td>
+                                                    <button class="btn btn-info" onclick="openEditStatsModal({{ game.id }})">
+                                                        Edit Stats
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'game_detail' game.id %}" class="btn btn-success">
+                                                        View Detail
+                                                    </a>
+                                                </td>
                                             {% else %}
                                                 <span class="badge bg-danger">Game Finished</span>
                                             {% endif %}
@@ -93,6 +107,25 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Stats Modal -->
+<div class="modal fade" id="editStatsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Game Stats</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStatsForm">
+                    {% csrf_token %}
+                    <div id="editStatsFields"></div>
+                    <button type="button" class="btn btn-primary" onclick="submitEditStats()">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -101,7 +134,54 @@
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <script>
     let currentGameId = null;
+    let currentEditGameId = null;
 
+    function openEditStatsModal(gameId) {
+            currentEditGameId = gameId;
+            fetch(`/tournament-games/${gameId}/update-stats/`)
+                .then(response => response.json())
+                .then(data => {
+                    populateEditStatsForm(data);
+                    new bootstrap.Modal(document.getElementById('editStatsModal')).show();
+                });
+        }
+
+    function populateEditStatsForm(data) {
+            let editStatsFields = document.getElementById('editStatsFields');
+            editStatsFields.innerHTML = '';  // Clear previous fields
+
+            for (let [key, value] of Object.entries(data)) {
+                let inputField = `
+                    <div class="mb-3">
+                        <label for="${key}" class="form-label">${key.replace(/_/g, ' ').toUpperCase()}</label>
+                        <input type="number" class="form-control" name="${key}" id="${key}" value="${value}">
+                    </div>
+                `;
+                editStatsFields.innerHTML += inputField;
+            }
+        }
+
+        function submitEditStats() {
+            let formData = new FormData(document.getElementById('editStatsForm'));
+        
+            // Send the POST request
+            fetch(`/tournament-games/${currentEditGameId}/update-stats/`, {
+                method: 'POST',  // Explicitly set the method to POST
+                body: formData,  // Send the form data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();  // Reload the page to reflect changes
+                } else {
+                    alert('Error updating stats: ' + JSON.stringify(data.errors));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the stats.');
+            });
+        }
     function openUserSearchModal(gameId) {
         currentGameId = gameId;
         document.getElementById('userList').innerHTML = ''; // Clear previous results
