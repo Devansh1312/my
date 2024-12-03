@@ -28,17 +28,18 @@ from django.core.exceptions import ObjectDoesNotExist
 class ManagerBranchDetail(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
         user_id = request.user.id
         if not user_id:
             return Response({
                 'status': 0,
-                'message':_('User Dose Not Found'),
-                
-                'data': {}
+                'message': _('User Dose Not Found'),
+                'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -48,10 +49,10 @@ class ManagerBranchDetail(APIView):
             )
             team_branch = TeamBranch.objects.get(id=join_branch.branch_id.id)
             
-            data = {
+            data = [{
                 'id': team_branch.id,
                 'name': team_branch.team_name
-            }
+            }]
 
             return Response({
                 'status': 1,
@@ -63,16 +64,15 @@ class ManagerBranchDetail(APIView):
             return Response({
                 'status': 0,
                 'message': _('User is not a Manager.'),
-                
-                'data': {}
+                'data': []
             }, status=status.HTTP_404_NOT_FOUND)
         except TeamBranch.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Team not found.'),
-                
-                'data': {}
+                'data': []
             }, status=status.HTTP_404_NOT_FOUND)
+
 
 class CreateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
