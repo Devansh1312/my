@@ -22,12 +22,10 @@
                               <th>No.</th>
                               <th>Tournament Name</th>
                               <th>Number</th>
-                              <th colspan="2">Teams</th>
+                              <th>Teams</th>
                               <th >Date</th>
                               <th>Team/User</th>
                               <th>Handler Name</th>
-                              <th>Handler</th>
-                              <th>stats</th>
                               <th>Detail</th>
                            </tr>
                         </thead>
@@ -35,19 +33,40 @@
                               <td>{{ forloop.counter }}</td>
                               <td>{{ game.tournament_id.tournament_name }}</td>
                               <td>{{ game.game_number }}</td>
-                              <td>{{ game.team_a.team_name }}</td>
-                              <td>{{ game.team_b.team_name }}</td>
+                              <td>{{ game.team_a.team_name }} & {{ game.team_b.team_name }}</td>
                               <td>{{ game.game_date }} {{ game.game_start_time }}</td>
                               <td>{{ game.tournament_id.team_id.team_name }}/{{ game.tournament_id.team_id.team_founder.username }}</td>
                               <td>{{ game.assigned_user_name }}</td>
-                              <td> {% if game.is_upcoming == 1 %} {% if game.is_unassigned == 1 %} <button class="btn btn-primary" onclick="openUserSearchModal({{ game.id }})"> Assign </button> {% else %} <button class="btn btn-warning" onclick="openUserSearchModal({{ game.id }})"> Change  </button> {% endif %} {% else %} <span class="badge bg-danger">Game Finished</span> {% endif %}
                               <td>
-                                 <button class="btn btn-info" onclick="openEditStatsModal({{ game.id }})"> Edit</button>
-                              </td>
-                              <td>
-                                 <a href="{% url 'game_detail' game.id %}" class="btn btn-success">  view </a>
-                              </td>
-                              </td>
+                                 <!-- Action buttons -->
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                         <i data-feather="more-vertical"></i>
+                                     </a>
+                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                         <ul style="list-style: none; padding: 0; margin: 0;">
+                                             {% if game.is_upcoming == 1 %}
+                                                 {% if game.is_unassigned == 1 %}
+                                                     <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                         <a href="#" onclick="openUserSearchModal({{ game.id }})">Assign Handler</a>
+                                                     </li>
+                                                 {% else %}
+                                                     <li style="padding: 8px 12px;">
+                                                         <a href="#" onclick="openUserSearchModal({{ game.id }})">Change Handler</a>
+                                                     </li>
+                                                 {% endif %}
+                                             {% else %}
+                                                 <li style="padding: 8px 12px;">
+                                                     <span class="badge bg-danger">Game Finished</span>
+                                                 </li>
+                                             {% endif %}
+                                             <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                 <a href="{% url 'game_detail' game.id %}">View</a>
+                                             </li>
+                                         </ul>
+                                     </div>
+                                 </div>
+                             </td>                             
                            </tr> {% endfor %} </tbody>
                      </table>
                   </div>
@@ -74,35 +93,12 @@
       </div>
    </div>
 </div>
-<!-- Edit Stats Modal -->
-<div class="modal fade" id="editStatsModal" tabindex="-1" aria-hidden="true">
-   <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title">Edit Game Stats</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body">
-            <form id="editStatsForm"> {% csrf_token %} <div id="editStatsFields"></div>
-               <button type="button" class="btn btn-primary" onclick="submitEditStats()">Save Changes</button>
-            </form>
-         </div>
-      </div>
-   </div>
-</div> {% endblock %} {% block script %} <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+{% endblock %} {% block script %} <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <script>
    let currentGameId = null;
    let currentEditGameId = null;
-
-   function openEditStatsModal(gameId) {
-      currentEditGameId = gameId;
-      fetch(`/tournament-games/${gameId}/update-stats/`).then(response => response.json()).then(data => {
-         populateEditStatsForm(data);
-         new bootstrap.Modal(document.getElementById('editStatsModal')).show();
-      });
-   }
 
    function populateEditStatsForm(data) {
       let editStatsFields = document.getElementById('editStatsFields');
@@ -188,4 +184,28 @@
          alert(`Failed to assign user: ${error.error}`);
       }
    }
+   function toggleMenu(menu) {
+    event.preventDefault();
+    const actionCard = menu.nextElementSibling;
+    // Toggle visibility
+    actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+
+    // Close other open action cards
+    document.querySelectorAll('.action-card').forEach(card => {
+        if (card !== actionCard) {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Close the action card when clicking outside
+document.addEventListener('click', function (event) {
+    if (!event.target.closest('.action-menu-container')) {
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.style.display = 'none';
+        });
+    }
+});
+feather.replace();
+
 </script> {% endblock %}

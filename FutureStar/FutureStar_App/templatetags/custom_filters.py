@@ -1,5 +1,6 @@
 from django import template
 import os
+from os.path import splitext
 
 register = template.Library()
 
@@ -19,9 +20,12 @@ def get_language_field(value, lang):
     return getattr(value, field_name, "")
 
 
-@register.filter
+@register.filter(name='get_filename')
 def get_filename(value):
-    """
-    Returns the file name from a file path.
-    """
-    return os.path.basename(value)
+    """Extracts the filename from a path"""
+    return value.split('/')[-1]  # Only the file name
+
+@register.filter(name='splitext')
+def splitext_filter(value):
+    """Split a filename into root and extension"""
+    return splitext(value)

@@ -1740,75 +1740,81 @@ class ProfileTypeView(APIView):
             'message': _('User Profiles retrieved successfully.'),
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)
-
+        
     def post(self, request):
+        # Set language based on headers, default to English
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        # Extract the profile type from the request data
+        if request.user.role.id != 5:
+            return Response({
+                'status': 0,
+                'message': _('You do not have permission to perform this action.'),
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Extract profile type and certificates from request
         profile_type = request.data.get('profile_type')
-        certificates = request.FILES.getlist('certificates')  # Get the list of uploaded files
+        certificates = request.FILES.getlist('certificates')  # Uploaded files
+        user = request.user  # Assuming user is authenticated
 
-        # Assuming the user is already authenticated and you have access to the user object
-        user = request.user
+        # Validate profile type
+        if profile_type not in ['3', '4']:
+            return Response({
+                'status': 0,
+                'message': _('Invalid profile type.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the user is already a coach or referee
+        # Check existing roles
         if user.is_coach and profile_type == '3':
             return Response({
                 'status': 0,
-                'message': _('You are already registered as a coach and cannot create a new coach profile.')
+                'message': _('You are already registered as a coach and cannot create a new coach profile.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if user.is_referee and profile_type == '4':
             return Response({
                 'status': 0,
-                'message': _('You are already registered as a referee and cannot create a new referee profile.')
+                'message': _('You are already registered as a referee and cannot create a new referee profile.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Set profile type flags and store certificates
+        # Determine directory and profile type settings
         if profile_type == '3':  # Profile type for coach
             user.is_coach = True
             user.is_referee = False
-
-            # Handle saving certificates for coach
-            for cert in certificates:
-                # Construct the file name using the original file name
-                file_name = f"coach_certificates/{cert.name}"
-                
-                # Save the certificate using the default storage
-                file_path = default_storage.save(file_name, cert)
-                
-                # Store the certificate in the database
-                UserCertificate.objects.create(
-                    user=user,
-                    certificate_type=CertificateType.COACH,
-                    certificate_file=file_path
-                )
-
+            directory = 'coach_certificates'
+            certificate_type = CertificateType.COACH
         elif profile_type == '4':  # Profile type for referee
             user.is_referee = True
             user.is_coach = False
+            directory = 'referee_certificates'
+            certificate_type = CertificateType.REFEREE
 
-            # Handle saving certificates for referee
-            for cert in certificates:
-                # Construct the file name using the original file name
-                file_name = f"referee_certificates/{cert.name}"
-                
-                # Save the certificate using the default storage
-                file_path = default_storage.save(file_name, cert)
-                
-                # Store the certificate in the database
-                UserCertificate.objects.create(
-                    user=user,
-                    certificate_type=CertificateType.REFEREE,
-                    certificate_file=file_path
-                )
-                        
+        # Save certificates with their original file names and extensions
+        for cert in certificates:
+            # Extract file extension
+            file_extension = os.path.splitext(cert.name)[-1].lower()  # Get the file extension
+
+            # Generate a unique 10-character string directly in the loop
+            unique_str = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+
+            # Create a unique file name using the original name and the unique string
+            file_name = f"{directory}/{request.user.role.id}/{unique_str}{file_extension}"  # Append unique string to the file name
+            file_path = default_storage.save(file_name, cert)
+
+            # Save the full file path (including the extension) in the database
+            UserCertificate.objects.create(
+                user=user,
+                certificate_type=certificate_type,
+                certificate_file=file_path,  # Store the full path (name + extension)
+            )
+
+
+        # Update user's profile and save changes
         user.updated_at = timezone.now()
-        # Save the user instance
         user.save()
 
+        # Return success response
         return Response({
             'status': 1,
             'message': _('Profile type and certificates uploaded successfully.'),

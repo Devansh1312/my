@@ -72,13 +72,25 @@
                                             <!-- Display File Name using the custom filter -->
                                             <span>{{ certificate.certificate_file.name|get_filename }}</span>
                                             <span>
-                                                <a href="{{ certificate.certificate_file.url }}" target="_blank" class="btn btn-primary btn-sm">View</a>
-                                                <a href="{{ certificate.certificate_file.url }}" download class="btn btn-success btn-sm">Download</a>
+                                                {% with cert_extension=certificate.certificate_file.name|splitext %}
+                                                    {% if cert_extension.1 in '.jpg,.jpeg,.png,.gif,.bmp,.webp' %}
+                                                        <!-- For image files, display directly -->
+                                                        <a href="{{ certificate.certificate_file.url }}" target="_blank" class="btn btn-primary btn-sm">View</a>
+                                                        <a href="{{ certificate.certificate_file.url }}" download class="btn btn-success btn-sm">Download</a>
+                                                    {% elif cert_extension.1 in '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx' %}
+                                                        <!-- For document and PDF files, display download option -->
+                                                        <a href="{{ certificate.certificate_file.url }}" target="_blank" class="btn btn-primary btn-sm">View</a>
+                                                        <a href="{{ certificate.certificate_file.url }}" download class="btn btn-success btn-sm">Download</a>
+                                                    {% else %}
+                                                        <!-- For other file types, provide download -->
+                                                        <a href="{{ certificate.certificate_file.url }}" download class="btn btn-success btn-sm">Download</a>
+                                                    {% endif %}
+                                                {% endwith %}
                                             </span>
                                         </div>
                                     </li>
                                 {% endfor %}
-                            </ul>                    
+                            </ul>                                  
                         </div>
                     </div>
 
