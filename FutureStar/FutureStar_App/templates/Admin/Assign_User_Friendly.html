@@ -33,7 +33,10 @@
                                         <th colspan="2">Game Date & time</th>
                                         <th>Game Created By</th>
                                         <th>Assigned User</th>
+                                     
                                         <th>Actions</th>
+                                        
+                                        <th>Detail View</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,9 +63,16 @@
                                                         Change User
                                                     </button>
                                                 {% endif %}
+                                                
                                             {% else %}
                                                 <span class="badge bg-danger">Game Finished</span>
                                             {% endif %}
+                                           
+                                            <td>
+                                                <a href="{% url 'friendly_game_detail' game.id %}" class="btn btn-success">
+                                                    View Detail
+                                                </a>
+                                            </td>
                                         </td>
                                     </tr>
                                     {% endfor %}

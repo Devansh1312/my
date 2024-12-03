@@ -6592,43 +6592,55 @@ class FriendlyGameStatsView(LoginRequiredMixin, View):
             {"games": games, "breadcrumb": {"parent": "Friendly Games", "child": "Game Stats"}}
         )
 
-@method_decorator(user_role_check, name='dispatch')
+method_decorator(user_role_check, name='dispatch')  # Custom decorator for role check
 class FriendlyGameEditStatsView(LoginRequiredMixin, View):
     template_name = "Admin/Friendly_Games/EditGameStatsModal.html"
+    
+    # Handle POST requests to update the game stats
+    def post(self, request, *args, **kwargs):
+        team = request.POST.get('team')
+        changes = json.loads(request.POST.get('changes', '{}'))  # Parse changes from JSON
 
-    def get(self, request, game_id):
+        pk = kwargs.get('pk')  # Get the primary key (ID) of the game
+        game = get_object_or_404(FriendlyGame, pk=pk)
+
+        print(game.team_a.team_id.team_logo.url)
+
+        # Check if 'changes' is a valid dictionary
+        if not isinstance(changes, dict):
+            return JsonResponse({"success": False, "error": "Invalid changes format."})
+
+        # Define valid fields based on the model
+        valid_fields = [field.name for field in FriendlyGame._meta.get_fields()]
+
+        # Process the changes
+        for field_name, new_value in changes.items():
+            if field_name not in valid_fields:
+                return JsonResponse({"success": False, "error": f"Invalid field name: {field_name}"})
+            
+            # Update the game object with the new value
+            setattr(game, field_name, new_value)
+
+        # Save the game object with updated stats
         try:
-            game = FriendlyGame.objects.get(id=game_id)
-            form = FriendlyGameForm(instance=game)
-
-            # Check if the request is AJAX (indicated by 'X-Requested-With' header)
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                html = render_to_string(self.template_name, {'form': form, 'game': game})
-                return JsonResponse({'html': html})
-            return render(request, self.template_name, {'form': form, 'game': game})
-        
-        except ObjectDoesNotExist:
-            return JsonResponse({'error': 'Game not found'}, status=404)
+            game.save()
+            return JsonResponse({"success": True})
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({"success": False, "error": str(e)})
+        
+    # Handle GET requests to display current game stats
+    def get(self, request, pk):
+        game = get_object_or_404(FriendlyGame, pk=pk)
+        print(game.team_a.team_id.team_logo.url)
 
-    def post(self, request, game_id):
-        try:
-            game = FriendlyGame.objects.get(id=game_id)
-        except FriendlyGame.DoesNotExist:
-            return redirect('friendly_games_list_stats')
+        # Create a dictionary to hold the form fields and their values
+        game_data = {}
 
-        form = FriendlyGameForm(request.POST, instance=game)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Stats updated successfully!')
-            return JsonResponse({'success': True})
-        else:
-            html = render_to_string(self.template_name, {'form': form, 'game': game})
-            return JsonResponse({'success': False, 'html': html})
+        # Assuming you have a form like FriendlyGameForm to get the field names
+        for field in FriendlyGameForm().fields:
+            game_data[field] = getattr(game, field, None)
 
-
-
+        return JsonResponse(game_data)
 
 
 ###################### User apply for coach or rafree ###########
@@ -6768,6 +6780,7 @@ class FriendlyGameDetailView(LoginRequiredMixin, View):
   
     def get(self, request, game_id):
         game = get_object_or_404(FriendlyGame, id=game_id)
+        print(game.team_a.team_id.team_logo.url)
         
         # Get lineups for both teams
         team_a_lineup = FriendlyGameLineup.objects.filter(game_id=game, team_id=game.team_a).order_by('lineup_status')

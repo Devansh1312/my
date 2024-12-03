@@ -272,7 +272,8 @@ urlpatterns = [
     ################## Friendly Game States Add URLS ############################
   
     path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
-    path('friendly-games/edit/<int:game_id>/', FriendlyGameEditStatsView.as_view(), name='friendlygame_edit_game_stats'),
+    path('friendly-games/<int:pk>/update-stats/', FriendlyGameEditStatsView.as_view(), name='update_game_stats'),
+
 
     path('friendly-games/<int:game_id>/details/', FriendlyGameDetailView.as_view(), name='friendly_game_detail'),
 
