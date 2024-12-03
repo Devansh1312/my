@@ -9,218 +9,287 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    {% include "components/loader.html" %}
+{% include "components/loader.html" %}
 
-    <style>
-        .profile-box {
-            position: relative;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #fff;
-        }
-        .card-body {
-            padding: 1.5rem;
-        }
-        .img-fluid {
-            max-width: 100%;
-            height: auto;
-        }
-        .cartoon {
-            position: absolute;
-            bottom: 10px;
-            right: 2px;
-            width: 200px;
-            height: auto;
-        }
-        .widget {
-            margin-bottom: 1.5rem;
-        }
-        .widget h4 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        .widget-content {
-            text-align: center;
-        }
-        .widget-1 {
-            background-size: cover;
-            margin-bottom: 25px;
-            background-color: #ffffff;
-            box-shadow: 0 0 6px 2px #00000026;
-            border-radius: 9px;
-            margin-left: 44px;
-        }
+<style>
+    .profile-box {
+        position: relative;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+    }
 
-        .widget-round.secondary .bg-round svg {
-            width: 40px;
-            height: 40px;
-        }
-    </style>
+    .card-body {
+        padding: 1.5rem;
+    }
 
-    <div class="page-body">
-        <div class="container-fluid">
-            {% include "layouts/breadcrumb.html" %}
+    .img-fluid {
+        max-width: 100%;
+        height: auto;
+    }
 
-            <div class="row">
-                <!-- Main Widget with Profile -->
-                <div class="col-4"></div>
-                <div class="col-4">
-                    <div class="card profile-box">
-                        <div class="card-body">
-                            <div class="media">
-                                <div class="media-body">
-                                    <h4 class="f-w-600">Goalactico</h4>
-                                    <p>Here You Can Become Like Your Idol</p>
-                                    <a class="btn btn-outline-white">What's New!</a>
-                                </div>
-                            </div>
-                            <div class="cartoon">
-                                <img class="img-fluid" src="{% static 'assets/images/dashboard/messi.svg' %}" alt="Football player">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-4"></div>
+    .cartoon {
+        position: absolute;
+        bottom: 10px;
+        right: 2px;
+        width: 200px;
+        height: auto;
+    }
 
-                <!-- Event Widget -->
-                <div class="col-3 widget-1">
+    .widget {
+        margin-bottom: 1.5rem;
+    }
+
+    .widget h4 {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .widget-content {
+        text-align: center;
+    }
+
+    .widget-1 {
+        margin-bottom: 25px;
+        background-color: #ffffff;
+        box-shadow: 0 0 6px 2px #00000026;
+        border-radius: 9px;
+        margin: 5 auto;
+        /* Centered without pushing to new row */
+    }
+
+    .widget-round.secondary .bg-round svg {
+        width: 40px;
+        height: 40px;
+    }
+</style>
+
+<div class="page-body">
+    <div class="container-fluid">
+        {% include "layouts/breadcrumb.html" %}
+
+        <div class="row widget-grid">
+            <div class="col-xxl-4 col-sm-6 box-col-6">
+                <div class="card profile-box">
                     <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-calendar-check-o"></i> <!-- Event Icon -->
+                        <div class="media media-wrapper justify-content-between">
+                            <div class="media-body">
+                                <div class="greeting-user">
+                                    <h4 class="f-w-600">Welcome to Goalactico</h4>
+                                    <p>Here whats happing in your account today</p>
+                                    <div class="whatsnew-btn"><a class="btn btn-outline-white">Whats New !</a></div>
                                 </div>
                             </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ event_count }}">{{ event_count|default:"0" }}</span></h4>
-                                <span class="f-light">Events</span>
+                           
+                        </div>
+                        <div class="cartoon"><img class="img-fluid" src="../assets/images/dashboard/football-img.png#cart"
+                                alt="footballar-img"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round secondary">
+                                        <div class="bg-round">
+                                            <svg class="svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#cart"> </use>
+                                            </svg>
+                                            <svg class="half-circle svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>10,000</h4><span class="f-light">Teams</span>
+                                    </div>
+                                </div>
+                              
+                            </div>
+                        </div>
+                        <div class="col-xl-12">
+                            <div class="card widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round primary">
+                                            <div class="bg-round">
+                                                <svg class="svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#tag"> </use>
+                                                </svg>
+                                                <svg class="half-circle svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>4,200</h4><span class="f-event">Events</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            
-                <!-- Main Teams Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-users"></i> <!-- Main Teams Icon -->
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <svg class="svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#return-box"> </use>
+                                            </svg>
+                                            <svg class="half-circle svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7000</h4><span class="f-light">Main Teams</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ team_count }}">{{ team_count|default:"0" }}</span></h4>
-                                <span class="f-light">Main Teams</span>
+                        </div>
+                        <div class="col-xl-12">
+                            <div class="card widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round success">
+                                            <div class="bg-round">
+                                                <svg class="svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#rate"> </use>
+                                                </svg>
+                                                <svg class="half-circle svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>5700</h4><span class="f-light">Teams</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            
-                <!-- Teams Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-users"></i> <!-- Teams Icon -->
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <svg class="svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#return-box"> </use>
+                                            </svg>
+                                            <svg class="half-circle svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7000</h4><span class="f-light">Post</span>
+                                    </div>
                                 </div>
+                              
                             </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ team_branch_count }}">{{ team_branch_count|default:"0" }}</span></h4>
-                                <span class="f-light">Teams</span>
+                        </div>
+                        <div class="col-xl-12">
+                            <div class="card widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round success">
+                                            <div class="bg-round">
+                                                <svg class="svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#rate"> </use>
+                                                </svg>
+                                                <svg class="half-circle svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4>5700</h4><span class="f-light">Tournaments</span>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            
-                <!-- Post Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-pencil"></i> <!-- Post Icon -->
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <svg class="svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#return-box"> </use>
+                                            </svg>
+                                            <svg class="half-circle svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7000</h4><span class="f-light">Tournament Games</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ post_count }}">{{ post_count|default:"0" }}</span></h4>
-                                <span class="f-light">Post</span>
+                              
                             </div>
                         </div>
                     </div>
                 </div>
-            
-                <!-- Friendly Games Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-futbol-o"></i> <!-- Friendly Games Icon -->
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <svg class="svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#return-box"> </use>
+                                            </svg>
+                                            <svg class="half-circle svg-fill">
+                                                <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7000</h4><span class="f-light">Training</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ friendly_game_count }}">{{ friendly_game_count|default:"0" }}</span></h4>
-                                <span class="f-light">Friendly Games</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Tournaments Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-trophy"></i> <!-- Tournament Icon -->
-                                </div>
-                            </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ tournament_count }}">{{ tournament_count|default:"0" }}</span></h4>
-                                <span class="f-light">Tournaments</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Tournament Games Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-gamepad"></i> <!-- Tournament Games Icon -->
-                                </div>
-                            </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ tournament_games_count }}">{{ tournament_games_count|default:"0" }}</span></h4>
-                                <span class="f-light">Tournament Games</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Training Widget -->
-                <div class="col-3 widget-1">
-                    <div class="card-body">
-                        <div class="widget-content">
-                            <div class="widget-round secondary">
-                                <div class="bg-round">
-                                    <i class="fa fa-calendar"></i> <!-- Training Icon -->
-                                </div>
-                            </div>
-                            <div>
-                                <h4><span class="counter" data-target="{{ training_count }}">{{ training_count|default:"0" }}</span></h4>
-                                <span class="f-light">Training</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
+
+
+
+
     </div>
+</div>
+</div>
 {% endblock %}
 
 {% block scriptcontent %}

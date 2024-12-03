@@ -12003,9 +12003,10 @@ select.crypto-select {
 .widget-with-chart .card-body {
   align-items: center; }
 
-.profile-box {
-  background: linear-gradient(103.75deg, #33B1EE -13.9%, var(--theme-deafult) 79.68%);
-  color: #fff; }
+  .profile-box {
+    background: linear-gradient(103.75deg, #262626 -13.9%, #78be20 79.68%);
+    color: #fff;
+}
   .profile-box .cartoon {
     position: absolute;
     bottom: -15px;

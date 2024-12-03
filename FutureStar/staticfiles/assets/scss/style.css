@@ -12012,9 +12012,8 @@ select.crypto-select {
   color: #fff; }
   .profile-box .cartoon {
     position: absolute;
-    bottom: -15px;
-    right: 20px;
-    animation: bounce-effect 5s infinite ease-in; }
+    bottom: 0px;
+    right: 0px; }
     [dir="rtl"] .profile-box .cartoon {
       right: unset !important;
       left: 5px; }

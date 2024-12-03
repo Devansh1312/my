@@ -332,9 +332,9 @@ $badge-light-color in (primary, $primary-color),
   color: $white;
   .cartoon {
     position: absolute;
-    bottom: -15px;
-    right: 20px;
-    animation: bounce-effect 5s infinite ease-in;
+    bottom: 0px;
+    right: 0px;
+    // animation: bounce-effect 5s infinite ease-in;
     [dir="rtl"] & {
       right: unset !important;
       left: 5px;
