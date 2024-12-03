@@ -54,7 +54,7 @@
         background-color: #ffffff;
         box-shadow: 0 0 6px 2px #00000026;
         border-radius: 9px;
-        margin: 5 auto;
+        background-image: url({% static 'assets/images/dashboard/temp/widget-bg.png' %});
     }
 
     .widget-round.secondary .bg-round svg {
@@ -82,8 +82,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="cartoon">
-                            <img class="img-fluid" src="{% static 'assets/images/dashboard/messi.svg' %}" alt="Football player">
+                        <div class="cartoon" style="animation: none; bottom: 0px !important; right: 0px !important;">
+                            <img class="img-fluid" src="/static/assets/images/dashboard/messi.svg" alt="Football player">
                         </div>
                     </div>
                 </div>
@@ -96,17 +96,12 @@
                                 <div class="widget-content">
                                     <div class="widget-round secondary">
                                         <div class="bg-round">
-                                            <svg class="svg-fill">
-                                                <use href="{% static 'assets/svg/icon-sprite.svg#cart' %}"></use>
-                                            </svg>
-                                            <svg class="half-circle svg-fill">
-                                                <use href="{% static 'assets/svg/icon-sprite.svg#halfcircle' %}"></use>
-                                            </svg>
+                                            <img src="{% static 'assets/images/dashboard/temp/soccer-player.png' %}" width="70%">
                                         </div>
                                     </div>
                                     <div>
                                         <h4>10,000</h4>
-                                        <span class="f-light">Teams</span>
+                                        <span class="f-light">Players</span>
                                     </div>
                                 </div>
                             </div>
@@ -117,12 +112,7 @@
                                     <div class="widget-content">
                                         <div class="widget-round primary">
                                             <div class="bg-round">
-                                                <svg class="svg-fill">
-                                                    <use href="{% static 'assets/svg/icon-sprite.svg#tag' %}"></use>
-                                                </svg>
-                                                <svg class="half-circle svg-fill">
-                                                    <use href="{% static 'assets/svg/icon-sprite.svg#halfcircle' %}"></use>
-                                                </svg>
+                                                <img src="{% static 'assets/images/dashboard/temp/event-management.png' %}" width="70%">
                                             </div>
                                         </div>
                                         <div>
@@ -144,12 +134,7 @@
                                 <div class="widget-content">
                                     <div class="widget-round warning">
                                         <div class="bg-round">
-                                            <svg class="svg-fill">
-                                                <use href="{% static 'assets/svg/icon-sprite.svg#return-box' %}"></use>
-                                            </svg>
-                                            <svg class="half-circle svg-fill">
-                                                <use href="{% static 'assets/svg/icon-sprite.svg#halfcircle' %}"></use>
-                                            </svg>
+                                            <img src="{% static 'assets/images/dashboard/temp/groups.png' %}" width="70%">
                                         </div>
                                     </div>
                                     <div>
@@ -165,12 +150,7 @@
                                     <div class="widget-content">
                                         <div class="widget-round success">
                                             <div class="bg-round">
-                                                <svg class="svg-fill">
-                                                    <use href="{% static 'assets/svg/icon-sprite.svg#rate' %}"></use>
-                                                </svg>
-                                                <svg class="half-circle svg-fill">
-                                                    <use href="{% static 'assets/svg/icon-sprite.svg#halfcircle' %}"></use>
-                                                </svg>
+                                                <img src="{% static 'assets/images/dashboard/temp/team.png' %}" width="70%">
                                             </div>
                                         </div>
                                         <div>
@@ -192,12 +172,7 @@
                                 <div class="widget-content">
                                     <div class="widget-round warning">
                                         <div class="bg-round">
-                                            <svg class="svg-fill">
-                                                <use href="{% static 'assets/svg/icon-sprite.svg#return-box' %}"></use>
-                                            </svg>
-                                            <svg class="half-circle svg-fill">
-                                                <use href="{% static 'assets/svg/icon-sprite.svg#halfcircle' %}"></use>
-                                            </svg>
+                                            <img src="{% static 'assets/images/dashboard/temp/online.png' %}" width="70%">
                                         </div>
                                     </div>
                                     <div>
@@ -213,12 +188,7 @@
                                     <div class="widget-content">
                                         <div class="widget-round success">
                                             <div class="bg-round">
-                                                <svg class="svg-fill">
-                                                    <use href="{% static 'assets/svg/icon-sprite.svg#rate' %}"></use>
-                                                </svg>
-                                                <svg class="half-circle svg-fill">
-                                                    <use href="{% static 'assets/svg/icon-sprite.svg#halfcircle' %}"></use>
-                                                </svg>
+                                                <img src="{% static 'assets/images/dashboard/temp/tournament.png' %}" width="70%">
                                             </div>
                                         </div>
                                         <div>
@@ -232,6 +202,92 @@
                     </div>
                 </div>
             </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <img src="{% static 'assets/images/dashboard/temp/user-profiles.png' %}" width="70%">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7,000</h4>
+                                        <span class="f-light">Default User</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <img src="{% static 'assets/images/dashboard/temp/coach.png' %}" width="70%">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7,000</h4>
+                                        <span class="f-light">Coaches</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <img src="{% static 'assets/images/dashboard/temp/managers.png' %}" width="70%">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7,000</h4>
+                                        <span class="f-light">Managers</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card widget-1">
+                            <div class="card-body">
+                                <div class="widget-content">
+                                    <div class="widget-round warning">
+                                        <div class="bg-round">
+                                            <img src="{% static 'assets/images/dashboard/temp/referee.png' %}" width="70%">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>7,000</h4>
+                                        <span class="f-light">Referees</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>

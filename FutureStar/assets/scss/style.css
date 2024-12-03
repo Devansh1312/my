@@ -12010,7 +12010,7 @@ select.crypto-select {
     position: absolute;
     bottom: -15px;
     right: 20px;
-    animation: bounce-effect 5s infinite ease-in; }
+    animation: none; }
     [dir="rtl"] .profile-box .cartoon {
       right: unset !important;
       left: 5px; }
