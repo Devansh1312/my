@@ -1773,16 +1773,12 @@ class ProfileTypeView(APIView):
 
             # Handle saving certificates for coach
             for cert in certificates:
-                # Create the directory path
-                directory_path = os.path.join(self.coach_directory_path(user, ''))
-                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-
-                # Save the file to the desired path
-                file_path = os.path.join(directory_path, cert.name)
-                with open(file_path, 'wb+') as destination:
-                    for chunk in cert.chunks():
-                        destination.write(chunk)
-
+                # Construct the file name using the original file name
+                file_name = f"coach_certificates/{cert.name}"
+                
+                # Save the certificate using the default storage
+                file_path = default_storage.save(file_name, cert)
+                
                 # Store the certificate in the database
                 UserCertificate.objects.create(
                     user=user,
@@ -1796,16 +1792,12 @@ class ProfileTypeView(APIView):
 
             # Handle saving certificates for referee
             for cert in certificates:
-                # Create the directory path
-                directory_path = os.path.join(self.referee_directory_path(user, ''))
-                os.makedirs(directory_path, exist_ok=True)  # Create the directory if it doesn't exist
-
-                # Save the file to the desired path
-                file_path = os.path.join(directory_path, cert.name)
-                with open(file_path, 'wb+') as destination:
-                    for chunk in cert.chunks():
-                        destination.write(chunk)
-
+                # Construct the file name using the original file name
+                file_name = f"referee_certificates/{cert.name}"
+                
+                # Save the certificate using the default storage
+                file_path = default_storage.save(file_name, cert)
+                
                 # Store the certificate in the database
                 UserCertificate.objects.create(
                     user=user,
