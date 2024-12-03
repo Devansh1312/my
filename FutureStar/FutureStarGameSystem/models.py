@@ -116,7 +116,7 @@ class GameOfficials(models.Model):
 class PlayerGameStats(models.Model):
     id=models.AutoField(primary_key=True)
     team_id = models.ForeignKey(TeamBranch, on_delete=models.CASCADE)
-    player_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    player_id = models.ForeignKey(User, null=True,blank=True, on_delete=models.CASCADE)
     game_id = models.ForeignKey(TournamentGames, on_delete=models.CASCADE)
     tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE)
 

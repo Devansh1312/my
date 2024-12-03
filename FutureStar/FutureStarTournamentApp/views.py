@@ -2079,6 +2079,8 @@ class UpcomingGameView(APIView):
                 "message": f"Upcoming {game_type} game fetched successfully.",
                 "data": {
                     "game_type": game_type,
+                    "game_start_time": first_game.game_start_time,
+                    "game_end_time": first_game.game_end_time,
                     "game_details": {
                         "game_id": first_game.id,
                         "team_a": {
@@ -2095,7 +2097,6 @@ class UpcomingGameView(APIView):
                     },
                 },
             }
-
 
             # if game_type == "Tournament":
             #     response_data["data"]["tournament_id"] = first_game.tournament_id.id if first_game.tournament_id else None
