@@ -425,7 +425,7 @@ class TeamBranchAPIView(APIView):
                 
                 # Retrieve the team ID for constructing the file name
                 team_id = request.data.get("team_id")
-                file_name = f"team_branch_images/{team_branch_instance.id}_{team_id.id}_{unique_suffix}.{file_extension}"
+                file_name = f"team_branch_images/{team_branch_instance.id}_{team_id}_{unique_suffix}.{file_extension}"
                 
                 # Save the image using the default storage
                 image_path = default_storage.save(file_name, image)
