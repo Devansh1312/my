@@ -16,5 +16,6 @@ urlpatterns = [
 
         path('api/staff-management/', StaffManagementView.as_view()),
         path('api/search_users/', UserSearchView.as_view()),
+        path('api/team_total_stats/',TeamStatsView.as_view()),
 
     ]
