@@ -189,7 +189,6 @@ class ResetPasswordView(View):
 
 
 @method_decorator(user_role_check, name='dispatch')
-# Dashboard View
 class Dashboard(LoginRequiredMixin, View):
     login_url = "/"
     redirect_field_name = "redirect_to"
@@ -199,30 +198,31 @@ class Dashboard(LoginRequiredMixin, View):
         user_counts = User.objects.values('role_id').annotate(count=Count('id'))
         user_count_by_role = {user['role_id']: user['count'] for user in user_counts}
 
-        # Counts for each model
-        team_count = Team.objects.count()
-        team_branch_count = TeamBranch.objects.count()
-        post_count = Post.objects.count()
-        event_count = Event.objects.count()
-        friendly_game_count = FriendlyGame.objects.count()
-        tournament_count = Tournament.objects.count()
-        tournament_games_count = TournamentGames.objects.count()
-        training_count = Training.objects.count()
+        # Dynamic counts for each model
+        model_counts = {
+            "players": User.objects.filter(role_id=2).count(),
+            "coaches": User.objects.filter(role_id=3).count(),
+            "managers": User.objects.filter(role_id=6).count(),
+            "referees": User.objects.filter(role_id=4).count(),
+            "default_users": User.objects.filter(role_id=5).count(),
+            "teams": Team.objects.count(),
+            "team_branches": TeamBranch.objects.count(),
+            "posts": Post.objects.count(),
+            "events": Event.objects.count(),
+            "friendly_games": FriendlyGame.objects.count(),
+            "tournaments": Tournament.objects.count(),
+            "tournament_games": TournamentGames.objects.count(),
+            "trainings": Training.objects.count(),
+        }
 
         context = {
             "breadcrumb": {"parent": "Admin", "child": "Dashboard"},
-            "user_count_by_role": user_count_by_role,  # Role-wise user counts
-            "team_count": team_count,
-            "team_branch_count": team_branch_count,
-            "post_count": post_count,
-            "event_count": event_count,
-            "friendly_game_count": friendly_game_count,
-            "tournament_count": tournament_count,
-            "tournament_games_count": tournament_games_count,
-            "training_count": training_count,
+            "user_count_by_role": user_count_by_role,
+            "model_counts": model_counts,  # Pass the model counts dynamically
         }
 
         return render(request, "Admin/Dashboard.html", context)
+
 
 
 
