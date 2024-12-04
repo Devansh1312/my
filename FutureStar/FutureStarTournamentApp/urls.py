@@ -61,6 +61,10 @@ urlpatterns = [
 
 
 
+        ############ Extra time ############\
+        path('api/update_extra_time/', ExtraTimeAPIView.as_view(), name='update_extra_time'),
+
+
 
 
 

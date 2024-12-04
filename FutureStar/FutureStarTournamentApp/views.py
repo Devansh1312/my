@@ -2534,3 +2534,90 @@ class TeamGameDetailStatsAPIView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+
+class ExtraTimeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Getting data from the request
+        game_type = request.data.get('game_type')  # Either "Tournament" or "Friendly"
+        game_id = request.data.get('game_id')
+        tournament_id = request.data.get('tournament_id')  # Only needed for Tournament games
+        extra_time_value = request.data.get('extra_time')  # 1 to add, -1 to remove
+   
+        extra_time_value=int(extra_time_value)
+
+
+        # Check if required fields are provided
+        if not game_type or not game_id:
+            return Response({
+                "status": 0,
+                "message": _("Game type and game ID are required.")
+            }, status=400)
+
+        # Ensure extra_time_value is provided and is either 1 or -1
+        if extra_time_value not in [1, -1]:
+            return Response({
+                "status": 0,
+                "message": _("Invalid value for 'extra_time'. It must be 1 (add) or -1 (remove).")
+            }, status=400)
+
+        # Handle "Tournament" game type
+        if game_type == "Tournament":
+            if not tournament_id:
+                return Response({
+                    "status": 0,
+                    "message": _("Tournament ID is required for Tournament games.")
+                }, status=400)
+
+            # Find the Tournament game using both game_id and tournament_id
+            game = TournamentGames.objects.filter(id=game_id, tournament_id=tournament_id).first()
+
+        # Handle "Friendly" game type
+        elif game_type == "Friendly":
+            # Find the Friendly game using only game_id
+            game = FriendlyGame.objects.filter(id=game_id).first()
+
+        else:
+            return Response({
+                "status": 0,
+                "message": _("Invalid game type. Must be either 'Tournament' or 'Friendly'.")
+            }, status=400)
+
+        if not game:
+            return Response({
+                "status": 0,
+                "message": _("Game not found.")
+            }, status=404)
+
+        # If extra_time_value is 1, add 1 to extra_time
+        if extra_time_value == 1:
+            game.extra_time += 1
+
+        # If extra_time_value is -1, remove 1 from extra_time but ensure it doesn't go below 0
+        elif extra_time_value == -1:
+            if game.extra_time > 0:
+                game.extra_time -= 1
+            else:
+                return Response({
+                    "status": 0,
+                    "message": _("Extra time is already at 0, cannot remove further.")
+                }, status=400)
+
+        # Save the updated game
+        game.save()
+
+        return Response({
+            "status": 1,
+            "message": _("Extra time updated successfully."),
+            "data": {
+                "game_id": game.id,
+                "extra_time": game.extra_time
+            }
+        }, status=200)

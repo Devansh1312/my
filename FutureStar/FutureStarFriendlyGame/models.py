@@ -31,6 +31,7 @@ class FriendlyGame(models.Model):
     winner_id = models.CharField(max_length=100, blank=True, null=True)  # ID of the winning team
     loser_id = models.CharField(max_length=100, blank=True, null=True)   # ID of the losing team
     is_draw = models.BooleanField(default=False)  # True if the game is a draw
+    extra_time = models.IntegerField(default=0)
 
     team_a_primary_color_player = models.CharField(max_length=255,null=True,blank=True)
     team_a_secondary_color_player = models.CharField(max_length=255,null=True,blank=True)
