@@ -5,612 +5,631 @@
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> -->
 <!-- Plugins css Ends-->
 <style>
-   .profile-info .label-value {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 5px 0;
-   }
+	.profile-info .label-value {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 5px 0;
+	}
 
-   .card-header,
-   .card-body {
-      padding: 1.5rem;
-   }
+	.card-header,
+	.card-body {
+		padding: 1.5rem;
+	}
 
-   .card-footer {
-      text-align: right;
-      padding: 1rem;
-   }
+	.card-footer {
+		text-align: right;
+		padding: 1rem;
+	}
 
-   /* Ensure the back button is at the end of the large card */
-   .card-footer a.btn-secondary {
-      display: inline-block;
-      margin-top: 20px;
-   }
+	/* Ensure the back button is at the end of the large card */
+	.card-footer a.btn-secondary {
+		display: inline-block;
+		margin-top: 20px;
+	}
 
-   .widget-1 {
-        margin-bottom: 25px;
-        background-color: #ffffff;
-        border: 1px solid #e4e4e4 !important;
-        box-shadow: 0 0 6px 2px #00000026;
-        border-radius: 9px;
-        background-image: url({% static 'assets/images/dashboard/goal/widget-bg.png' %});
-    }
+	.widget-1 {
+		margin-bottom: 25px;
+		background-color: #ffffff;
+		border: 1px solid #e4e4e4 !important;
+		box-shadow: 0 0 6px 2px #00000026;
+		border-radius: 9px;
+		background-image: url({% static 'assets/images/dashboard/goal/widget-bg.png' %});
+	}
 </style> {% endblock %} {% block title %} {{title}} | Page {% endblock %} {% block content %} <div class="page-body">
-   <!-- Big Card -->
-   <div class="card" style="margin-top:100px;">
-      <div class="card-body">
-         <div class="row">
-            <!-- Profile Information -->
-            <div class="col-xl-12">
-               <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4 class="card-title mb-0">Profile Details</h4>
-                  <!-- Back Button -->
-                  <button class="btn btn-secondary btn-sm" onclick="history.back();">
-                     <i class="fa fa-arrow-left"></i> Back </button>
-               </div>
-               <div class="card-body">
-                  <div class="info">
-                     <div class="row g-3">
-                        <!-- Left Column -->
-                        <div class="col-sm-6 col-xl-4 order-sm-1 order-xl-0">
-                           <div class="row g-3 mb-3">
-                              <!-- Added spacing here -->
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-user"></i> Full Name
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.fullname }}</span>
-                                 </div>
-                              </div>
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-birthday-cake"></i> Date of Birth
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.date_of_birth|default:"None" }}</span>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="row g-3">
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-envelope"></i> Email
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.email|default:"None" }}</span>
-                                 </div>
-                              </div>
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-flag"></i> Nationality
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.nationality|default:"None" }}</span>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                        <!-- Middle Column -->
-                        <div class="col-sm-12 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center">
-                           <img src="{{ user.profile_picture.url|default:'path/to/default-image.jpg' }}" alt="Profile Picture" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
-                           <!-- Username and Role in a row -->
-                           <div class="w-100 mb-3 text-center">
-                              <div class="title mb-1">
-                                 <a target="_blank" href="">{{ user.username }}</a>
-                              </div>
-                              <div class="desc">
-                                 <i class="fa fa-briefcase"></i> {{ user.role.name_en }}
-                              </div>
-                              <!-- Updated icon -->
-                           </div>
-                        </div>
-                        <!-- Right Column -->
-                        <div class="col-sm-6 col-xl-4 order-sm-2 order-xl-2">
-                           <div class="row g-3 mb-3">
-                              <!-- Added spacing here -->
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-phone"></i> Phone
-                                    </h6>
-                                    <span>{{ user.phone|default:"None" }}</span>
-                                 </div>
-                              </div>
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-venus-mars"></i> Gender
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.gender.name|default:"None" }}</span>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="row g-3">
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-globe"></i> Country
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.country.name|default:"None" }}</span>
-                                 </div>
-                              </div>
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-building"></i> City
-                                    </h6>
-                                    <!-- Updated icon -->
-                                    <span>{{ user.city.name|default:"None" }}</span>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-                  <hr>
-               </div>
-               <div class="card-header">
-                  <h4 class="card-title mb-0">Additional Information</h4>
-               </div>
-               <div class="card-body">
-                  <div class="info">
-                     <div class="row g-3">
-                        <!-- Left Column -->
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-balance-scale"></i> Weight
-                                 <!-- FA4 equivalent for weight -->
-                              </h6>
-                              <span>{{ user.weight|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-arrows-v"></i> Height
-                                 <!-- FA4 equivalent for height -->
-                              </h6>
-                              <span>{{ user.height|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-soccer-ball-o"></i> Main Playing Position
-                                 <!-- FA4 equivalent -->
-                              </h6>
-                              <span>{{ user.main_playing_position|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-soccer-ball-o"></i> Secondary Playing Position
-                                 <!-- FA4 equivalent -->
-                              </h6>
-                              <span>{{ user.secondary_playing_position|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-chevron-circle-right"></i> Playing Foot
-                                 <!-- FA4 equivalent -->
-                              </h6>
-                              <span>{{ user.playing_foot|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-home"></i> Favourite Local Team
-                              </h6>
-                              <span>{{ user.favourite_local_team|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-users"></i> Favourite Team
-                              </h6>
-                              <span>{{ user.favourite_team|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-user"></i> Favourite Local Player
-                              </h6>
-                              <span>{{ user.favourite_local_player|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-user"></i> Favourite Player
-                              </h6>
-                              <span>{{ user.favourite_player|default:"None" }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6">
-                           <div class="ttl-info text-start">
-                              <h6>
-                                 <i class="fa fa-comment"></i> Bio
-                              </h6>
-                              <span>{{ user.bio|default:"None" }}</span>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-                  <hr>
-               </div> 
-               {% if user.role.id == 2 or user.role.id == 3 or user.role.id == 4 %} 
-               <div class="card-header">
-                  <h4 class="card-title mb-0">Stats Information</h4>
-               </div> {% if stats %} 
-               <div class="row">
-                  {% if user.role.id == 2 %}
-                      <!-- Player Stats -->
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/matches.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.matchplayed }}</h4>
-                                          <span class="f-light">Games Played</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/wins.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.win }}</h4>
-                                          <span class="f-light">Wins</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/losses.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.loss }}</h4>
-                                          <span class="f-light">Losses</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/draws.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.draw }}</h4>
-                                          <span class="f-light">Draws</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/goals.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.goals }}</h4>
-                                          <span class="f-light">Goals</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/assists.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.assists }}</h4>
-                                          <span class="f-light">Assists</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/yellow_cards.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.yellow_card }}</h4>
-                                          <span class="f-light">Yellow Cards</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/player/red_cards.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.red }}</h4>
-                                          <span class="f-light">Red Cards</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  {% elif user.role.id == 3 %}
-                      <!-- Coach Stats -->
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/coach/matches.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.matchplayed }}</h4>
-                                          <span class="f-light">Games Coached</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/coach/wins.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.win }}</h4>
-                                          <span class="f-light">Wins</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/coach/losses.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.loss }}</h4>
-                                          <span class="f-light">Losses</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  {% elif user.role.id == 4 %}
-                      <!-- Referee Stats -->
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/referee/matches.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.matchplayed }}</h4>
-                                          <span class="f-light">Games Officiated</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/referee/yellow_cards.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.yellow_card }}</h4>
-                                          <span class="f-light">Yellow Cards Given</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="col-3">
-                          <div class="card widget-1">
-                              <div class="card-body">
-                                  <div class="widget-content">
-                                      <div class="widget-round">
-                                          <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/referee/red_cards.png' %}" width="70%">
-                                          </div>
-                                      </div>
-                                      <div>
-                                          <h4>{{ stats.red }}</h4>
-                                          <span class="f-light">Red Cards Given</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  {% endif %}
-              </div>
-               
-               {% else %} 
-               <p>No statistics available.</p> 
-               {% endif %} 
-               {% endif %}
-            </div>
-         </div>
-      </div>
-   </div>
-   <!-- Datatable Section -->
-   <div class="row">
-      <div class="col-sm-12">
-         <div class="card">
-            <div class="card-body">
-               <!-- Add tab navigation -->
-               <ul class="nav nav-tabs" id="dataTab" role="tablist">
-                  <li class="nav-item">
-                     <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
-                  </li>
-                  <li class="nav-item">
-                     <a class="nav-link" id="participated_event-tab" data-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
-                  </li>
-                  <li class="nav-item">
-                     <a class="nav-link" id="team-tab" data-toggle="tab" href="#team" role="tab" aria-controls="team" aria-selected="false">Team</a>
-                  </li>
-               </ul>
-               <div class="tab-content" id="dataTabContent">
-                  <!-- Post Tab  -->
-                  <div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
-                     <div class="table-responsive">
-                        <table class="display" id="post-table">
-                           <thead>
-                              <tr>
-                                 <th>No</th>
-                                 <th>Post Title</th>
-                                 <th>Description</th>
-                                 <th>Image</th>
-                                 <th>date created</th>
-                              </tr>
-                           </thead>
-                           <tbody> {% for post in posts %} <tr>
-                                 <td>{{ forloop.counter }}</td>
-                                 <td>{{ post.title }}</td>
-                                 <td> {% if post.creator_type == post.USER_TYPE %} {{ post.description }} {% else %} invalid {% endif %} </td>
-                                 <td> {% if post.media_type == 1 %} {% if post.image %} <img src="{{ post.image.url }}" alt="{{ post.title }}" width="100" height="100"> {% else %} No Image {% endif %} {% elif post.media_type == 2 %} {% if post.image %} <video width="200" height="100" controls>
-                                       <source src="{{ post.image.url }}" type="video/mp4"> Your browser does not support the video tag.
-                                    </video> {% else %} No Video {% endif %} {% else %} No Media {% endif %} </td>
-                                 <td>{{ post.date_created|date:"d-M-Y" }}</td>
-                              </tr> {% endfor %} </tbody>
-                        </table>
-                     </div>
-                  </div>
-                  <!--Participated Event Tab  -->
-                  <div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
-                     <div class="table-responsive">
-                        <table class="display" id="participated_event-table">
-                           <thead>
-                              <tr>
-                                 <th>No</th>
-                                 <th>Event Name</th>
-                                 <th>Event Type</th>
-                                 <th>No of Tickets</th>
-                                 <th>Total Paid</th>
-                                 <th>Booking Date</th>
-                                 <th>Event Date</th>
-                              </tr>
-                           </thead>
-                           <tbody> {% for event_booking in events_bookings %} <tr>
-                                 <td>{{ forloop.counter }}</td>
-                                 <td>{{ event_booking.event.event_name }}</td>
-                                 <td>{{ event_booking.event.event_type }}</td>
-                                 <td>{{ event_booking.ticket_amount|floatformat:0 }}</td>
-                                 <td>{{ event_booking.total_amount }}</td>
-                                 <td>{{ event_booking.created_at|date:"d-M-Y" }}</td>
-                                 <td>{{ event_booking.event.event_date|date:"d-M-Y" }}</td>
-                              </tr> {% endfor %} </tbody>
-                        </table>
-                     </div>
-                  </div>
-                  <!-- Team Tab  -->
-                  <div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
-                     <div class="table-responsive">
-                        <table class="display" id="team-table">
-                           <thead>
-                              <tr>
-                                 <th>No</th>
-                                 <th>Team Name</th>
-                                 <th>Age</th>
-                                 <th>Joining Type</th>
-                                 <th>Joining Date</th>
-                              </tr>
-                           </thead>
-                           <tbody> {% for teams in teams %} <tr>
-                                 <td>{{ forloop.counter }}</td>
-                                 <td>{{ teams.branch_id.team_name }}</td>
-                                 <td>{{ teams.branch_id.age_group_id }}</td>
-                                 <td>{{ teams.get_joinning_type_display }}</td>
-                                 <td>{{ teams.created_at }}</td>
-                              </tr> {% endfor %} </tbody>
-                        </table>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
+	<!-- Big Card -->
+	<div class="card" style="margin-top:100px;">
+		<div class="card-body">
+			<div class="row">
+				<!-- Profile Information -->
+				<div class="col-xl-12">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h4 class="card-title mb-0">Profile Details</h4>
+						<!-- Back Button -->
+						<button class="btn btn-secondary btn-sm" onclick="history.back();">
+							<i class="fa fa-arrow-left"></i> Back </button>
+					</div>
+					<div class="card-body">
+						<div class="info">
+							<div class="row g-3">
+								<!-- Left Column -->
+								<div class="col-12 col-sm-6 col-xl-4 order-sm-1 order-xl-0">
+									<div class="row g-3 mb-3">
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-user"></i> Full Name
+												</h6>
+												<span>{{ user.fullname }}</span>
+											</div>
+										</div>
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-birthday-cake"></i> Date of Birth
+												</h6>
+												<span>{{ user.date_of_birth|default:"None" }}</span>
+											</div>
+										</div>
+									</div>
+									<div class="row g-3">
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-envelope"></i> Email
+												</h6>
+												<span>{{ user.email|default:"None" }}</span>
+											</div>
+										</div>
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-flag"></i> Nationality
+												</h6>
+												<span>{{ user.nationality|default:"None" }}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- Middle Column -->
+								<div class="col-12 col-sm-12 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center text-center">
+									<img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/images/dashboard/profile.jpg' %}{% endif %}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+									<div class="w-100 mb-3">
+										<div class="title mb-1">
+											<a target="_blank" href="">{{ user.username }}</a>
+										</div>
+										<div class="desc">
+											<i class="fa fa-briefcase"></i> {{ user.role.name_en }}
+										</div>
+									</div>
+								</div>
+								<!-- Right Column -->
+								<div class="col-12 col-sm-6 col-xl-4 order-sm-2 order-xl-2">
+									<div class="row g-3 mb-3">
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-phone"></i> Phone
+												</h6>
+												<span>{{ user.phone|default:"None" }}</span>
+											</div>
+										</div>
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-venus-mars"></i> Gender
+												</h6>
+												<span>{{ user.gender.name|default:"None" }}</span>
+											</div>
+										</div>
+									</div>
+									<div class="row g-3">
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-globe"></i> Country
+												</h6>
+												<span>{{ user.country.name|default:"None" }}</span>
+											</div>
+										</div>
+										<div class="col-12 col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-building"></i> City
+												</h6>
+												<span>{{ user.city.name|default:"None" }}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<hr>
+					</div>
+					<div class="card-header">
+						<h4 class="card-title mb-0">Additional Information</h4>
+					</div>
+					<div class="card-body">
+						<div class="info">
+							<div class="row g-3">
+								<!-- Each item stacks on smaller screens -->
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-balance-scale"></i> Weight
+										</h6>
+										<span>{{ user.weight|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-arrows-v"></i> Height
+										</h6>
+										<span>{{ user.height|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-soccer-ball-o"></i> Main Playing Position
+										</h6>
+										<span>{{ user.main_playing_position|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-soccer-ball-o"></i> Secondary Playing Position
+										</h6>
+										<span>{{ user.secondary_playing_position|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-chevron-circle-right"></i> Playing Foot
+										</h6>
+										<span>{{ user.playing_foot|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-home"></i> Favourite Local Team
+										</h6>
+										<span>{{ user.favourite_local_team|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-users"></i> Favourite Team
+										</h6>
+										<span>{{ user.favourite_team|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-user"></i> Favourite Local Player
+										</h6>
+										<span>{{ user.favourite_local_player|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12 col-md-4">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-user"></i> Favourite Player
+										</h6>
+										<span>{{ user.favourite_player|default:"None" }}</span>
+									</div>
+								</div>
+								<div class="col-12">
+									<div class="ttl-info text-start">
+										<h6>
+											<i class="fa fa-comment"></i> Bio
+										</h6>
+										<span>{{ user.bio|default:"None" }}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<hr>
+					</div> {% if user.role.id == 2 or user.role.id == 3 or user.role.id == 4 %} <div class="card-header">
+						<h4 class="card-title mb-0">Stats Information</h4>
+					</div> {% if stats %} <div class="row"> {% if user.role.id == 2 %}
+						<!-- Player Stats -->
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.matchplayed }}</h4>
+											<span class="f-light">Games Played</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.win }}</h4>
+											<span class="f-light">Wins</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.loss }}</h4>
+											<span class="f-light">Losses</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.draw }}</h4>
+											<span class="f-light">Draws</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/goal.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.goals }}</h4>
+											<span class="f-light">Goals</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/assists.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.assists }}</h4>
+											<span class="f-light">Assists</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/yellow-card.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.yellow_card }}</h4>
+											<span class="f-light">Yellow Cards</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/red-card.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.red }}</h4>
+											<span class="f-light">Red Cards</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div> {% elif user.role.id == 3 %}
+						<!-- Coach Stats -->
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.matchplayed }}</h4>
+											<span class="f-light">Games Coached</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.win }}</h4>
+											<span class="f-light">Wins</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.loss }}</h4>
+											<span class="f-light">Losses</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.draw }}</h4>
+											<span class="f-light">Draws</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/yellow-card.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.yellow_card }}</h4>
+											<span class="f-light">Yellow Cards</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/red-card.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.red }}</h4>
+											<span class="f-light">Red Cards</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div> {% elif user.role.id == 4 %}
+						<!-- Referee Stats -->
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.matchplayed }}</h4>
+											<span class="f-light">Games Officiated</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/yellow-card.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.yellow_card }}</h4>
+											<span class="f-light">Yellow Cards Given</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+							<div class="card widget-1">
+								<div class="card-body">
+									<div class="widget-content">
+										<div class="widget-round">
+											<div class="bg-round">
+												<img src="{% static 'assets/images/dashboard/goal/red-card.png' %}" width="70%">
+											</div>
+										</div>
+										<div>
+											<h4>{{ stats.red }}</h4>
+											<span class="f-light">Red Cards Given</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div> {% endif %}
+					</div> {% else %} <p>No statistics available.</p> {% endif %} {% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Datatable Section -->
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+					<!-- Add tab navigation -->
+					<ul class="nav nav-tabs" id="dataTab" role="tablist">
+						<li class="nav-item">
+							<a class="nav-link active" id="post-tab" data-bs-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="true">Post</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" id="participated_event-tab" data-bs-toggle="tab" href="#participated_event" role="tab" aria-controls="participated_event" aria-selected="false">Participated Event</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" id="team-tab" data-bs-toggle="tab" href="#team" role="tab" aria-controls="team" aria-selected="false">Team</a>
+						</li>
+					</ul>
+					<div class="tab-content" id="dataTabContent">
+						<!-- Post Tab  -->
+						<div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
+							<div class="table-responsive">
+								<table class="table table-striped table-bordered" id="post-table">
+									<thead>
+										<tr>
+											<th>No</th>
+											<th>Post Title</th>
+											<th>Description</th>
+											<th>Date Created</th>
+										</tr>
+									</thead>
+									<tbody> {% for post in posts %} <tr>
+											<td>{{ forloop.counter }}</td>
+											<td>{{ post.title }}</td>
+											<td> {% if post.creator_type == post.USER_TYPE %} {{ post.description }} {% else %} Invalid {% endif %} </td>
+											<td>{{ post.date_created|date:"d-M-Y" }}</td>
+										</tr> {% endfor %} </tbody>
+								</table>
+							</div>
+						</div>
+						<!-- Participated Event Tab -->
+						<div class="tab-pane fade" id="participated_event" role="tabpanel" aria-labelledby="participated_event-tab">
+							<div class="table-responsive">
+								<table class="table table-striped table-bordered" id="participated_event-table">
+									<thead>
+										<tr>
+											<th>No</th>
+											<th>Event Name</th>
+											<th>Event Type</th>
+											<th>No of Tickets</th>
+											<th>Total Paid</th>
+											<th>Booking Date</th>
+											<th>Event Date</th>
+										</tr>
+									</thead>
+									<tbody> {% for event_booking in events_bookings %} <tr>
+											<td>{{ forloop.counter }}</td>
+											<td>{{ event_booking.event.event_name }}</td>
+											<td>{{ event_booking.event.event_type }}</td>
+											<td>{{ event_booking.ticket_amount|floatformat:0 }}</td>
+											<td>{{ event_booking.total_amount }}</td>
+											<td>{{ event_booking.created_at|date:"d-M-Y" }}</td>
+											<td>{{ event_booking.event.event_date|date:"d-M-Y" }}</td>
+										</tr> {% endfor %} </tbody>
+								</table>
+							</div>
+						</div>
+						<!-- Team Tab -->
+						<div class="tab-pane fade" id="team" role="tabpanel" aria-labelledby="team-tab">
+							<div class="table-responsive">
+								<table class="table table-striped table-bordered" id="team-table">
+									<thead>
+										<tr>
+											<th>No</th>
+											<th>Team Name</th>
+											<th>Age</th>
+											<th>Joining Type</th>
+											<th>Joining Date</th>
+										</tr>
+									</thead>
+									<tbody> {% for teams in teams %} <tr>
+											<td>{{ forloop.counter }}</td>
+											<td>{{ teams.branch_id.team_name }}</td>
+											<td>{{ teams.branch_id.age_group_id }}</td>
+											<td>{{ teams.get_joinning_type_display }}</td>
+											<td>{{ teams.created_at|date:"d-M-Y" }}</td>
+										</tr> {% endfor %} </tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div> {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -620,21 +639,21 @@
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
 <!-- Plugins JS Ends-->
 <script>
-   $(document).ready(function() {
-      // Initialize datatables for both tables
-      $('#post-table').DataTable();
-      $('#participated_event-table').DataTable();
-      $('#team-table').DataTable();
-      // Adjust DataTables when tabs are switched
-      $('#dataTab a').on('shown.bs.tab', function(e) {
-         var target = $(e.target).attr("href");
-         if (target === "#post") {
-            $('#post-table').DataTable().columns.adjust().draw();
-         } else if (target === "#participated_event") {
-            $('#participated_event-table').DataTable().columns.adjust().draw();
-         } else if (target === "#team") {
-            $('#team-table').DataTable().columns.adjust().draw();
-         }
-      });
-   });
+	$(document).ready(function() {
+		// Initialize datatables for both tables
+		$('#post-table').DataTable();
+		$('#participated_event-table').DataTable();
+		$('#team-table').DataTable();
+		// Adjust DataTables when tabs are switched
+		$('#dataTab a').on('shown.bs.tab', function(e) {
+			var target = $(e.target).attr("href");
+			if (target === "#post") {
+				$('#post-table').DataTable().columns.adjust().draw();
+			} else if (target === "#participated_event") {
+				$('#participated_event-table').DataTable().columns.adjust().draw();
+			} else if (target === "#team") {
+				$('#team-table').DataTable().columns.adjust().draw();
+			}
+		});
+	});
 </script> {% endblock %}
