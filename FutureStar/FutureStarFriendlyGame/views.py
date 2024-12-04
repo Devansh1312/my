@@ -1346,9 +1346,8 @@ class FriendlyGameStatsLineupPlayers(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, game_id=None):
-       
-        # Check if the user is the game_statistics_handler for the given game and tournament
-        if game_id :
+        # Check if the user is the game_statistics_handler for the given game
+        if game_id:
             try:
                 game = FriendlyGame.objects.get(id=game_id)
                 if game.game_statistics_handler == user:
@@ -1357,6 +1356,7 @@ class FriendlyGameStatsLineupPlayers(APIView):
                 pass  # Game not found or doesn't match; access denied
 
         return False   
+
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -1365,14 +1365,14 @@ class FriendlyGameStatsLineupPlayers(APIView):
         team_a_id = request.query_params.get('team_a_id')
         team_b_id = request.query_params.get('team_b_id')
         game_id = request.query_params.get('game_id')
-     
 
-        if not team_a_id or not team_b_id or not game_id :
+        if not team_a_id or not team_b_id or not game_id:
             return Response({
                 'status': 0,
                 'message': _('team_a_id, team_b_id, game_id are required.'),
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
+
         if not self._has_access(request.user, game_id=game_id):
             return Response({
                 'status': 0,
@@ -1386,41 +1386,41 @@ class FriendlyGameStatsLineupPlayers(APIView):
             substitute_lineups = FriendlyGameLineup.objects.filter(
                 team_id=team_id,
                 game_id=game_id,
-                
                 lineup_status=FriendlyGameLineup.SUBSTITUTE
             )
             already_added_lineups = FriendlyGameLineup.objects.filter(
                 team_id=team_id,
                 game_id=game_id,
-             
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
             )
 
             # Prepare response data for substitute and already added players
             substitute_data = [{
-                'id':lineup.id,
+                'id': lineup.id,
                 'player_id': lineup.player_id.id,
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,  # Add jersey number
             } for lineup in substitute_lineups]
 
             already_added_data = [{
-                'id':lineup.id,
+                'id': lineup.id,
                 'player_id': lineup.player_id.id,
                 'player_username': lineup.player_id.username,
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,  # Add jersey number
             } for lineup in already_added_lineups]
 
             # Retrieve managerial staff related to the given team
             managerial_staff = JoinBranch.objects.filter(
                 branch_id=team_id,
-                joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE  # Assuming this is the constant for managerial staff type
+                joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
             ).select_related('user_id')
 
             managerial_staff_data = [{
-                'id':staff.id,
+                'id': staff.id,
                 'staff_id': staff.user_id.id,
                 'staff_username': staff.user_id.username,
                 'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
@@ -1441,7 +1441,6 @@ class FriendlyGameStatsLineupPlayers(APIView):
             'message': _('Lineup players and Manager fetched successfully for both teams.'),
             'data': lineup_data
         }, status=status.HTTP_200_OK)
-
 
 
 class FriendlyGameLineupPlayerStatusAPIView(APIView):

@@ -2189,6 +2189,7 @@ class UpcomingGameView(APIView):
                         "user_role": user_role,
                         # Add "tournament_id" only if game_type is "Tournament"
                         **({"tournament_id": first_game.tournament_id.id} if game_type == "Tournament" and first_game.tournament_id else {})
+                        **({"tournament_name": first_game.tournament_id.tournament_name} if game_type == "Tournament" and first_game.tournament_id else {})
                     },
                 },
             }
