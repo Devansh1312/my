@@ -29,13 +29,13 @@
    }
 
    .widget-1 {
-      background-size: cover;
-      margin-bottom: 25px;
-      background-color: #ffffff;
-      box-shadow: 0 0 6px 2px #00000026;
-      border-radius: 9px;
-      margin-left: 44px;
-   }
+        margin-bottom: 25px;
+        background-color: #ffffff;
+        border: 1px solid #e4e4e4 !important;
+        box-shadow: 0 0 6px 2px #00000026;
+        border-radius: 9px;
+        background-image: url({% static 'assets/images/dashboard/goal/widget-bg.png' %});
+    }
 </style> {% endblock %} {% block title %} {{title}} | Page {% endblock %} {% block content %} <div class="page-body">
    <!-- Big Card -->
    <div class="card" style="margin-top:100px;">
@@ -47,9 +47,8 @@
                   <h4 class="card-title mb-0">Profile Details</h4>
                   <!-- Back Button -->
                   <button class="btn btn-secondary btn-sm" onclick="history.back();">
-                      <i class="fa fa-arrow-left"></i> Back
-                  </button>
-              </div>
+                     <i class="fa fa-arrow-left"></i> Back </button>
+               </div>
                <div class="card-body">
                   <div class="info">
                      <div class="row g-3">
@@ -253,271 +252,262 @@
                      </div>
                   </div>
                   <hr>
-               </div>
-               {% if user.role.id == 2 or user.role.id == 3 or user.role.id == 4 %}
+               </div> 
+               {% if user.role.id == 2 or user.role.id == 3 or user.role.id == 4 %} 
                <div class="card-header">
-                     <h4 class="card-title mb-0">Stats Information</h4>
-                  </div> 
-                  {% if stats %} 
-                  <div class="row"> 
-                     {% if user.role.id == 2 %}
-                     <!-- Player Role -->
-                     <!-- Games Played -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-futbol-o"></i>
-                                 </div>
+                  <h4 class="card-title mb-0">Stats Information</h4>
+               </div> {% if stats %} 
+               <div class="row">
+                  {% if user.role.id == 2 %}
+                      <!-- Player Stats -->
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/matches.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.matchplayed }}</h4>
+                                          <span class="f-light">Games Played</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.matchplayed }}</span>
-                                 </h4>
-                                 <span class="f-light">Games Played</span>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/wins.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.win }}</h4>
+                                          <span class="f-light">Wins</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Wins -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-trophy"></i>
-                                 </div>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/losses.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.loss }}</h4>
+                                          <span class="f-light">Losses</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.win }}</span>
-                                 </h4>
-                                 <span class="f-light">Wins</span>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/draws.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.draw }}</h4>
+                                          <span class="f-light">Draws</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Losses -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-times-circle"></i>
-                                 </div>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/goals.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.goals }}</h4>
+                                          <span class="f-light">Goals</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.loss }}</span>
-                                 </h4>
-                                 <span class="f-light">Losses</span>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/assists.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.assists }}</h4>
+                                          <span class="f-light">Assists</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Draws -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-handshake-o"></i>
-                                 </div>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/yellow_cards.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.yellow_card }}</h4>
+                                          <span class="f-light">Yellow Cards</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.draw }}</span>
-                                 </h4>
-                                 <span class="f-light">Draws</span>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/player/red_cards.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.red }}</h4>
+                                          <span class="f-light">Red Cards</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Goals -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-soccer-ball-o"></i>
-                                 </div>
+                          </div>
+                      </div>
+                  {% elif user.role.id == 3 %}
+                      <!-- Coach Stats -->
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/coach/matches.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.matchplayed }}</h4>
+                                          <span class="f-light">Games Coached</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.goals }}</span>
-                                 </h4>
-                                 <span class="f-light">Goals</span>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/coach/wins.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.win }}</h4>
+                                          <span class="f-light">Wins</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Assists -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-forward"></i>
-                                 </div>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/coach/losses.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.loss }}</h4>
+                                          <span class="f-light">Losses</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.assists }}</span>
-                                 </h4>
-                                 <span class="f-light">Assists</span>
+                          </div>
+                      </div>
+                  {% elif user.role.id == 4 %}
+                      <!-- Referee Stats -->
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/referee/matches.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.matchplayed }}</h4>
+                                          <span class="f-light">Games Officiated</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Yellow Cards -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-square yellow"></i>
-                                 </div>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/referee/yellow_cards.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.yellow_card }}</h4>
+                                          <span class="f-light">Yellow Cards Given</span>
+                                      </div>
+                                  </div>
                               </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.yellow_card }}</span>
-                                 </h4>
-                                 <span class="f-light">Yellow Cards</span>
+                          </div>
+                      </div>
+                      <div class="col-3">
+                          <div class="card widget-1">
+                              <div class="card-body">
+                                  <div class="widget-content">
+                                      <div class="widget-round">
+                                          <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/referee/red_cards.png' %}" width="70%">
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <h4>{{ stats.red }}</h4>
+                                          <span class="f-light">Red Cards Given</span>
+                                      </div>
+                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Red Cards -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-square red"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.red }}</span>
-                                 </h4>
-                                 <span class="f-light">Red Cards</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div> {% elif user.role.id == 3 %}
-                     <!-- Coach Role -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-user"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.matchplayed }}</span>
-                                 </h4>
-                                 <span class="f-light">Games Coached</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Wins -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-trophy"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.win }}</span>
-                                 </h4>
-                                 <span class="f-light">Wins</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Losses -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-times-circle"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.loss }}</span>
-                                 </h4>
-                                 <span class="f-light">Losses</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div> {% elif user.role.id == 4 %}
-                     <!-- Referee Role -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-whistle"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.matchplayed }}</span>
-                                 </h4>
-                                 <span class="f-light">Games Officiated</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Yellow Cards -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-square yellow"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.yellow_card }}</span>
-                                 </h4>
-                                 <span class="f-light">Yellow Cards Given</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <!-- Red Cards -->
-                     <div class="col-3 widget-1">
-                        <div class="card-body">
-                           <div class="widget-content">
-                              <div class="widget-round">
-                                 <div class="bg-round">
-                                    <i class="fa fa-square red"></i>
-                                 </div>
-                              </div>
-                              <div>
-                                 <h4>
-                                    <span class="counter">{{ stats.red }}</span>
-                                 </h4>
-                                 <span class="f-light">Red Cards Given</span>
-                              </div>
-                           </div>
-                        </div>
-                     </div> {% endif %}
-                  </div> 
-                  {% else %}
-                  <p>No statistics available.</p>
+                          </div>
+                      </div>
                   {% endif %}
+              </div>
+               
+               {% else %} 
+               <p>No statistics available.</p> 
+               {% endif %} 
                {% endif %}
             </div>
          </div>

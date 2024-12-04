@@ -2029,6 +2029,7 @@ def post(self, request, *args, **kwargs):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -2041,19 +2042,24 @@ class UpcomingGameView(APIView):
         user_id = user.id
         user_role = user.role.id  # Assuming `role` is a related field
         one_hour_ago = now() - timedelta(hours=1)
+        current_time = now()
 
         all_games = []
 
         # Condition 1: Statistics Handler
-        if user_role == 5:  # Role for Statistics Handler
+        if user_role == 5:
             tournament_games = TournamentGames.objects.filter(
-                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                Q(game_date__gt=current_time.date()) | 
+                (Q(game_date=current_time.date()) & Q(game_start_time__gte=current_time.time())) | 
+                (Q(game_date=current_time.date()) & Q(game_end_time__gte=one_hour_ago)),
                 game_statistics_handler=user_id,
                 finish=False
             ).order_by('game_date', 'game_start_time')
 
             friendly_games = FriendlyGame.objects.filter(
-                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                Q(game_date__gt=current_time.date()) | 
+                (Q(game_date=current_time.date()) & Q(game_start_time__gte=current_time.time())) | 
+                (Q(game_date=current_time.date()) & Q(game_end_time__gte=one_hour_ago)),
                 game_statistics_handler=user_id,
                 finish=False
             ).order_by('game_date', 'game_start_time')
@@ -2069,13 +2075,17 @@ class UpcomingGameView(APIView):
 
             if branches:
                 tournament_games = TournamentGames.objects.filter(
-                    Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                    Q(game_date__gt=current_time.date()) | 
+                    (Q(game_date=current_time.date()) & Q(game_start_time__gte=current_time.time())) | 
+                    (Q(game_date=current_time.date()) & Q(game_end_time__gte=one_hour_ago)),
                     Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
                     finish=False
                 ).order_by('game_date', 'game_start_time')
 
                 friendly_games = FriendlyGame.objects.filter(
-                    Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                    Q(game_date__gt=current_time.date()) | 
+                    (Q(game_date=current_time.date()) & Q(game_start_time__gte=current_time.time())) | 
+                    (Q(game_date=current_time.date()) & Q(game_end_time__gte=one_hour_ago)),
                     Q(team_a_id__in=branches) | Q(team_b_id__in=branches),
                     finish=False
                 ).order_by('game_date', 'game_start_time')
@@ -2085,14 +2095,18 @@ class UpcomingGameView(APIView):
         # Condition 3: Role 4 (Game Official)
         if user_role == 4:
             tournament_games = TournamentGames.objects.filter(
-                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                Q(game_date__gt=current_time.date()) | 
+                (Q(game_date=current_time.date()) & Q(game_start_time__gte=current_time.time())) | 
+                (Q(game_date=current_time.date()) & Q(game_end_time__gte=one_hour_ago)),
                 finish=False,
                 gameofficials__official_id=user_id,
                 gameofficials__officials_type_id__in=[2, 3, 4, 5]
             ).order_by('game_date', 'game_start_time')
 
             friendly_games = FriendlyGame.objects.filter(
-                Q(game_end_time__gt=now()) | Q(game_end_time__gte=one_hour_ago),
+                Q(game_date__gt=current_time.date()) | 
+                (Q(game_date=current_time.date()) & Q(game_start_time__gte=current_time.time())) | 
+                (Q(game_date=current_time.date()) & Q(game_end_time__gte=one_hour_ago)),
                 finish=False,
                 friendlygamegameofficials__official_id=user_id,
                 friendlygamegameofficials__officials_type_id__in=[2, 3, 4, 5]
@@ -2178,10 +2192,6 @@ class UpcomingGameView(APIView):
                     },
                 },
             }
-
-            # if game_type == "Tournament":
-            #     response_data["data"]["tournament_id"] = first_game.tournament_id.id if first_game.tournament_id else None
-
             return Response(response_data, status=200)
 
         return Response(
@@ -2191,8 +2201,6 @@ class UpcomingGameView(APIView):
             },
             status=200,
         )
-
-
 
 
 ################### Fetch My Games ################################

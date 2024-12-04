@@ -30,7 +30,7 @@ import re
 import logging
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
-from django.db.models import Q, Sum, Count
+from django.db.models import Case, When, F, Q, Sum
 
 
 logger = logging.getLogger(__name__)
@@ -4124,31 +4124,32 @@ class InjuryListAPIView(APIView):
 
 
 
-################# User Stastics ######################
 class UserRoleStatsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', request.user.id)
-        past_years = request.query_params.get('past_years', 0)  # Default to 0 (all-time data)
+        years_param = request.query_params.get('years', '0')  # Default to '0' (all-time data)
 
-        # Validate past_years
+        # Validate years
         try:
-            past_years = int(past_years)
-            if past_years < 0:
-                raise ValueError("past_years cannot be negative.")
+            # Parse years if provided as a comma-separated list
+            years = [int(year.strip()) for year in years_param.split(',') if year.strip().isdigit()]
+            if years and any(year < 0 for year in years):
+                raise ValueError("Year cannot be negative.")
         except ValueError:
             return Response({
                 "status": 0,
-                "message": "Invalid value for 'past_years'. Please provide a non-negative integer.",
+                "message": "Invalid value for 'years'. Please provide a comma-separated list of valid years.",
                 "data": []
             }, status=400)
 
-        # Calculate date filter
-        time_filter = {}
-        if past_years > 0:
-            start_date = datetime.now() - timedelta(days=past_years * 365)
-            time_filter['created_at__gte'] = start_date
+        # If years is empty or contains '0', set it to all-time data
+        if not years or 0 in years:
+            time_filter = {}
+        else:
+            # Filter for the provided years
+            time_filter = {'created_at__year__in': years}
 
         try:
             # Validate user_id and fetch user
@@ -4215,29 +4216,63 @@ class UserRoleStatsAPIView(APIView):
         Fetch coach-specific stats.
         """
         try:
+            # Get the branches the coach belongs to
             coach_branches = JoinBranch.objects.filter(
                 user_id=user.id,
                 joinning_type=JoinBranch.COACH_STAFF_TYPE
             ).values_list('branch_id', flat=True)
 
+            # Fetch games where the coach's teams participated
+            games = TournamentGames.objects.filter(
+                (Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches)),
+                **time_filter
+            )
+
+            total_games_played = games.count()
+
+            # Calculate stats
+            games_won = games.filter(
+                Q(team_a__in=coach_branches, winner_id=F('team_a')) |
+                Q(team_b__in=coach_branches, winner_id=F('team_b'))
+            ).count()
+
+            games_lost = games.filter(
+                Q(team_a__in=coach_branches, loser_id=F('team_a')) |
+                Q(team_b__in=coach_branches, loser_id=F('team_b'))
+            ).count()
+
+            games_drawn = games.filter(is_draw=True).count()
+
+            # Goals conceded
+            goals_conceded = games.aggregate(
+                total_goals=Sum(
+                    Case(
+                        When(team_a__in=coach_branches, then='team_b_goal'),
+                        When(team_b__in=coach_branches, then='team_a_goal'),
+                        default=0,
+                        output_field=models.IntegerField()
+                    )
+                )
+            )['total_goals'] or 0
+
+            # Red and yellow cards for all players in the coach's teams
             team_stats = PlayerGameStats.objects.filter(team_id__in=coach_branches, **time_filter)
 
-            total_goals = team_stats.aggregate(Sum('goals'))['goals__sum'] or 0
-            total_assists = team_stats.aggregate(Sum('assists'))['assists__sum'] or 0
-            total_yellow_cards = team_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
             total_red_cards = team_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
-            total_games_played = Lineup.objects.filter(team_id__in=coach_branches, **time_filter).count()
+            total_yellow_cards = team_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
 
             return Response({
                 "status": 1,
                 "message": "Coach stats fetched successfully.",
                 "data": {
                     "user_id": user.id,
-                    "total_goals": total_goals,
-                    "total_assists": total_assists,
-                    "total_yellow_cards": total_yellow_cards,
-                    "total_red_cards": total_red_cards,
                     "total_games_played": total_games_played,
+                    "games_won": games_won,
+                    "games_lost": games_lost,
+                    "games_drawn": games_drawn,
+                    "total_red_cards": total_red_cards,
+                    "total_yellow_cards": total_yellow_cards,
+                    "total_goals_conceded": goals_conceded,
                 },
             }, status=200)
         except Exception as e:
@@ -4246,6 +4281,7 @@ class UserRoleStatsAPIView(APIView):
                 "message": "Failed to fetch coach stats.",
                 "error": str(e),
             }, status=500)
+
 
     def get_referee_stats(self, user, time_filter):
         """
