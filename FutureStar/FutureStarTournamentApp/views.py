@@ -1947,6 +1947,70 @@ class TournamentGroupTeamListCreateAPIView(APIView):
             'message': _('Tournament Group Points Table fetched successfully.'),
             'data': grouped_data
         }, status=status.HTTP_200_OK)
+    
+def post(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        team_branch_id = request.data.get('team_id')
+        group_id = request.data.get('group_id')
+        tournament_id = request.data.get('tournament_id')
+
+        if not (team_branch_id and group_id and tournament_id):
+            return Response({
+                'status': 0,
+                'message': _('team_id, group_id, and tournament_id are required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate tournament existence
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Tournament does not exist.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate group existence and its relation to the tournament
+        try:
+            group_instance = GroupTable.objects.get(id=group_id, tournament_id=tournament_id)
+        except GroupTable.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('The provided group does not belong to the specified tournament.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        with transaction.atomic():
+            # Check if the team already exists in the tournament
+            existing_team = TournamentGroupTeam.objects.filter(
+                team_branch_id=team_branch_id, tournament_id=tournament_id
+            ).first()
+
+            if existing_team:
+                # If the team already has a group assigned (not NULL), show an error message
+                if existing_team.group_id:
+                    return Response({
+                        'status': 0,
+                        'message': _('The team is already assigned to another group in this tournament.'),
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                # If group_id is NULL, update the record
+                existing_team.group_id = group_instance
+                existing_team.status = 1  # Update the status if required
+                existing_team.save(update_fields=['group_id', 'status', 'updated_at'])
+                return Response({
+                    'status': 1,
+                    'message': _('Tournament Group Team added successfully.'),
+                    'data': TournamentGroupTeamSerializer(existing_team).data
+                }, status=status.HTTP_200_OK)
+
+            # If no existing assignment, return an error
+            return Response({
+                'status': 0,
+                'message': _('No team found to add.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]

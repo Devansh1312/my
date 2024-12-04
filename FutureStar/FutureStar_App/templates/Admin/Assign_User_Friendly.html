@@ -36,7 +36,7 @@
                                      
                                         <th>Actions</th>
                                         
-                                        <th>Detail View</th>
+                                        <!-- <th>Detail View</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -53,27 +53,35 @@
 
                                         <td>{{ game.assigned_user_name }}</td>
                                         <td>
-                                            {% if game.is_upcoming == 1 %}
-                                                {% if game.is_unassigned == 1 %}
-                                                    <button class="btn btn-primary" onclick="openUserSearchModal({{ game.id }})">
-                                                        Assign User
-                                                    </button>
-                                                {% else %}
-                                                    <button class="btn btn-warning" onclick="openUserSearchModal({{ game.id }})">
-                                                        Change User
-                                                    </button>
-                                                {% endif %}
-                                                
-                                            {% else %}
-                                                <span class="badge bg-danger">Game Finished</span>
-                                            {% endif %}
-                                           
-                                            <td>
-                                                <a href="{% url 'friendly_game_detail' game.id %}" class="btn btn-success">
-                                                    View Detail
+                                            <!-- Action buttons -->
+                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                    <i data-feather="more-vertical"></i>
                                                 </a>
-                                            </td>
-                                        </td>
+                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                                        {% if game.is_upcoming == 1 %}
+                                                            {% if game.is_unassigned == 1 %}
+                                                                <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                                    <a href="#" onclick="openUserSearchModal({{ game.id }})">Assign Handler</a>
+                                                                </li>
+                                                            {% else %}
+                                                                <li style="padding: 8px 12px;">
+                                                                    <a href="#" onclick="openUserSearchModal({{ game.id }})">Change Handler</a>
+                                                                </li>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            <li style="padding: 8px 12px;">
+                                                                <span class="badge bg-danger">Game Finished</span>
+                                                            </li>
+                                                        {% endif %}
+                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                            <a href="{% url 'game_detail' game.id %}">View</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </td>               
                                     </tr>
                                     {% endfor %}
                                 </tbody>                                                           
@@ -165,5 +173,28 @@
             alert(`Failed to assign user: ${error.error}`);
         }
     }
+    function toggleMenu(menu) {
+        event.preventDefault();
+        const actionCard = menu.nextElementSibling;
+        // Toggle visibility
+        actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+    
+        // Close other open action cards
+        document.querySelectorAll('.action-card').forEach(card => {
+            if (card !== actionCard) {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    // Close the action card when clicking outside
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.action-menu-container')) {
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.style.display = 'none';
+            });
+        }
+    });
+    feather.replace();
 </script>
 {% endblock %}
