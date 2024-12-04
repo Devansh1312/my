@@ -34,9 +34,17 @@ urlpatterns = [
     #User List URL
     path('players/', PlayerListView.as_view(), name='player_list'),
     path('coach/', CoachListView.as_view(), name='coach_list'),
+    path('manager/', ManagerListView.as_view(), name='manager_list'),
+
+
     path('referee/', RefereeListView.as_view(), name='referee_list'),
     path('default-user/', DefaultUserList.as_view(), name='default_user_list'),
     path('user/', UserDetailView.as_view(), name='user_detail'),
+    path('manager/<int:pk>/', ManagerDetailView.as_view(), name='manager_detail'),
+    path('tournament_list/', TournamentListView.as_view(), name='tournament_list'),
+    path('tournament_detail/<int:pk>/', TournamentDetailView.as_view(), name='tournament_detail'),
+    
+
 
 
     # path('users/<int:user_id>/edit/', UserEditView.as_view(), name='user_edit'),

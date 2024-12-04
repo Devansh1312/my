@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}
+Manager List
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{ breadcrumb.child }}</h3>
+            </div>
+            <div class="col-6"></div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="display" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Manager Username</th>
+                              <!-- <th>Email</th> -->
+                              <th>Team</th>
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for manager in managers_with_branches %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ manager.user.username }}</td>
+                              <!-- <td>{{ manager.user.email }}</td> -->
+                              <td>{{ manager.branch }}</td>
+                              <td>
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                       <i data-feather="more-vertical"></i>
+                                    </a>
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                           <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                               <a href="#" class="view-details" data-id="{{ manager.user.id }}">View</a>
+                                               <form id="view-form-{{ manager.user.id }}" method="post" action="{% url 'manager_detail' pk=manager.user.id %}" style="display: none;">
+                                                   {% csrf_token %}
+                                                   <input type="hidden" name="user_id" value="{{ manager.user.id }}">
+                                                   <input type="hidden" name="source_page" value="manager_list">
+                                                   <input type="hidden" name="title" value="Manager">
+                                               </form>
+                                           </li>
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<!-- Plugins JS Ends-->
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // Toggle User Status
+      document.querySelectorAll('.toggle-status').forEach(function(button) {
+         button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = button.getAttribute('data-id');
+            var form = document.getElementById('status-form-' + userId);
+            form.submit();
+         });
+      });
+
+      // View User Details
+      document.querySelectorAll('.view-details').forEach(function(link) {
+         link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = this.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + userId);
+            form.submit();
+         });
+      });
+
+      // Toggle the visibility of the action card
+      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+         menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                  card.style.display = 'none';
+               }
+            });
+         });
+      });
+
+      // Hide action card if clicking outside
+      document.addEventListener('click', function(event) {
+         var isClickInside = event.target.closest('.action-menu-container');
+         if (!isClickInside) {
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+            });
+         }
+      });
+   });
+</script>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Plugins css Ends-->
+ <style>
+    .custom-card {
+        border: 1px solid #0000003b  !important;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+     }
+    
+     
+     .card-header {
+        background-color: #f8f9fa !important; /* Light background for the header */
+     }
+     
+     .card-body {
+        padding: 1.5rem !important; /* Additional padding */
+     }
+ </style>
+{% endblock %}
+
+{% block title %}
+{{ tournament.tournament_name }} | Tournament Details
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <!-- Big Card -->
+   <div class="card" style="margin-top: 100px;">
+      <div class="card-body">
+         <div class="row">
+            <!-- Tournament Information -->
+            <div class="col-xl-12">
+               <div class="card-header d-flex justify-content-between align-items-center">
+                  <h4 class="card-title mb-0">Tournament Details</h4>
+                  <!-- Back Button -->
+                  <button class="btn btn-secondary btn-sm" onclick="history.back();">
+                      <i class="fa fa-arrow-left"></i> Back
+                  </button>
+              </div>
+               <div class="card-body">
+                  <div class="info">
+                     <div class="row g-3">
+                        <!-- Left Column -->
+                        <div class="col-sm-6 col-xl-4 order-sm-1 order-xl-0">
+                           <div class="row g-3 mb-3">
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-trophy"></i> Tournament Name
+                                    </h6>
+                                    <span>{{ tournament.tournament_name }}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-calendar"></i> Starting Date
+                                    </h6>
+                                    <span>{{ tournament.tournament_starting_date|date:"Y-m-d" }}</span>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="row g-3">
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-calendar-check"></i> Final Date
+                                    </h6>
+                                    <span>{{ tournament.tournament_final_date|date:"Y-m-d" }}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-users"></i> Number of Teams
+                                    </h6>
+                                    <span>{{ tournament.number_of_team }}</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <!-- Middle Column -->
+                        <div class="col-sm-12 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center">
+                           {% if tournament.logo %}
+                              <img src="{{ tournament.logo.url }}" alt="Tournament Logo" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
+                           {% else %}
+                              <img src="path/to/default-image.jpg" alt="Default Logo" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
+                           {% endif %}
+                           <div class="w-100 mb-3 text-center">
+                              <div class="title mb-1">
+                                 <a target="_blank" href="">{{ tournament.tournament_name }}</a>
+                              </div>
+                           </div>
+                        </div>
+                        <!-- Right Column -->
+                        <div class="col-sm-6 col-xl-4 order-sm-2 order-xl-2">
+                           <div class="row g-3 mb-3">
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-sitemap"></i> Number of Groups
+                                    </h6>
+                                    <span>{{ tournament.number_of_group }}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-flag"></i> Country
+                                    </h6>
+                                    <span> {% if tournament.country %}
+                                        {{ tournament.country.name }}
+                                    {% else %}
+                                        None
+                                    {% endif %}</span>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="row g-3">
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-building"></i> City
+                                    </h6>
+                                    <span> {% if tournament.city %}
+                                        {{ tournament.city.name }}
+                                    {% else %}
+                                        None
+                                    {% endif %}</span>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="ttl-info text-start">
+                                    <h6>
+                                       <i class="fa fa-map-marker-alt"></i> Field
+                                    </h6>
+                                    <span> {% if tournament.field.field_name %}
+                                        {{ tournament.field.field_name }}
+                                    {% else %}
+                                        None
+                                    {% endif %}</span>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <hr>
+               </div>
+            
+               
+                  
+             
+                   <!-- Points Table -->
+                   <div class="card custom-card  shadow-sm rounded">
+                      <div class="card-header">
+                         <h4 class="card-title mb-0">Points Table</h4>
+                      </div>
+                      <div class="card-body">
+                         {% for group in grouped_data %}
+                            <br>
+                            <h5>{{ group.group_name }}</h5>
+                            <hr>
+                            <br>
+                            <table class="table table-bordered">
+                               <thead>
+                                  <tr>
+                                     <th>Team</th>
+                                     <th>Matches Played</th>
+                                     <th>W</th>
+                                     <th>L</th>
+                                     <th>D</th>
+                                     <th>Goals</th>
+                                     <th>Conceded</th>
+                                     <th>Goal Difference</th>
+                                     <th>Points</th>
+                                  </tr>
+                               </thead>
+                               <tbody>
+                                  {% for team in group.teams %}
+                                     <tr>
+                                        <td>{{ team.team_name }}</td>
+                                        <td>{{ team.match_played }}</td>
+                                        <td>{{ team.total_wins }}</td>
+                                        <td>{{ team.total_losses }}</td>
+                                        <td>{{ team.total_draws }}</td>
+                                        <td>{{ team.total_goals }}</td>
+                                        <td>{{ team.conceded_goals }}</td>
+                                        <td>{{ team.goal_difference }}</td>
+                                        <td>{{ team.points }}</td>
+                                     </tr>
+                                  {% endfor %}
+                               </tbody>
+                            </table>
+                         {% endfor %}
+                      </div>
+                   </div>
+                </div>
+             </div>
+         </div>
+ 
+
+      </div>
+   </div>
+</div>
+{% endblock %}

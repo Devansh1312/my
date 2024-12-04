@@ -65,6 +65,9 @@
                         <a href="{% url 'coach_list' %}">Coach List</a>
                      </li>
                      <li>
+                        <a href="{% url 'manager_list' %}">Manager List</a>
+                     </li>
+                     <li>
                         <a href="{% url 'referee_list' %}">Referee List</a>
                      </li>
                      <li>
@@ -89,6 +92,14 @@
                         <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
                      </svg>
                      <span class="lan">Team List</span>
+                  </a>
+               </li>
+               <li class="sidebar">
+                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'tournament_list' %}">
+                     <svg class="stroke-icon">
+                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
+                     </svg>
+                     <span class="lan">Tournaments List</span>
                   </a>
                </li>
 

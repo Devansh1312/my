@@ -13,7 +13,7 @@ from FutureStarTournamentApp.serializers import *
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from django.db.models import Sum
+from django.db.models import Sum,Case,When
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -1908,7 +1908,22 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 )
                 total_goals_scored = total_goals['total_goals_a'] or 0
                 total_goals_conceded = total_goals['total_goals_b'] or 0
-                total_goals = total_goals_scored + total_goals_conceded
+                total_goals = total_goals_scored 
+
+                # Calculate conceded goals (goals scored by the opponent)
+                conceded_goals = games.aggregate(
+                    total_conceded=Sum(
+                        Case(
+                            When(team_a=team_id, then='team_b_goal'),
+                            When(team_b=team_id, then='team_a_goal'),
+                            default=0,
+                            output_field=models.IntegerField()
+                        )
+                    )
+                )['total_conceded'] or 0
+
+                # Calculate "+/-" (difference between total goals scored and conceded)
+                goal_difference = total_goals_scored - conceded_goals
 
                 # Total wins, losses, and draws
                 total_wins = games.filter(winner_id=team_id).count()
@@ -1930,6 +1945,8 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                     "total_losses": total_losses,
                     "total_draws": total_draws,
                     "points": points,
+                    "conceded_goals": conceded_goals,
+                    "+/-": goal_difference  # Add the goal difference (total goals - conceded goals)
                 })
                 team_stats.append(team_data)
 

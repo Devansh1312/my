@@ -614,8 +614,335 @@ class RefereeListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Referee List"},
             },
         )
+    
+######### manager list ##################
+@method_decorator(user_role_check, name='dispatch')
+
+class ManagerListView(LoginRequiredMixin, View):
+    template_name = "Admin/User/Manager_List.html"
+
+    def get(self, request):
+        User = get_user_model()
+
+        # Fetch all managers with role_id = 6
+        managers = User.objects.filter(role_id=6)
+
+        # Get all managerial staff entries
+        managerial_staff = JoinBranch.objects.filter(
+            joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
+        ).select_related('user_id', 'branch_id')
+
+        # Create a mapping of user ID to branch name
+        user_branch_mapping = {
+            join.user_id.id: join.branch_id.team_name for join in managerial_staff
+        }
+
+        # Combine managers with their branch or "None"
+        managers_with_branches = [
+            {
+                "user": manager,
+                "branch": user_branch_mapping.get(manager.id, "None")
+            }
+            for manager in managers
+        ]
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "managers_with_branches": managers_with_branches,
+                "breadcrumb": {"child": "Manager List"},
+            },
+        )
+
+#### manager detail view ###########
+@method_decorator(user_role_check, name='dispatch')
+class ManagerDetailView(View):
+    template_name = "Admin/User/Manager_Detail.html"
+
+    def get(self, request, pk, *args, **kwargs):
+        User = get_user_model()
+
+        # Fetch the manager using the primary key
+        manager = get_object_or_404(User, pk=pk, role_id=6)
+
+        # Fetch the team branch associated with this manager
+        team_branch = JoinBranch.objects.filter(
+            user_id=manager, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
+        ).select_related("branch_id").first()
+
+        # Check if manager is associated with a team branch
+        team_branch_info = (
+            team_branch.branch_id.team_name if team_branch else "Manager not associated with any team."
+        )
+
+        context = {
+            "user": manager,
+            "team_branch_info": team_branch_info,
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, pk, *args, **kwargs):
+        User = get_user_model()
+
+        # Fetch the manager using the primary key
+        manager = get_object_or_404(User, pk=pk, role_id=6)
+
+        # Handle form data or any actions you want to take on POST request
+        # Example: Updating manager information based on POST data
+        manager_data = request.POST.get("manager_data")  # Assuming you have some data to process
+        if manager_data:
+            # Process the data (for example, update the manager's profile)
+            manager.some_field = manager_data
+            manager.save()
+
+        # Fetch the team branch associated with this manager again after any updates
+        team_branch = JoinBranch.objects.filter(
+            user_id=manager, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
+        ).select_related("branch_id").first()
+
+        # Check if manager is associated with a team branch
+        team_branch_info = (
+            team_branch.branch_id.team_name if team_branch else "Manager not associated with any team."
+        )
+
+        context = {
+            "user": manager,
+            "team_branch_info": team_branch_info,
+             # Example feedback
+        }
+
+        return render(request, self.template_name, context)
 
 
+###### Tournament List #####
+@method_decorator(user_role_check, name='dispatch')
+
+class TournamentListView(LoginRequiredMixin, View):
+    template_name = "Admin/Tournament_List.html"  # Specify the template to render
+  
+
+    def get(self, request):
+        # Fetch all tournaments from the Tournament model
+        tournaments = Tournament.objects.all()
+
+        # Render the template and pass the tournaments as context
+        return render(
+            request,
+            self.template_name,  # Render the template file
+            {
+                "tournaments": tournaments,  # The list of tournaments passed to the template
+                "breadcrumb": {"child": "Tournament List"},  # Breadcrumb for navigation
+            },
+        )
+    
+###### Tournament Detail #####
+
+@method_decorator(user_role_check, name='dispatch')
+class TournamentDetailView(View):
+    template_name = "Admin/Tournament_detail.html"
+
+    def get(self, request, pk, *args, **kwargs):
+        tournament = get_object_or_404(Tournament, pk=pk)
+
+        # Fetch additional related information
+        team = tournament.team_id if tournament.team_id else "No team assigned"
+        age_group = tournament.age_group if tournament.age_group else "No age group"
+        country = tournament.country if tournament.country else "No country assigned"
+        city = tournament.city if tournament.city else "No city assigned"
+        field = tournament.tournament_fields if tournament.tournament_fields else "No field assigned"
+
+        # Fetch groups associated with the tournament
+        groups = GroupTable.objects.filter(tournament_id=pk).order_by('group_name')
+
+        grouped_data = []
+        for group in groups:
+            teams = TournamentGroupTeam.objects.filter(
+                group_id=group.id,
+                tournament_id=tournament.id
+            ).select_related('group_id', 'team_branch_id')
+
+            team_stats = []
+            for team in teams:
+                team_id = team.team_branch_id.id if team.team_branch_id else None
+                games = TournamentGames.objects.filter(
+                    (Q(team_a=team_id) | Q(team_b=team_id)),
+                    group_id=group.id,
+                    tournament_id=tournament.id,
+                    finish=True
+                )
+
+                match_played = games.count()
+                total_goals = games.aggregate(
+                    total_goals_a=Sum('team_a_goal'),
+                    total_goals_b=Sum('team_b_goal')
+                )
+                total_goals_scored = total_goals['total_goals_a'] or 0
+                total_goals_conceded = total_goals['total_goals_b'] or 0
+                total_goals = total_goals_scored
+                conceded_goals = games.aggregate(
+                    total_conceded=Sum(
+                        Case(
+                            When(team_a=team_id, then='team_b_goal'),
+                            When(team_b=team_id, then='team_a_goal'),
+                            default=0,
+                            output_field=IntegerField()
+                        )
+                    )
+                )['total_conceded'] or 0
+                goal_difference = total_goals_scored - conceded_goals
+
+                total_wins = games.filter(winner_id=team_id).count()
+                total_losses = games.filter(loser_id=team_id).count()
+                total_draws = games.filter(is_draw=True).count()
+
+                points = total_wins  # 1 point per win
+
+                # Create a dictionary with team statistics
+                team_data = {
+                    "team_name": team.team_branch_id.name,
+                    "match_played": match_played,
+                    "total_goals": total_goals,
+                    "total_wins": total_wins,
+                    "total_losses": total_losses,
+                    "total_draws": total_draws,
+                    "points": points,
+                    "conceded_goals": conceded_goals,
+                    "goal_difference": goal_difference
+                }
+
+                team_stats.append(team_data)
+
+            # Sort teams by points (descending) and then by total goals as a tiebreaker
+            sorted_team_stats = sorted(team_stats, key=lambda x: (x['points'], x['total_goals']), reverse=True)
+
+            grouped_data.append({
+                "group_id": group.id,
+                "group_name": group.group_name,
+                "teams": sorted_team_stats
+            })
+
+        context = {
+            "tournament": tournament,
+            "team": team,
+            "age_group": age_group,
+            "country": country,
+            "city": city,
+            "field": field,
+            "grouped_data": grouped_data,  # Add the grouped data to context
+        }
+
+        return render(request, self.template_name, context)
+    
+    def post(self, request, pk, *args, **kwargs):
+            # Fetch the tournament using the primary key
+            tournament = get_object_or_404(Tournament, pk=pk)
+
+            # Update the tournament based on the POST data (example fields)
+            team = request.POST.get('team', None)
+            age_group = request.POST.get('age_group', None)
+            country = request.POST.get('country', None)
+            city = request.POST.get('city', None)
+            field = request.POST.get('field', None)
+
+            # Optionally, handle null or missing values
+            if team:
+                tournament.team_id = team
+            if age_group:
+                tournament.age_group = age_group
+            if country:
+                tournament.country = country
+            if city:
+                tournament.city = city
+            if field:
+                tournament.tournament_fields = field
+
+            # Save the updated tournament
+            tournament.save()
+
+            # Fetch groups associated with the tournament after update
+            groups = GroupTable.objects.filter(tournament_id=tournament.id).order_by('group_name')
+
+            grouped_data = []
+            for group in groups:
+                teams = TournamentGroupTeam.objects.filter(
+                    group_id=group.id,
+                    tournament_id=tournament.id
+                ).select_related('group_id', 'team_branch_id')
+
+                team_stats = []
+                for team in teams:
+                    team_id = team.team_branch_id.id if team.team_branch_id else None
+                    games = TournamentGames.objects.filter(
+                        (Q(team_a=team_id) | Q(team_b=team_id)),
+                        group_id=group.id,
+                        tournament_id=tournament.id,
+                        finish=True
+                    )
+
+                    match_played = games.count()
+                    total_goals = games.aggregate(
+                        total_goals_a=Sum('team_a_goal'),
+                        total_goals_b=Sum('team_b_goal')
+                    )
+                    total_goals_scored = total_goals['total_goals_a'] or 0
+                    total_goals_conceded = total_goals['total_goals_b'] or 0
+                    total_goals = total_goals_scored
+                    conceded_goals = games.aggregate(
+                        total_conceded=Sum(
+                            Case(
+                                When(team_a=team_id, then='team_b_goal'),
+                                When(team_b=team_id, then='team_a_goal'),
+                                default=0,
+                                output_field=IntegerField()
+                            )
+                        )
+                    )['total_conceded'] or 0
+                    goal_difference = total_goals_scored - conceded_goals
+
+                    total_wins = games.filter(winner_id=team_id).count()
+                    total_losses = games.filter(loser_id=team_id).count()
+                    total_draws = games.filter(is_draw=True).count()
+
+                    points = total_wins  # 1 point per win
+
+                    # Create a dictionary with team statistics
+                    team_data = {
+                        "team_name": team.team_branch_id.team_name,
+                        "match_played": match_played,
+                        "total_goals": total_goals,
+                        "total_wins": total_wins,
+                        "total_losses": total_losses,
+                        "total_draws": total_draws,
+                        "points": points,
+                        "conceded_goals": conceded_goals,
+                        "goal_difference": goal_difference
+                    }
+
+                    team_stats.append(team_data)
+
+                # Sort teams by points (descending) and then by total goals as a tiebreaker
+                sorted_team_stats = sorted(team_stats, key=lambda x: (x['points'], x['total_goals']), reverse=True)
+
+                grouped_data.append({
+                    "group_id": group.id,
+                    "group_name": group.group_name,
+                    "teams": sorted_team_stats
+                })
+
+            # Include the grouped data in context
+            context = {
+                "tournament": tournament,
+                "team": team or "No team assigned",
+                "age_group": age_group or "No age group",
+                "country": country or "No country assigned",
+                "city": city or "No city assigned",
+                "field": field or "No field assigned",
+                "grouped_data": grouped_data,  # Include the grouped data in context
+            }
+
+            return render(request, self.template_name, context)
 # Default User List View
 @method_decorator(user_role_check, name='dispatch')
 class DefaultUserList(LoginRequiredMixin, View):
