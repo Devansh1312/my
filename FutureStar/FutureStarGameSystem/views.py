@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext as _  
 from django.utils.translation import activate
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,9 +20,9 @@ from django.utils.crypto import get_random_string
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
-from django.db.models import Sum
+from django.db.models import Sum,Count,Q
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count
+
 
 
 
@@ -1009,7 +1008,6 @@ class AddPlayerJerseyAPIView(APIView):
 
 ################## Players games stats in tournament ###############
 
-   
 class GameStatsLineupPlayers(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1025,6 +1023,32 @@ class GameStatsLineupPlayers(APIView):
                 pass
 
         return False   
+
+    # Function to get the last update for a player
+    def get_last_update(self, player_id, game_id, tournament_id):  # Add self to the method definition
+        last_stat = PlayerGameStats.objects.filter(
+            Q(player_id_id=player_id) | Q(in_player_id=player_id) | Q(out_player_id=player_id),
+            game_id=game_id,
+            tournament_id=tournament_id
+        ).order_by('-updated_at').first()  # Fetch the most recent update
+
+        if last_stat:
+            # Determine the type of the last update
+            if last_stat.goals > 0:
+                return 'goal'
+            elif last_stat.assists > 0:
+                return 'assist'
+            elif last_stat.own_goals > 0:
+                return 'own_goal'
+            elif last_stat.yellow_cards > 0:
+                return 'yellow_card'
+            elif last_stat.red_cards > 0:
+                return 'red_card'
+            elif last_stat.in_player_id == player_id:
+                return 'substituted'
+            elif last_stat.out_player_id == player_id:
+                return 'substituted'
+        return None  # No relevant update found
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -1048,8 +1072,6 @@ class GameStatsLineupPlayers(APIView):
         # Fetch lineup data for both teams
         lineup_data = {}
         for team_id, team_key in [(team_a_id, 'team_a'), (team_b_id, 'team_b')]:
-
-            # Fetch the lineup data for substitutes and already added players
             substitute_lineups = Lineup.objects.filter(
                 team_id=team_id,
                 game_id=game_id,
@@ -1063,7 +1085,6 @@ class GameStatsLineupPlayers(APIView):
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
 
-            # Prepare response data for substitute players
             substitute_data = [{
                 'id': lineup.id,
                 'player_id': lineup.player_id.id,
@@ -1071,9 +1092,9 @@ class GameStatsLineupPlayers(APIView):
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)  # Use self to call the method
             } for lineup in substitute_lineups]
 
-            # Prepare response data for already added players
             already_added_data = [{
                 'id': lineup.id,
                 'player_id': lineup.player_id.id,
@@ -1081,9 +1102,9 @@ class GameStatsLineupPlayers(APIView):
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)  # Use self to call the method
             } for lineup in already_added_lineups]
 
-            # Retrieve managerial staff for the team
             managerial_staff = JoinBranch.objects.filter(
                 branch_id=team_id,
                 joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
@@ -1098,19 +1119,18 @@ class GameStatsLineupPlayers(APIView):
                 'joining_type_name': staff.get_joinning_type_display()
             } for staff in managerial_staff]
 
-            # Add the data for each team to the response
             lineup_data[team_key] = {
                 'player_added_in_lineup': already_added_data,
                 'substitute': substitute_data,
                 'managerial_staff': managerial_staff_data
             }
 
-        # Return the response with lineup data
         return Response({
             'status': 1,
             'message': _('Lineup players and manager fetched successfully for both teams.'),
             'data': lineup_data
         }, status=status.HTTP_200_OK)
+
 
     
 
@@ -1704,7 +1724,7 @@ class PlayerGameStatsAPIView(APIView):
         return False
 
     def post(self, request, *args, **kwargs):
-         # Set language based on the request headers
+        # Set language based on the request headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -1714,125 +1734,84 @@ class PlayerGameStatsAPIView(APIView):
         team_id = request.data.get('team_id')
         tournament_id = request.data.get('tournament_id')
         game_id = request.data.get('game_id')
+        game_time = request.data.get('game_time')
+
         
-        # Validate player_id
+        # Validate all required fields
         if not player_id:
-            return Response({
-                'status': 0,
-                'message': _('Player id is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate team_id
+            return Response({'status': 0, 'message': _('Player id is required.')}, status=status.HTTP_400_BAD_REQUEST)
         if not team_id:
-            return Response({
-                'status': 0,
-                'message': _('Team id is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate tournament_id
+            return Response({'status': 0, 'message': _('Team id is required.')}, status=status.HTTP_400_BAD_REQUEST)
         if not tournament_id:
-            return Response({
-                'status': 0,
-                'message': _('Tournament is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate game_id
+            return Response({'status': 0, 'message': _('Tournament is required.')}, status=status.HTTP_400_BAD_REQUEST)
         if not game_id:
-            return Response({
-                'status': 0,
-                'message': _('Game id is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Game id is required.')}, status=status.HTTP_400_BAD_REQUEST)
+        if not game_time:
+            return Response({'status': 0, 'message': _('game time is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-       
+        # Check access
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-            return Response({
-                'status': 0,
-                'message': _('You do not have access to this resource.'),
-                'data': {}
-            }, status=status.HTTP_403_FORBIDDEN)
-        
-        game_instance = get_object_or_404(TournamentGames, id=game_id)
-        if game_instance.finish==True:  # Explicitly check if the game is finished
-            return Response({
-                'status': 0,
-                'message': _('Cannot add stats for a finished game.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('You do not have access to this resource.')}, status=status.HTTP_403_FORBIDDEN)
 
-
-        
-        # Retrieve related model instances
+        # Retrieve model instances
         team_instance = get_object_or_404(TeamBranch, id=team_id)
         player_instance = get_object_or_404(User, id=player_id)
         tournament_instance = get_object_or_404(Tournament, id=tournament_id)
         game_instance = get_object_or_404(TournamentGames, id=game_id)
-        
-        # Retrieve stats values from request data
-        goals = int(request.data.get('goals', 0) or 0)
-        assists = int(request.data.get('assists', 0) or 0)
-        own_goals = int(request.data.get('own_goals', 0) or 0)
-        yellow_cards = int(request.data.get('yellow_cards', 0) or 0)
-        red_cards = int(request.data.get('red_cards', 0) or 0)
-        
-        # Create a new entry for each submission
-        new_stat = PlayerGameStats.objects.create(
-            player_id=player_instance,
-            team_id=team_instance,
-            tournament_id=tournament_instance,
-            game_id=game_instance,
-            goals=goals,
-            assists=assists,
-            own_goals=own_goals,
-            yellow_cards=yellow_cards,
-            red_cards=red_cards,
-            created_by_id=request.user.id 
-        )
-        
-        # Aggregate totals for this player, team, game, and tournament combination
-        total_stats = PlayerGameStats.objects.filter(
-            player_id=player_instance,
-            team_id=team_instance,
-            tournament_id=tournament_instance,
-            game_id=game_instance
-        ).aggregate(
-            total_goals=Sum('goals'),
-            total_assists=Sum('assists'),
-            total_own_goals=Sum('own_goals'),
-            total_yellow_cards=Sum('yellow_cards'),
-            total_red_cards=Sum('red_cards')
-        )
-        
-        # Calculate the increment for each new entry
-        increment_data = {
-            'goals_increment': goals,
-            'assists_increment': assists,
-            'own_goals_increment': own_goals,
-            'yellow_cards_increment': yellow_cards,
-            'red_cards_increment': red_cards
-        }
-        
-        # Respond with the cumulative and incremental stats
-        response_data = {
-            'id': new_stat.id,
-            'team_id': team_instance.id,
-            'player_id': player_instance.id,
-            'game_id': game_instance.id,
-            'tournament_id': tournament_instance.id,
-            'total_goals': total_stats['total_goals'] or 0,
-            'total_assists': total_stats['total_assists'] or 0,
-            'total_own_goals': total_stats['total_own_goals'] or 0,
-            'total_yellow_cards': total_stats['total_yellow_cards'] or 0,
-            'total_red_cards': total_stats['total_red_cards'] or 0,
-            'incremental_data': increment_data,
-            'created_at': new_stat.created_at,
-            'updated_at': new_stat.updated_at
-        }
-        
-        message = _('Player stats recorded successfully.')
-        return Response({
-            'status': 1,
-            'message': message,
-            'data': response_data
-        }, status=status.HTTP_201_CREATED)
+
+        if game_instance.finish:
+            return Response({'status': 0, 'message': _('Cannot modify stats for a finished game.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Process statistics
+        stats_keys = ['goals', 'assists', 'own_goals', 'yellow_cards', 'red_cards']
+        for stat in stats_keys:
+            stat_value = request.data.get(stat)
+
+            if stat_value is not None:  # Check if the stat is included in the request
+                stat_value = int(stat_value)
+                
+                if stat_value == 1:
+                    # Increment: Create a new entry
+                    PlayerGameStats.objects.create(
+                        player_id=player_instance,
+                        team_id=team_instance,
+                        tournament_id=tournament_instance,
+                        game_id=game_instance,
+                        game_time=game_time,
+                        **{stat: 1},  # Set the specific stat to 1
+                        created_by_id=request.user.id
+                    )
+                    return Response({
+                        'status': 1,
+                        'message': _(f'{stat.capitalize()} incremented successfully.'),
+                        'data': {}
+                    }, status=status.HTTP_201_CREATED)
+                
+                elif stat_value == -1:
+                    # Decrement: Find and delete the most recent entry for this stat
+                    latest_stat = PlayerGameStats.objects.filter(
+                        player_id=player_instance,
+                        team_id=team_instance,
+                        tournament_id=tournament_instance,
+                        game_id=game_instance,
+                        **{stat: 1}  # Find the most recent positive entry
+                    ).order_by('-created_at').first()
+
+                    if latest_stat:
+                        latest_stat.delete()
+                        return Response({
+                            'status': 1,
+                            'message': _(f'{stat.capitalize()} decremented successfully.'),
+                            'data': {}
+                        }, status=status.HTTP_200_OK)
+                    else:
+                        return Response({
+                            'status': 0,
+                            'message': _(f'Cannot decrement {stat.capitalize()} as no entries exist.'),
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
+
 
     def get(self, request, *args, **kwargs):
     # Set language based on the request headers
