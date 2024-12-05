@@ -294,233 +294,181 @@
                            </tr> {% endfor %} </tbody>
                      </table>
                   </div>
+
+
+
                   <div class="tab-pane" id="stats" role="tabpanel" aria-labelledby="stats-tab">
                      <ul class="nav nav-tabs" id="statsTabs" role="tablist">
-                        <li class="nav-item">
-                           <a class="nav-link active" id="team-a-stats-tab" data-toggle="tab" href="#team-a-stats" role="tab" aria-controls="team-a-stats" aria-selected="true">{{ game.team_a.team_name }} Stats</a>
-                        </li>
-                        <li class="nav-item">
-                           <a class="nav-link" id="team-b-stats-tab" data-toggle="tab" href="#team-b-stats" role="tab" aria-controls="team-b-stats" aria-selected="false">{{ game.team_b.team_name }} Stats</a>
-                        </li>
+                       <li class="nav-item">
+                         <a class="nav-link active" id="team-a-stats-tab" data-toggle="tab" href="#team-a-stats" role="tab" aria-controls="team-a-stats" aria-selected="true">{{ game.team_a.team_name }} Stats</a>
+                       </li>
+                       <li class="nav-item">
+                         <a class="nav-link" id="team-b-stats-tab" data-toggle="tab" href="#team-b-stats" role="tab" aria-controls="team-b-stats" aria-selected="false">{{ game.team_b.team_name }} Stats</a>
+                       </li>
                      </ul>
                      <div class="tab-content" id="statsTabsContent">
-                        <!-- Team A Stats -->
-                        <div class="tab-pane show active" id="team-a-stats" role="tabpanel" aria-labelledby="team-a-stats-tab">
-                           <h5>{{ game.team_a.team_name }} Match Stats</h5>
-                           <button id="edit-team-a" class="btn btn-primary">Edit</button>
-                           <div class="row">
-                              <div class="col-6">
-                                 <div class="card">
-                                    <div class="card-header">General Stats</div>
-                                    <div class="card-body">
-                                       <table class="table">
-                                          <tbody>
-                                             <tr>
-                                                <td>Possession</td>
-                                                <td>
-                                                   <span class="editable" data-field="general_team_a_possession">{{ game.general_team_a_possession }}</span>
-                                                   <input type="text" value="{{ game.general_team_a_possession }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Interceptions</td>
-                                                <td>
-                                                   <span class="editable" data-field="general_team_a_interception">{{ game.general_team_a_interception }}</span>
-                                                   <input type="text" value="{{ game.general_team_a_interception }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Offside</td>
-                                                <td>
-                                                   <span class="editable" data-field="general_team_a_offside">{{ game.general_team_a_offside }}</span>
-                                                   <input type="text" value="{{ game.general_team_a_offside }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Corner</td>
-                                                <td>
-                                                   <span class="editable" data-field="general_team_a_corner">{{ game.general_team_a_corner }}</span>
-                                                   <input type="text" value="{{ game.general_team_a_corner }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                          </tbody>
-                                       </table>
-                                    </div>
-                                 </div>
-                              </div>
-                              <!-- Defence Stats Column -->
-                              <div class="col-6">
-                                 <div class="card">
-                                    <div class="card-header">Defence Stats</div>
-                                    <div class="card-body">
-                                       <table class="table">
-                                          <tbody>
-                                             <tr>
-                                                <td>Defence Possession</td>
-                                                <td>
-                                                   <span class="editable" data-field="defence_team_a_possession">{{ game.defence_team_a_possession }}</span>
-                                                   <input type="text" value="{{ game.defence_team_a_possession }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Defence Interceptions</td>
-                                                <td>
-                                                   <span class="editable" data-field="defence_team_a_interception">{{ game.defence_team_a_interception }}</span>
-                                                   <input type="text" value="{{ game.defence_team_a_interception }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Defence Offside</td>
-                                                <td>
-                                                   <span class="editable" data-field="defence_team_a_offside">{{ game.defence_team_a_offside }}</span>
-                                                   <input type="text" value="{{ game.defence_team_a_offside }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Defence Corner</td>
-                                                <td>
-                                                   <span class="editable" data-field="defence_team_a_corner">{{ game.defence_team_a_corner }}</span>
-                                                   <input type="text" value="{{ game.defence_team_a_corner }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                          </tbody>
-                                       </table>
-                                    </div>
-                                 </div>
-                              </div>
+                       <div class="tab-pane show active" id="team-a-stats" role="tabpanel" aria-labelledby="team-a-stats-tab">
+                         <h5>{{ game.team_a.team_name }} Match Stats</h5>
+                         <button id="edit-team-a" class="btn btn-primary">Edit</button>
+                         <div class="row">
+                           <!-- General Stats -->
+                           <div class="col-12 col-md-6">
+                             <div class="card">
+                               <div class="card-header">General Stats</div>
+                               <div class="card-body">
+                                 <table class="table">
+                                   <tbody>
+                                     <tr>
+                                       <td>Possession</td>
+                                       <td><span class="editable" data-field="general_team_a_possession">{{ game.general_team_a_possession }}</span><input type="text" value="{{ game.general_team_a_possession }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Interceptions</td>
+                                       <td><span class="editable" data-field="general_team_a_interception">{{ game.general_team_a_interception }}</span><input type="text" value="{{ game.general_team_a_interception }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Offside</td>
+                                       <td><span class="editable" data-field="general_team_a_offside">{{ game.general_team_a_offside }}</span><input type="text" value="{{ game.general_team_a_offside }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Corner</td>
+                                       <td><span class="editable" data-field="general_team_a_corner">{{ game.general_team_a_corner }}</span><input type="text" value="{{ game.general_team_a_corner }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                   </tbody>
+                                 </table>
+                               </div>
+                             </div>
                            </div>
-                           <div class="row">
-                              <!-- Distribution Stats Column -->
-                              <div class="col-6">
-                                 <div class="card">
-                                    <div class="card-header">Distribution Stats</div>
-                                    <div class="card-body">
-                                       <table class="table">
-                                          <tbody>
-                                             <tr>
-                                                <td>Distribution Possession</td>
-                                                <td>
-                                                   <span class="editable" data-field="distribution_team_a_possession">{{ game.distribution_team_a_possession }}</span>
-                                                   <input type="text" value="{{ game.distribution_team_a_possession }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Distribution Interceptions</td>
-                                                <td>
-                                                   <span class="editable" data-field="distribution_team_a_interception">{{ game.distribution_team_a_interception }}</span>
-                                                   <input type="text" value="{{ game.distribution_team_a_interception }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Distribution Offside</td>
-                                                <td>
-                                                   <span class="editable" data-field="distribution_team_a_offside">{{ game.distribution_team_a_offside }}</span>
-                                                   <input type="text" value="{{ game.distribution_team_a_offside }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Distribution Corner</td>
-                                                <td>
-                                                   <span class="editable" data-field="distribution_team_a_corner">{{ game.distribution_team_a_corner }}</span>
-                                                   <input type="text" value="{{ game.distribution_team_a_corner }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                          </tbody>
-                                       </table>
-                                    </div>
-                                 </div>
-                              </div>
-                              <!-- Attack Stats Column -->
-                              <div class="col-6">
-                                 <div class="card">
-                                    <div class="card-header">Attack Stats</div>
-                                    <div class="card-body">
-                                       <table class="table">
-                                          <tbody>
-                                             <tr>
-                                                <td>Attack Possession</td>
-                                                <td>
-                                                   <span class="editable" data-field="attack_team_a_possession">{{ game.attack_team_a_possession }}</span>
-                                                   <input type="text" value="{{ game.attack_team_a_possession }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Attack Interceptions</td>
-                                                <td>
-                                                   <span class="editable" data-field="attack_team_a_interception">{{ game.attack_team_a_interception }}</span>
-                                                   <input type="text" value="{{ game.attack_team_a_interception }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Attack Offside</td>
-                                                <td>
-                                                   <span class="editable" data-field="attack_team_a_offside">{{ game.attack_team_a_offside }}</span>
-                                                   <input type="text" value="{{ game.attack_team_a_offside }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Attack Corner</td>
-                                                <td>
-                                                   <span class="editable" data-field="attack_team_a_corner">{{ game.attack_team_a_corner }}</span>
-                                                   <input type="text" value="{{ game.attack_team_a_corner }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                          </tbody>
-                                       </table>
-                                    </div>
-                                 </div>
-                              </div>
+                   
+                           <!-- Defence Stats -->
+                           <div class="col-12 col-md-6">
+                             <div class="card">
+                               <div class="card-header">Defence Stats</div>
+                               <div class="card-body">
+                                 <table class="table">
+                                   <tbody>
+                                     <tr>
+                                       <td>Defence Possession</td>
+                                       <td><span class="editable" data-field="defence_team_a_possession">{{ game.defence_team_a_possession }}</span><input type="text" value="{{ game.defence_team_a_possession }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Defence Interceptions</td>
+                                       <td><span class="editable" data-field="defence_team_a_interception">{{ game.defence_team_a_interception }}</span><input type="text" value="{{ game.defence_team_a_interception }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Defence Offside</td>
+                                       <td><span class="editable" data-field="defence_team_a_offside">{{ game.defence_team_a_offside }}</span><input type="text" value="{{ game.defence_team_a_offside }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Defence Corner</td>
+                                       <td><span class="editable" data-field="defence_team_a_corner">{{ game.defence_team_a_corner }}</span><input type="text" value="{{ game.defence_team_a_corner }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                   </tbody>
+                                 </table>
+                               </div>
+                             </div>
                            </div>
-                           <div class="row">
-                              <!-- Discipline Stats Column -->
-                              <div class="col-6">
-                                 <div class="card">
-                                    <div class="card-header">Discipline Stats</div>
-                                    <div class="card-body">
-                                       <table class="table">
-                                          <tbody>
-                                             <tr>
-                                                <td>Discipline Possession</td>
-                                                <td>
-                                                   <span class="editable" data-field="discipline_team_a_possession">{{ game.discipline_team_a_possession }}</span>
-                                                   <input type="text" value="{{ game.discipline_team_a_possession }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Discipline Interceptions</td>
-                                                <td>
-                                                   <span class="editable" data-field="discipline_team_a_interception">{{ game.discipline_team_a_interception }}</span>
-                                                   <input type="text" value="{{ game.discipline_team_a_interception }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Discipline Offside</td>
-                                                <td>
-                                                   <span class="editable" data-field="discipline_team_a_offside">{{ game.discipline_team_a_offside }}</span>
-                                                   <input type="text" value="{{ game.discipline_team_a_offside }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                             <tr>
-                                                <td>Discipline Corner</td>
-                                                <td>
-                                                   <span class="editable" data-field="discipline_team_a_corner">{{ game.discipline_team_a_corner }}</span>
-                                                   <input type="text" value="{{ game.discipline_team_a_corner }}" class="form-control" style="display:none;">
-                                                </td>
-                                             </tr>
-                                          </tbody>
-                                       </table>
-                                    </div>
-                                 </div>
-                              </div>
+                         </div>
+                   
+                         <div class="row">
+                           <!-- Distribution Stats -->
+                           <div class="col-12 col-md-6">
+                             <div class="card">
+                               <div class="card-header">Distribution Stats</div>
+                               <div class="card-body">
+                                 <table class="table">
+                                   <tbody>
+                                     <tr>
+                                       <td>Distribution Possession</td>
+                                       <td><span class="editable" data-field="distribution_team_a_possession">{{ game.distribution_team_a_possession }}</span><input type="text" value="{{ game.distribution_team_a_possession }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Distribution Interceptions</td>
+                                       <td><span class="editable" data-field="distribution_team_a_interception">{{ game.distribution_team_a_interception }}</span><input type="text" value="{{ game.distribution_team_a_interception }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Distribution Offside</td>
+                                       <td><span class="editable" data-field="distribution_team_a_offside">{{ game.distribution_team_a_offside }}</span><input type="text" value="{{ game.distribution_team_a_offside }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Distribution Corner</td>
+                                       <td><span class="editable" data-field="distribution_team_a_corner">{{ game.distribution_team_a_corner }}</span><input type="text" value="{{ game.distribution_team_a_corner }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                   </tbody>
+                                 </table>
+                               </div>
+                             </div>
                            </div>
-                        </div>
+                   
+                           <!-- Attack Stats -->
+                           <div class="col-12 col-md-6">
+                             <div class="card">
+                               <div class="card-header">Attack Stats</div>
+                               <div class="card-body">
+                                 <table class="table">
+                                   <tbody>
+                                     <tr>
+                                       <td>Attack Possession</td>
+                                       <td><span class="editable" data-field="attack_team_a_possession">{{ game.attack_team_a_possession }}</span><input type="text" value="{{ game.attack_team_a_possession }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Attack Interceptions</td>
+                                       <td><span class="editable" data-field="attack_team_a_interception">{{ game.attack_team_a_interception }}</span><input type="text" value="{{ game.attack_team_a_interception }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Attack Offside</td>
+                                       <td><span class="editable" data-field="attack_team_a_offside">{{ game.attack_team_a_offside }}</span><input type="text" value="{{ game.attack_team_a_offside }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Attack Corner</td>
+                                       <td><span class="editable" data-field="attack_team_a_corner">{{ game.attack_team_a_corner }}</span><input type="text" value="{{ game.attack_team_a_corner }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                   </tbody>
+                                 </table>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                   
+                         <div class="row">
+                           <!-- Discipline Stats -->
+                           <div class="col-12 col-md-6">
+                             <div class="card">
+                               <div class="card-header">Discipline Stats</div>
+                               <div class="card-body">
+                                 <table class="table">
+                                   <tbody>
+                                     <tr>
+                                       <td>Discipline Possession</td>
+                                       <td><span class="editable" data-field="discipline_team_a_possession">{{ game.discipline_team_a_possession }}</span><input type="text" value="{{ game.discipline_team_a_possession }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Discipline Interceptions</td>
+                                       <td><span class="editable" data-field="discipline_team_a_interception">{{ game.discipline_team_a_interception }}</span><input type="text" value="{{ game.discipline_team_a_interception }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Discipline Offside</td>
+                                       <td><span class="editable" data-field="discipline_team_a_offside">{{ game.discipline_team_a_offside }}</span><input type="text" value="{{ game.discipline_team_a_offside }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                     <tr>
+                                       <td>Discipline Corner</td>
+                                       <td><span class="editable" data-field="discipline_team_a_corner">{{ game.discipline_team_a_corner }}</span><input type="text" value="{{ game.discipline_team_a_corner }}" class="form-control" style="display:none"></td>
+                                     </tr>
+                                   </tbody>
+                                 </table>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
                         <!-- Team B Stats (similar structure as Team A) -->
                         <!-- Team B Stats -->
                         <div class="tab-pane" id="team-b-stats" role="tabpanel" aria-labelledby="team-b-stats-tab">
                            <h5>{{ game.team_b.team_name }} Match Stats</h5>
                            <button id="edit-team-b" class="btn btn-primary">Edit</button>
                            <div class="row">
-                              <div class="col-6">
+                              <!-- General Stats Column -->
+                              <div class="col-12 col-md-6">
                                  <div class="card">
                                     <div class="card-header">General Stats</div>
                                     <div class="card-body">
@@ -559,8 +507,9 @@
                                     </div>
                                  </div>
                               </div>
+                        
                               <!-- Defence Stats Column -->
-                              <div class="col-6">
+                              <div class="col-12 col-md-6">
                                  <div class="card">
                                     <div class="card-header">Defence Stats</div>
                                     <div class="card-body">
@@ -600,9 +549,10 @@
                                  </div>
                               </div>
                            </div>
+                        
                            <div class="row">
                               <!-- Distribution Stats Column -->
-                              <div class="col-6">
+                              <div class="col-12 col-md-6">
                                  <div class="card">
                                     <div class="card-header">Distribution Stats</div>
                                     <div class="card-body">
@@ -641,8 +591,9 @@
                                     </div>
                                  </div>
                               </div>
+                        
                               <!-- Attack Stats Column -->
-                              <div class="col-6">
+                              <div class="col-12 col-md-6">
                                  <div class="card">
                                     <div class="card-header">Attack Stats</div>
                                     <div class="card-body">
@@ -682,9 +633,10 @@
                                  </div>
                               </div>
                            </div>
+                        
                            <div class="row">
                               <!-- Discipline Stats Column -->
-                              <div class="col-6">
+                              <div class="col-12 col-md-6">
                                  <div class="card">
                                     <div class="card-header">Discipline Stats</div>
                                     <div class="card-body">
@@ -727,6 +679,10 @@
                         </div>
                      </div>
                   </div>
+
+
+
+
                </div>
             </div>
          </div>

@@ -1368,9 +1368,9 @@ class FriendlyGameStatsLineupPlayers(APIView):
             if last_stat.goals > 0:
                 return 'goal'
             elif last_stat.assists > 0:
-                return 'assist'
+                return None
             elif last_stat.own_goals > 0:
-                return 'own_goal'
+                return None
             elif last_stat.yellow_cards > 0:
                 return 'yellow_card'
             elif last_stat.red_cards > 0:

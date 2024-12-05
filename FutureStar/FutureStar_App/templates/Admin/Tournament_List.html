@@ -6,6 +6,13 @@
 <!-- Plugins CSS Start -->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+   @media (max-width: 576px) {
+    .action-card {
+        width: 120px; /* Adjust the width of the action menu for smaller screens */
+    }
+}
+</style>
 <!-- Plugins CSS End -->
 {% endblock %}
 
@@ -29,14 +36,14 @@ Tournament List
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-striped table-bordered" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
                               <th>Tournament Name</th>
                               <th>Start Date</th>
-                              <th>End Date</th>
-                              <th>Number of Teams</th>
+                              <th>Final Date</th>
+                              <th>Team Count</th>
                               <th>Country</th>
                               <th>City</th>
                               <th>Age Group</th>
