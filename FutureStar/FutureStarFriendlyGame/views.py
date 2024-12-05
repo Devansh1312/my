@@ -700,10 +700,19 @@ class FriendlyGameTeamPlayersAPIView(APIView):
         # Determine if reload is needed
         reload = added_or_in_lineup_count >= 11  # Reload if there are 11 or more players
 
+        message = _('Lineup updated successfully.')
+        if lineup_status == FriendlyGameLineup.SUBSTITUTE:
+            message = _('Player Substituted.')
+        else:
+            message = _('Player Added')
+
+        # Return success response
+       
+
         # Return success response
         return Response({
             'status': 1,
-            'message': _('Lineup updated successfully.'),
+            'message': message,
             'data': {
                 'team_id': team.id,
                 'team_name': team.team_name,
