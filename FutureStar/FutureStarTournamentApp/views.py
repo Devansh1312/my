@@ -1159,29 +1159,35 @@ class TournamentGamesAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Filter by tournament_id if provided in query params
         tournament_id = request.query_params.get('tournament_id')
         games_query = TournamentGames.objects.all().order_by('-game_date', '-game_start_time')
 
         if tournament_id:
             games_query = games_query.filter(tournament_id=tournament_id)
 
-        # Paginate the queryset
         paginator = CustomGameListPagination()
         paginated_games = paginator.paginate_queryset(games_query, request)
 
         grouped_data = defaultdict(list)
-        for game in paginated_games:  # Use paginated data
+        for game in paginated_games:
             game_date = game.game_date
 
-            if game_date:
-                day_name = game_date.strftime('%A')
-                formatted_date = game_date.strftime('%Y-%m-%d')
-            else:
-                day_name = "Unknown"
-                formatted_date = "Unknown-Date"
+            day_name = game_date.strftime('%A') if game_date else "Unknown"
+            formatted_date = game_date.strftime('%Y-%m-%d') if game_date else "Unknown-Date"
 
-            # Retrieve team names and logos based on ForeignKey relationships
+            # Calculate team goals even if the game is not finished
+            team_a_goals = PlayerGameStats.objects.filter(
+                team_id=game.team_a.id,
+                game_id=game.id,
+                tournament_id=game.tournament_id.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            team_b_goals = PlayerGameStats.objects.filter(
+                team_id=game.team_b.id,
+                game_id=game.id,
+                tournament_id=game.tournament_id.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
             team_a_branch = game.team_a
             team_b_branch = game.team_b
 
@@ -1194,7 +1200,6 @@ class TournamentGamesAPIView(APIView):
             team_a_logo_path = f"/media/{team_a_logo}" if team_a_logo else None
             team_b_logo_path = f"/media/{team_b_logo}" if team_b_logo else None
 
-            # Prepare game data for response
             game_data = {
                 "id": game.id,
                 "tournament_id": game.tournament_id.id if game.tournament_id else None,
@@ -1208,11 +1213,11 @@ class TournamentGamesAPIView(APIView):
                 "team_a": game.team_a.id if game.team_a else None,
                 "team_a_name": team_a_name,
                 "team_a_logo": team_a_logo_path,
-                "team_a_goal": game.team_a_goal,
+                "team_a_goal": team_a_goals,
                 "team_b": game.team_b.id if game.team_b else None,
                 "team_b_name": team_b_name,
                 "team_b_logo": team_b_logo_path,
-                "team_b_goal": game.team_b_goal,
+                "team_b_goal": team_b_goals,
                 "game_field_id": game.game_field_id.id if game.game_field_id else None,
                 "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
                 "finish": game.finish,
@@ -1223,20 +1228,13 @@ class TournamentGamesAPIView(APIView):
                 "updated_at": game.updated_at,
             }
 
-            # Group games by day name and formatted date
             grouped_data[f"{day_name},{formatted_date}"].append(game_data)
 
-        # Prepare the final formatted data
-        formatted_data = []
-        for date, games in grouped_data.items():
-            # Skip empty game lists
-            if games:
-                formatted_data.append({
-                    "date": date,
-                    "games": games
-                })
+        formatted_data = [
+            {"date": date, "games": games}
+            for date, games in grouped_data.items() if games
+        ]
 
-        # Return paginated response
         return paginator.get_paginated_response(formatted_data)
 
             

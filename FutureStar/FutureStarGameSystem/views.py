@@ -1754,31 +1754,19 @@ class PlayerGameStatsAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
-        # Retrieve required identifiers from the request data
         player_id = request.data.get('player_id')
         team_id = request.data.get('team_id')
         tournament_id = request.data.get('tournament_id')
         game_id = request.data.get('game_id')
         game_time = request.data.get('game_time')
 
-        
         # Validate all required fields
-        if not player_id:
-            return Response({'status': 0, 'message': _('Player id is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not team_id:
-            return Response({'status': 0, 'message': _('Team id is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not tournament_id:
-            return Response({'status': 0, 'message': _('Tournament is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not game_id:
-            return Response({'status': 0, 'message': _('Game id is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not game_time:
-            return Response({'status': 0, 'message': _('game time is required.')}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([player_id, team_id, tournament_id, game_id, game_time]):
+            return Response({'status': 0, 'message': _('All fields are required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check access
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
             return Response({'status': 0, 'message': _('You do not have access to this resource.')}, status=status.HTTP_403_FORBIDDEN)
 
-        # Retrieve model instances
         team_instance = get_object_or_404(TeamBranch, id=team_id)
         player_instance = get_object_or_404(User, id=player_id)
         tournament_instance = get_object_or_404(Tournament, id=tournament_id)
@@ -1787,56 +1775,66 @@ class PlayerGameStatsAPIView(APIView):
         if game_instance.finish:
             return Response({'status': 0, 'message': _('Cannot modify stats for a finished game.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Process statistics
         stats_keys = ['goals', 'assists', 'own_goals', 'yellow_cards', 'red_cards']
         for stat in stats_keys:
             stat_value = request.data.get(stat)
 
-            if stat_value is not None:  # Check if the stat is included in the request
+            if stat_value is not None:
                 stat_value = int(stat_value)
-                
+
                 if stat_value == 1:
-                    # Increment: Create a new entry
                     PlayerGameStats.objects.create(
                         player_id=player_instance,
                         team_id=team_instance,
                         tournament_id=tournament_instance,
                         game_id=game_instance,
                         game_time=game_time,
-                        **{stat: 1},  # Set the specific stat to 1
+                        **{stat: 1},
                         created_by_id=request.user.id
                     )
-                    return Response({
-                        'status': 1,
-                        'message': _(f'{stat.capitalize()} incremented successfully.'),
-                        'data': {}
-                    }, status=status.HTTP_201_CREATED)
-                
+                    self._update_team_goals(game_instance)
+                    return Response({'status': 1, 'message': _(f'{stat.capitalize()} incremented successfully.'), 'data': {}}, status=status.HTTP_201_CREATED)
+
                 elif stat_value == -1:
-                    # Decrement: Find and delete the most recent entry for this stat
-                    latest_stat = PlayerGameStats.objects.filter(
+                    stat_count = PlayerGameStats.objects.filter(
                         player_id=player_instance,
                         team_id=team_instance,
                         tournament_id=tournament_instance,
                         game_id=game_instance,
-                        **{stat: 1}  # Find the most recent positive entry
-                    ).order_by('-created_at').first()
+                        **{stat: 1}
+                    ).count()
 
-                    if latest_stat:
+                    if stat_count > 0:
+                        latest_stat = PlayerGameStats.objects.filter(
+                            player_id=player_instance,
+                            team_id=team_instance,
+                            tournament_id=tournament_instance,
+                            game_id=game_instance,
+                            **{stat: 1}
+                        ).order_by('-created_at').first()
                         latest_stat.delete()
-                        return Response({
-                            'status': 1,
-                            'message': _(f'{stat.capitalize()} decremented successfully.'),
-                            'data': {}
-                        }, status=status.HTTP_200_OK)
+                        self._update_team_goals(game_instance)  # Update team goals after deletion
+                        return Response({'status': 1, 'message': _(f'{stat.capitalize()} decremented successfully.'), 'data': {}}, status=status.HTTP_200_OK)
                     else:
-                        return Response({
-                            'status': 0,
-                            'message': _(f'Cannot decrement {stat.capitalize()} as no entries exist.'),
-                        }, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'status': 0, 'message': _(f'Cannot decrement {stat.capitalize()} as it cannot go below zero.')}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
+    def _update_team_goals(self, game_instance):
+        """
+        Updates the total goals for both teams in a game instance.
+        """
+        game_instance.team_a_goal = PlayerGameStats.objects.filter(
+            team_id=game_instance.team_a.id,
+            game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        game_instance.team_b_goal = PlayerGameStats.objects.filter(
+            team_id=game_instance.team_b.id,
+            game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        game_instance.save()
 
     def get(self, request, *args, **kwargs):
     # Set language based on the request headers

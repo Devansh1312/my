@@ -32,6 +32,8 @@ from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 from django.db.models import Case, When, F, Q, Sum
 
+from FutureStarTournamentApp.serializers import TournamentGameSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -3320,7 +3322,7 @@ class ListFollowingAPI(generics.ListAPIView):
 
 ##################################### Mobile Dashboard Image #######################################
 
-class DashboardImageAPI(APIView):
+class DashboardAPI(APIView):
     permission_classes = [IsAuthenticated]  # Ensure user is authenticated
     parser_classes = (JSONParser, MultiPartParser, FormParser)  # Handle various parsers (for file uploads, if needed)
 
@@ -3328,10 +3330,33 @@ class DashboardImageAPI(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-            
+
+        # Fetch banners
         banners = MobileDashboardBanner.objects.all()
-        serializer = MobileDashboardBannerSerializer(banners, many=True)
-        
+        banner_serializer = MobileDashboardBannerSerializer(banners, many=True)
+
+        # Fetch latest post
+        latest_post = Post.objects.order_by('-created_at').first()
+        latest_post_serializer = PostSerializer(latest_post, context={'request': request}) if latest_post else None
+
+        # Fetch latest event
+        latest_event = Event.objects.order_by('-created_at').first()
+        latest_event_serializer = EventSerializer(latest_event, context={'request': request}) if latest_event else None
+
+        # Fetch latest game
+        latest_game = TournamentGames.objects.order_by('-game_date', '-game_start_time').first()
+        latest_game_serializer = TournamentGameSerializer(latest_game, context={'request': request}) if latest_game else None
+
+        return Response({
+            "status": 1,
+            "message": _("Dashboard banner list fetched successfully."),
+            "data": {
+                "banners": banner_serializer.data,
+                "latest_post": latest_post_serializer.data if latest_post_serializer else None,
+                "latest_event": latest_event_serializer.data if latest_event_serializer else None,
+                "latest_game": latest_game_serializer.data if latest_game_serializer else None
+            }
+        }, status=status.HTTP_200_OK)
      
     
         return Response({
