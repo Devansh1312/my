@@ -94,122 +94,135 @@ Branch Details
                         <br>
                         <h3>Team static</h3>
                         <div class="row">
-                            <!-- Games Played -->
-                            <div class="col-4 widget-1">
-                                <div class="card-body">
-                                    <div class="widget-content">
-                                        <div class="widget-round">
-                                            <div class="bg-round">
-                                                <i class="fa fa-futbol-o"></i>
+                           
+                                <!-- Games Played -->
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card widget-1">
+                                        <div class="card-body">
+                                            <div class="widget-content">
+                                                <div class="widget-round">
+                                                    <div class="bg-round">
+                                                        <img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4>
+                                                        <span class="counter">{{ total_games }}</span>
+                                                    </h4>
+                                                    <span class="f-light">Games Played</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            <h4>
-                                                <span class="counter">{{ total_games }}</span>
-                                            </h4>
-                                            <span class="f-light">Games Played</span>
+                                    </div>
+                                </div>
+                            
+                                <!-- Wins -->
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card widget-1">
+                                        <div class="card-body">
+                                            <div class="widget-content">
+                                                <div class="widget-round">
+                                                    <div class="bg-round">
+                                                        <img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4>
+                                                        <span class="counter">{{ total_wins }}</span>
+                                                    </h4>
+                                                    <span class="f-light">Wins</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Losses -->
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card widget-1">
+                                        <div class="card-body">
+                                            <div class="widget-content">
+                                                <div class="widget-round">
+                                                    <div class="bg-round">
+                                                        <img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4>
+                                                        <span class="counter">{{ total_losses }}</span>
+                                                    </h4>
+                                                    <span class="f-light">Losses</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Draws -->
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card widget-1">
+                                        <div class="card-body">
+                                            <div class="widget-content">
+                                                <div class="widget-round">
+                                                    <div class="bg-round">
+                                                        <img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4>
+                                                        <span class="counter">{{ total_draws }}</span>
+                                                    </h4>
+                                                    <span class="f-light">Draws</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Goals -->
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card widget-1">
+                                        <div class="card-body">
+                                            <div class="widget-content">
+                                                <div class="widget-round">
+                                                    <div class="bg-round">
+                                                        <img src="{% static 'assets/images/dashboard/goal/goal.png' %}" width="70%">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4>
+                                                        <span class="counter">{{ total_goals }}</span>
+                                                    </h4>
+                                                    <span class="f-light">Goals</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Assists -->
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card widget-1">
+                                        <div class="card-body">
+                                            <div class="widget-content">
+                                                <div class="widget-round">
+                                                    <div class="bg-round">
+                                                        <img src="{% static 'assets/images/dashboard/goal/assists.png' %}" width="70%">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4>
+                                                        <span class="counter">{{ total_assists }}</span>
+                                                    </h4>
+                                                    <span class="f-light">Assists</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        
-                            <!-- Wins -->
-                            <div class="col-4 widget-1">
-                                <div class="card-body">
-                                    <div class="widget-content">
-                                        <div class="widget-round">
-                                            <div class="bg-round">
-                                                <i class="fa fa-trophy"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4>
-                                                <span class="counter">{{ total_wins }}</span>
-                                            </h4>
-                                            <span class="f-light">Wins</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <!-- Losses -->
-                            <div class="col-4 widget-1">
-                                <div class="card-body">
-                                    <div class="widget-content">
-                                        <div class="widget-round">
-                                            <div class="bg-round">
-                                                <i class="fa fa-times-circle"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4>
-                                                <span class="counter">{{ total_losses }}</span>
-                                            </h4>
-                                            <span class="f-light">Losses</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <!-- Draws -->
-                            <div class="col-4 widget-1">
-                                <div class="card-body">
-                                    <div class="widget-content">
-                                        <div class="widget-round">
-                                            <div class="bg-round">
-                                                <i class="fa fa-handshake-o"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4>
-                                                <span class="counter">{{ total_draws }}</span>
-                                            </h4>
-                                            <span class="f-light">Draws</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <!-- Goals -->
-                            <div class="col-4 widget-1">
-                                <div class="card-body">
-                                    <div class="widget-content">
-                                        <div class="widget-round">
-                                            <div class="bg-round">
-                                                <i class="fa fa-soccer-ball-o"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4>
-                                                <span class="counter">{{ total_goals }}</span>
-                                            </h4>
-                                            <span class="f-light">Goals</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <!-- Assists -->
-                            <div class="col-4 widget-1">
-                                <div class="card-body">
-                                    <div class="widget-content">
-                                        <div class="widget-round">
-                                            <div class="bg-round">
-                                                <i class="fa fa-forward"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4>
-                                                <span class="counter">{{ total_assists }}</span>
-                                            </h4>
-                                            <span class="f-light">Assists</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>                        
-                    </div>
-                </div>
+                        </div>
+                          
                 <!-- Datatable Section  -->
                 <div class="row">
                     <div class="col-sm-12">
