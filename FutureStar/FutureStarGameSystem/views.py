@@ -1068,6 +1068,17 @@ class GameStatsLineupPlayers(APIView):
                 'message': _('You do not have access to this resource.'),
                 'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
+        
+           # Calculate team goals
+    
+        tournament_game = TournamentGames.objects.select_related('team_a', 'team_b').get(id=game_id, tournament_id=tournament_id)
+        team_a_goals = PlayerGameStats.objects.filter(
+            team_id=team_a_id, game_id=game_id, tournament_id=tournament_id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = PlayerGameStats.objects.filter(
+            team_id=team_b_id, game_id=game_id, tournament_id=tournament_id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
         # Fetch lineup data for both teams
         lineup_data = {}
@@ -1128,7 +1139,21 @@ class GameStatsLineupPlayers(APIView):
         return Response({
             'status': 1,
             'message': _('Lineup players and manager fetched successfully for both teams.'),
-            'data': lineup_data
+            'data': {
+                'game_id': game_id,
+                'tournament_id': tournament_id,
+                'goals': {
+                    'team_a_id': tournament_game.team_a.id,
+                    'team_a_name': tournament_game.team_a.team_name,
+                    'team_a_total_goals': team_a_goals,
+                    'team_a_logo': tournament_game.team_a.team_id.team_logo.url if tournament_game.team_a.team_id.team_logo else None,
+                    'team_b_id': tournament_game.team_b.id,
+                    'team_b_name': tournament_game.team_b.team_name,
+                    'team_b_total_goals': team_b_goals,
+                    'team_b_logo': tournament_game.team_b.team_id.team_logo.url if tournament_game.team_b.team_id.team_logo else None,
+                },
+                **lineup_data
+            }
         }, status=status.HTTP_200_OK)
 
 

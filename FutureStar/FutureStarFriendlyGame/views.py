@@ -1337,32 +1337,30 @@ class FriendlyAddPlayerJerseyAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-# ################## Players games stats in tournament ###############
+################## Players games stats lineup in Friendly ###############
 
-   
 class FriendlyGameStatsLineupPlayers(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def _has_access(self, user, game_id=None):
-        # Check if the user is the game_statistics_handler for the given game
-        if game_id:
+    def _has_access(self, user, game_id=None, tournament_id=None):
+        # Same access check code as before
+        if game_id and tournament_id:
             try:
-                game = FriendlyGame.objects.get(id=game_id)
+                game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
                 if game.game_statistics_handler == user:
                     return True
-            except FriendlyGame.DoesNotExist:
-                pass  # Game not found or doesn't match; access denied
+            except TournamentGames.DoesNotExist:
+                pass
 
         return False   
 
-    def get_last_update(self, player_id, game_id):
-        """
-        Fetch the last update type for a player in a specific friendly game.
-        """
+    # Function to get the last update for a player
+    def get_last_update(self, player_id, game_id, tournament_id):  # Add self to the method definition
         last_stat = FriendlyGamesPlayerGameStats.objects.filter(
             Q(player_id_id=player_id) | Q(in_player_id=player_id) | Q(out_player_id=player_id),
-            game_id=game_id
+            game_id=game_id,
+            tournament_id=tournament_id
         ).order_by('-updated_at').first()  # Fetch the most recent update
 
         if last_stat:
@@ -1392,12 +1390,7 @@ class FriendlyGameStatsLineupPlayers(APIView):
         team_b_id = request.query_params.get('team_b_id')
         game_id = request.query_params.get('game_id')
 
-        if not team_a_id or not team_b_id or not game_id:
-            return Response({
-                'status': 0,
-                'message': _('team_a_id, team_b_id, and game_id are required.'),
-                'data': {}
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Validate team_a_id, team_b_id, game_id, tournament_id as before...
 
         if not self._has_access(request.user, game_id=game_id):
             return Response({
@@ -1405,6 +1398,17 @@ class FriendlyGameStatsLineupPlayers(APIView):
                 'message': _('You do not have access to this resource.'),
                 'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
+        
+           # Calculate team goals
+    
+        friendly_game = FriendlyGame.objects.select_related('team_a', 'team_b').get(id=game_id)
+        team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=team_a_id, game_id=game_id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=team_b_id, game_id=game_id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
         # Fetch lineup data for both teams
         lineup_data = {}
@@ -1412,11 +1416,13 @@ class FriendlyGameStatsLineupPlayers(APIView):
             substitute_lineups = FriendlyGameLineup.objects.filter(
                 team_id=team_id,
                 game_id=game_id,
+              
                 lineup_status=FriendlyGameLineup.SUBSTITUTE
             )
             already_added_lineups = FriendlyGameLineup.objects.filter(
                 team_id=team_id,
                 game_id=game_id,
+               
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
             )
 
@@ -1427,7 +1433,7 @@ class FriendlyGameStatsLineupPlayers(APIView):
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
-                'lastupdate': self.get_last_update(lineup.player_id.id, game_id)  # Include last update
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id)  # Use self to call the method
             } for lineup in substitute_lineups]
 
             already_added_data = [{
@@ -1437,7 +1443,7 @@ class FriendlyGameStatsLineupPlayers(APIView):
                 'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
                 'position_1': lineup.position_1,
                 'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
-                'lastupdate': self.get_last_update(lineup.player_id.id, game_id)  # Include last update
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id)  # Use self to call the method
             } for lineup in already_added_lineups]
 
             managerial_staff = JoinBranch.objects.filter(
@@ -1463,8 +1469,25 @@ class FriendlyGameStatsLineupPlayers(APIView):
         return Response({
             'status': 1,
             'message': _('Lineup players and manager fetched successfully for both teams.'),
-            'data': lineup_data
+            'data': {
+                'game_id': game_id,
+              
+                'goals': {
+                    'team_a_id': friendly_game.team_a.id,
+                    'team_a_name': friendly_game.team_a.team_name,
+                    'team_a_total_goals': team_a_goals,
+                    'team_a_logo': friendly_game.team_a.team_id.team_logo.url if friendly_game.team_a.team_id.team_logo else None,
+                    'team_b_id': friendly_game.team_b.id,
+                    'team_b_name': friendly_game.team_b.team_name,
+                    'team_b_total_goals': team_b_goals,
+                    'team_b_logo': friendly_game.team_b.team_id.team_logo.url if friendly_game.team_b.team_id.team_logo else None,
+                },
+                'lineup': lineup_data
+            }
         }, status=status.HTTP_200_OK)
+
+
+    
 
 
 class FriendlyGameLineupPlayerStatusAPIView(APIView):
