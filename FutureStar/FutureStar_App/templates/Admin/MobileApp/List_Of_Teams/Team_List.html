@@ -23,23 +23,24 @@ Team List View
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
+            <div class="col-12 col-md-6">
+               <h3>{{ breadcrumb.child }}</h3>
             </div>
          </div>
       </div>
       <div class="row">
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                    <table class="display" id="basic-1">
+                     <table class="table table-bordered" id="basic-1">
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Team Name</th> 
-                                <th>Team User Name</th>
-                                <th>Created By</th>
+                                <th>Team Name</th>
+                                <th>Username</th>
+                                <th>Founder Username</th>
+                                <th>President</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -50,6 +51,7 @@ Team List View
                                 <td>{{ team.team_name }}</td>
                                 <td>{{ team.team_username }}</td>
                                 <td>{{ team.team_founder.username }}</td>
+                                <td>{{ team.team_president }}</td>
                                 <td>
                                     <!-- Action buttons -->
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">
@@ -84,135 +86,59 @@ Team List View
    </div>
 </div>
 
+<!-- Add responsive styles -->
+<style>
+   /* Make table scrollable on small screens */
+   .table-responsive {
+      overflow-x: auto;
+   }
 
+   /* For small screens, adjust font size and padding */
+   @media (max-width: 767px) {
+      .table th, .table td {
+         font-size: 12px;
+         padding: 6px;
+      }
 
-<!-- View Team Modal
-<div class="modal fade bd-example-modal-lg" id="viewTeamModal" tabindex="-1" aria-labelledby="viewTeamModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-       <div class="modal-content shadow-lg border-0 rounded">
-          <div class="modal-header bg-primary text-white">
-             <h5 class="modal-title" id="viewTeamModalLabel">Team Details</h5>
-             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body p-4">
-             <div class="row">
-                Team Details Section
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Team Name:</label>
-                   <span id="teamName"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Team Username:</label>
-                   <span id="teamUsername"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Created By:</label>
-                   <span id="createdBy"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Team Type:</label>
-                   <span id="teamType"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Bio:</label>
-                   <span id="bio"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Establishment Date:</label>
-                   <span id="establishmentDate"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">President:</label>
-                   <span id="teamPresident"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Latitude:</label>
-                   <span id="latitude"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Longitude:</label>
-                   <span id="longitude"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Address:</label>
-                   <span id="address"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">House No:</label>
-                   <span id="houseNo"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Premises:</label>
-                   <span id="premises"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Street:</label>
-                   <span id="street"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">City:</label>
-                   <span id="city"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">State:</label>
-                   <span id="state"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Country:</label>
-                   <span id="country"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Postal Code:</label>
-                   <span id="postalCode"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Country Code:</label>
-                   <span id="countryCode"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Phone:</label>
-                   <span id="phone"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Email:</label>
-                   <span id="email"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Age Group:</label>
-                   <span id="ageGroup"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Entry Fees:</label>
-                   <span id="entryFees"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                   <label class="form-label fw-bold">Branches:</label>
-                   <span id="branches"></span>
-                </div>
-             </div>
-             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Team Logo:</label>
-                    <img id="teamLogoPreview" src="" alt="Team Logo" class="img-fluid">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Background Image:</label>
-                    <img id="teamBackgroundImagePreview" src="" alt="Background Image" class="img-fluid">
-                </div>
-                <div class="col-md-12 mb-3">
-                    <label class="form-label fw-bold">Uniform:</label>
-                    <img id="teamUniformPreview" src="" alt="Uniform" class="img-fluid">
-                </div>
-             </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-       </div>
-    </div>
-  </div>  -->
- 
+      /* Action menu button styling */
+      .three-dots-menu {
+         font-size: 20px;
+      }
 
+      .action-card {
+         width: auto;
+         min-width: 120px;
+      }
+
+      /* Ensure action buttons are not overflowing */
+      .action-menu-container {
+         display: block;
+         margin-top: 10px;
+      }
+
+      /* Adjust modal dialog for smaller screens */
+      .modal-dialog {
+         max-width: 90%;
+         margin: 0;
+      }
+
+      .modal-body {
+         padding: 10px;
+      }
+
+      .btn {
+         font-size: 14px;
+         padding: 10px;
+      }
+   }
+
+   /* For larger screens, retain normal layout */
+   @media (min-width: 768px) {
+      .modal-dialog {
+         max-width: 500px;
+      }
+   }
+</style>
 
 {% endblock %}
 

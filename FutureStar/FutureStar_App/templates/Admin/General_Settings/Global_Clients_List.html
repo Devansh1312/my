@@ -24,70 +24,73 @@ Global_Clients Management
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <!-- Title on the left for all screen sizes -->
+            <div class="col-6 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addGlobal_ClientsModal">Add Global-Clients</button>
-               </ol>
+            <!-- Button on the right for larger screens, on mobile, it will be aligned to the right -->
+            <div class="col-6 col-md-6 d-flex justify-content-end">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addGlobal_ClientsModal">Add Global-Clients</button>
             </div>
          </div>
       </div>
+      
+
       <div class="row">
          <!-- Global_Clients List -->
          <div class="col-sm-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-bordered table-striped" id="basic-1">
                         <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Image</th> <!-- New column for the image -->
-                                <th>Title</th>
-                                <th>Actions</th>
-                            </tr>
+                           <tr>
+                              <th style="text-align: center;">No.</th>
+                              <th style="text-align: center;">Image</th>
+                              <th style="text-align: center;">Title</th>
+                              <th style="text-align: center;">Actions</th>
+                           </tr>
                         </thead>
                         <tbody>
-                            {% for global_clients_item in global_clients %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>
-                                    {% if global_clients_item.image %}
-                                        <img src="{{ global_clients_item.image.url }}" alt="{{ global_clients_item.title }}" width="100" height="auto">
-                                    {% else %}
-                                        No Image
-                                    {% endif %}
-                                </td>                                
-                                <td>{{ global_clients_item.title }}</td>
-                                <td>
-                                    <!-- Action buttons -->
-                                    <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                        <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                            <i data-feather="more-vertical"></i>
-                                        </a>
-                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                          <ul style="list-style: none; padding: 0; margin: 0;">
-                                             <li style="padding: 8px 12px;">
-                                                <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGlobal_ClientsModal"  data-global_clients-id="{{ global_clients_item.id }}" 
-                                                data-global_clients-title="{{ global_clients_item.title }}" 
-                                                data-global_clients-image="{{ global_clients_item.image.url }}">
-                                                   <i data-feather="edit"></i> Edit </a>
-                                             </li>
-                                             <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteGlobal_ClientsModal" data-global_clients-id="{{ global_clients_item.id }}">
-                                                   <i data-feather="trash-2"></i> Delete </a>
-                                             </li>
-                                          </ul>
-                                       </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>                        
+                           {% for global_clients_item in global_clients %}
+                           <tr>
+                              <td style="text-align: center;">{{ forloop.counter }}</td> <!-- Centered content -->
+                              <td style="text-align: center;">
+                                 {% if global_clients_item.image %}
+                                 <img src="{{ global_clients_item.image.url }}" alt="{{ global_clients_item.title }}" width="100" height="auto">
+                                 {% else %}
+                                 No Image
+                                 {% endif %}
+                              </td> <!-- Centered content -->
+                              <td style="text-align: center;">{{ global_clients_item.title }}</td> <!-- Centered content -->
+                              <td style="text-align: center;"> <!-- Centered content -->
+                                 <div class="action-menu-container" style="position: relative; display: inline-flex; justify-content: center; align-items: center; height: 100%;">
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                       <i data-feather="more-vertical"></i>
+                                    </a>
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px; text-align: left;">
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                          <li style="padding: 8px 12px;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGlobal_ClientsModal" data-global_clients-id="{{ global_clients_item.id }}" 
+                                                data-global_clients-title="{{ global_clients_item.title }}" data-global_clients-image="{{ global_clients_item.image.url }}">
+                                                Edit
+                                             </a>
+                                          </li>
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteGlobal_ClientsModal" data-global_clients-id="{{ global_clients_item.id }}">
+                                                Delete
+                                             </a>
+                                          </li>
+                                       </ul>
+                                    </div>                                    
+                                 </div>
+                              </td> <!-- Centered content -->                              
+                           </tr>
+                           {% endfor %}
+                        </tbody>
                      </table>
                   </div>
+                  
                </div>
             </div>
          </div>
@@ -97,7 +100,7 @@ Global_Clients Management
 
 <!-- Add Global_Clients Modal -->
 <div class="modal fade" id="addGlobal_ClientsModal" tabindex="-1" aria-labelledby="addGlobal_ClientsModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addGlobal_ClientsModalLabel">Add Global Clients</h5>
@@ -109,13 +112,13 @@ Global_Clients Management
                <div class="mb-3">
                   <label for="title" class="form-label">Title</label>
                   <input type="text" class="form-control" id="title" name="title" placeholder="Enter Global_Clients Title">
-                  <div class="invalid-feedback" id="title-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="title-error"></div>
                </div>
                <div class="mb-3">
-                    <label for="image" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
-                    <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
-                </div>
+                  <label for="image" class="form-label">Image</label>
+                  <input type="file" class="form-control" id="image" name="image">
+                  <div class="invalid-feedback" id="image-error"></div>
+               </div>
                <button type="submit" class="btn btn-primary">Add Global Clients</button>
             </form>
          </div>
@@ -123,10 +126,9 @@ Global_Clients Management
    </div>
 </div>
 
-
 <!-- Edit Global_Clients Modal -->
 <div class="modal fade" id="editGlobal_ClientsModal" tabindex="-1" aria-labelledby="editGlobal_ClientsModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editGlobal_ClientsModalLabel">Edit Global Clients</h5>
@@ -139,7 +141,7 @@ Global_Clients Management
                <div class="mb-3">
                   <label for="editTitle" class="form-label">Title</label>
                   <input type="text" class="form-control" id="editTitle" name="title" placeholder="Enter Global_Clients Title">
-                  <div class="invalid-feedback" id="edit-title-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-title-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
@@ -153,10 +155,9 @@ Global_Clients Management
    </div>
 </div>
 
-
 <!-- Delete Global_Clients Modal -->
 <div class="modal fade" id="deleteGlobal_ClientsModal" tabindex="-1" aria-labelledby="deleteGlobal_ClientsModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteGlobal_ClientsModalLabel">Delete Global Clients</h5>

@@ -52,7 +52,7 @@ User Role Apply Management
                      <!-- Coaches Tab Content -->
                      <div class="tab-pane fade show active" id="coach-tab-pane" role="tabpanel" aria-labelledby="coach-tab">
                         <div class="table-responsive">
-                           <table class="display" id="coach-table">
+                           <table class="table table-bordered" id="coach-table">
                               <thead>
                                  <tr>
                                     <th>ID</th>
@@ -71,7 +71,6 @@ User Role Apply Management
                                     <td>{{ user.updated_at|date:"Y-m-d H:i" }}</td>
                                     <td>
                                         <form action="{% url 'user_role_action'%}" method="get">
-                                           <!-- {% csrf_token %} -->
                                            <input type="hidden" name="user_id" value="{{ user.id }}">
                                            <button type="submit" class="btn btn-info">View</button>
                                         </form>
@@ -85,7 +84,7 @@ User Role Apply Management
                      <!-- Referees Tab Content -->
                      <div class="tab-pane fade" id="referee-tab-pane" role="tabpanel" aria-labelledby="referee-tab">
                         <div class="table-responsive">
-                           <table class="display" id="referee-table">
+                           <table class="table table-bordered" id="referee-table">
                               <thead>
                                  <tr>
                                     <th>ID</th>
@@ -104,7 +103,6 @@ User Role Apply Management
                                     <td>{{ user.updated_at|date:"Y-m-d H:i" }}</td>
                                     <td>
                                         <form action="{% url 'user_role_action'%}" method="get">
-                                           <!-- {% csrf_token %} -->
                                            <input type="hidden" name="user_id" value="{{ user.id }}">
                                            <button type="submit" class="btn btn-info">View</button>
                                         </form>
@@ -122,6 +120,69 @@ User Role Apply Management
       </div>
    </div>
 </div>
+
+<!-- Add responsive styles -->
+<style>
+   /* Ensure tabs display well on small screens */
+   @media (max-width: 767px) {
+      /* For mobile screens */
+      .nav-tabs {
+         flex-direction: column;
+         align-items: flex-start;
+      }
+
+      .nav-link {
+         padding: 12px 10px;
+         font-size: 14px;
+      }
+
+      .tab-content {
+         margin-top: 20px;
+      }
+
+      /* Make tables scrollable */
+      .table-responsive {
+         overflow-x: auto;
+         -webkit-overflow-scrolling: touch;
+      }
+
+      /* Style for table cells to make them more readable */
+      .table th, .table td {
+         padding: 10px;
+         font-size: 12px;
+      }
+
+      /* For action buttons */
+      .btn {
+         font-size: 12px;
+         padding: 6px 12px;
+      }
+
+      /* For small screens, make the tabs stacked vertically */
+      .tab-pane {
+         margin-top: 10px;
+      }
+   }
+
+   /* Additional styling for tablet and larger screens */
+   @media (min-width: 768px) {
+      /* For medium and larger screens, keep the tabs horizontal */
+      .nav-tabs {
+         flex-direction: row;
+      }
+
+      .nav-link {
+         font-size: 16px;
+      }
+
+      /* Ensure the tables are not too wide */
+      .table-responsive {
+         max-width: 100%;
+         overflow-x: auto;
+      }
+   }
+</style>
+
 {% endblock %}
 
 {% block script %}

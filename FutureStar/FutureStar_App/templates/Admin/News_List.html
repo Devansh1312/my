@@ -24,10 +24,10 @@ News Management
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                <ol class="breadcrumb">
                   <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addNewsModal">Add News</button>
                </ol>
@@ -46,9 +46,7 @@ News Management
                                 <th>ID</th>
                                 <th>Image</th> <!-- New column for the image -->
                                 <th>Title (English)</th>
-                                <th>Title (English)</th>
-                                <!-- <th>Description (Arabic)</th>
-                                <th>Description (Arabic)</th> -->
+                                <th>Title (Arabic)</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -63,7 +61,7 @@ News Management
                                     {% else %}
                                         No Image
                                     {% endif %}
-                                </td>                                
+                                </td>                                 
                                 <td>
                                  {{ news_item.title_en|slice:":30" }}{% if news_item.title_en|length > 30 %}...
                                  <a href="#" class="view-news-btn" data-news-id="{{ news_item.id }}" 
@@ -83,8 +81,6 @@ News Management
                                     data-news-description_ar="{{ news_item.description_ar }}" 
                                     data-news-image="{{ news_item.image.url }}">Read more</a>{% endif %}
                               </td>                              
-                                <!-- <td>{{ news_item.description_en }}</td>
-                                <td>{{ news_item.description_ar }}</td> -->
                                 <td>{{ news_item.news_date }}</td>
                                 <td>
                                     <!-- Action buttons -->
@@ -136,7 +132,7 @@ News Management
 
 <!-- Add News Modal -->
 <div class="modal fade" id="addNewsModal" tabindex="-1" aria-labelledby="addNewsModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addNewsModalLabel">Add News</h5>
@@ -146,30 +142,30 @@ News Management
             <form method="post" action="{% url 'news_create' %}" id="addNewsForm" enctype="multipart/form-data">
                {% csrf_token %}
                <div class="row">
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="title_en" class="form-label">Title in English</label>
                      <textarea class="form-control" id="title_en" name="title_en" placeholder="Enter News Title"></textarea>
-                     <div class="invalid-feedback" id="title_en-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="title_en-error"></div>
                   </div>
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="title_ar" class="form-label">Title in Arabic</label>
                      <textarea class="form-control" id="title_ar" name="title_ar" placeholder="Enter News Title"></textarea>
-                     <div class="invalid-feedback" id="title_ar-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="title_ar-error"></div>
                   </div>
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="description_en" class="form-label">Description in English</label>
                      <textarea class="form-control" id="description_en" name="description_en" placeholder="Enter News Description"></textarea>
-                     <div class="invalid-feedback" id="description_en-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="description_en-error"></div>
                   </div>
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="description_ar" class="form-label">Description in Arabic</label>
                      <textarea class="form-control" id="description_ar" name="description_ar" placeholder="Enter News Description"></textarea>
-                     <div class="invalid-feedback" id="description_ar-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="description_ar-error"></div>
                   </div>
                   <div class="col-12 mb-3">
                      <label for="image" class="form-label">Image</label>
                      <input type="file" class="form-control" id="image" name="image">
-                     <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="image-error"></div>
                   </div>
                   <button type="submit" class="btn btn-primary">Add News</button>
                </div>
@@ -179,10 +175,9 @@ News Management
    </div>
 </div>
 
-
 <!-- Edit News Modal -->
 <div class="modal fade" id="editNewsModal" tabindex="-1" aria-labelledby="editNewsModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editNewsModalLabel">Edit News</h5>
@@ -193,25 +188,25 @@ News Management
                {% csrf_token %}
                <div class="row">
                   <input type="hidden" id="editNewsId" name="id">
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="editTitle_en" class="form-label">Title in English</label>
                      <textarea class="form-control" id="editTitle_en" name="title_en" placeholder="Enter News Title"></textarea>
-                     <div class="invalid-feedback" id="edit-title_en-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="edit-title_en-error"></div>
                   </div>
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="editTitle_ar" class="form-label">Title in Arabic</label>
                      <textarea class="form-control" id="editTitle_ar" name="title_ar" placeholder="Enter News Title"></textarea>
-                     <div class="invalid-feedback" id="edit-title_ar-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="edit-title_ar-error"></div>
                   </div>
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="editDescription_en" class="form-label">Description in English</label>
                      <textarea class="form-control" id="editDescription_en" name="description_en" placeholder="Enter News Description"></textarea>
-                     <div class="invalid-feedback" id="edit-description_en-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="edit-description_en-error"></div>
                   </div>
-                  <div class="col-6 mb-3">
+                  <div class="col-12 col-sm-6 mb-3">
                      <label for="editDescription_ar" class="form-label">Description in Arabic</label>
                      <textarea class="form-control" id="editDescription_ar" name="description_ar" placeholder="Enter News Description"></textarea>
-                     <div class="invalid-feedback" id="edit-description_ar-error"></div> <!-- Error message container -->
+                     <div class="invalid-feedback" id="edit-description_ar-error"></div>
                   </div>
                   <div class="col-12 mb-3">
                      <label for="editImage" class="form-label">Image</label>
@@ -221,7 +216,6 @@ News Management
                   <button type="submit" class="btn btn-primary">Update News</button>
                </div>
             </form>            
-            </div>
          </div>
       </div>
    </div>
@@ -229,7 +223,7 @@ News Management
 
 <!-- View News Modal -->
 <div class="modal fade bd-example-modal-lg" id="viewNewsModal" tabindex="-1" aria-labelledby="viewNewsModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-lg">
+   <div class="modal-dialog modal-lg modal-dialog-centered">
        <div class="modal-content shadow-lg border-0 rounded">
            <div class="modal-header bg-primary text-white">
                <h5 class="modal-title" id="viewNewsModalLabel">News Details</h5>
@@ -237,25 +231,25 @@ News Management
            </div>
            <div class="modal-body p-4">
                <div class="row">
-                   <div class="col-md-12 mb-3">
+                   <div class="col-12 mb-3">
                        <label class="form-label fw-bold">Title in English:</label>
-                       <span id="newsTitleEn"></span> <!-- Example title in English -->
+                       <span id="newsTitleEn"></span>
                    </div>
-                   <div class="col-md-12 mb-3">
+                   <div class="col-12 mb-3">
                        <label class="form-label fw-bold">Title in Arabic:</label>
-                       <span id="newsTitleAr"></span> <!-- Example title in Arabic -->
+                       <span id="newsTitleAr"></span>
                    </div>
-                   <div class="col-md-12 mb-3">
+                   <div class="col-12 mb-3">
                        <label class="form-label fw-bold">Description in English:</label>
-                       <span id="newsDescriptionEn"></span> <!-- Example description in English -->
+                       <span id="newsDescriptionEn"></span>
                    </div>
-                   <div class="col-md-12 mb-3">
+                   <div class="col-12 mb-3">
                        <label class="form-label fw-bold">Description in Arabic:</label>
-                       <span id="newsDescriptionAr"></span> <!-- Example description in Arabic -->
+                       <span id="newsDescriptionAr"></span>
                    </div>
-                   <div class="col-md-12 mb-3">
+                   <div class="col-12 mb-3">
                        <label class="form-label fw-bold">Image:</label><br>
-                       <img id="newsImagePreview" style="width: 150px;"> <!-- News image preview -->
+                       <img id="newsImagePreview" style="width: 150px;">
                    </div>
                </div>
            </div>
@@ -266,10 +260,9 @@ News Management
    </div>
 </div>
 
-
 <!-- Delete News Modal -->
 <div class="modal fade" id="deleteNewsModal" tabindex="-1" aria-labelledby="deleteNewsModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteNewsModalLabel">Delete News</h5>
@@ -286,6 +279,7 @@ News Management
       </div>
    </div>
 </div>
+
 
 {% endblock %}
 

@@ -2025,15 +2025,11 @@ class FriendlyGameOfficialsAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-
 class FriendlyPlayerGameStatsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, game_id=None):
-        """
-        Check if the user is the game_statistics_handler for the specified game.
-        """
         if game_id:
             try:
                 game = FriendlyGame.objects.get(id=game_id)
@@ -2123,7 +2119,64 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                             'message': _(f'Cannot decrement {stat.capitalize()} as no entries exist.'),
                         }, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
+        # Calculate team goals
+        team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=team_instance.team_a.id, game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=team_instance.team_b.id, game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        # Fetch lineup data for both teams
+        lineup_data = {}
+        for team_key, team in [('team_a', team_instance.team_a), ('team_b', team_instance.team_b)]:
+            lineup_data[team_key] = {
+                'player_added_in_lineup': [
+                    {
+                        'id': lineup.id,
+                        'player_id': lineup.player_id.id,
+                        'player_username': lineup.player_id.username,
+                        'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                        'position_1': lineup.position_1,
+                        'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                        'lastupdate': self.get_last_update(lineup.player_id.id, game_instance.id)
+                    }
+                    for lineup in FriendlyGameLineup.objects.filter(team_id=team.id, game_id=game_instance.id, lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP)
+                ],
+                'substitute': [
+                    {
+                        'id': lineup.id,
+                        'player_id': lineup.player_id.id,
+                        'player_username': lineup.player_id.username,
+                        'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                        'position_1': lineup.position_1,
+                        'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                        'lastupdate': self.get_last_update(lineup.player_id.id, game_instance.id)
+                    }
+                    for lineup in FriendlyGameLineup.objects.filter(team_id=team.id, game_id=game_instance.id, lineup_status=FriendlyGameLineup.SUBSTITUTE)
+                ]
+            }
+
+        return Response({
+            'status': 1,
+            'message': _('Player stats updated successfully.'),
+            'data': {
+                'game_id': game_instance.id,
+                'goals': {
+                    'team_a_id': team_instance.team_a.id,
+                    'team_a_name': team_instance.team_a.team_name,
+                    'team_a_total_goals': team_a_goals,
+                    'team_a_logo': team_instance.team_a.team_id.team_logo.url if team_instance.team_a.team_id.team_logo else None,
+                    'team_b_id': team_instance.team_b.id,
+                    'team_b_name': team_instance.team_b.team_name,
+                    'team_b_total_goals': team_b_goals,
+                    'team_b_logo': team_instance.team_b.team_id.team_logo.url if team_instance.team_b.team_id.team_logo else None,
+                },
+                'lineup': lineup_data
+            }
+        }, status=status.HTTP_200_OK)
+
 
 
     def get(self, request, *args, **kwargs):
@@ -2167,11 +2220,25 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 game_id=game_id
             )
 
+            # If no stats found, return 0 for all stats
             if not stats.exists():
+                total_stats = {
+                    'id': None,  # or an appropriate default value
+                    'team_id': team_id,
+                    'player_id': player_id,
+                    'game_id': game_id,
+                    'goals': 0,
+                    'assists': 0,
+                    'yellow_cards': 0,
+                    'red_cards': 0,
+                    'own_goals': 0
+                }
+
                 return Response({
-                    'status': 0,
-                    'message': _('Player stats not found.')
-                }, status=status.HTTP_404_NOT_FOUND)
+                    'status': 1,
+                    'message': _('Player stats fetched successfully.'),
+                    'data': [total_stats]
+                }, status=status.HTTP_200_OK)
 
             # Calculate totals
             totals = stats.aggregate(
@@ -2179,7 +2246,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 total_assists=Sum('assists'),
                 total_yellow_cards=Sum('yellow_cards'),
                 total_red_cards=Sum('red_cards'),
-                total_own_goals=Sum('own_goals'),  # Added aggregation for own_goals
+                total_own_goals=Sum('own_goals')
             )
 
             # Format the response data
@@ -2192,7 +2259,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 'assists': totals['total_assists'] or 0,
                 'yellow_cards': totals['total_yellow_cards'] or 0,
                 'red_cards': totals['total_red_cards'] or 0,
-                'own_goals': totals['total_own_goals'] or 0,  # Added own_goals to response
+                'own_goals': totals['total_own_goals'] or 0
             }
 
             # Respond with the formatted data
@@ -2207,6 +2274,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 'status': 0,
                 'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class FriendlyPlayerGameStatsTimelineAPIView(APIView):

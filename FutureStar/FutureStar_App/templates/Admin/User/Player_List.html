@@ -18,10 +18,9 @@ Player List
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12">
                <h3>{{ breadcrumb.child }}</h3>
             </div>
-            <div class="col-6"></div>
          </div>
       </div>
       <div class="row">
@@ -51,9 +50,13 @@ Player List
                               <td>{{ user.last_name }}</td>
                               <td>{{ user.email }}</td>
                               <td>{{ user.phone }}</td>
-                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}" style="padding: 5px; margin-top: 10px;">
-                                 {% if user.is_active %}Active{% else %}Deactive{% endif %}
-                              </td>
+                              <td>
+                                 {% if user.is_active %}
+                                    <span class="text-success">Active</span>
+                                 {% else %}
+                                    <span class="text-danger">Deactive</span>
+                                 {% endif %}
+                              </td>                                                         
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
@@ -99,6 +102,68 @@ Player List
       </div>
    </div>
 </div>
+
+<!-- Additional Custom CSS for Mobile Responsiveness -->
+<style>
+   /* Table Responsiveness */
+   .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+   }
+
+   /* Adjust modal sizes for mobile */
+   .modal-dialog {
+      max-width: 100%;
+      width: 90%;
+   }
+
+   .modal-dialog-centered {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+   }
+
+   /* Ensure the action menu is mobile-friendly */
+   .action-menu-container {
+      position: relative;
+      display: inline-block;
+   }
+
+   .action-card {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      width: 150px;
+   }
+
+   /* Adjust fonts and padding for smaller screens */
+   @media (max-width: 767px) {
+      .page-title h3 {
+         font-size: 18px;
+      }
+
+      .card-body {
+         padding: 1rem;
+      }
+
+      .table th, .table td {
+         padding: 8px;
+         font-size: 14px;
+      }
+
+      .btn {
+         font-size: 14px;
+         padding: 8px;
+      }
+   }
+</style>
+
 
 {% endblock %}
 

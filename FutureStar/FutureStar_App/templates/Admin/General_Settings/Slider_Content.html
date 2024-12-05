@@ -15,23 +15,23 @@
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addSlider_ContentModal">Add Slider Content</button>
+            <div class="col-12 col-md-6">
+               <ol class="breadcrumb d-flex justify-content-end">
+                  <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addSlider_ContentModal">Add Slider Content</button>
                </ol>
             </div>
          </div>
       </div>
       <div class="row">
          <!-- Slider_Content List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="display table table-striped" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -57,12 +57,12 @@
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editSlider_ContentModal" data-slider_content-id="{{ slider_content.id }}" data-slider_content-content_en="{{ slider_content.content_en }}" data-slider_content-content_ar="{{ slider_content.content_ar }}">
-                                                <i data-feather="edit"></i> Edit 
+                                             Edit 
                                              </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteSlider_ContentModal" data-slider_content-id="{{ slider_content.id }}">
-                                                <i data-feather="trash-2"></i> Delete 
+                                             Delete 
                                              </a>
                                           </li>
                                        </ul>
@@ -83,7 +83,7 @@
 
 <!-- Add Slider_Content Modal -->
 <div class="modal fade" id="addSlider_ContentModal" tabindex="-1" aria-labelledby="addSlider_ContentModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addSlider_ContentModalLabel">Add Slider Content</h5>
@@ -102,7 +102,7 @@
                   <input type="text" class="form-control" id="content_ar" name="content_ar" placeholder="Enter Content (Arabic)">
                   <div id="addSlider_ContentArError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Add Content</button>
+               <button type="submit" class="btn btn-primary w-100">Add Content</button>
             </form>
          </div>
       </div>
@@ -111,7 +111,7 @@
 
 <!-- Edit Slider_Content Modal -->
 <div class="modal fade" id="editSlider_ContentModal" tabindex="-1" aria-labelledby="editSlider_ContentModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editSlider_ContentModalLabel">Edit Slider Content</h5>
@@ -131,7 +131,7 @@
                   <input type="text" class="form-control" id="editContent_ar" name="content_ar" placeholder="Enter Content (Arabic)">
                   <div id="editSlider_ContentArError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update Content</button>
+               <button type="submit" class="btn btn-primary w-100">Update Content</button>
             </form>
          </div>
       </div>
@@ -140,7 +140,7 @@
 
 <!-- Delete Slider_Content Modal -->
 <div class="modal fade" id="deleteSlider_ContentModal" tabindex="-1" aria-labelledby="deleteSlider_ContentModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteSlider_ContentModalLabel">Delete Slider Content</h5>
@@ -151,12 +151,13 @@
                {% csrf_token %} 
                <input type="hidden" id="deleteSlider_ContentId" name="id">
                <p>Are you sure you want to delete this slider content?</p>
-               <button type="submit" class="btn btn-danger">Delete Content</button>
+               <button type="submit" class="btn btn-danger w-100">Delete Content</button>
             </form>
          </div>
       </div>
    </div>
-</div> 
+</div>
+
 
 {% endblock %} 
 

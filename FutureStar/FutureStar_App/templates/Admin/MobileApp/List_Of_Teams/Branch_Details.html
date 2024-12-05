@@ -34,202 +34,196 @@ Branch Details
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <button onclick="history.back()" class="btn btn-secondary" style="float: right;">Back</button>
-                        <h3>Team Details</h3>
+                        <button onclick="history.back()" class="btn btn-secondary mb-3" style="float: right;">Back</button>
+                        <h3 class="text-center text-md-start fs-4">Team Details</h3>
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <strong>Team Name:</strong> {{ branch.team_name }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Age Group:</strong> {{ branch.age_group_id }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Field Size:</strong> {{ branch.field_size }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Phone:</strong> {{ branch.phone }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Email:</strong> {{ branch.email }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Gender:</strong> {{ branch.gender }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Address:</strong> {{ branch.address }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>City:</strong> {{ branch.city }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>State:</strong> {{ branch.state }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Country:</strong> {{ branch.country_name }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Postal Code:</strong> {{ branch.postalCode }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Country Code:</strong> {{ branch.country_code }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Entry Fees:</strong> {{ branch.entry_fees }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Description:</strong> {{ branch.description }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Created At:</strong> {{ branch.created_at }}
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <strong>Image:</strong> 
-                                {% if branch.upload_image %}
-                                    <img src="{{ branch.upload_image.url }}" alt="Branch Image" class="img-fluid" style="height: 100px; width: 200px;">
-                                {% else %}
-                                    No Image Available
-                                {% endif %}
-                            </div>                            
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Team Name:</strong> {{ branch.team_name }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Age Group:</strong> {{ branch.age_group_id }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Field Size:</strong> {{ branch.field_size }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Phone:</strong> {{ branch.phone }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Email:</strong> {{ branch.email }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Gender:</strong> {{ branch.gender }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Address:</strong> {{ branch.address }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>City:</strong> {{ branch.city }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>State:</strong> {{ branch.state }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Country:</strong> {{ branch.country_name }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Postal Code:</strong> {{ branch.postalCode }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Country Code:</strong> {{ branch.country_code }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Entry Fees:</strong> {{ branch.entry_fees }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Description:</strong> {{ branch.description }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Created At:</strong> {{ branch.created_at }}
+                           </div>
+                           <div class="col-12 col-md-6 col-lg-4 mb-3">
+                              <strong>Image:</strong>
+                              {% if branch.upload_image %}
+                              <img src="{{ branch.upload_image.url }}" alt="Branch Image" class="img-fluid" height="100" width="200">
+                              {% else %}
+                              No Image Available
+                              {% endif %}
+                           </div>
                         </div>
                         <br>
-                        <h3>Team static</h3>
+                        <h3 class="text-center text-md-start fs-4">Team Stats</h3>
                         <div class="row">
-                           
-                                <!-- Games Played -->
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="card widget-1">
-                                        <div class="card-body">
-                                            <div class="widget-content">
-                                                <div class="widget-round">
-                                                    <div class="bg-round">
-                                                        <img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4>
-                                                        <span class="counter">{{ total_games }}</span>
-                                                    </h4>
-                                                    <span class="f-light">Games Played</span>
-                                                </div>
-                                            </div>
+                            <!-- Games Played -->
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                               <div class="card widget-1">
+                                  <div class="card-body">
+                                     <div class="widget-content">
+                                        <div class="widget-round">
+                                           <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
+                                           </div>
                                         </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Wins -->
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="card widget-1">
-                                        <div class="card-body">
-                                            <div class="widget-content">
-                                                <div class="widget-round">
-                                                    <div class="bg-round">
-                                                        <img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4>
-                                                        <span class="counter">{{ total_wins }}</span>
-                                                    </h4>
-                                                    <span class="f-light">Wins</span>
-                                                </div>
-                                            </div>
+                                        <div>
+                                           <h4>
+                                              <span class="counter">{{ total_games }}</span>
+                                           </h4>
+                                           <span class="f-light">Games Played</span>
                                         </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Losses -->
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="card widget-1">
-                                        <div class="card-body">
-                                            <div class="widget-content">
-                                                <div class="widget-round">
-                                                    <div class="bg-round">
-                                                        <img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4>
-                                                        <span class="counter">{{ total_losses }}</span>
-                                                    </h4>
-                                                    <span class="f-light">Losses</span>
-                                                </div>
-                                            </div>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                            <!-- Wins -->
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                               <div class="card widget-1">
+                                  <div class="card-body">
+                                     <div class="widget-content">
+                                        <div class="widget-round">
+                                           <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
+                                           </div>
                                         </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Draws -->
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="card widget-1">
-                                        <div class="card-body">
-                                            <div class="widget-content">
-                                                <div class="widget-round">
-                                                    <div class="bg-round">
-                                                        <img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4>
-                                                        <span class="counter">{{ total_draws }}</span>
-                                                    </h4>
-                                                    <span class="f-light">Draws</span>
-                                                </div>
-                                            </div>
+                                        <div>
+                                           <h4>
+                                              <span class="counter">{{ total_wins }}</span>
+                                           </h4>
+                                           <span class="f-light">Wins</span>
                                         </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Goals -->
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="card widget-1">
-                                        <div class="card-body">
-                                            <div class="widget-content">
-                                                <div class="widget-round">
-                                                    <div class="bg-round">
-                                                        <img src="{% static 'assets/images/dashboard/goal/goal.png' %}" width="70%">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4>
-                                                        <span class="counter">{{ total_goals }}</span>
-                                                    </h4>
-                                                    <span class="f-light">Goals</span>
-                                                </div>
-                                            </div>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                            <!-- Losses -->
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                               <div class="card widget-1">
+                                  <div class="card-body">
+                                     <div class="widget-content">
+                                        <div class="widget-round">
+                                           <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
+                                           </div>
                                         </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Assists -->
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="card widget-1">
-                                        <div class="card-body">
-                                            <div class="widget-content">
-                                                <div class="widget-round">
-                                                    <div class="bg-round">
-                                                        <img src="{% static 'assets/images/dashboard/goal/assists.png' %}" width="70%">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4>
-                                                        <span class="counter">{{ total_assists }}</span>
-                                                    </h4>
-                                                    <span class="f-light">Assists</span>
-                                                </div>
-                                            </div>
+                                        <div>
+                                           <h4>
+                                              <span class="counter">{{ total_losses }}</span>
+                                           </h4>
+                                           <span class="f-light">Losses</span>
                                         </div>
-                                    </div>
-                                </div>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                            <!-- Draws -->
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                               <div class="card widget-1">
+                                  <div class="card-body">
+                                     <div class="widget-content">
+                                        <div class="widget-round">
+                                           <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
+                                           </div>
+                                        </div>
+                                        <div>
+                                           <h4>
+                                              <span class="counter">{{ total_draws }}</span>
+                                           </h4>
+                                           <span class="f-light">Draws</span>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                            <!-- Goals -->
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                               <div class="card widget-1">
+                                  <div class="card-body">
+                                     <div class="widget-content">
+                                        <div class="widget-round">
+                                           <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/goal/goal.png' %}" width="70%">
+                                           </div>
+                                        </div>
+                                        <div>
+                                           <h4>
+                                              <span class="counter">{{ total_goals }}</span>
+                                           </h4>
+                                           <span class="f-light">Goals</span>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                            <!-- Assists -->
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                               <div class="card widget-1">
+                                  <div class="card-body">
+                                     <div class="widget-content">
+                                        <div class="widget-round">
+                                           <div class="bg-round">
+                                              <img src="{% static 'assets/images/dashboard/goal/assists.png' %}" width="70%">
+                                           </div>
+                                        </div>
+                                        <div>
+                                           <h4>
+                                              <span class="counter">{{ total_assists }}</span>
+                                           </h4>
+                                           <span class="f-light">Assists</span>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </div>
                             </div>
                         </div>
-                          
+                    </div>                     
+                </div>
                 <!-- Datatable Section  -->
                 <div class="row">
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <div class="card">
-                            <div class="card-body"> 
-                                <!-- Add tab navigation  -->
-                                <ul class="nav nav-tabs" id="dataTab" role="tablist">
+                            <div class="card-body">
+                                <!-- Add tab navigation -->
+                                <ul class="nav nav-tabs nav-justified" id="dataTab" role="tablist">
                                     <li class="nav-item">
                                         <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">
                                             Staff Members <span class="badge badge-info">{{ staff_members|length }}</span>
@@ -250,13 +244,13 @@ Branch Details
                                             Tournament Joined Games <span class="badge badge-info">{{ game_count }}</span>
                                         </a>
                                     </li>
-                                </ul>                                
-            
-                                <div class="tab-content" id="dataTabContent"> 
+                                </ul>
+                
+                                <div class="tab-content mt-3" id="dataTabContent">
                                     <!-- Staff Members Tab -->
                                     <div class="tab-pane fade show active" id="member" role="tabpanel" aria-labelledby="member-tab">
                                         <div class="table-responsive">
-                                            <table class="display" id="staff-member-table">
+                                            <table class="table table-striped table-bordered table-hover" id="staff-member-table">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -270,7 +264,7 @@ Branch Details
                                                     {% for member in staff_members %}
                                                     <tr>
                                                         <td>{{ forloop.counter }}</td>
-                                                        <td>{{ member.user_id.username }}</td>
+                                                        <td class="text-truncate" style="max-width: 150px;">{{ member.user_id.username }}</td>
                                                         <td>
                                                             {% if member.user_id and member.user_id.email %}
                                                                 {{ member.user_id.email }}
@@ -286,11 +280,11 @@ Branch Details
                                             </table>
                                         </div>
                                     </div>
-
+                
                                     <!-- Players Tab -->
                                     <div class="tab-pane fade" id="player" role="tabpanel" aria-labelledby="player-tab">
                                         <div class="table-responsive">
-                                            <table class="display" id="player-table">
+                                            <table class="table table-striped table-bordered table-hover" id="player-table">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -303,7 +297,7 @@ Branch Details
                                                     {% for player in players %}
                                                     <tr>
                                                         <td>{{ forloop.counter }}</td>
-                                                        <td>{{ player.user_id.username }}</td>
+                                                        <td class="text-truncate" style="max-width: 150px;">{{ player.user_id.username }}</td>
                                                         <td>
                                                             {% if player.user_id and player.user_id.email %}
                                                                 {{ player.user_id.email }}
@@ -318,68 +312,67 @@ Branch Details
                                             </table>
                                         </div>
                                     </div>
-                                    <!-- tournament Tab  -->
-                                    <div class="tab-pane fade " id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
+                
+                                    <!-- Tournament Tab -->
+                                    <div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
                                         <div class="table-responsive">
-                                            <table class="display" id="tournament-table">
-                                                <thead> 
+                                            <table class="table table-striped table-bordered table-hover" id="tournament-table">
+                                                <thead>
                                                     <tr>
-                                                    <th>Tournament Name</th>
-                                                    <th>Start Date</th>
-                                                    <th>Age Group</th>
-                                                    <th>city</th>
-                                                    <th>Joining Cost</th>
-                                                    <th>city</th>
+                                                        <th>Tournament Name</th>
+                                                        <th>Start Date</th>
+                                                        <th>Age Group</th>
+                                                        <th>City</th>
+                                                        <th>Joining Cost</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {% for tournament in tournaments %}
                                                     <tr>
-                                                    <td>{{ forloop.counter }}</td>
-                                                    <td>{{ tournament.tournament_name }}</td>
-                                                    <td>{{ tournament.tournament_starting_date }}</td>
-                                                    <td>{{ tournament.age_group }}</td>                                                                                       
-                                                    <td>{{ tournament.tournament_joining_cost }}</td>
-                                                    <td>{{ tournament.city }}</td>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ tournament.tournament_name }}</td>
+                                                        <td>{{ tournament.tournament_starting_date }}</td>
+                                                        <td>{{ tournament.age_group }}</td>
+                                                        <td>{{ tournament.tournament_joining_cost }}</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    <!-- games Tab  -->
-                                    <div class="tab-pane fade " id="games" role="tabpanel" aria-labelledby="games-tab">
+                
+                                    <!-- Games Tab -->
+                                    <div class="tab-pane fade" id="games" role="tabpanel" aria-labelledby="games-tab">
                                         <div class="table-responsive">
-                                            <table class="display" id="games-table">
-                                                <thead> 
+                                            <table class="table table-striped table-bordered table-hover" id="games-table">
+                                                <thead>
                                                     <tr>
-                                                    <th>No</th>
-                                                    <th>Tournament Name</th>
-                                                    <th>Game Number</th>
-                                                    <th>Game Date</th>
-                                                    <th>Group Name</th>
+                                                        <th>No</th>
+                                                        <th>Tournament Name</th>
+                                                        <th>Game Number</th>
+                                                        <th>Game Date</th>
+                                                        <th>Group Name</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {% for game in games %}
                                                     <tr>
-                                                    <td>{{ forloop.counter }}</td>
-                                                    <td>{{ game.tournament_id.tournament_name }}</td>
-                                                    <td>{{ game.game_number }}</td>
-                                                    <td>{{ game.game_date }}</td>
-                                                    <td>{{ game.group_id.group_name }}</td>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ game.tournament_id.tournament_name }}</td>
+                                                        <td>{{ game.game_number }}</td>
+                                                        <td>{{ game.game_date }}</td>
+                                                        <td>{{ game.group_id.group_name }}</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                    
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>                
             </div>
          </div>
       </div>

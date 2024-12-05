@@ -24,19 +24,19 @@ Tryout Club Management
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <!-- Title on the left for all screen sizes -->
+            <div class="col-6 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addTryout_ClubModal">Add Tryout Club</button>
-               </ol>
+            <!-- Button on the right for larger screens, on mobile, it will be aligned to the right -->
+            <div class="col-6 col-md-6 d-flex justify-content-end">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addTryout_ClubModal">Add Tryout Club</button>
             </div>
          </div>
-      </div>
+      </div>      
       <div class="row">
          <!-- Tryout_Club List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
@@ -44,7 +44,7 @@ Tryout Club Management
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Image</th> <!-- New column for the image -->
+                                <th>Image</th>
                                 <th>Title</th>
                                 <th>Actions</th>
                             </tr>
@@ -59,10 +59,9 @@ Tryout Club Management
                                     {% else %}
                                         No Image
                                     {% endif %}
-                                </td>                                
+                                </td>                                 
                                 <td>{{ tryout_club_item.title }}</td>
                                 <td>
-                                    <!-- Action buttons -->
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">
                                         <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                             <i data-feather="more-vertical"></i>
@@ -73,11 +72,11 @@ Tryout Club Management
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editTryout_ClubModal"  data-tryout_club-id="{{ tryout_club_item.id }}" 
                                                 data-tryout_club-title="{{ tryout_club_item.title }}" 
                                                 data-tryout_club-image="{{ tryout_club_item.image.url }}">
-                                                   <i data-feather="edit"></i> Edit </a>
+                                                Edit </a>
                                              </li>
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTryout_ClubModal" data-tryout_club-id="{{ tryout_club_item.id }}">
-                                                   <i data-feather="trash-2"></i> Delete </a>
+                                                Delete </a>
                                              </li>
                                           </ul>
                                        </div>
@@ -97,7 +96,7 @@ Tryout Club Management
 
 <!-- Add Tryout_Club Modal -->
 <div class="modal fade" id="addTryout_ClubModal" tabindex="-1" aria-labelledby="addTryout_ClubModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addTryout_ClubModalLabel">Add Tryout Club</h5>
@@ -109,12 +108,12 @@ Tryout Club Management
                <div class="mb-3">
                   <label for="title" class="form-label">Title</label>
                   <input type="text" class="form-control" id="title" name="title" placeholder="Enter Tryout_Club Title">
-                  <div class="invalid-feedback" id="title-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="title-error"></div>
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
                     <input type="file" class="form-control" id="image" name="image">
-                    <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
+                    <div class="invalid-feedback" id="image-error"></div>
                 </div>
                <button type="submit" class="btn btn-primary">Add Tryout Club</button>
             </form>
@@ -123,10 +122,9 @@ Tryout Club Management
    </div>
 </div>
 
-
 <!-- Edit Tryout_Club Modal -->
 <div class="modal fade" id="editTryout_ClubModal" tabindex="-1" aria-labelledby="editTryout_ClubModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editTryout_ClubModalLabel">Edit Tryout Club</h5>
@@ -139,7 +137,7 @@ Tryout Club Management
                <div class="mb-3">
                   <label for="editTitle" class="form-label">Title</label>
                   <input type="text" class="form-control" id="editTitle" name="title" placeholder="Enter Tryout Club Title">
-                  <div class="invalid-feedback" id="edit-title-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-title-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
@@ -153,10 +151,9 @@ Tryout Club Management
    </div>
 </div>
 
-
 <!-- Delete Tryout_Club Modal -->
 <div class="modal fade" id="deleteTryout_ClubModal" tabindex="-1" aria-labelledby="deleteTryout_ClubModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteTryout_ClubModalLabel">Delete Tryout Club</h5>
@@ -173,6 +170,7 @@ Tryout Club Management
       </div>
    </div>
 </div>
+
 
 {% endblock %}
 

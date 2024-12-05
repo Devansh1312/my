@@ -4,7 +4,8 @@
         border-color: #dc3545;
         background-color: #f8d7da;
     }
-</style> {% block title %} Team Detail page {% endblock %} {% block content %} <div class="page-body">
+</style> {% block title %} Team Detail page {% endblock %} {% block content %} 
+<div class="page-body">
     <div class="container-fluid">
         <div class="page-title"></div>
         <div class="row">
@@ -15,46 +16,46 @@
                         <h3>Team Details</h3>
                         <div class="container mt-5">
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Team Name:</strong> {{ team.team_name }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Team Username:</strong> {{ team.team_username }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Team Founder:</strong> {{ team.team_founder.username }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Team Type:</strong> {{ team.team_type.name_en }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Bio:</strong> {{ team.bio }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Establishment Date:</strong> {{ team.team_establishment_date }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>President:</strong> {{ team.team_president }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>City:</strong> {{ team.city }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>State:</strong> {{ team.state }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Country:</strong> {{ team.country_name }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Postal Code:</strong> {{ team.postalCode }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Country Code:</strong> {{ team.country_code }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Phone:</strong> {{ team.phone }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Email:</strong> {{ team.email }}
                                 </div>
                             </div>
@@ -62,7 +63,7 @@
                             <!-- LOGO Section -->
                             <h4 class="mt-5">Team Logo's</h4>
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Team Logo:</strong> 
                                     {% if team.team_logo %}
                                         <img src="{{ team.team_logo.url }}" alt="Team Logo" class="img-fluid" width="150" height="150">
@@ -70,7 +71,7 @@
                                         No Image Available
                                     {% endif %}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-md-4 mb-3">
                                     <strong>Background Image:</strong> 
                                     {% if team.team_background_image %}
                                         <img src="{{ team.team_background_image.url }}" alt="Background Image" class="img-fluid" width="150" height="150">
@@ -84,7 +85,7 @@
                             <h4 class="mt-5">Uniforms</h4>
                             <div class="row">
                                 {% for uniform in uniforms %}
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-12 col-md-4 mb-3">
                                         <strong>Uniform {{ forloop.counter }}:</strong> 
                                         {% if uniform.team_uniform_image %}
                                             <img src="{{ uniform.team_uniform_image.url }}" alt="Uniform" class="img-fluid" width="150" height="150">
@@ -93,7 +94,7 @@
                                         {% endif %}
                                     </div>
                                 {% empty %}
-                                    <div class="col-md-12 mb-3">
+                                    <div class="col-12 mb-3">
                                         <strong>No Uniforms Available</strong>
                                     </div>
                                 {% endfor %}
@@ -129,13 +130,12 @@
                                         <!-- branch Tab  -->
                                         <div class="tab-pane fade show active" id="branch" role="tabpanel" aria-labelledby="branch-tab">
                                             <div class="table-responsive">
-                                                <table class="display" id="branch-table">
+                                                <table class="table table-bordered" id="branch-table">
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
                                                             <th>Branch Name</th>
                                                             <th>Age Group</th>
-                                                            <!-- <th>Image</th> -->
                                                             <th>Entry Fees</th>
                                                             <th>Actions</th>
                                                         </tr>
@@ -173,10 +173,10 @@
                                                 </table>
                                             </div>
                                         </div>
-                                        <!--Sponsers Event Tab  -->
+                                        <!--Other Tabs (Sponsors, Posts, Events)-->
                                         <div class="tab-pane fade" id="sponsers" role="tabpanel" aria-labelledby="sponsers-tab">
                                             <div class="table-responsive">
-                                                <table class="display" id="sponsers-table">
+                                                <table class="table table-bordered" id="sponsers-table">
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
@@ -196,11 +196,10 @@
                                                 </table>
                                             </div>
                                         </div>
-                                        <!--Post Event Tab  -->
-                                        <!-- Post Event Tab -->
+                                        <!-- Post Tab -->
                                         <div class="tab-pane fade" id="post" role="tabpanel" aria-labelledby="post-tab">
                                             <div class="table-responsive">
-                                                <table class="display" id="post-table">
+                                                <table class="table table-bordered" id="post-table">
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
@@ -212,26 +211,27 @@
                                                             <th>Date Created</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody> {% for post_data in posts_with_counts %} <tr>
-                                                            <td>{{ forloop.counter }}</td>
-                                                            <td>{{ post_data.post.title }}</td>
-                                                            <td>{{ post_data.post.description }}</td>
-                                                            <td>{{ post_data.comments_count }}</td>
-                                                            <!-- Comment count -->
-                                                            <td>{{ post_data.likes_count }}</td>
-                                                            <!-- Like count -->
-                                                            <td>{{ post_data.views_count }}</td>
-                                                            <!-- View count -->
-                                                            <td>{{ post_data.post.created_at }}</td>
-                                                        </tr> {% endfor %} </tbody>
+                                                    <tbody>
+                                                        {% for post_data in posts_with_counts %}
+                                                            <tr>
+                                                                <td>{{ forloop.counter }}</td>
+                                                                <td>{{ post_data.post.title }}</td>
+                                                                <td>{{ post_data.post.description }}</td>
+                                                                <td>{{ post_data.comments_count }}</td> <!-- Comment count -->
+                                                                <td>{{ post_data.likes_count }}</td> <!-- Like count -->
+                                                                <td>{{ post_data.views_count }}</td> <!-- View count -->
+                                                                <td>{{ post_data.post.created_at }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
-                                        <!-- Event Tab  -->
+
                                         <!-- Event Tab -->
                                         <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
                                             <div class="table-responsive">
-                                                <table class="display" id="event-table">
+                                                <table class="table table-bordered" id="event-table">
                                                     <thead>
                                                         <tr>
                                                             <th>No</th>
@@ -245,22 +245,20 @@
                                                     </thead>
                                                     <tbody>
                                                         {% for item in events_with_sales %}
-                                                        <tr>
-                                                            <td>{{ forloop.counter }}</td>
-                                                            <td>{{ item.event.event_name }}</td>
-                                                            <td>{{ item.event.event_description }}</td>
-                                                            <td>{{ item.event.event_type }}</td>
-                                                            <td>{{ item.event.event_cost }}</td>
-                                                            <td>{{ item.event.event_date }}</td>
-                                                            <td>{{ item.total_tickets_sold }}</td> <!-- Display ticket sales -->
-                                                        </tr>
+                                                            <tr>
+                                                                <td>{{ forloop.counter }}</td>
+                                                                <td>{{ item.event.event_name }}</td>
+                                                                <td>{{ item.event.event_description }}</td>
+                                                                <td>{{ item.event.event_type }}</td>
+                                                                <td>{{ item.event.event_cost }}</td>
+                                                                <td>{{ item.event.event_date }}</td>
+                                                                <td>{{ item.total_tickets_sold }}</td> <!-- Display ticket sales -->
+                                                            </tr>
                                                         {% endfor %}
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +268,11 @@
             </div>
         </div>
     </div>
-</div> {% endblock %} {% block script %} <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</div>
+
+{% endblock %}
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>

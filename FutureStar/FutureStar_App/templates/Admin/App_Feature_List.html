@@ -24,19 +24,17 @@ App Feature List
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-sm-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addApp_FeatureModal">Add App Feature</button>
-               </ol>
+            <div class="col-12 col-sm-6 text-sm-end">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addApp_FeatureModal">Add App Feature</button>
             </div>
          </div>
       </div>
       <div class="row">
          <!-- App_Feature List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
@@ -62,7 +60,7 @@ App Feature List
                                     {% else %}
                                         No Image
                                     {% endif %}
-                                </td>                                
+                                </td>                                 
                                 <td>{{ app_feature_item.title_en }}</td>
                                 <td>{{ app_feature_item.title_ar }}</td>
                                 <td>{{ app_feature_item.sub_title_en }}</td>
@@ -77,7 +75,7 @@ App Feature List
                                           <ul style="list-style: none; padding: 0; margin: 0;">
                                              <li style="padding: 8px 12px;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editApp_FeatureModal"  data-app_feature-id="{{ app_feature_item.id }}" 
-                                                data-app_feature-title_en="{{ app_feature_item.title_en }}"
+                                                data-app_feature-title_en="{{ app_feature_item.title_en }} "
                                                 data-app_feature-title_ar="{{ app_feature_item.title_ar }}"
                                                 data-app_feature-sub_title_en="{{ app_feature_item.sub_title_en }}"
                                                 data-app_feature-sub_title_ar="{{ app_feature_item.sub_title_ar }}"
@@ -106,7 +104,7 @@ App Feature List
 
 <!-- Add App_Feature Modal -->
 <div class="modal fade" id="addApp_FeatureModal" tabindex="-1" aria-labelledby="addApp_FeatureModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addApp_FeatureModalLabel">Add App Feature</h5>
@@ -118,27 +116,27 @@ App Feature List
                <div class="mb-3">
                   <label for="title_en" class="form-label">Enter App Feature Title ( English )</label>
                   <input type="text" class="form-control" id="title_en" name="title_en" placeholder="Enter App Feature Title ( English )">
-                  <div class="invalid-feedback" id="title_en-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="title_en-error"></div>
                </div>
                <div class="mb-3">
                   <label for="title_ar" class="form-label">Enter App Feature Title ( Arabic )</label>
                   <input type="text" class="form-control" id="title_ar" name="title_ar" placeholder="Enter App Feature Title ( Arabic )">
-                  <div class="invalid-feedback" id="title_ar-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="title_ar-error"></div>
                </div>
                <div class="mb-3">
                   <label for="sub_title_en" class="form-label">Sub Title ( English )</label>
                   <input type="text" class="form-control" id="sub_title_en" name="sub_title_en" placeholder="Enter App Feature Sub Title ( English )">
-                  <div class="invalid-feedback" id="sub_title_en-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="sub_title_en-error"></div>
                </div>
                <div class="mb-3">
                   <label for="sub_title_ar" class="form-label">Sub Title ( Arabic )</label>
                   <input type="text" class="form-control" id="sub_title_ar" name="sub_title_ar" placeholder="Enter App Feature Sub Title ( Arabic )">
-                  <div class="invalid-feedback" id="sub_title_ar-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="sub_title_ar-error"></div>
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
                     <input type="file" class="form-control" id="image" name="image">
-                    <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
+                    <div class="invalid-feedback" id="image-error"></div>
                 </div>
                <button type="submit" class="btn btn-primary">Add App Feature</button>
             </form>
@@ -149,7 +147,7 @@ App Feature List
 
 <!-- Edit App_Feature Modal -->
 <div class="modal fade" id="editApp_FeatureModal" tabindex="-1" aria-labelledby="editApp_FeatureModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editApp_FeatureModalLabel">Edit App Feature</h5>
@@ -162,27 +160,27 @@ App Feature List
                <div class="mb-3">
                   <label for="editTitle_en" class="form-label">Title ( English )</label>
                   <input type="text" class="form-control" id="editTitle_en" name="title_en" placeholder="Enter App Feature Title ( English )">
-                  <div class="invalid-feedback" id="edit-title_en-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-title_en-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editTitle_ar" class="form-label">Title ( Arabic )</label>
                   <input type="text" class="form-control" id="editTitle_ar" name="title_ar" placeholder="Enter App Feature Title ( Arabic )">
-                  <div class="invalid-feedback" id="edit-title_ar-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-title_ar-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editSub_Title_en" class="form-label">Sub Title ( English )</label>
                   <input type="text" class="form-control" id="editSub_Title_en" name="sub_title_en" placeholder="Enter App Feature Sub Title ( English )">
-                  <div class="invalid-feedback" id="edit-sub_title_en-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-sub_title_en-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editSub_Title_ar" class="form-label">Sub Title ( Arabic )</label>
                   <input type="text" class="form-control" id="editSub_Title_ar" name="sub_title_ar" placeholder="Enter App Feature Sub Title ( Arabic )">
-                  <div class="invalid-feedback" id="edit-sub_title_ar-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-sub_title_ar-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
                   <input type="file" class="form-control" id="editImage" name="image">
-                  <div class="invalid-feedback" id="edit-image-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-image-error"></div>
                </div>
                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
@@ -193,7 +191,7 @@ App Feature List
 
 <!-- Delete App_Feature Modal -->
 <div class="modal fade" id="deleteApp_FeatureModal" tabindex="-1" aria-labelledby="deleteApp_FeatureModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-sm">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteApp_FeatureModalLabel">Delete App Feature</h5>

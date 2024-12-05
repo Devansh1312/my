@@ -1740,10 +1740,7 @@ class PlayerGameStatsAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, game_id=None, tournament_id=None):
-        """
-        Check if the user is the game_statistics_handler for the specified game and tournament.
-        """
-        # Check if the user is the game_statistics_handler for the given game and tournament
+        # Check if the user is the game_statistics_handler for the specified game and tournament.
         if game_id and tournament_id:
             try:
                 game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
@@ -1753,6 +1750,31 @@ class PlayerGameStatsAPIView(APIView):
                 pass  # Game not found or doesn't match; access denied
 
         return False
+    
+    def get_last_update(self, player_id, game_id, tournament_id):  # Add self to the method definition
+        last_stat = PlayerGameStats.objects.filter(
+            Q(player_id_id=player_id) | Q(in_player_id=player_id) | Q(out_player_id=player_id),
+            game_id=game_id,
+            tournament_id=tournament_id
+        ).order_by('-updated_at').first()  # Fetch the most recent update
+
+        if last_stat:
+            # Determine the type of the last update
+            if last_stat.goals > 0:
+                return 'goal'
+            elif last_stat.assists > 0:
+                return None
+            elif last_stat.own_goals > 0:
+                return None
+            elif last_stat.yellow_cards > 0:
+                return 'yellow_card'
+            elif last_stat.red_cards > 0:
+                return 'red_card'
+            elif last_stat.in_player_id == player_id:
+                return 'substituted'
+            elif last_stat.out_player_id == player_id:
+                return 'substituted'
+        return None  # No relevant update found
 
     def post(self, request, *args, **kwargs):
         # Set language based on the request headers
@@ -1799,7 +1821,7 @@ class PlayerGameStatsAPIView(APIView):
                         created_by_id=request.user.id
                     )
                     self._update_team_goals(game_instance)
-                    return Response({'status': 1, 'message': _(f'{stat.capitalize()} incremented successfully.'), 'data': {}}, status=status.HTTP_201_CREATED)
+                    return self._get_game_stats_response(game_instance, team_id, player_id, tournament_id, game_id)
 
                 elif stat_value == -1:
                     stat_count = PlayerGameStats.objects.filter(
@@ -1820,7 +1842,7 @@ class PlayerGameStatsAPIView(APIView):
                         ).order_by('-created_at').first()
                         latest_stat.delete()
                         self._update_team_goals(game_instance)  # Update team goals after deletion
-                        return Response({'status': 1, 'message': _(f'{stat.capitalize()} decremented successfully.'), 'data': {}}, status=status.HTTP_200_OK)
+                        return self._get_game_stats_response(game_instance, team_id, player_id, tournament_id, game_id)
                     else:
                         return Response({'status': 0, 'message': _(f'Cannot decrement {stat.capitalize()} as it cannot go below zero.')}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1842,6 +1864,82 @@ class PlayerGameStatsAPIView(APIView):
 
         game_instance.save()
 
+    def _get_game_stats_response(self, game_instance, team_id, player_id, tournament_id, game_id):
+        """
+        Returns a formatted response with goals, lineups, and stats for the game and teams.
+        """
+        # Calculate team goals
+        team_a_goals = PlayerGameStats.objects.filter(
+            team_id=game_instance.team_a.id,
+            game_id=game_instance.id,
+            tournament_id=tournament_id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = PlayerGameStats.objects.filter(
+            team_id=game_instance.team_b.id,
+            game_id=game_instance.id,
+            tournament_id=tournament_id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        # Fetch lineup data for both teams
+        lineup_data = {}
+        for team_id, team_key in [(game_instance.team_a.id, 'team_a'), (game_instance.team_b.id, 'team_b')]:
+            substitute_lineups = Lineup.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+                tournament_id=tournament_id,
+                lineup_status=Lineup.SUBSTITUTE
+            )
+            already_added_lineups = Lineup.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+                tournament_id=tournament_id,
+                lineup_status=Lineup.ALREADY_IN_LINEUP
+            )
+
+            substitute_data = [{
+                'id': lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)
+            } for lineup in substitute_lineups]
+
+            already_added_data = [{
+                'id': lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)
+            } for lineup in already_added_lineups]
+
+            lineup_data[team_key] = {
+                'player_added_in_lineup': already_added_data,
+                'substitute': substitute_data
+            }
+
+        return Response({
+            'status': 1,
+            'message': _('Stats updated and lineup fetched successfully.'),
+            'data': {
+                'game_id': game_instance.id,
+                'tournament_id': tournament_id,
+                'goals': {
+                    'team_a_id': game_instance.team_a.id,
+                    'team_a_name': game_instance.team_a.team_name,
+                    'team_a_total_goals': team_a_goals,
+                    'team_b_id': game_instance.team_b.id,
+                    'team_b_name': game_instance.team_b.team_name,
+                    'team_b_total_goals': team_b_goals,
+                },
+                **lineup_data
+            }
+        }, status=status.HTTP_200_OK)
+    
     def get(self, request, *args, **kwargs):
         # Set language based on the request headers
         language = request.headers.get('Language', 'en')
@@ -1886,17 +1984,32 @@ class PlayerGameStatsAPIView(APIView):
                 game_id=game_id
             )
 
+            # If no stats found, return 0 for all stats
             if not stats.exists():
+                total_stats = {
+                    'id': None,  # or an appropriate default value
+                    'team_id': team_id,
+                    'player_id': player_id,
+                    'game_id': game_id,
+                    'tournament_id': tournament_id,
+                    'goals': 0,
+                    'assists': 0,
+                    'own_goals': 0,
+                    'yellow_cards': 0,
+                    'red_cards': 0
+                }
+
                 return Response({
-                    'status': 0,
-                    'message': _('Player stats not found for the specified criteria.')
-                }, status=status.HTTP_404_NOT_FOUND)
+                    'status': 1,
+                    'message': _('Player stats fetched successfully, but no data found. Default values returned.'),
+                    'data': [total_stats]
+                }, status=status.HTTP_200_OK)
 
             # Calculate totals
             totals = stats.aggregate(
                 total_goals=Sum('goals'),
                 total_assists=Sum('assists'),
-                total_own_goals=Sum('own_goals'),  # Added own_goals calculation
+                total_own_goals=Sum('own_goals'),
                 total_yellow_cards=Sum('yellow_cards'),
                 total_red_cards=Sum('red_cards')
             )
@@ -1910,7 +2023,7 @@ class PlayerGameStatsAPIView(APIView):
                 'tournament_id': stats.first().tournament_id.id,
                 'goals': totals['total_goals'] or 0,
                 'assists': totals['total_assists'] or 0,
-                'own_goals': totals['total_own_goals'] or 0,  # Added own_goals to response
+                'own_goals': totals['total_own_goals'] or 0,
                 'yellow_cards': totals['total_yellow_cards'] or 0,
                 'red_cards': totals['total_red_cards'] or 0
             }
@@ -1927,6 +2040,7 @@ class PlayerGameStatsAPIView(APIView):
                 'status': 0,
                 'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 ######################### team game timeline #####################

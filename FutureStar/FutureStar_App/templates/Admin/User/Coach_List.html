@@ -2,12 +2,13 @@
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Coach List{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends--> {% endblock %} {% block title %}Coach List{% endblock %} {% block content %}
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
             <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
+               <h3>{{ breadcrumb.child }}</h3>
             </div>
             <div class="col-6"></div>
          </div>
@@ -17,7 +18,7 @@
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-bordered" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -30,7 +31,8 @@
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for user in users %} 
+                        <tbody>
+                           {% for user in users %}
                            <tr>
                               <td>{{ forloop.counter }}</td>
                               <td>{{ user.username }}</td>
@@ -38,47 +40,52 @@
                               <td>{{ user.last_name }}</td>
                               <td>{{ user.email }}</td>
                               <td>{{ user.phone }}</td>
-                              <td class="btn {% if user.is_active %}btn-success{% else %}btn-danger{% endif %}"  style="padding: 5px; margin-top: 10px; justify-self: center; justify-items: center;" >
-                                 {% if user.is_active %}Active{% else %}Deactive{% endif %}
-                             </td>
+                              <td>
+                                 {% if user.is_active %}
+                                    <span class="text-success">Active</span>
+                                 {% else %}
+                                    <span class="text-danger">Deactive</span>
+                                 {% endif %}
+                              </td>  
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <!-- Three dots menu trigger -->
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)" style="display: flex; align-items: center; justify-content: center;">
-                                        <i data-feather="more-vertical"></i> <!-- Icon for three dots -->
+                                       <i data-feather="more-vertical"></i> <!-- Icon for three dots -->
                                     </a>
-                                
+
                                     <!-- Action card for menu items -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                        <ul style="list-style: none; padding: 0; margin: 0;">
-                                            <!-- Toggle Status -->
-                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
-                                                <a href="#" class="toggle-status" data-id="{{ user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
-                                                    {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
-                                                </a>
-                                                <form id="status-form-{{ user.id }}" method="post" action="{% url 'user_toggle_status' pk=user.id %}" style="display: none;">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="source_page" value="coach_list">
-                                                    <input type="hidden" name="title" value="Coach">
-                                                    <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
-                                                </form>
-                                            </li>
-                                
-                                            <!-- View Details -->
-                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
-                                                <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
-                                                <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
-                                                    <input type="hidden" name="source_page" value="coach_list">
-                                                    <input type="hidden" name="title" value="Coach">
-                                                </form>
-                                            </li>
-                                        </ul>
+                                       <ul style="list-style: none; padding: 0; margin: 0;">
+                                          <!-- Toggle Status -->
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                             <a href="#" class="toggle-status" data-id="{{ user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                                {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                             </a>
+                                             <form id="status-form-{{ user.id }}" method="post" action="{% url 'user_toggle_status' pk=user.id %}" style="display: none;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="source_page" value="coach_list">
+                                                <input type="hidden" name="title" value="Coach">
+                                                <input type="hidden" name="status" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                             </form>
+                                          </li>
+                                          <!-- View Details -->
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                             <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
+                                             <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                <input type="hidden" name="source_page" value="coach_list">
+                                                <input type="hidden" name="title" value="Coach">
+                                             </form>
+                                          </li>
+                                       </ul>
                                     </div>
-                                </div>
+                                 </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
                      </table>
                   </div>
                </div>
@@ -87,6 +94,51 @@
       </div>
    </div>
 </div>
+
+<!-- Add responsive styles -->
+<style>
+   @media (max-width: 767px) {
+      .table-responsive {
+         overflow-x: auto;
+      }
+
+      .action-card {
+         width: 120px;
+      }
+
+      /* Adjust table column widths */
+      .table th, .table td {
+         padding: 8px;
+         font-size: 12px;
+      }
+
+      .table th {
+         text-align: left;
+      }
+
+      /* Make the action menu appear properly */
+      .action-menu-container {
+         display: block;
+         position: relative;
+      }
+
+      .three-dots-menu {
+         font-size: 20px;
+         display: block;
+         margin: 0 auto;
+         padding: 10px;
+         cursor: pointer;
+      }
+   }
+
+   /* Additional styling for tablet and larger screens */
+   @media (min-width: 768px) {
+      .three-dots-menu {
+         font-size: 18px;
+      }
+   }
+</style>
+
  {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>

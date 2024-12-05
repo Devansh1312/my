@@ -24,27 +24,25 @@ Partners Management
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-sm-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addPartnersModal">Add Partners</button>
-               </ol>
+            <div class="col-12 col-sm-6 text-sm-end">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addPartnersModal">Add Partners</button>
             </div>
          </div>
       </div>
       <div class="row">
          <!-- Partners List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="display table table-striped" id="basic-1">
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Image</th> <!-- New column for the image -->
+                                <th>Image</th>
                                 <th>Title</th>
                                 <th>Actions</th>
                             </tr>
@@ -59,10 +57,9 @@ Partners Management
                                     {% else %}
                                         No Image
                                     {% endif %}
-                                </td>                                
+                                </td>
                                 <td>{{ partners_item.title }}</td>
                                 <td>
-                                    <!-- Action buttons -->
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">
                                         <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                             <i data-feather="more-vertical"></i>
@@ -73,11 +70,11 @@ Partners Management
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editPartnersModal"  data-partners-id="{{ partners_item.id }}" 
                                                 data-partners-title="{{ partners_item.title }}" 
                                                 data-partners-image="{{ partners_item.image.url }}">
-                                                   <i data-feather="edit"></i> Edit </a>
+                                                Edit </a>
                                              </li>
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                                 <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deletePartnersModal" data-partners-id="{{ partners_item.id }}">
-                                                   <i data-feather="trash-2"></i> Delete </a>
+                                                Delete </a>
                                              </li>
                                           </ul>
                                        </div>
@@ -97,7 +94,7 @@ Partners Management
 
 <!-- Add Partners Modal -->
 <div class="modal fade" id="addPartnersModal" tabindex="-1" aria-labelledby="addPartnersModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addPartnersModalLabel">Add Partners</h5>
@@ -109,12 +106,12 @@ Partners Management
                <div class="mb-3">
                   <label for="title" class="form-label">Title</label>
                   <input type="text" class="form-control" id="title" name="title" placeholder="Enter Partners Title">
-                  <div class="invalid-feedback" id="title-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="title-error"></div>
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
                     <input type="file" class="form-control" id="image" name="image">
-                    <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
+                    <div class="invalid-feedback" id="image-error"></div>
                 </div>
                <button type="submit" class="btn btn-primary">Add Partners</button>
             </form>
@@ -123,10 +120,9 @@ Partners Management
    </div>
 </div>
 
-
 <!-- Edit Partners Modal -->
 <div class="modal fade" id="editPartnersModal" tabindex="-1" aria-labelledby="editPartnersModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-lg">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editPartnersModalLabel">Edit Partners</h5>
@@ -139,7 +135,7 @@ Partners Management
                <div class="mb-3">
                   <label for="editTitle" class="form-label">Title</label>
                   <input type="text" class="form-control" id="editTitle" name="title" placeholder="Enter Partners Title">
-                  <div class="invalid-feedback" id="edit-title-error"></div> <!-- Error message container -->
+                  <div class="invalid-feedback" id="edit-title-error"></div>
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
@@ -153,10 +149,9 @@ Partners Management
    </div>
 </div>
 
-
 <!-- Delete Partners Modal -->
 <div class="modal fade" id="deletePartnersModal" tabindex="-1" aria-labelledby="deletePartnersModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-sm">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deletePartnersModalLabel">Delete Partners</h5>
@@ -166,7 +161,7 @@ Partners Management
             <form method="post" action="" id="deletePartnersForm">
                {% csrf_token %}
                <input type="hidden" id="deletePartnersId" name="id">
-               <p>Are you sure you want to delete this partners?</p>
+               <p>Are you sure you want to delete this partner?</p>
                <button type="submit" class="btn btn-danger">Delete Partners</button>
             </form>
          </div>
