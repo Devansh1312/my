@@ -137,7 +137,11 @@ urlpatterns = [
         
         ################## Mobile Dashboard Image  ################
         
-        path('api/dashboard-images/', DashboardImageAPI.as_view())
+        path('api/dashboard-images/', DashboardImageAPI.as_view()),
+
+
+        ######## searching APi #############
+        path('api/search/', SearchAPIView.as_view(), name='search_api'),
          
         #new apis generation
         

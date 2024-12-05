@@ -4320,3 +4320,100 @@ class UserRoleStatsAPIView(APIView):
                 "message": "Failed to fetch referee stats.",
                 "error": str(e),
             }, status=500)
+
+
+class CustomSearchPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class SearchAPIView(APIView):
+    pagination_class = CustomSearchPagination
+
+    def get(self, request, *args, **kwargs):
+        search_query = request.query_params.get('search', '')
+        search_type = request.query_params.get('type')
+        creator_type = request.query_params.get('creator_type')  # Get creator_type from query parameters
+        created_by_id = request.query_params.get('created_by_id')  # Get created_by_id from query parameters
+        paginator = self.pagination_class()
+
+        if not search_type:
+            return Response({"status": 0, "message": _("Type is required."), "data": {}}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Users section
+        if search_type.lower() == 'users':
+            users = User.objects.all()
+            if search_query:
+                users = users.filter(username__icontains=search_query)
+            if creator_type and created_by_id:
+                users = users.filter(creator_type=creator_type, created_by_id=created_by_id)
+            paginated_users = paginator.paginate_queryset(users, request)
+            user_data = [get_user_data(user, request) for user in paginated_users]
+            return paginator.get_paginated_response({
+                "status": 1,
+                "message": _("Users fetched successfully."),
+                "data": user_data
+            })
+
+        # Posts section
+        if search_type.lower() == 'posts':
+            posts = Post.objects.all()
+            if search_query:
+                posts = posts.filter(title__icontains=search_query)
+            if creator_type and created_by_id:
+                posts = posts.filter(creator_type=creator_type, created_by_id=created_by_id)
+            paginated_posts = paginator.paginate_queryset(posts, request)
+            serializer = PostSerializer(paginated_posts, many=True, context={'request': request})
+            return paginator.get_paginated_response({
+                "status": 1,
+                "message": _("Posts fetched successfully."),
+                "data": serializer.data
+            })
+
+        # Teams section
+        if search_type.lower() == 'teams':
+            teams = Team.objects.all()
+            if search_query:
+                teams = teams.filter(team_username__icontains=search_query)
+            if creator_type and created_by_id:
+                teams = teams.filter(creator_type=creator_type, created_by_id=created_by_id)
+            paginated_teams = paginator.paginate_queryset(teams, request)
+            team_data = [get_team_data(team.team_founder, request) for team in paginated_teams if get_team_data(team.team_founder, request)]
+            return paginator.get_paginated_response({
+                "status": 1,
+                "message": _("Teams fetched successfully."),
+                "data": team_data
+            })
+
+        # Fields section
+        if search_type.lower() == 'fields':
+            fields = Field.objects.all()
+            if search_query:
+                fields = fields.filter(field_name__icontains=search_query)
+            if creator_type and created_by_id:
+                fields = fields.filter(creator_type=creator_type, created_by_id=created_by_id)
+            paginated_fields = paginator.paginate_queryset(fields, request)
+            serializer = FieldSerializer(paginated_fields, many=True, context={'request': request})
+            return paginator.get_paginated_response({
+                "status": 1,
+                "message": _("Fields fetched successfully."),
+                "data": serializer.data
+            })
+
+        # Events section
+        if search_type.lower() == 'events':
+            events = Event.objects.all()
+            if search_query:
+                events = events.filter(event_name__icontains=search_query)
+            if creator_type and created_by_id:
+                events = events.filter(creator_type=creator_type, created_by_id=created_by_id)
+            paginated_events = paginator.paginate_queryset(events, request)
+            serializer = EventSerializer(paginated_events, many=True, context={'request': request})
+            return paginator.get_paginated_response({
+                "status": 1,
+                "message": _("Events fetched successfully."),
+                "data": serializer.data
+            })
+
+        return Response({"status": 0, "message": _("Invalid search type."), "data": {}}, status=status.HTTP_400_BAD_REQUEST)
