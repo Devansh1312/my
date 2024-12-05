@@ -797,7 +797,7 @@ class UserSearchView(APIView):
             users = User.objects.filter(role_id=5, is_deleted=False)
         ###### Search for Player ##########
         if search_type == '4':
-            users = User.objects.filter(role_id__in=[5, 2], is_deleted=False)
+            users = User.objects.filter(role_id=5, is_deleted=False)
         
        
 

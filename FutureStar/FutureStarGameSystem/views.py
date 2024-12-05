@@ -269,11 +269,17 @@ class TeamPlayersAPIView(APIView):
         # Update the lineup entry
         lineup.lineup_status = lineup_status
         lineup.save()
+        
+        message = _('Lineup updated successfully.')
+        if lineup_status == Lineup.SUBSTITUTE:
+            message = _('Player Substituted.')
+        else:
+            message = _('Player Added')
 
         # Return success response
         return Response({
             'status': 1,
-            'message': _('Lineup updated successfully.'),
+            'message': message,
             'data': {
                 'team_id': team.id,
                 'team_name': team.team_name,
