@@ -2118,7 +2118,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
 
     def get(self, request, *args, **kwargs):
-    # Set language based on the request headers
+        # Set language based on the request headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -2126,14 +2126,12 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         # Retrieve query parameters for filtering
         player_id = request.query_params.get('player_id')
         team_id = request.query_params.get('team_id')
-    
         game_id = request.query_params.get('game_id')
 
         # Validate required parameters
         required_params = {
             'player_id': player_id,
             'team_id': team_id,
-          
             'game_id': game_id
         }
         
@@ -2157,7 +2155,6 @@ class FriendlyPlayerGameStatsAPIView(APIView):
             stats = FriendlyGamesPlayerGameStats.objects.filter(
                 player_id=player_id,
                 team_id=team_id,
-              
                 game_id=game_id
             )
 
@@ -2172,7 +2169,8 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 total_goals=Sum('goals'),
                 total_assists=Sum('assists'),
                 total_yellow_cards=Sum('yellow_cards'),
-                total_red_cards=Sum('red_cards')
+                total_red_cards=Sum('red_cards'),
+                total_own_goals=Sum('own_goals'),  # Added aggregation for own_goals
             )
 
             # Format the response data
@@ -2181,14 +2179,11 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 'team_id': stats.first().team_id.id,
                 'player_id': stats.first().player_id.id,
                 'game_id': stats.first().game_id.id,
-              
                 'goals': totals['total_goals'] or 0,
                 'assists': totals['total_assists'] or 0,
                 'yellow_cards': totals['total_yellow_cards'] or 0,
                 'red_cards': totals['total_red_cards'] or 0,
-                'game_time': stats.first().game_time,  # If total time is not needed, take first
-                'created_at': stats.first().created_at,
-                'updated_at': stats.first().updated_at
+                'own_goals': totals['total_own_goals'] or 0,  # Added own_goals to response
             }
 
             # Respond with the formatted data

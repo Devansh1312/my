@@ -1837,7 +1837,7 @@ class PlayerGameStatsAPIView(APIView):
         game_instance.save()
 
     def get(self, request, *args, **kwargs):
-    # Set language based on the request headers
+        # Set language based on the request headers
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -1890,6 +1890,7 @@ class PlayerGameStatsAPIView(APIView):
             totals = stats.aggregate(
                 total_goals=Sum('goals'),
                 total_assists=Sum('assists'),
+                total_own_goals=Sum('own_goals'),  # Added own_goals calculation
                 total_yellow_cards=Sum('yellow_cards'),
                 total_red_cards=Sum('red_cards')
             )
@@ -1903,11 +1904,9 @@ class PlayerGameStatsAPIView(APIView):
                 'tournament_id': stats.first().tournament_id.id,
                 'goals': totals['total_goals'] or 0,
                 'assists': totals['total_assists'] or 0,
+                'own_goals': totals['total_own_goals'] or 0,  # Added own_goals to response
                 'yellow_cards': totals['total_yellow_cards'] or 0,
-                'red_cards': totals['total_red_cards'] or 0,
-                'game_time': stats.first().game_time,  # If total time is not needed, take first
-                'created_at': stats.first().created_at,
-                'updated_at': stats.first().updated_at
+                'red_cards': totals['total_red_cards'] or 0
             }
 
             # Respond with the formatted data
@@ -1922,6 +1921,7 @@ class PlayerGameStatsAPIView(APIView):
                 'status': 0,
                 'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
 
 ######################### team game timeline #####################
 class TeamGameStatsTimelineAPIView(APIView):
