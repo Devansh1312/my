@@ -2030,14 +2030,116 @@ class FriendlyPlayerGameStatsAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, game_id=None):
+        # Check if the user is the game_statistics_handler for the specified friendly game.
         if game_id:
             try:
                 game = FriendlyGame.objects.get(id=game_id)
                 if game.game_statistics_handler == user:
                     return True
             except FriendlyGame.DoesNotExist:
-                pass
+                pass  # Game not found or doesn't match; access denied
         return False
+
+    def get_last_update(self, player_id, game_id): 
+        # Fetch the most recent update for the player
+        last_stat = FriendlyGamesPlayerGameStats.objects.filter(
+            Q(player_id_id=player_id) | Q(in_player_id=player_id) | Q(out_player_id=player_id),
+            game_id=game_id
+        ).order_by('-updated_at').first()
+
+        if last_stat:
+            if last_stat.goals > 0:
+                return 'goal'
+            elif last_stat.yellow_cards > 0:
+                return 'yellow_card'
+            elif last_stat.red_cards > 0:
+                return 'red_card'
+            elif last_stat.in_player_id == player_id:
+                return 'substituted'
+            elif last_stat.out_player_id == player_id:
+                return 'substituted'
+        return None
+
+    def _update_team_goals(self, game_instance):
+        # Updates the total goals for both teams in a friendly game instance.
+        game_instance.team_a_goal = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=game_instance.team_a.id,
+            game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        game_instance.team_b_goal = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=game_instance.team_b.id,
+            game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        game_instance.save()
+
+    def _get_game_stats_response(self, game_instance, team_id, player_id, game_id):
+        # Returns stats, goals, and lineup details for friendly games.
+        team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=game_instance.team_a.id,
+            game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=game_instance.team_b.id,
+            game_id=game_instance.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        lineup_data = {}
+        for team_id, team_key in [(game_instance.team_a.id, 'team_a'), (game_instance.team_b.id, 'team_b')]:
+            substitute_lineups = FriendlyGameLineup.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+                lineup_status=FriendlyGameLineup.SUBSTITUTE
+            )
+            already_added_lineups = FriendlyGameLineup.objects.filter(
+                team_id=team_id,
+                game_id=game_id,
+                lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
+            )
+
+            substitute_data = [{
+                'id': lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id)
+            } for lineup in substitute_lineups]
+
+            already_added_data = [{
+                'id': lineup.id,
+                'player_id': lineup.player_id.id,
+                'player_username': lineup.player_id.username,
+                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+                'position_1': lineup.position_1,
+                'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+                'lastupdate': self.get_last_update(lineup.player_id.id, game_id)
+            } for lineup in already_added_lineups]
+
+            lineup_data[team_key] = {
+                'player_added_in_lineup': already_added_data,
+                'substitute': substitute_data
+            }
+
+        return Response({
+            'status': 1,
+            'message': _('Stats updated and lineup fetched successfully.'),
+            'data': {
+                'game_id': game_instance.id,
+                'goals': {
+                    'team_a_id': game_instance.team_a.id,
+                    'team_a_name': game_instance.team_a.team_name,
+                    'team_a_total_goals': team_a_goals,
+                    'team_b_id': game_instance.team_b.id,
+                    'team_b_name': game_instance.team_b.team_name,
+                    'team_b_total_goals': team_b_goals,
+                },
+                **lineup_data
+            }
+        }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         # Set language based on the request headers
@@ -2052,14 +2154,8 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         game_time = request.data.get('game_time')
 
         # Validate required fields
-        if not player_id:
-            return Response({'status': 0, 'message': _('Player id is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not team_id:
-            return Response({'status': 0, 'message': _('Team id is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not game_id:
-            return Response({'status': 0, 'message': _('Game id is required.')}, status=status.HTTP_400_BAD_REQUEST)
-        if not game_time:
-            return Response({'status': 0, 'message': _('Game time is required.')}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([player_id, team_id, game_id, game_time]):
+            return Response({'status': 0, 'message': _('All fields are required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check access
         if not self._has_access(request.user, game_id=game_id):
@@ -2091,91 +2187,34 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         **{stat: 1},  # Set the specific stat to 1
                         created_by_id=request.user.id
                     )
-                    return Response({
-                        'status': 1,
-                        'message': _(f'{stat.capitalize()} incremented successfully.'),
-                        'data': {}
-                    }, status=status.HTTP_201_CREATED)
+                    self._update_team_goals(game_instance)
+                    return self._get_game_stats_response(game_instance, team_id, player_id)
 
                 elif stat_value == -1:
                     # Decrement: Find and delete the most recent entry for this stat
-                    latest_stat = FriendlyGamesPlayerGameStats.objects.filter(
+                    stat_count = FriendlyGamesPlayerGameStats.objects.filter(
                         player_id=player_instance,
                         team_id=team_instance,
                         game_id=game_instance,
-                        **{stat: 1}  # Find the most recent positive entry
-                    ).order_by('-created_at').first()
+                        **{stat: 1}
+                    ).count()
 
-                    if latest_stat:
+                    if stat_count > 0:
+                        latest_stat = FriendlyGamesPlayerGameStats.objects.filter(
+                            player_id=player_instance,
+                            team_id=team_instance,
+                            game_id=game_instance,
+                            **{stat: 1}
+                        ).order_by('-created_at').first()
                         latest_stat.delete()
-                        return Response({
-                            'status': 1,
-                            'message': _(f'{stat.capitalize()} decremented successfully.'),
-                            'data': {}
-                        }, status=status.HTTP_200_OK)
+                        self._update_team_goals(game_instance)
+                        return self._get_game_stats_response(game_instance, team_id, player_id)
                     else:
-                        return Response({
-                            'status': 0,
-                            'message': _(f'Cannot decrement {stat.capitalize()} as no entries exist.'),
-                        }, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'status': 0, 'message': _(f'Cannot decrement {stat.capitalize()} as it cannot go below zero.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Calculate team goals
-        team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
-            team_id=team_instance.team_a.id, game_id=game_instance.id
-        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+        return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
-            team_id=team_instance.team_b.id, game_id=game_instance.id
-        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-        # Fetch lineup data for both teams
-        lineup_data = {}
-        for team_key, team in [('team_a', team_instance.team_a), ('team_b', team_instance.team_b)]:
-            lineup_data[team_key] = {
-                'player_added_in_lineup': [
-                    {
-                        'id': lineup.id,
-                        'player_id': lineup.player_id.id,
-                        'player_username': lineup.player_id.username,
-                        'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-                        'position_1': lineup.position_1,
-                        'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
-                        'lastupdate': self.get_last_update(lineup.player_id.id, game_instance.id)
-                    }
-                    for lineup in FriendlyGameLineup.objects.filter(team_id=team.id, game_id=game_instance.id, lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP)
-                ],
-                'substitute': [
-                    {
-                        'id': lineup.id,
-                        'player_id': lineup.player_id.id,
-                        'player_username': lineup.player_id.username,
-                        'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-                        'position_1': lineup.position_1,
-                        'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
-                        'lastupdate': self.get_last_update(lineup.player_id.id, game_instance.id)
-                    }
-                    for lineup in FriendlyGameLineup.objects.filter(team_id=team.id, game_id=game_instance.id, lineup_status=FriendlyGameLineup.SUBSTITUTE)
-                ]
-            }
-
-        return Response({
-            'status': 1,
-            'message': _('Player stats updated successfully.'),
-            'data': {
-                'game_id': game_instance.id,
-                'goals': {
-                    'team_a_id': team_instance.team_a.id,
-                    'team_a_name': team_instance.team_a.team_name,
-                    'team_a_total_goals': team_a_goals,
-                    'team_a_logo': team_instance.team_a.team_id.team_logo.url if team_instance.team_a.team_id.team_logo else None,
-                    'team_b_id': team_instance.team_b.id,
-                    'team_b_name': team_instance.team_b.team_name,
-                    'team_b_total_goals': team_b_goals,
-                    'team_b_logo': team_instance.team_b.team_id.team_logo.url if team_instance.team_b.team_id.team_logo else None,
-                },
-                'lineup': lineup_data
-            }
-        }, status=status.HTTP_200_OK)
 
 
 
