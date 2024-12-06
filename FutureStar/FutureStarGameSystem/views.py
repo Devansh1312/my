@@ -2192,19 +2192,43 @@ class PlayerSubstitutionAPIView(APIView):
             elif last_stat.out_player_id == player_id:
                 return 'substituted'
         return None  # No relevant update found
+    
+    def _format_lineup_data(self, lineup, game_id, tournament_id):
+        return {
+            'id': lineup.id,
+            'player_id': lineup.player_id.id,
+            'player_username': lineup.player_id.username,
+            'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
+            'position_1': lineup.position_1,
+            'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
+            'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)
+        }
+
+    def _format_managerial_staff(self, staff):
+        return {
+            'id': staff.id,
+            'staff_id': staff.user_id.id,
+            'staff_username': staff.user_id.username,
+            'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
+            'joining_type_id': staff.joinning_type,
+            'joining_type_name': staff.get_joinning_type_display()
+        }
 
     def post(self, request):
+        # Handle language activation
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
+
+        # Extract input data
         team_id = request.data.get("team_id")
         tournament_id = request.data.get("tournament_id")
         game_id = request.data.get("game_id")
         player_a_id = request.data.get("player_a_id")
         player_b_id = request.data.get("player_b_id")
+        game_time = request.data.get("game_time")
 
-        # Validate each field individually
+        # Validate inputs
         if not team_id:
             return Response({'status': 0, 'message': _('Team id is required.')}, status=status.HTTP_400_BAD_REQUEST)
         if not tournament_id:
@@ -2216,10 +2240,11 @@ class PlayerSubstitutionAPIView(APIView):
         if not player_b_id:
             return Response({'status': 0, 'message': _('Player B id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check user access
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
             return Response({'status': 0, 'message': _('You do not have access to this resource.')}, status=status.HTTP_403_FORBIDDEN)
 
-        # Retrieve player A (must have status ALREADY_IN_LINEUP)
+        # Retrieve Player A and Player B
         try:
             player_a = Lineup.objects.get(
                 team_id=team_id,
@@ -2231,7 +2256,6 @@ class PlayerSubstitutionAPIView(APIView):
         except Lineup.DoesNotExist:
             return Response({'status': 0, 'message': _('Player A not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Retrieve player B (must have status SUBSTITUTE)
         try:
             player_b = Lineup.objects.get(
                 team_id=team_id,
@@ -2251,7 +2275,10 @@ class PlayerSubstitutionAPIView(APIView):
         player_a.lineup_status = Lineup.SUBSTITUTE
         player_b.lineup_status = Lineup.ALREADY_IN_LINEUP
 
-        # Save the updated players
+        player_a.save()
+        player_b.save()
+
+        # Retrieve player instances
         user_a = get_object_or_404(User, id=player_a.player_id.id)
         user_b = get_object_or_404(User, id=player_b.player_id.id)
 
@@ -2259,7 +2286,7 @@ class PlayerSubstitutionAPIView(APIView):
         tournament_instance = get_object_or_404(Tournament, id=tournament_id)
         game_instance = get_object_or_404(TournamentGames, id=game_id)
 
-        # Create a new PlayerGameStats record to log the substitution
+        # Create a PlayerGameStats record
         try:
             player_game_stat = PlayerGameStats.objects.create(
                 team_id=team_branch,
@@ -2268,73 +2295,53 @@ class PlayerSubstitutionAPIView(APIView):
                 player_id=user_b if user_b else user_a,
                 in_player=user_b,
                 out_player=user_a,
+                game_time = game_time,
                 created_by_id=request.user.id
             )
         except IntegrityError as e:
             return Response({'status': 0, 'message': _('Failed to log player substitution.'), "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-        player_a.save()
-        player_b.save()
-
-        # Calculate goals for both teams
+        # Calculate total goals for each team
         team_a_goals = PlayerGameStats.objects.filter(
-            team_id=team_id, game_id=game_id, tournament_id=tournament_id
+            team_id=game_instance.team_a.id, 
+            game_id=game_id, 
+            tournament_id=tournament_id
         ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
         team_b_goals = PlayerGameStats.objects.filter(
-            team_id=team_id, game_id=game_id, tournament_id=tournament_id
+            team_id=game_instance.team_b.id, 
+            game_id=game_id, 
+            tournament_id=tournament_id
         ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
-        # Fetch lineup data for both teams
+        # Fetch updated lineup data for both teams
         lineup_data = {}
-        for team_id, team_key in [(team_id, 'team_a'), (team_id, 'team_b')]:
+        for team, team_key in [
+            (game_instance.team_a, 'team_a'),
+            (game_instance.team_b, 'team_b')
+        ]:
             substitute_lineups = Lineup.objects.filter(
-                team_id=team_id,
+                team_id=team.id,
                 game_id=game_id,
                 tournament_id=tournament_id,
                 lineup_status=Lineup.SUBSTITUTE
             )
             already_added_lineups = Lineup.objects.filter(
-                team_id=team_id,
+                team_id=team.id,
                 game_id=game_id,
                 tournament_id=tournament_id,
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
 
-            substitute_data = [{
-                'id': lineup.id,
-                'player_id': lineup.player_id.id,
-                'player_username': lineup.player_id.username,
-                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-                'position_1': lineup.position_1,
-                'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
-                'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)
-            } for lineup in substitute_lineups]
-
-            already_added_data = [{
-                'id': lineup.id,
-                'player_id': lineup.player_id.id,
-                'player_username': lineup.player_id.username,
-                'profile_picture': lineup.player_id.profile_picture.url if lineup.player_id.profile_picture else None,
-                'position_1': lineup.position_1,
-                'jersey_number': PlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if PlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
-                'lastupdate': self.get_last_update(lineup.player_id.id, game_id, tournament_id)
-            } for lineup in already_added_lineups]
+            substitute_data = [self._format_lineup_data(lineup, game_id, tournament_id) for lineup in substitute_lineups]
+            already_added_data = [self._format_lineup_data(lineup, game_id, tournament_id) for lineup in already_added_lineups]
 
             managerial_staff = JoinBranch.objects.filter(
-                branch_id=team_id,
+                branch_id=team.id,
                 joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
             ).select_related('user_id')
 
-            managerial_staff_data = [{
-                'id': staff.id,
-                'staff_id': staff.user_id.id,
-                'staff_username': staff.user_id.username,
-                'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
-                'joining_type_id': staff.joinning_type,
-                'joining_type_name': staff.get_joinning_type_display()
-            } for staff in managerial_staff]
+            managerial_staff_data = [self._format_managerial_staff(staff) for staff in managerial_staff]
 
             lineup_data[team_key] = {
                 'player_added_in_lineup': already_added_data,
@@ -2342,6 +2349,7 @@ class PlayerSubstitutionAPIView(APIView):
                 'managerial_staff': managerial_staff_data
             }
 
+        # Return response
         return Response({
             'status': 1,
             'message': _('Player substitution successful.'),
@@ -2362,7 +2370,6 @@ class PlayerSubstitutionAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-   
 
     def get(self, request, *args, **kwargs):   
         permission_classes = [IsAuthenticated]

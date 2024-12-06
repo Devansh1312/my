@@ -2144,6 +2144,7 @@ class UpcomingGameView(APIView):
                     "game_start_time": first_game.game_start_time,
                     "game_end_time": first_game.game_end_time,
                     "user_role": user_role,
+                    "extra_time":first_game.extra_time,
                     "status": "Upcoming",
                 }
                 if game_type == "Tournament":

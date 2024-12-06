@@ -24,21 +24,21 @@ Post Report Management
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               
+            <div class="col-12 col-md-6">
+               <!-- You can add any other controls or buttons here -->
             </div>
          </div>
       </div>
       <div class="row">
          <!-- News List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                    <table class="display" id="basic-1">
+                    <table class="display table table-bordered" id="basic-1">
                         <thead>
                             <tr>
                                 <th>No.</th>
@@ -70,7 +70,7 @@ Post Report Management
                                      Unknown
                                  {% endif %}
                                  </td>
-                                    <td>
+                                 <td>
                                     {% if report.creator_type == 1 %}
                                         {{ report.user_info.role.name_en }}  
                                     {% elif report.creator_type == 2 %}
@@ -80,10 +80,10 @@ Post Report Management
                                     {% else %}
                                        Unknown
                                     {% endif %}
-                                    </td>
+                                 </td>
                                  <td>{{ report.report_id.title_en }}</td>
-                                <td>{{ report.created_at }}</td>
-                                <td>
+                                 <td>{{ report.created_at }}</td>
+                                 <td>
                                     <!-- Action buttons -->
 
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">
@@ -111,7 +111,7 @@ Post Report Management
                                                    {% else %}
                                                       data-username="Unknown" 
                                                       data-mobile-no="Unknown"
-                                                   {% endif %}>
+                                                   {% endif %} style="font-size: large;">
                                                    View
                                                 </a>
                                             </li>                                             
@@ -135,11 +135,9 @@ Post Report Management
       </div>
    </div>
 </div>
-
-
 <!-- View Report Modal -->
 <div class="modal fade bd-example-modal-lg" id="viewReportModal" tabindex="-1" aria-labelledby="viewReportModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-lg">
+   <div class="modal-dialog modal-dialog-scrollable modal-lg">
       <div class="modal-content shadow-lg border-0 rounded">
          <div class="modal-header bg-primary text-white">
             <h5 class="modal-title" id="viewReportModalLabel">Report Details</h5>
@@ -148,41 +146,41 @@ Post Report Management
          <div class="modal-body p-4">
             <div class="row">
                <!-- Report Details Section -->
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <label class="form-label fw-bold">Report ID:</label>
                   <span id="reportId"></span>
                </div>
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <label class="form-label fw-bold">Report Title:</label>
                   <span id="reportTitle"></span>
                </div>
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <label class="form-label fw-bold">Report Detail:</label>
                   <span id="reportDetail"></span>
                </div>
 
                <!-- Post Details Section -->
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <h5 class="fw-bold mt-4">Post Details</h5>
                </div>
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <label class="form-label fw-bold">Post Title:</label>
                   <span id="postTitle"></span>
                </div>
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <label class="form-label fw-bold">Post Content:</label>
                   <span id="postContent"></span>
                </div>
 
                <!-- Reported By Section -->
-               <div class="col-md-12 mb-3">
+               <div class="col-12 mb-3">
                   <h5 class="fw-bold mt-4">Reported By</h5>
                </div>
-               <div class="col-md-6 mb-3">
+               <div class="col-12 col-md-6 mb-3">
                   <label class="form-label fw-bold">Username:</label>
                   <span id="username"></span>
                </div>
-               <div class="col-md-6 mb-3">
+               <div class="col-12 col-md-6 mb-3">
                   <label class="form-label fw-bold">Mobile No:</label>
                   <span id="mobileNo"></span>
                </div>
@@ -195,13 +193,9 @@ Post Report Management
    </div>
 </div>
 
-
-
-
-
-<!-- Delete Report Model  -->
+<!-- Delete Report Modal -->
 <div class="modal fade" id="deleteReportModal" tabindex="-1" aria-labelledby="deleteReportModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteReportModalLabel">Delete Post</h5>
@@ -218,6 +212,7 @@ Post Report Management
       </div>
    </div>
 </div>
+
 
 
 {% endblock %}

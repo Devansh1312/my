@@ -1,27 +1,26 @@
 {% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Ground Material{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends--> {% endblock %} {% block title %}Ground Material{% endblock %} {% block content %} 
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-6 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addGroundMaterialModal">Add Ground Material</button>
-               </ol>
+            <div class="col-6 col-md-6 d-flex justify-content-md-end">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addGroundMaterialModal">Add Ground Material</button>
             </div>
          </div>
       </div>
       <div class="row">
          <!-- GroundMaterial List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-striped" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -40,18 +39,14 @@
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                        <i data-feather="more-vertical"></i>
-                                       <!-- Three dots icon -->
                                     </a>
-                                    <!-- Hidden card for actions -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
-                                       <ul style="list-style: none; padding: 0; margin: 0;">
-                                          <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGroundMaterialModal" data-groundmaterial-id="{{ groundmaterial.id }}" data-groundmaterial-name-en="{{ groundmaterial.name_en }}" data-groundmaterial-name-ar="{{ groundmaterial.name_ar }}">
-                                                Edit </a>
+                                       <ul class="list-unstyled m-0">
+                                          <li class="py-2 px-3">
+                                             <a href="#" style="font-size: large;" data-bs-toggle="modal" data-bs-target="#editGroundMaterialModal" data-groundmaterial-id="{{ groundmaterial.id }}" data-groundmaterial-name-en="{{ groundmaterial.name_en }}" data-groundmaterial-name-ar="{{ groundmaterial.name_ar }}">Edit</a>
                                           </li>
-                                          <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteGroundMaterialModal" data-groundmaterial-id="{{ groundmaterial.id }}">
-                                                Delete </a>
+                                          <li class="py-2 px-3 border-top">
+                                             <a href="#" style="font-size: large;" data-bs-toggle="modal" data-bs-target="#deleteGroundMaterialModal" data-groundmaterial-id="{{ groundmaterial.id }}">Delete</a>
                                           </li>
                                        </ul>
                                     </div>
@@ -60,7 +55,7 @@
                            </tr>
                            {% endfor %}
                         </tbody>
-                     </table>                     
+                     </table>
                   </div>
                </div>
             </div>
@@ -68,10 +63,10 @@
       </div>
    </div>
 </div>
-<!-- Add GroundMaterial Modal -->
+
 <!-- Add GroundMaterial Modal -->
 <div class="modal fade" id="addGroundMaterialModal" tabindex="-1" aria-labelledby="addGroundMaterialModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addGroundMaterialModalLabel">Add Ground Material</h5>
@@ -95,9 +90,10 @@
       </div>
    </div>
 </div>
+
 <!-- Edit GroundMaterial Modal -->
 <div class="modal fade" id="editGroundMaterialModal" tabindex="-1" aria-labelledby="editGroundMaterialModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editGroundMaterialModalLabel">Edit Ground Material</h5>
@@ -125,7 +121,7 @@
 
 <!-- Delete GroundMaterial Modal -->
 <div class="modal fade" id="deleteGroundMaterialModal" tabindex="-1" aria-labelledby="deleteGroundMaterialModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteGroundMaterialModalLabel">Delete GroundMaterial</h5>
@@ -139,7 +135,8 @@
          </div>
       </div>
    </div>
-</div> {% endblock %} {% block scriptcontent %}
+</div>
+{% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>

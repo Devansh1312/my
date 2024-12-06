@@ -8,20 +8,18 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}User Category{% endblock %}
+{% block title %}Team Type{% endblock %}
 
 {% block content %}
 <div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-6 col-md-6">
                <h3>{{ breadcrumb.child }}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category Type</button>
-               </ol>
+            <div class="col-6 col-md-6 d-flex justify-content-md-end align-items-center">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category Type</button>
             </div>
          </div>
       </div>
@@ -31,7 +29,7 @@
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-striped table-bordered" id="basic-1">
                         <thead>
                            <tr>
                               <th>ID</th>
@@ -50,18 +48,15 @@
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                        <i data-feather="more-vertical"></i>
-                                       <!-- Three dots icon -->
                                     </a>
                                     <!-- Hidden card for actions -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}" data-category-name-en="{{ category.name_en }}" data-category-name-ar="{{ category.name_ar }}">
-                                                 Edit </a>
+                                             <a href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}" data-category-name-en="{{ category.name_en }}" data-category-name-ar="{{ category.name_ar }}">Edit</a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal" data-category-id="{{ category.id }}">
-                                                 Delete </a>
+                                             <a href="#" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal" data-category-id="{{ category.id }}">Delete</a>
                                           </li>
                                        </ul>
                                     </div>
@@ -78,10 +73,9 @@
       </div>
    </div>
 </div>
-
 <!-- Add Category Modal -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addCategoryModalLabel">Add Category Type</h5>
@@ -109,7 +103,7 @@
 
 <!-- Edit Category Modal -->
 <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editCategoryModalLabel">Edit Category Type</h5>
@@ -138,7 +132,7 @@
 
 <!-- Delete Category Modal -->
 <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteCategoryModalLabel">Delete Category Type</h5>
@@ -155,6 +149,7 @@
       </div>
    </div>
 </div>
+
 
 {% endblock %}
 

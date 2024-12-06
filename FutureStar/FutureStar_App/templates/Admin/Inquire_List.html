@@ -1,8 +1,15 @@
-{% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+{% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Inquire{% endblock %}
-{% block content %} 
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}Inquire{% endblock %}
+
+{% block content %}
 <style>
    .modal-content {
     border-radius: 10px;
@@ -27,77 +34,95 @@
 }
 
 </style>
+
 <div class="page-body">
-   <div class="container-fluid"> 
-    <div class="page-title">
-        <div class="row">
-          <div class="col-6">
-            <h3>{{breadcrumb.child}}</h3>
-          </div>
-          <div class="col-6">
-            <ol class="breadcrumb">
-            </ol>
-          </div>
-        </div>
-      </div>
-    <div class="row">
-         <!-- Inquire List -->
-         <div class="col-sm-12">
-            <div class="card">
-               <div class="card-body">
-                  <div class="table-responsive">
-                     <table class="display" id="basic-1">
-                        <thead>
-                           <tr>
-                              <th>ID No.</th>
-                              <th>Full Name</th>
-                              <th>Phone</th>
-                              <th>Email</th>
-                              <th>Message</th>
-                              <th>Actions</th>
-                           </tr>
-                        </thead>
-                        <tbody> {% for inquire in inquire %} <tr>
-                              <td>{{ forloop.counter }}</td>
-                              <td>{{ inquire.fullname }}</td>
-                              <td>{{ inquire.phone }}</td>
-                              <td>{{ inquire.email }}</td>
-                              <td>
-                                 {{ inquire.message|slice:":30" }}...
-                                 <a href="#" class="read-more-link text-primary" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#viewInquireModal" 
-                                    data-inquire-fullname="{{ inquire.fullname }}"
-                                    data-inquire-phone="{{ inquire.phone }}"
-                                    data-inquire-email="{{ inquire.email }}"
-                                    data-inquire-message="{{ inquire.message }}">
-                                    Read more
-                                 </a>
-                              </td>
-                              <td>
-                                 <ul class="action">
-                                    <li class="view">
-                                       <a href="#" data-bs-toggle="modal" data-bs-target="#viewInquireModal" data-inquire-id="{{ inquire.id }}" data-inquire-fullname="{{ inquire.fullname }}"
-                                       data-inquire-phone="{{ inquire.phone }}"
-                                       data-inquire-email="{{ inquire.email }}"
-                                       data-inquire-message="{{ inquire.message }}">
-                                          <i class="icon-eye"></i>
-                                       </a>
-                                    </li>
-                                 </ul>
-                              </td>
-                           </tr> {% endfor %} </tbody>
-                     </table>
-                  </div>
-               </div>
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <h3>{{breadcrumb.child}}</h3>
+                </div>
+                <div class="col-12 col-md-6">
+                    <ol class="breadcrumb">
+                        <!-- Breadcrumbs (optional) -->
+                    </ol>
+                </div>
             </div>
-         </div>
-      </div>
-   </div>
+        </div>
+        <div class="row">
+            <!-- Inquire List -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display" id="basic-1">
+                                <thead>
+                                    <tr>
+                                        <th>ID No.</th>
+                                        <th>Full Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Message</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for inquire in inquire %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ inquire.fullname }}</td>
+                                        <td>{{ inquire.phone }}</td>
+                                        <td>{{ inquire.email }}</td>
+                                        <td>
+                                            {{ inquire.message|slice:":30" }}...
+                                            <a href="#" class="read-more-link text-primary" 
+                                               data-bs-toggle="modal" 
+                                               data-bs-target="#viewInquireModal" 
+                                               data-inquire-fullname="{{ inquire.fullname }}"
+                                               data-inquire-phone="{{ inquire.phone }}"
+                                               data-inquire-email="{{ inquire.email }}"
+                                               data-inquire-message="{{ inquire.message }}">
+                                               Read more
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                    <i data-feather="more-vertical"></i>
+                                                </a>
+                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                                        <!-- View Inquiry -->
+                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                            <a href="#" class="view-inquiry-btn" 
+                                                               data-bs-toggle="modal" data-bs-target="#viewInquireModal"
+                                                               data-inquire-id="{{ inquire.id }}" 
+                                                               data-inquire-fullname="{{ inquire.fullname }}"
+                                                               data-inquire-phone="{{ inquire.phone }}"
+                                                               data-inquire-email="{{ inquire.email }}"
+                                                               data-inquire-message="{{ inquire.message }}">
+                                                               View
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </td>                                 
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 <!-- View Inquire Modal -->
 <div class="modal fade bd-example-modal-lg" id="viewInquireModal" tabindex="-1" aria-labelledby="viewInquireModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg border-0 rounded">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="viewInquireModalLabel">Inquire Details</h5>
@@ -105,22 +130,22 @@
             </div>
             <div class="modal-body p-4">
                 <div class="row">
-                    <div class="col-md-12 mb-3">
+                    <div class="col-12 mb-3">
                         <label class="form-label fw-bold">Full Name:</label>
-                        <span id="inquireFullName"></span> <!-- Example name -->
+                        <span id="inquireFullName"></span>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-12 mb-3">
                         <label class="form-label fw-bold">Phone:</label>
-                        <span id="inquirePhone"></span> <!-- Example phone -->
+                        <span id="inquirePhone"></span>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-12 mb-3">
                         <label class="form-label fw-bold">Email:</label>
-                        <span id="inquireEmail"></span> <!-- Example email -->
+                        <span id="inquireEmail"></span>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-12 mb-3">
                         <label class="form-label fw-bold">Message:</label>
                         <span id="inquireMessage" style="display: block; word-wrap: break-word; word-break: break-word;">
-                        </span> <!-- Example long message -->
+                        </span>
                     </div>
                 </div>
             </div>
@@ -131,6 +156,7 @@
     </div>
 </div>
 
+
 <script>
    document.addEventListener('DOMContentLoaded', function () {
        var viewInquireModal = document.getElementById('viewInquireModal');
@@ -140,7 +166,7 @@
            var inquirePhone = button.getAttribute('data-inquire-phone');
            var inquireEmail = button.getAttribute('data-inquire-email');
            var inquireMessage = button.getAttribute('data-inquire-message');
-   
+
            // Populate the modal with the corresponding inquiry data using textContent or innerText for <p> tags
            viewInquireModal.querySelector('#inquireFullName').textContent = inquireFullName;
            viewInquireModal.querySelector('#inquirePhone').textContent = inquirePhone;
@@ -148,14 +174,28 @@
            viewInquireModal.querySelector('#inquireMessage').textContent = inquireMessage;
        });
    });
-   </script>
-   
-   
-{% endblock %} {% block scriptcontent %}
+
+   function toggleMenu(element) {
+        var menu = element.nextElementSibling; // Get the dropdown menu (action-card)
+        
+        // Toggle visibility of the action card
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+
+        // Close the menu if clicked outside
+        document.addEventListener('click', function(event) {
+            if (!element.contains(event.target) && !menu.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+{% endblock %}
+
+{% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
- {% endblock %}
+{% endblock %}

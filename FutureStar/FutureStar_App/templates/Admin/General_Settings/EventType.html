@@ -1,17 +1,16 @@
 {% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Event Type{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends--> {% endblock %} {% block title %}Event Type{% endblock %} {% block content %} 
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-6 col-sm-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addEventTypeModal">Add Event Type</button>
-               </ol>
+            <div class="col-6 col-sm-6 text-sm-end">
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addEventTypeModal">Add Event Type</button>
             </div>
          </div>
       </div>
@@ -21,7 +20,7 @@
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-bordered table-striped" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -40,19 +39,13 @@
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                        <i data-feather="more-vertical"></i>
-                                       <!-- Three dots icon -->
                                     </a>
-                                    <!-- Hidden card for actions -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editEventTypeModal" data-eventtypes-id="{{ eventtypes.id }}" data-eventtypes-name-en="{{ eventtypes.name_en }}" data-eventtypes-name-ar="{{ eventtypes.name_ar }}">
                                                  Edit </a>
                                           </li>
-                                          <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteEventTypeModal" data-eventtypes-id="{{ eventtypes.id }}">
-                                                 Delete </a>
-                                          </li> -->
                                        </ul>
                                     </div>
                                  </div>
@@ -60,7 +53,7 @@
                            </tr>
                            {% endfor %}
                         </tbody>
-                     </table>                     
+                     </table>
                   </div>
                </div>
             </div>
@@ -68,16 +61,18 @@
       </div>
    </div>
 </div>
+
 <!-- Add EventType Modal -->
 <div class="modal fade" id="addEventTypeModal" tabindex="-1" aria-labelledby="addEventTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addEventTypeModalLabel">Add Event Type</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'eventtype_create' %}" id="addEventTypeForm"> {% csrf_token %}
+            <form method="post" action="{% url 'eventtype_create' %}" id="addEventTypeForm">
+               {% csrf_token %}
                <div class="mb-3">
                   <label for="name_en" class="form-label">Event Type (English)</label>
                   <input type="text" class="form-control" id="name_en" name="name_en" placeholder="Enter Event Type (English)">
@@ -94,16 +89,18 @@
       </div>
    </div>
 </div>
+
 <!-- Edit EventType Modal -->
 <div class="modal fade" id="editEventTypeModal" tabindex="-1" aria-labelledby="editEventTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editEventTypeModalLabel">Edit Event Type</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'eventtype_update' pk=0 %}" id="editEventTypeForm"> {% csrf_token %}
+            <form method="post" action="{% url 'eventtype_update' pk=0 %}" id="editEventTypeForm">
+               {% csrf_token %}
                <input type="hidden" id="editEventTypeId" name="id">
                <div class="mb-3">
                   <label for="editName_en" class="form-label">Event Type (English)</label>
@@ -124,21 +121,24 @@
 
 <!-- Delete EventType Modal -->
 <div class="modal fade" id="deleteEventTypeModal" tabindex="-1" aria-labelledby="deleteEventTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="deleteEventTypeModalLabel">Delete EventType</h5>
+            <h5 class="modal-title" id="deleteEventTypeModalLabel">Delete Event Type</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'eventtype_delete' pk=0 %}" id="deleteEventTypeForm"> {% csrf_token %} <input type="hidden" id="deleteEventTypeId" name="id">
+            <form method="post" action="{% url 'eventtype_delete' pk=0 %}" id="deleteEventTypeForm">
+               {% csrf_token %}
+               <input type="hidden" id="deleteEventTypeId" name="id">
                <p>Are you sure you want to delete this Event Type?</p>
                <button type="submit" class="btn btn-danger">Delete Event Type</button>
             </form>
          </div>
       </div>
    </div>
-</div> {% endblock %} {% block scriptcontent %}
+</div>
+{% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>

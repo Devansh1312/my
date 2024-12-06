@@ -1,27 +1,28 @@
 {% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Field Capacity{% endblock %} {% block content %} <div class="page-body">
+<!-- Plugins css Ends--> {% endblock %} {% block title %}Field Capacity{% endblock %} {% block content %}
+<div class="page-body">
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-6 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <div class="col-6">
+            <div class="col-6 col-md-6 text-md-end">
                <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addFieldCapacityModal">Add FieldCapacity</button>
+                  <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addFieldCapacityModal">Add FieldCapacity</button>
                </ol>
             </div>
          </div>
       </div>
       <div class="row">
          <!-- FieldCapacity List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="display table" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -29,31 +30,35 @@
                               <th>Actions</th>
                            </tr>
                         </thead>
-                        <tbody> {% for fieldcapacity in fieldcapacitys %} <tr>
+                        <tbody>
+                           {% for fieldcapacity in fieldcapacitys %}
+                           <tr>
                               <td>{{ forloop.counter }}</td>
                               <td>{{ fieldcapacity.name }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                        <i data-feather="more-vertical"></i>
-                                       <!-- Three dots icon -->
                                     </a>
-                                    <!-- Hidden card for actions -->
                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editFieldCapacityModal" data-fieldcapacity-id="{{ fieldcapacity.id }}" data-fieldcapacity-name="{{ fieldcapacity.name }}">
-                                                 Edit </a>
+                                                 Edit
+                                             </a>
                                           </li>
                                           <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteFieldCapacityModal" data-fieldcapacity-id="{{ fieldcapacity.id }}">
-                                                 Delete </a>
+                                                 Delete
+                                             </a>
                                           </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
-                           </tr> {% endfor %} </tbody>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
                      </table>
                   </div>
                </div>
@@ -62,64 +67,75 @@
       </div>
    </div>
 </div>
+
 <!-- Add FieldCapacity Modal -->
 <div class="modal fade" id="addFieldCapacityModal" tabindex="-1" aria-labelledby="addFieldCapacityModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="addFieldCapacityModalLabel">Add FieldCapacity (Players) </h5>
+            <h5 class="modal-title" id="addFieldCapacityModalLabel">Add FieldCapacity (Players)</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'fieldcapacity_create' %}" id="addFieldCapacityForm"> {% csrf_token %} <div class="mb-3">
-                  <label for="name" class="form-label">Approx Field Capacity (Players) </label>
+            <form method="post" action="{% url 'fieldcapacity_create' %}" id="addFieldCapacityForm">
+               {% csrf_token %}
+               <div class="mb-3">
+                  <label for="name" class="form-label">Approx Field Capacity (Players)</label>
                   <input type="text" class="form-control" id="name" name="name" placeholder="Enter approx field capacity">
                   <div id="addFieldCapacityError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Add Field Capacity (Players) </button>
+               <button type="submit" class="btn btn-primary">Add Field Capacity (Players)</button>
             </form>
          </div>
       </div>
    </div>
 </div>
+
 <!-- Edit FieldCapacity Modal -->
 <div class="modal fade" id="editFieldCapacityModal" tabindex="-1" aria-labelledby="editFieldCapacityModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editFieldCapacityModalLabel">Edit FieldCapacity (Players)</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'fieldcapacity_update' pk=0 %}" id="editFieldCapacityForm"> {% csrf_token %} <input type="hidden" id="editFieldCapacityId" name="id">
+            <form method="post" action="{% url 'fieldcapacity_update' pk=0 %}" id="editFieldCapacityForm">
+               {% csrf_token %}
+               <input type="hidden" id="editFieldCapacityId" name="id">
                <div class="mb-3">
                   <label for="editName" class="form-label">Approx Field Capacity</label>
                   <input type="text" class="form-control" id="editName" name="name" placeholder="Enter fieldcapacity name">
                   <div id="editFieldCapacityError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update Field Capacity (Players) </button>
+               <button type="submit" class="btn btn-primary">Update Field Capacity (Players)</button>
             </form>
          </div>
       </div>
    </div>
 </div>
+
 <!-- Delete FieldCapacity Modal -->
 <div class="modal fade" id="deleteFieldCapacityModal" tabindex="-1" aria-labelledby="deleteFieldCapacityModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteFieldCapacityModalLabel">Delete FieldCapacity</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
-            <form method="post" action="{% url 'fieldcapacity_delete' pk=0 %}" id="deleteFieldCapacityForm"> {% csrf_token %} <input type="hidden" id="deleteFieldCapacityId" name="id">
+            <form method="post" action="{% url 'fieldcapacity_delete' pk=0 %}" id="deleteFieldCapacityForm">
+               {% csrf_token %}
+               <input type="hidden" id="deleteFieldCapacityId" name="id">
                <p>Are you sure you want to delete this fieldcapacity?</p>
                <button type="submit" class="btn btn-danger">Delete FieldCapacity</button>
             </form>
          </div>
       </div>
    </div>
-</div> {% endblock %} {% block scriptcontent %}
+</div>
+
+ {% endblock %} {% block scriptcontent %}
 <!-- Plugins JS start-->
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
