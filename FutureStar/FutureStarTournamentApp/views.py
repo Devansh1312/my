@@ -1,4 +1,5 @@
 from collections import defaultdict,OrderedDict
+from itertools import chain
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
@@ -2209,109 +2210,110 @@ class FetchMyGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Determine the language for the response
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         user = request.user
 
-        # Ensure user is authenticated
+        # Ensure the user is authenticated
         if not user.is_authenticated:
             return Response({"status": 0, "message": "User is not authenticated."})
-        
-        # Get the teams associated with the user via JoinBranch
-        user_teams = TeamBranch.objects.filter(joinbranch__user_id=user).values_list('id', flat=True)
-        
-        # Fetch all tournament and friendly games for the user's teams
-        tournament_games = TournamentGames.objects.filter(
-            Q(team_a__id__in=user_teams) | Q(team_b__id__in=user_teams)
-        )
-        friendly_games = FriendlyGame.objects.filter(
-            Q(team_a__id__in=user_teams) | Q(team_b__id__in=user_teams)
-        )
-        
-        # Group games by date
-        games_by_date = {}
-        for game in tournament_games:
-            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
-            if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament_games": [], "friendly_games": []}
-            games_by_date[date_str]["tournament_games"].append({
+
+        created_by_id = request.GET.get('created_by_id', None)
+        creator_type = str(request.GET.get('creator_type', 0))
+
+        if creator_type == '2' and not created_by_id:
+            return Response({"status": 0, "message": "created_by_id must be provided for creator_type 2."})
+
+        creator_type = int(creator_type)
+        created_by_id = int(created_by_id) if created_by_id else None
+
+        user_teams = []
+        teams_data = []
+
+        # Fetch user teams based on creator type
+        if creator_type == 1:
+            user_teams = list(TeamBranch.objects.filter(joinbranch__user_id=user).values_list('id', flat=True))
+        elif creator_type == 2 and created_by_id:
+            teams_data = TeamBranch.objects.filter(team_id__id=created_by_id)
+
+        # Fetch games based on teams
+        tournament_games = []
+        friendly_games = []
+
+        if creator_type == 1:
+            tournament_games = TournamentGames.objects.filter(
+                Q(team_a__id__in=user_teams) | Q(team_b__id__in=user_teams)
+            ).distinct()
+            friendly_games = FriendlyGame.objects.filter(
+                Q(team_a__id__in=user_teams) | Q(team_b__id__in=user_teams)
+            ).distinct()
+
+        if creator_type == 2 and teams_data:
+            for team in teams_data:
+                tournament_games += TournamentGames.objects.filter(
+                    Q(team_a=team) | Q(team_b=team)
+                ).distinct()
+                friendly_games += FriendlyGame.objects.filter(
+                    Q(team_a=team) | Q(team_b=team)
+                ).distinct()
+
+        # Combine tournament and friendly games into one list and remove duplicates
+        all_games = list(chain(tournament_games, friendly_games))
+        unique_games = {}
+        for game in all_games:
+            if game.id not in unique_games:
+                unique_games[game.id] = game
+
+        # Prepare response data grouped by date
+      
+        games_by_date = defaultdict(lambda: {"tournament_games": [], "friendly_games": []})
+        for game in unique_games.values():
+            game_data = {
                 "id": game.id,
-                "tournament_id": game.tournament_id.id if game.tournament_id else None,
-                "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
                 "game_number": game.game_number,
                 "game_date": str(game.game_date),
                 "game_start_time": str(game.game_start_time),
                 "game_end_time": str(game.game_end_time),
-                "group_id": game.group_id.id if game.group_id else None,
-                "group_id_name": game.group_id.group_name if game.group_id else None,
                 "team_a": game.team_a.id if game.team_a else None,
                 "team_a_name": game.team_a.team_name if game.team_a else None,
-                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
-                "team_a_goal": game.team_a_goal,
+                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
                 "team_b": game.team_b.id if game.team_b else None,
                 "team_b_name": game.team_b.team_name if game.team_b else None,
-                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
-                "team_b_goal": game.team_b_goal,
-                "game_field_id": game.game_field_id.id if game.game_field_id else None,
-                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
+                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None,
                 "finish": game.finish,
                 "winner": game.winner_id,
                 "loser_id": game.loser_id,
                 "is_draw": game.is_draw,
-                "created_at": game.created_at,
-                "updated_at": game.updated_at,
-                "game_type":"Tournament",
-            })
-        
-        for game in friendly_games:
-            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
-            if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament_games": [], "friendly_games": []}
-            games_by_date[date_str]["friendly_games"].append({
-                "id": game.id,
-                "game_number": game.game_number,
-                "game_date": str(game.game_date),
-                "game_start_time": str(game.game_start_time),
-                "game_end_time": str(game.game_end_time),
-                "group_id": None,
-                "group_id_name": None,
-                "team_a": game.team_a.id if game.team_a else None,
-                "team_a_name": game.team_a.team_name if game.team_a else None,
-                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
-                "team_a_goal": game.team_a_goal,
-                "team_b": game.team_b.id if game.team_b else None,
-                "team_b_name": game.team_b.team_name if game.team_b else None,
-                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
-                "team_b_goal": game.team_b_goal,
-                "game_field_id": game.game_field_id.id if game.game_field_id else None,
-                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
-                "finish": game.finish,
-                "winner": game.winner_id,
-                "loser_id": game.loser_id,
-                "is_draw": game.is_draw,
-                "created_at": game.created_at,
-                "updated_at": game.updated_at,
-                "game_type":"Friendly",
-            })
-        
-        # Format the response
-        response_data = []
-        for date, games in games_by_date.items():
-            response_data.append({
-                "date": date,
-                "tournament_games": games["tournament_games"],
-                "friendly_games": games["friendly_games"],
-            })
-        
+                "game_type": "Tournament" if isinstance(game, TournamentGames) else "Friendly"
+            }
+
+            # Include group_id and group_id_name only for tournament games
+            if isinstance(game, TournamentGames):
+                game_data["group_id"] = game.group_id.id if game.group_id else None
+                game_data["group_id_name"] = game.group_id.group_name if game.group_id and hasattr(game.group_id, "group_name") else None
+
+            date_str = game.game_date.strftime('%A, %Y-%m-%d') if game.game_date else "Unknown"
+            if isinstance(game, TournamentGames):
+                games_by_date[date_str]["tournament_games"].append(game_data)
+            else:
+                games_by_date[date_str]["friendly_games"].append(game_data)
+
+
         # Pagination
         page = int(request.GET.get("page", 1))
         page_size = 10
+        response_data = [
+            {"date": date, "tournament_games": games["tournament_games"], "friendly_games": games["friendly_games"]}
+            for date, games in games_by_date.items()
+        ]
         total_records = len(response_data)
         total_pages = (total_records + page_size - 1) // page_size
         start = (page - 1) * page_size
         end = start + page_size
-        
+
         return Response({
             "status": 1,
             "message": "Games fetched successfully.",
@@ -2320,7 +2322,6 @@ class FetchMyGamesAPIView(APIView):
             "current_page": page,
             "data": response_data[start:end],
         })
-
 
 
 
