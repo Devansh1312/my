@@ -2133,9 +2133,11 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                     'team_a_id': game_instance.team_a.id,
                     'team_a_name': game_instance.team_a.team_name,
                     'team_a_total_goals': team_a_goals,
+                    'team_a_logo': game_instance.team_a.team_id.team_logo.url if game_instance.team_a.team_id.team_logo else None,
                     'team_b_id': game_instance.team_b.id,
                     'team_b_name': game_instance.team_b.team_name,
                     'team_b_total_goals': team_b_goals,
+                    'team_b_logo': game_instance.team_b.team_id.team_logo.url if game_instance.team_b.team_id.team_logo else None,
                 },
                 **lineup_data
             }
