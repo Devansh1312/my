@@ -773,6 +773,7 @@ class JoinTrainingAPIView(APIView):
             
 
 class TrainingFeedbackAPI(APIView):
+
     
     def patch(self, request, *args, **kwargs):
         # Set language based on the request header
@@ -780,8 +781,10 @@ class TrainingFeedbackAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract required and optional fields from request data
         user_id = request.data.get('user_id')
         training_id = request.data.get('training_id')
+        feedback_id = request.data.get('feedback_id')  # Optional feedback ID
         attendance_status = request.data.get('attendance_status')
         feedback_text = request.data.get('feedback')
         rating = request.data.get('rating')
@@ -790,8 +793,8 @@ class TrainingFeedbackAPI(APIView):
         # Check if both training_id and user_id are provided
         if not user_id or not training_id:
             return Response({
-                'status': 0,
-                'message': _('user_id and training_id are required')
+                "status": 0,
+                "message": _("user_id and training_id are required")
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Fetch the Training_Joined object
@@ -813,35 +816,85 @@ class TrainingFeedbackAPI(APIView):
             updated = True
             update_messages.append(_("Rating updated"))
 
-        # Update injury types if provided
-        if injury_ids:
-            injury_id_list = [int(id) for id in injury_ids.split(',')]
-            injuries = InjuryType.objects.filter(id__in=injury_id_list)
-            training_joined.injury_type.set(injuries)  # Use set to update ManyToManyField
-            updated = True
-            update_messages.append(_("Injury details updated"))
-
         # Save the updated Training_Joined record if there are any updates
         if updated:
             training_joined.save()
 
-        # If feedback is provided, create a new feedback entry
-        if feedback_text:
+        # If feedback_id is provided, update the existing feedback
+        if feedback_id:
+            feedback = get_object_or_404(Training_Feedback, id=feedback_id, user_id=user_id, training_id=training_id)
+
+            # Update feedback text if provided
+            if feedback_text:
+                feedback.feedback = feedback_text
+                update_messages.append(_("Feedback updated"))
+
+            # Update injuries related to the feedback if provided
+            if injury_ids:
+                injury_id_list = [int(id) for id in injury_ids.split(',')]
+                injuries = InjuryType.objects.filter(id__in=injury_id_list)
+                feedback.injuries.set(injuries)
+                update_messages.append(_("Injury details updated"))
+
+            # Save the updated feedback record
+            feedback.save()
+
+        # If no feedback_id is provided, create a new feedback entry
+        elif feedback_text:
             feedback = Training_Feedback.objects.create(
                 training_id=training_id,
                 user_id=user_id,
                 feedback=feedback_text
             )
+
+            # Add injuries to the new feedback if provided
+            if injury_ids:
+                injury_id_list = [int(id) for id in injury_ids.split(',')]
+                injuries = InjuryType.objects.filter(id__in=injury_id_list)
+                feedback.injuries.set(injuries)
+
             update_messages.append(_("New feedback added"))
+
+        # Fetch all feedbacks for the user and training
+        feedbacks = Training_Feedback.objects.filter(training_id=training_id, user_id=user_id).order_by("-created_at")
+
+        # Serialize feedbacks
+        feedback_data = [
+            {
+                "id": feedback.id,
+                "training": feedback.training.id,
+                "user": feedback.user.id,
+                "feedback": feedback.feedback,
+                "injury_type": list(feedback.injuries.values_list("id", flat=True)),
+                "date_created": feedback.date_created,
+                "created_at": feedback.created_at,
+                "updated_at": feedback.updated_at
+            }
+            for feedback in feedbacks
+        ]
+
+        # Serialize the Training_Joined data
+        joined_data = {
+            "id": training_joined.id,
+            "training": training_joined.training.id,
+            "user": {
+                "id": training_joined.user.id,
+                "username": training_joined.user.username,
+                "phone": training_joined.user.phone,  # Assuming a profile relationship
+                "profile_picture": training_joined.user.profile_picture.url,  # Assuming a profile relationship
+                "country_id": training_joined.user.country.id,  # Assuming a profile relationship
+                "country_name": training_joined.user.country.name,  # Assuming a profile relationship
+            },
+            "attendance_status": training_joined.attendance_status,
+            "rating": training_joined.rating,
+            "feedbacks": feedback_data
+        }
 
         # Compile the message based on what was updated
         update_message = ", ".join(update_messages) if update_messages else _("No changes made")
 
-        # Serialize the updated Training_Joined data to return in the response
-        feedback_serializer = TrainingMembershipSerializer(training_joined)
-
         return Response({
-            'status': 1,
-            'message': update_message,
-            'data': feedback_serializer.data
+            "status": 1,
+            "message": update_message,
+            "data": joined_data
         }, status=status.HTTP_200_OK)

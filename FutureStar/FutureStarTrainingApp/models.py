@@ -125,6 +125,7 @@ class Training_Feedback(models.Model):
     training = models.ForeignKey(Training, related_name='feedback', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='feedback', on_delete=models.CASCADE)
     feedback = models.TextField()
+    injuries = models.ManyToManyField(InjuryType, blank=True, related_name="feedback_injuries")  # Add Many-to-Many relationship
     date_created = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
