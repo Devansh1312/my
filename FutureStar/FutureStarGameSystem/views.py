@@ -2229,7 +2229,7 @@ class PlayerSubstitutionAPIView(APIView):
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
         except Lineup.DoesNotExist:
-            return Response({"error": _("Player A not found or not in the correct lineup status.")})
+            return Response({'status': 0, 'message': _('Player A not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve player B (must have status SUBSTITUTE)
         try:
@@ -2241,7 +2241,7 @@ class PlayerSubstitutionAPIView(APIView):
                 lineup_status=Lineup.SUBSTITUTE
             )
         except Lineup.DoesNotExist:
-            return Response({"error": _("Player B not found or not in the correct lineup status.")})
+            return Response({'status': 0, 'message': _('Player B not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Swap positions and update statuses
         player_b.position_1 = player_a.position_1
@@ -2271,7 +2271,8 @@ class PlayerSubstitutionAPIView(APIView):
                 created_by_id=request.user.id
             )
         except IntegrityError as e:
-            return Response({"error": _("Failed to log player substitution."), "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'status': 0, 'message': _('Failed to log player substitution.'), "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
         player_a.save()
         player_b.save()

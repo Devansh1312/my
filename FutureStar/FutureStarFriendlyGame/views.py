@@ -2484,13 +2484,13 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
             # Retrieve player A (must have status ALREADY_IN_LINEUP)
             player_a = FriendlyGameLineup.objects.get(team_id=team_id, game_id=game_id, player_id=player_a_id, lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP)
         except FriendlyGameLineup.DoesNotExist:
-            return Response({"error": _("Player A not found or not in the correct lineup status.")})
+            return Response({'status': 0, 'message': _('Player A not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             # Retrieve player B (must have status SUBSTITUTE)
             player_b = FriendlyGameLineup.objects.get(team_id=team_id, game_id=game_id, player_id=player_b_id, lineup_status=FriendlyGameLineup.SUBSTITUTE)
         except FriendlyGameLineup.DoesNotExist:
-            return Response({"error": _("Player B not found or not in the correct lineup status.")})
+            return Response({'status': 0, 'message': _('Player B not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Swap positions and update statuses
         player_b.position_1 = player_a.position_1
@@ -2517,7 +2517,7 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
                 created_by_id=request.user.id
             )
         except IntegrityError as e:
-            return Response({"error": _("Failed to log player substitution."), "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'status': 0, 'message': _('Failed to log player substitution.'), "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Calculate team goals
         team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(team_id=team_id, game_id=game_id).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
