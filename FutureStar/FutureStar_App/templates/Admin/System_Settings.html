@@ -1,360 +1,281 @@
-{% extends 'base.html' %}
-
-{% load static %}
-{% load sass_tags %}
-
-{% block css %}
+{% extends 'base.html' %} {% load static %} {% load sass_tags %} {% block css %}
 <!-- Plugins css start-->
-<!-- Plugins css Ends-->
-{% endblock %}
-{% block title %}System Settings{% endblock %}
-
-{% block content %}
-{% include "components/loader.html" %}
-
+<!-- Plugins css Ends--> {% endblock %} {% block title %}System Settings{% endblock %} {% block content %} {% include "components/loader.html" %}
 <div class="page-body">
-    <div class="container-fluid">
-        {% include "layouts/breadcrumb.html" %}
-        <div class="card">
-            <form class="form theme-form" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="card-body">
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Basic Website Settings</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    <!-- Website Name (English) -->
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="website_name_english">Website Name (English)</label>
-                                <input class="form-control btn-pill {% if errors.website_name_english %}is-invalid{% endif %}" id="website_name_english" name="website_name_english" type="text" value="{{ system_settings.website_name_english }}" placeholder="Website Name (English)">
-                                {% if errors.website_name_english %}
-                                    <div class="invalid-feedback">{{ errors.website_name_english }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Website Name (Arabic) -->
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="website_name_arabic">Website Name (Arabic)</label>
-                                <input class="form-control btn-pill {% if errors.website_name_arabic %}is-invalid{% endif %}" id="website_name_arabic" name="website_name_arabic" type="text" value="{{ system_settings.website_name_arabic }}" placeholder="Website Name (Arabic)">
-                                {% if errors.website_name_arabic %}
-                                    <div class="invalid-feedback">{{ errors.website_name_arabic }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Phone Number -->
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="phone">Phone Number</label>
-                                <input class="form-control btn-pill {% if errors.phone %}is-invalid{% endif %}" id="phone" name="phone" type="text" value="{{ system_settings.phone }}" placeholder="Phone Number">
-                                {% if errors.phone %}
-                                    <div class="invalid-feedback">{{ errors.phone }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Email Address -->
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="email">Email Address</label>
-                                <input class="form-control btn-pill {% if errors.email %}is-invalid{% endif %}" id="email" name="email" type="email" value="{{ system_settings.email }}" placeholder="Email Address">
-                                {% if errors.email %}
-                                    <div class="invalid-feedback">{{ errors.email }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Address -->
-                    <div class="row">
-                        <div class="col">
-                            <div class="mb-3">
-                                <label class="form-label" for="address">Address</label>
-                                <textarea class="form-control btn-pill" id="address" name="address" rows="3" placeholder="Address">{{ system_settings.address }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Achievements of App (Home Page)</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>                    
-                    <!-- Achivemets of app -->
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="happy_user">Happy User</label>
-                                <input class="form-control btn-pill {% if errors.happy_user %}is-invalid{% endif %}" id="happy_user" name="happy_user" type="text" value="{{ system_settings.happy_user }}" placeholder="Happy User">
-                                {% if errors.happy_user %}
-                                    <div class="invalid-feedback">{{ errors.happy_user }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="line_of_code">Line of code</label>
-                                <input class="form-control btn-pill {% if errors.line_of_code %}is-invalid{% endif %}" id="line_of_code" name="line_of_code" type="text" value="{{ system_settings.line_of_code }}" placeholder="Line of Code">
-                                {% if errors.line_of_code %}
-                                    <div class="invalid-feedback">{{ errors.line_of_code }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="downloads">Number of Downloads</label>
-                                <input class="form-control btn-pill {% if errors.downloads %}is-invalid{% endif %}" id="downloads" name="downloads" type="text" value="{{ system_settings.downloads }}" placeholder="Number of Downloads">
-                                {% if errors.downloads %}
-                                    <div class="invalid-feedback">{{ errors.downloads }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="phone">App Rate</label>
-                                <input class="form-control btn-pill {% if errors.app_rate %}is-invalid{% endif %}" id="app_rate" name="app_rate" type="text" value="{{ system_settings.app_rate }}" placeholder="App Rate">
-                                {% if errors.app_rate %}
-                                    <div class="invalid-feedback">{{ errors.app_rate }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Achievements of App (About Us Page)</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>                    
-                    <!-- Achivemets of app -->
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="years_of_experience">Years of Experience</label>
-                                <input class="form-control btn-pill {% if errors.years_of_experience %}is-invalid{% endif %}" id="years_of_experience" name="years_of_experience" type="text" value="{{ system_settings.years_of_experience }}" placeholder="Years of Experience">
-                                {% if errors.years_of_experience %}
-                                    <div class="invalid-feedback">{{ errors.years_of_experience }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="proffesioan_team_members">Number of Proffesioan Team Members</label>
-                                <input class="form-control btn-pill {% if errors.proffesioan_team_members %}is-invalid{% endif %}" id="proffesioan_team_members" name="proffesioan_team_members" type="text" value="{{ system_settings.proffesioan_team_members }}" placeholder="Number of Proffesioan Team Members">
-                                {% if errors.proffesioan_team_members %}
-                                    <div class="invalid-feedback">{{ errors.proffesioan_team_members }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="project_completed">Number of Project Completed</label>
-                                <input class="form-control btn-pill {% if errors.downloads %}is-invalid{% endif %}" id="project_completed" name="project_completed" type="text" value="{{ system_settings.project_completed }}" placeholder="Number of project completed">
-                                {% if errors.project_completed %}
-                                    <div class="invalid-feedback">{{ errors.project_completed }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="mb-3">
-                                <label class="form-label" for="awards_winning">Number of Awards Winning</label>
-                                <input class="form-control btn-pill {% if errors.awards_winning %}is-invalid{% endif %}" id="awards_winning" name="awards_winning" type="text" value="{{ system_settings.awards_winning }}" placeholder="Number of Awards Winning">
-                                {% if errors.awards_winning %}
-                                    <div class="invalid-feedback">{{ errors.awards_winning }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Website Logo's</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    <!-- Favicon -->
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="fav_icon">Fav Icon (64x64 px)</label>
-                                <input class="form-control btn-pill" id="fav_icon" name="fav_icon" type="file">
-                                {% if system_settings.fav_icon %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-
-                        <!-- Footer Logo -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="footer_logo">Footer Logo (293x66 px)</label>
-                                <input class="form-control btn-pill" id="footer_logo" name="footer_logo" type="file">
-                                {% if system_settings.footer_logo %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.footer_logo }}" alt="Footer Logo" style="width: 121px; height: 35px;">
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Header Logo -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="header_logo">Header Logo (249x56 px)</label>
-                                <input class="form-control btn-pill" id="header_logo" name="header_logo" type="file">
-                                {% if system_settings.header_logo %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.header_logo }}" alt="Header Logo" style="width: 121px; height: 35px;">
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Social Media Link</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    <!-- Social Media Links -->
-                    <div class="row">
-                        <div class="col">
-                            <div class="mb-3">
-                                <label class="form-label" for="instagram">Instagram</label>
-                                <input class="form-control btn-pill" id="instagram" name="instagram" type="text" value="{{ system_settings.instagram }}" placeholder="Instagram URL">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="mb-3">
-                                <label class="form-label" for="facebook">Facebook</label>
-                                <input class="form-control btn-pill" id="facebook" name="facebook" type="text" value="{{ system_settings.facebook }}" placeholder="Facebook URL">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="mb-3">
-                                <label class="form-label" for="twitter">Twitter</label>
-                                <input class="form-control btn-pill" id="twitter" name="twitter" type="text" value="{{ system_settings.twitter }}" placeholder="Twitter URL">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="mb-3">
-                                <label class="form-label" for="linkedin">LinkedIn</label>
-                                <input class="form-control btn-pill" id="linkedin" name="linkedin" type="text" value="{{ system_settings.linkedin }}" placeholder="LinkedIn URL">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="mb-3">
-                                <label class="form-label" for="pinterest">Pinterest</label>
-                                <input class="form-control btn-pill" id="pinterest" name="pinterest" type="text" value="{{ system_settings.pinterest }}" placeholder="Pinterest URL">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Mobile Settings</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    
-                    <!-- Splash Screen -->
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="splash_screen">Splash Screen</label>
-                                <input class="form-control btn-pill" id="splash_screen" name="splash_screen" type="file">
-                                {% if system_settings.splash_screen %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.splash_screen }}" alt="Splash Screen" style="width: 35px; height: 121px;">
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <!-- Intro 1 Image -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="intro1_image">Intro 1 Image</label>
-                                <input class="form-control btn-pill" id="intro1_image" name="intro1_image" type="file">
-                                {% if system_settings.intro1_image %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.intro1_image }}" alt="Intro 1 Image" style="width: 35px; height: 121px;">
-                                {% endif %}
-                            </div>
-                        </div>
-                    
-                        <!-- Intro 2 Image -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="intro2_image">Intro 2 Image</label>
-                                <input class="form-control btn-pill" id="intro2_image" name="intro2_image" type="file">
-                                {% if system_settings.intro2_image %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.intro2_image }}" alt="Intro 2 Image" style="width: 35px; height: 121px;">
-                                {% endif %}
-                            </div>
-                        </div>
-
-                    
-                        <!-- Intro 3 Image -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="intro3_image">Intro 3 Image</label>
-                                <input class="form-control btn-pill" id="intro3_image" name="intro3_image" type="file">
-                                {% if system_settings.intro3_image %}
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.intro3_image }}" alt="Intro 3 Image" style="width: 35px; height: 121px;">
-                                {% endif %}
-                            </div>
-                        </div>
-                    
-                        <!-- Intro 1 Text -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="intro1_text">Intro 1 Text</label>
-                                <input class="form-control btn-pill" id="intro1_text" name="intro1_text" type="text" value="{{ system_settings.intro1_text }}">
-                            </div>
-                        </div>
-                    
-                        <!-- Intro 2 Text -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="intro2_text">Intro 2 Text</label>
-                                <input class="form-control btn-pill" id="intro2_text" name="intro2_text" type="text" value="{{ system_settings.intro2_text }}">
-                            </div>
-                        </div>
-                    
-                        <!-- Intro 3 Text -->
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label class="form-label" for="intro3_text">Intro 3 Text</label>
-                                <input class="form-control btn-pill" id="intro3_text" name="intro3_text" type="text" value="{{ system_settings.intro3_text }}">
-                            </div>
-                        </div>
-                    </div>                    
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Other Settings</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    <!-- Social Media Links -->
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="currency_symbol">Currency Symbol</label>
-                                <input class="form-control btn-pill" id="currency_symbol" name="currency_symbol" type="text" value="{{ system_settings.currency_symbol }}" placeholder="Currency symbol">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="event_convenience_fee">Event Convenience Fee</label>
-                                <input class="form-control btn-pill" id="event_convenience_fee" name="event_convenience_fee" type="text" value="{{ system_settings.event_convenience_fee }}" placeholder="event convenience fee">
-                            </div>
-                            <script>
-                                document.getElementById("event_convenience_fee").addEventListener("input", function (e) {
-                                    // Remove any non-numeric characters
-                                    this.value = this.value.replace(/[^0-9]/g, '');
-                                });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit">Save</button>
-                    <input class="btn btn-light" type="reset" value="Cancel">
-                </div>
-            </form>
+   <div class="container-fluid">
+    <div class="row" style="margin-top: 10px; margin-bottom: 10px ; ">
+        <div class="col-6 col-md-6">
+           <h3>{{breadcrumb.child}}</h3>
         </div>
-    </div>
-</div>
-
+     </div>
+    <div class="card">
+         <form class="form theme-form" method="post" enctype="multipart/form-data"> {% csrf_token %} <div class="card-body">
+               <div class="row mb-3">
+                  <h4 class="col-12">Basic Website Settings</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Website Name (English) -->
+               <div class="row">
+                  <div class="col-12 col-md-6">
+                     <div class="mb-3">
+                        <label class="form-label" for="website_name_english">Website Name (English)</label>
+                        <input class="form-control btn-pill {% if errors.website_name_english %}is-invalid{% endif %}" id="website_name_english" name="website_name_english" type="text" value="{{ system_settings.website_name_english }}" placeholder="Website Name (English)"> {% if errors.website_name_english %} <div class="invalid-feedback">{{ errors.website_name_english }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <!-- Website Name (Arabic) -->
+                  <div class="col-12 col-md-6">
+                     <div class="mb-3">
+                        <label class="form-label" for="website_name_arabic">Website Name (Arabic)</label>
+                        <input class="form-control btn-pill {% if errors.website_name_arabic %}is-invalid{% endif %}" id="website_name_arabic" name="website_name_arabic" type="text" value="{{ system_settings.website_name_arabic }}" placeholder="Website Name (Arabic)"> {% if errors.website_name_arabic %} <div class="invalid-feedback">{{ errors.website_name_arabic }}</div> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <!-- Phone Number -->
+               <div class="row">
+                  <div class="col-12 col-md-6">
+                     <div class="mb-3">
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input class="form-control btn-pill {% if errors.phone %}is-invalid{% endif %}" id="phone" name="phone" type="text" value="{{ system_settings.phone }}" placeholder="Phone Number"> {% if errors.phone %} <div class="invalid-feedback">{{ errors.phone }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <!-- Email Address -->
+                  <div class="col-12 col-md-6">
+                     <div class="mb-3">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input class="form-control btn-pill {% if errors.email %}is-invalid{% endif %}" id="email" name="email" type="email" value="{{ system_settings.email }}" placeholder="Email Address"> {% if errors.email %} <div class="invalid-feedback">{{ errors.email }}</div> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <!-- Address -->
+               <div class="row">
+                  <div class="col-12">
+                     <div class="mb-3">
+                        <label class="form-label" for="address">Address</label>
+                        <textarea class="form-control btn-pill" id="address" name="address" rows="3" placeholder="Address">{{ system_settings.address }}</textarea>
+                     </div>
+                  </div>
+               </div>
+               <div class="row" style="margin-bottom: 10px;">
+                  <h4>Achievements of App (Home Page)</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Achievements of app -->
+               <div class="row">
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="happy_user">Happy User</label>
+                        <input class="form-control btn-pill {% if errors.happy_user %}is-invalid{% endif %}" id="happy_user" name="happy_user" type="text" value="{{ system_settings.happy_user }}" placeholder="Happy User"> {% if errors.happy_user %} <div class="invalid-feedback">{{ errors.happy_user }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="line_of_code">Line of Code</label>
+                        <input class="form-control btn-pill {% if errors.line_of_code %}is-invalid{% endif %}" id="line_of_code" name="line_of_code" type="text" value="{{ system_settings.line_of_code }}" placeholder="Line of Code"> {% if errors.line_of_code %} <div class="invalid-feedback">{{ errors.line_of_code }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="downloads">Number of Downloads</label>
+                        <input class="form-control btn-pill {% if errors.downloads %}is-invalid{% endif %}" id="downloads" name="downloads" type="text" value="{{ system_settings.downloads }}" placeholder="Number of Downloads"> {% if errors.downloads %} <div class="invalid-feedback">{{ errors.downloads }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="phone">App Rate</label>
+                        <input class="form-control btn-pill {% if errors.app_rate %}is-invalid{% endif %}" id="app_rate" name="app_rate" type="text" value="{{ system_settings.app_rate }}" placeholder="App Rate"> {% if errors.app_rate %} <div class="invalid-feedback">{{ errors.app_rate }}</div> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <div class="row" style="margin-bottom: 10px;">
+                  <h4>Achievements of App (About Us Page)</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Achievements of app -->
+               <div class="row">
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="years_of_experience">Years of Experience</label>
+                        <input class="form-control btn-pill {% if errors.years_of_experience %}is-invalid{% endif %}" id="years_of_experience" name="years_of_experience" type="text" value="{{ system_settings.years_of_experience }}" placeholder="Years of Experience"> {% if errors.years_of_experience %} <div class="invalid-feedback">{{ errors.years_of_experience }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="proffesioan_team_members">Number of Professional Team Members</label>
+                        <input class="form-control btn-pill {% if errors.proffesioan_team_members %}is-invalid{% endif %}" id="proffesioan_team_members" name="proffesioan_team_members" type="text" value="{{ system_settings.proffesioan_team_members }}" placeholder="Number of Professional Team Members"> {% if errors.proffesioan_team_members %} <div class="invalid-feedback">{{ errors.proffesioan_team_members }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="project_completed">Number of Projects Completed</label>
+                        <input class="form-control btn-pill {% if errors.downloads %}is-invalid{% endif %}" id="project_completed" name="project_completed" type="text" value="{{ system_settings.project_completed }}" placeholder="Number of Projects Completed"> {% if errors.project_completed %} <div class="invalid-feedback">{{ errors.project_completed }}</div> {% endif %}
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                     <div class="mb-3">
+                        <label class="form-label" for="awards_winning">Number of Awards Won</label>
+                        <input class="form-control btn-pill {% if errors.awards_winning %}is-invalid{% endif %}" id="awards_winning" name="awards_winning" type="text" value="{{ system_settings.awards_winning }}" placeholder="Number of Awards Won"> {% if errors.awards_winning %} <div class="invalid-feedback">{{ errors.awards_winning }}</div> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <div class="row" style="margin-bottom: 10px;">
+                  <h4>Website Logos</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Favicon -->
+               <div class="row">
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="fav_icon">Fav Icon (64x64 px)</label>
+                        <input class="form-control btn-pill" id="fav_icon" name="fav_icon" type="file"> {% if system_settings.fav_icon %} <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;"> {% endif %}
+                     </div>
+                  </div>
+                  <!-- Footer Logo -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="footer_logo">Footer Logo (293x66 px)</label>
+                        <input class="form-control btn-pill" id="footer_logo" name="footer_logo" type="file"> {% if system_settings.footer_logo %} <img src="{{ MEDIA_URL }}{{ system_settings.footer_logo }}" alt="Footer Logo" style="width: 121px; height: 35px;"> {% endif %}
+                     </div>
+                  </div>
+                  <!-- Header Logo -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="header_logo">Header Logo (249x56 px)</label>
+                        <input class="form-control btn-pill" id="header_logo" name="header_logo" type="file"> {% if system_settings.header_logo %} <img src="{{ MEDIA_URL }}{{ system_settings.header_logo }}" alt="Header Logo" style="width: 121px; height: 35px;"> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <div class="row" style="margin-bottom: 10px;">
+                  <h4>Social Media Link</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Social Media Links -->
+               <div class="row">
+                  <div class="col-12 col-md">
+                     <div class="mb-3">
+                        <label class="form-label" for="instagram">Instagram</label>
+                        <input class="form-control btn-pill" id="instagram" name="instagram" type="text" value="{{ system_settings.instagram }}" placeholder="Instagram URL">
+                     </div>
+                  </div>
+                  <div class="col-12 col-md">
+                     <div class="mb-3">
+                        <label class="form-label" for="facebook">Facebook</label>
+                        <input class="form-control btn-pill" id="facebook" name="facebook" type="text" value="{{ system_settings.facebook }}" placeholder="Facebook URL">
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-12 col-md">
+                     <div class="mb-3">
+                        <label class="form-label" for="twitter">Twitter</label>
+                        <input class="form-control btn-pill" id="twitter" name="twitter" type="text" value="{{ system_settings.twitter }}" placeholder="Twitter URL">
+                     </div>
+                  </div>
+                  <div class="col-12 col-md">
+                     <div class="mb-3">
+                        <label class="form-label" for="linkedin">LinkedIn</label>
+                        <input class="form-control btn-pill" id="linkedin" name="linkedin" type="text" value="{{ system_settings.linkedin }}" placeholder="LinkedIn URL">
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-12">
+                     <div class="mb-3">
+                        <label class="form-label" for="pinterest">Pinterest</label>
+                        <input class="form-control btn-pill" id="pinterest" name="pinterest" type="text" value="{{ system_settings.pinterest }}" placeholder="Pinterest URL">
+                     </div>
+                  </div>
+               </div>
+               <div class="row" style="margin-bottom: 10px;">
+                  <h4>Mobile Settings</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Splash Screen -->
+               <div class="row">
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="splash_screen">Splash Screen</label>
+                        <input class="form-control btn-pill" id="splash_screen" name="splash_screen" type="file"> {% if system_settings.splash_screen %} <img src="{{ MEDIA_URL }}{{ system_settings.splash_screen }}" alt="Splash Screen" style="width: 35px; height: 121px;"> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <!-- Intro 1 Image -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="intro1_image">Intro 1 Image</label>
+                        <input class="form-control btn-pill" id="intro1_image" name="intro1_image" type="file"> {% if system_settings.intro1_image %} <img src="{{ MEDIA_URL }}{{ system_settings.intro1_image }}" alt="Intro 1 Image" style="width: 35px; height: 121px;"> {% endif %}
+                     </div>
+                  </div>
+                  <!-- Intro 2 Image -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="intro2_image">Intro 2 Image</label>
+                        <input class="form-control btn-pill" id="intro2_image" name="intro2_image" type="file"> {% if system_settings.intro2_image %} <img src="{{ MEDIA_URL }}{{ system_settings.intro2_image }}" alt="Intro 2 Image" style="width: 35px; height: 121px;"> {% endif %}
+                     </div>
+                  </div>
+                  <!-- Intro 3 Image -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="intro3_image">Intro 3 Image</label>
+                        <input class="form-control btn-pill" id="intro3_image" name="intro3_image" type="file"> {% if system_settings.intro3_image %} <img src="{{ MEDIA_URL }}{{ system_settings.intro3_image }}" alt="Intro 3 Image" style="width: 35px; height: 121px;"> {% endif %}
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <!-- Intro 1 Text -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="intro1_text">Intro 1 Text</label>
+                        <input class="form-control btn-pill" id="intro1_text" name="intro1_text" type="text" value="{{ system_settings.intro1_text }}">
+                     </div>
+                  </div>
+                  <!-- Intro 2 Text -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="intro2_text">Intro 2 Text</label>
+                        <input class="form-control btn-pill" id="intro2_text" name="intro2_text" type="text" value="{{ system_settings.intro2_text }}">
+                     </div>
+                  </div>
+                  <!-- Intro 3 Text -->
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="intro3_text">Intro 3 Text</label>
+                        <input class="form-control btn-pill" id="intro3_text" name="intro3_text" type="text" value="{{ system_settings.intro3_text }}">
+                     </div>
+                  </div>
+               </div>
+               <div class="row" style="margin-bottom: 10px;">
+                  <h4>Other Settings</h4>
+               </div>
+               <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+               <!-- Social Media Links -->
+               <div class="row">
+                  <div class="col-12 col-md-6">
+                     <div class="mb-3">
+                        <label class="form-label" for="currency_symbol">Currency Symbol</label>
+                        <input class="form-control btn-pill" id="currency_symbol" name="currency_symbol" type="text" value="{{ system_settings.currency_symbol }}" placeholder="Currency symbol">
+                     </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                     <div class="mb-3">
+                        <label class="form-label" for="event_convenience_fee">Event Convenience Fee</label>
+                        <input class="form-control btn-pill" id="event_convenience_fee" name="event_convenience_fee" type="text" value="{{ system_settings.event_convenience_fee }}" placeholder="event convenience fee">
+                     </div>
+                     <script>
+                        document.getElementById("event_convenience_fee").addEventListener("input", function(e) {
+                           // Remove any non-numeric characters
+                           this.value = this.value.replace(/[^0-9]/g, '');
+                        });
+                     </script>
+                  </div>
+               </div>
+            </div>
+            <div class="card-footer text-end">
+               <button class="btn btn-primary" type="submit">Save</button>
+               <input class="btn btn-light" type="reset" value="Cancel">
+            </div>
+         </form>
+      </div>
+   </div>
+</div> 
 {% endblock %}

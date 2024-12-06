@@ -12,23 +12,21 @@
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
-               <h3>{{breadcrumb.child}}</h3>
-            </div>
-            <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addInjuryTypeModal">Add InjuryType</button>
-               </ol>
+            <div class="col-12 d-flex justify-content-between align-items-center">
+               <h3 class="text-truncate">{{breadcrumb.child}}</h3>
+               <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addInjuryTypeModal">
+                  Add InjuryType
+               </button>
             </div>
          </div>
       </div>
       <div class="row">
          <!-- InjuryType List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
+                     <table class="table table-bordered table-hover" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -78,7 +76,7 @@
 
 <!-- Add InjuryType Modal -->
 <div class="modal fade" id="addInjuryTypeModal" tabindex="-1" aria-labelledby="addInjuryTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addInjuryTypeModalLabel">Add InjuryType</h5>
@@ -96,7 +94,7 @@
                   <input type="text" class="form-control" id="name_ar" name="name_ar" placeholder="Enter Arabic Injury Type">
                   <div id="addInjuryTypeArError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Add InjuryType</button>
+               <button type="submit" class="btn btn-primary w-100">Add InjuryType</button>
             </form>
          </div>
       </div>
@@ -105,7 +103,7 @@
 
 <!-- Edit InjuryType Modal -->
 <div class="modal fade" id="editInjuryTypeModal" tabindex="-1" aria-labelledby="editInjuryTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editInjuryTypeModalLabel">Edit InjuryType</h5>
@@ -124,7 +122,7 @@
                   <input type="text" class="form-control" id="editName_ar" name="name_ar" placeholder="Enter Arabic Injury Type">
                   <div id="editInjuryTypeArError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update InjuryType</button>
+               <button type="submit" class="btn btn-primary w-100">Update InjuryType</button>
             </form>
          </div>
       </div>
@@ -133,7 +131,7 @@
 
 <!-- Delete InjuryType Modal -->
 <div class="modal fade" id="deleteInjuryTypeModal" tabindex="-1" aria-labelledby="deleteInjuryTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteInjuryTypeModalLabel">Delete InjuryType</h5>
@@ -142,13 +140,14 @@
          <div class="modal-body">
             <form method="post" action="{% url 'injurytype_delete' pk=0 %}" id="deleteInjuryTypeForm"> {% csrf_token %}
                <input type="hidden" id="deleteInjuryTypeId" name="id">
-               <p>Are you sure you want to delete this injurytype?</p>
-               <button type="submit" class="btn btn-danger">Delete InjuryType</button>
+               <p class="text-center">Are you sure you want to delete this injurytype?</p>
+               <button type="submit" class="btn btn-danger w-100">Delete InjuryType</button>
             </form>
          </div>
       </div>
    </div>
 </div>
+
 {% endblock %}
 {% block scriptcontent %}
 <!-- Plugins JS start-->

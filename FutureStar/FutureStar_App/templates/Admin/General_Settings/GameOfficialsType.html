@@ -12,24 +12,19 @@
    <div class="container-fluid">
       <div class="page-title">
          <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                <h3>{{breadcrumb.child}}</h3>
             </div>
-            <!-- <div class="col-6">
-               <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x ml-auto" data-bs-toggle="modal" data-bs-target="#addGameOfficialsTypeModal">Add GameOfficialsType</button>
-               </ol>
-            </div> -->
          </div>
       </div>
       <div class="row">
          <!-- GameOfficialsType List -->
-         <div class="col-sm-12">
+         <div class="col-12">
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="display" id="basic-1">
-                        <thead>
+                     <table class="table table-striped table-bordered" id="basic-1">
+                        <thead class="thead-light">
                            <tr>
                               <th>No.</th>
                               <th>Game Officials Type (English)</th>
@@ -56,10 +51,6 @@
                                              <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editGameOfficialsTypeModal" data-gameofficialstype-id="{{ gameofficialstype.id }}" data-gameofficialstype-name-en="{{ gameofficialstype.name_en }}" data-gameofficialstype-name-ar="{{ gameofficialstype.name_ar }}">
                                                  Edit </a>
                                           </li>
-                                          <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteGameOfficialsTypeModal" data-gameofficialstype-id="{{ gameofficialstype.id }}">
-                                                 Delete </a>
-                                          </li> -->
                                        </ul>
                                     </div>
                                  </div>
@@ -78,7 +69,7 @@
 
 <!-- Add GameOfficialsType Modal -->
 <div class="modal fade" id="addGameOfficialsTypeModal" tabindex="-1" aria-labelledby="addGameOfficialsTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="addGameOfficialsTypeModalLabel">Add GameOfficialsType</h5>
@@ -105,7 +96,7 @@
 
 <!-- Edit GameOfficialsType Modal -->
 <div class="modal fade" id="editGameOfficialsTypeModal" tabindex="-1" aria-labelledby="editGameOfficialsTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editGameOfficialsTypeModalLabel">Edit GameOfficialsType</h5>
@@ -133,7 +124,7 @@
 
 <!-- Delete GameOfficialsType Modal -->
 <div class="modal fade" id="deleteGameOfficialsTypeModal" tabindex="-1" aria-labelledby="deleteGameOfficialsTypeModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="deleteGameOfficialsTypeModalLabel">Delete GameOfficialsType</h5>
@@ -149,6 +140,7 @@
       </div>
    </div>
 </div>
+
 {% endblock %}
 {% block scriptcontent %}
 <!-- Plugins JS start-->

@@ -1,7 +1,7 @@
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django import views
-from .forms import *
+from FutureStar_App.forms import *
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -6149,21 +6149,30 @@ class BranchDetailView(LoginRequiredMixin, View):
             total_games = (friendly_games_as_team_a | friendly_games_as_team_b).count()
 
             total_wins = (friendly_games_as_team_a.filter(finish=True, winner_id=branch.id) |
-                          friendly_games_as_team_b.filter(finish=True, winner_id=branch.id)).count()
+                        friendly_games_as_team_b.filter(finish=True, winner_id=branch.id)).count()
 
             total_losses = (friendly_games_as_team_a.filter(finish=True, loser_id=branch.id) |
                             friendly_games_as_team_b.filter(finish=True, loser_id=branch.id)).count()
 
             total_draws = (friendly_games_as_team_a.filter(finish=True, is_draw=True) |
-                           friendly_games_as_team_b.filter(finish=True, is_draw=True)).count()
+                        friendly_games_as_team_b.filter(finish=True, is_draw=True)).count()
 
             # Goals scored in friendly games (count goals for both teams)
             total_goals_team_a = friendly_games_as_team_a.aggregate(total_goals=Sum('team_a_goal'))['total_goals'] or 0
             total_goals_team_b = friendly_games_as_team_b.aggregate(total_goals=Sum('team_b_goal'))['total_goals'] or 0
             total_goals = total_goals_team_a + total_goals_team_b
 
-            # Assists (assuming assists are tracked in your models, if not, set to 0)
-            total_assists = 0  # Placeholder if no assists field is available
+            # Now, calculate conceded goals
+            conceded_goals = (games.aggregate(
+                total_conceded=Sum(
+                    Case(
+                        When(team_a=branch, then='team_b_goal'),
+                        When(team_b=branch, then='team_a_goal'),
+                        default=0,
+                        output_field=IntegerField()
+                    )
+                )
+            )['total_conceded']) or 0
 
             # Now, also calculate for TournamentGames (both as team_a and team_b)
             tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch)
@@ -6172,13 +6181,13 @@ class BranchDetailView(LoginRequiredMixin, View):
             total_games_tournament = games.count()
 
             total_wins_tournament = (tournament_games_as_team_a.filter(finish=True, winner_id=branch.id) |
-                                     tournament_games_as_team_b.filter(finish=True, winner_id=branch.id)).count()
+                                    tournament_games_as_team_b.filter(finish=True, winner_id=branch.id)).count()
 
             total_losses_tournament = (tournament_games_as_team_a.filter(finish=True, loser_id=branch.id) |
-                                       tournament_games_as_team_b.filter(finish=True, loser_id=branch.id)).count()
+                                    tournament_games_as_team_b.filter(finish=True, loser_id=branch.id)).count()
 
             total_draws_tournament = (tournament_games_as_team_a.filter(finish=True, is_draw=True) |
-                                      tournament_games_as_team_b.filter(finish=True, is_draw=True)).count()
+                                    tournament_games_as_team_b.filter(finish=True, is_draw=True)).count()
 
             total_goals_tournament_team_a = tournament_games_as_team_a.aggregate(total_goals=Sum('team_a_goal'))['total_goals'] or 0
             total_goals_tournament_team_b = tournament_games_as_team_b.aggregate(total_goals=Sum('team_b_goal'))['total_goals'] or 0
@@ -6190,7 +6199,7 @@ class BranchDetailView(LoginRequiredMixin, View):
             total_losses_combined = total_losses + total_losses_tournament
             total_draws_combined = total_draws + total_draws_tournament
             total_goals_combined = total_goals + total_goals_tournament
-            total_assists_combined = total_assists  # Combine assists if applicable
+            total_conceded_goals = conceded_goals  # Combined conceded goals
 
             member_count = staff_members.count() + players.count()
             tournament_count = tournaments.count()
@@ -6210,10 +6219,11 @@ class BranchDetailView(LoginRequiredMixin, View):
                 'total_losses': total_losses_combined,
                 'total_draws': total_draws_combined,
                 'total_goals': total_goals_combined,
-                'total_assists': total_assists_combined,
+                'total_conceded_goals': total_conceded_goals,
             }
         except TeamBranch.DoesNotExist:
             raise ValueError("Branch not found")
+
         
     def get(self, request):
         branch_id = request.GET.get('team_id')
