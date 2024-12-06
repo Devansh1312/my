@@ -3120,7 +3120,6 @@ class FriendlyGameUniformColorAPIView(APIView):
             secondary_color_player = validated_data['secondary_color_player']
             primary_color_goalkeeper = validated_data['primary_color_goalkeeper']
             secondary_color_goalkeeper = validated_data['secondary_color_goalkeeper']
-            print(team_id)
             if not self._has_access(request.user, team_id):
                 return Response({
                     'status': 0,
