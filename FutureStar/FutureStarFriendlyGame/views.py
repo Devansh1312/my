@@ -83,6 +83,8 @@ class CreateFriendlyGame(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
+        # Check if user has the correct role
         if request.user.role.id not in [3, 6]:
             return Response({
                 'status': 0,
@@ -90,6 +92,7 @@ class CreateFriendlyGame(APIView):
                 'data': {}
             }, status=status.HTTP_403_FORBIDDEN)
 
+        # Validate game_field_id
         game_field_id = request.data.get('game_field_id', None)
         if not game_field_id:
             return Response({
@@ -107,6 +110,7 @@ class CreateFriendlyGame(APIView):
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Validate and create FriendlyGame
         serializer = FriendlyGameSerializer(data=request.data)
         if serializer.is_valid():
             team_a_id = request.data.get('team_a')
@@ -126,8 +130,7 @@ class CreateFriendlyGame(APIView):
                     'message': _('Team B cannot be the same as Team A.'),
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Catch IntegrityError during save operation
+
             try:
                 friendly_game = serializer.save(
                     team_a_id=team_a_id, 
@@ -135,6 +138,25 @@ class CreateFriendlyGame(APIView):
                     game_field_id=game_field,
                     created_by=request.user
                 )
+
+                # Process requested referees
+                referees_data = request.data.get('referees', [])
+                for referee_data in referees_data:
+                    user_id = referee_data.get('user_id')
+                    fees = referee_data.get('fees', 0)
+
+                    if fees and int(fees) > 0:  # Only create entry if fees > 0
+                        try:
+                            RequestedReferee.objects.create(
+                                game_id=friendly_game,
+                                user_id_id=user_id,
+                                fees=fees,
+                                status=RequestedReferee.REQUESTED
+                            )
+                        except Exception as e:
+                            # Log or handle any specific errors (like invalid user_id)
+                            continue
+
                 return Response({
                     'status': 1,
                     'message': _('Friendly game created successfully.'),
@@ -149,9 +171,10 @@ class CreateFriendlyGame(APIView):
 
         return Response({
             'status': 0,
-            'message': 'Invalid data.',
+            'message': _('Invalid data.'),
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
     
