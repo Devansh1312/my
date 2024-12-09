@@ -2375,7 +2375,8 @@ class FetchAllGamesAPIView(APIView):
 
         # Group games by date
         games_by_date = {}
-        
+
+        # Process tournament games
         for game in tournament_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
             if date_str not in games_by_date:
@@ -2406,9 +2407,10 @@ class FetchAllGamesAPIView(APIView):
                 "is_draw": game.is_draw,
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
-                "game_type":"Tournament",
+                "game_type": "Tournament",
             })
         
+        # Process friendly games
         for game in friendly_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
             if date_str not in games_by_date:
@@ -2437,21 +2439,22 @@ class FetchAllGamesAPIView(APIView):
                 "is_draw": game.is_draw,
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
-                "game_type":"Friendly",
+                "game_type": "Friendly",
             })
-        
+
         # Format the response
-        response_data = []
-        for date, games in games_by_date.items():
-            response_data.append({
+        response_data = {
+            date: {
                 "date": date,
                 "tournament_games": games["tournament_games"],
                 "friendly_games": games["friendly_games"],
-            })
-        
+            }
+            for date, games in games_by_date.items()
+        }
+
         # Pagination
         page = int(request.GET.get("page", 1))
-        page_size = 10
+        page_size = 2  # You can adjust this as needed
         total_records = len(response_data)
         total_pages = (total_records + page_size - 1) // page_size
         start = (page - 1) * page_size
@@ -2463,8 +2466,9 @@ class FetchAllGamesAPIView(APIView):
             "total_records": total_records,
             "total_pages": total_pages,
             "current_page": page,
-            "data": response_data[start:end],
+            "data": response_data,  # Return the data as an object (not a list)
         })
+
 
 
 ############################ Tournaments Game Stats  API ########################################
