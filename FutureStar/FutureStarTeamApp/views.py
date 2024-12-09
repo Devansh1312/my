@@ -20,9 +20,11 @@ from django.db import IntegrityError
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count,Sum,Q,When,Case
-
+from FutureStar.firebase_config import send_push_notification
+# FutureStar\firebase_config.py
 from FutureStarGameSystem.models import *
 from FutureStarTournamentApp.models import *
+from firebase_admin import messaging
 
 
 ################################################################## TEAM API ###############################################################################################
@@ -163,7 +165,6 @@ class TeamViewAPI(APIView):
 
     def put(self, request):
         team_id = request.data.get('created_by_id')
-        print(team_id)
         user = request.user
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -176,9 +177,7 @@ class TeamViewAPI(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            print(team_id)
             team_instance = Team.objects.get(id=team_id, team_founder=request.user)
-            print(team_instance)
         except Team.DoesNotExist:
             return Response({
                 'status': 0, 
@@ -617,7 +616,7 @@ class StaffManagementView(APIView):
             }
         }
         return Response(response_data, status=status.HTTP_200_OK)
-
+    
     def post(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -633,7 +632,6 @@ class StaffManagementView(APIView):
                 'message': _('branch_id, user_id, and joinning_type are required')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Convert joinning_type to an integer and validate it
         try:
             joinning_type = int(joinning_type)
         except (ValueError, TypeError):
@@ -642,7 +640,6 @@ class StaffManagementView(APIView):
                 'message': _('Please provide a valid joining type')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate joinning_type to accept only values 1, 2, 3, or 4
         if joinning_type not in [1, 2, 3, 4]:
             return Response({
                 'status': 0,
@@ -651,36 +648,44 @@ class StaffManagementView(APIView):
 
         try:
             with transaction.atomic():
-                # Retrieve the user
                 user = User.objects.get(id=user_id)
                 success_message = ''
 
-                # Check if joining as MANAGERIAL_STAFF and update the role if current role is 5
+                # Role assignment logic based on joinning_type
                 if joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE and user.role_id == 5:
                     user.role_id = 6
                     user.save()
                     success_message = _('Manager added successfully, and user role updated to manager.')
 
-                # Check if joining as PLAYER_TYPE and update the role to 2
                 elif joinning_type == JoinBranch.PLAYER_TYPE:
                     user.role_id = 2
                     user.save()
                     success_message = _('Player added successfully, and user role updated to player.')
 
-                # Set success message for other staff types
                 elif joinning_type in [JoinBranch.COACH_STAFF_TYPE, JoinBranch.MEDICAL_STAFF_TYPE]:
                     success_message = _('Staff added successfully.')
 
-                # Prepare and save JoinBranch data
                 join_branch_data = {
                     'branch_id': branch_id,
                     'user_id': user_id,
                     'joinning_type': joinning_type
                 }
                 serializer = JoinBranchSerializer(data=join_branch_data)
-                
+
                 if serializer.is_valid():
                     serializer.save()
+
+                    # Sending Push Notification logic
+                    title = _('Welcome to the branch!')
+                    body = success_message
+                    device_token = user.device_token
+                    device_type = user.device_type
+                    print(f"Device Token: {device_token}, Device Type: {device_type}")
+
+                    # Ensure the user has a valid device token and device type (1 for Android, 2 for iOS)
+                    if device_token and device_type in [1, 2]:
+                        send_push_notification(device_token, title, body, device_type)
+
                     return Response({
                         'status': 1,
                         'message': success_message,
@@ -703,6 +708,93 @@ class StaffManagementView(APIView):
                 'status': 0,
                 'message': _('User has already joined this branch.')
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+    # def post(self, request):
+    #     language = request.headers.get('Language', 'en')
+    #     if language in ['en', 'ar']:
+    #         activate(language)
+
+    #     branch_id = request.data.get('branch_id')
+    #     user_id = request.data.get('user_id')
+    #     joinning_type = request.data.get('joinning_type')
+
+    #     if not branch_id or not user_id or joinning_type is None:
+    #         return Response({
+    #             'status': 0, 
+    #             'message': _('branch_id, user_id, and joinning_type are required')
+    #         }, status=status.HTTP_400_BAD_REQUEST)
+
+    #     # Convert joinning_type to an integer and validate it
+    #     try:
+    #         joinning_type = int(joinning_type)
+    #     except (ValueError, TypeError):
+    #         return Response({
+    #             'status': 0,
+    #             'message': _('Please provide a valid joining type')
+    #         }, status=status.HTTP_400_BAD_REQUEST)
+
+    #     # Validate joinning_type to accept only values 1, 2, 3, or 4
+    #     if joinning_type not in [1, 2, 3, 4]:
+    #         return Response({
+    #             'status': 0,
+    #             'message': _('Please provide a valid joining type.')
+    #         }, status=status.HTTP_400_BAD_REQUEST)
+
+    #     try:
+    #         with transaction.atomic():
+    #             # Retrieve the user
+    #             user = User.objects.get(id=user_id)
+    #             success_message = ''
+
+    #             # Check if joining as MANAGERIAL_STAFF and update the role if current role is 5
+    #             if joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE and user.role_id == 5:
+    #                 user.role_id = 6
+    #                 user.save()
+    #                 success_message = _('Manager added successfully, and user role updated to manager.')
+
+    #             # Check if joining as PLAYER_TYPE and update the role to 2
+    #             elif joinning_type == JoinBranch.PLAYER_TYPE:
+    #                 user.role_id = 2
+    #                 user.save()
+    #                 success_message = _('Player added successfully, and user role updated to player.')
+
+    #             # Set success message for other staff types
+    #             elif joinning_type in [JoinBranch.COACH_STAFF_TYPE, JoinBranch.MEDICAL_STAFF_TYPE]:
+    #                 success_message = _('Staff added successfully.')
+
+    #             # Prepare and save JoinBranch data
+    #             join_branch_data = {
+    #                 'branch_id': branch_id,
+    #                 'user_id': user_id,
+    #                 'joinning_type': joinning_type
+    #             }
+    #             serializer = JoinBranchSerializer(data=join_branch_data)
+                
+    #             if serializer.is_valid():
+    #                 serializer.save()
+    #                 return Response({
+    #                     'status': 1,
+    #                     'message': success_message,
+    #                     'data': serializer.data
+    #                 }, status=status.HTTP_201_CREATED)
+    #             else:
+    #                 return Response({
+    #                     'status': 0,
+    #                     'message': _('Failed to add staff/player.'),
+    #                     'errors': serializer.errors
+    #                 }, status=status.HTTP_400_BAD_REQUEST)
+
+    #     except User.DoesNotExist:
+    #         return Response({
+    #             'status': 0,
+    #             'message': _('User not found.')
+    #         }, status=status.HTTP_404_NOT_FOUND)
+    #     except IntegrityError:
+    #         return Response({
+    #             'status': 0,
+    #             'message': _('User has already joined this branch.')
+    #         }, status=status.HTTP_400_BAD_REQUEST)
 
 
 

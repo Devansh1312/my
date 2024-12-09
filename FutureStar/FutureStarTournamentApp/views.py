@@ -2365,39 +2365,33 @@ class FetchAllGamesAPIView(APIView):
             activate(language)
         user = request.user
 
-        # Ensure user is authenticated
         if not user.is_authenticated:
             return Response({"status": 0, "message": "User is not authenticated."})
 
-        # Fetch all tournament and friendly games
         tournament_games = TournamentGames.objects.all()
         friendly_games = FriendlyGame.objects.all()
 
-        # Group games by date
         games_by_date = {}
 
         # Process tournament games
         for game in tournament_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
             if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament": [], "friendly_games": []}
+                games_by_date[date_str] = {"tournament": []}
 
             tournament_name = game.tournament_id.tournament_name if game.tournament_id else "Unknown Tournament"
             
-            # Check if the tournament entry exists
             tournament_entry = next(
                 (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == tournament_name),
                 None
             )
             if not tournament_entry:
-                # Create a new tournament entry if not found
                 tournament_entry = {
                     "tournament_name": tournament_name,
                     "games": []
                 }
                 games_by_date[date_str]["tournament"].append(tournament_entry)
 
-            # Add the game to the tournament's games list
             tournament_entry["games"].append({
                 "id": game.id,
                 "tournament_id": game.tournament_id.id if game.tournament_id else None,
@@ -2426,12 +2420,24 @@ class FetchAllGamesAPIView(APIView):
                 "game_type": "Tournament",
             })
 
-        # Process friendly games
+        # Process friendly games as a pseudo-tournament
         for game in friendly_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
             if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament": [], "friendly_games": []}
-            games_by_date[date_str]["friendly_games"].append({
+                games_by_date[date_str] = {"tournament": []}
+            
+            friendly_tournament_entry = next(
+                (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == "Friendly Games"),
+                None
+            )
+            if not friendly_tournament_entry:
+                friendly_tournament_entry = {
+                    "tournament_name": "Friendly Games",
+                    "games": []
+                }
+                games_by_date[date_str]["tournament"].append(friendly_tournament_entry)
+
+            friendly_tournament_entry["games"].append({
                 "id": game.id,
                 "game_number": game.game_number,
                 "game_date": str(game.game_date),
@@ -2458,21 +2464,25 @@ class FetchAllGamesAPIView(APIView):
                 "game_type": "Friendly",
             })
 
+        # Sort the games by date (latest first)
+        sorted_games_by_date = dict(sorted(
+            games_by_date.items(),
+            key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
+            reverse=True
+        ))
+
         # Format the response
-        # Format the response as a list of dictionaries
         response_data = [
             {
                 "date": date,
                 "tournament": games["tournament"],
-                "friendly_games": games["friendly_games"],
             }
-            for date, games in games_by_date.items()
+            for date, games in sorted_games_by_date.items()
         ]
-
 
         # Pagination
         page = int(request.GET.get("page", 1))
-        page_size = 2  # You can adjust this as needed
+        page_size = 10  # Adjust as needed
         total_records = len(response_data)
         total_pages = (total_records + page_size - 1) // page_size
         start = (page - 1) * page_size
@@ -2484,7 +2494,7 @@ class FetchAllGamesAPIView(APIView):
             "total_records": total_records,
             "total_pages": total_pages,
             "current_page": page,
-            "data": response_data,
+            "data": response_data[start:end],
         })
 
 ############################ Tournaments Game Stats  API ########################################
