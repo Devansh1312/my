@@ -1942,9 +1942,9 @@ class PlayerGameStatsAPIView(APIView):
             'message': _('Stats updated and lineup fetched successfully.'),
             'data': {
                 'game_id': game_instance.id,
+                'tournament_id': tournament_id,
                 'tournament_logo': tournament.logo.url if tournament.logo else None,
                 'tournament_name': tournament.tournament_name,
-                'tournament_name':tournament_id.tournament_name,
                 'goals': {
                     'team_a_id': game_instance.team_a.id,
                     'team_a_name': game_instance.team_a.team_name,
