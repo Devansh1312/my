@@ -185,6 +185,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_coach = models.BooleanField(default=False)
     is_referee = models.BooleanField(default=False)
 
+    current_language = models.CharField(max_length=10, blank=True,null=True,default="en")
+
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 

@@ -564,7 +564,7 @@ class PlayerListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=2)  
+        users = User.objects.filter(role_id=2).order_by('-id')  # Order by latest created first  
         roles = Role.objects.filter(id=2)
         return render(
             request,
@@ -584,7 +584,7 @@ class CoachListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=3)  # Fetch users where role_id is 3
+        users = User.objects.filter(role_id=3).order_by('-id')  # Order by latest created first  # Fetch users where role_id is 3
         roles = Role.objects.filter(id=3)  # Fetch roles with id 3
         return render(
             request,
@@ -604,7 +604,7 @@ class RefereeListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=4)  # Fetch users where role_id is 2
+        users = User.objects.filter(role_id=4).order_by('-id')  # Order by latest created first  # Fetch users where role_id is 2
         roles = Role.objects.filter(id=4)  # Fetch roles with id 2
         return render(
             request,
@@ -626,7 +626,7 @@ class ManagerListView(LoginRequiredMixin, View):
         User = get_user_model()
 
         # Fetch all managers with role_id = 6
-        managers = User.objects.filter(role_id=6)
+        managers = User.objects.filter(role_id=6).order_by('-id')
 
         # Get all managerial staff entries
         managerial_staff = JoinBranch.objects.filter(

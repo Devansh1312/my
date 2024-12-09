@@ -133,6 +133,7 @@ def get_user_data(user, request):
         'cover_photo': user.card_header.url if user.card_header else None,
         'device_type': user.device_type,
         'device_token': user.device_token,
+        'current_language': user.current_language,
     }
 
 
