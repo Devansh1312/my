@@ -152,6 +152,52 @@ class CreateFriendlyGame(APIView):
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
+    
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Get the game_id from query parameters
+        game_id = request.query_params.get('game_id')
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the friendly game using the game_id
+            friendly_game = FriendlyGame.objects.select_related('team_a', 'team_b', 'game_field_id').get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Friendly game not found.'),
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Prepare custom response data
+        data = {
+            "game_number":friendly_game.game_number,
+            "team_a_id": friendly_game.team_a.id if friendly_game.team_a else None,
+            "team_a_name": friendly_game.team_a.team_name if friendly_game.team_a else None,
+            "team_b_id": friendly_game.team_b.id if friendly_game.team_b else None,
+            "team_b_name": friendly_game.team_b.team_name if friendly_game.team_b else None,
+            "start_time": str(friendly_game.game_start_time) if friendly_game.game_start_time else None,
+            "end_time": str(friendly_game.game_end_time) if friendly_game.game_end_time else None,
+            "start_date": str(friendly_game.game_date) if friendly_game.game_date else None,
+            "game_field_id": friendly_game.game_field_id.id,
+            "game_field_name": friendly_game.game_field_id.field_name,
+        }
+
+        return Response({
+            'status': 1,
+            'message': _('Friendly game fetched successfully.'),
+            'data': data
+        }, status=status.HTTP_200_OK)
+
 class UpdateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
