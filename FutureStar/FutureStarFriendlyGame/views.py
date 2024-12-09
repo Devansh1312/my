@@ -425,6 +425,8 @@ class FriendlyGameDetailAPIView(APIView):
             activate(language)
         
         game_id = request.query_params.get('game_id')
+        game_id=int(game_id)
+      
         if not game_id:
             return Response({
                 'status': 0,
