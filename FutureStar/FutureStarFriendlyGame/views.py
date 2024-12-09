@@ -373,7 +373,7 @@ class SearchOfficialView(APIView):
         
         # Get phone as a string, not converting to integer
         phone = request.query_params.get('phone', '')
-        print(f"Incoming phone parameter: {phone}")
+       
         
         role_id = 4  # Role 4 for referees
         
