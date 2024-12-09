@@ -2369,7 +2369,7 @@ class FetchAllGamesAPIView(APIView):
         if not user.is_authenticated:
             return Response({"status": 0, "message": "User is not authenticated."})
 
-        # Fetch all tournament and friendly games (no filter by user teams)
+        # Fetch all tournament and friendly games
         tournament_games = TournamentGames.objects.all()
         friendly_games = FriendlyGame.objects.all()
 
@@ -2380,11 +2380,27 @@ class FetchAllGamesAPIView(APIView):
         for game in tournament_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
             if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament_games": [], "friendly_games": []}
-            games_by_date[date_str]["tournament_games"].append({
+                games_by_date[date_str] = {"tournament": [], "friendly_games": []}
+
+            tournament_name = game.tournament_id.tournament_name if game.tournament_id else "Unknown Tournament"
+            
+            # Check if the tournament entry exists
+            tournament_entry = next(
+                (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == tournament_name),
+                None
+            )
+            if not tournament_entry:
+                # Create a new tournament entry if not found
+                tournament_entry = {
+                    "tournament_name": tournament_name,
+                    "games": []
+                }
+                games_by_date[date_str]["tournament"].append(tournament_entry)
+
+            # Add the game to the tournament's games list
+            tournament_entry["games"].append({
                 "id": game.id,
                 "tournament_id": game.tournament_id.id if game.tournament_id else None,
-                "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
                 "game_number": game.game_number,
                 "game_date": str(game.game_date),
                 "game_start_time": str(game.game_start_time),
@@ -2409,12 +2425,12 @@ class FetchAllGamesAPIView(APIView):
                 "updated_at": game.updated_at,
                 "game_type": "Tournament",
             })
-        
+
         # Process friendly games
         for game in friendly_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
             if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament_games": [], "friendly_games": []}
+                games_by_date[date_str] = {"tournament": [], "friendly_games": []}
             games_by_date[date_str]["friendly_games"].append({
                 "id": game.id,
                 "game_number": game.game_number,
@@ -2443,14 +2459,16 @@ class FetchAllGamesAPIView(APIView):
             })
 
         # Format the response
-        response_data = {
-            date: {
+        # Format the response as a list of dictionaries
+        response_data = [
+            {
                 "date": date,
-                "tournament_games": games["tournament_games"],
+                "tournament": games["tournament"],
                 "friendly_games": games["friendly_games"],
             }
             for date, games in games_by_date.items()
-        }
+        ]
+
 
         # Pagination
         page = int(request.GET.get("page", 1))
@@ -2459,17 +2477,15 @@ class FetchAllGamesAPIView(APIView):
         total_pages = (total_records + page_size - 1) // page_size
         start = (page - 1) * page_size
         end = start + page_size
-        
+
         return Response({
             "status": 1,
             "message": "Games fetched successfully.",
             "total_records": total_records,
             "total_pages": total_pages,
             "current_page": page,
-            "data": response_data,  # Return the data as an object (not a list)
+            "data": response_data,
         })
-
-
 
 ############################ Tournaments Game Stats  API ########################################
 class TeamGameDetailStatsAPIView(APIView):
