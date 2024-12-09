@@ -22,6 +22,7 @@ from django.db.models import Q ,Sum
 from itertools import chain
 from operator import attrgetter
 from django.core.exceptions import ObjectDoesNotExist
+import re
 
 
 class ManagerBranchDetail(APIView):
@@ -1480,7 +1481,8 @@ class FriendlyGameStatsLineupPlayers(APIView):
             'message': _('Lineup players and manager fetched successfully for both teams.'),
             'data': {
                 'game_id': game_id,
-              
+                'tournament_logo':None,
+                'tournament_name':"Friendly Game",
                 'goals': {
                     'team_a_id': friendly_game.team_a.id,
                     'team_a_name': friendly_game.team_a.team_name,
@@ -2129,6 +2131,8 @@ class FriendlyPlayerGameStatsAPIView(APIView):
             'message': _('Stats updated and lineup fetched successfully.'),
             'data': {
                 'game_id': game_instance.id,
+                'tournament_logo':None,
+                'tournament_name':"Friendly Game",
                 'goals': {
                     'team_a_id': game_instance.team_a.id,
                     'team_a_name': game_instance.team_a.team_name,
@@ -2154,6 +2158,16 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         team_id = request.data.get('team_id')
         game_id = request.data.get('game_id')
         game_time = request.data.get('game_time')
+
+        time_format_regex = r"^(?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)$"
+
+        if not game_time or not re.match(time_format_regex, game_time):
+            return Response(
+                {
+                    'status': 0,
+                    'message': _('Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59).')
+                },status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Validate required fields
         if not all([player_id, team_id, game_id, game_time]):
@@ -2393,6 +2407,8 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
                 'message': _('Team stats timeline fetched successfully.'),
                 'data': {
                     'game_id': game_id,
+                    'tournament_logo':None,
+                    'tournament_name':"Friendly Game",
                     'goals': {
                         'team_a_id': friendly_game.team_a.id,
                         'team_a_name': friendly_game.team_a.team_name,
@@ -2481,6 +2497,16 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
         player_b_id = request.data.get("player_b_id")
         game_time = request.data.get("game_time")
 
+        time_format_regex = r"^(?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)$"
+
+        if not game_time or not re.match(time_format_regex, game_time):
+            return Response(
+                {
+                    'status': 0,
+                    'message': _('Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59).')
+                },status=status.HTTP_400_BAD_REQUEST
+            )
+        
         # Validate inputs
         if not team_id or not game_id or not player_a_id or not player_b_id:
             return Response({'status': 0, 'message': _('All fields (team_id, game_id, player_a_id, player_b_id) are required.')}, status=status.HTTP_400_BAD_REQUEST)
@@ -2543,6 +2569,8 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
             'message': _('Player substitution successful.'),
             'data': {
                 'game_id': game_id,
+                'tournament_logo':None,
+                'tournament_name':"Friendly Game",
                 'goals': {
                     'team_a_id': game_instance.team_a.id,
                     'team_a_name': game_instance.team_a.team_name,

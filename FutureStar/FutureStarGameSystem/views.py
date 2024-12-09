@@ -22,6 +22,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
 from django.db.models import Sum,Count,Q
 from django.core.exceptions import ObjectDoesNotExist
+import re
 
 
 
@@ -1141,6 +1142,7 @@ class GameStatsLineupPlayers(APIView):
                 'substitute': substitute_data,
                 'managerial_staff': managerial_staff_data
             }
+        tournament = Tournament.objects.get(id=tournament_id)
 
         return Response({
             'status': 1,
@@ -1148,6 +1150,8 @@ class GameStatsLineupPlayers(APIView):
             'data': {
                 'game_id': game_id,
                 'tournament_id': tournament_id,
+                'tournament_logo': tournament.logo.url if tournament.logo else None,
+                'tournament_name': tournament.tournament_name,
                 'goals': {
                     'team_a_id': tournament_game.team_a.id,
                     'team_a_name': tournament_game.team_a.team_name,
@@ -1788,6 +1792,16 @@ class PlayerGameStatsAPIView(APIView):
         game_id = request.data.get('game_id')
         game_time = request.data.get('game_time')
 
+        time_format_regex = r"^(?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)$"
+
+        if not game_time or not re.match(time_format_regex, game_time):
+            return Response(
+                {
+                    'status': 0,
+                    'message': _('Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59).')
+                },status=status.HTTP_400_BAD_REQUEST
+            )
+
         # Validate all required fields
         if not all([player_id, team_id, tournament_id, game_id, game_time]):
             return Response({'status': 0, 'message': _('All fields are required.')}, status=status.HTTP_400_BAD_REQUEST)
@@ -1921,13 +1935,16 @@ class PlayerGameStatsAPIView(APIView):
                 'player_added_in_lineup': already_added_data,
                 'substitute': substitute_data
             }
+        tournament = Tournament.objects.get(id=tournament_id)
 
         return Response({
             'status': 1,
             'message': _('Stats updated and lineup fetched successfully.'),
             'data': {
                 'game_id': game_instance.id,
-                'tournament_id': tournament_id,
+                'tournament_logo': tournament.logo.url if tournament.logo else None,
+                'tournament_name': tournament.tournament_name,
+                'tournament_name':tournament_id.tournament_name,
                 'goals': {
                     'team_a_id': game_instance.team_a.id,
                     'team_a_name': game_instance.team_a.team_name,
@@ -2123,6 +2140,7 @@ class TeamGameStatsTimelineAPIView(APIView):
                     'game_time': stat.game_time if stat.game_time else None
                 }
                 timeline.append(stat_info)
+            tournament = Tournament.objects.get(id=tournament_id)
 
             return Response({
                 'status': 1,
@@ -2130,6 +2148,8 @@ class TeamGameStatsTimelineAPIView(APIView):
                 'data': {
                     'game_id': game_id,
                     'tournament_id': tournament_id,
+                    'tournament_logo': tournament.logo.url if tournament.logo else None,
+                    'tournament_name': tournament.tournament_name,
                     'goals': {
                         'team_a_id': tournament_game.team_a.id,
                         'team_a_name': tournament_game.team_a.team_name,
@@ -2228,6 +2248,13 @@ class PlayerSubstitutionAPIView(APIView):
         player_b_id = request.data.get("player_b_id")
         game_time = request.data.get("game_time")
 
+        time_format_regex = r"^(?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)$"
+
+        if not game_time or not re.match(time_format_regex, game_time):
+            return Response(
+                {'status': 0, 'message': _('Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59).')},
+                status=status.HTTP_400_BAD_REQUEST
+    )
         # Validate inputs
         if not team_id:
             return Response({'status': 0, 'message': _('Team id is required.')}, status=status.HTTP_400_BAD_REQUEST)
@@ -2348,6 +2375,7 @@ class PlayerSubstitutionAPIView(APIView):
                 'substitute': substitute_data,
                 'managerial_staff': managerial_staff_data
             }
+        tournament = Tournament.objects.get(id=tournament_id)
 
         # Return response
         return Response({
@@ -2356,6 +2384,8 @@ class PlayerSubstitutionAPIView(APIView):
             'data': {
                 'game_id': game_id,
                 'tournament_id': tournament_id,
+                'tournament_logo': tournament.logo.url if tournament.logo else None,
+                'tournament_name': tournament.tournament_name,
                 'goals': {
                     'team_a_id': game_instance.team_a.id,
                     'team_a_name': game_instance.team_a.team_name,
