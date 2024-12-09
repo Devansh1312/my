@@ -465,6 +465,12 @@ class FriendlyGameDetailAPIView(APIView):
                 'message': _('Game details fetched successfully.'),
                 'data': data,
             }, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({
+                "status": 0,
+                "message": _("Invalid Game ID."),
+                "data": {}
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         except FriendlyGame.DoesNotExist:
             return Response({
