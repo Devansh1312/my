@@ -317,76 +317,21 @@ class RefereeFeeCreateUpdateView(APIView):
 
 
 ########### search referee ############
-class OfficialSearchPagination(PageNumberPagination):
-    page_size = 10
-    page_query_param = 'page'
-    page_size_query_param = 'page_size'
-    max_page_size = 100
 
-    def paginate_queryset(self, queryset, request, view=None):
-        try:
-            page_number = request.query_params.get(self.page_query_param, 1)
-            self.page = int(page_number)
-            if self.page < 1:
-                raise ValidationError(_("Page number must be a positive integer."))
-        except (ValueError, TypeError):
-            return Response({
-                'status': 0,
-                'message': _('Invalid page number.'),
-                'data': []
-            }, status=400)
 
-        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
-        self.total_pages = paginator.num_pages
-        self.total_records = paginator.count
-
-        try:
-            page = paginator.page(self.page)
-        except EmptyPage:
-            return Response({
-                'status': 0,
-                'message': _('Page not found.'),
-                'data': []
-            }, status=400)
-
-        self.paginated_data = page
-        return list(page)
-
-    def get_paginated_response(self, data):
-        return Response({
-            'status': 1,
-            'message': _('Data fetched successfully.'),
-            'total_records': self.total_records,
-            'total_pages': self.total_pages,
-            'current_page': self.page,
-            'data': data
-        })
-class SearchOfficialView(APIView):
+class OfficialListView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser,)
-    pagination_class = OfficialSearchPagination
 
     def get(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
         
-        # Get phone as a string, not converting to integer
-        phone = request.query_params.get('phone', '')
-       
-        
         role_id = 4  # Role 4 for referees
         
         # Only include users who are referees (role_id=4) and not deleted
         users = User.objects.filter(role_id=role_id, is_deleted=False).order_by('id')
-
-        if phone:
-            # If phone number is provided, filter users by phone (case-insensitive)
-            users = users.filter(phone__icontains=phone)
-
-        # Pagination
-        paginator = self.pagination_class()
-        paginated_users = paginator.paginate_queryset(users, request)
 
         # Prepare the data to be returned in the response
         user_data = [
@@ -399,11 +344,15 @@ class SearchOfficialView(APIView):
                 'country_name': user.country.name if user.country else None,
                 'country_flag': user.country.flag.url if user.country else None,
             }
-            for user in paginated_users
+            for user in users
         ]
 
-        # Return paginated response
-        return paginator.get_paginated_response(user_data)
+        # Return the list of users
+        return Response({
+            'status': 1, 
+            'message': _('Referee list fetched successfully'), 
+            'data': user_data
+        }, status=status.HTTP_200_OK)
 
 ############### Update Friendly Game ################
 class UpdateFriendlyGame(APIView):
