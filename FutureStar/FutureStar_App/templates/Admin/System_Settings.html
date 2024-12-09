@@ -250,19 +250,31 @@
                <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
                <!-- Social Media Links -->
                <div class="row">
-                  <div class="col-12 col-md-6">
+                  <div class="col-12 col-md-4">
                      <div class="mb-3">
                         <label class="form-label" for="currency_symbol">Currency Symbol</label>
                         <input class="form-control btn-pill" id="currency_symbol" name="currency_symbol" type="text" value="{{ system_settings.currency_symbol }}" placeholder="Currency symbol">
                      </div>
                   </div>
-                  <div class="col-12 col-md-6">
+                  <div class="col-12 col-md-4">
                      <div class="mb-3">
                         <label class="form-label" for="event_convenience_fee">Event Convenience Fee</label>
                         <input class="form-control btn-pill" id="event_convenience_fee" name="event_convenience_fee" type="text" value="{{ system_settings.event_convenience_fee }}" placeholder="event convenience fee">
                      </div>
                      <script>
                         document.getElementById("event_convenience_fee").addEventListener("input", function(e) {
+                           // Remove any non-numeric characters
+                           this.value = this.value.replace(/[^0-9]/g, '');
+                        });
+                     </script>
+                  </div>
+                  <div class="col-12 col-md-4">
+                     <div class="mb-3">
+                        <label class="form-label" for="past_year">Dropdown Past Year</label>
+                        <input class="form-control btn-pill" id="past_year" name="past_year" type="text" value="{{ system_settings.past_year }}" placeholder="Drop Down Past Year">
+                     </div>
+                     <script>
+                        document.getElementById("past_year").addEventListener("input", function(e) {
                            // Remove any non-numeric characters
                            this.value = this.value.replace(/[^0-9]/g, '');
                         });

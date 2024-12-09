@@ -459,6 +459,7 @@ class System_Settings(LoginRequiredMixin, View):
                 "line_of_code": "This field is required.",
                 "downloads": "This field is required.",
                 "app_rate": "This field is required.",
+                "past_year":"This field is required.",
                 "instagram": None,
                 "facebook": None,
                 "twitter": None,

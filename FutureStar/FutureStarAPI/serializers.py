@@ -808,3 +808,52 @@ class DeleteAccountReasonSerializer(serializers.ModelSerializer):
         else:
             name = obj.name_en 
         return name
+    
+
+class SystemSettingsSerializer(serializers.ModelSerializer):
+    fav_icon = serializers.SerializerMethodField()
+    footer_logo = serializers.SerializerMethodField()
+    header_logo = serializers.SerializerMethodField()
+    splash_screen = serializers.SerializerMethodField()
+    intro1_image = serializers.SerializerMethodField()
+    intro2_image = serializers.SerializerMethodField()
+    intro3_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SystemSettings
+        fields = [
+            'fav_icon', 'footer_logo', 'header_logo', 'website_name_english',
+            'website_name_arabic', 'phone', 'email', 'address', 'currency_symbol',
+            'event_convenience_fee', 'instagram', 'facebook', 'twitter', 'linkedin',
+            'pinterest', 'happy_user', 'line_of_code', 'downloads', 'app_rate',
+            'years_of_experience', 'project_completed', 'proffesioan_team_members',
+            'awards_winning', 'past_year', 'splash_screen', 'intro1_image', 'intro2_image',
+            'intro3_image', 'intro1_text', 'intro2_text', 'intro3_text'
+        ]
+
+    def get_fav_icon(self, obj):
+        return self.get_image_url(obj.fav_icon)
+
+    def get_footer_logo(self, obj):
+        return self.get_image_url(obj.footer_logo)
+
+    def get_header_logo(self, obj):
+        return self.get_image_url(obj.header_logo)
+
+    def get_splash_screen(self, obj):
+        return self.get_image_url(obj.splash_screen)
+
+    def get_intro1_image(self, obj):
+        return self.get_image_url(obj.intro1_image)
+
+    def get_intro2_image(self, obj):
+        return self.get_image_url(obj.intro2_image)
+
+    def get_intro3_image(self, obj):
+        return self.get_image_url(obj.intro3_image)
+
+    def get_image_url(self, image_path):
+        if image_path:
+            return f"{settings.MEDIA_URL}{image_path}"
+        return None
+from django.conf import settings

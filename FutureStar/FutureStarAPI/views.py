@@ -31,7 +31,7 @@ import logging
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 from django.db.models import Case, When, F, Q, Sum
-
+from django.forms.models import model_to_dict
 from FutureStarTournamentApp.serializers import TournamentGameSerializer
 
 
@@ -4059,6 +4059,8 @@ class GeneralSettingsList(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
+        # Retrieve the first general settings object
         general_settings = SystemSettings.objects.first()
 
         if not general_settings:
@@ -4068,32 +4070,15 @@ class GeneralSettingsList(APIView):
                 'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
+        # Serialize the general settings data
+        serializer = SystemSettingsSerializer(general_settings)
+
         return Response({
             'status': 1,
             'message': _('General Settings retrieved successfully.'),
-            'data': {
-                'website_name_english': general_settings.website_name_english,
-                'website_name_arabic': general_settings.website_name_arabic,
-                'phone': general_settings.phone,
-                'email': general_settings.email,
-                'address': general_settings.address,
-                'currency_symbol': general_settings.currency_symbol,
-                'event_convenience_fee': general_settings.event_convenience_fee,
-                'instagram': general_settings.instagram,
-                'facebook': general_settings.facebook,
-                'twitter': general_settings.twitter,
-                'linkedin': general_settings.linkedin,
-                'pinterest': general_settings.pinterest,
-                'happy_user': general_settings.happy_user,
-                'line_of_code': general_settings.line_of_code,
-                'downloads': general_settings.downloads,
-                'app_rate': general_settings.app_rate,
-                'years_of_experience': general_settings.years_of_experience,
-                'project_completed': general_settings.project_completed,
-                'proffesioan_team_members': general_settings.proffesioan_team_members,
-                'awards_winning': general_settings.awards_winning,
-            }
+            'data': serializer.data
         }, status=status.HTTP_200_OK)
+
 
 
 

@@ -249,7 +249,8 @@ class SystemSettings(models.Model):
     project_completed = models.CharField(max_length=30,null=True, blank=True)
     proffesioan_team_members = models.CharField(max_length=30,null=True, blank=True)
     awards_winning = models.CharField(max_length=30,null=True, blank=True)
-
+    past_year = models.IntegerField(blank=True,null=True,default=0)
+    
     splash_screen = models.CharField(max_length=255, null=True, blank=True)
     intro1_image = models.CharField(max_length=255, null=True, blank=True)
     intro2_image = models.CharField(max_length=255, null=True, blank=True)
