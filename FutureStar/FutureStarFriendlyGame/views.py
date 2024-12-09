@@ -22,6 +22,7 @@ from django.db.models import Q ,Sum
 from itertools import chain
 from operator import attrgetter
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 import re
 
 
@@ -197,7 +198,214 @@ class CreateFriendlyGame(APIView):
             'message': _('Friendly game fetched successfully.'),
             'data': data
         }, status=status.HTTP_200_OK)
+    
+################## Request Referee ##################
+########## Add fee #################
+class RefereeFeeCreateUpdateView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        game_id = data.get('game_id')
+        officials_data = data.get('officials')
+        
+        if not game_id or not officials_data:
+            return Response({
+                'status': 0,
+                'message': _('Game ID and officials are required.'),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check if the game exists
+        try:
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not exists'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Create or update referees for the game in a transaction to ensure atomicity
+        try:
+            updated_referees = []
+            with transaction.atomic():
+                for official in officials_data:
+                    user_id = official.get('user_id')
+                    fees = official.get('fees')
+                    
+                    # Try to get or update the RequestedReferee entry
+                    referee, created = RequestedReferee.objects.update_or_create(
+                        game_id_id=game_id,  # ForeignKey, hence game_id_id is used here
+                        user_id_id=user_id,  # ForeignKey, hence user_id_id is used here
+                        defaults={'fees': fees, 'status': RequestedReferee.REQUESTED}
+                    )
+                    
+                    # Append the updated or created referee details
+                    updated_referees.append({
+                        'user_id': user_id,
+                        'fees': fees
+                    })
+            
+            return Response({
+                'status': 1,
+                'message': _('Referees requested successfully.'),
+                'data': [{
+                    'game_id': game_id,
+                    'officials': updated_referees
+                }]
+            }, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': str(e),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+################ Raferee status update ############
+
+
+    def patch(self, request, *args, **kwargs):
+        # Extract the game_id, user_id, and status from the request data
+        game_id = request.data.get('game_id')
+        user_id = request.data.get('user_id')
+        status_value = request.data.get('status')
+        status_value=int(status_value)
+        game_id=int(game_id)
+        user_id=int(user_id)
+
+        # Validate the input
+        if not game_id or not user_id or not status_value:
+            return Response({
+                'status': 0,
+                'message': _('game_id, user_id, and status are required'),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate the status value to ensure it is only APPROVED (1) or REJECT (2)
+        if status_value not in [1, 2]:
+            return Response({
+                'status': 0,
+                'message': _('Invalid status value. Only APPROVED or REJECT are allowed'),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Try to get the RequestedReferee object based on game_id and user_id
+        try:
+            referee = RequestedReferee.objects.get(game_id_id=game_id, user_id_id=user_id)
+        except RequestedReferee.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Requested Referee not found for the provided game_id and user_id'),
+                'data': None
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Update the status field
+        referee.status = status_value
+        referee.save()
+
+        return Response({
+            'status': 1,
+            'message': _('Referee status updated successfully'),
+            'data': {
+                'game_id': game_id,
+                'user_id': user_id,
+                'status': referee.status
+            }
+        }, status=status.HTTP_200_OK)
+
+
+
+########### search referee ############
+class OfficialSearchPagination(PageNumberPagination):
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError(_("Page number must be a positive integer."))
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Invalid page number.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        try:
+            page = paginator.page(self.page)
+        except EmptyPage:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        self.paginated_data = page
+        return list(page)
+
+    def get_paginated_response(self, data):
+        return Response({
+            'status': 1,
+            'message': _('Data fetched successfully.'),
+            'total_records': self.total_records,
+            'total_pages': self.total_pages,
+            'current_page': self.page,
+            'data': data
+        })
+class SearchOfficialView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser,)
+    pagination_class = OfficialSearchPagination
+
+    def get(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        
+        # Get phone as a string, not converting to integer
+        phone = request.query_params.get('phone', '')
+        print(f"Incoming phone parameter: {phone}")
+        
+        role_id = 4  # Role 4 for referees
+        
+        # Only include users who are referees (role_id=4) and not deleted
+        users = User.objects.filter(role_id=role_id, is_deleted=False).order_by('id')
+
+        if phone:
+            # If phone number is provided, filter users by phone (case-insensitive)
+            users = users.filter(phone__icontains=phone)
+
+        # Pagination
+        paginator = self.pagination_class()
+        paginated_users = paginator.paginate_queryset(users, request)
+
+        # Prepare the data to be returned in the response
+        user_data = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'phone': user.phone,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                'country_id': user.country.id if user.country else None,
+                'country_name': user.country.name if user.country else None,
+                'country_flag': user.country.flag.url if user.country else None,
+            }
+            for user in paginated_users
+        ]
+
+        # Return paginated response
+        return paginator.get_paginated_response(user_data)
+
+############### Update Friendly Game ################
 class UpdateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)

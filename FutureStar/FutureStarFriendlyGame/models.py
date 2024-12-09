@@ -18,10 +18,7 @@ class FriendlyGame(models.Model):
     game_start_time = models.TimeField(blank=True, null=True)
     game_end_time = models.TimeField(blank=True, null=True)
     game_field_id = models.ForeignKey(Field, on_delete=models.CASCADE)
-    referee = models.ForeignKey(User,related_name="referee", null=True,blank=True, on_delete=models.CASCADE)
-    assistant_refree_1st = models.ForeignKey(User,related_name="assistant_refree_1st", null=True,blank=True, on_delete=models.CASCADE)
-    assistant_refree_2nd = models.ForeignKey(User,related_name="assistant_refree_2nd", null=True,blank=True, on_delete=models.CASCADE)
-    refree_4th = models.ForeignKey(User,related_name="refree_4th", null=True,blank=True, on_delete=models.CASCADE)
+  
     game_status = models.IntegerField(default=0)
     
     team_a_goal = models.IntegerField(blank=True, null=True)
@@ -110,6 +107,31 @@ class FriendlyGame(models.Model):
         unique_together = ('game_name', 'game_number', 'game_date', 'game_start_time', 'game_end_time', 'game_field_id')  # Ensure user can join a group only once
         
 
+
+class RequestedReferee(models.Model):
+    REQUESTED = 0
+    APPROVED = 1
+    REJECT=2
+    
+    OFFICIALS_STATUS_CHOICES = (
+        (REQUESTED, 'REQUESTED'),
+        (APPROVED, 'APPROVED'),
+        (REJECT, 'REJECT'),
+        
+    )
+    id = models.AutoField(primary_key=True)
+    game_id=models.ForeignKey(FriendlyGame, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    fees=models.PositiveIntegerField(blank=True, null=True)
+    status=models.CharField(choices=OFFICIALS_STATUS_CHOICES,max_length=50,default=0)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f'{self.user_id} - {self.game_id}'
+    
+    class Meta:
+        db_table = 'futurestar_app_requested_referees'
 
 
 class FriendlyGameLineup(models.Model):
