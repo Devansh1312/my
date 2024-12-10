@@ -684,7 +684,8 @@ class StaffManagementView(APIView):
 
                     # Ensure the user has a valid device token and device type (1 for Android, 2 for iOS)
                     if device_token and device_type in [1, 2]:
-                        send_push_notification(device_token, title, body, device_type)
+                        push_data = {"branch_id": branch_id}  # Include branch_id in the push notification payload
+                        send_push_notification(device_token, title, body, device_type, data=push_data)
 
                     return Response({
                         'status': 1,

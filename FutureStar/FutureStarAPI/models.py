@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from datetime import datetime 
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.timezone import now
 
 # Create your models here.
 
@@ -250,7 +251,7 @@ class PostLike(models.Model):
     created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # 1, 2, or 3 based on the type
     post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
-    date_liked = models.DateTimeField(default=datetime.now)
+    date_liked = models.DateTimeField(default=now)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 

@@ -33,6 +33,7 @@ from django.utils.timezone import now
 from django.db.models import Case, When, F, Q, Sum
 from django.forms.models import model_to_dict
 from FutureStarTournamentApp.serializers import TournamentGameSerializer
+from FutureStar.firebase_config import send_push_notification
 
 
 logger = logging.getLogger(__name__)
@@ -1213,6 +1214,7 @@ class PostLikeAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         post_id = request.data.get('post_id')
 
         if not post_id:
@@ -1229,28 +1231,67 @@ class PostLikeAPIView(APIView):
                 'message': _('Post not found.')
             }, status=404)
 
-        # Toggle like/unlike
+        # Get creator type and created_by_id
         creator_type = request.data.get('creator_type')
         created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user ID
 
+        # Toggle like/unlike
         post_like, created = PostLike.objects.get_or_create(created_by_id=created_by_id, post=post, creator_type=creator_type)
-        
+
         if not created:
             # If the user already liked the post, unlike it (delete the like)
             post_like.delete()
             message = _('Post unliked successfully.')
         else:
+            post_like.date_liked = timezone.now()
+            post_like.save()
             message = _('Post liked successfully.')
+            print(creator_type)
+            # Fetch the relevant user to send push notification
+            if creator_type in [1,"1"]:
+                user = User.objects.get(id=created_by_id)
+                notifier_name = user.username
+                device_token = user.device_token
+                device_type = user.device_type
+            elif creator_type in [2,"2"]:
+                team = Team.objects.get(id=created_by_id)
+                user = team.team_founder
+                notifier_name = team.team_username
+                device_token = user.device_token
+                device_type = user.device_type
+            elif creator_type == 3:
+                group = TrainingGroups.objects.get(id=created_by_id)
+                user = group.group_founder
+                notifier_name = group.group_name
+                device_token = user.device_token
+                device_type = user.device_type
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid creator type.')
+                }, status=400)
 
-        # Serialize the post data with comments set to empty
+            # device_type = int(device_type)
+
+            # Sending push notification
+            if device_type in [1, 2,"1","2"]:
+                title = _('Post Liked!')
+                body = _(f'{notifier_name} liked your post.')
+                push_data = {'type':'post','post_id': post_id}  # Include the post ID in the notification payload
+                print("outside function")
+                send_push_notification(device_token, title, body, device_type, data=push_data)
+                print("inside function")
+
+        # Serialize the post data
         serializer = PostSerializer(post, context={'request': request})
-        
-        # Return the full post data with an empty comment list
+
+        # Return the full post data
         return Response({
             'status': 1,
             'message': message,
             'data': serializer.data
         }, status=200)
+
 
 ############################# ALL POST LIST VIEW ##########################
 class AllPostsListAPIView(generics.ListAPIView):

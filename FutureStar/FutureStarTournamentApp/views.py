@@ -2215,11 +2215,11 @@ class FetchMyGamesAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        user = request.user
+        # user = request.user
 
-        # Ensure the user is authenticated
-        if not user.is_authenticated:
-            return Response({"status": 0, "message": "User is not authenticated."})
+        # # Ensure the user is authenticated
+        # if not user.is_authenticated:
+        #     return Response({"status": 0, "message": "User is not authenticated."})
 
         created_by_id = request.GET.get('created_by_id', None)
         creator_type = str(request.GET.get('creator_type', 0))
@@ -2235,7 +2235,7 @@ class FetchMyGamesAPIView(APIView):
 
         # Fetch user teams based on creator type
         if creator_type == 1:
-            user_teams = list(TeamBranch.objects.filter(joinbranch__user_id=user).values_list('id', flat=True))
+            user_teams = list(TeamBranch.objects.filter(joinbranch__user_id=created_by_id).values_list('id', flat=True))
         elif creator_type == 2 and created_by_id:
             teams_data = TeamBranch.objects.filter(team_id__id=created_by_id)
 

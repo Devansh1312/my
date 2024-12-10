@@ -205,6 +205,8 @@ class CreateFriendlyGame(APIView):
 
         # Prepare custom response data
         data = {
+            "game_id":friendly_game.id,
+            "game_name":friendly_game.game_name,
             "game_number":friendly_game.game_number,
             "team_a_id": friendly_game.team_a.id if friendly_game.team_a else None,
             "team_a_name": friendly_game.team_a.team_name if friendly_game.team_a else None,
