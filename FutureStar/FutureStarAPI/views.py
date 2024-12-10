@@ -1246,41 +1246,44 @@ class PostLikeAPIView(APIView):
             post_like.date_liked = timezone.now()
             post_like.save()
             message = _('Post liked successfully.')
-            print(creator_type)
+
             # Fetch the relevant user to send push notification
-            if creator_type in [1,"1"]:
+            if creator_type in [1, "1"]:
                 user = User.objects.get(id=created_by_id)
                 notifier_name = user.username
                 device_token = user.device_token
                 device_type = user.device_type
-            elif creator_type in [2,"2"]:
+                notification_language = user.current_language  # Get user's language for notifications
+            elif creator_type in [2, "2"]:
                 team = Team.objects.get(id=created_by_id)
                 user = team.team_founder
                 notifier_name = team.team_username
                 device_token = user.device_token
                 device_type = user.device_type
-            elif creator_type == 3:
+                notification_language = user.current_language  # Get team founder's language for notifications
+            elif creator_type in [3, "3"]:
                 group = TrainingGroups.objects.get(id=created_by_id)
                 user = group.group_founder
                 notifier_name = group.group_name
                 device_token = user.device_token
                 device_type = user.device_type
+                notification_language = user.current_language  # Get group founder's language for notifications
             else:
                 return Response({
                     'status': 0,
                     'message': _('Invalid creator type.')
                 }, status=400)
 
-            # device_type = int(device_type)
+            # Set notification language based on user's preference
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
 
             # Sending push notification
-            if device_type in [1, 2,"1","2"]:
+            if device_type in [1, 2, "1", "2"]:
                 title = _('Post Liked!')
                 body = _(f'{notifier_name} liked your post.')
-                push_data = {'type':'post','post_id': post_id}  # Include the post ID in the notification payload
-                print("outside function")
+                push_data = {'type': 'post', 'post_id': post_id}  # Include the post ID in the notification payload
                 send_push_notification(device_token, title, body, device_type, data=push_data)
-                print("inside function")
 
         # Serialize the post data
         serializer = PostSerializer(post, context={'request': request})
@@ -1291,6 +1294,7 @@ class PostLikeAPIView(APIView):
             'message': message,
             'data': serializer.data
         }, status=200)
+
 
 
 ############################# ALL POST LIST VIEW ##########################
@@ -1402,7 +1406,7 @@ class PostCreateAPIView(APIView):
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
         media_type = request.data.get('media_type')
-        print(media_type)
+
         if not created_by_id or not creator_type:
             return Response({
                 'status': 0,
@@ -1415,20 +1419,22 @@ class PostCreateAPIView(APIView):
 
             if "image" in request.FILES:
                 image = request.FILES["image"]
-                
+
                 # Determine file extension based on media_type
                 file_extension = "jpg" if media_type == "1" else "mp4" if media_type == "2" else image.name.split('.')[-1]
-                print(file_extension)
-                
+
                 # Generate unique file name
                 unique_suffix = get_random_string(8)
                 file_name = f"post_images/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
-                print(file_name)
+
                 # Save the file and assign path to post.image
                 image_path = default_storage.save(file_name, image)
                 post.image = image_path
                 post.save()
-            
+
+            # Notify followers
+            self.notify_followers(created_by_id, creator_type, post)
+
             post.refresh_from_db()
 
             return Response({
@@ -1443,6 +1449,34 @@ class PostCreateAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
+    def notify_followers(self, created_by_id, creator_type, post):
+        # Fetch followers based on FollowRequest
+        followers = FollowRequest.objects.filter(
+            Q(target_id=created_by_id, target_type=creator_type)
+        )
+
+        print(followers)
+
+        # Retrieve creator name based on creator_type
+        creator_name = None
+        if creator_type in [1, "1"]:
+            creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
+        elif creator_type in [2, "2"]:
+            creator_name = Team.objects.filter(id=created_by_id).values_list('team_username', flat=True).first()
+        elif creator_type in [3, "3"]:
+            creator_name = TrainingGroups.objects.filter(id=created_by_id).values_list('group_name', flat=True).first()
+
+        for follower in followers:
+            follower_user = User.objects.filter(id=follower.created_by_id).first()
+            if follower_user and follower_user.device_token and follower_user.device_type in [1, 2, "1", "2"]:
+                # Send notification
+                title = _('New Post Alert!')
+                body = _(f'{creator_name} you are following just posted.')
+                push_data = {
+                    'type': 'post',
+                    'post_id': post.id
+                }
+                send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
 
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
@@ -1690,7 +1724,7 @@ class CommentCreateAPIView(APIView):
                     'message': _('Parent comment not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
-        # Create the comment using the new fields
+        # Create the comment
         comment = Post_comment.objects.create(
             created_by_id=created_by_id,
             creator_type=creator_type,
@@ -1699,12 +1733,56 @@ class CommentCreateAPIView(APIView):
             parent=parent_comment
         )
 
+        # Determine the notifier and send a push notification
+        if creator_type in [1, "1"]:  # User as creator
+            user = User.objects.get(id=created_by_id)
+            notifier_name = user.username
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get user language for notification
+        elif creator_type in [2, "2"]:  # Team as creator
+            team = Team.objects.get(id=created_by_id)
+            user = team.team_founder
+            notifier_name = team.team_username
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get team founder's language for notification
+        elif creator_type == 3:  # Group as creator
+            group = TrainingGroups.objects.get(id=created_by_id)
+            user = group.group_founder
+            notifier_name = group.group_name
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get group founder's language for notification
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator type.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Set notification language
+        if notification_language in ['ar', 'en']:
+            activate(notification_language)
+
+        # For replies
+        if parent_comment:
+            title = _('New Comment on Your Post!')
+            body = _(f'{notifier_name} commented on your post.')
+            push_data = {'type': 'comment', 'post_id': post_id, 'parent_id': parent_id, 'comment_id': comment.id}
+        else:
+            title = _('New Comment on Your Post!')
+            body = _(f'{notifier_name} commented on your post.')
+            push_data = {'type': 'comment', 'post_id': post_id, 'comment_id': comment.id}
+
+        # Sending push notification
+        if device_type in [1, 2, "1", "2"]:
+            send_push_notification(device_token, title, body, device_type, data=push_data)
+
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
             'data': PostCommentSerializer(comment).data
         }, status=status.HTTP_201_CREATED)
-
 
 ############### POST DELETE API ##############################
 class PostDeleteAPIView(APIView):
@@ -3103,10 +3181,12 @@ class LocationAPIView(APIView):
 class FollowUnfollowAPI(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)    
+    
     def post(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         creator_type = request.data.get('creator_type')
         created_by_id = request.data.get('created_by_id')
         target_id = request.data.get('target_id')
@@ -3123,9 +3203,11 @@ class FollowUnfollowAPI(APIView):
             follow_request.delete()
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
+            
+            # Return the response for unfollowing
             return Response({
                 'status': 1,
-                'message': 'Unfollowed successfully.',
+                'message': _('Unfollowed successfully.'),
                 'data': {
                     'followers_count': followers_count,
                     'following_count': following_count,
@@ -3142,9 +3224,49 @@ class FollowUnfollowAPI(APIView):
             )
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
+
+            # Fetch the relevant user to send push notification
+            if creator_type in [1, "1"]:
+                user = User.objects.get(id=created_by_id)
+                notifier_name = user.username
+                device_token = user.device_token
+                device_type = user.device_type
+                notification_language = user.current_language  # Get user's language for notifications
+            elif creator_type in [2, "2"]:
+                team = Team.objects.get(id=created_by_id)
+                user = team.team_founder
+                notifier_name = team.team_username
+                device_token = user.device_token
+                device_type = user.device_type
+                notification_language = user.current_language  # Get team founder's language for notifications
+            elif creator_type == 3:
+                group = TrainingGroups.objects.get(id=created_by_id)
+                user = group.group_founder
+                notifier_name = group.group_name
+                device_token = user.device_token
+                device_type = user.device_type
+                notification_language = user.current_language  # Get group founder's language for notifications
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid creator type.')
+                }, status=400)
+
+            # Set notification language based on user's preference
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+
+            # Sending push notification
+            if device_type in [1, 2, "1", "2"]:
+                title = _('New Follower!')
+                body = _(f'{notifier_name} started following you.')
+                push_data = {'type': 'follow', 'created_by_id': created_by_id, 'creator_type': creator_type}  # Include follow info in the notification payload
+                send_push_notification(device_token, title, body, device_type, data=push_data)
+
+            # Return the response for following
             return Response({
                 'status': 1,
-                'message': 'Followed successfully.',
+                'message': _('Followed successfully.'),
                 'data': {
                     'followers_count': followers_count,
                     'following_count': following_count,

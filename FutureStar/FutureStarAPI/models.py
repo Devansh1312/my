@@ -164,7 +164,7 @@ class Post(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     media_type = models.IntegerField(default=1)
-    date_created = models.DateTimeField(default=datetime.now)
+    date_created = models.DateTimeField(default=timezone.now)
 
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)

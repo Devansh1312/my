@@ -25,6 +25,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 import re
 from datetime import date
+from FutureStar.firebase_config import send_push_notification
 
 
 class ManagerBranchDetail(APIView):
@@ -2435,8 +2436,13 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         **{stat: 1},  # Set the specific stat to 1
                         created_by_id=request.user.id
                     )
+
+                    # Send push notification
+                    self._send_stat_notification(player_instance, stat, game_instance)
+
+                    # Update team goals
                     self._update_team_goals(game_instance)
-                    return self._get_game_stats_response(game_instance, team_id, player_id)
+                    return self._get_game_stats_response(game_instance, team_id, player_id, game_instance.id)
 
                 elif stat_value == -1:
                     # Decrement: Find and delete the most recent entry for this stat
@@ -2462,9 +2468,29 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
+    def _send_stat_notification(self, player_instance, stat, game_instance):
+        """
+        Sends a push notification when a player's statistics are updated.
+        """
+        # Define the notification content
+        stat_messages = {
+            'goals': _('You just scored a goal!'),
+            'assists': _('You just made an assist!'),
+            'own_goals': _('You just scored an own goal!'),
+            'yellow_cards': _('You just received a yellow card!'),
+            'red_cards': _('You just received a red card!'),
+        }
 
+        # Customize the message based on the stat type
+        message = stat_messages.get(stat, _('Your statistics have been updated!'))
 
+        # Construct the notification body
+        notification_body = f"{message} in Friendly Game - Game Number {game_instance.game_number}"
 
+        # Send the notification to the player
+        if player_instance.device_token:
+            push_data = {'type': 'player_stat', 'player_id': player_instance.id, 'game_id': game_instance.id}
+            send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
 
     def get(self, request, *args, **kwargs):
         # Set language based on the request headers
