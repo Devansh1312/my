@@ -111,6 +111,8 @@ class TeamPlayersAPIView(APIView):
             # Fetch all players excluding those already in the Lineup model
             excluded_player_ids = Lineup.objects.filter(
                 team_id=team_id,
+                game_id=game_id,
+                tournament_id=tournament_id,
                 player_id__in=player_user_ids,
                 lineup_status__in=[
                     Lineup.ADDED,
