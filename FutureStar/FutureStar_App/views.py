@@ -37,6 +37,9 @@ from django.db.models import F, Case, When, IntegerField,Sum,Q
 from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum,Count
+from django.utils.translation import gettext as _
+from FutureStar.firebase_config import send_push_notification
+
 
 
 def user_role_check(view_func):
@@ -6714,6 +6717,9 @@ class UpdateGameStatsView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class AssignUserToGameView(LoginRequiredMixin, View):
     def post(self, request, game_id):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         try:
             # Parse JSON request body
             data = json.loads(request.body)
@@ -6730,9 +6736,9 @@ class AssignUserToGameView(LoginRequiredMixin, View):
                 game.game_date == current_time.date() and game.game_start_time <= current_time.time()
             ):
                 messages.success(
-                request,
-                f"Cannot assign user; game already started."
-            )
+                    request,
+                    f"Cannot assign user; game already started."
+                )
                 return JsonResponse(
                     {'error': 'Cannot assign user; game already started.'}, status=400
                 )
@@ -6740,6 +6746,22 @@ class AssignUserToGameView(LoginRequiredMixin, View):
             # Assign the user to the game
             game.game_statistics_handler = user
             game.save()
+
+            # Prepare notification details
+            title = _('Match Assignment')
+            body = _(
+                f"You have been assigned to handle the match between {game.team_a.team_name} and {game.team_b.team_name} on "
+                f"{game.game_date.strftime('%Y-%m-%d')} at {game.game_start_time.strftime('%H:%M')} at {game.game_field_id.field_name}."
+            )
+            device_token = user.device_token
+            device_type = user.device_type
+            push_data = {'type': 'game system', 'user_id': user_id}  # Custom payload
+
+            # Send push notification if valid token and type
+            if device_token and device_type in [1, 2, "1", "2"]:
+                print("Outside function")
+                send_push_notification(device_token, title, body, device_type, data=push_data)
+                print("Inside function")
 
             messages.success(
                 request,
