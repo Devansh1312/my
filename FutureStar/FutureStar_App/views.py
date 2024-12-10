@@ -38,6 +38,8 @@ from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum,Count
 from django.utils.translation import gettext as _
+
+from django.utils.translation import activate
 from FutureStar.firebase_config import send_push_notification
 
 
