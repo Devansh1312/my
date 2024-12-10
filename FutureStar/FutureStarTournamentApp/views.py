@@ -2260,19 +2260,19 @@ class FetchMyGamesAPIView(APIView):
                     Q(team_a=team) | Q(team_b=team)
                 ).distinct()
 
-        # Group games by date
-   
         # Use a set to avoid duplicates
         seen_game_ids = set()
 
+        # Combine tournament games and friendly games
+        all_games = []
+
         # Process tournament games
-        # Process tournament games
-        processed_tournament_games = []
         for game in tournament_games:
             if game.id not in seen_game_ids:
                 seen_game_ids.add(game.id)
-                processed_tournament_games.append({
+                all_games.append({
                     "id": game.id,
+                    "game_type": "Tournament",
                     "tournament_id": game.tournament_id.id if game.tournament_id else None,
                     "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
                     "game_number": game.game_number,
@@ -2297,16 +2297,15 @@ class FetchMyGamesAPIView(APIView):
                     "is_draw": game.is_draw,
                     "created_at": game.created_at,
                     "updated_at": game.updated_at,
-                    "game_type": "Tournament",
                 })
 
         # Process friendly games
-        processed_friendly_games = []
         for game in friendly_games:
             if game.id not in seen_game_ids:
                 seen_game_ids.add(game.id)
-                processed_friendly_games.append({
+                all_games.append({
                     "id": game.id,
+                    "game_type": "Friendly",
                     "game_number": game.game_number,
                     "game_date": str(game.game_date),
                     "game_start_time": str(game.game_start_time),
@@ -2329,20 +2328,21 @@ class FetchMyGamesAPIView(APIView):
                     "is_draw": game.is_draw,
                     "created_at": game.created_at,
                     "updated_at": game.updated_at,
-                    "game_type": "Friendly",
                 })
+
+        # Sort all games by game_date and game_start_time
+        all_games.sort(key=lambda x: (x["game_date"], x["game_start_time"]))
 
         # Implement Pagination
         page = int(request.GET.get("page", 1))
         page_size = 10
-        total_records = len(processed_tournament_games) + len(processed_friendly_games)
+        total_records = len(all_games)
         total_pages = (total_records + page_size - 1) // page_size
         start = (page - 1) * page_size
         end = start + page_size
 
         # Paginate the games
-        paginated_tournament_games = processed_tournament_games[start:end]
-        paginated_friendly_games = processed_friendly_games[start:end]
+        paginated_games = all_games[start:end]
 
         # Return the response
         return Response({
@@ -2351,10 +2351,8 @@ class FetchMyGamesAPIView(APIView):
             "total_records": total_records,
             "total_pages": total_pages,
             "current_page": page,
-            "tournament_games": paginated_tournament_games,
-            "friendly_games": paginated_friendly_games,
+            "data": paginated_games,
         })
-
 
 class FetchAllGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]

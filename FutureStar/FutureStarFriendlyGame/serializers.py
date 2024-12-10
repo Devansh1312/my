@@ -12,18 +12,13 @@ from FutureStarFriendlyGame.models import *
 class FriendlyGameSerializer(serializers.ModelSerializer):
     team_a = serializers.SerializerMethodField()
     team_b = serializers.SerializerMethodField()
-    referee = serializers.SerializerMethodField()
-    assistant_refree_1st = serializers.SerializerMethodField()
-    assistant_refree_2nd = serializers.SerializerMethodField()
-    refree_4th = serializers.SerializerMethodField()
     game_field_id = serializers.SerializerMethodField()
 
     class Meta:
         model = FriendlyGame
         fields = [
             'id', 'team_a', 'team_b', 'game_name', 'game_number', 'game_date', 'game_start_time', 
-            'game_end_time', 'game_field_id','referee', 'assistant_refree_1st', 'assistant_refree_2nd', 
-            'refree_4th', 'game_status', 'created_at', 'updated_at'
+            'game_end_time', 'game_field_id', 'game_status','created_by'
         ]
 
     def get_team_a(self, obj):
@@ -58,25 +53,6 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
                     'country_code': obj.game_field_id.country_code
                     }
                 } if obj.game_field_id else None
-
-    def get_referee(self, obj):
-        return self._get_user_data(obj.referee)
-
-    def get_assistant_refree_1st(self, obj):
-        return self._get_user_data(obj.assistant_refree_1st)
-
-    def get_assistant_refree_2nd(self, obj):
-        return self._get_user_data(obj.assistant_refree_2nd)
-
-    def get_refree_4th(self, obj):
-        return self._get_user_data(obj.refree_4th)
-
-    def _get_user_data(self, user):
-        return {
-            'id': user.id,
-            'username': user.username,
-            'profile_picture': user.profile_picture.url if user.profile_picture else None,
-        } if user else None
 
 
 

@@ -24,6 +24,7 @@ from operator import attrgetter
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 import re
+from datetime import date
 
 
 class ManagerBranchDetail(APIView):
@@ -360,12 +361,13 @@ class OfficialListView(APIView):
         user_data = [
             {
                 'id': user.id,
-                'username': user.username,
-                'phone': user.phone,
-                'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                'country_id': user.country.id if user.country else None,
-                'country_name': user.country.name if user.country else None,
-                'country_flag': user.country.flag.url if user.country else None,
+                'name': user.username,
+                'fees':None,
+                # 'phone': user.phone,
+                # 'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                # 'country_id': user.country.id if user.country else None,
+                # 'country_name': user.country.name if user.country else None,
+                # 'country_flag': user.country.flag.url if user.country else None,
             }
             for user in users
         ]
@@ -581,18 +583,12 @@ class ListOfFridlyGamesForJoin(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # First fetch games where game_status=0 and team_b is None
-        primary_games = FriendlyGame.objects.filter(game_status=0, team_b=None)
-
-        # Then fetch all other games excluding the primary games
-        other_games = FriendlyGame.objects.exclude(id__in=primary_games.values_list('id', flat=True))
-
-        # Combine the querysets
-        all_games = list(primary_games) + list(other_games)
+        # Filter games where game_date is in the future and team_b is None
+        games = FriendlyGame.objects.filter(game_date__gte=date.today(), team_b=None)
 
         # Initialize pagination
         paginator = self.pagination_class()
-        paginated_queryset = paginator.paginate_queryset(all_games, request, view=self)
+        paginated_queryset = paginator.paginate_queryset(games, request, view=self)
 
         # If paginated queryset exists, serialize the data and return paginated response
         if paginated_queryset is not None:
@@ -600,7 +596,7 @@ class ListOfFridlyGamesForJoin(APIView):
             return paginator.get_paginated_response(serializer.data)
 
         # Fallback response if no pagination
-        serializer = FriendlyGameSerializer(all_games, many=True)
+        serializer = FriendlyGameSerializer(games, many=True)
         return Response({
             'status': 1,
             'message': _('Data fetched successfully.'),
