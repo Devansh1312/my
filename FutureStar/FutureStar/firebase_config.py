@@ -22,7 +22,6 @@ def send_push_notification(device_token, title, body, device_type, data=None):
                 "title": str(title) if title else "",
                 "body": str(body) if body else "",
             })
-            print(data)
 
         # Create the notification message
         android_config = (
@@ -62,7 +61,6 @@ def send_push_notification(device_token, title, body, device_type, data=None):
 
         # Log and return the response
         logging.info(f"Firebase response: {response}")
-        print(f"Notification sent successfully: {response}")
         return response
 
     except Exception as e:

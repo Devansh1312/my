@@ -1408,7 +1408,6 @@ class PostCreateAPIView(APIView):
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
         media_type = request.data.get('media_type')
-        print(created_by_id,creator_type)
 
         if not created_by_id or not creator_type:
             return Response({
@@ -1457,7 +1456,7 @@ class PostCreateAPIView(APIView):
         followers = FollowRequest.objects.filter(
             Q(target_id=created_by_id, target_type=creator_type)
         )
-        print(followers)
+
         # Retrieve creator name and user data based on creator_type
         creator_name = None
         notification_language = None
