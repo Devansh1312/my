@@ -50,10 +50,10 @@
                                        <!-- Three dots icon -->
                                     </a>
                                     <!-- Hidden card for actions -->
-                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                           <li style="padding: 8px 12px;">
-                                             <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editRoleModal" data-role-id="{{ role.id }}" data-role-name-en="{{ role.name_en }}" data-role-name-ar="{{ role.name_ar }}">
+                                             <a style="font-size: small;" href="#" data-bs-toggle="modal" data-bs-target="#editRoleModal" data-role-id="{{ role.id }}" data-role-name-en="{{ role.name_en }}" data-role-name-ar="{{ role.name_ar }}">
                                                  Edit </a>
                                           </li>
                                           <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
@@ -105,7 +105,7 @@
 
 <!-- Edit Role Modal -->
 <div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered modal-lg">
+   <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="editRoleModalLabel">Edit Role</h5>
@@ -209,6 +209,18 @@
          padding: 8px;
       }
    }
+   /* Specific custom styles for Edit Role Modal */
+#editRoleModal .modal-dialog {
+   max-width: 500px; /* or any other value you prefer */
+   width: auto;
+}
+/* Mobile-specific styles for Edit Role Modal */
+@media (max-width: 767px) {
+   #editRoleModal .modal-dialog {
+      max-width: 90%;
+   }
+}
+
 </style>
 
 {% endblock %}

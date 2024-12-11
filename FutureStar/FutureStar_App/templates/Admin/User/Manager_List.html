@@ -56,24 +56,46 @@ Manager List
                               </td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                       <i data-feather="more-vertical"></i>
+                                    <!-- Three dots menu trigger -->
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)" style="display: flex; align-items: center; justify-content: center;">
+                                       <i data-feather="more-vertical"></i> <!-- Icon for three dots -->
                                     </a>
-                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                              
+                                    <!-- Action card for menu items -->
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
-                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                          <!-- Toggle Status -->
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                             <a href="#" class="toggle-status" data-id="{{ manager.user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                                {% if manager.user.is_active %}
+                                                   Deactivate
+                                                {% else %}
+                                                   Activate
+                                                {% endif %}
+                                             </a>
+                                             <form id="status-form-{{ manager.user.id }}" method="post" action="{% url 'user_toggle_status' pk=manager.user.id %}" style="display: none;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="source_page" value="manager_list">
+                                                <input type="hidden" name="title" value="Manager">
+                                                <input type="hidden" name="status" value="{% if manager.user.is_active %}deactivate{% else %}activate{% endif %}">
+                                             </form>
+                                          </li>
+                              
+                                          <!-- View Details -->
+                                          <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
                                              <a href="#" class="view-details" data-id="{{ manager.user.id }}">View</a>
-                                             <form id="view-form-{{ manager.user.id }}" method="post" action="{% url 'manager_detail' pk=manager.user.id %}" style="display: none;">
+                                             <form id="view-form-{{ manager.user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="user_id" value="{{ manager.user.id }}">
                                                 <input type="hidden" name="source_page" value="manager_list">
-                                                <input type="hidden" name="title" value="Manager">
+                                                <input type="hidden" name="title" value="Coach">
                                              </form>
                                           </li>
                                        </ul>
                                     </div>
                                  </div>
                               </td>
+                              
                            </tr>
                            {% endfor %}
                         </tbody>

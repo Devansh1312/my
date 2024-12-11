@@ -61,10 +61,10 @@
                                     <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                        <i data-feather="more-vertical"></i> <!-- Three dots icon -->
                                     </a>
-                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
                                        <ul style="list-style: none; padding: 0; margin: 0;">
                                            <!-- Toggle Status Action -->
-                                           <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                           <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
                                                <a href="#" class="toggle-status" data-id="{{ user.id }}" data-status="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
                                                    {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
                                                </a>
@@ -77,7 +77,7 @@
                                            </li>
                                    
                                            <!-- View Details Action -->
-                                           <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                           <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
                                                <a href="#" class="view-details" data-id="{{ user.id }}">View</a>
                                                <form id="view-form-{{ user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;">
                                                    {% csrf_token %}

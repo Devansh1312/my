@@ -520,7 +520,9 @@ class System_Settings(LoginRequiredMixin, View):
 class ToggleUserStatusView(View):
     def post(self, request, pk, *args, **kwargs):
         user = get_object_or_404(User, pk=pk)
+        print(user)
         new_status = request.POST.get("status")
+        print(new_status)
         source_page = request.POST.get(
             "source_page", "Dashboard"
         )  # Default to Dashboard if not provided
@@ -528,7 +530,7 @@ class ToggleUserStatusView(View):
         # Check if the user is a superuser
         if user.role_id == 1:
             messages.error(request, "Superuser status cannot be changed.")
-            return redirect("user_list")
+            return redirect(source_page)
 
         # Check if the current user is trying to deactivate their own account
         if user == request.user and new_status == "deactivate":
@@ -558,6 +560,8 @@ class ToggleUserStatusView(View):
             return redirect(reverse("referee_list"))
         elif source_page == "default_user_list":
             return redirect(reverse("default_user_list"))
+        elif source_page == "manager_list":
+            return redirect(reverse("manager_list"))
         else:
             return redirect(reverse("Dashboard"))
 

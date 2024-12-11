@@ -153,10 +153,10 @@
                                                                         <i data-feather="more-vertical"></i>
                                                                     </a>
                                                                     <!-- Action card -->
-                                                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                                                    <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
                                                                         <ul style="list-style: none; padding: 0; margin: 0;">
                                                                             <!-- View action -->
-                                                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: large;">
+                                                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
                                                                                 <a href="#" class="view-details" data-id="{{ branch.id }}" onclick="submitViewForm(event, '{{ branch.id }}')">View</a>
                                                                                 <form id="view-form-{{ branch.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;">
                                                                                     {% csrf_token %}
