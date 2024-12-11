@@ -1876,7 +1876,7 @@ class PlayerGameStatsAPIView(APIView):
         """
         Sends a push notification when a player's statistics are updated.
         """
-        # Define the notification content
+        # Define the notification content with translations
         stat_messages = {
             'goals': _('You just scored a goal!'),
             'assists': _('You just made an assist!'),
@@ -1888,8 +1888,26 @@ class PlayerGameStatsAPIView(APIView):
         # Customize the message based on the stat type
         message = stat_messages.get(stat, _('Your statistics have been updated!'))
 
+        # Set the language based on player's current_language
+        print(f"Player's preferred language: {player_instance.current_language}")
+        notification_language = player_instance.current_language  # Use player's preferred language
+        
+        if notification_language in ['en', 'ar']:
+            activate(notification_language)  # Activate language for notification
+            print(f"Language activated: {notification_language}")
+            print(_('You just scored a goal!'))  # Check translation
+
+        # Translate each part of the notification message
+        translated_message = _(message)
+        translated_tournament_name = _(tournament_instance.tournament_name)
+        translated_game_number = _(f"Game Number {game_instance.game_number}")
+
         # Construct the notification body
-        notification_body = f"{message} in {tournament_instance.tournament_name} - Game Number {game_instance.game_number}"
+        notification_body = f"{translated_message} in {translated_tournament_name} - {translated_game_number}"
+
+        # Print the notification details to verify the message content
+        print(f"Notification title: {_('Statistics Updated!')}")
+        print(f"Notification body: {notification_body}")
 
         # Send the notification to the player
         if player_instance.device_token:

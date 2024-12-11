@@ -109,3 +109,57 @@ msgstr "تم إنشاء التعليق بنجاح."
 
 msgid "Post deleted successfully."
 msgstr "تم حذف المشاركة بنجاح."
+
+msgid "You just scored a goal!"
+msgstr "لقد سجلت هدفًا!"
+
+msgid "You just made an assist!"
+msgstr "لقد قدمت تمريرة حاسمة!"
+
+msgid "You just scored an own goal!"
+msgstr "لقد سجلت هدفًا في مرماك!"
+
+msgid "You just received a yellow card!"
+msgstr "لقد تلقيت بطاقة صفراء!"
+
+msgid "You just received a red card!"
+msgstr "لقد تلقيت بطاقة حمراء!"
+
+msgid "branch_id, user_id, and joinning_type are required"
+msgstr "branch_id و user_id و joinning_type مطلوبة"
+
+msgid "Please provide a valid joining type"
+msgstr "يرجى تقديم نوع انضمام صالح"
+
+msgid "Please provide a valid joining type."
+msgstr "يرجى تقديم نوع انضمام صالح."
+
+msgid "Branch not found."
+msgstr "لم يتم العثور على الفرع."
+
+msgid "Manager added successfully, and user role updated to manager."
+msgstr "تم إضافة المدير بنجاح، وتم تحديث دور المستخدم إلى مدير."
+
+msgid "Player added successfully, and user role updated to player."
+msgstr "تم إضافة اللاعب بنجاح، وتم تحديث دور المستخدم إلى لاعب."
+
+msgid "Staff added successfully."
+msgstr "تم إضافة الموظف بنجاح."
+
+msgid "Failed to add staff/player."
+msgstr "فشل في إضافة الموظف/اللاعب."
+
+msgid "User has already joined this branch."
+msgstr "لقد انضم المستخدم بالفعل إلى هذا الفرع."
+
+msgid "Welcome to {team_name}"
+msgstr "مرحبًا بك في {team_name}"
+
+msgid "{team_name} added you as {joinning_type_name}"
+msgstr "{team_name} أضافك كـ {joinning_type_name}"
+
+msgid "Current language updated successfully."
+msgstr "تم تحديث اللغة الحالية بنجاح."
+
+msgid "Invalid or missing current_language. It must be either \"en\" or \"ar\"."
+msgstr "اللغة الحالية غير صالحة أو مفقودة. يجب أن تكون إما \"en\" أو \"ar\"."

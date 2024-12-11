@@ -2470,9 +2470,9 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
     def _send_stat_notification(self, player_instance, stat, game_instance):
         """
-        Sends a push notification when a player's statistics are updated.
+        Sends a push notification when a player's statistics are updated in a friendly game.
         """
-        # Define the notification content
+        # Define the notification content with translations
         stat_messages = {
             'goals': _('You just scored a goal!'),
             'assists': _('You just made an assist!'),
@@ -2484,13 +2484,31 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         # Customize the message based on the stat type
         message = stat_messages.get(stat, _('Your statistics have been updated!'))
 
+        # Set the language based on player's current_language
+        print(f"Player's preferred language: {player_instance.current_language}")
+        notification_language = player_instance.current_language  # Use player's preferred language
+
+        if notification_language in ['en', 'ar']:
+            activate(notification_language)  # Activate language for notification
+            print(f"Language activated: {notification_language}")
+            print(_('You just scored a goal!'))  # Check translation
+
+        # Translate each part of the notification message
+        translated_message = _(message)
+        translated_game_number = _(f"Game Number {game_instance.game_number}")
+
         # Construct the notification body
-        notification_body = f"{message} in Friendly Game - Game Number {game_instance.game_number}"
+        notification_body = f"{translated_message} in Friendly Game - {translated_game_number}"
+
+        # Print the notification details to verify the message content
+        print(f"Notification title: {_('Statistics Updated!')}")
+        print(f"Notification body: {notification_body}")
 
         # Send the notification to the player
         if player_instance.device_token:
             push_data = {'type': 'player_stat', 'player_id': player_instance.id, 'game_id': game_instance.id}
             send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
+
 
     def get(self, request, *args, **kwargs):
         # Set language based on the request headers
@@ -3070,6 +3088,12 @@ class FriendlyGamesh2hCompleteAPIView(APIView):
             "team_b_lose": team_b_stats['losses'],
             "team_a_draw": team_a_stats['draws'],
             "team_b_draw": team_b_stats['draws'],
+            "team_a_Duel_success_rate" : 0,
+            "team_b_Duel_success_rate" : 0,
+            "team_a_Total_Long_passes" : 0,
+            "team_b_Total_Long_passes" : 0,
+            "team_a_Aerial_duels_success_rate" : 0,
+            "team_b_Aerial_duels_success_rate" : 0,
         }
 
         # Query recent meetings

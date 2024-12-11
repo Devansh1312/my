@@ -753,36 +753,38 @@ class DeleteAccountView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user  # Get the authenticated user
-        serializer = UserDeleteSerializer(data=request.data)
+        deleted_reason_id = request.data.get('deleted_reason_id')
+        deleted_reason_text = request.data.get('deleted_reason')
 
-        if serializer.is_valid():
-            deleted_reason_id = serializer.validated_data.get('deleted_reason_id')
-            deleted_reason = serializer.validated_data.get('deleted_reason')
-
-            # Check if the reason ID exists
-            delete_reason = UserDeleteReason.objects.filter(id=deleted_reason_id).first()
-            if not delete_reason:
-                return Response({
-                    'status': 0,
-                    'message': _('Invalid deletion reason ID.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Mark the user as deleted and set the reason
-            user.is_deleted = True
-            user.deleted_reason_id = deleted_reason_id
-            user.deleted_reason = deleted_reason
-            user.is_active = False  # Optionally, deactivate the user as well
-            user.save()
-
+        try:
+            # Convert deleted_reason_id to an integer if possible
+            deleted_reason_id = int(deleted_reason_id)
+        except (ValueError, TypeError):
             return Response({
-                'status': 2,
-                'message': _('Your account has been deleted successfully.')
-            }, status=status.HTTP_200_OK)
+                'status': 0,
+                'message': _('Invalid deletion reason ID. It must be an integer.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the reason ID exists
+        delete_reason = UserDeleteReason.objects.filter(id=deleted_reason_id).first()
+        if not delete_reason:
+            return Response({
+                'status': 0,
+                'message': _('Invalid deletion reason ID.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Mark the user as deleted and set the reason
+        user.is_deleted = True
+        user.deleted_reason_id = delete_reason  # Assign the UserDeleteReason instance to the foreign key
+        user.deleted_reason = deleted_reason_text  # Assign the additional text reason
+        user.is_active = False  # Optionally, deactivate the user as well
+        user.save()
 
         return Response({
-            'status': 0,
-            'message': _('Invalid data provided.')
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'status': 2,
+            'message': _('Your account has been deleted successfully.')
+        }, status=status.HTTP_200_OK)
+
 
 
 
@@ -1406,6 +1408,7 @@ class PostCreateAPIView(APIView):
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
         media_type = request.data.get('media_type')
+        print(created_by_id,creator_type)
 
         if not created_by_id or not creator_type:
             return Response({
@@ -1454,22 +1457,41 @@ class PostCreateAPIView(APIView):
         followers = FollowRequest.objects.filter(
             Q(target_id=created_by_id, target_type=creator_type)
         )
-
         print(followers)
-
-        # Retrieve creator name based on creator_type
+        # Retrieve creator name and user data based on creator_type
         creator_name = None
-        if creator_type in [1, "1"]:
-            creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
-        elif creator_type in [2, "2"]:
-            creator_name = Team.objects.filter(id=created_by_id).values_list('team_username', flat=True).first()
-        elif creator_type in [3, "3"]:
-            creator_name = TrainingGroups.objects.filter(id=created_by_id).values_list('group_name', flat=True).first()
+        notification_language = None
+        device_token = None
+        device_type = None
 
+        if creator_type in [1, "1"]:  # For individual user posts
+            creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
+        elif creator_type in [2, "2"]:  # For team posts
+            team = Team.objects.get(id=created_by_id)
+            creator_name = team.team_username
+            user = team.team_founder
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get the team founder's language
+        elif creator_type in [3, "3"]:  # For group posts
+            group = TrainingGroups.objects.get(id=created_by_id)
+            creator_name = group.group_name
+            user = group.group_founder
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get the group founder's language
+
+        # Notify followers based on their type
         for follower in followers:
             follower_user = User.objects.filter(id=follower.created_by_id).first()
-            if follower_user and follower_user.device_token and follower_user.device_type in [1, 2, "1", "2"]:
-                # Send notification
+            if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
+                
+                # Set notification language based on the follower's preference
+                notification_language = follower_user.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                # Send notification to the follower
                 title = _('New Post Alert!')
                 body = _(f'{creator_name} you are following just posted.')
                 push_data = {
@@ -1477,6 +1499,30 @@ class PostCreateAPIView(APIView):
                     'post_id': post.id
                 }
                 send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+
+                # If the follower is a team, send notification to the team founder
+                if creator_type == 2:
+                    follower_user.id = team.team_founder.id
+                    title = _('Your team has a new post!')
+                    body = _(f'Team {creator_name} just posted a new update.')
+                    push_data = {
+                        'type': 'team_post',
+                        'post_id': post.id,
+                        'team_id': team.id
+                    }
+                    send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+
+                # If the follower is a group, send notification to the group founder
+                elif creator_type == 3 :
+                    follower_user.id = group.group_founder.id
+                    title = _('Your group has a new post!')
+                    body = _(f'Group {creator_name} just posted a new update.')
+                    push_data = {
+                        'type': 'group_post',
+                        'post_id': post.id,
+                        'group_id': group.id
+                    }
+                    send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
 
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
@@ -4593,3 +4639,36 @@ class SearchAPIView(APIView):
             })
 
         return Response({"status": 0, "message": _("Invalid search type."), "data": {}}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+####### Change Language ##############
+class UpdateCurrentLanguageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user  # Get the authenticated user
+        current_language = request.data.get('current_language')
+
+        # Validate the input
+        if current_language not in ["en", "ar"]:
+            return Response({
+                'status': 0,
+                'message': _('Invalid or missing current_language. It must be either "en" or "ar".')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Activate the selected language
+        activate(current_language)
+
+        # Update the user's current language
+        user.current_language = current_language
+        user.save()
+
+        return Response({
+            'status': 1,
+            'message': _('Current language updated successfully.'),
+            'data': {
+                'current_language': user.current_language
+            }
+        }, status=status.HTTP_200_OK)
+    

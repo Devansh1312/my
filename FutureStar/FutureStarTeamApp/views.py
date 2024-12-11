@@ -712,6 +712,7 @@ class StaffManagementView(APIView):
 
 
     def post(self, request):
+        # Activate language from the request header
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -720,6 +721,7 @@ class StaffManagementView(APIView):
         user_id = request.data.get('user_id')
         joinning_type = request.data.get('joinning_type')
 
+        # Check required fields
         if not branch_id or not user_id or joinning_type is None:
             return Response({
                 'status': 0, 
@@ -735,7 +737,7 @@ class StaffManagementView(APIView):
                 'message': _('Please provide a valid joining type')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate joinning_type to accept only values 1, 2, 3, or 4
+        # Validate joinning_type
         if joinning_type not in [1, 2, 3, 4]:
             return Response({
                 'status': 0,
@@ -747,6 +749,9 @@ class StaffManagementView(APIView):
                 # Retrieve the user
                 user = User.objects.get(id=user_id)
                 success_message = ''
+
+                # Set the language for notification based on user's current_language
+               
 
                 # Retrieve the branch and team name
                 try:
@@ -781,35 +786,51 @@ class StaffManagementView(APIView):
                     'joinning_type': joinning_type
                 }
                 serializer = JoinBranchSerializer(data=join_branch_data)
-                
+
                 if serializer.is_valid():
                     serializer.save()
+                    notification_language = user.current_language if user.current_language in ['en', 'ar'] else 'en'
+                    print(f"User's preferred language: {notification_language}")  # Debugging
+                    activate(notification_language)
+                    # Translate and format notification title and body
+                    joinning_type_name = dict(JoinBranch.JOINNING_TYPE_CHOICES).get(joinning_type, "Staff")
+                    title_template = _('Welcome to {team_name}')
+                    body_template = _('{team_name} added you as {joinning_type_name}')
+
+                    title = title_template.format(team_name=team_name)
+                    body = body_template.format(team_name=team_name, joinning_type_name=joinning_type_name)
+
+                    print(f"Translated title: {title}")
+                    print(f"Translated body: {body}")
 
                     # Send push notification to the user
-                    if user.device_token and user.device_type in [1, 2, "1", "2"]:
-                        joinning_type_name = dict(JoinBranch.JOINNING_TYPE_CHOICES).get(joinning_type, "Staff")
-
-                        title = _(f'Welcome to {team_name}')
-                        body = _(f'{team_name} added you as {joinning_type_name}')
+                    if user.device_type in [1, 2, "1", "2"]:
                         push_data = {
                             'type': 'branch',
                             'branch_id': branch_id,
                             'joinning_type': joinning_type
                         }
-                        send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
 
+                        print(f"Sending push notification with title: {title}")  # Debugging
+                        send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
+                        print(f"Notification sent successfully with title: {title} and body: {body}")
+
+                    # Return API success message in the selected language
+                    activate(language)  # Reactivate header language
                     return Response({
                         'status': 1,
                         'message': success_message,
                         'data': serializer.data
                     }, status=status.HTTP_201_CREATED)
                 else:
+                    print(f"Serializer errors: {serializer.errors}")  # Debugging
                     return Response({
                         'status': 0,
                         'message': _('Failed to add staff/player.'),
                         'errors': serializer.errors
                     }, status=status.HTTP_400_BAD_REQUEST)
-
+                
+            activate(language)
         except User.DoesNotExist:
             return Response({
                 'status': 0,
@@ -820,7 +841,6 @@ class StaffManagementView(APIView):
                 'status': 0,
                 'message': _('User has already joined this branch.')
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 
