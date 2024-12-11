@@ -3750,7 +3750,7 @@ class EventsAPIView(APIView):
             activate(language)
 
         paginator = CustomEventPagination()
-        
+
         events_section = request.query_params.get('events_section')  # Default to 1 if not provided
         creator_type = request.query_params.get('creator_type')  # Get creator_type from query parameters
         created_by_id = request.query_params.get('created_by_id')  # Get created_by_id from query parameters
@@ -3770,38 +3770,21 @@ class EventsAPIView(APIView):
         elif events_section == 2:
             # Show events created by the specified creator_type and created_by_id
             events = Event.objects.filter(
-                creator_type=creator_type, 
+                creator_type=creator_type,
                 created_by_id=created_by_id
             )
 
             if not events.exists():
                 # If no created events, look up joined events in EventBooking
-                joined_events_ids = EventBooking.objects.filter(
+                joined_events = EventBooking.objects.filter(
                     creator_type=creator_type,
                     created_by_id=created_by_id
-                ).values_list('event_id', flat=True)
-                
-                events = Event.objects.filter(id__in=joined_events_ids)
+                )
 
-            # Retrieve booking details for each event
-            event_data = []
-            for event in events:
-                # Get the booking details for the event
-                booking_details = EventBooking.objects.filter(event=event, creator_type=creator_type, created_by_id=created_by_id).first()
-
-                booking_detail = {}
-                if booking_details:
-                    booking_detail = {
-                        "tickets": booking_details.tickets,
-                        "convenience_fee": booking_details.convenience_fee,
-                        "ticket_amount": booking_details.ticket_amount,
-                        "total_amount": booking_details.total_amount
-                    }
-
-                event_data.append({
-                    "event": EventSerializer(event, context={'request': request}).data,
-                    "booking_detail": booking_detail
-                })
+                if joined_events.exists():
+                    # Get event IDs from joined bookings
+                    joined_event_ids = joined_events.values_list('event_id', flat=True)
+                    events = Event.objects.filter(id__in=joined_event_ids)
 
         else:
             return Response({
@@ -3810,12 +3793,13 @@ class EventsAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Paginate the queryset
-        paginated_events = paginator.paginate_queryset(event_data, request, view=self)
+        paginated_events = paginator.paginate_queryset(events, request, view=self)
+        serializer = EventSerializer(paginated_events, many=True, context={'request': request, 'creator_type': creator_type, 'created_by_id': created_by_id})
 
         return Response({
             'status': 1,
             'message': _('Events fetched successfully.'),
-            'data': paginated_events,
+            'data': serializer.data,
             'total_records': paginator.page.paginator.count,
             'total_pages': paginator.total_pages,
             'current_page': paginator.page.number

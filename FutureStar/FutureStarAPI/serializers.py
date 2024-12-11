@@ -592,16 +592,38 @@ class EventSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
     event_organizer = serializers.SerializerMethodField()
+    booking_details = serializers.SerializerMethodField()  # New field for booking details
+
 
     class Meta:
         model = Event
         fields = [
-            'id', 'event_organizer', 'event_name', 'event_type', 'event_type_name', 'event_date',
+            'id', 'event_organizer','booking_details', 'event_name', 'event_type', 'event_type_name', 'event_date',
             'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
             'event_description', 'event_cost',   'created_by_id','creator_type', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
         ]
         read_only_fields = ['event_organizer']  # Make 'event_organizer' read-only since it will be auto-assigned
+
+    def get_booking_details(self, obj):
+        request = self.context.get('request')
+        creator_type = self.context.get('creator_type')
+        created_by_id = self.context.get('created_by_id')
+
+        if creator_type and created_by_id:
+            booking = EventBooking.objects.filter(
+                event=obj,
+                creator_type=creator_type,
+                created_by_id=created_by_id
+            ).first()
+            if booking:
+                return {
+                    'tickets': booking.tickets,
+                    'convenience_fee': booking.convenience_fee,
+                    'ticket_amount': booking.ticket_amount,
+                    'total_amount': booking.total_amount,
+                }
+        return None
 
     def get_event_organizer(self, obj):
         user = obj.event_organizer
