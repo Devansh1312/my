@@ -3226,8 +3226,8 @@ class LocationAPIView(APIView):
 ####################################### FOLLOW USER ############################################
 class FollowUnfollowAPI(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)    
-    
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def post(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -3249,7 +3249,7 @@ class FollowUnfollowAPI(APIView):
             follow_request.delete()
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
-            
+
             # Return the response for unfollowing
             return Response({
                 'status': 1,
@@ -3271,42 +3271,42 @@ class FollowUnfollowAPI(APIView):
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
 
-            # Fetch the relevant user to send push notification
-            if creator_type in [1, "1"]:
-                user = User.objects.get(id=created_by_id)
-                notifier_name = user.username
-                device_token = user.device_token
-                device_type = user.device_type
-                notification_language = user.current_language  # Get user's language for notifications
-            elif creator_type in [2, "2"]:
-                team = Team.objects.get(id=created_by_id)
-                user = team.team_founder
-                notifier_name = team.team_username
-                device_token = user.device_token
-                device_type = user.device_type
-                notification_language = user.current_language  # Get team founder's language for notifications
-            elif creator_type == 3:
-                group = TrainingGroups.objects.get(id=created_by_id)
-                user = group.group_founder
-                notifier_name = group.group_name
-                device_token = user.device_token
-                device_type = user.device_type
-                notification_language = user.current_language  # Get group founder's language for notifications
+            # Fetch the relevant user for the target to send push notification
+            if target_type in [1, "1"]:  # Target is a User
+                target_user = User.objects.get(id=target_id)
+                recipient_name = target_user.username
+                device_token = target_user.device_token
+                device_type = target_user.device_type
+                notification_language = target_user.current_language  # Get user's language for notifications
+            elif target_type in [2, "2"]:  # Target is a Team
+                target_team = Team.objects.get(id=target_id)
+                target_user = target_team.team_founder
+                recipient_name = target_team.team_username
+                device_token = target_user.device_token
+                device_type = target_user.device_type
+                notification_language = target_user.current_language  # Get team founder's language for notifications
+            elif target_type == 3:  # Target is a Training Group
+                target_group = TrainingGroups.objects.get(id=target_id)
+                target_user = target_group.group_founder
+                recipient_name = target_group.group_name
+                device_token = target_user.device_token
+                device_type = target_user.device_type
+                notification_language = target_user.current_language  # Get group founder's language for notifications
             else:
                 return Response({
                     'status': 0,
-                    'message': _('Invalid creator type.')
+                    'message': _('Invalid target type.')
                 }, status=400)
 
-            # Set notification language based on user's preference
+            # Set notification language based on the target user's preference
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
 
-            # Sending push notification
+            # Sending push notification to the target
             if device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
-                body = _(f'{notifier_name} started following you.')
-                push_data = {'type': 'follow', 'created_by_id': created_by_id, 'creator_type': creator_type}  # Include follow info in the notification payload
+                body = _(f'{recipient_name} started following you.')
+                push_data = {'type': 'follow', 'target_id': target_id, 'target_type': target_type}  # Include follow info in the notification payload
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
             # Return the response for following

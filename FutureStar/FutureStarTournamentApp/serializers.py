@@ -210,14 +210,14 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
     group_id_name = serializers.SerializerMethodField()
     game_field_id_name = serializers.SerializerMethodField()
     tournament_name= serializers.SerializerMethodField()
-    tournament_banner = serializers.SerializerMethodField()
+    # tournament_banner = serializers.SerializerMethodField()
 
 
    
     class Meta:
         model = TournamentGames
         fields = [
-            'id', 'tournament_id','tournament_name','tournament_banner','game_number', 'game_date', 'game_start_time', 'game_end_time',
+            'id', 'tournament_id','tournament_name','game_number', 'game_date', 'game_start_time', 'game_end_time',
             'group_id', 'group_id_name', 'team_a','team_a_goal','team_b','team_b_goal', 
             'game_field_id', 'game_field_id_name', 'finish','winner_id','loser_id','is_draw' ,'created_at', 'updated_at'
         ]
@@ -234,10 +234,10 @@ class TournamentGamesSerializer(serializers.ModelSerializer):
             return obj.tournament_id.tournament_name
         return None 
     
-    def get_tournament_banner(self,obj):
-        if obj.tournament_id:
-            return obj.tournament_id.tournament_banner.url
-        return None
+    # def get_tournament_banner(self,obj):
+    #     if obj.tournament_id:
+    #         return obj.tournament_id.tournament_banner.url
+    #     return None
     
 
 
