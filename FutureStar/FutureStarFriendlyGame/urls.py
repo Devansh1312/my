@@ -63,13 +63,15 @@ urlpatterns = [
       # Friendly Game Stats
       path('api/friendlygames/h2h/completed/', FriendlyGamesh2hCompleteAPIView.as_view(), name='friendly_games_completed'),
       path('api/friendlygames/game_detail_stats/', FriendlyTeamGameDetailStatsAPIView.as_view(), name='friendly_game_stats'),
-
+      path('api/friendlygames/update_result/',FriendlyGameResult.as_view()),
 
       # Team Uniform Management
       path('api/friendlygames/team_uniform/create/', FriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
       path('api/friendlygames/team_uniform/', FetchFriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
 
       path('api/friendlygames/uniform_fetch/',FriendlyGameUniformAPIView.as_view()),
+
+
 
 
 

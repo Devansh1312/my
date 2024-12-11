@@ -3546,3 +3546,95 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
                 'team_b': team_b_data
             },
         }, status=status.HTTP_200_OK)
+
+
+
+class FriendlyGameResult(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def patch(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+ 
+        game_id = request.data.get('game_id')  # Extract game_id from URL parameters
+         # Get tournament_id from the request data
+
+        try:
+            # Get the game by game_id and tournament_id
+            game = FriendlyGame.objects.get(id=game_id)
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": _("Game not found for the given tournament.")
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Retrieve the goals scored by each team in the game
+        team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=game.team_a.id,
+            game_id=game.id,
+            tournament_id=game.tournament_id.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+            team_id=game.team_b.id,
+            game_id=game.id,
+            tournament_id=game.tournament_id.id
+        ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+        # Check if the finish status is provided and is true
+        finish = request.data.get('finish', 'false').lower() == 'true'
+
+        if finish:
+            # If the game is finished, determine the result
+            if team_a_goals == 0 and team_b_goals == 0:
+                # If both teams have 0-0, set is_draw to True
+                game.is_draw = True
+            else:
+                # If one team wins, set is_draw to False
+                game.is_draw = False
+                if team_a_goals > team_b_goals:
+                    game.winner_id = game.team_a.id
+                    game.loser_id = game.team_b.id
+                else:
+                    game.winner_id = game.team_b.id
+                    game.loser_id = game.team_a.id
+
+            # Set the finish status to True and update the scores
+            game.finish = True
+            game.team_a_goal = team_a_goals
+            game.team_b_goal = team_b_goals
+            game.save()
+
+            return Response({
+                "status": 1,
+                "message": _("Game updated successfully."),
+                "data": {
+                    "id": game.id,
+                    "tournament_id": game.tournament_id.id,
+                    "is_draw": game.is_draw,
+                    "finish": game.finish,
+                    "team_a_goal": game.team_a_goal,
+                    "team_b_goal": game.team_b_goal,
+                    "winner_id": game.winner_id,
+                    "loser_id": game.loser_id,
+                }
+            }, status=status.HTTP_200_OK)
+
+        else:
+            # If finish is not true, return the current game state with null values for is_draw and finish
+            return Response({
+                "status": 1,
+                "message": _("Match is still running."),
+                "data": {
+                    "id": game.id,
+                    "tournament_id": game.tournament_id.id,
+                    "is_draw": game.is_draw if game.is_draw is not None else None,
+                    "finish": game.finish if game.finish is not None else None,
+                    "team_a_goal": game.team_a_goal,
+                    "team_b_goal": game.team_b_goal,
+                    "winner_id": game.winner_id,
+                    "loser_id": game.loser_id,
+                }
+            }, status=status.HTTP_200_OK)
