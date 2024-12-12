@@ -6725,7 +6725,8 @@ class AssignUserToGameView(LoginRequiredMixin, View):
     def post(self, request, game_id):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
-            activate(language)
+            activate(language)  # Activate the requested language
+        
         try:
             # Parse JSON request body
             data = json.loads(request.body)
@@ -6743,44 +6744,49 @@ class AssignUserToGameView(LoginRequiredMixin, View):
             ):
                 messages.success(
                     request,
-                    f"Cannot assign user; game already started."
+                    _('Cannot assign user; game already started.')
                 )
                 return JsonResponse(
-                    {'error': 'Cannot assign user; game already started.'}, status=400
+                    {'error': _('Cannot assign user; game already started.')}, status=400
                 )
 
             # Assign the user to the game
             game.game_statistics_handler = user
             game.save()
 
+            # Activate the user's current language or use header language
+            if user.current_language:
+                activate(user.current_language)
+            else:
+                activate(language)  # Fall back to header language
+
             # Prepare notification details
             title = _('Match Assignment')
-            body = _(
-                f"You have been assigned to handle the match between {game.team_a.team_name} and {game.team_b.team_name} on "
-                f"{game.game_date.strftime('%Y-%m-%d')} at {game.game_start_time.strftime('%H:%M')} at {game.game_field_id.field_name}."
-            )
+            body = _(f"You have been assigned to handle the match between {game.team_a.team_name} and {game.team_b.team_name} on {game.game_date.strftime('%Y-%m-%d')} at {game.game_start_time.strftime('%H:%M')} at {game.game_field_id.field_name}.")
+
+            print(title, body)  # Print for debugging
+
             device_token = user.device_token
             device_type = user.device_type
             push_data = {'type': 'game system', 'user_id': user_id}  # Custom payload
 
             # Send push notification if valid token and type
-            if device_token and device_type in [1, 2, "1", "2"]:
-                print("Outside function")
+            if device_type in [1, 2, "1", "2"]:
                 send_push_notification(device_token, title, body, device_type, data=push_data)
-                print("Inside function")
-
+            
+            activate(language)
             messages.success(
                 request,
-                f"User assigned successfully!"
+                _('User assigned successfully!')
             )
-
-            return JsonResponse({'message': 'User assigned successfully!'}, status=200)
+            activate(language)
+            return JsonResponse({'message': _('User assigned successfully!')}, status=200)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-    def get(self, request, *args, **kwargs):
-        return JsonResponse({'error': 'GET method not allowed'}, status=405)
+
+
 
 
 def fetch_users(request):

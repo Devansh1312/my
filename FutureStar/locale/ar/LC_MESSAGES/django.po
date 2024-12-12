@@ -163,3 +163,18 @@ msgstr "تم تحديث اللغة الحالية بنجاح."
 
 msgid "Invalid or missing current_language. It must be either \"en\" or \"ar\"."
 msgstr "اللغة الحالية غير صالحة أو مفقودة. يجب أن تكون إما \"en\" أو \"ar\"."
+
+msgid "Match Assignment"
+msgstr "تعيين المباراة"
+
+msgid "You have been assigned to handle the match between {team_a_name} and {team_b_name} on {game_date} at {game_time} at {field_name}."
+msgstr "تم تكليفك بإدارة المباراة بين {team_a_name} و {team_b_name} في {game_date} الساعة {game_time} في {field_name}."
+
+msgid "Cannot assign user; game already started."
+msgstr "لا يمكن تعيين المستخدم؛ المباراة قد بدأت بالفعل."
+
+msgid "User assigned successfully!"
+msgstr "تم تعيين المستخدم بنجاح!"
+
+msgid "You have been assigned to handle the match between %s and %s on %s at %s."
+msgstr "تم تعيينك للتعامل مع المباراة بين %s و %s في %s في %s."

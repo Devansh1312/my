@@ -34,6 +34,8 @@ Manager List
                            <tr>
                               <th>No.</th>
                               <th>Manager Username</th>
+                              <th>Name</th>
+                              <th>Email</th>
                               <th>Phone</th>
                               <th>Team</th>
                               <th>Status</th>
@@ -45,6 +47,8 @@ Manager List
                            <tr>
                               <td>{{ forloop.counter }}</td>
                               <td>{{ manager.user.username }}</td>
+                              <td>{{ manager.user.fullname }}</td>
+                              <td>{{ manager.user.email }}</td>
                               <td>{{ manager.user.phone }}</td>
                               <td>{{ manager.branch }}</td>
                               <td>

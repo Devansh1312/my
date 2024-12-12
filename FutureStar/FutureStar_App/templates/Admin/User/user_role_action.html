@@ -16,14 +16,14 @@
                                 <!-- User Details Section -->
                                 <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
                                     <div class="ttl-info text-start">
-                                        <h6><i class="fa fa-user"></i> First Name</h6>
-                                        <span>{{ user.first_name }}</span>
+                                        <h6><i class="fa fa-user"></i> Name</h6>
+                                        <span>{{ user.fullname }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
                                     <div class="ttl-info text-start">
-                                        <h6><i class="fa fa-user"></i> Last Name</h6>
-                                        <span>{{ user.last_name }}</span>
+                                        <h6><i class="fa fa-globe"></i> Country & City </h6>
+                                        <span>{{ user.country.name }} - {{ user.city.name }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4" style="margin-top: 5px; margin-bottom: 5px;">
