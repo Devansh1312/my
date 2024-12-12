@@ -48,12 +48,14 @@ from django.utils.timezone import now
 
 
 
-from datetime import timedelta
+from datetime import date, timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils.timezone import now
 from django.db.models import Q
+
+from FutureStar.firebase_config import send_push_notification
 
 
 
@@ -1737,9 +1739,10 @@ class TeamUniformColorAPIView(APIView):
             'data': serializer.errors,
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
 ############ Fetch both team uniform using refree #######################
 class FetchTeamUniformColorAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     def _has_access(self, user, game_id=None, tournament_id=None):
         """
         Check if the user has access to the game based on role and official type for a specific game in a specific tournament.
@@ -1829,6 +1832,67 @@ class FetchTeamUniformColorAPIView(APIView):
                 'team_b': team_b_data
             },
         }, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+     
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        game_id = request.data.get('game_id')
+        tournament_id = request.data.get('tournament_id')
+        is_confirm = request.data.get('is_confirm')
+        game_id=int(game_id)
+        tournament_id=int(tournament_id)
+
+        if not game_id or not tournament_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id and tournament_id are required.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if is_confirm not in [1, True, '1', 'true', 'True']:
+            return Response({
+                'status': 0,
+                'message': _('Invalid is_confirm value. It must be 1 or true.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+            return Response({
+                'status': 0,
+                'message': _('Access denied. You do not have permission to update this game.'),
+                'data': None,
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Fetch the game record
+            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+
+            # Update the `is_confirm` field
+            game.is_confirm = True
+            game.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Uniform confirmation status updated successfully.'),
+                'data': {
+                    'game_id': game_id,
+                    'tournament_id': tournament_id,
+                    'is_confirm': game.is_confirm,
+                },
+            }, status=status.HTTP_200_OK)
+
+        except TournamentGames.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': None,
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+
 
             
 
@@ -2831,3 +2895,378 @@ class ExtraTimeAPIView(APIView):
                 "extra_time": game.extra_time
             }
         }, status=200)
+    
+
+
+
+
+class UpcomingGamesNotificationAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        # Get current time and today's date
+        current_time = timezone.now()
+        current_date = date.today()  # This will give you today's date
+
+        # Calculate the time one hour from now
+        one_hour_later = current_time + timedelta(hours=1)
+        print(one_hour_later)
+
+        # Get upcoming tournament games within the next 1 hour for today
+        upcoming_tournament_games = TournamentGames.objects.filter(
+            game_date=current_date,  # Use current_date here to ensure it's today
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False  # Only consider games that have not finished
+        )
+
+        # Get upcoming friendly games within the next 1 hour for today
+        upcoming_friendly_games = FriendlyGame.objects.filter(
+            game_date=current_date,  # Use current_date here to ensure it's today
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False  # Only consider games that have not finished
+        )
+
+        # Check if there are no upcoming games for today
+        if not upcoming_tournament_games and not upcoming_friendly_games:
+            return Response({
+                "status": "success",
+                "message": "No upcoming games found for today.",
+                "details": []  # Empty list as no games are found
+            }, status=status.HTTP_200_OK)
+
+        notifications_sent = []
+
+        # Process tournament games
+        for game in upcoming_tournament_games:
+            self._check_and_notify_lineup(game, "tournament", notifications_sent)
+
+        # Process friendly games
+        for game in upcoming_friendly_games:
+            self._check_and_notify_lineup(game, "friendly", notifications_sent)
+
+        return Response({
+            "status": "success",
+            "message": "Notifications sent for incomplete lineups",
+            "details": notifications_sent
+        }, status=status.HTTP_200_OK)
+    
+    def _check_and_notify_lineup(self, game, game_type, notifications_sent):
+        if game_type == "tournament":
+            # For tournament games, use the Lineup model
+            team_a_lineup = Lineup.objects.filter(
+                game_id=game.id,  # Use the game instance's id
+                team_id=game.team_a,
+                lineup_status=Lineup.ALREADY_IN_LINEUP
+            )
+            team_b_lineup = Lineup.objects.filter(
+                game_id=game.id,  # Use the game instance's id
+                team_id=game.team_b,
+                lineup_status=Lineup.ALREADY_IN_LINEUP
+            )
+        else:
+            # For friendly games, use the FriendlyGameLineup model
+            team_a_lineup = FriendlyGameLineup.objects.filter(
+                game_id=game.id,  # Use the game instance's id
+                team_id=game.team_a,
+                lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
+            )
+            team_b_lineup = FriendlyGameLineup.objects.filter(
+                game_id=game.id,  # Use the game instance's id
+                team_id=game.team_b,
+                lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
+            )
+
+        # If any team does not have 11 players in the lineup, send notification
+        if team_a_lineup.count() < 11 or team_b_lineup.count() < 11:
+            # Get the coaches and managers for both teams
+            team_a_staff = JoinBranch.objects.filter(
+                branch_id=game.team_a,
+                joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
+            )
+
+            team_b_staff = JoinBranch.objects.filter(
+                branch_id=game.team_b,
+                joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
+            )
+
+            # Notify staff members for Team A
+            for staff_member in team_a_staff:
+                if staff_member.user_id.device_token:
+                    # Set the notification title and body based on language
+                    notification_language = staff_member.user_id.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    # Set the dynamic message
+                    if game_type == "tournament":
+                        body = f"Starting 11 is incomplete for {game.game_number} for {game.tournament_id.tournament_name} tournament"
+                    else:
+                        body = f"Starting 11 is incomplete for {game.game_number} for {game.id} friendly match"
+
+                    title = f"Please complete your line-up for your match against {game.team_b.team_name if game_type == 'tournament' else game.team_b.team_name}"
+
+                    send_push_notification(
+                        staff_member.user_id.device_token,
+                        title=title,
+                        body=body,
+                        device_type=staff_member.user_id.device_type
+                    )
+                    notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team A ({game_type})")
+
+            # Notify staff members for Team B
+            for staff_member in team_b_staff:
+                if staff_member.user_id.device_token:
+                    # Set the notification title and body based on language
+                    notification_language = staff_member.user_id.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    # Set the dynamic message
+                    if game_type == "tournament":
+                        body = f"Starting 11 is incomplete for {game.game_number} for {game.tournament_id.tournament_name} tournament"
+                    else:
+                        body = f"Starting 11 is incomplete for {game.game_number} for {game.id} friendly match"
+
+                    title = f"Please complete your line-up for your match against {game.team_a.team_name if game_type == 'tournament' else game.team_a.team_name}"
+
+                    send_push_notification(
+                        staff_member.user_id.device_token,
+                        title=title,
+                        body=body,
+                        device_type=staff_member.user_id.device_type
+                    )
+                    notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team B ({game_type})")
+
+
+
+class UniformConfirmationNotificationView(APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        API endpoint to send notifications for confirming uniforms.
+        """
+        current_time = timezone.now()
+        current_date = date.today()
+        one_hour_later = current_time + timedelta(hours=1)
+        print(current_time)
+        print(one_hour_later)
+
+        # Retrieve upcoming tournament games that are not confirmed
+        upcoming_tournament_games = TournamentGames.objects.filter(
+            game_date=current_date,
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False,
+            is_confirm=False  # Only include games where confirmation is required
+        )
+
+        # Retrieve upcoming friendly games that are not confirmed
+        upcoming_friendly_games = FriendlyGame.objects.filter(
+            game_date=current_date,
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False,
+            is_confirm=False  # Only include games where confirmation is required
+        )
+
+        if not upcoming_tournament_games and not upcoming_friendly_games:
+            return Response({
+                "status": "success",
+                "message": "No upcoming games found for today.",
+                "details": []  # No notifications to send
+            }, status=status.HTTP_200_OK)
+
+        notifications_sent = []
+
+        # Helper function to send notifications
+        def notify_game_officials_and_handler(game, game_type):
+            game_type_label = "Tournament" if game_type == "tournament" else "Friendly"
+            game_number = game.game_number
+
+            if game_type == "tournament":
+                officials = GameOfficials.objects.filter(game_id=game, officials_type_id=2)
+            else:  # Friendly game
+                officials = FriendlyGameGameOfficials.objects.filter(game_id=game, officials_type_id=2)
+
+            # Notify officials
+            for official in officials:
+                official_user = official.official_id
+                notification_language = official_user.current_language  # Get user's preferred language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+                title = "Uniform Confirmation Required"
+                body = (
+                    f"refree:Please confirm the uniforms colors for the {game_type_label} game (Game #{game_number}) "
+                    f"between {game.team_a} and {game.team_b}."
+                )
+                send_push_notification(
+                    device_token=official_user.device_token,
+                    title=title,
+                    body=body,
+                    device_type=official_user.device_type
+                )
+                notifications_sent.append({
+                    "user": official_user.id,
+                    "message": body
+                })
+
+            # Notify game statistics handler
+            if game.game_statistics_handler:
+                handler = game.game_statistics_handler
+                notification_language = handler.current_language  # Get handler's preferred language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+                title = "Uniform Confirmation Required"
+                body = (
+                    f"Game:Please confirm the uniforms colors for the {game_type_label} game (Game #{game_number}) "
+                    f"between {game.team_a} and {game.team_b}."
+                )
+                send_push_notification(
+                    device_token=handler.device_token,
+                    title=title,
+                    body=body,
+                    device_type=handler.device_type
+                )
+                notifications_sent.append({
+                    "user": handler.id,
+                    "message": body
+                })
+
+        # Process tournament games
+        for game in upcoming_tournament_games:
+            notify_game_officials_and_handler(game, "tournament")
+
+        # Process friendly games
+        for game in upcoming_friendly_games:
+            notify_game_officials_and_handler(game, "friendly")
+
+        return Response({
+            "status": "success",
+            "message": "Notifications sent for uniform confirmation.",
+            "details": notifications_sent
+        }, status=status.HTTP_200_OK)
+
+
+
+class UniformAddNotificationAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        # Get current time and today's date
+        current_time = timezone.now()
+        current_date = date.today()  # This will give you today's date
+
+        # Calculate the time one hour from now
+        one_hour_later = current_time + timedelta(hours=1)
+        print(one_hour_later)
+
+        # Get upcoming tournament games within the next 1 hour for today
+        upcoming_tournament_games = TournamentGames.objects.filter(
+            game_date=current_date,  # Use current_date here to ensure it's today
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False  # Only consider games that have not finished
+        )
+
+        # Get upcoming friendly games within the next 1 hour for today
+        upcoming_friendly_games = FriendlyGame.objects.filter(
+            game_date=current_date,  # Use current_date here to ensure it's today
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False  # Only consider games that have not finished
+        )
+
+        # Check if there are no upcoming games for today
+        if not upcoming_tournament_games and not upcoming_friendly_games:
+            return Response({
+                "status": "success",
+                "message": "No upcoming games found for today.",
+                "details": []  # Empty list as no games are found
+            }, status=status.HTTP_200_OK)
+
+        notifications_sent = []
+
+        # Process tournament games
+        for game in upcoming_tournament_games:
+            self._check_and_notify_add_uniform(game, "tournament", notifications_sent)
+
+        # Process friendly games
+        for game in upcoming_friendly_games:
+            self._check_and_notify_add_uniform(game, "friendly", notifications_sent)
+
+        return Response({
+            "status": "success",
+            "message": "Notifications sent for add uniform",
+            "details": notifications_sent
+        }, status=status.HTTP_200_OK)
+    
+    def _check_and_notify_add_uniform(self, game, game_type, notifications_sent):
+        if game_type == "tournament":
+            game_type_label = "tournament"
+        else:
+            game_type_label = "friendly"
+        
+        # Helper function to check if uniform colors are missing for a specific team
+        def are_uniform_colors_missing(team):
+            # Check uniform color fields for the specific team and ensure they are not None or empty
+            return not any([
+                team.team_a_primary_color_player, 
+                team.team_a_secondary_color_player, 
+                team.team_a_primary_color_goalkeeper, 
+                team.team_a_secondary_color_goalkeeper,
+                team.team_b_primary_color_player, 
+                team.team_b_secondary_color_player, 
+                team.team_b_primary_color_goalkeeper, 
+                team.team_b_secondary_color_goalkeeper
+            ])
+
+        # Check if uniform colors for Team A are missing
+        if game.team_a and are_uniform_colors_missing(game):
+            team_a_staff = JoinBranch.objects.filter(
+                branch_id=game.team_a,
+                joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
+            )
+            
+            # Notify staff members for Team A
+            for staff_member in team_a_staff:
+                if staff_member.user_id.device_token:
+                    notification_language = staff_member.user_id.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    title = f"Missing uniform for your {game_type_label} match against {game.team_b.name}"
+                    body = f"Please add the uniform colors for the {game_type_label} game (Game #{game.game_number}) against {game.team_b.name}."
+                    
+                    send_push_notification(
+                        staff_member.user_id.device_token,
+                        title=title,
+                        body=body,
+                        device_type=staff_member.user_id.device_type
+                    )
+                    notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team A ({game_type})")
+        
+        # Check if uniform colors for Team B are missing
+        if game.team_b and are_uniform_colors_missing(game):
+            team_b_staff = JoinBranch.objects.filter(
+                branch_id=game.team_b,
+                joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
+            )
+            
+            # Notify staff members for Team B
+            for staff_member in team_b_staff:
+                if staff_member.user_id.device_token:
+                    notification_language = staff_member.user_id.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    title = f"Missing uniform for your {game_type_label} match against {game.team_a.name}"
+                    body = f"Please add the uniform colors for the {game_type_label} game (Game #{game.game_number}) against {game.team_a.name}."
+                    
+                    send_push_notification(
+                        staff_member.user_id.device_token,
+                        title=title,
+                        body=body,
+                        device_type=staff_member.user_id.device_type
+                    )
+                    notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team B ({game_type})")
+
+

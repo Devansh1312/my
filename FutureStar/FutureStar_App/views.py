@@ -1044,8 +1044,8 @@ class UserDetailView(LoginRequiredMixin, View):
             total_assists_scored = total_assists['total_assists'] or 0
 
             # Total wins, losses, and draws
-            total_wins = games.filter(winner_id=team_id).count()
-            total_losses = games.filter(loser_id=team_id).count()
+            total_wins = games.filter(winner_id=int(team_id.id)).count()
+            total_losses = games.filter(loser_id=int(team_id.id)).count()
             total_draws = games.filter(is_draw=True).count()
 
             # Total yellow and red cards

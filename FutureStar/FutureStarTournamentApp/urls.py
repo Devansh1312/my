@@ -30,6 +30,7 @@ urlpatterns = [
         path('api/games/team_uniform/', TeamUniformColorAPIView.as_view()),
         path('api/games/refree/fetch_team_uniform/', FetchTeamUniformColorAPIView.as_view()),
         path('api/games/uniform_fetch/',GameUniformColorAPIView.as_view()),
+        path('api/games/refree/confirm_team_uniform/', FetchTeamUniformColorAPIView.as_view()),
 
 
 
@@ -66,6 +67,14 @@ urlpatterns = [
 
         ############ Extra time ############\
         path('api/update_extra_time/', ExtraTimeAPIView.as_view(), name='update_extra_time'),
+
+
+        path('api/upcoming/noti/',UpcomingGamesNotificationAPIView.as_view()),
+        path('api/upcoming/uniform_confirm_noti/',UniformConfirmationNotificationView.as_view()),
+        path('api/upcoming/uniform_add_noti/',UniformAddNotificationAPIView.as_view()),
+
+
+
 
 
 
