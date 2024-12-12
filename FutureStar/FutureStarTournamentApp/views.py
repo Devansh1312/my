@@ -1146,6 +1146,9 @@ class CustomGameListPagination(PageNumberPagination):
 ######### Single game Detail API ##################
 class GameDetailsAPIView(APIView):
     def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         tournament_id = request.query_params.get('tournament_id')
         game_id = request.query_params.get('game_id')
 
@@ -1179,6 +1182,7 @@ class GameDetailsAPIView(APIView):
             "id": game.id,
             "tournament_id": game.tournament_id.id if game.tournament_id else None,
             "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
+            "age_group_name": game.tournament_id.age_group.name_en if language is 'en' else game.tournament_id.age_group.name_ar,
             "game_number": game.game_number,
             "game_date": game.game_date,
             "game_start_time": game.game_start_time,
