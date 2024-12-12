@@ -88,10 +88,10 @@ News Management
                                         <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                             <i data-feather="more-vertical"></i>
                                         </a>
-                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
                                           <ul style="list-style: none; padding: 0; margin: 0;">
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                <a style="font-size: large;" href="#" class="view-news-btn" 
+                                                <a style="font-size: small;" href="#" class="view-news-btn" 
                                                    data-news-id="{{ news_item.id }}" 
                                                    data-news-title_en="{{ news_item.title_en }}" 
                                                    data-news-title_ar="{{ news_item.title_ar }}" 
@@ -102,7 +102,7 @@ News Management
                                                 </a>
                                              </li>                                             
                                              <li style="padding: 8px 12px;">
-                                                <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editNewsModal"  data-news-id="{{ news_item.id }}" 
+                                                <a style="font-size: small;" href="#" data-bs-toggle="modal" data-bs-target="#editNewsModal"  data-news-id="{{ news_item.id }}" 
                                                 data-news-title_en="{{ news_item.title_en }}" 
                                                 data-news-description_en="{{ news_item.description_en }}"
                                                 data-news-title_ar="{{ news_item.title_ar }}" 
@@ -111,7 +111,7 @@ News Management
                                                    Edit </a>
                                              </li>
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteNewsModal" data-news-id="{{ news_item.id }}">
+                                                <a style="font-size: small;" href="#" data-bs-toggle="modal" data-bs-target="#deleteNewsModal" data-news-id="{{ news_item.id }}">
                                                    Delete </a>
                                              </li>
                                           </ul>

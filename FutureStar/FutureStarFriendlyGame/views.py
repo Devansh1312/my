@@ -2133,32 +2133,32 @@ class FriendlyGameOfficialsAPIView(APIView):
         # Check if the game exists
         game = get_object_or_404(FriendlyGame, id=game_id)
 
-        # Fetch all officials for the given game, grouped by officials type
-        game_officials = FriendlyGameGameOfficials.objects.filter(game_id=game_id)
-        if not game_officials.exists():
-            return Response({
-                'status': 0,
-                'message': _('No officials found for the specified game.'),
-                'data': {}
-            }, status=status.HTTP_404_NOT_FOUND)
+        # Fetch all official types
+        all_official_types = FriendlyGameOfficialsType.objects.all()
 
-        # Organize officials by their type
+        # Fetch assigned officials for the given game
+        assigned_game_officials = FriendlyGameGameOfficials.objects.filter(game_id=game_id)
+
+        # Prepare the response data, grouping by official type
         officials_by_type = {}
-        for official in game_officials:
+        for official_type in all_official_types:
             # Serialize the official type
-            type_serializer = FriendlyGameOficialTypeSerializer(official.officials_type_id, context={'language': language})
+            type_serializer = FriendlyGameOficialTypeSerializer(official_type, context={'language': language})
             type_name = type_serializer.data['name']
 
-            if type_name not in officials_by_type:
-                officials_by_type[type_name] = []
+            # Filter assigned officials for the current official type
+            assigned_officials = assigned_game_officials.filter(officials_type_id=official_type)
 
-            # Add official details including profile picture
-            officials_by_type[type_name].append({
-                'official_id': official.official_id.id,
-                'official_name': official.official_id.username,
-                'profile_picture': official.official_id.profile_picture.url if official.official_id.profile_picture else None,
-                'officials_type_id': official.officials_type_id.id,
-            })
+            # Prepare list of assigned officials or an empty list if none
+            officials_by_type[type_name] = [
+                {
+                    'official_id': official.official_id.id,
+                    'official_name': official.official_id.username,
+                    'profile_picture': official.official_id.profile_picture.url if official.official_id.profile_picture else None,
+                    'officials_type_id': official.officials_type_id.id,
+                }
+                for official in assigned_officials
+            ]
 
         return Response({
             'status': 1,

@@ -71,10 +71,10 @@ Team Members List
                                         <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                             <i data-feather="more-vertical"></i>
                                         </a>
-                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: 150px;">
+                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
                                           <ul style="list-style: none; padding: 0; margin: 0;">
                                              <li style="padding: 8px 12px;">
-                                                <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#editTeam_MembersModal"  data-team_members-id="{{ team_members_item.id }}" 
+                                                <a style="font-size: small;" href="#" data-bs-toggle="modal" data-bs-target="#editTeam_MembersModal"  data-team_members-id="{{ team_members_item.id }}" 
                                                 data-team_members-name-en="{{ team_members_item.name_en }}" 
                                                 data-team_members-name-ar="{{ team_members_item.name_ar }}" 
                                                 data-team_members-designations-en="{{ team_members_item.designations_en }}" 
@@ -83,7 +83,7 @@ Team Members List
                                                     Edit </a>
                                              </li>
                                              <li style="padding: 8px 12px; border-top: 1px solid #eee;">
-                                                <a style="font-size: large;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTeam_MembersModal" data-team_members-id="{{ team_members_item.id }}">
+                                                <a style="font-size: small;" href="#" data-bs-toggle="modal" data-bs-target="#deleteTeam_MembersModal" data-team_members-id="{{ team_members_item.id }}">
                                                     Delete </a>
                                              </li>
                                           </ul>
