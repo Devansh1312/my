@@ -54,7 +54,7 @@ urlpatterns = [
       path('api/friendlygames/game_officials/', FriendlyGameOfficialsAPIView.as_view()),
       path('api/friendlygames/game_officials/add/', FriendlyGameOfficialsAPIView.as_view()),
       path('api/friendlygames/game_officials/remove/', FriendlyGameOfficialsAPIView.as_view()),
-      path('api/friendlygames/game-officials/search/', FriendlyOfficialSearchView.as_view()),
+      path('api/friendlygames/game_officials/search/', FriendlyOfficialSearchView.as_view()),
 
 
       # Player Stats & Tournament Details
