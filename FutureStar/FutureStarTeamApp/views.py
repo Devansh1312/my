@@ -94,6 +94,12 @@ class TeamViewAPI(APIView):
             activate(language)
         user = request.user
 
+        if not user.role_id in [2, 5]:
+            return Response({
+                'status': 0,
+                'message': _('You do not have permission to create a team.')
+            }, status=status.HTTP_403_FORBIDDEN)
+
         # Check if the user has already created a team
         if Team.objects.filter(team_founder=user).exists():
             return Response({
