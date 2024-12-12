@@ -1513,18 +1513,28 @@ class OfficialSearchView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        # Get search_type and phone from query parameters
+
+        # Get search_type, phone, and game_id from query parameters
         search_type = request.query_params.get('search_type')
-        phone = request.query_params.get('phone')
+        phone = request.query_params.get('phone', '').strip()  # Get phone and remove extra spaces
         game_id = request.query_params.get('game_id')  # Get game_id from request
+
+        print(search_type,phone,game_id)
 
         # Validate search_type: must be between 1 and 10
         if not search_type or not search_type.isdigit() or int(search_type) not in range(1, 11):
             return Response({
-                'status': 0, 
+                'status': 0,
                 'message': _('Invalid search type.')
-                }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # If phone is blank, return no data
+        if not phone:
+            return Response({
+                'status': 1,
+                'message': _('No data available.'),
+                'data': []
+            }, status=status.HTTP_200_OK)
 
         search_type = int(search_type)  # Convert search_type to an integer for logic
         users = User.objects.none()  # Initialize an empty queryset
@@ -1537,9 +1547,8 @@ class OfficialSearchView(APIView):
         elif search_type in [6, 7, 8, 9, 10]:
             users = User.objects.filter(role_id=5, is_deleted=False)  # Role 5 for search_type 6-10
 
-        # Filter by phone if provided
-        if phone:
-            users = users.filter(phone__icontains=phone)
+        # Filter by phone
+        users = users.filter(phone__icontains=phone)
 
         # Exclude users who have already joined the specified game
         if game_id:
@@ -1566,6 +1575,7 @@ class OfficialSearchView(APIView):
 
         # Return paginated response with custom data
         return paginator.get_paginated_response(user_data)
+
 
 
 ################### Game Officilals API Views ###################
