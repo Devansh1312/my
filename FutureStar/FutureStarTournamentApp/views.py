@@ -418,6 +418,56 @@ class TournamentAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
+####################### Get My Tournamnets For team Profile  #######################
+class MyTournamentsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomTournamentPagination
+
+    def get(self, request, *args, **kwargs):
+        # Extract parameters from request
+        creator_type = request.query_params.get('creator_type', None)
+        created_by_id = request.query_params.get('created_by_id', None)
+
+        # Check creator_type and created_by_id validity
+        if creator_type is None or int(creator_type) != 2:
+            return Response({
+                'status': 0,
+                'message': _('You do not have access.')
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        if not created_by_id:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator details.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter tournaments where team_id matches created_by_id
+        tournaments = Tournament.objects.filter(team_id=created_by_id).order_by('-created_at')
+
+        if not tournaments.exists():
+            return Response({
+                'status': 1,
+                'message': _('You have not created any tournament yet...'),
+                'data': []
+            }, status=status.HTTP_200_OK)
+
+        # Initialize paginator
+        paginator = self.pagination_class()
+        paginated_tournaments = paginator.paginate_queryset(tournaments, request, view=self)
+
+        # Serialize the data
+        serializer = TournamentSerializer(paginated_tournaments, many=True, context={'request': request})
+
+        # Return paginated response
+        return Response({
+            'status': 1,
+            'message': _('Tournaments fetched successfully.'),
+            'data': serializer.data,
+            'total_records': paginator.page.paginator.count,
+            'total_pages': paginator.total_pages,
+            'current_page': paginator.page.number
+        }, status=status.HTTP_200_OK)
+
 ############################# TOURNAMENT DETAIL WITH ID ###########################
 class TournamentDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1093,6 +1143,68 @@ class CustomGameListPagination(PageNumberPagination):
         })
 
 
+######### Single game Detail API ##################
+class GameDetailsAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        tournament_id = request.query_params.get('tournament_id')
+        game_id = request.query_params.get('game_id')
+
+        # Validate required parameters
+        if not tournament_id or not game_id:
+            return Response({
+                "status": 0,
+                "message": "Tournament ID and Game ID are required."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the game details based on tournament_id and game_id
+            game = TournamentGames.objects.get(tournament_id=tournament_id, id=game_id)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                "status": 0,
+                "message": "Game not found for the given Tournament ID and Game ID."
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Calculate game duration
+        if game.game_start_time and game.game_end_time:
+            start_time = datetime.combine(datetime.today(), game.game_start_time)
+            end_time = datetime.combine(datetime.today(), game.game_end_time)
+            duration = end_time - start_time
+            game_duration = str(duration)  # Convert timedelta to string
+        else:
+            game_duration = None  # If either time is missing
+
+        # Construct response data
+        game_data = {
+            "id": game.id,
+            "tournament_id": game.tournament_id.id if game.tournament_id else None,
+            "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
+            "game_number": game.game_number,
+            "game_date": game.game_date,
+            "game_start_time": game.game_start_time,
+            "game_end_time": game.game_end_time,
+            "game_duration": game_duration,  # Include game duration
+            "group_id": game.group_id.id if game.group_id else None,
+            "group_name": game.group_id.group_name if game.group_id else None,
+            "team_a_name": game.team_a.team_id.team_name if game.team_a and game.team_a.team_id else None,
+            "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
+            "team_b_name": game.team_b.team_id.team_name if game.team_b and game.team_b.team_id else None,
+            "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None,
+            "game_field_id": game.game_field_id.id if game.game_field_id else None,
+            "game_field_name": game.game_field_id.field_name if game.game_field_id else None,
+            "finish": game.finish,
+            "winner_id": game.winner_id,
+            "loser_id": game.loser_id,
+            "is_draw": game.is_draw,
+            "created_at": game.created_at,
+            "updated_at": game.updated_at,
+        }
+
+        return Response({
+            "status": 1,
+            "message": "Game details fetched successfully.",
+            "data": game_data
+        }, status=status.HTTP_200_OK)
 
 class TournamentGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]

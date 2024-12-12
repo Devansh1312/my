@@ -58,7 +58,7 @@ urlpatterns = [
 
 
       # Player Stats & Tournament Details
-      path('api/friendlygames/games/details/', FriendlyGamesDetailAPIView.as_view()),
+      path('api/friendlygames/game/linup/details/', FriendlyGamesDetailAPIView.as_view()),
 
       # Friendly Game Stats
       path('api/friendlygames/h2h/completed/', FriendlyGamesh2hCompleteAPIView.as_view(), name='friendly_games_completed'),

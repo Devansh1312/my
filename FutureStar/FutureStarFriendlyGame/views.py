@@ -642,66 +642,60 @@ class TeamBranchListView(APIView):
 ####################### Fetch Friendly Games Detail #####################
 
 class FriendlyGameDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
-        
         game_id = request.query_params.get('game_id')
-        game_id=int(game_id)
-      
+
+        # Validate required parameters
         if not game_id:
             return Response({
-                'status': 0,
-                'message': _('Game ID is required.'),
+                "status": 0,
+                "message": "Game ID is required."
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Fetch the game object
-            game = get_object_or_404(FriendlyGame, id=game_id)
-            
-            # Calculate duration (if both start and end times are available)
-            duration = None
-            if game.game_start_time and game.game_end_time:
-                duration = datetime.combine(game.game_date, game.game_end_time) - datetime.combine(game.game_date, game.game_start_time)
-
-            # Create custom response data
-            data = {
-                "team_a_id":game.team_a.id,
-
-                "team_a_name": game.team_a.team_name if game.team_a else None,
-                "team_b_id":game.team_b.id,
-                "team_b_name": game.team_b.team_name if game.team_b else None,
-                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
-                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
-                "game_field_id": game.game_field_id.id,
-
-                "game_field": game.game_field_id.field_name if game.game_field_id else None,
-                "timing":game.game_start_time,
-                "date":game.game_date,
-            
-                "duration": str(duration) if duration else None,
-            }
-
-            return Response({
-                'status': 1,
-                'message': _('Game details fetched successfully.'),
-                'data': data,
-            }, status=status.HTTP_200_OK)
-        except Exception:
-            return Response({
-                "status": 0,
-                "message": _("Invalid Game ID."),
-                "data": {}
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+            # Fetch the game details
+            game = FriendlyGame.objects.get(id=game_id)
         except FriendlyGame.DoesNotExist:
             return Response({
-                'status': 0,
-                'message': _('Game not found.'),
+                "status": 0,
+                "message": "Game not found for the given Game ID."
             }, status=status.HTTP_404_NOT_FOUND)
+
+        # Calculate game duration
+        if game.game_start_time and game.game_end_time:
+            start_time = datetime.combine(game.game_date, game.game_start_time)
+            end_time = datetime.combine(game.game_date, game.game_end_time)
+            duration = end_time - start_time
+            game_duration = str(duration)  # Convert timedelta to string
+        else:
+            game_duration = None  # If either time is missing
+
+        # Construct response data
+        game_data = {
+            "id": game.id,
+            "tournament_name": "Friendly Game",
+            "team_a_id": game.team_a.id if game.team_a else None,
+            "team_a_name": game.team_a.team_name if game.team_a else None,
+            "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
+            "team_b_id": game.team_b.id if game.team_b else None,
+            "team_b_name": game.team_b.team_name if game.team_b else None,
+            "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None,
+            "game_field_id": game.game_field_id.id if game.game_field_id else None,
+            "game_field_name": game.game_field_id.field_name if game.game_field_id else None,
+            "game_date": game.game_date,
+            "game_start_time": game.game_start_time,
+            "game_end_time": game.game_end_time,
+            "game_duration": game_duration,  # Include game duration
+            "created_at": game.created_at,
+            "updated_at": game.updated_at,
+        }
+
+        return Response({
+            "status": 1,
+            "message": "Game details fetched successfully.",
+            "data": game_data
+        }, status=status.HTTP_200_OK)
+
 
 ################## participates players of particular team for particular tournament ###############
 

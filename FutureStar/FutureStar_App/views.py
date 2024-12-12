@@ -7115,15 +7115,10 @@ class TournamentGameDetailView(LoginRequiredMixin, View):
         officials_data = []
         for official in game_officials:
             official_user = official.official_id
-            official_type = official.officials_type_id
-
-            print(official.official_id.profile_picture.url)
-            
+            official_type = official.officials_type_id            
             officials_data.append({
                 'fullname': f"{official_user.first_name} {official_user.last_name}",
                 'username': f"{official_user.username}",
-
-                'profile_picture': official_user.profile_picture.url if official_user.profile_picture else None,
                 'official_type': official_type.name_en  # Assuming you want the English name
             })
         
@@ -7166,8 +7161,6 @@ class FriendlyGameDetailView(LoginRequiredMixin, View):
             officials_data.append({
                 'fullname': f"{official_user.first_name} {official_user.last_name}",
                 'username': f"{official_user.username}",
-
-                'profile_picture': official_user.profile_picture.url if official_user.profile_picture else None,
                 'official_type': official_type.name_en  # Assuming you want the English name
             })
         

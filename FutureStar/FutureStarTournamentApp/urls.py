@@ -10,7 +10,10 @@ handler404 = 'FutureStarFrontend.views.custom_404_view'
 urlpatterns = [
     
         path('api/tournament/', TournamentAPIView.as_view()),
+        path('api/tournament/my_tournament/', MyTournamentsAPIView.as_view()),
         path('api/tournament/create/', TournamentAPIView.as_view()),
+        path('api/tournament/game/detail/', GameDetailsAPIView.as_view()),
+
         
         path('api/tournament/team_request/', TeamJoiningRequest.as_view()),
         path('api/tournament/team_reject/', TeamRejectRequest.as_view()),
@@ -30,7 +33,7 @@ urlpatterns = [
 
 
 
-        path('api/tournament/games/details/', TournamentGamesDetailAPIView.as_view()),
+        path('api/tournament/game/linup/details/', TournamentGamesDetailAPIView.as_view()),
         # path('api/team_game_stats/', TournamentGameStatsAPIView.as_view()),
         path('api/tournament/team_game_h2h/', TournamentGamesh2hCompleteAPIView.as_view()),
 

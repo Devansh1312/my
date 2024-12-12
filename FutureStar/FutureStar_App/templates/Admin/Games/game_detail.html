@@ -277,20 +277,12 @@
                               <th>Official FullName</th>
                               <th>Official Username</th>
                               <th>Role</th>
-                              <!-- <th>Profile Picture</th> -->
                            </tr>
                         </thead>
                         <tbody> {% for official in officials_data %} <tr>
                               <td>{{ official.fullname }}</td>
                               <td>{{ official.username }}</td>
                               <td>{{ official.official_type }}</td>
-                              <!-- <td>
-                                                {% if official.profile_picture %}
-                                                    <img src="{{ official.profile_picture }}" alt="{{ official.fullname }}" class="official-profile-picture" style="width: 50px; height: 50px; object-fit: cover;">
-                                                {% else %}
-                                                {{ official.profile_picture.url }}
-                                                {% endif %}
-                                            </td> -->
                            </tr> {% endfor %} </tbody>
                      </table>
                   </div>
