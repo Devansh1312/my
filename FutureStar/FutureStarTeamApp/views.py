@@ -1027,10 +1027,10 @@ class TeamStatsView(APIView):
 
             if not team_branches.exists():
                 return Response({
-                    'status': 0,
+                    'status': 1,
                     'message': _('No Team Branches found for the provided team ID.'),
-                    'data': None
-                }, status=status.HTTP_404_NOT_FOUND)
+                    'data': []
+                }, status=status.HTTP_200_OK)
 
             team_branch_ids = team_branches.values_list('id', flat=True)
 
@@ -1099,6 +1099,7 @@ class TeamStatsView(APIView):
                 team_branch_data.append({
                     "team_branch_id": team_branch.id,
                     "team_name": team_branch.team_name,
+                    "age_group": team_branch.age_group_id.name_en if language == 'en' else team_branch.age_group_id.name_ar,
                     "total_goals": stats['total_goals'] or 0,
                     "total_assists": stats['total_assists'] or 0,
                     "total_yellow_cards": stats['total_yellow_cards'] or 0,

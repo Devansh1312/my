@@ -1185,6 +1185,7 @@ class GameDetailsAPIView(APIView):
             "tournament_id": game.tournament_id.id if game.tournament_id else None,
             "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
             "age_group_name": game.tournament_id.age_group.name_en if language is 'en' else game.tournament_id.age_group.name_ar,
+            "team_id": game.tournament_id.team_id.id,
             "game_number": game.game_number,
             "game_date": game.game_date,
             "game_start_time": game.game_start_time,

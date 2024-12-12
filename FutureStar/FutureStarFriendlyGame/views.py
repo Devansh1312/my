@@ -699,8 +699,7 @@ class FriendlyGameDetailAPIView(APIView):
             "game_start_time": game.game_start_time,
             "game_end_time": game.game_end_time,
             "game_duration": game_duration,  # Include game duration
-            "created_at": game.created_at,
-            "updated_at": game.updated_at,
+            "created_by": game.created_by.id,
         }
 
         return Response({
