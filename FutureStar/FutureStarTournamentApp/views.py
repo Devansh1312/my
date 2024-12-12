@@ -3149,6 +3149,8 @@ class UniformConfirmationNotificationView(APIView):
 
 
 
+
+
 class UniformAddNotificationAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
@@ -3158,26 +3160,28 @@ class UniformAddNotificationAPIView(APIView):
 
         # Calculate the time one hour from now
         one_hour_later = current_time + timedelta(hours=1)
-        print(one_hour_later)
+        print(f"Current Time: {current_time}, One Hour Later: {one_hour_later}")
 
         # Get upcoming tournament games within the next 1 hour for today
         upcoming_tournament_games = TournamentGames.objects.filter(
-            game_date=current_date,  # Use current_date here to ensure it's today
+            game_date=current_date,  # Ensure it's today's date
             game_start_time__gte=current_time.time(),
             game_start_time__lte=one_hour_later.time(),
             finish=False  # Only consider games that have not finished
         )
+       
 
         # Get upcoming friendly games within the next 1 hour for today
         upcoming_friendly_games = FriendlyGame.objects.filter(
-            game_date=current_date,  # Use current_date here to ensure it's today
+            game_date=current_date,  # Ensure it's today's date
             game_start_time__gte=current_time.time(),
             game_start_time__lte=one_hour_later.time(),
             finish=False  # Only consider games that have not finished
         )
-
+     
         # Check if there are no upcoming games for today
         if not upcoming_tournament_games and not upcoming_friendly_games:
+            
             return Response({
                 "status": "success",
                 "message": "No upcoming games found for today.",
@@ -3188,86 +3192,93 @@ class UniformAddNotificationAPIView(APIView):
 
         # Process tournament games
         for game in upcoming_tournament_games:
-            self._check_and_notify_add_uniform(game, "tournament", notifications_sent)
+           
+            self._check_and_notify_missing_uniforms(game, "tournament", notifications_sent)
 
         # Process friendly games
         for game in upcoming_friendly_games:
-            self._check_and_notify_add_uniform(game, "friendly", notifications_sent)
+            
+            self._check_and_notify_missing_uniforms(game, "friendly", notifications_sent)
+
+       
 
         return Response({
             "status": "success",
-            "message": "Notifications sent for add uniform",
+            "message": "Notifications sent for missing uniforms",
             "details": notifications_sent
         }, status=status.HTTP_200_OK)
     
-    def _check_and_notify_add_uniform(self, game, game_type, notifications_sent):
-        if game_type == "tournament":
-            game_type_label = "tournament"
-        else:
-            game_type_label = "friendly"
+    def _check_and_notify_missing_uniforms(self, game, game_type, notifications_sent):
+      
+        # Check if any uniform color fields are missing for Team A or Team B
+        missing_team_a_colors = any([
+            not game.team_a_primary_color_player,
+            not game.team_a_secondary_color_player,
+            not game.team_a_primary_color_goalkeeper,
+            not game.team_a_secondary_color_goalkeeper
+        ])
         
-        # Helper function to check if uniform colors are missing for a specific team
-        def are_uniform_colors_missing(team):
-            # Check uniform color fields for the specific team and ensure they are not None or empty
-            return not any([
-                team.team_a_primary_color_player, 
-                team.team_a_secondary_color_player, 
-                team.team_a_primary_color_goalkeeper, 
-                team.team_a_secondary_color_goalkeeper,
-                team.team_b_primary_color_player, 
-                team.team_b_secondary_color_player, 
-                team.team_b_primary_color_goalkeeper, 
-                team.team_b_secondary_color_goalkeeper
-            ])
+        missing_team_b_colors = any([
+            not game.team_b_primary_color_player,
+            not game.team_b_secondary_color_player,
+            not game.team_b_primary_color_goalkeeper,
+            not game.team_b_secondary_color_goalkeeper
+        ])
 
-        # Check if uniform colors for Team A are missing
-        if game.team_a and are_uniform_colors_missing(game):
+        
+        if missing_team_a_colors or missing_team_b_colors:
+            # Get the coaches and managers for both teams
             team_a_staff = JoinBranch.objects.filter(
                 branch_id=game.team_a,
                 joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
             )
-            
-            # Notify staff members for Team A
-            for staff_member in team_a_staff:
-                if staff_member.user_id.device_token:
-                    notification_language = staff_member.user_id.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
 
-                    title = f"Missing uniform for your {game_type_label} match against {game.team_b.name}"
-                    body = f"Please add the uniform colors for the {game_type_label} game (Game #{game.game_number}) against {game.team_b.name}."
-                    
-                    send_push_notification(
-                        staff_member.user_id.device_token,
-                        title=title,
-                        body=body,
-                        device_type=staff_member.user_id.device_type
-                    )
-                    notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team A ({game_type})")
-        
-        # Check if uniform colors for Team B are missing
-        if game.team_b and are_uniform_colors_missing(game):
             team_b_staff = JoinBranch.objects.filter(
                 branch_id=game.team_b,
                 joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
             )
-            
-            # Notify staff members for Team B
-            for staff_member in team_b_staff:
-                if staff_member.user_id.device_token:
-                    notification_language = staff_member.user_id.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-
-                    title = f"Missing uniform for your {game_type_label} match against {game.team_a.name}"
-                    body = f"Please add the uniform colors for the {game_type_label} game (Game #{game.game_number}) against {game.team_a.name}."
-                    
-                    send_push_notification(
-                        staff_member.user_id.device_token,
-                        title=title,
-                        body=body,
-                        device_type=staff_member.user_id.device_type
-                    )
-                    notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team B ({game_type})")
 
 
+            # Notify staff members for Team A if any color is missing
+            if missing_team_a_colors:
+                for staff_member in team_a_staff:
+                   
+                    if staff_member.user_id.device_token:
+                        # Set the notification title and body based on language
+                        notification_language = staff_member.user_id.current_language
+                        if notification_language in ['ar', 'en']:
+                            activate(notification_language)
+
+                        # Set the dynamic message
+                        body = f"Please add your uniform colors to your {game_type.capitalize()} match against {game.team_b.team_name}"
+                        title = f"Missing Uniform Colors!!"
+
+                        send_push_notification(
+                            device_token=staff_member.user_id.device_token,
+                            title=title,
+                            body=body,
+                            device_type=staff_member.user_id.device_type
+                        )
+                        notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team A ({game_type})")
+
+            # Notify staff members for Team B if any color is missing
+            if missing_team_b_colors:
+                for staff_member in team_b_staff:
+              
+                    if staff_member.user_id.device_token:
+                        # Set the notification title and body based on language
+                        notification_language = staff_member.user_id.current_language
+                        if notification_language in ['ar', 'en']:
+                            activate(notification_language)
+
+                        # Set the dynamic message
+                        body = f"Please add your uniform colors to your {game_type.capitalize()} match against {game.team_a.team_name}"
+                        title = f"Missing Uniform Colors!!"
+
+                        send_push_notification(
+                            device_token=staff_member.user_id.device_token,
+                            title=title,
+                            body=body,
+                            device_type=staff_member.user_id.device_type
+                        )
+                        notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team B ({game_type})")
