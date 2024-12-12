@@ -110,7 +110,7 @@
 									<img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/images/dashboard/profile.jpg' %}{% endif %}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
 									<div class="w-100 mb-3">
 										<div class="title mb-1">
-											<a target="_blank" href="">{{ user.username }}</a>
+											<a>{{ user.username }}</a>
 										</div>
 										<div class="desc">
 											<i class="fa fa-briefcase"></i> {{ user.role.name_en }}
@@ -251,7 +251,7 @@
 						</div>
 						<hr>
 					</div> {% if user.role.id == 2 or user.role.id == 3 or user.role.id == 4 %} <div class="card-header">
-						<h4 class="card-title mb-0">Stats Information</h4>
+						<h4 class="card-title mb-0">{{user.role.name_en}} Statistics</h4>
 					</div> {% if stats %} <div class="row"> {% if user.role.id == 2 %}
 						<!-- Player Stats -->
 						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
