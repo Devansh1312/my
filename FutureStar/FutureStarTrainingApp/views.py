@@ -621,6 +621,96 @@ class JoinTrainingAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
+    def _has_access(self, user_id, training,manager_id,coach_id):
+       
+        # Get the user by user_id
+        user = User.objects.get(id=user_id)
+       
+
+        # Case 1: The user is the creator and has the correct role (role 5)
+        if training.created_by_id == int(user_id):  # Check if user is the creator
+        
+            
+            if training.creator_type == Training.USER_TYPE and user.role.id == 5:  # Check if creator type is USER_TYPE and role is 5
+              
+                return True
+            
+            if training.creator_type== Training.TEAM_TYPE:
+                print("team")
+                return True
+           
+
+            # Case 2: The training creator is a player (role 2) who joined a team
+            if training.creator_type == Training.USER_TYPE and user.role.id == 2:  # Creator is a player, user role is 2
+             
+                # Fetch the player's branch memberships (player's teams)
+                player_branch_memberships = JoinBranch.objects.filter(
+                    user_id=training.created_by_id,
+                    joinning_type=JoinBranch.PLAYER_TYPE  # Ensure the creator is a PLAYER in a team
+                )
+             
+                return True
+            
+             
+            
+            
+    
+            return False
+        
+            
+            # ########### for manager 
+            # if manager_id:
+            #     if training.creator_type == Training.USER_TYPE and user.role.id == 2:
+                    
+            #         team_branch_datas = JoinBranch.objects.filter(
+            #             user_id=training.created_by_id,
+            #             joinning_type=JoinBranch.PLAYER_TYPE  # Ensure the creator is a PLAYER in a team
+            #         )
+                    
+            
+            #         for team_branch_data in team_branch_datas:
+            #             team_branch = team_branch_data.branch_id  
+                
+
+            #             manager_branch_memberships = JoinBranch.objects.filter(
+            #                 branch_id=team_branch.id,
+            #                 user_id=manager_id,  # Ensure the creator is the manager
+            #                 joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE  # Ensure the creator is a PLAYER in a team
+            #             )
+            #             print("sfgsdfg",manager_branch_memberships)
+            #             return True
+                    
+                
+            #     ########### for coach
+            #     if coach_id:
+            #         if training.creator_type == Training.USER_TYPE and user.role.id == 2:
+                        
+            #             team_branch_datas = JoinBranch.objects.filter(
+            #                 user_id=training.created_by_id,
+            #                 joinning_type=JoinBranch.PLAYER_TYPE  # Ensure the creator is a PLAYER in a team
+            #             )
+                        
+            #             for team_branch_data in team_branch_datas:
+            #                 team_branch = team_branch_data.branch_id
+
+                        
+            #             coach_branch_memberships = JoinBranch.objects.filter(
+            #                 branch_id=team_branch.id,
+            #                 user_id=coach_id,  # Ensure the creator is the coach
+            #                 joinning_type=JoinBranch.COACH_STAFF_TYPE  # Ensure the creator is a PLAYER in a team
+            #             )
+            #             return True
+
+                       
+            #         print(f"Access denied: User is not a manager or coach for the team.")
+            #         return False
+            #     print(f"Access denied: No conditions matched.")
+            #     return False
+           
+
+        # If no condition is met, access is denied
+        print(f"Access denied: No conditions matched.")
+        return False
     ######### Create a new training membership for the user ###################
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -686,6 +776,8 @@ class JoinTrainingAPIView(APIView):
             activate(language)
             # Get the training ID from the request
             training_id = request.query_params.get('training_id')
+            # manager_id = request.query_params.get('manager_id')
+            # coach_id = request.query_params.get('coach_id')
             if not training_id:
                 return Response({
                   'status': 0,
@@ -708,6 +800,14 @@ class JoinTrainingAPIView(APIView):
                  'status': 0,
                  'message': _('Training not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
+            
+            print(type(user))
+
+            if not self._has_access(user, training):
+                return Response({
+                    'status': 0,
+                    'message': _('You do not have permission to access this training.')
+                }, status=status.HTTP_403_FORBIDDEN)
             
             # Get the membership of the user in the training
             try:
@@ -753,6 +853,11 @@ class JoinTrainingAPIView(APIView):
                 'status': 0,
                 'message': _('Training not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
+            if not self._has_access(user, training):  # Pass None for manager_id and coach_id if not needed
+                return Response({
+                    'status': 0,
+                    'message': _('User does not have access to delete this training.')
+                }, status=status.HTTP_403_FORBIDDEN)
             
             # Get the membership of the user in the training
             try:
@@ -773,6 +878,43 @@ class JoinTrainingAPIView(APIView):
             
 
 class TrainingFeedbackAPI(APIView):
+    def _has_access(self, user_id, training):
+       
+        # Get the user by user_id
+        user = User.objects.get(id=user_id)
+       
+
+        # Case 1: The user is the creator and has the correct role (role 5)
+        if training.created_by_id == int(user_id):  # Check if user is the creator
+        
+            
+            if training.creator_type == Training.USER_TYPE and user.role.id == 5:  # Check if creator type is USER_TYPE and role is 5
+              
+                return True
+            
+            if training.creator_type== Training.TEAM_TYPE:
+                print("team")
+                return True
+           
+
+            # Case 2: The training creator is a player (role 2) who joined a team
+            if training.creator_type == Training.USER_TYPE and user.role.id == 2:  # Creator is a player, user role is 2
+             
+                # Fetch the player's branch memberships (player's teams)
+                player_branch_memberships = JoinBranch.objects.filter(
+                    user_id=training.created_by_id,
+                    joinning_type=JoinBranch.PLAYER_TYPE  # Ensure the creator is a PLAYER in a team
+                )
+             
+                return True
+            
+             
+            
+            
+    
+            return False
+     
+        return False
 
     
     def patch(self, request, *args, **kwargs):
@@ -796,6 +938,12 @@ class TrainingFeedbackAPI(APIView):
                 "status": 0,
                 "message": _("user_id and training_id are required")
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not self._has_access(user_id, training_id):
+            return Response({
+                "status": 0,
+                "message": _("Access denied")
+            }, status=status.HTTP_403_FORBIDDEN)
 
         # Fetch the Training_Joined object
         training_joined = get_object_or_404(Training_Joined, user=user_id, training=training_id)

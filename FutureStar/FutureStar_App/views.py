@@ -7111,8 +7111,8 @@ class TournamentGameDetailView(LoginRequiredMixin, View):
         game = get_object_or_404(TournamentGames, id=game_id)
         
         # Get lineups for both teams
-        team_a_lineup = Lineup.objects.filter(game_id=game, team_id=game.team_a).order_by('lineup_status')
-        team_b_lineup = Lineup.objects.filter(game_id=game, team_id=game.team_b).order_by('lineup_status')
+        team_a_lineup = Lineup.objects.filter(game_id=game, team_id=game.team_a).order_by('lineup_status').prefetch_related('playerjersey_set')
+        team_b_lineup = Lineup.objects.filter(game_id=game, team_id=game.team_b).order_by('lineup_status').prefetch_related('playerjersey_set')
         
         # Get officials for the game
         game_officials = GameOfficials.objects.filter(game_id=game)

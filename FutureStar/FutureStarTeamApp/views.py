@@ -1096,19 +1096,22 @@ class TeamStatsView(APIView):
                     )
                 )['total_conceded'] or 0
 
+                # Append the team branch data
                 team_branch_data.append({
                     "team_branch_id": team_branch.id,
                     "team_name": team_branch.team_name,
                     "age_group": team_branch.age_group_id.name_en if language == 'en' else team_branch.age_group_id.name_ar,
-                    "total_goals": stats['total_goals'] or 0,
-                    "total_assists": stats['total_assists'] or 0,
-                    "total_yellow_cards": stats['total_yellow_cards'] or 0,
-                    "total_red_cards": stats['total_red_cards'] or 0,
-                    "total_games_played": total_games,
-                    "total_wins": total_wins,
-                    "total_losses": total_losses,
-                    "total_draws": total_draws,
-                    "total_conceded_goals": conceded_goals
+                    "team_stats": {
+                        "total_goals": stats['total_goals'] or 0,
+                        "total_assists": stats['total_assists'] or 0,
+                        "total_yellow_cards": stats['total_yellow_cards'] or 0,
+                        "total_red_cards": stats['total_red_cards'] or 0,
+                        "total_games_played": total_games,
+                        "total_wins": total_wins,
+                        "total_losses": total_losses,
+                        "total_draws": total_draws,
+                        "total_conceded_goals": conceded_goals
+                    }
                 })
 
             return Response({

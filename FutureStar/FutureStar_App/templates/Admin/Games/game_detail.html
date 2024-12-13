@@ -216,7 +216,13 @@
                               </thead>
                               <tbody> {% for lineup in team_a_lineup %} {% if lineup.lineup_status == 3 %} <tr>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.playerjersey_set.first %}
+                                           {{ lineup.playerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                           Not Assigned
+                                       {% endif %}
+                                   </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                            <br>
@@ -230,7 +236,13 @@
                               </thead>
                               <tbody> {% for lineup in team_a_lineup %} {% if lineup.lineup_status == 2 %} <tr>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.playerjersey_set.first %}
+                                           {{ lineup.playerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                           Not Assigned
+                                       {% endif %}
+                                   </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                         </div>
@@ -247,7 +259,13 @@
                               </thead>
                               <tbody> {% for lineup in team_b_lineup %} {% if lineup.lineup_status == 3 %} <tr>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.playerjersey_set.first %}
+                                           {{ lineup.playerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                           Not Assigned
+                                       {% endif %}
+                                   </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                            <br>
@@ -261,7 +279,13 @@
                               </thead>
                               <tbody> {% for lineup in team_b_lineup %} {% if lineup.lineup_status == 2 %} <tr>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.playerjersey_set.first %}
+                                           {{ lineup.playerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                           Not Assigned
+                                       {% endif %}
+                                   </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                         </div>
