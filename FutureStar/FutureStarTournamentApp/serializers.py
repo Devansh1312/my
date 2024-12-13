@@ -62,6 +62,7 @@ class TournamentSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField()
     logo=serializers.SerializerMethodField()
     tournament_banner=serializers.SerializerMethodField()
+    age_group_name = serializers.SerializerMethodField()
 
     
 
@@ -76,6 +77,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             'number_of_team',
             'number_of_group',
             'age_group',
+            'age_group_name', 
             'country',
             'country_name',
             'city',
@@ -136,6 +138,8 @@ class TournamentSerializer(serializers.ModelSerializer):
     def get_tournament_banner(self, obj):
         # Return the relative path of the tournament banner
         return obj.tournament_banner.url if obj.tournament_banner else None
+    def get_age_group_name(self, obj):
+        return obj.age_group.name_en if obj.age_group else None
 
 
     def create(self, validated_data):
