@@ -980,142 +980,113 @@ class UserSearchView(APIView):
 class TeamStatsView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-   
+
     def get(self, request):
-            language = request.headers.get('Language', 'en')
-            if language in ['en', 'ar']:
-                activate(language)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
 
-            team_id = request.query_params.get('team_id')
-            season = request.query_params.get('season')  # Expecting a format like "2024"
+        team_id = request.query_params.get('team_id')
+        years_param = request.query_params.get('years', '0')  # Default to '0' (all-time data)
 
-            if not team_id:
-                return Response({
-                    'status': 0,
-                    'message': _('team_id is required'),
-                    'data': None
-                }, status=status.HTTP_400_BAD_REQUEST)
+        if not team_id:
+            return Response({
+                'status': 0,
+                'message': _('team_id is required'),
+                'data': None
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Step 1: Handle season logic
-            if season:
-                try:
-                    season_start = datetime(int(season), 1, 1)
-                    season_end = datetime(int(season), 12, 31)
-                except (ValueError, TypeError):
-                    return Response({
-                        'status': 0,
-                        'message': _('Invalid season format. Please provide a valid year.'),
-                        'data': None
-                    }, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                # If no season is provided, we fetch data for all seasons, so no date filtering
-                season_start = None
-                season_end = None
+        # Step 1: Parse years parameter
+        try:
+            years = [int(year.strip()) for year in years_param.split(',') if year.strip().isdigit()]
+            if years and any(year < 0 for year in years):
+                raise ValueError("Year cannot be negative.")
+        except ValueError:
+            return Response({
+                "status": 0,
+                "message": _("Invalid value for 'years'. Please provide a comma-separated list of valid years."),
+                "data": None
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Step 2: Filter TeamBranch instances by team_id and season range
-            if season_start and season_end:
-                # Filter by specific season range
-                team_branches = TeamBranch.objects.filter(
-                    team_id=team_id,
-                    created_at__range=(season_start, season_end)
-                )
-            else:
-                # Fetch all data if season is not provided
-                team_branches = TeamBranch.objects.filter(
-                    team_id=team_id
-                )
+        # If no specific years or "0" is provided, fetch all-time data
+        if not years or 0 in years:
+            time_filter = {}
+        else:
+            time_filter = {"created_at__year__in": years}
 
-            if not team_branches.exists():
-                return Response({
-                    'status': 1,
-                    'message': _('No Team Branches found for the provided team ID.'),
-                    'data': []
-                }, status=status.HTTP_200_OK)
+        # Step 2: Fetch all team branches for the given team_id
+        all_team_branches = TeamBranch.objects.filter(team_id=team_id)
 
-            team_branch_ids = team_branches.values_list('id', flat=True)
-
-            # Step 3: Aggregate player stats per branch using team_id__in
-            if season_start and season_end:
-                stats_per_branch = PlayerGameStats.objects.filter(
-                    team_id__in=team_branch_ids,
-                    created_at__range=(season_start, season_end)
-                ).values('team_id').annotate(
-                    total_goals=Sum('goals') or 0,
-                    total_assists=Sum('assists') or 0,
-                    total_yellow_cards=Sum('yellow_cards') or 0,
-                    total_red_cards=Sum('red_cards') or 0
-                )
-            else:
-                # Fetch stats for all seasons if no specific season is provided
-                stats_per_branch = PlayerGameStats.objects.filter(
-                    team_id__in=team_branch_ids
-                ).values('team_id').annotate(
-                    total_goals=Sum('goals') or 0,
-                    total_assists=Sum('assists') or 0,
-                    total_yellow_cards=Sum('yellow_cards') or 0,
-                    total_red_cards=Sum('red_cards') or 0
-                )
-
-            # Create a dictionary for easy lookup
-            stats_dict = {stat['team_id']: stat for stat in stats_per_branch}
-
-            team_branch_data = []
-            for team_branch in team_branches:
-                stats = stats_dict.get(team_branch.id, {
-                    'total_goals': 0,
-                    'total_assists': 0,
-                    'total_yellow_cards': 0,
-                    'total_red_cards': 0
-                })
-
-                # Step 4: Gather tournament game statistics
-                if season_start and season_end:
-                    games = TournamentGames.objects.filter(
-                        (Q(team_a=team_branch) | Q(team_b=team_branch)) &
-                        Q(game_date__range=(season_start, season_end))
-                    )
-                else:
-                    # Fetch games for all available seasons if no specific season is provided
-                    games = TournamentGames.objects.filter(
-                        (Q(team_a=team_branch) | Q(team_b=team_branch))
-                    )
-
-                total_games = games.count()
-                total_wins = games.filter(winner_id=str(team_branch.id)).count()
-                total_losses = games.filter(loser_id=str(team_branch.id)).count()
-                total_draws = games.filter(is_draw=True).count()
-
-                conceded_goals = games.aggregate(
-                    total_conceded=Sum(
-                        Case(
-                            When(team_a=team_branch, then='team_b_goal'),
-                            When(team_b=team_branch, then='team_a_goal'),
-                            default=0,
-                            output_field=models.IntegerField()
-                        )
-                    )
-                )['total_conceded'] or 0
-
-                # Append the team branch data
-                team_branch_data.append({
-                    "team_branch_id": team_branch.id,
-                    "team_name": team_branch.team_name,
-                    "age_group": team_branch.age_group_id.name_en if language == 'en' else team_branch.age_group_id.name_ar,
-                    "team_stats": {
-                        "total_goals": stats['total_goals'] or 0,
-                        "total_assists": stats['total_assists'] or 0,
-                        "total_yellow_cards": stats['total_yellow_cards'] or 0,
-                        "total_red_cards": stats['total_red_cards'] or 0,
-                        "total_games_played": total_games,
-                        "total_wins": total_wins,
-                        "total_losses": total_losses,
-                        "total_draws": total_draws,
-                        "total_conceded_goals": conceded_goals
-                    }
-                })
-
+        if not all_team_branches.exists():
             return Response({
                 'status': 1,
-                'message': _('Data fetched successfully.'),
-                'data': team_branch_data
+                'message': _('No branches found for the given team ID.'),
+                'data': []
             }, status=status.HTTP_200_OK)
+
+        stats_per_branch = PlayerGameStats.objects.filter(
+            team_id__in=all_team_branches.values_list('id', flat=True),
+            **time_filter
+        ).values('team_id').annotate(
+            total_goals=Sum('goals') or 0,
+            total_assists=Sum('assists') or 0,
+            total_yellow_cards=Sum('yellow_cards') or 0,
+            total_red_cards=Sum('red_cards') or 0
+        )
+
+        stats_dict = {stat['team_id']: stat for stat in stats_per_branch}
+
+        team_branch_data = []
+
+        for team_branch in all_team_branches:
+            stats = stats_dict.get(team_branch.id, {
+                'total_goals': 0,
+                'total_assists': 0,
+                'total_yellow_cards': 0,
+                'total_red_cards': 0
+            })
+
+            # Step 3: Aggregate game statistics
+            games = TournamentGames.objects.filter(
+                (Q(team_a=team_branch) | Q(team_b=team_branch)),
+                **time_filter
+            )
+
+            total_games = games.count()
+            total_wins = games.filter(winner_id=str(team_branch.id)).count()
+            total_losses = games.filter(loser_id=str(team_branch.id)).count()
+            total_draws = games.filter(is_draw=True).count()
+
+            conceded_goals = games.aggregate(
+                total_conceded=Sum(
+                    Case(
+                        When(team_a=team_branch, then='team_b_goal'),
+                        When(team_b=team_branch, then='team_a_goal'),
+                        default=0,
+                        output_field=models.IntegerField()
+                    )
+                )
+            )['total_conceded'] or 0
+
+            team_branch_data.append({
+                "team_branch_id": team_branch.id,
+                "team_name": team_branch.team_name,
+                "age_group": team_branch.age_group_id.name_en if language == 'en' else team_branch.age_group_id.name_ar,
+                "team_stats": {
+                    "total_goals": stats['total_goals'] or 0,
+                    "total_assists": stats['total_assists'] or 0,
+                    "total_yellow_cards": stats['total_yellow_cards'] or 0,
+                    "total_red_cards": stats['total_red_cards'] or 0,
+                    "total_games_played": total_games,
+                    "total_wins": total_wins,
+                    "total_losses": total_losses,
+                    "total_draws": total_draws,
+                    "total_conceded_goals": conceded_goals
+                }
+            })
+
+        return Response({
+            'status': 1,
+            'message': _('Data fetched successfully.'),
+            'data': team_branch_data
+        }, status=status.HTTP_200_OK)

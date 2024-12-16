@@ -1184,7 +1184,7 @@ class GameDetailsAPIView(APIView):
             "id": game.id,
             "tournament_id": game.tournament_id.id if game.tournament_id else None,
             "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
-            "age_group_name": game.tournament_id.age_group.name_en if language is 'en' else game.tournament_id.age_group.name_ar,
+            "age_group_name": game.tournament_id.age_group.name_en if language == 'en' else game.tournament_id.age_group.name_ar,
             "team_id": game.tournament_id.team_id.id,
             "game_number": game.game_number,
             "game_date": game.game_date,
@@ -2510,8 +2510,7 @@ class FetchMyGamesAPIView(APIView):
                     "winner": game.winner_id,
                     "loser_id": game.loser_id,
                     "is_draw": game.is_draw,
-                    "created_at": game.created_at,
-                    "updated_at": game.updated_at,
+                    "created_by": game.tournament_id.team_id,
                 })
 
         # Process friendly games
@@ -2541,8 +2540,7 @@ class FetchMyGamesAPIView(APIView):
                     "winner": game.winner_id,
                     "loser_id": game.loser_id,
                     "is_draw": game.is_draw,
-                    "created_at": game.created_at,
-                    "updated_at": game.updated_at,
+                    "created_by":game.created_by,
                 })
 
         # Sort all games by game_date and game_start_time
