@@ -47,10 +47,13 @@ from FutureStar.firebase_config import send_push_notification
 def user_role_check(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        user = request.user
-        if user.is_authenticated and user.role_id != 1:
+        if not request.user.is_authenticated:
+            return redirect(f"{settings.LOGIN_URL}?next={request.path}")
+        
+        if request.user.role_id != 1:  # Check role
             messages.error(request, "You do not have access to this site.")
-            return redirect("login")
+            return redirect(settings.LOGIN_URL)
+        
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 

@@ -19,7 +19,19 @@ from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
+from django.shortcuts import render
+from django.conf.urls import handler404, handler500
 
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
+
+def custom_500(request):
+    return render(request, '500.html', status=500)
+
+
+# Set the custom handler for 404 errors
+handler404 = 'FutureStar.urls.custom_404'
+handler500 = 'FutureStar.urls.custom_500'
 
 urlpatterns = [
     path('admin/', admin.site.urls),

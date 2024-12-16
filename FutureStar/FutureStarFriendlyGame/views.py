@@ -45,6 +45,13 @@ class ManagerBranchDetail(APIView):
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        if request.user.role.id != 6:
+            return Response({
+                'status': 0,
+                'message': _('You do not have the required role to access this resource'),
+                'data': []
+            }, status=status.HTTP_403_FORBIDDEN)
+
         try:
             join_branch = JoinBranch.objects.get(
                 Q(joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE) | Q(joinning_type=JoinBranch.COACH_STAFF_TYPE),
@@ -66,7 +73,7 @@ class ManagerBranchDetail(APIView):
         except JoinBranch.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('User is not a Manager.'),
+                'message': _('You are not a manager of any team.'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
         except TeamBranch.DoesNotExist:

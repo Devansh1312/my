@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-x7$wh)3+(3$)13tn$!pa=x#@1%l*qdmwk%zv!x(vlvsxkwey9-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['futurestar.redspark.redspark.a2hosted.com', 'localhost', '127.0.0.1','75.101.179.30']
 
@@ -78,6 +78,9 @@ CORS_ALLOWED_ORIGINS  = [
 ]
 
 ROOT_URLCONF = 'FutureStar.urls'
+
+LOGIN_URL = '/login/' 
+
 
 TEMPLATES = [
     {
