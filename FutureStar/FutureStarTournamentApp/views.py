@@ -2899,6 +2899,7 @@ class ExtraTimeAPIView(APIView):
 
 
 
+
 class UpcomingGamesNotificationAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
@@ -2999,11 +3000,20 @@ class UpcomingGamesNotificationAPIView(APIView):
 
                     # Set the dynamic message
                     if game_type == "tournament":
-                        body = f"Starting 11 is incomplete for {game.game_number} for {game.tournament_id.tournament_name} tournament"
+                        body = _(
+                            "Starting 11 is incomplete for game #{game_number} in the {tournament_name} tournament."
+                        ).format(
+                            game_number=game.game_number,
+                            tournament_name=game.tournament_id.tournament_name
+                        )
                     else:
-                        body = f"Starting 11 is incomplete for {game.game_number} for {game.id} friendly match"
+                        body = _(
+                            "Starting 11 is incomplete for game #{game_number} in the friendly match."
+                        ).format(game_number=game.game_number)
 
-                    title = f"Please complete your line-up for your match against {game.team_b.team_name if game_type == 'tournament' else game.team_b.team_name}"
+                    title = _(
+                        "Please complete your line-up for your match against {opponent_team}."
+                    ).format(opponent_team=game.team_b.team_name)
 
                     send_push_notification(
                         staff_member.user_id.device_token,
@@ -3023,11 +3033,20 @@ class UpcomingGamesNotificationAPIView(APIView):
 
                     # Set the dynamic message
                     if game_type == "tournament":
-                        body = f"Starting 11 is incomplete for {game.game_number} for {game.tournament_id.tournament_name} tournament"
+                        body = _(
+                            "Starting 11 is incomplete for game #{game_number} in the {tournament_name} tournament."
+                        ).format(
+                            game_number=game.game_number,
+                            tournament_name=game.tournament_id.tournament_name
+                        )
                     else:
-                        body = f"Starting 11 is incomplete for {game.game_number} for {game.id} friendly match"
+                        body = _(
+                            "Starting 11 is incomplete for game #{game_number} in the friendly match."
+                        ).format(game_number=game.game_number)
 
-                    title = f"Please complete your line-up for your match against {game.team_a.team_name if game_type == 'tournament' else game.team_a.team_name}"
+                    title = _(
+                        "Please complete your line-up for your match against {opponent_team}."
+                    ).format(opponent_team=game.team_a.team_name)
 
                     send_push_notification(
                         staff_member.user_id.device_token,
@@ -3093,11 +3112,11 @@ class UniformConfirmationNotificationView(APIView):
                 notification_language = official_user.current_language  # Get user's preferred language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                title = "Uniform Confirmation Required"
-                body = (
-                    f"refree:Please confirm the uniforms colors for the {game_type_label} game (Game #{game_number}) "
-                    f"between {game.team_a} and {game.team_b}."
-                )
+                title = _("Uniform Confirmation Required")
+                body = _(
+                        f"Referee: Please confirm the uniform colors for the {game_type_label} game (Game #{game_number}) "
+                        f"between {game.team_a} and {game.team_b}."
+                    )
                 send_push_notification(
                     device_token=official_user.device_token,
                     title=title,
@@ -3248,8 +3267,11 @@ class UniformAddNotificationAPIView(APIView):
                             activate(notification_language)
 
                         # Set the dynamic message
-                        body = f"Please add your uniform colors to your {game_type.capitalize()} match against {game.team_b.team_name}"
-                        title = f"Missing Uniform Colors!!"
+                        body = _(
+                        f"Please add your uniform colors to your {game_type.capitalize()} match "
+                        f"against {game.team_b.team_name}."
+                        )
+                        title = _("Missing Uniform Colors!!")
 
                         send_push_notification(
                             device_token=staff_member.user_id.device_token,
@@ -3280,3 +3302,122 @@ class UniformAddNotificationAPIView(APIView):
                             device_type=staff_member.user_id.device_type
                         )
                         notifications_sent.append(f"Notification sent to {staff_member.user_id.username} for Team B ({game_type})")
+
+
+
+class PlayerReadyNotificationAPIView(APIView):
+    def get(self, request):
+        current_time = now()
+        current_date = date.today()
+        one_hour_later = current_time + timedelta(hours=1)
+        print(f"Current Time: {current_time}, One Hour Later: {one_hour_later}")
+
+        # Fetch upcoming games
+        upcoming_tournament_games = TournamentGames.objects.filter(
+            game_date=current_date,
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False
+        )
+        upcoming_friendly_games = FriendlyGame.objects.filter(
+            game_date=current_date,
+            game_start_time__gte=current_time.time(),
+            game_start_time__lte=one_hour_later.time(),
+            finish=False
+        )
+
+        # Combine tournament and friendly games into one list
+        upcoming_games = list(upcoming_tournament_games) + list(upcoming_friendly_games)
+
+        if not upcoming_games:
+            return Response({
+                "status": "success",
+                "message": "No upcoming games found for today.",
+                "details": []
+            }, status=status.HTTP_200_OK)
+
+        notifications_sent = []
+
+        # Check player readiness and send notifications if needed
+        for game in upcoming_games:
+            game_label = "tournament" if isinstance(game, TournamentGames) else "friendly"
+            game_number = game.game_number
+            team_a = game.team_a
+            team_b = game.team_b
+
+            for team in [team_a, team_b]:
+                print(game)
+                print(f"Checking readiness for {team.team_name} in {game_label} game {game_number}")
+                if isinstance(game, TournamentGames):
+                    lineups = Lineup.objects.filter(
+                        game_id=game.id,
+                        team_id=team.id,
+                        lineup_status=3  # ALREADY_IN_LINEUP
+                    )
+            # Check readiness for friendly games
+                elif isinstance(game, FriendlyGame):
+                    lineups = FriendlyGameLineup.objects.filter(
+                        game_id=game.id,
+                        team_id=team.id,
+                        lineup_status=3  # ALREADY_IN_LINEUP
+                    )
+                
+                # Check readiness of players
+                not_ready_players = lineups.filter(player_ready=False)
+                print(not_ready_players)
+                if not_ready_players.exists():
+                    # Fetch coaches and managers of the team
+                    staff_members = JoinBranch.objects.filter(
+                        branch_id=team.id,
+                        joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+                    )
+
+                    for staff in staff_members:
+                        # Assume `User` has device_token, device_type fields
+                        user = staff.user_id
+                        device_token = getattr(user, "device_token", None)
+                        device_type = getattr(user, "device_type", None)
+                        notification_language = getattr(user, "current_language", "en")
+
+                        if notification_language in ['ar', 'en']:
+                            activate(notification_language)
+
+                        if device_token and device_type:
+                            role = "manager" if staff.joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE else "coach"
+                            opponent_team = team_b if team == team_a else team_a
+                            message = _(
+                                "One or more of your players are not ready for the match! "
+                                "Make sure that they are ASAP for {game_label} game of {game_number} match "
+                                "against {opponent_team}."
+                            ).format(
+                                game_label=game_label,
+                                game_number=game_number,
+                                opponent_team=opponent_team.team_name
+                            )
+                            title = _("Player Readiness Alert")
+                            try:
+                                send_push_notification(
+                                    device_token=device_token,
+                                    title=title,
+                                    body=message,
+                                    device_type=device_type
+                                )
+                                notifications_sent.append({
+                                    "user": user.id,
+                                    "team": team.id,
+                                    "role": role,
+                                    "message": message
+                                })
+                            except Exception as e:
+                                notifications_sent.append({
+                                    "user": user.id,
+                                    "team": team.id,
+                                    "role": role,
+                                    "message": str(e)
+                                })
+
+        return Response({
+            "status": "success",
+            "message": "Notifications sent for games with unready players.",
+            "notifications": notifications_sent
+        }, status=status.HTTP_200_OK)

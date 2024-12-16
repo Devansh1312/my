@@ -72,6 +72,8 @@ urlpatterns = [
         path('api/upcoming/noti/',UpcomingGamesNotificationAPIView.as_view()),
         path('api/upcoming/uniform_confirm_noti/',UniformConfirmationNotificationView.as_view()),
         path('api/upcoming/uniform_add_noti/',UniformAddNotificationAPIView.as_view()),
+        path('api/upcoming/player_ready_noti/',PlayerReadyNotificationAPIView.as_view()),
+
 
 
 
