@@ -761,6 +761,14 @@ class TeamJoiningRequest(APIView):
         
         # Serialize and return the created or updated object
         serializer = TournamentGroupTeamSerializer(tournament_group_team)
+        team_founder = team_branch.team_id.team_founder
+        if team_founder:
+            device_token = team_founder.device_token  # Ensure the `device_token` is available
+            if device_token:
+                title = "Tournament Joining Request"
+                body = f"Team {team_branch.team_id.team_name} has sent a request to join the tournament {tournament.tournament_name}."
+                send_push_notification(device_token, title, body, device_type=team_founder.device_type)  # Use the appropriate device type
+        
         return Response({
             'status': 1,
             'message': _('Team joining request created successfully.' if not existing_request else _('Team joining request updated successfully.')),
