@@ -266,7 +266,7 @@ class TournamentCommentCreateAPIView(APIView):
             'status': 1,
             'message': _('Comment created successfully.'),
             'data': TournamentCommentSerializer(comment).data
-        }, status=status.HTTP_201_CREATED)
+        }, status=status.HTTP_200_OK)
 
 
 
@@ -336,7 +336,7 @@ class TournamentAPIView(APIView):
                 'status': 1,
                 'message': _('Tournament created successfully.'),
                 'data': TournamentSerializer(tournament_instance).data
-            }, status=status.HTTP_201_CREATED)
+            }, status=status.HTTP_200_OK)
         
         return Response({
             'status': 0,
@@ -743,7 +743,7 @@ class TeamJoiningRequest(APIView):
             'status': 1,
             'message': _('Team joining request created successfully.' if not existing_request else _('Team joining request updated successfully.')),
             'data': serializer.data
-        }, status=status.HTTP_201_CREATED)
+        }, status=status.HTTP_200_OK)
 
 
 
@@ -855,7 +855,7 @@ class TournamentGroupTeamListView(APIView):
             'status': 1,
             'message': _('Team Fetched successfully.'),
             'data': serializer.data
-        }, status=status.HTTP_201_CREATED)
+        }, status=status.HTTP_200_OK)
 
 ############################# REJECT TEAM OF GROUP ###########################
 
@@ -1270,7 +1270,7 @@ class TournamentGamesAPIView(APIView):
                     'status': 1,
                     'message': _('Game created successfully.'),
                     'data': serializer.data
-                }, status=status.HTTP_201_CREATED)
+                }, status=status.HTTP_200_OK)
             else:
                 return Response({
                     'status': 0,

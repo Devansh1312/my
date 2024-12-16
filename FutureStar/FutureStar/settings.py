@@ -103,35 +103,35 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FutureStar.wsgi.application'
 
 ### Local ####
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'futurestar',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#          'OPTIONS': {
-#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
-#         }
-#     }
-# }
-
-
-### A2Hosting ####
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'redspar2_futurestardata2',
-        'USER': 'redspar2_futurestar',
-        'PASSWORD': 'redspark@1',
+        'NAME': 'futurestar',
+        'USER': 'root',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
-        'OPTIONS': {
+         'OPTIONS': {
             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
-        },
+        }
     }
 }
+
+
+### A2Hosting ####
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'redspar2_futurestardata2',
+#         'USER': 'redspar2_futurestar',
+#         'PASSWORD': 'redspark@1',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
+#         },
+#     }
+# }
 
 
 ## AWS ####

@@ -4386,9 +4386,10 @@ class UserRoleStatsAPIView(APIView):
                 return self.get_referee_stats(user, time_filter)
             else:
                 return Response({
-                    "status": 0,
-                    "message": "User does not have a proper role.",
-                }, status=400)
+                    "status": 1,
+                    "message": "You don't have Any Statstics",
+                    "data":{},
+                }, status=200)
 
         except User.DoesNotExist:
             return Response({
