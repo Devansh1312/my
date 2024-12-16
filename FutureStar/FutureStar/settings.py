@@ -118,7 +118,7 @@ DATABASES = {
 }
 
 
-### A2Hosting ####
+# ### A2Hosting ####
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',

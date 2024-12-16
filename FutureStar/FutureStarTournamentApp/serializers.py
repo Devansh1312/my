@@ -147,16 +147,17 @@ class TournamentSerializer(serializers.ModelSerializer):
     
         number_of_group = validated_data.pop('number_of_group', 1)  # Get number of groups, default to 1
 
-        try:
-            team_id = int(validated_data.get('created_by_id'))
-        except (TypeError, ValueError):
-            raise serializers.ValidationError({"created_by_id": "Team ID must be a valid integer."})
+        # team_id = int('created_by_id')
+        # try:
+        #     team_id = int(validated_data.get('created_by_id'))
+        # except (TypeError, ValueError):
+        #     raise serializers.ValidationError({"created_by_id": "Team ID must be a valid integer."})
 
-        if not team_id:
-            raise serializers.ValidationError({"created_by_id": "Team ID is required to create a tournament."})
+        # if not team_id:
+        #     raise serializers.ValidationError({"created_by_id": "Team ID is required to create a tournament."})
 
-        if not team_id:
-            raise serializers.ValidationError({"created_by_id": "Team ID is required to create a tournament."})
+        # if not team_id:
+        #     raise serializers.ValidationError({"created_by_id": "Team ID is required to create a tournament."})
 
         # Dynamically create group names based on the number of groups
         if number_of_group < 1:

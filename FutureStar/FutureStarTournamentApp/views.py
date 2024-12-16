@@ -304,8 +304,9 @@ class TournamentAPIView(APIView):
             activate(language)
 
         serializer = TournamentSerializer(data=request.data, context={'request': request})
-        
+
         if serializer.is_valid():
+            # Save the tournament instance
             tournament_instance = serializer.save()
 
             # Handle logo upload
@@ -317,33 +318,40 @@ class TournamentAPIView(APIView):
                 logo_path = default_storage.save(file_name, logo)
                 tournament_instance.logo = logo_path
                 tournament_instance.save()
-            # Handle logo upload
+
             if 'tournament_banner' in request.FILES:
-                logo = request.FILES['tournament_banner']
-                file_extension = logo.name.split('.')[-1]
+                banner = request.FILES['tournament_banner']
+                file_extension = banner.name.split('.')[-1]
                 unique_suffix = get_random_string(8)
                 file_name = f"tournament_banner/{tournament_instance.id}_{unique_suffix}.{file_extension}"
-                logo_path = default_storage.save(file_name, logo)
-                tournament_instance.tournament_banner = logo_path
+                banner_path = default_storage.save(file_name, banner)
+                tournament_instance.tournament_banner = banner_path
                 tournament_instance.save()
 
-            serializer.save()
-
-
-
+            # Assign the team_id correctly
+            team_id = request.data.get('created_by_id')
+            try:
+                team_instance = Team.objects.get(id=team_id)  # Fetch the Team instance
+                tournament_instance.team_id = team_instance
+                tournament_instance.save()
+            except Team.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid team ID. Team not found.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({
                 'status': 1,
                 'message': _('Tournament created successfully.'),
                 'data': TournamentSerializer(tournament_instance).data
             }, status=status.HTTP_200_OK)
-        
+
         return Response({
             'status': 0,
             'message': _('Tournament creation failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 
     ############################# EDIT AND DELETE###################
@@ -386,6 +394,19 @@ class TournamentAPIView(APIView):
                 tournament_instance.tournament_banner = logo_path
                 tournament_instance.save()
 
+            
+            # Assign the team_id correctly
+            team_id = request.data.get('created_by_id')
+            try:
+                team_instance = Team.objects.get(id=team_id)  # Fetch the Team instance
+                tournament_instance.team_id = team_instance
+                tournament_instance.save()
+            except Team.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid team ID. Team not found.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             serializer.save()
 
             return Response({
@@ -418,6 +439,7 @@ class TournamentAPIView(APIView):
                 'status': 0,
                 'message': _('Tournament not found.')
             }, status=status.HTTP_404_NOT_FOUND)
+
 
 
 ####################### Get My Tournamnets For team Profile  #######################
