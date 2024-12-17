@@ -1,4 +1,5 @@
 from collections import defaultdict
+import logging
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
@@ -141,6 +142,7 @@ class CreateFriendlyGame(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             try:
+                # Save the friendly game instance
                 friendly_game = serializer.save(
                     team_a_id=team_a_id, 
                     team_b_id=team_b_id, 
@@ -164,7 +166,20 @@ class CreateFriendlyGame(APIView):
                             )
                         except Exception as e:
                             # Log or handle any specific errors (like invalid user_id)
+                            print(e)
                             continue
+
+                # Notify eligible team members (coaches and managers)
+                team_a_name = friendly_game.team_a.team_name
+                team_b_name = friendly_game.team_b.team_name if team_b_id else None
+                game_field_name=friendly_game.game_field_id.field_name
+                start_time = friendly_game.game_start_time.strftime('%H:%M')
+                date=friendly_game.game_date.strftime('%d-%m')
+
+
+                # Notify eligible team members (coaches and managers)
+                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date,start_time)
+
 
                 return Response({
                     'status': 1,
@@ -183,6 +198,85 @@ class CreateFriendlyGame(APIView):
             'message': _('Invalid data.'),
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+    def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None):
+        """
+        Notify eligible team members (coaches and managers) about a new friendly game.
+        """
+        # Notify Team B Members
+        if team_b_id:
+            team_b_members = JoinBranch.objects.filter(
+                branch_id=team_b_id,  # Filter users by role (Coach or Manager)
+                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]  # Staff types only
+            )
+            for member in team_b_members:
+                user = member.user_id
+                notification_language = user.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                # Prepare and send push notification
+                device_token = user.device_token  # Assuming `device_token` is stored in the User model
+                device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
+                title = _("Your Game is Scheduled")
+                body = _("You have a Friendly Game against {opponent_team_name} at {game_date} {start_time} at {game_field_name}").format(
+                    opponent_team_name=opponent_team_name,  # Dynamically added opponent team name
+                    game_date=game_date,
+                    start_time=start_time,
+                    game_field_name=game_field_name
+                )
+                if device_token:
+                    send_push_notification(
+                        device_token=device_token,
+                        title=title,
+                        body=body,
+                        device_type=device_type,
+                        data={"game_id": None}  # Optionally include game-related data
+                    )
+
+
+
+
+        else:       
+            user_datas = User.objects.filter(Q(role__id=3) | Q(role__id=6))
+            for user_data in user_datas:
+                # print(user_datas)
+            
+            
+            
+            
+                team_members = JoinBranch.objects.filter(
+                    user_id=user_data.id,  # Filter users by role (Coach or Manager)
+                    joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]  # Staff types only
+                ).exclude(user_id=creator_user.id)  # Optimize query by prefetching related user data
+                # print("fghfgh",team_members)
+
+            
+
+            # Iterate through the filtered users and send notifications
+                for member in team_members:
+                    print(member.id)
+                    print(member)
+                
+                    user = member.user_id
+                    notification_language = user.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    # Prepare and send push notification
+                    device_token = user.device_token  # Assuming `device_token` is stored in the User model
+                    device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
+                    title = _("A new friendly game has been created!")
+                    body = _("Make sure to check it out.")
+
+                    if device_token:
+                        send_push_notification(
+                            device_token=device_token,
+                            title=title,
+                            body=body,
+                            device_type=device_type,
+                            data={"game_id": None}  # Optionally include game-related data
+                        )
 
 
 
@@ -459,6 +553,18 @@ class UpdateFriendlyGame(APIView):
             game.team_b = team_b_instance  # Assign the TeamBranch instance
             game.game_status = 1  # Set status to started
             game.save()
+
+
+            team_a_id=game.team_a_id
+            team_b_name = game.team_b.team_name if team_b_id else None
+            game_field_name=game.game_field_id.field_name
+            start_time = game.game_start_time.strftime('%H:%M')
+            date=game.game_date.strftime('%d-%m')
+        
+
+            # Notify team_a's coach and manager
+            self.notify_team_a_coach_and_manager(team_a_id,team_b_name, date, start_time, game_field_name)
+
             data = FriendlyGameSerializer(game).data
             return Response({
                 'status': 1,
@@ -471,6 +577,40 @@ class UpdateFriendlyGame(APIView):
                 'message': _('Team B is already assigned.'),
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
+
+    def notify_team_a_coach_and_manager(self,team_a_id, team_b_name, game_date, start_time, game_field_name):
+        """
+        Notify coach and manager of team A when team B is assigned.
+        """
+        team_a_members = JoinBranch.objects.filter(
+            branch_id=team_a_id,  # Filter users by role (Coach or Manager)
+            joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]  # Staff types only
+        )
+
+        for member in team_a_members:
+            user = member.user_id
+            notification_language = user.current_language
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+
+            # Prepare and send push notification
+            device_token = user.device_token  # Assuming `device_token` is stored in the User model
+            device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
+            title = _("Your Game is Scheduled")
+            body = _("You have a Friendly Game against {opponent_team_name} at {game_date} {start_time} at {game_field_name}").format(
+                opponent_team_name=team_b_name,  # Dynamically added opponent team name (team B)
+                game_date=game_date,
+                start_time=start_time,
+                game_field_name=game_field_name
+            )
+            if device_token:
+                send_push_notification(
+                    device_token=device_token,
+                    title=title,
+                    body=body,
+                    device_type=device_type,
+                    data={"game_id": None}  # Optionally include game-related data
+                )
 
 
 class DeleteFriendlyGame(APIView):
@@ -2226,6 +2366,35 @@ class FriendlyGameOfficialsAPIView(APIView):
 
         # Serialize the official type for the response
         type_serializer = FriendlyGameOficialTypeSerializer(officials_type, context={'language': language})
+        try:
+        # Retrieve the official's device token and language preference
+            device_token = official.device_token  # Assuming User model has `device_token` field
+            notification_language = official.current_language  # Assuming User model has `current_language` field
+
+            # Activate the official's preferred language
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+
+            if device_token:
+                title = _('You have been appointed to officiate a friendly game.')
+
+                # Include detailed information in the body
+                body = _(
+                    'You have been appointed as {officials_type} to the friendly game between {team_a} and {team_b} on {date} {time} at {location} .'
+                ).format(
+                    team_a=game.team_a.team_name,  # Assuming `team_a_name` is a field in the `game` object
+                    team_b=game.team_b.team_name,  # Assuming `team_b_name` is a field in the `game` object
+                    date=game.game_date.strftime('%d-%b'),  # Format the date and time
+                    time=game.game_start_time.strftime('%H:%M'),
+                    location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
+                    officials_type=type_serializer.data['name']
+                )
+
+
+                # Send the push notification to the official
+                send_push_notification(device_token, title, body, device_type=official.device_type)  # device_type: 1 for Android, 2 for iOS
+        except Exception as e:
+            logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 
         return Response({
             'status': 1,
