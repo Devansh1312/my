@@ -59,6 +59,8 @@ class TrainingListSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
     joined_players_count = serializers.SerializerMethodField()
+    is_joined = serializers.SerializerMethodField()  # New field for is_joined flag
+
 
 
     class Meta:
@@ -66,10 +68,19 @@ class TrainingListSerializer(serializers.ModelSerializer):
         fields = ['id', 'training_name', 'training_photo', 'country', 'country_name', 'city', 'city_name', 
                   'field', 'field_info' ,'gender', 'gender_name', 'training_date', 'start_time', 'training_duration', 
                   'end_time', 'no_of_participants', 'training_type', 'training_type_name', 'cost', 
-                  'description', 'like_count', 'is_like','comments','creator_type', 'created_by_id','joined_players_count']
+                  'description', 'like_count', 'is_like','comments','creator_type', 'created_by_id','joined_players_count','is_joined']
         
     def get_joined_players_count(self, obj):
         return Training_Joined.objects.filter(training=obj).count()
+    
+    def get_is_joined(self, obj):
+        request = self.context.get('request')
+        if request is None:
+            return False
+        
+        user = request.user  # Get the current user
+        # Check if the current user is joined in this training
+        return Training_Joined.objects.filter(training=obj, user=user).exists()
 
     def get_comments(self, obj):
         # Always return the count of top-level comments
@@ -203,6 +214,7 @@ class TrainingSerializer(serializers.ModelSerializer):
                 'id': user.id,
                 'username': user.username,
                 'phone': user.phone,
+                'gender':user.gender.id if user.gender else None,
                 'profile_picture': user.profile_picture.url if user.profile_picture else None,
                 'country_id': user.country.id if user.country else None,
                 'country_name': user.country.name if user.country else None,

@@ -198,9 +198,7 @@ class ResetPasswordView(View):
 
 @method_decorator(user_role_check, name='dispatch')
 class Dashboard(LoginRequiredMixin, View):
-    login_url = "/"
-    redirect_field_name = "redirect_to"
-
+    
     def get(self, request, *args, **kwargs):
         # Count of users based on role
         user_counts = User.objects.values('role_id').annotate(count=Count('id'))
@@ -389,8 +387,6 @@ class UserUpdateProfileView(View):
 ################################## SytemSettings view #######################################################
 @method_decorator(user_role_check, name='dispatch')
 class System_Settings(LoginRequiredMixin, View):
-    login_url = "/"
-    redirect_field_name = "redirect_to"
 
     def get(self, request, *args, **kwargs):
         system_settings = SystemSettings.objects.first()  # Fetch the first record
