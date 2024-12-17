@@ -488,71 +488,105 @@ class OpenTrainingListView(APIView):
 ###### My Created Training List API ######
 class MyTrainingsView(APIView):
     def get(self, request, *args, **kwargs):
-        # Retrieve creator_type and created_by_id from query parameters
-        creator_type = request.query_params.get('creator_type')
-        created_by_id = request.query_params.get('created_by_id')
+        # Retrieve the logged-in user ID
+        user = request.user.id
 
-        # Validate input parameters
-        if not creator_type or not created_by_id:
-            return Response({
-                'status': 0,
-                'message': 'Missing creator_type or created_by_id parameter',
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Get all trainings initially
+        trainings = Training.objects.all()
 
-        # Fetch trainings that match creator_type and created_by_id
-        try:
-            creator_type = int(creator_type)
-            created_by_id = int(created_by_id)
-        except ValueError:
-            return Response({
-                'status': 0,
-                'message': 'Invalid creator_type or created_by_id',
-                'data': []
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Filter trainings based on access logic
+        accessible_trainings = []
+        for training in trainings:
+            if self._has_access(training, user):
+                accessible_trainings.append(training)
 
-        trainings = Training.objects.filter(
-            creator_type=creator_type,
-            created_by_id=created_by_id
-        ).order_by('-training_date') 
+        # Sort the trainings by `training_date` in descending order
+        accessible_trainings = sorted(accessible_trainings, key=lambda t: t.training_date, reverse=True)
 
-        # Initialize custom pagination
+        # Apply custom pagination
         paginator = CustomTrainingPagination()
 
-        # Paginate the queryset
-        paginated_trainings = paginator.paginate_queryset(trainings, request)
+        # Paginate the accessible trainings
+        paginated_trainings = paginator.paginate_queryset(accessible_trainings, request)
         if paginated_trainings is not None:
             # Serialize the paginated data
             serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
-            # Prepare the pagination data directly in 'data'
+            # Prepare pagination metadata
             pagination_data = {
-                'total_records': trainings.count(),
+                'total_records': len(accessible_trainings),
                 'total_pages': paginator.page.paginator.num_pages,
                 'current_page': paginator.page.number,
-                'data': serializer.data  # Directly add the serialized data to 'data'
+                'data': serializer.data
             }
 
-            # Return paginated data in the response
+            # Return paginated response
             return Response({
                 'status': 1,
                 'message': 'Trainings retrieved successfully',
                 'data': pagination_data
             }, status=status.HTTP_200_OK)
 
-        # If pagination is not applied, just return the serialized data
-        serializer = TrainingListSerializer(trainings, many=True, context={'request': request})
+        # If pagination is not applied, return all serialized data
+        serializer = TrainingListSerializer(accessible_trainings, many=True, context={'request': request})
         return Response({
             'status': 1,
             'message': 'Trainings retrieved successfully',
             'data': {
-                'total_records': trainings.count(),
+                'total_records': len(accessible_trainings),
                 'total_pages': 1,
                 'current_page': 1,
-                'data': serializer.data  # Directly add the serialized data to 'data'
+                'data': serializer.data
             }
         }, status=status.HTTP_200_OK)
+    
+    def _has_access(self, training, user):
+        print("Checking access...")
+        print(training.created_by_id, user)
 
+        # Case 1: Creator type is USER_TYPE
+        if training.creator_type == 1:
+            if training.created_by_id == user:  # Request user is the creator
+                return True
+
+            # Check if the request user is in the same branch as the creator
+            creator_branches = JoinBranch.objects.filter(
+                user_id=training.created_by_id,
+                joinning_type=4
+            ).values_list('branch_id', flat=True)
+            print(f"Creator Branches: {list(creator_branches)}")
+
+            user_branch = JoinBranch.objects.filter(
+                user_id=user
+            ).values_list('branch_id', flat=True)
+            print(f"Login User Branches: {list(user_branch)}")
+
+            if not creator_branches:
+                print("No creator branches found.")
+                return False
+
+            request_user_branches = JoinBranch.objects.filter(
+                user_id=user,
+                branch_id__in=creator_branches,
+                joinning_type__in=[1, 3]
+            )
+            print(f"Request User Branches: {request_user_branches}")
+
+            if not request_user_branches.exists():
+                print("Access denied: User is not in the same branch.")
+                return False
+
+            print("Access granted: User is in the same branch.")
+            return True
+
+        # Case 2: Creator type is TEAM_TYPE
+        elif training.creator_type == 2:
+            team = get_object_or_404(Team, id=training.created_by_id)
+            if team.team_founder_id == user:  # Request user is the team's founder
+                return True
+
+        # Default: No access
+        return False
     
 ############ My Joined Training List API #################
 class MyJoinedTrainingsView(APIView):
