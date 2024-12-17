@@ -2540,7 +2540,7 @@ class FetchMyGamesAPIView(APIView):
                     "winner": game.winner_id,
                     "loser_id": game.loser_id,
                     "is_draw": game.is_draw,
-                    "created_by": game.tournament_id.team_id,
+                    "created_by": game.tournament_id.team_id.id,
                 })
 
         # Process friendly games
@@ -2570,7 +2570,7 @@ class FetchMyGamesAPIView(APIView):
                     "winner": game.winner_id,
                     "loser_id": game.loser_id,
                     "is_draw": game.is_draw,
-                    "created_by":game.created_by,
+                    "created_by":game.created_by.id,
                 })
 
         # Sort all games by game_date and game_start_time
