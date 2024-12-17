@@ -765,10 +765,17 @@ class TeamJoiningRequest(APIView):
         if team_founder:
             device_token = team_founder.device_token  # Ensure the `device_token` is available
             if device_token:
-                title = "Tournament Joining Request"
-                body = f"Team {team_branch.team_id.team_name} has sent a request to join the tournament {tournament.tournament_name}."
+                notification_language = team_founder.current_language  # Retrieve the user's current language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)  # Activate the user's preferred language
+                
+                title = _("Tournament Joining Request")  # Use the translation function
+                body = _("Team {team_name} has sent a request to join the tournament {tournament_name}.").format(
+                    team_name=team_branch.team_id.team_name,
+                    tournament_name=tournament.tournament_name
+                )
                 send_push_notification(device_token, title, body, device_type=team_founder.device_type)  # Use the appropriate device type
-        
+
         return Response({
             'status': 1,
             'message': _('Team joining request created successfully.' if not existing_request else _('Team joining request updated successfully.')),
@@ -830,6 +837,30 @@ class TeamRequestApproved(APIView):
             
             existing_team.save()
 
+            team_members = JoinBranch.objects.filter(
+                branch_id=team_branch_id,
+                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+            )
+
+            for member in team_members:
+                user = member.user_id  # Assuming JoinBranch.user_id is a ForeignKey to the User model
+                device_token = user.device_token  # Assuming User model has a `device_token` field
+                device_type = user.device_type  # Assuming User model has a `device_type` field
+
+                # Check and activate the user's preferred notification language
+                notification_language = user.current_language  # Assuming User model has a `current_language` field
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                if device_token and device_type:
+                    # Send push notification with translated content
+                    send_push_notification(
+                        device_token=device_token,
+                        title=_("Team Approved"),
+                        body=_("Your team has been accepted to join the {} tournament.").format(tournament.tournament_name),
+                        device_type=device_type
+                    )
+
             return Response({
                 'status': 1,
                 'message': _('Tournament Group Team status updated to accepted.'),
@@ -846,7 +877,6 @@ class TeamRequestApproved(APIView):
             'status': 0,
             'message': _('The team does not exist in the tournament. Please ensure the team is already added.'),
         }, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 
@@ -1269,33 +1299,34 @@ class TournamentGamesAPIView(APIView):
         # Extract data from the request
         tournament_id = request.data.get("tournament_id")
         game_number = request.data.get("game_number")
-        team_a = request.data.get("team_a")  # New field
-        team_b = request.data.get("team_b")  # New field
+        team_a = request.data.get("team_a")  # Team A ID
+        team_b = request.data.get("team_b")  # Team B ID
         group_id = request.data.get("group_id")  # Optional field
 
-        # Validate required fields
         if not tournament_id or not game_number or not team_a or not team_b:
             return Response({
                 'status': 0,
                 'message': _('Both tournament_id, game_number, team_a, and team_b are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the game_number already exists for the given tournament_id
         if TournamentGames.objects.filter(Q(tournament_id=tournament_id) & Q(game_number=game_number)).exists():
             return Response({
                 'status': 0,
                 'message': _('This game number already exists for the specified tournament. Please choose a different game number.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Handle group_id == 0 and set it to None
         if group_id == 0 or group_id == "0":
             request.data["group_id"] = None
 
-        # Proceed with serializer validation and saving
         serializer = TournamentGamesSerializer(data=request.data)
         try:
             if serializer.is_valid():
-                serializer.save()
+                game = serializer.save()
+
+                # Notify coaches and managers of both teams
+                self.notify_team_members(team_a, tournament_id, game)
+                self.notify_team_members(team_b, tournament_id, game)
+
                 return Response({
                     'status': 1,
                     'message': _('Game created successfully.'),
@@ -1315,8 +1346,45 @@ class TournamentGamesAPIView(APIView):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def notify_team_members(self, team_branch_id, tournament_id, game):
+        """
+        Send notifications to the coaches and managers of the given team.
+        """
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            team_members = JoinBranch.objects.filter(
+                branch_id=team_branch_id,
+                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+            )
+
+            for member in team_members:
+                user = member.user_id  # Assuming JoinBranch.user_id is a ForeignKey to User
+                device_token = user.device_token  # Assuming User model has `device_token` field
+                device_type = user.device_type  # Assuming User model has `device_type` field
+                notification_language = user.current_language  # Assuming User model has `current_language` field
+
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                if device_token and device_type:
+                    send_push_notification(
+                        device_token=device_token,
+                        title=_("Game Scheduled"),
+                        body=_("Your team has been scheduled to a match in {} on {} at {}.").format(
+                            tournament.name,
+                            game.date.strftime("%Y-%m-%d") if game.date else _("TBD"),
+                            game.time.strftime("%H:%M") if game.time else _("TBD"),
+                        ),
+                        device_type=device_type
+                    )
+        except Tournament.DoesNotExist:
+            logging.error(f"Tournament with ID {tournament_id} does not exist.")
+        except Exception as e:
+            logging.error(f"Error sending notification: {str(e)}", exc_info=True)
                     
-  
+
+
+
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -2706,37 +2774,37 @@ class FetchAllGamesAPIView(APIView):
             })
 
         # Sort the games by date (latest first)
-        sorted_games_by_date = dict(sorted(
-            games_by_date.items(),
-            key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
-            reverse=True
-        ))
+            sorted_games_by_date = dict(sorted(
+                games_by_date.items(),
+                key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
+                reverse=True
+            ))
 
         # Format the response
-        response_data = [
-            {
-                "date": date,
-                "tournament": games["tournament"],
-            }
-            for date, games in sorted_games_by_date.items()
-        ]
+            response_data = [
+                {
+                    "date": date,
+                    "tournament": games["tournament"],
+                }
+                for date, games in sorted_games_by_date.items()
+            ]
 
-        # Pagination
-        page = int(request.GET.get("page", 1))
-        page_size = 10  # Adjust as needed
-        total_records = len(response_data)
-        total_pages = (total_records + page_size - 1) // page_size
-        start = (page - 1) * page_size
-        end = start + page_size
+            # Pagination
+            page = int(request.GET.get("page", 1))
+            page_size = 10  # Adjust as needed
+            total_records = len(response_data)
+            total_pages = (total_records + page_size - 1) // page_size
+            start = (page - 1) * page_size
+            end = start + page_size
 
-        return Response({
-            "status": 1,
-            "message": "Games fetched successfully.",
-            "total_records": total_records,
-            "total_pages": total_pages,
-            "current_page": page,
-            "data": response_data[start:end],
-        })
+            return Response({
+                "status": 1,
+                "message": "Games fetched successfully.",
+                "total_records": total_records,
+                "total_pages": total_pages,
+                "current_page": page,
+                "data": response_data[start:end],
+            })
 
 ############################ Tournaments Game Stats  API ########################################
 class TeamGameDetailStatsAPIView(APIView):
