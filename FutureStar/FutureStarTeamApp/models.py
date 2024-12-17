@@ -2,14 +2,6 @@ from django.db import models
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 
-from django.utils import timezone
-import datetime
-from django.core.exceptions import ValidationError
-from datetime import datetime 
-from django.utils import timezone
-from datetime import timedelta
-
-
 # Create your models here.
 class JoinBranch(models.Model):
     MANAGERIAL_STAFF_TYPE = 1

@@ -541,8 +541,6 @@ class MyTrainingsView(APIView):
         }, status=status.HTTP_200_OK)
     
     def _has_access(self, training, user):
-        print("Checking access...")
-        print(training.created_by_id, user)
 
         # Case 1: Creator type is USER_TYPE
         if training.creator_type == 1:
@@ -554,15 +552,12 @@ class MyTrainingsView(APIView):
                 user_id=training.created_by_id,
                 joinning_type=4
             ).values_list('branch_id', flat=True)
-            print(f"Creator Branches: {list(creator_branches)}")
 
             user_branch = JoinBranch.objects.filter(
                 user_id=user
             ).values_list('branch_id', flat=True)
-            print(f"Login User Branches: {list(user_branch)}")
 
             if not creator_branches:
-                print("No creator branches found.")
                 return False
 
             request_user_branches = JoinBranch.objects.filter(
@@ -570,13 +565,10 @@ class MyTrainingsView(APIView):
                 branch_id__in=creator_branches,
                 joinning_type__in=[1, 3]
             )
-            print(f"Request User Branches: {request_user_branches}")
 
             if not request_user_branches.exists():
-                print("Access denied: User is not in the same branch.")
                 return False
 
-            print("Access granted: User is in the same branch.")
             return True
 
         # Case 2: Creator type is TEAM_TYPE
@@ -656,8 +648,6 @@ class JoinTrainingAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, training, user):
-        print("inside acess ")
-        print(training.created_by_id, user)
 
         # Case 1: Creator type is USER_TYPE
         if training.creator_type == 1:
@@ -670,16 +660,13 @@ class JoinTrainingAPIView(APIView):
                 user_id=training.created_by_id,
                 joinning_type=4
             ).values_list('branch_id', flat=True)
-            print(f"Creator Branches: {list(creator_branches)}")
 
             user_branch = JoinBranch.objects.filter(
                 user_id=user,
                 # joinning_type=4
             ).values_list('branch_id', flat=True)
-            print(f"login user branches : {list(user_branch)}")
 
             if not creator_branches:
-                print("No creator branches found. Check JoinBranch data for this user.")
                 return False
 
             # Debugging request user branches
@@ -688,13 +675,10 @@ class JoinTrainingAPIView(APIView):
                 branch_id__in=creator_branches,
                 joinning_type__in=[1, 3]
             )
-            print(f"Request User Branches: {request_user_branches}")
 
             if not request_user_branches.exists():
-                print("Request user branches do not exist. Access denied.")
                 return False
 
-            print("Access granted.")
             return True
 
 
@@ -880,8 +864,6 @@ class JoinTrainingAPIView(APIView):
 
 class TrainingFeedbackAPI(APIView):
     def _has_access(self, training, user):
-        print("inside acess ")
-        print(training.created_by_id, user)
 
         # Case 1: Creator type is USER_TYPE
         if training.creator_type == 1:
@@ -894,16 +876,13 @@ class TrainingFeedbackAPI(APIView):
                 user_id=training.created_by_id,
                 joinning_type=4
             ).values_list('branch_id', flat=True)
-            print(f"Creator Branches: {list(creator_branches)}")
 
             user_branch = JoinBranch.objects.filter(
                 user_id=user,
                 # joinning_type=4
             ).values_list('branch_id', flat=True)
-            print(f"login user branches : {list(user_branch)}")
 
             if not creator_branches:
-                print("No creator branches found. Check JoinBranch data for this user.")
                 return False
 
             # Debugging request user branches
@@ -912,13 +891,10 @@ class TrainingFeedbackAPI(APIView):
                 branch_id__in=creator_branches,
                 joinning_type__in=[1, 3]
             )
-            print(f"Request User Branches: {request_user_branches}")
 
             if not request_user_branches.exists():
-                print("Request user branches do not exist. Access denied.")
                 return False
 
-            print("Access granted.")
             return True
 
 
@@ -965,10 +941,7 @@ class TrainingFeedbackAPI(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
         
         user = request.user.id
-        print(user)
-        print(f"Training: {type(training)}, User: {type(user)}")
         if not self._has_access(training, user):
-            print("inside,fucntion")  # Correct order
             return Response({
                 "status": 0,
                 "message": _("Access denied")
