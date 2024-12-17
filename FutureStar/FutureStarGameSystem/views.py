@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
@@ -1646,6 +1647,7 @@ class GameOfficialsAPIView(APIView):
         game_id = request.data.get('game_id')
         official_id = request.data.get('official_id')
         officials_type_id = request.data.get('officials_type_id')
+        print(game_id)
 
         # Validate game_id
         if not game_id:
@@ -1694,6 +1696,36 @@ class GameOfficialsAPIView(APIView):
 
         # Serialize the official type for the response
         type_serializer = GameOficialTypeSerializer(officials_type, context={'language': language})
+
+        notification_language = official.current_language  # Assuming User model has a `current_language` field
+
+        # Activate the official's preferred language if it's either 'ar' or 'en'
+        if notification_language in ['ar', 'en']:
+            activate(notification_language)
+
+        # Send push notification to the official
+        try:
+            # Retrieve the official's device token
+            device_token = official.device_token  # This assumes you have a field `device_token` in the User model.
+            if device_token:
+                title = _('You have been appointed to officiate a game.')
+
+                # Include detailed information in the body
+                body = _(
+                    'You have been appointed as {officials_type} to the game between {team_a} and {team_b} on {date} {time} at {location} .'
+                ).format(
+                    team_a=game.team_a.team_name,  # Assuming `team_a_name` is a field in the `game` object
+                    team_b=game.team_b.team_name,  # Assuming `team_b_name` is a field in the `game` object
+                    date=game.game_date.strftime('%d-%m'),  # Format the date and time
+                    time=game.game_start_time.strftime('%H:%M'),
+                    location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
+                    officials_type=type_serializer.data['name']
+                )
+
+                # Send the push notification to the official
+                send_push_notification(device_token, title, body, device_type=official.device_type)  # device_type: 1 for Android, 2 for iOS
+        except Exception as e:
+            logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 
         return Response({
             'status': 1,
