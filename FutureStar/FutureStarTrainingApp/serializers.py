@@ -307,19 +307,7 @@ class TrainingSerializer(serializers.ModelSerializer):
             }
         return None
     
-    def create(self, validated_data):
-        # Ensure 'created_by_id' is passed in validated_data if not already present
-        # user = self.context.get('request').user  # Assuming the logged-in user is creating the training
-        # validated_data['created_by_id'] = user.id
-        
-        # Calculate end_time based on start_time and training_duration
-        start_time = validated_data.get('start_time')
-        duration = validated_data.get('training_duration')
-        
-        if start_time and duration:
-            validated_data['end_time'] = (datetime.combine(date.min, start_time) + timedelta(minutes=duration)).time()
-        
-        return super().create(validated_data)
+
 
 class TrainingMembershipSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
