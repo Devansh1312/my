@@ -229,7 +229,7 @@ class PostView(models.Model):
     created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # 1, 2, or 3 based on the type
     post = models.ForeignKey(Post, related_name='views', on_delete=models.CASCADE)
-    date_viewed = models.DateTimeField(default=datetime.now)
+    date_viewed = models.DateTimeField(default=now)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
@@ -584,7 +584,7 @@ class Event_comment(models.Model):
     event = models.ForeignKey(Event, related_name='event_comments', on_delete=models.CASCADE, default=True)
     parent = models.ForeignKey('self', related_name='event_replies', null=True, blank=True, on_delete=models.CASCADE)
     comment = models.TextField()
-    date_created = models.DateTimeField(default=datetime.now)
+    date_created = models.DateTimeField(default=now)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
@@ -609,7 +609,7 @@ class EventLike(models.Model):
     created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)
     event = models.ForeignKey(Event, related_name='event_likes', on_delete=models.CASCADE, default=True)
-    date_liked = models.DateTimeField(default=datetime.now)
+    date_liked = models.DateTimeField(default=now)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)   
 
@@ -623,7 +623,7 @@ class FAQ(models.Model):
     question_ar = models.TextField(blank=True,null=True)
     answer_en = models.TextField(blank=True,null=True)
     answer_ar = models.TextField(blank=True,null=True)
-    date_created = models.DateTimeField(default=datetime.now)
+    date_created = models.DateTimeField(default=now)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)  
 
