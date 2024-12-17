@@ -1324,8 +1324,9 @@ class TournamentGamesAPIView(APIView):
                 game = serializer.save()
 
                 # Notify coaches and managers of both teams
-                self.notify_team_members(team_a, tournament_id, game)
-                self.notify_team_members(team_b, tournament_id, game)
+                self.notify_team_members(team_a, tournament_id, game, "team_a")
+                self.notify_team_members(team_b, tournament_id, game, "team_b")
+
 
                 return Response({
                     'status': 1,
@@ -1346,7 +1347,7 @@ class TournamentGamesAPIView(APIView):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def notify_team_members(self, team_branch_id, tournament_id, game):
+    def notify_team_members(self, team_branch_id, tournament_id, game,team_type):
         """
         Send notifications to the coaches and managers of the given team.
         """
@@ -1356,7 +1357,25 @@ class TournamentGamesAPIView(APIView):
                 branch_id=team_branch_id,
                 joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
             )
+ 
 
+            if team_type == "team_a":
+                team_name = game.team_a.team_name
+                opponent_team_name = game.team_b.team_name
+            else:
+                team_name = game.team_b.team_name
+                opponent_team_name = game.team_a.team_name
+
+            # Create the notification message
+            notification_message = _("Your team ({}), has been scheduled to a match in {} against {} on {} at {}.").format(
+                team_name,
+                tournament.tournament_name,
+                opponent_team_name,
+                game.game_date.strftime("%Y-%m-%d") if game.game_date else _("TBD"),
+                game.game_start_time.strftime("%H:%M") if game.game_start_time else _("TBD"),
+            )
+
+            # Send notification to each team member
             for member in team_members:
                 user = member.user_id  # Assuming JoinBranch.user_id is a ForeignKey to User
                 device_token = user.device_token  # Assuming User model has `device_token` field
@@ -1370,19 +1389,13 @@ class TournamentGamesAPIView(APIView):
                     send_push_notification(
                         device_token=device_token,
                         title=_("Game Scheduled"),
-                        body=_("Your team has been scheduled to a match in {} on {} at {}.").format(
-                            tournament.name,
-                            game.date.strftime("%Y-%m-%d") if game.date else _("TBD"),
-                            game.time.strftime("%H:%M") if game.time else _("TBD"),
-                        ),
+                        body=notification_message,
                         device_type=device_type
                     )
         except Tournament.DoesNotExist:
             logging.error(f"Tournament with ID {tournament_id} does not exist.")
         except Exception as e:
             logging.error(f"Error sending notification: {str(e)}", exc_info=True)
-                    
-
 
 
     def get(self, request, *args, **kwargs):
