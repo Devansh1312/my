@@ -327,7 +327,7 @@ class TrainingMembershipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Training_Joined
-        fields = ['id', 'training', 'user', 'attendance_status', 'rating', 'injury_type', 'feedbacks']
+        fields = ['id', 'training', 'user', 'attendance_status', 'rating', 'feedbacks']
 
     def get_user(self, obj):
         """Retrieve user data as a dictionary."""
@@ -347,32 +347,14 @@ class TrainingMembershipSerializer(serializers.ModelSerializer):
         return Training_FeedbackSerializer(feedbacks, many=True).data
 
 class Training_FeedbackSerializer(serializers.ModelSerializer):
+    injuries = serializers.SerializerMethodField()
+
     class Meta:
         model = Training_Feedback
-        fields = ['id', 'training', 'user', 'feedback', 'date_created', 'created_at', 'updated_at']
+        fields = ['id', 'training', 'user', 'feedback', 'injuries', 'date_created', 'created_at', 'updated_at']
 
-
-# class JoinTraining(serializers.ModelSerializer):
-#     user = serializers.SerializerMethodField()  # Custom method to include user data
-
-#     class Meta:
-#         model = JoinBranch
-#         fields = ['id', 'branch_id', 'user', 'joinning_type', 'user_id']  # Keep 'user_id' here for input purposes
-
-#     def get_user(self, obj):
-#         """Retrieve user data as a dictionary."""
-#         user = obj.user_id  # Get the related User object via foreign key
-#         return {
-#             'id': user.id,
-#             'username': user.username,
-#             'phone': user.phone,
-#             'profile_picture': user.profile_picture.url if user.profile_picture else None,
-#             'country_id': user.country.id if user.country else None,
-#         }
-
-#     def to_representation(self, instance):
-#         """Customize the output representation of the serializer."""
-#         representation = super().to_representation(instance)
-#         # Remove 'user_id' from the output as it's already represented in 'user'
-#         representation.pop('user_id', None)
-#         return representation
+    def get_injuries(self, obj):
+        """Return a comma-separated string of injury ids."""
+        injuries = obj.injuries.all()  # 'injuries' is the correct field name
+        injury_ids = [str(injury.id) for injury in injuries]  # Extract only the IDs
+        return ','.join(injury_ids)  # Join them into a comma-separated string

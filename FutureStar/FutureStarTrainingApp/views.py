@@ -761,20 +761,18 @@ class JoinTrainingAPIView(APIView):
             activate(language)
             # Get the training ID from the request
             training_id = request.query_params.get('training_id')
-            # manager_id = request.query_params.get('manager_id')
-            # coach_id = request.query_params.get('coach_id')
             if not training_id:
                 return Response({
-                  'status': 0,
-                  'message': _('Training ID is required.')
+                'status': 0,
+                'message': _('Training ID is required.')
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # Get the user from the request
             user_id = request.query_params.get('user_id')
-            if not user:
+            if not user_id:
                 return Response({
-                  'status': 0,
-                  'message': _('User not found.')
+                'status': 0,
+                'message': _('User not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
             
             # Validate the training ID
@@ -782,32 +780,30 @@ class JoinTrainingAPIView(APIView):
                 training = Training.objects.get(id=training_id)
             except Training.DoesNotExist:
                 return Response({
-                 'status': 0,
-                 'message': _('Training not found.')
+                'status': 0,
+                'message': _('Training not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
-            user = request.user.id
 
-            if not self._has_access(user, training):
-                return Response({
-                    'status': 0,
-                    'message': _('You do not have permission to access this training.')
-                }, status=status.HTTP_403_FORBIDDEN)
-            
-            # Get the membership of the user in the training
+            user = request.user.id
             try:
                 membership = Training_Joined.objects.get(user=user_id, training=training)
                 serializer = TrainingMembershipSerializer(membership, context={'request': request})
+                
+                # Modify the serialized data by adding injury_type inside feedbacks
+                data = serializer.data
+                # Assuming feedbacks are part of the serialized data, no need to remove anything else
+                
                 return Response({
                 'status': 1,
                 'message': _('User membership retrieved successfully.'),
-                  'data': serializer.data
+                'data': data
                 }, status=status.HTTP_200_OK)
             except Training_Joined.DoesNotExist:
                 return Response({
-                 'status': 0,
-                 'message': _('User is not a member of the training.')
+                'status': 0,
+                'message': _('User is not a member of the training.')
                 }, status=status.HTTP_404_NOT_FOUND)
-            
+
     
     def delete(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
