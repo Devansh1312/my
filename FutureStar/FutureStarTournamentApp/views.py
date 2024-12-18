@@ -2290,7 +2290,7 @@ class TournamentGroupTeamListCreateAPIView(APIView):
             'data': grouped_data
         }, status=status.HTTP_200_OK)
     
-def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)

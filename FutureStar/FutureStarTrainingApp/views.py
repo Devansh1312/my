@@ -648,6 +648,7 @@ class JoinTrainingAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, training, user):
+      
 
         # Case 1: Creator type is USER_TYPE
         if training.creator_type == 1:
@@ -819,7 +820,7 @@ class JoinTrainingAPIView(APIView):
             
             # Get the user from the request
             user_id = request.query_params.get('user_id')
-            if not user:
+            if not user_id:
                 return Response({
                  'status': 0,
                  'message': _('User not found.')
@@ -834,7 +835,7 @@ class JoinTrainingAPIView(APIView):
                 'message': _('Training not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
             user = request.user.id
-            if not self._has_access(user, training):  # Pass None for manager_id and coach_id if not needed
+            if not self._has_access(training, user):  # Pass None for manager_id and coach_id if not needed
                 return Response({
                     'status': 0,
                     'message': _('User does not have access to delete this training.')

@@ -320,17 +320,71 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
     
 
 class TournamentGameSerializer(serializers.ModelSerializer):
-    tournament_name = serializers.CharField(source='tournament_id.name', read_only=True)
-    group_id_name = serializers.CharField(source='group_id.name', read_only=True)
-    team_a_name = serializers.CharField(source='team_a.name', read_only=True)
-    team_a_logo = serializers.ImageField(source='team_a.logo', read_only=True)
-    team_b_name = serializers.CharField(source='team_b.name', read_only=True)
-    team_b_logo = serializers.ImageField(source='team_b.logo', read_only=True)
-    game_field_id_name = serializers.CharField(source='game_field_id.name', read_only=True)
+    tournament_name = serializers.SerializerMethodField()
+    group_id_name = serializers.SerializerMethodField()
+    team_a_name = serializers.SerializerMethodField()
+    team_b_name = serializers.SerializerMethodField()
+    team_a_logo = serializers.SerializerMethodField()
+    team_b_logo = serializers.SerializerMethodField()
+    game_field_id_name = serializers.SerializerMethodField()
 
     class Meta:
         model = TournamentGames
-        fields = '__all__'
+        fields = [
+            'id','tournament_id', 'game_number', 'game_date', 'game_start_time', 'game_end_time',
+            'team_a_goal', 'team_b_goal', 'finish', 'winner_id', 'loser_id', 'is_draw',
+            'is_confirm', 'extra_time', 'tournament_name','group_id', 'group_id_name',
+            'team_a_name', 'team_a_logo', 'team_b_name', 'team_b_logo',
+            'game_field_id_name'
+        ]
+   
+    def get_tournament_name(self, obj):
+        """
+        Get the name of the tournament associated with the game.
+        """
+        return obj.tournament_id.tournament_name if obj.tournament_id else None
+
+    def get_group_id_name(self, obj):
+        """
+        Get the name of the group associated with the game.
+        """
+        return obj.group_id.group_name if obj.group_id else None
+
+    def get_team_a_name(self, obj):
+        """
+        Get the name of Team A.
+        """
+        return obj.team_a.team_name if obj.team_a else None
+
+    def get_team_b_name(self, obj):
+        """
+        Get the name of Team B.
+        """
+        return obj.team_b.team_name if obj.team_b else None
+
+    def get_team_a_logo(self, obj):
+        """
+        Get the logo of Team A.
+        """
+        if obj.team_a and hasattr(obj.team_a, 'team_id'):
+            team_a_logo = obj.team_a.team_id.team_logo
+            return f"/media/{team_a_logo}" if team_a_logo else None
+        return None
+
+    def get_team_b_logo(self, obj):
+        """
+        Get the logo of Team B.
+        """
+        if obj.team_b and hasattr(obj.team_b, 'team_id'):
+            team_b_logo = obj.team_b.team_id.team_logo
+            return f"/media/{team_b_logo}" if team_b_logo else None
+        return None
+
+    def get_game_field_id_name(self, obj):
+        """
+        Get the name of the game field associated with the game.
+        """
+        return obj.game_field_id.field_name if obj.game_field_id else None
 
 
 class DetailedTournamentGroupTeamSerializer(serializers.ModelSerializer):
