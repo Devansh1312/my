@@ -1,6 +1,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from FutureStar.firebase_config import send_push_notification
 from .models import *
 from .serializers import *
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -1048,3 +1050,197 @@ class TrainingFeedbackAPI(APIView):
             "message": update_message,
             "data": joined_data
         }, status=status.HTTP_200_OK)
+
+
+class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
+    """
+    This API view checks all training sessions for today, compares the training's start time with the current time,
+    and sends push notifications to the appropriate users (creator, team founder, or group founder).
+    """
+
+    def get(self, request, *args, **kwargs):
+        # Get the current time and date
+        current_time = timezone.now().time()
+        current_date = timezone.now().date()
+        print(current_time)
+
+        # Extract the current hour and minute
+        current_hour = current_time.hour
+        current_minute = current_time.minute
+
+        # Query all training sessions for today
+        trainings = Training.objects.filter(training_date=current_date)
+
+        # A variable to track if notifications were sent (for logging purposes)
+        notifications_sent = 0
+
+        for training in trainings:
+            # Extract the hour and minute from the training start time
+            start_time = training.start_time
+            start_hour = start_time.hour
+            start_minute = start_time.minute
+
+            # Check if the training's start time (hour and minute) matches the current time
+            if start_hour == current_hour and start_minute == current_minute:
+                # Define notification message
+                message = _("Don't forget to take attendance at {start_time}").format(start_time=training.start_time)
+
+                # Get user language preference, assuming `User` model has `current_language` field
+                if training.creator_type == Training.USER_TYPE:
+                    user = User.objects.get(id=training.created_by_id)
+                    notification_language = user.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    # Prepare push data
+                    push_data = {
+                        "training_id": training.id,
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
+                    }
+
+                    # Send push notification to the user
+                    send_push_notification(user.device_token, _("Training Reminder"), message, device_type=user.device_type, data=push_data)
+                    notifications_sent += 1
+
+                elif training.creator_type == Training.TEAM_TYPE:
+                    print(training.creator_type == Training.TEAM_TYPE)
+                    team = Team.objects.get(id=training.created_by_id)
+                    notification_language = team.team_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    push_data = {
+                        "training_id": training.id,
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
+                    }
+
+                    # Send push notification to the team founder
+                    send_push_notification(team.team_founder.device_token, _("Training Reminder"), message, device_type=team.team_founder.device_type, data=push_data)
+                    notifications_sent += 1
+
+                elif training.creator_type == Training.GROUP_TYPE:
+                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
+                    notification_language = training_group.group_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    push_data = {
+                        "training_id": training.id,
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
+                    }
+
+                    # Send push notification to the group founder
+                    send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), message, device_type=training_group.group_founder.device_type, data=push_data)
+                    notifications_sent += 1
+
+        # Return a response with the number of notifications sent
+        return Response(
+            {"message": f"Notifications sent to {notifications_sent} users."},
+            status=status.HTTP_200_OK
+        )
+
+
+
+class CheckEndTimeAndSendNotificationsAPIView(APIView):
+    """
+    This API view checks all training sessions for today, compares the training's end time
+    (hour and minute) with the current time (hour and minute), and sends push notifications
+    to the appropriate users (creator, team founder, or group founder).
+    """
+
+    def get(self, request, *args, **kwargs):
+        # Get the current time and date
+        current_time = timezone.now().time()
+        current_date = timezone.now().date()
+
+        # Extract the current hour and minute
+        current_hour = current_time.hour
+        current_minute = current_time.minute
+
+        # Query all training sessions for today
+        trainings = Training.objects.filter(training_date=current_date)
+
+        # A variable to track if notifications were sent (for logging purposes)
+        notifications_sent = 0
+
+        for training in trainings:
+            # Extract the hour and minute from the training end time
+            end_time = training.end_time
+            end_hour = end_time.hour
+            end_minute = end_time.minute
+
+            # Check if the training's end time (hour and minute) matches the current time
+            if end_hour == current_hour and end_minute == current_minute:
+                # Define notification message
+                message = _("Don't forget to rate your players after the training session.")
+
+                # Get user language preference, assuming `User` model has `current_language` field
+                if training.creator_type == Training.USER_TYPE:
+                    user = User.objects.get(id=training.created_by_id)
+                    notification_language = user.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    # Prepare push data
+                    push_data = {
+                        "training_id": training.id,
+                        "training_name": training.training_name,
+                        "end_time": str(training.end_time),
+                        "cost": training.cost,
+                        "description": training.description
+                    }
+
+                    # Send push notification to the user
+                    send_push_notification(user.device_token, _("Training Reminder"), message, device_type=user.device_type, data=push_data)
+                    notifications_sent += 1
+
+                elif training.creator_type == Training.TEAM_TYPE:
+                    team = Team.objects.get(id=training.created_by_id)
+                    notification_language = team.team_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    push_data = {
+                        "training_id": training.id,
+                        "training_name": training.training_name,
+                        "end_time": str(training.end_time),
+                        "cost": training.cost,
+                        "description": training.description
+                    }
+
+                    # Send push notification to the team founder
+                    send_push_notification(team.team_founder.device_token, _("Training Reminder"), message, device_type=team.team_founder.device_type, data=push_data)
+                    notifications_sent += 1
+
+                elif training.creator_type == Training.GROUP_TYPE:
+                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
+                    notification_language = training_group.group_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+
+                    push_data = {
+                        "training_id": training.id,
+                        "training_name": training.training_name,
+                        "end_time": str(training.end_time),
+                        "cost": training.cost,
+                        "description": training.description
+                    }
+
+                    # Send push notification to the group founder
+                    send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), message, device_type=training_group.group_founder.device_type, data=push_data)
+                    notifications_sent += 1
+
+        # Return a response with the number of notifications sent
+        return Response(
+            {"message": f"Notifications sent to {notifications_sent} users."},
+            status=status.HTTP_200_OK
+        )
