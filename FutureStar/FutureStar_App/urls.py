@@ -113,8 +113,8 @@ urlpatterns = [
     path('aboutus/',cms_aboutpage.as_view(),name="cms_aboutpage"),
     path('saveaboutusedit/',saveAboutUspage,name="saveaboutuspage"),
     
-    path('FAQ/',cms_newsPage.as_view(),name="cms_newspage"),
-    path('saveFAQedit/',savenewspage,name="savenewspage"),
+    path('NewsCms/',cms_newsPage.as_view(),name="cms_newspage"),
+    path('savenewsedit/',savenewspage,name="savenewspage"),
 
     path('successStory/',cms_successStory.as_view(),name="cms_successStorypage"),
     path('saveSuccessStory/',saveSucessStorypage,name = "saveSucessStorypage"),
