@@ -13,8 +13,19 @@ IOS = 2
 def send_push_notification(device_token, title, body, device_type, data=None):
     """
     Sends a push notification to the specified device using Firebase Cloud Messaging (FCM).
+    Handles both Android and iOS devices. Skips sending if device type or device token is invalid.
     """
     try:
+        # Validate device type
+        if device_type not in [1, "1", 2, "2"]:
+            logging.warning(f"Invalid device type: {device_type}. Skipping notification.")
+            return
+
+        # Validate device token
+        if not isinstance(device_token, str) or not device_token.strip():
+            logging.warning(f"Invalid device token: {device_token}. Skipping notification.")
+            return
+
         # Prepare custom data for Android
         if device_type in [1, "1"]:
             data = data or {}
@@ -23,7 +34,7 @@ def send_push_notification(device_token, title, body, device_type, data=None):
                 "body": str(body) if body else "",
             })
 
-        # Create the notification message
+        # Android configuration (optional, only used for Android devices)
         android_config = (
             messaging.AndroidConfig(
                 priority="high",
@@ -33,14 +44,15 @@ def send_push_notification(device_token, title, body, device_type, data=None):
             else None
         )
 
+        # iOS configuration (only used for iOS devices)
         ios_config = (
             messaging.APNSConfig(
                 payload=messaging.APNSPayload(
                     aps=messaging.Aps(
-                        alert={
-                            "title": title,
-                            "body": body,
-                        },
+                        alert=messaging.ApsAlert(
+                            title=title,  # Set the title for the notification
+                            body=body     # Set the body for the notification
+                        ),
                         content_available=True,
                     ),
                     custom_data={str(k): str(v) for k, v in (data or {}).items()},  # Ensure all keys and values are strings
@@ -50,6 +62,7 @@ def send_push_notification(device_token, title, body, device_type, data=None):
             else None
         )
 
+        # Creating the message with either Android or iOS configuration
         message = messaging.Message(
             token=device_token,
             android=android_config,
