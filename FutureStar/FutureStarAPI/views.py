@@ -3985,6 +3985,41 @@ class EventCreateAPIView(generics.CreateAPIView):
                 event.event_image = image_path
                 event.save()  # Save the event with the updated image path
 
+            team_name = Team.objects.get(id=created_by_id).team_name if created_by_id else _("Team")
+
+        # Notify all active users
+            all_users = User.objects.filter(is_active=True)
+            for user in all_users:
+                notification_language = user.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)  # Activate the user's preferred language
+
+                # Fetch the event type name based on the user's language
+                if notification_language == 'ar' and event.event_type.name_ar:
+                    event_type_name = event.event_type.name_ar
+                else:
+                    event_type_name = event.event_type.name_en
+
+                # Construct the notification message
+                notification_title = _("New Event Added")
+                notification_body = _("%s has added a %s event.") % (team_name, event_type_name)
+
+                # Send the notification
+                if user.device_token:
+                    send_push_notification(
+                        device_token=user.device_token,
+                        title=notification_title,
+                        body=notification_body,
+                        device_type=user.device_type,
+                        data={
+                            "event_id": event.id,
+                            "team_id": created_by_id,
+                            "type":"event"
+
+                        }
+                    )
+
+
             return Response({
                 'status': 1,
                 'message': _('Events Fetched successfully.'),
@@ -4118,16 +4153,16 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
         # Fetch the Event instance using the provided event_id
         event_instance = get_object_or_404(Event, id=event_id)
+        print(event_instance.created_by_id)
 
         # Retrieve convenience_fee from request or SystemSettings
         convenience_fee = request.data.get('convenience_fee')
         if convenience_fee is None:
-            # Fetch the event_convenience_fee from SystemSettings if not provided
             try:
-                system_settings = SystemSettings.objects.latest('id')  # Assuming you want the latest settings
+                system_settings = SystemSettings.objects.latest('id')
                 convenience_fee = system_settings.event_convenience_fee or 0
             except SystemSettings.DoesNotExist:
-                convenience_fee = 0  # Default to 0 if SystemSettings is not configured
+                convenience_fee = 0
 
         # Extract and validate creator_type and created_by_id
         creator_type = request.data.get('creator_type')
@@ -4139,29 +4174,19 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'message': _('creator_type must be provided.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Match created_by_id with a Team and fetch the team founder
         try:
-            creator_type = int(creator_type)
-        except (ValueError, TypeError):
+            event_created_by_id=event_instance.created_by_id
+            team = Team.objects.get(id=event_created_by_id)
+            team_founder = team.team_founder
+            print(team_founder)
+        except Team.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('creator_type must be a valid integer.')
+                'message': _('No matching team found for this event.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Logic for handling creator_type and created_by_id
-        
-            # If creator_type is USER_TYPE, set created_by_id to the logged-in user's ID
-        created_by_id = request.user.id
-        if creator_type == EventBooking.USER_TYPE:
-            # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
-            created_by_id = request.user.id
-
-        else:
-            return Response({
-                'status': 0,
-                'message': _('Invalid creator type.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Prepare data for booking creation
+        # Prepare booking data
         booking_data = {
             'event': event_instance.id,
             'tickets': request.data.get('tickets'),
@@ -4176,6 +4201,43 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=booking_data)
         if serializer.is_valid():
             booking_instance = serializer.save()
+            self.notify_followers_event(created_by_id, creator_type, event_instance)
+
+            # Send notification to the team founder
+            if team_founder:
+                # Activate founder's preferred language for notification
+                notification_language = team_founder.current_language  # Assuming `current_language` exists in User
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                # Prepare notification title and body
+                title = _('%(user_name)s is attending your event!')% {
+                    'user_name': request.user.username
+                    }
+                body = _('%(user_name)s has successfully booked a ticket for your event "%(event_name)s".') % {
+                    'user_name': request.user.username,
+                    'event_name': event_instance.event_name,
+                }
+
+                # Prepare push_data for additional details
+                push_data = {
+                    'event_id': str(event_instance.id),
+                    'event_name': event_instance.event_name,
+                    'user_id': str(request.user.id),
+                    'user_name': request.user.username,
+                    'tickets': booking_data['tickets'],
+                    'total_amount': booking_data['total_amount'],
+                }
+
+                # Send the notification
+                send_push_notification(
+                    device_token=team_founder.device_token,  # Assuming `device_token` exists in the User model
+                    title=title,
+                    body=body,
+                    device_type=team_founder.device_type,  # Adjust for IOS if necessary
+                    data=push_data
+                )
+
             return Response({
                 'status': 1,
                 'message': _('Booking created successfully.'),
@@ -4188,6 +4250,67 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
+    def notify_followers_event(self, created_by_id, creator_type, event):
+        # Fetch followers based on FollowRequest
+        followers = FollowRequest.objects.filter(
+            Q(target_id=created_by_id, target_type=creator_type)
+        )
+
+        # Retrieve creator name and user data based on creator_type
+        creator_name = None
+        notification_language = None
+
+        if creator_type in [1, "1"]:  # For individual users
+            creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
+        elif creator_type in [2, "2"]:  # For teams
+            team = Team.objects.get(id=created_by_id)
+            creator_name = team.team_username
+            notification_language = team.team_founder.current_language  # Get the team founder's language
+        elif creator_type in [3, "3"]:  # For groups
+            group = TrainingGroups.objects.get(id=created_by_id)
+            creator_name = group.group_name
+            notification_language = group.group_founder.current_language  # Get the group founder's language
+
+        # Notify followers based on their type
+        for follower in followers:
+            follower_user = User.objects.filter(id=follower.created_by_id).first()
+            if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
+
+                # Set notification language based on the follower's preference
+                notification_language = follower_user.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                # Send notification to the follower
+                title = _('Event Notification')
+                body = _(f'{creator_name}, whom you are following, is attending an event.')
+                push_data = {
+                    'type': 'event',
+                    'event_id': event.id
+                }
+                send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+
+                # If the follower is a team, send notification to the team founder
+                if creator_type == 2:
+                    title = _('Your team is attending an event!')
+                    body = _(f'Team {creator_name} is attending an event.')
+                    push_data = {
+                        'type': 'team_event',
+                        'event_id': event.id,
+                        'team_id': team.id
+                    }
+                    send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
+
+                # If the follower is a group, send notification to the group founder
+                elif creator_type == 3:
+                    title = _('Your group is attending an event!')
+                    body = _(f'Group {creator_name} is attending an event.')
+                    push_data = {
+                        'type': 'group_event',
+                        'event_id': event.id,
+                        'group_id': group.id
+                    }
+                    send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
 
 
 
@@ -4718,17 +4841,29 @@ class SearchAPIView(APIView):
                 teams = teams.filter(team_username__icontains=search_query)
             # if creator_type and created_by_id:
             #     teams = teams.filter(creator_type=creator_type, team_founder=created_by_id)
-            paginated_teams = paginator.paginate_queryset(teams, request)
-            team_data = [get_team_data(team.team_founder, request) for team in paginated_teams if get_team_data(team.team_founder, request)]
-            return paginator.get_paginated_response(team_data)
+            team_data = [get_team_data(team.team_founder, request) for team in teams if get_team_data(team.team_founder, request)]
+            
+            return Response({
+                "status": 1,
+                "message": "Data fetched successfully.",
+                "results": {
+                    "data": team_data
+                }
+            })
 
         if search_type.lower() == 'fields':
             fields = Field.objects.all()
             if search_query:
                 fields = fields.filter(field_name__icontains=search_query)
-            paginated_fields = paginator.paginate_queryset(fields, request)
-            serializer = FieldSerializer(paginated_fields, many=True, context={'request': request})
-            return paginator.get_paginated_response(serializer.data)
+            serializer = FieldSerializer(fields, many=True, context={'request': request})
+            return Response({
+                "status": 1,
+                "message": "Data fetched successfully.",
+                "results": {
+                    "data": serializer.data
+                }
+            })
+
 
         if search_type.lower() == 'events':
             events = Event.objects.all()

@@ -622,7 +622,7 @@ class LineupPlayers(APIView):
                         opponent_team=opponent_team.team_name
                     ),
                     device_type=lineup.player_id.device_type,
-                    data={"game_id": game.id, "team_id": team_id, "opponent_team_id": opponent_team.id}
+                    data={"game_id": game.id,"game_type":"tournament", "team_id": team_id, "opponent_team_id": opponent_team.id}
                 )
 
 
@@ -1383,7 +1383,7 @@ class LineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Your {team_name} team is ready to play!").format(team_name=team_a_name),
                     device_type=user.device_type,
-                    data={"team_id": game.team_a.id}
+                    data={"game_id":game_id,"team_id": game.team_a.id,"game_type":"tournament"}
                 )
 
         # Send notifications to team_b coaches and managers if they have 11 players ready
@@ -1405,7 +1405,7 @@ class LineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Your {team_name} team is ready to play!").format(team_name=team_b_name),
                     device_type=user.device_type,
-                    data={"team_id": game.team_b.id}
+                    data={"game_id":game_id,"team_id": game.team_b.id,"game_type":"tournament"}
                 )
 
         # If both teams are ready, send a notification to coaches and managers of both teams
@@ -1430,7 +1430,7 @@ class LineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"team_id": game.team_a.id}
+                    data={"game_id":game_id,"team_id": game.team_a.id,"game_type":"tournament"}
                 )
 
             for join in team_b_coaches_and_managers:
@@ -1444,7 +1444,7 @@ class LineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"team_id": game.team_b.id}
+                    data={"game_id":game_id,"team_id": game.team_b.id,"game_type":"tournament"}
                 )
 
         # Return the response with players classified into team_a and team_b and also by lineup status
@@ -1846,9 +1846,14 @@ class GameOfficialsAPIView(APIView):
                     location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
                     officials_type=type_serializer.data['name']
                 )
+                push_data = {
+                    "tournament_id": game.tournament_id.id,  # The tournament ID
+                    "game_id": game.id,  # The game ID
+                    "game_type":"tournament"
+                }
 
                 # Send the push notification to the official
-                send_push_notification(device_token, title, body, device_type=official.device_type)  # device_type: 1 for Android, 2 for iOS
+                send_push_notification(device_token, title, body, device_type=official.device_type,data=push_data)  # device_type: 1 for Android, 2 for iOS
         except Exception as e:
             logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 

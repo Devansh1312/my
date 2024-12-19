@@ -175,6 +175,7 @@ class CreateFriendlyGame(APIView):
                 game_field_name=friendly_game.game_field_id.field_name
                 start_time = friendly_game.game_start_time.strftime('%H:%M')
                 date=friendly_game.game_date.strftime('%d-%m')
+              
 
 
                 # Notify eligible team members (coaches and managers)
@@ -199,7 +200,7 @@ class CreateFriendlyGame(APIView):
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None):
+    def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None,game_id=None):
         """
         Notify eligible team members (coaches and managers) about a new friendly game.
         """
@@ -225,13 +226,22 @@ class CreateFriendlyGame(APIView):
                     start_time=start_time,
                     game_field_name=game_field_name
                 )
+                push_data = {
+              
+                "game_id": game_id,  # Team ID to associate with the notification
+                "game_type": "friendly",  # Specify that this is a friendly game
+              
+                    
+            
+                }
                 if device_token:
                     send_push_notification(
                         device_token=device_token,
                         title=title,
                         body=body,
                         device_type=device_type,
-                        data={"game_id": None}  # Optionally include game-related data
+                        data=push_data  # Optionally include game-related data
+
                     )
 
 
@@ -269,13 +279,19 @@ class CreateFriendlyGame(APIView):
                     title = _("A new friendly game has been created!")
                     body = _("Make sure to check it out.")
 
+                    push_data = {
+                            "game_id": game_id,  # Include the game ID
+                            "game_type": "friendly",  # Specify that this is a friendly game
+                            
+                    }
+
                     if device_token:
                         send_push_notification(
                             device_token=device_token,
                             title=title,
                             body=body,
                             device_type=device_type,
-                            data={"game_id": None}  # Optionally include game-related data
+                            data=push_data  # Optionally include game-related data
                         )
 
 
@@ -466,12 +482,19 @@ class RefereeFeeCreateUpdateView(APIView):
             device_type = user.device_type  # ANDROID or IOS
 
             # Send push notification
+            push_data = {
+                "game_id": game_id,
+                "game_type": "friendly",  # Specify that this is a friendly game
+                "user_id": user_id  # Add user_id to the push data
+            }
             try:
                 send_push_notification(
                     device_token=device_token,
                     title=notification_title,
                     body=notification_body,
                     device_type=device_type,
+                    data=push_data,
+                
                 )
             except Exception as e:
                 return Response({
@@ -608,10 +631,12 @@ class UpdateFriendlyGame(APIView):
             game_field_name=game.game_field_id.field_name
             start_time = game.game_start_time.strftime('%H:%M')
             date=game.game_date.strftime('%d-%m')
+            game_id=game.id
+            
         
 
             # Notify team_a's coach and manager
-            self.notify_team_a_coach_and_manager(team_a_id,team_b_name, date, start_time, game_field_name)
+            self.notify_team_a_coach_and_manager(team_a_id,team_b_id,team_b_name, date, start_time, game_field_name)
 
             data = FriendlyGameSerializer(game).data
             return Response({
@@ -626,7 +651,7 @@ class UpdateFriendlyGame(APIView):
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    def notify_team_a_coach_and_manager(self,team_a_id, team_b_name, game_date, start_time, game_field_name):
+    def notify_team_a_coach_and_manager(self,team_a_id,team_b_id, team_b_name, game_date, start_time, game_field_name,game_id):
         """
         Notify coach and manager of team A when team B is assigned.
         """
@@ -651,13 +676,18 @@ class UpdateFriendlyGame(APIView):
                 start_time=start_time,
                 game_field_name=game_field_name
             )
+            push_data = {
+               
+                "game_type": "friendly",  # Specify that this is a friendly game
+                "team_b_id": team_b_id  # Add team_b_name to give more context in the notification
+            }
             if device_token:
                 send_push_notification(
                     device_token=device_token,
                     title=title,
                     body=body,
                     device_type=device_type,
-                    data={"game_id": None}  # Optionally include game-related data
+                    data=push_data  # Optionally include game-related data
                 )
 
 
@@ -1446,7 +1476,7 @@ class FriendlyGameLineupPlayers(APIView):
                         opponent_team=opponent_team.team_name
                     ),
                     device_type=lineup.player_id.device_type,
-                    data={"game_id": game.id, "team_id": team_id, "opponent_team_id": opponent_team.id}
+                    data={"game_id": game.id, "team_id": team_id, "opponent_team_id": opponent_team.id,"game_type":"friendly"}
                 )
 
 
@@ -2140,7 +2170,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Your {team_name} team is ready to play!").format(team_name=team_a_name),
                     device_type=user.device_type,
-                    data={"team_id": game.team_a.id}
+                    data={"game_id":game.id,"team_id": game.team_a.id,"game_type":"friendly"}
                 )
 
         # Send notifications to team_b coaches and managers if they have 11 players ready
@@ -2162,7 +2192,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Your {team_name} team is ready to play!").format(team_name=team_b_name),
                     device_type=user.device_type,
-                    data={"team_id": game.team_b.id}
+                    data={"game_id":game.id,"team_id": game.team_b.id,"game_type":"friendly"}
                 )
 
         # If both teams are ready, send a notification to coaches and managers of both teams
@@ -2187,7 +2217,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"team_id": game.team_a.id}
+                    data={"game_id":game.id,"team_id": game.team_a.id,"game_type":"friendly"}
                 )
 
             for join in team_b_coaches_and_managers:
@@ -2201,7 +2231,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"team_id": game.team_b.id}
+                    data={"game_id":game.id,"team_id": game.team_b.id,"game_type":"friendly"}
                 )
 
 
@@ -2567,10 +2597,13 @@ class FriendlyGameOfficialsAPIView(APIView):
                     location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
                     officials_type=type_serializer.data['name']
                 )
+                push_data={
+                    "game_id": game.id,  # The game ID
+                }
 
 
                 # Send the push notification to the official
-                send_push_notification(device_token, title, body, device_type=official.device_type)  # device_type: 1 for Android, 2 for iOS
+                send_push_notification(device_token, title, body, device_type=official.device_type,data=push_data)  # device_type: 1 for Android, 2 for iOS
         except Exception as e:
             logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 

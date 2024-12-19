@@ -774,8 +774,13 @@ class TeamJoiningRequest(APIView):
                     team_name=team_branch.team_id.team_name,
                     tournament_name=tournament.tournament_name
                 )
-                send_push_notification(device_token, title, body, device_type=team_founder.device_type)  # Use the appropriate device type
+                  # Include tournament_id in the push data
+                push_data = {
+                    "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
 
+                }
+                
+                send_push_notification(device_token, title, body, device_type=team_founder.device_type, data=push_data)
         return Response({
             'status': 1,
             'message': _('Team joining request created successfully.' if not existing_request else _('Team joining request updated successfully.')),
@@ -854,11 +859,16 @@ class TeamRequestApproved(APIView):
 
                 if device_token and device_type:
                     # Send push notification with translated content
+                    push_data = {
+                        "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
+                        "branch_id": team_branch_id,  # Include the branch_id
+                    }
                     send_push_notification(
                         device_token=device_token,
                         title=_("Team Approved"),
                         body=_("Your team has been accepted to join the {} tournament.").format(tournament.tournament_name),
-                        device_type=device_type
+                        device_type=device_type,
+                        data=push_data,
                     )
 
             return Response({
@@ -1374,6 +1384,11 @@ class TournamentGamesAPIView(APIView):
                 game.game_date.strftime("%Y-%m-%d") if game.game_date else _("TBD"),
                 game.game_start_time.strftime("%H:%M") if game.game_start_time else _("TBD"),
             )
+            push_data = {
+                    "tournament_id": tournament.id,  # The tournament ID
+                    "game_id": game.id,  # The game ID
+                    "team_branch_id": team_branch_id,  # The team branch ID
+                }
 
             # Send notification to each team member
             for member in team_members:
@@ -1390,7 +1405,8 @@ class TournamentGamesAPIView(APIView):
                         device_token=device_token,
                         title=_("Game Scheduled"),
                         body=notification_message,
-                        device_type=device_type
+                        device_type=device_type,
+                        data=push_data
                     )
         except Tournament.DoesNotExist:
             logging.error(f"Tournament with ID {tournament_id} does not exist.")
