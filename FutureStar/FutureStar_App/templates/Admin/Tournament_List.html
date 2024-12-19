@@ -36,7 +36,7 @@ Tournament List
             <div class="card">
                <div class="card-body">
                   <div class="table-responsive">
-                     <table class="table table-striped table-bordered" id="basic-1">
+                     <table class="table table-bordered" id="basic-1">
                         <thead>
                            <tr>
                               <th>No.</th>
@@ -44,8 +44,8 @@ Tournament List
                               <th>Start Date</th>
                               <th>Final Date</th>
                               <th>Team Count</th>
-                              <th>Country</th>
-                              <th>City</th>
+                              <!-- <th>Country</th>
+                              <th>City</th> -->
                               <th>Age Group</th>
                               <th>Actions</th>
                            </tr>
@@ -58,8 +58,8 @@ Tournament List
                               <td>{{ tournament.tournament_starting_date }}</td>
                               <td>{{ tournament.tournament_final_date }}</td>
                               <td>{{ tournament.number_of_team }}</td>
-                              <td>{{ tournament.country.name }}</td>
-                              <td>{{ tournament.city.name }}</td>
+                              <!-- <td>{{ tournament.country.name }}</td>
+                              <td>{{ tournament.city.name }}</td> -->
                               <td>{{ tournament.age_group.name_en }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">

@@ -1,0 +1,173 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+{% load lang_filter %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}Goalactico||Games{% endblock %}
+{% load lang_filter %} <!-- Loading your custom filter -->
+{% block content %}
+
+<style>
+    .team-logo {
+    width: 30px;  /* Adjust the size as needed */
+    height: 30px;
+    border-radius: 50%;  /* Makes the image round */
+    object-fit: cover;  /* Ensures the image fits the circle without distortion */
+    margin-right: 5px;  /* Space between logos */
+    margin-left: 5px;
+}
+
+</style>
+
+<section class="services-area-six pt-150 pb-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "heading" as heading %}
+                    <h2>
+                        {{heading}}
+                    </h2>
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                    <h4>
+                        {{heading_title}}
+                    </h4>
+                </div>
+            </div>                
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="sidebar-wrapper wow fadeInUp delay-0-5s animated">
+                    <div class="user-info">
+                        <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png'%}" alt=""></div>
+                        <div>
+                            <h5 class="user-name">{{ user.username }}</h6>
+                            <p class="user-desi">
+                                {% lang user.role current_language "name" as name %} 
+                                {{name}}
+                            </p>
+                        </div>
+                    </div>
+                    <ul>
+                        <li><a href="{% url 'player-dashboard' %}" class="sidebar-link"><span><i class="fas fa-th-large"></i></span> Dashboard</a></li>
+                    
+                        <!-- Team Dropdown -->
+                        <li class="sidebar-dropdown">
+                            <a href="#" class="sidebar-link"><span><i class="fas fa-users"></i></span> Team</a>
+                            <ul class="sidebar-submenu">
+                                <li><a href="{% url 'index' %}" class="sidebar-link">Team Page</a></li>
+                                <li><a href="{% url 'index' %}" class="sidebar-link">Teams</a></li>
+                            </ul>
+                        </li>
+                    
+                        <li><a href="{% url 'index' %}" class="sidebar-link"><span><i class="fas fa-running"></i></span> Training</a></li>
+                        <li><a href="{% url 'player-dashboard-games' %}" class="sidebar-link active"><span><i class="fas fa-trophy"></i></span> Games</a></li>
+                        <li><a href="{% url 'player-dashboard-events' %}" class="sidebar-link"><span><i class="fas fa-calendar-check"></i></span> Events</a></li>
+                        <li><a href="{% url 'player-dashboard-fileds' %}" class="sidebar-link"><span><i class="fas fa-shield-alt"></i></span> Fields</a></li>
+                        <li><a href="{% url 'index' %}" class="sidebar-link"><span><i class="fas fa-sign-out-alt"></i></span> Logout</a></li>
+                    </ul>                    
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <h5>Upcoming Game</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>id </th>
+                                    <th>Match Type</th>
+                                    <th>Teams</th>
+                                    <th>Game Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if stats.upcoming_games %}
+                                    {% for game in stats.upcoming_games %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ game.game_type }}</td>
+                                            <td>
+                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
+                                                <span> {{ game.team_a_vs_team_b }} </span>
+                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                            </td>
+                                            <td>{{ game.game_date }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="4">No upcoming games</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <h5>Latest Game</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>id </th>
+                                    <th>Match Type</th>
+                                    <th>Teams</th>
+                                    <th>Game Date</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if stats.finished_games %}
+                                    {% for game in stats.finished_games %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ game.game_type }}</td>
+                                            <td>
+                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
+                                                <span> {{ game.team_a_vs_team_b }} </span>
+                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                            </td>
+                                            <td>{{ game.game_date }}</td>
+                                            <td>{{ game.score }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="5">No finished games</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   </section>
+
+<!-- Blog Page Area end -->
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default language from localStorage or 'en' by default
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
+
+        // On language change, update localStorage
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}

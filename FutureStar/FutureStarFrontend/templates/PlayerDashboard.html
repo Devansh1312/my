@@ -9,7 +9,7 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %} Future Star || Player-Dashboard{% endblock %}
+{% block title %}Goalactico||Dashboard{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 
@@ -55,15 +55,21 @@
                         </div>
                     </div>
                     <ul>
-                        <li><a href="#" class="sidebar-link active"><span><i class="fas fa-th-large"></i></span> Dashboard</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="far fa-life-ring"></i></span> Players</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-users"></i></span> Team</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-user-secret"></i></span> Coach</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-running"></i></span> Referee</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-futbol"></i></span> Training</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-trophy"></i></span> Games</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-shield-alt"></i></span> Fields</a></li>
-                        <li><a href="#" class="sidebar-link"><span><i class="fas fa-calendar-check"></i></span> Events</a></li>
+                        <li><a href="{% url 'player-dashboard' %}" class="sidebar-link active"><span><i class="fas fa-th-large"></i></span> Dashboard</a></li>
+                    
+                        <!-- Team Dropdown -->
+                        <li class="sidebar-dropdown">
+                            <a href="#" class="sidebar-link"><span><i class="fas fa-users"></i></span> Team</a>
+                            <ul class="sidebar-submenu">
+                                <li><a href="{% url 'index' %}" class="sidebar-link">Team Page</a></li>
+                                <li><a href="{% url 'index' %}" class="sidebar-link">Teams</a></li>
+                            </ul>
+                        </li>
+                    
+                        <li><a href="{% url 'index' %}" class="sidebar-link"><span><i class="fas fa-running"></i></span> Training</a></li>
+                        <li><a href="{% url 'player-dashboard-games' %}" class="sidebar-link"><span><i class="fas fa-trophy"></i></span> Games</a></li>
+                        <li><a href="{% url 'player-dashboard-events' %}" class="sidebar-link"><span><i class="fas fa-calendar-check"></i></span> Events</a></li>
+                        <li><a href="{% url 'player-dashboard-fileds' %}" class="sidebar-link"><span><i class="fas fa-shield-alt"></i></span> Fields</a></li>
                         <li><a href="{% url 'logout' %}" class="sidebar-link"><span><i class="fas fa-sign-out-alt"></i></span> Logout</a></li>
                     </ul>
                 </div>
@@ -392,9 +398,6 @@
                         </table>
                     </div>
                 </div>
-                
-
-
             </div>
         </div>
     </div>

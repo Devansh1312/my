@@ -551,6 +551,77 @@
 				</div>
 			</div>
 		</div>
+		{% if user.role.id == 6 %}
+		<div class="card-header">
+			<h4 class="card-title mb-0">Team Details</h4>
+		</div>
+		<div class="card-body">
+			{% if stats.branch %}
+			<div class="row">
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Team Name:</strong> {{ stats.branch.team_name }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Age Group:</strong> {{ stats.branch.age_group_id }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Field Size:</strong> {{ stats.branch.field_size }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Phone:</strong> {{ stats.branch.phone }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Email:</strong> {{ stats.branch.email }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Gender:</strong> {{ stats.branch.gender }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Address:</strong> {{ stats.branch.address }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>City:</strong> {{ stats.branch.city }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>State:</strong> {{ stats.branch.state }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Country:</strong> {{ stats.branch.country_name }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Postal Code:</strong> {{ stats.branch.postalCode }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Country Code:</strong> {{ stats.branch.country_code }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Entry Fees:</strong> {{ stats.branch.entry_fees }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Description:</strong> {{ stats.branch.description }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Created At:</strong> {{ stats.branch.created_at }}
+			   </div>
+			   <div class="col-12 col-md-6 col-lg-4 mb-3">
+				  <strong>Branch Image:</strong>
+				  {% if branch.upload_image %}
+				  <img src="{{ stats.branch.upload_image.url }}" alt="Branch Image" class="img-fluid" height="50" width="100">
+				  {% else %}
+				  No Image Available
+				  {% endif %}
+			   </div>
+			</div>
+			{% else %}
+			<div class="row">
+				<div class="col-12">
+					<p class="text-danger">No branch joined as manager.</p>
+				</div>
+			</div>
+			{% endif %}			
+		 </div>
+		{% endif %}
+ 
 	</div>
 	<!-- Datatable Section -->
 	<div class="row">

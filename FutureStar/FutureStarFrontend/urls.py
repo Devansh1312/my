@@ -24,6 +24,12 @@ urlpatterns = [
     path('privacy-policy/', PrivacyPolicyPage.as_view(),name="privacy-policy"),
     path('terms-of-services/', TermsofServicesPage.as_view(),name="terms-of-services"),
     path('player-dashboard/', PlayerDashboardPage.as_view(),name="player-dashboard"),
+    path('player-dashboard-games/', UserDashboardGames.as_view(),name="player-dashboard-games"),
+    path('player-dashboard-events/', UserEventBookingInfo.as_view(),name="player-dashboard-events"),
+    path('player-dashboard-fileds/', UserCreatedFieldsView.as_view(),name="player-dashboard-fileds"),
+
+
+
     path('register/', RegisterPage.as_view(), name='register'),
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
     path('social_signup/', SocialSignupView.as_view(), name='social_signup'),
