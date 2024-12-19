@@ -521,7 +521,9 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 game = lineup.game_id
                 upcoming_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -530,8 +532,10 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for lineup in tournament_upcoming_games:
                 game = lineup.game_id
                 upcoming_games.append({
-                    "game_type": "Tournament",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "game_type": game.tournament_id.tournament_name,
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -563,9 +567,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 game = lineup.game_id
                 finished_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
@@ -573,9 +579,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for lineup in tournament_finished_games:
                 game = lineup.game_id
                 finished_games.append({
-                    "game_type": "Tournament",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "game_type": game.tournament_id.tournament_name,
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
@@ -713,19 +721,23 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in friendly_upcoming_games:
                 upcoming_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                 })
 
             for game in tournament_upcoming_games:
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                 })
 
             # Fetch Finished Games
@@ -744,8 +756,10 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in friendly_finished_games:
                 finished_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
@@ -754,8 +768,10 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in tournament_finished_games:
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
@@ -893,18 +909,22 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in friendly_upcoming_games:
                 upcoming_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_end_time": game.game_end_time,
                 })
 
             for game in tournament_upcoming_games:
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_end_time": game.game_end_time,
                 })
 
@@ -924,7 +944,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in friendly_finished_games:
                 finished_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -934,7 +954,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in tournament_finished_games:
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -1018,9 +1038,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
             for game in upcoming_tournament_games:
                 upcoming_games.append({
-                    "game_type": "Tournament",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "game_type": game.tournament_id.tournament_name,
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                 })
@@ -1028,9 +1050,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in upcoming_friendly_games:
                 upcoming_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_end_time": game.game_end_time,
                 })
 
@@ -1051,10 +1075,12 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
             for game in finished_tournament_games:
                 finished_games.append({
-                    "game_type": "Tournament",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "game_type": game.tournament_id.tournament_name,
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
@@ -1062,9 +1088,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             for game in finished_friendly_games:
                 finished_games.append({
                     "game_type": "Friendly",
-                    "team_a_vs_team_b": f"{game.team_a} vs {game.team_b}",
+                    "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })

@@ -13,6 +13,18 @@
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 
+<style>
+    .team-logo {
+    width: 30px;  /* Adjust the size as needed */
+    height: 30px;
+    border-radius: 50%;  /* Makes the image round */
+    object-fit: cover;  /* Ensures the image fits the circle without distortion */
+    margin-right: 5px;  /* Space between logos */
+    margin-left: 5px;
+}
+
+</style>
+
 <section class="services-area-six pt-150 pb-100">
     <div class="container">
         <div class="row justify-content-center">
@@ -328,24 +340,27 @@
                                     <th>id </th>
                                     <th>Match Type</th>
                                     <th>Teams</th>
-                                    <th>game date</th>
+                                    <th>Game Date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for game in stats.upcoming_games %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{game.game_type}}</td>
-        <td>{{ game.team_a_vs_team_b }}</td>
-        
-        <td>{{ game.game_date }}</td>
-    </tr>
-{% endfor %}
-
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ game.game_type }}</td>
+                                        <td>
+                                            <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
+                                            <span> {{ game.team_a_vs_team_b }} </span>
+                                            <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                        </td>
+                                        <td>{{ game.game_date }}</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+                
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
                     <h5>Latest Finish Game</h5>
                     <div class="table-responsive">
@@ -355,7 +370,7 @@
                                     <th>id </th>
                                     <th>Match Type</th>
                                     <th>Teams</th>
-                                    <th>game date</th>
+                                    <th>Game Date</th>
                                     <th>Score</th>
                                 </tr>
                             </thead>
@@ -363,16 +378,23 @@
                                 {% for game in stats.finished_games %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{game.game_type}}</td>
-                                        <td>{{ game.team_a_vs_team_b }}</td>
+                                        <td>{{ game.game_type }}</td>
+                                        <td>
+                                            <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
+                                            <span> {{ game.team_a_vs_team_b }} </span>
+                                            <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                        </td>
                                         <td>{{ game.game_date }}</td>
-                                        <td>{{game.score}}</td>
+                                        <td>{{ game.score }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+                
+
+
             </div>
         </div>
     </div>
