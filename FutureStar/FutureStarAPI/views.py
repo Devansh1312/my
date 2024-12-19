@@ -3730,6 +3730,53 @@ class EventCommentCreateAPIView(APIView):
             comment=comment_text,
             parent=parent_comment
         )
+        if creator_type in [1, "1"]:  # User as creator
+            user = User.objects.get(id=created_by_id)
+            notifier_name = user.username
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get user language for notification
+        elif creator_type in [2, "2"]:  # Team as creator
+            team = Team.objects.get(id=created_by_id)
+            user = team.team_founder
+            notifier_name = team.team_username
+            
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get team founder's language for notification
+        elif creator_type == 3:  # Group as creator
+            group = TrainingGroups.objects.get(id=created_by_id)
+            user = group.group_founder
+            notifier_name = group.group_name
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get group founder's language for notification
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator type.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Set notification language
+        if notification_language in ['ar', 'en']:
+            activate(notification_language)
+
+        # Prepare push notification data
+        if parent_comment:
+            title = _('New Comment on Your Event!')
+            body = _(f'{notifier_name} commented on your event.')
+            push_data = {'type': 'comment', 'event_id': event.id, 'parent_id': parent_id, 'comment_id': comment.id}
+        else:
+            title = _('New Comment on Your Event!')
+            body = _(f'{notifier_name} commented on your event.')
+            push_data = {'type': 'comment', 'event_id': event.id, 'comment_id': comment.id}
+
+        # Sending push notification to the event organizer (creator of the event)
+        device_token = event.event_organizer.device_token
+        device_type = event.event_organizer.device_type
+
+        if device_type in [1, 2, "1", "2"]:
+            send_push_notification(device_token, title, body, device_type, data=push_data)
 
         # Return response with comment details
         return Response({
