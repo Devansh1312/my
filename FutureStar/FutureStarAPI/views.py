@@ -4885,7 +4885,9 @@ class SearchAPIView(APIView):
         if search_type.lower() == 'teams':
             teams = Team.objects.all()
             if search_query:
-                teams = teams.filter(team_name__icontains=search_query)
+                teams = teams.filter(
+                Q(team_name__icontains=search_query) | Q(team_username__icontains=search_query)
+            )
             # if creator_type and created_by_id:
             #     teams = teams.filter(creator_type=creator_type, team_founder=created_by_id)
             team_data = [get_team_data(team.team_founder, request) for team in teams if get_team_data(team.team_founder, request)]
