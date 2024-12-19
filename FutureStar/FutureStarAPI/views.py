@@ -4645,6 +4645,21 @@ class CustomSearchPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+    def paginate_queryset(self, queryset, request, view=None):
+        # Get the page parameter
+        page_param = request.query_params.get(self.page_query_param, None)
+        try:
+            page_number = int(page_param) if page_param is not None else None
+            if page_number == 0:  # Treat page=0 as if the page is not specified
+                page_number = None
+                # Remove the page parameter to mimic blank behavior
+                request.query_params._mutable = True
+                del request.query_params[self.page_query_param]
+                request.query_params._mutable = False
+        except (ValueError, TypeError):
+            page_number = None  # Default to None for invalid input
+        return super().paginate_queryset(queryset, request, view)
+
     def get_paginated_response(self, data):
         # Calculate total pages
         total_pages = self.page.paginator.num_pages
