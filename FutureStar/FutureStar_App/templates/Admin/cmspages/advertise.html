@@ -88,9 +88,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="advertise-heading-section-banner">Heading banner </label>
                                 <input class="form-control btn-pill" id="advertise-heading-section-banner" name="advertise_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
+                                
 
                                 <img id="selected-advertise-banner" src = "/media/{{data.heading_image_1}}" style="display: block; width: 200px; height: 50px;" />
                                 <p style="color: red; display: none;" class="error-message" id ="error-advertise-heading-section-banner"></p>
@@ -619,9 +617,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="ads-image-1">Image-1 </label>
                                     <input class="form-control btn-pill" id="ads-image-1" name="ads_image_1" type="file"  onchange= "displayImageads(event,count=1)" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                  
     
                                     <img id="selected-ads-image-1" src = "/media/{{data.section_4_image}}" style="display: block; width: 100px; height: 100px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-ads-image-1"></p>
@@ -658,9 +654,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="ads-image-{{forloop.counter |add:'1'}}">Image-{{forloop.counter |add:'1'}} </label>
                                     <input class="form-control btn-pill" id="ads-image-{{forloop.counter |add:'1'}}" name="ads_image_{{forloop.counter |add:'1'}}" type="file"  onchange= "displayImageads(event,count=`{{forloop.counter |add:'1'}}`)" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-ads-image-{{forloop.counter |add:'1'}}" src = "/media/{{fields.images}}" style="display: block; width: 100px; height: 100px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-ads-image-{{forloop.counter |add:'1'}}"></p>
@@ -1022,9 +1016,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-section-image">Image </label>
                                     <input class="form-control btn-pill" id="social-media-section-image" name="social_media_section_image" type="file"  onchange= "displaySocialMediaImg(event)" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-social-media-img" src = "/media/{{data.section_6_logo}}" style="display: block; width: 200px; height: 50px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-section-image"></p>
@@ -1039,9 +1031,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="social-media-section-back-image">background Image </label>
                                     <input class="form-control btn-pill" id="social-media-section-back-image" name="social_media_section_back_image" type="file"  onchange= "displaySocialMediaBackgroundImg(event)" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-social-media-back-img" src = "/media/{{data.section_6_image}}" style="display: block; width: 200px; height: 50px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-social-media-section-back-image"></p>
@@ -1106,9 +1096,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="competition-section-section-image">Image </label>
                                     <input class="form-control btn-pill" id="competition-section-section-image" name="competition_section_section_image" type="file"  onchange= "displayCompetitionImage(event)" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-competition-image" src = "/media/{{data.section_9_image}}"  style="display: block; width: 200px; height: 50px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-competition-section-section-image"></p>
@@ -3145,9 +3133,7 @@ if(adscount > 1){
                                 <div class="mb-3">
                                     <label class="form-label" for="ads-image-${adscount}">Image-${adscount} </label>
                                     <input class="form-control btn-pill" id="ads-image-${adscount}" name="ads_image_${adscount}" type="file"  onchange= "displayImageads(event,count=${adscount})" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-ads-image-${adscount}" style="display: none; width: 100px; height: 100px;" />
                                     <p style="color: red; display: none;" class="error-message" id ="error-ads-image-${adscount}"></p>
@@ -3246,9 +3232,7 @@ if(adscount > 1){
                                 <div class="mb-3">
                                     <label class="form-label" for="game-section-image-${imgcount}">Image-${imgcount} </label>
                                     <input class="form-control btn-pill" id="game-section-banner-${imgcount}" name="game_section_banner_${imgcount}" type="file"  onchange= "displaygameImage(event,${imgcount})" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-game-image-${imgcount}" style="display: none; width: 100px; height: 100px;" />
     

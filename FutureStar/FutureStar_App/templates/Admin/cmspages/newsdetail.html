@@ -42,9 +42,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="newsdetail-heading-section-banner">Heading banner </label>
                                 <input class="form-control btn-pill" id="newsdetail-heading-section-banner" name="newsdetail_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
+                                
 
                                 <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display:block; width: 200px; height: 50px;" />
 

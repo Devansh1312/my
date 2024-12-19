@@ -1257,7 +1257,7 @@ class UserDetailView(LoginRequiredMixin, View):
 
     def post(self, request):
         user_id = request.POST.get("user_id")
-        print("pOST", user_id)
+        
         if not user_id:
             return redirect("Dashboard")
         try:
@@ -2186,7 +2186,7 @@ class InquireListView(LoginRequiredMixin, View):
 
     def get(self, request):
         inquire = Inquire.objects.all().order_by("-id")
-        print(inquire)
+        
         return render(
             request,
             self.template_name,
@@ -2624,7 +2624,7 @@ def savecontactpage(request):
                 contactussave = cms_pages.objects.get(name_en="Contacts")
 
                 if "banner" in request.FILES:
-                    print("yes")
+                    
 
                     heading_banner = request.FILES.get("banner", None)
                     if heading_banner:
@@ -3527,12 +3527,9 @@ def saveDiscoverdetail(request):
                         for i in range(2, int(who_count) + 1):
 
                             if str(i) in deleted_who_list:
-                                print("its in field ", i)
+                                pass
                             else:
-                                """if 'field-roll-image-id-{}'.format(i) in request.POST:
-                                unique_id = request.POST.get('ugid_{}'.format(i))
-
-                                print("exisiting: "+str(existing_record))"""
+                               
 
                                 unique_id = request.POST.get("uwid_{}".format(i))
                                 if unique_id != "":
@@ -3831,20 +3828,16 @@ def saveDiscoverdetail(request):
                                 )
 
                         except Exception as e:
-                            print(e)
 
                             messages.error(request, str(e))
 
                     messages.success(request, "Discovery Page Updated Successfully")
 
                 except Exception as e:
-                    print(sys.exc_info)
-                    print(str(e))
+
                     messages.error(request, str(e))
 
             except Exception as e:
-                print(str(e))
-                print(sys.exc_info)
 
                 messages.error(request, str(e))
 
@@ -3905,7 +3898,7 @@ def saveadvertisedetail(request):
             partnership_heading_name_ar_1 = request.POST.get(
                 "partnership_heading_name_ar_1"
             )
-            print("heading: ", partnership_heading_name_ar_1)
+
 
             partnership_heading_title_en_1 = request.POST.get(
                 "partnership-heading-title-en-1"
@@ -3977,7 +3970,7 @@ def saveadvertisedetail(request):
                 saveadvertiseetail.section_2_title_en = section_2_title_en
                 saveadvertiseetail.section_2_title_ar = section_2_title_ar
 
-                print("advertise: " + str(section_2_title_ar))
+                
                 saveadvertiseetail.section_2_content_en = section_2_content_en
                 saveadvertiseetail.section_2_content_ar = section_2_content_ar
 
@@ -4027,14 +4020,14 @@ def saveadvertisedetail(request):
                 saveadvertiseetail.meta_content_ar = seo_content_ar
 
                 section_count = request.POST.get("section_field_passed")
-                print(section_count)
+               
                 if section_count:
-                    print("count is :" + str(section_count))
+                  
                     section_deleted_field = request.POST.get("deleteing_section2field")
-                    print(section_deleted_field)
+                 
 
                     if "deleteing_section2field" in request.POST:
-                        print("yes")
+                        pass
                         if "," in section_deleted_field:
                             deleted_section_list = section_deleted_field.split(",")
                         else:
@@ -4046,11 +4039,11 @@ def saveadvertisedetail(request):
                             ]
 
                     else:
-                        print("no")
+                        
                         deleted_section_list = []
                     # Convert strings to integers
 
-                    print(deleted_section_list)
+                 
 
                     print("this is whoCount: " + str(section_count))
                     for i in range(2, int(section_count) + 1):

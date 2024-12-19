@@ -110,9 +110,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="discovery-heading-section-banner">Heading banner </label>
                                 <input class="form-control btn-pill" id="discovery-heading-section-banner" name="discovery_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
+                                
 
                                 <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display: block; width: 200px; height: 50px;" />
 
@@ -332,9 +330,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="training-section-1-image">Heading banner </label>
                                 <input class="form-control btn-pill" id="training-section-1-image" name="training_section_1_image" type="file"  onchange= "displayImagetraining_section1(event)" accept="image/*">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                <!--{% endif %}-->
+                                
 
                                 <img id="selected-section-1-image"  src ="/media/{{data.sub_section_2_1_icon}}"style="display: block; width: 200px; height: 50px;" />
 
@@ -597,9 +593,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="why-choose-us-section-image">Banner </label>
                                     <input class="form-control btn-pill" id="why-choose-us-section-image" name="why_choose_us_section_image" type="file"  onchange= "displayImagewhychooseus(event)" accept="image/*">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 35px; height: 35px;">
-                                    <!--{% endif %}-->
+                                    
     
                                     <img id="selected-why-choose-us-image" src="/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
     
