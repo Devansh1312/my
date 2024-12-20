@@ -188,10 +188,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="game-section-image-1">Image-1 </label>
                                         <input class="form-control btn-pill" id="game-section-banner-1" name="game_section_banner_1" type="file"  onchange= "displaygameImage(event,count=1)" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
-        
+                                        
                                         <img id="selected-game-image-1" src = "/media/{{data.section_2_images}}" style="display: block; width: 100px; height: 100px;" />
         
                                     </div>
@@ -220,9 +217,7 @@
                                             <p id="field-id" style='display:none'>{{image.field_id}}</p>
                                             <p id="field-roll-image-id-{{ forloop.counter| add:'1' }}" style='display:none'>{{image.field_id}}</p>
                                             <input class="form-control btn-pill" id="game-section-banner-{{ forloop.counter| add:'1' }}" name="game_section_banner_{{ forloop.counter| add:'1' }}" type="file"  onchange= "displaygameImage(event,count=`{{ forloop.counter| add:'1' }}`)" accept="image/*">
-                                            <!--{% if system_settings.fav_icon %}-->
-                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                            <!--{% endif %}-->
+                                            
             
                                             <img id="selected-game-image-{{ forloop.counter| add:'1' }}" src = "/media/{{image.images}}" style="display: block; width: 100px; height: 100px;" />
             
@@ -392,9 +387,7 @@
                             <div class="mb-3">
                                 <label class="form-label" for="training-section-2-image">Heading banner </label>
                                 <input class="form-control btn-pill" id="training-section-2-image" name="training-section-2-image" type="file"  onchange= "displayImagetraining_section2(event)" accept="image/*">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 50px;">
-                                <!--{% endif %}-->
+                                
 
                                 <img id="selected-section-2-image" src = "/media/{{data.sub_section_2_2_icon}}" style="display: block; width: 200px; height: 50px;" />
 
@@ -1801,9 +1794,7 @@
                                             <p id="field-id" style='display:none'>${image_id}</p>
                                             <p id="field-roll-image-id-${headerimageCount}" style='display:none'>${image_id}</p>
                                             <input class="form-control btn-pill" id="game-section-banner-${headerimageCount}" name="game_section_banner_${headerimageCount}" type="file"  onchange= "displaygameImage(event,count=${headerimageCount})" accept="image/*">
-                                            <!--{% if system_settings.fav_icon %}-->
-                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                            <!--{% endif %}-->
+                                            
             
                                             <img id="selected-game-image-${headerimageCount}" style="display: none; width: 100px; height: 100px;" />
             

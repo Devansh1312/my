@@ -173,9 +173,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="section-2-image-1">Image-1 </label>
                                         <input class="form-control btn-pill" id="section-2-banner-1" name="section_2_banner_1" type="file"  onchange= "displaysection2Image(event,count=1)" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
+                                        
                                 
                                         <img id="selected-section-2-image-1" src = "/media/{{data.section_2_images}}" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-1"></p>
@@ -269,9 +267,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="section-2-image-{{forloop.counter | add:'1'}}">Image-{{ forloop.counter| add:'1' }} </label>
                                         <input class="form-control btn-pill" id="section-2-banner-{{forloop.counter | add:'1'}}" name="section_2_banner_{{forloop.counter | add:'1'}}" type="file"  onchange= "displaysection2Image(event,count=`{{forloop.counter | add:'1'}}`)" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
+                                        
                                 
                                         <img id="selected-section-2-image-{{forloop.counter | add:'1'}}" src = "/media/{{fields.images}}" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-{{forloop.counter | add:'1'}}"></p>
@@ -424,9 +420,7 @@
                                         <div class="mb-3">
                                             <label class="form-label" for="partnership-image-1">Icon </label>
                                             <input class="form-control btn-pill" id="partnership-banner-1" name="partnership_banner_1" type="file"  onchange= "displaypartnershipImage(event,count=1)" accept="image/*">
-                                            <!--{% if system_settings.fav_icon %}-->
-                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                            <!--{% endif %}-->
+                                            
                                             <img id="selected-partnership-image-1" src = "/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
                                             <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-1"></p>
                                         </div>
@@ -515,9 +509,7 @@
                                                 <div class="mb-3">
                                                     <label class="form-label" for="partnership-image-1">Icon </label>
                                                     <input class="form-control btn-pill" id="partnership-banner-{{ forloop.counter|add:'1' }}" name="partnership_banner_{{ forloop.counter|add:'1' }}" type="file"  onchange= "displaypartnershipImage(event,count=`{{forloop.counter | add:'1'}}`)" accept="image/*">
-                                                    <!--{% if system_settings.fav_icon %}-->
-                                                        <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                                    <!--{% endif %}-->
+                                                    
                                                     <img id="selected-partnership-image-{{ forloop.counter|add:'1' }}" src = "/media/{{fields.images}}" style="display: block; width: 100px; height: 100px;" />
                                                     <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-{{ forloop.counter|add:'1' }}"></p>
                                                 </div>
@@ -747,9 +739,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="premium-image-1">Premium Icon </label>
                                         <input class="form-control btn-pill" id="premium-banner-1" name="premium_banner_1" type="file"  onchange= "return displaypremiumFeatures(event,count=1)" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
+                                        
         
                                         <img id="selected-premium-image-1" src = "/media/{{data.section_5_image}}" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-1"></p>
@@ -803,9 +793,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="premium-image-{{ forloop.counter| add:'1' }}">Premium Icon </label>
                                         <input class="form-control btn-pill" id="premium-banner-{{ forloop.counter| add:'1' }}" name="premium_banner_{{ forloop.counter| add:'1' }}" type="file"  onchange= "return displaypremiumFeatures(event,count=`{{ forloop.counter| add:'1' }}`)" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
+                                        
         
                                         <img id="selected-premium-image-{{ forloop.counter| add:'1' }}" src = "/media/{{field.images}}" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-{{ forloop.counter| add:'1' }}"></p>
@@ -2650,9 +2638,7 @@ function displaySocialMediaImg(event) {
                                         <div class="mb-3">
                                             <label class="form-label" for="partnership-image-${partnership_count}">Icon-${partnership_count} </label>
                                             <input class="form-control btn-pill" id="partnership-banner-${partnership_count}" name="partnership_banner_${partnership_count}" type="file"  onchange= "displaypartnershipImage(event,${partnership_count})" accept="image/*">
-                                            <!--{% if system_settings.fav_icon %}-->
-                                                <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                            <!--{% endif %}-->
+                                            
             
                                             <img id="selected-partnership-image-${partnership_count}" style="display: none; width: 100px; height: 100px;" />
                                             <p style="color: red; display: none;" class="error-message" id ="error-partnership-banner-${partnership_count}"></p>
@@ -2948,9 +2934,7 @@ function displaySocialMediaImg(event) {
                                     <div class="mb-3">
                                         <label class="form-label" for="section-2-image-${section_field_1}">Image-${section_field_1} </label>
                                         <input class="form-control btn-pill" id="section-2-banner-${section_field_1}" name="section_2_banner_${section_field_1}" type="file"  onchange= "displaysection2Image(event,${section_field_1})" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
+                                        
         
                                         <img id="selected-section-2-image-${section_field_1}"  style="display: none; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-section-2-banner-${section_field_1}"></p>
@@ -3390,9 +3374,7 @@ if(adscount > 1){
                                     <div class="mb-3">
                                         <label class="form-label" for="premium-image-${premiumCount}">Premium Icon </label>
                                         <input class="form-control btn-pill" id="premium-banner-${premiumCount}" name="premium_banner_${premiumCount}" type="file"  onchange= "return displaypremiumFeatures(event,count=${premiumCount})" accept="image/*">
-                                        <!--{% if system_settings.fav_icon %}-->
-                                            <img src="{{ MEDIA_URL }}{{ system_settings.fav_icon }}" alt="Fav Icon" style="width: 100px; height: 100px;">
-                                        <!--{% endif %}-->
+                                        
         
                                         <img id="selected-premium-image-${premiumCount}" src = "" style="display: block; width: 100px; height: 100px;" />
                                         <p style="color: red; display: none;" class="error-message" id ="error-premium-banner-${premiumCount}"></p>
