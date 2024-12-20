@@ -69,13 +69,7 @@ urlpatterns = [
         path('api/update_extra_time/', ExtraTimeAPIView.as_view(), name='update_extra_time'),
 
 
-        path('api/upcoming/lineup_add_noti/',LineupNotificationAPIView.as_view()),
-        path('api/upcoming/uniform_confirm_noti/',UniformConfirmationNotificationView.as_view()),
-        path('api/upcoming/uniform_add_noti/',UniformAddNotificationAPIView.as_view()),
-        path('api/upcoming/player_ready_noti/',PlayerReadyNotificationAPIView.as_view()),
-
-
-
+     
 
 
 

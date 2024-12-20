@@ -110,7 +110,7 @@ Partners Management
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
+                    <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                     <div class="invalid-feedback" id="image-error"></div>
                 </div>
                <button type="submit" class="btn btn-primary">Add Partners</button>
@@ -139,7 +139,7 @@ Partners Management
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
+                  <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                   <img id="editPartnersImagePreview" style="width: 100px; margin-top: 10px;">
                </div>
                <button type="submit" class="btn btn-primary">Update Partners</button>
@@ -177,7 +177,7 @@ Partners Management
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <!-- Plugins JS Ends-->
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Edit Partners Modal
     var editPartnersModal = document.getElementById('editPartnersModal');
     if (editPartnersModal) {
@@ -233,19 +233,38 @@ function validateForm(form) {
         document.getElementById(titleErrorId).textContent = '';
     }
 
-    // Image validation (only for Add Partners)
+    // Image validation
+    if (image && image.files.length > 0) {
+        const file = image.files[0];
+        const validImageTypes = [
+            'image/jpeg', 'image/png', 'image/gif',
+            'image/bmp', 'image/webp', 'image/tiff',
+            'image/svg+xml', 'image/x-icon'
+        ];
+
+        if (!validImageTypes.includes(file.type)) {
+            image.classList.add('is-invalid');
+            var imageErrorId = form.id === 'addPartnersForm' ? 'image-error' : 'edit-image-error';
+            document.getElementById(imageErrorId).textContent = 'Allowed image types: JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO.';
+            isValid = false;
+        } else {
+            image.classList.remove('is-invalid');
+            var imageErrorId = form.id === 'addPartnersForm' ? 'image-error' : 'edit-image-error';
+            document.getElementById(imageErrorId).textContent = '';
+        }
+    }
+
+    // For Add form, ensure an image is required
     if (form.id === 'addPartnersForm' && image.files.length === 0) {
         image.classList.add('is-invalid');
         document.getElementById('image-error').textContent = 'An image is required.';
         isValid = false;
-    } else {
-        image.classList.remove('is-invalid');
-        document.getElementById('image-error').textContent = '';
     }
 
     return isValid;
 }
 
+// Attach validation logic to forms
 document.getElementById('addPartnersForm').addEventListener('submit', function(event) {
     var form = event.target;
     if (!validateForm(form)) {
@@ -284,6 +303,7 @@ document.addEventListener('click', function(event) {
         });
     }
 });
+
 </script>
 
 {% endblock %}

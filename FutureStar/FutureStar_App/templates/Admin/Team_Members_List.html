@@ -135,7 +135,7 @@ Team Members List
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
+                    <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                     <div class="invalid-feedback" id="image-error"></div>
                </div>
                <button type="submit" class="btn btn-primary">Add Team Member</button>
@@ -179,7 +179,7 @@ Team Members List
                </div>
                <div class="mb-3">
                     <label for="editImage" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="editImage" name="image">
+                    <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                     <div class="invalid-feedback" id="edit-image-error"></div>
                </div>
                <button type="submit" class="btn btn-primary">Update Team Member</button>
@@ -285,19 +285,39 @@ $(document).ready(function () {
         });
 
         // Image validation (only required in the Add form)
-        if (form.id === 'addTeam_MembersForm') {
+         if (form.id === 'addTeam_MembersForm') {
             const $imageInput = $(form).find('input[type="file"]#image');
             const $imageErrorElement = $('#image-error');
+            const file = $imageInput[0].files[0];
 
-            if ($imageInput.val().trim() === '') {
-                $imageInput.addClass('is-invalid');
-                $imageErrorElement.text('An image is required.').css('color', 'red');
-                isValid = false;
+            if (!file) {
+               // Check if no file is selected
+               $imageInput.addClass('is-invalid');
+               $imageErrorElement.text('An image is required.').css('color', 'red');
+               isValid = false;
             } else {
-                $imageInput.removeClass('is-invalid');
-                $imageErrorElement.text('');
+               // Validate file type
+               const validImageTypes = [
+                     'image/jpeg',  // .jpg, .jpeg
+                     'image/png',   // .png
+                     'image/gif',   // .gif
+                     'image/bmp',   // .bmp
+                     'image/webp',  // .webp
+                     'image/tiff',  // .tif, .tiff
+                     'image/svg+xml', // .svg
+                     'image/x-icon', // .ico
+               ];
+
+               if (!validImageTypes.includes(file.type)) {
+                     $imageInput.addClass('is-invalid');
+                     $imageErrorElement.text('Allowed image types: JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO.').css('color', 'red');
+                     isValid = false;
+               } else {
+                     $imageInput.removeClass('is-invalid');
+                     $imageErrorElement.text('');
+               }
             }
-        }
+         }
 
         return isValid;
     }

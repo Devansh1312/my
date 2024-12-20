@@ -1,6 +1,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from FutureStar.firebase_config import send_push_notification
 from .models import *
 from .serializers import *
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -933,8 +935,8 @@ class TrainingFeedbackAPI(APIView):
             training = Training.objects.get(id=training_id)
         except Training.DoesNotExist:
             return Response({
-              'status': 0,
-              'message': _('Training not found.')
+                'status': 0,
+                'message': _('Training not found.')
             }, status=status.HTTP_404_NOT_FOUND)
         
         user = request.user.id
@@ -943,9 +945,6 @@ class TrainingFeedbackAPI(APIView):
                 "status": 0,
                 "message": _("Access denied")
             }, status=status.HTTP_403_FORBIDDEN)
-        
-        
-
 
         # Fetch the Training_Joined object
         training_joined = get_object_or_404(Training_Joined, user=user_id, training=training_id)
@@ -984,7 +983,39 @@ class TrainingFeedbackAPI(APIView):
                 injury_id_list = [int(id) for id in injury_ids.split(',')]
                 injuries = InjuryType.objects.filter(id__in=injury_id_list)
                 feedback.injuries.set(injuries)
-                update_messages.append(_("Injury details updated"))
+
+                # Send notification for injuries
+                notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
+                push_data = {
+                    "training_id": training.id,
+                    "training_name": training.training_name,
+                    "start_time": str(training.start_time),
+                    "cost": training.cost,
+                    "description": training.description
+                }
+
+                if training.creator_type == Training.USER_TYPE:
+                    user = User.objects.get(id=training.created_by_id)
+                    notification_language = user.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    send_push_notification(user.device_token, _("Injury Notification"), notification_message, device_type=user.device_type, data=push_data)
+
+                elif training.creator_type == Training.TEAM_TYPE:
+                    team = Team.objects.get(id=training.created_by_id)
+                    notification_language = team.team_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    send_push_notification(team.team_founder.device_token, _("Injury Notification"), notification_message, device_type=team.team_founder.device_type, data=push_data)
+
+                elif training.creator_type == Training.GROUP_TYPE:
+                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
+                    notification_language = training_group.group_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    send_push_notification(training_group.group_founder.device_token, _("Injury Notification"), notification_message, device_type=training_group.group_founder.device_type, data=push_data)
+
+                update_messages.append(_("Injury details updated and notification sent"))
 
             # Save the updated feedback record
             feedback.save()
@@ -1003,7 +1034,38 @@ class TrainingFeedbackAPI(APIView):
                 injuries = InjuryType.objects.filter(id__in=injury_id_list)
                 feedback.injuries.set(injuries)
 
-            update_messages.append(_("New feedback added"))
+                # Send notification for injuries
+                notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
+                push_data = {
+                    "training_id": training.id,
+                    "training_name": training.training_name,
+                    "start_time": str(training.start_time),
+                    "cost": training.cost,
+                    "description": training.description
+                }
+
+                if training.creator_type == Training.USER_TYPE:
+                    user = User.objects.get(id=training.created_by_id)
+                    notification_language = user.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    send_push_notification(user.device_token, _("Injury Notification"), notification_message, device_type=user.device_type, data=push_data)
+
+                elif training.creator_type == Training.TEAM_TYPE:
+                    team = Team.objects.get(id=training.created_by_id)
+                    notification_language = team.team_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    send_push_notification(team.team_founder.device_token, _("Injury Notification"), notification_message, device_type=team.team_founder.device_type, data=push_data)
+
+                elif training.creator_type == Training.GROUP_TYPE:
+                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
+                    notification_language = training_group.group_founder.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    send_push_notification(training_group.group_founder.device_token, _("Injury Notification"), notification_message, device_type=training_group.group_founder.device_type, data=push_data)
+
+                update_messages.append(_("New feedback added and injury notification sent"))
 
         # Fetch all feedbacks for the user and training
         feedbacks = Training_Feedback.objects.filter(training_id=training_id, user_id=user_id).order_by("-created_at")
@@ -1048,3 +1110,4 @@ class TrainingFeedbackAPI(APIView):
             "message": update_message,
             "data": joined_data
         }, status=status.HTTP_200_OK)
+

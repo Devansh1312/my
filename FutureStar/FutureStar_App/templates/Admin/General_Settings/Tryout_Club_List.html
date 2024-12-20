@@ -112,7 +112,7 @@ Tryout Club Management
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
+                    <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                     <div class="invalid-feedback" id="image-error"></div>
                 </div>
                <button type="submit" class="btn btn-primary">Add Tryout Club</button>
@@ -141,7 +141,7 @@ Tryout Club Management
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
+                  <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                   <img id="editTryout_ClubImagePreview" style="width: 100px; margin-top: 10px;">
                </div>
                <button type="submit" class="btn btn-primary">Update Tryout Club</button>
@@ -180,7 +180,7 @@ Tryout Club Management
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <!-- Plugins JS Ends-->
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // Edit Tryout_Club Modal
     var editTryout_ClubModal = document.getElementById('editTryout_ClubModal');
     if (editTryout_ClubModal) {
@@ -236,14 +236,50 @@ function validateForm(form) {
         document.getElementById(titleErrorId).textContent = '';
     }
 
-    // Image validation (only for Add Tryout_Club)
-    if (form.id === 'addTryout_ClubForm' && image.files.length === 0) {
-        image.classList.add('is-invalid');
-        document.getElementById('image-error').textContent = 'An image is required.';
-        isValid = false;
-    } else {
-        image.classList.remove('is-invalid');
-        document.getElementById('image-error').textContent = '';
+    // Image validation for Add form: Only image files
+    if (form.id === 'addTryout_ClubForm') {
+        if (image.files.length === 0) {
+            image.classList.add('is-invalid');
+            document.getElementById('image-error').textContent = 'An image is required.';
+            isValid = false;
+        } else {
+            const file = image.files[0];
+            const validImageTypes = [
+                'image/jpeg', 'image/png', 'image/gif',
+                'image/bmp', 'image/webp', 'image/tiff',
+                'image/svg+xml', 'image/x-icon'
+            ];
+
+            if (!validImageTypes.includes(file.type)) {
+                image.classList.add('is-invalid');
+                document.getElementById('image-error').textContent = 'Only image files are allowed (JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO).';
+                isValid = false;
+            } else {
+                image.classList.remove('is-invalid');
+                document.getElementById('image-error').textContent = '';
+            }
+        }
+    }
+
+    // Image validation for Edit form: Validate if image is provided
+    if (form.id === 'editTryout_ClubForm') {
+        if (image.files.length > 0) {
+            const file = image.files[0];
+            const validImageTypes = [
+                'image/jpeg', 'image/png', 'image/gif',
+                'image/bmp', 'image/webp', 'image/tiff',
+                'image/svg+xml', 'image/x-icon'
+            ];
+
+            if (!validImageTypes.includes(file.type)) {
+                image.classList.add('is-invalid');
+                document.getElementById('image-error').textContent = 'Only image files are allowed (JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO).';
+                isValid = false;
+            } else {
+                image.classList.remove('is-invalid');
+                document.getElementById('image-error').textContent = '';
+            }
+        }
     }
 
     return isValid;

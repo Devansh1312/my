@@ -4045,16 +4045,13 @@ def saveadvertisedetail(request):
 
                  
 
-                    print("this is whoCount: " + str(section_count))
+                  
                     for i in range(2, int(section_count) + 1):
 
                         if str(i) in deleted_section_list:
-                            print("its in field ", i)
+                            pass
                         else:
-                            """if 'field-roll-image-id-{}'.format(i) in request.POST:
-                            unique_id = request.POST.get('ugid_{}'.format(i))
-
-                            print("exisiting: "+str(existing_record))"""
+                         
 
                             unique_id = request.POST.get("usid_{}".format(i))
                             if unique_id != "":
@@ -4075,14 +4072,13 @@ def saveadvertisedetail(request):
                                     field_id=unique_id
                                 ).first()
 
-                                print("Name: " + section_title_en)
 
                                 if "imagess_{}".format(str(i)) in request.FILES:
 
                                     image_1 = request.FILES.get(
                                         "imagess_{}".format(str(i)), None
                                     )
-                                    print("image: " + str(image_1))
+                                   
 
                                     if image_1:
                                         try:
@@ -4121,7 +4117,7 @@ def saveadvertisedetail(request):
                                         if image_1:
                                             existing_section_record.images = image_1
                                     except Exception as e:
-                                        print(str(e))
+                                        pass
 
                                     existing_section_record.save()
                                 else:
@@ -4138,15 +4134,15 @@ def saveadvertisedetail(request):
                                     savediscoveryview.save()
 
                 partnership_count = request.POST.get("partnership_field_passed")
-                print("partnership: ", partnership_count)
+             
                 if partnership_count:
                     partnership_deleted_field = request.POST.get(
                         "deleteing_partnershipfield"
                     )
-                    print(partnership_deleted_field)
+                  
 
                     if "partnership_deleted_field" in request.POST:
-                        print("yes")
+                       
                         if "," in partnership_deleted_field:
                             deleted_partnership_list = partnership_deleted_field.split(
                                 ","
@@ -4160,22 +4156,17 @@ def saveadvertisedetail(request):
                             ]
 
                     else:
-                        print("no")
+                       
                         deleted_partnership_list = []
                     # Convert strings to integers
 
-                    print(deleted_partnership_list)
-
-                    print("this is Partnerhsip : " + str(partnership_count))
+             
                     for i in range(2, int(partnership_count) + 1):
 
                         if str(i) in deleted_partnership_list:
-                            print("its in field ", i)
+                           pass
                         else:
-                            """if 'field-roll-image-id-{}'.format(i) in request.POST:
-                            unique_id = request.POST.get('ugid_{}'.format(i))
-
-                            print("exisiting: "+str(existing_record))"""
+                         
 
                             unique_id = request.POST.get("upid_{}".format(i))
                             if unique_id != "":
@@ -4196,14 +4187,14 @@ def saveadvertisedetail(request):
                                     field_id=unique_id
                                 ).first()
 
-                                print(partnership_title_en)
+                               
 
                                 if "imagep1p_{}".format(str(i)) in request.FILES:
 
                                     image_2 = request.FILES.get(
                                         "imagep1p_{}".format(str(i)), None
                                     )
-                                    print("image: " + str(image_2))
+                                 
 
                                     if image_2:
                                         try:
@@ -4246,7 +4237,7 @@ def saveadvertisedetail(request):
                                         if image_2:
                                             existing_partnership_record.images = image_2
                                     except Exception as e:
-                                        print(str(e))
+                                        pass
 
                                     existing_partnership_record.save()
                                 else:
@@ -4268,7 +4259,7 @@ def saveadvertisedetail(request):
                     image_deleted_field = request.POST.get("deleted_ads_field")
 
                     if "deleted_ads_field" in request.POST:
-                        print("yes")
+                       
                         if "," in image_deleted_field:
                             deleted_image_list = image_deleted_field.split(",")
                         else:
@@ -4280,23 +4271,18 @@ def saveadvertisedetail(request):
                             ]
 
                     else:
-                        print("no")
+                    
                         deleted_image_list = []
                     # Convert strings to integers
 
-                    print(deleted_image_list)
-
-                    print("this is game imgaes: " + str(ads_image))
+                 
 
                     for i in range(2, int(ads_image) + 1):
 
                         if i in deleted_image_list:
-                            print("its in field ", i)
+                           pass
                         else:
-                            """if 'field-roll-image-id-{}'.format(i) in request.POST:
-                            unique_id = request.POST.get('ugid_{}'.format(i))
-
-                            print("exisiting: "+str(existing_record))"""
+                           
 
                             if "imageapp_{}".format(str(i)) in request.FILES:
 
@@ -4341,7 +4327,7 @@ def saveadvertisedetail(request):
                                         ):  # Update the image if a new one is uploaded
                                             existing_record.images = image_3
                                     except Exception as e:
-                                        print(str(e))
+                                       pass
 
                                     existing_record.save()  # Save the updated record
                                 else:
@@ -4354,14 +4340,14 @@ def saveadvertisedetail(request):
                 premium_count = request.POST.get("premium_field_passed")
                 if premium_count:
                     premium_deleted_field = request.POST.get("deleteing_premium_field")
-                    print(premium_deleted_field)
+                   
 
                     if "deleteing_premium_field" in request.POST:
-                        print("yes")
+                       
                         if "," in premium_deleted_field:
                             deleted_premium_list = premium_deleted_field.split(",")
                         else:
-                            print("yes")
+                            
                             # Correct the variable reference here
                             deleted_premium_list = [
                                 "{}".format(premium_deleted_field)
@@ -4371,18 +4357,16 @@ def saveadvertisedetail(request):
                         ]  # Convert to integers
 
                     else:
-                        print("no")
+                     
                         deleted_premium_list = []
 
-                    print(deleted_premium_list)
-
-                    print("this is Premium: " + str(premium_count))
+                   
                     for i in range(2, int(premium_count) + 1):
                         if str(i) in deleted_premium_list:
-                            print("its in field ", i)
+                            pass
                         else:
                             unique_id = request.POST.get("uppid_{}".format(i))
-                            print("advertise unique field: ", unique_id)
+                           
                             if unique_id != "":
                                 premium_title_en = request.POST.get(
                                     "premium_title_en_{}".format(str(i))
@@ -4400,8 +4384,7 @@ def saveadvertisedetail(request):
                                     image_4 = request.FILES.get(
                                         "imagepp_{}".format(str(i)), None
                                     )
-                                    print(image_4)
-                                    print("image: " + str(image_4))
+                                 
                                     if image_4:
                                         try:
                                             save_path = os.path.join(
@@ -4430,7 +4413,7 @@ def saveadvertisedetail(request):
                                         if image_4:
                                             existing_premium_record.images = image_4
                                     except Exception as e:
-                                        print(str(e))
+                                        pass
 
                                     existing_premium_record.save()
                                 else:
@@ -4445,7 +4428,7 @@ def saveadvertisedetail(request):
                                     saveadvertiseview.save()
 
                 if "heading_image_1" in request.FILES:
-                    print("yes")
+                  
 
                     image_1 = request.FILES.get("heading_image_1", None)
 
@@ -4462,7 +4445,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.heading_image_1 = image_1
-                                    print("image_saved")
+                                  
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4487,7 +4470,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_2_images = image_2
-                                    print("image_saved")
+                                    
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4512,7 +4495,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_3_image = image_3
-                                    print("image_saved")
+                             
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4537,7 +4520,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_4_image = image_4
-                                    print("image_saved")
+                                 
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4562,7 +4545,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_5_image = image_5
-                                    print("image_saved")
+                                  
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4589,7 +4572,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_6_logo = image_6
-                                    print("image_saved")
+                                   
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4616,7 +4599,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_6_image = image_7
-                                    print("image_saved")
+                                   
 
                         except Exception as e:
                             messages.error(request, str(e))
@@ -4643,8 +4626,7 @@ def saveadvertisedetail(request):
                                     destination.write(chunk)
                                     # imageName.append(heading_banner.name)
                                     saveadvertiseetail.section_9_image = image_8
-                                    print("image_saved")
-
+                                 
                         except Exception as e:
                             messages.error(request, str(e))
 
@@ -4660,7 +4642,7 @@ def saveadvertisedetail(request):
                             "dyanmic_deleted_section_field"
                         )
                         dynamic_deleted_section_list = dynamic_section_data.split(",")
-                        print(dynamic_deleted_section_list)
+                        
 
                         for i in range(len(dynamic_deleted_section_list)):
 
@@ -4671,7 +4653,7 @@ def saveadvertisedetail(request):
                             )
 
                     except Exception as e:
-                        print("error: " + e)
+                       
 
                         messages.error(request, str(e))
 
@@ -4682,7 +4664,7 @@ def saveadvertisedetail(request):
                             "dynamic_deleted_partner_field"
                         )
                         dynamic_deleted_partner_list = dynamic_partner_data.split(",")
-                        print(dynamic_deleted_partner_list)
+                  
 
                         for i in range(len(dynamic_deleted_partner_list)):
 
@@ -4693,7 +4675,7 @@ def saveadvertisedetail(request):
                             )
 
                     except Exception as e:
-                        print("error: " + e)
+                     
 
                         messages.error(request, str(e))
 
@@ -4702,7 +4684,7 @@ def saveadvertisedetail(request):
                     try:
                         dynamic_ads_data = request.POST.get("dyanmic_deleted_ads_field")
                         dynamic_deleted_ads_list = dynamic_ads_data.split(",")
-                        print(dynamic_deleted_ads_list)
+                  
 
                         for i in range(len(dynamic_deleted_ads_list)):
 
@@ -4713,7 +4695,7 @@ def saveadvertisedetail(request):
                             )
 
                     except Exception as e:
-                        print("error: " + e)
+                     
 
                         messages.error(request, str(e))
 
@@ -4724,8 +4706,7 @@ def saveadvertisedetail(request):
                             "dynamic_deleted_premium_field"
                         )
                         dynamic_deleted_premium_list = dynamic_premium_data.split(",")
-                        print(dynamic_deleted_premium_list)
-
+                    
                         for i in range(len(dynamic_deleted_premium_list)):
 
                             deletingviewfrom_data = (
@@ -4735,15 +4716,14 @@ def saveadvertisedetail(request):
                             )
 
                     except Exception as e:
-                        print("error: " + e)
-
+                       
                         messages.error(request, str(e))
 
                 # dom = "True"
                 messages.success(request, "Advertise Page Updated Successfully")
 
             except Exception as e:
-                print(str(e))
+               
                 messages.error(request, str(e))
 
             response_data = {
@@ -4903,7 +4883,7 @@ def savehomedetail(request):
                 content_en = request.POST.get(f"features_section_form_content_en_{i}")
                 content_ar = request.POST.get(f"features_section_form_content_ar_{i}")
 
-                print(title_en)
+         
                 if title_en or title_ar or content_en or content_ar:
                     features.append(
                         {
@@ -5017,13 +4997,13 @@ def savehomedetail(request):
 
                 feature_count = request.POST.get("features_passed")
 
-                print("this is feature: " + str(feature_count))
+            
                 if feature_count:
                     for i in range(int(feature_count) + 1):
 
                         dom = i + 1
                         image = 0
-                        print("loop: " + str(dom))
+                     
                         feature_title_en = request.POST.get(
                             "features_section_form_title_en_{}".format(str(dom))
                         )
@@ -5038,18 +5018,16 @@ def savehomedetail(request):
                         )
                         feature_field = request.POST.get("id")
                         unique_id = request.POST.get("uid_{}".format(dom))
-                        print(unique_id)
-                        print("title_ar {}: ".format(dom) + str(feature_title_ar))
-
+                   
                         existing_record = cms_home_dynamic_field.objects.filter(
                             field_id=unique_id
                         ).first()
-                        print("exisiting: " + str(existing_record))
+                       
 
                         if "image_{}".format(str(dom)) in request.FILES:
 
                             image = request.FILES.get("image_{}".format(str(dom)), None)
-                            print("image: " + str(image))
+                      
 
                             if image:
                                 try:
@@ -5081,7 +5059,7 @@ def savehomedetail(request):
                                 existing_record.images = image
 
                             existing_record.save()  # Save the updated record
-                            print("exsiting_title: " + str(existing_record.title_en))
+                          
                         else:
                             savehomedynamcidetail = cms_home_dynamic_field(
                                 field_id=unique_id,
@@ -5093,7 +5071,7 @@ def savehomedetail(request):
                             )
                             savehomedynamcidetail.save()
 
-                            print("last unique id: " + str(unique_id))
+                       
                         delete_record = cms_home_dynamic_field.objects.filter(
                             field_id=None
                         )
@@ -5102,13 +5080,13 @@ def savehomedetail(request):
                         # achivement section
                 achive_count = request.POST.get("achive_passed")
 
-                print("this is achive: " + str(achive_count))
+              
                 if achive_count:
                     for i in range(int(achive_count) + 1):
 
                         dom = i + 1
                         image = 0
-                        print("loop: " + str(dom))
+                      
                         achive_title_en = request.POST.get(
                             "achive_section_form_htitle_en_{}".format(str(dom))
                         )
@@ -5123,15 +5101,13 @@ def savehomedetail(request):
                         )
                         achive_field = request.POST.get("aid")
                         achive_unique_id = request.POST.get("uaid_{}".format(dom))
-                        print(achive_unique_id)
-                        print("title_ar {}: ".format(dom) + str(achive_title_ar))
-
+                     
                         existing_achive_record = (
                             cms_home_dynamic_achivements_field.objects.filter(
                                 field_id=achive_unique_id
                             ).first()
                         )
-                        print("exisiting: " + str(existing_achive_record))
+                   
 
                         if existing_achive_record:
                             # Update the existing record
@@ -5141,10 +5117,7 @@ def savehomedetail(request):
                             existing_achive_record.title_ar = achive_content_ar
 
                             existing_achive_record.save()  # Save the updated record
-                            print(
-                                "exsiting_title: "
-                                + str(existing_achive_record.title_en)
-                            )
+                            
                         else:
                             savehomeachivedynamic = cms_home_dynamic_achivements_field(
                                 field_id=achive_unique_id,
@@ -5155,7 +5128,7 @@ def savehomedetail(request):
                             )
                             savehomeachivedynamic.save()
 
-                            print("last unique id: " + str(unique_id))
+                          
                         delete_record = (
                             cms_home_dynamic_achivements_field.objects.filter(
                                 field_id=None
@@ -5168,21 +5141,21 @@ def savehomedetail(request):
                 savehomedetail.save()
 
                 deletedField = request.POST.get("deletedField")
-                print(deletedField)
+               
 
                 if deletedField != 0:
                     for i in range(int(deletedField)):
 
                         deleted_id = request.POST.get("deleted_field_{}".format(i))
-                        print(deleted_id)
+                      
                         delete_the_record = cms_home_dynamic_field.objects.filter(
                             field_id=deleted_id
                         ).delete()
                 else:
-                    print("value is 0")
+                   pass
 
                 achivedeletedField = request.POST.get("deletedachiveField")
-                print(achivedeletedField)
+              
 
                 if achivedeletedField != 0:
                     for i in range(int(achivedeletedField)):
@@ -5190,14 +5163,14 @@ def savehomedetail(request):
                         achivedeleted_id = request.POST.get(
                             "deleted_achivefield_{}".format(i)
                         )
-                        print(achivedeleted_id)
+                   
                         achviedelete_the_record = (
                             cms_home_dynamic_achivements_field.objects.filter(
                                 field_id=achivedeleted_id
                             ).delete()
                         )
                 else:
-                    print("value is 0")
+                    pass
 
                 if "home_heading_section_image_1" in request.FILES:
 
@@ -5225,7 +5198,7 @@ def savehomedetail(request):
                 if "home_heading_section_image_2" in request.FILES:
 
                     image_2 = request.FILES.get("home_heading_section_image_2", None)
-                    print("image: " + str(image_2))
+                   
                     if image_2:
                         try:
                             save_path = os.path.join(
@@ -5249,7 +5222,7 @@ def savehomedetail(request):
                 if "home_heading_section_image_3" in request.FILES:
 
                     image_3 = request.FILES.get("home_heading_section_image_3", None)
-                    print("image: " + str(image_3))
+                   
                     if image_3:
                         try:
                             save_path = os.path.join(
@@ -5273,7 +5246,7 @@ def savehomedetail(request):
                 if "home_heading_section_icon" in request.FILES:
 
                     image_4 = request.FILES.get("home_heading_section_icon", None)
-                    print("image: " + str(image_4))
+                 
                     if image_4:
                         try:
                             save_path = os.path.join(
@@ -5297,7 +5270,7 @@ def savehomedetail(request):
                 if "home_heading_section_2_icon_1" in request.FILES:
 
                     image_5 = request.FILES.get("home_heading_section_2_icon_1", None)
-                    print("image: " + str(image_5))
+                   
                     if image_5:
                         try:
                             save_path = os.path.join(
@@ -5321,7 +5294,7 @@ def savehomedetail(request):
                 if "home_heading_section_2_icon_2" in request.FILES:
 
                     image_6 = request.FILES.get("home_heading_section_2_icon_2", None)
-                    print("image: " + str(image_6))
+                  
                     if image_6:
                         try:
                             save_path = os.path.join(
@@ -5345,7 +5318,7 @@ def savehomedetail(request):
                 if "empower_section_icon" in request.FILES:
 
                     image_7 = request.FILES.get("empower_section_icon", None)
-                    print("image: " + str(image_7))
+                  
                     if image_7:
                         try:
                             save_path = os.path.join(
@@ -5371,7 +5344,7 @@ def savehomedetail(request):
                     image_8 = request.FILES.get(
                         "empower_section_background_image", None
                     )
-                    print("image: " + str(image_8))
+                  
                     if image_8:
                         try:
                             save_path = os.path.join(
@@ -5395,7 +5368,7 @@ def savehomedetail(request):
                 if "feature_image_1" in request.FILES:
 
                     image_9 = request.FILES.get("feature_image_1", None)
-                    print("image: " + str(image_9))
+                    
                     if image_9:
                         try:
                             save_path = os.path.join(
@@ -5419,7 +5392,7 @@ def savehomedetail(request):
                 if "spirit_icon_e" in request.FILES:
 
                     image_10 = request.FILES.get("spirit_icon_e", None)
-                    print("image: " + str(image_10))
+                  
                     if image_10:
                         try:
                             save_path = os.path.join(
@@ -5443,7 +5416,7 @@ def savehomedetail(request):
                 if "spirit_background_image" in request.FILES:
 
                     image_11 = request.FILES.get("spirit_background_image", None)
-                    print("image: " + str(image_11))
+                   
                     if image_11:
                         try:
                             save_path = os.path.join(
@@ -5467,7 +5440,7 @@ def savehomedetail(request):
                 if "achivements_image_e" in request.FILES:
 
                     image_12 = request.FILES.get("achivements_image_e", None)
-                    print("image: " + str(image_12))
+                 
                     if image_12:
                         try:
                             save_path = os.path.join(
@@ -5491,7 +5464,7 @@ def savehomedetail(request):
                 if "testomonial_icon" in request.FILES:
 
                     image_13 = request.FILES.get("testomonial_icon", None)
-                    print("image: " + str(image_13))
+                
                     if image_13:
                         try:
                             save_path = os.path.join(
@@ -5515,7 +5488,7 @@ def savehomedetail(request):
                 if "testomonial_image_1" in request.FILES:
 
                     image_14 = request.FILES.get("testomonial_image_1", None)
-                    print("image 14: " + str(image_14))
+                 
                     if image_14:
                         try:
                             save_path = os.path.join(

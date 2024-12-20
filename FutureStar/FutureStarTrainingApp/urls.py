@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/training/mytraining/',MyTrainingsView.as_view()),
     path('api/training/jointarining/',MyJoinedTrainingsView.as_view()),
 
+  
 
 
 
