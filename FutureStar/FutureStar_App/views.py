@@ -5046,7 +5046,8 @@ def savehomedetail(request):
                                             # savenewsdetail.heading_banner = heading_banner
 
                                 except Exception as e:
-                                    dom = str(e)
+                                    response_data = {"status": "error", "message": "in home 71 page something wrong"}
+
 
                         if existing_record:
                             # Update the existing record
@@ -5191,7 +5192,7 @@ def savehomedetail(request):
                                     savehomedetail.heading_image_1 = image_1
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in 7895 home page something wrong"}
                 else:
                     pass
 
@@ -5215,7 +5216,7 @@ def savehomedetail(request):
                                     savehomedetail.heading_image_2 = image_2
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in 49905645 home page something wrong"}
                 else:
                     pass
 
@@ -5239,7 +5240,8 @@ def savehomedetail(request):
                                     savehomedetail.heading_image_3 = image_3
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in 78978 home page something wrong"}
+
                 else:
                     pass
 
@@ -5263,7 +5265,7 @@ def savehomedetail(request):
                                     savehomedetail.sub_heading_logo = image_4
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in 088690 home page something wrong"}
                 else:
                     pass
 
@@ -5287,7 +5289,8 @@ def savehomedetail(request):
                                     savehomedetail.sub_heading_icon_1 = image_5
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in 0890 home page something wrong"}
+
                 else:
                     pass
 
@@ -5311,7 +5314,8 @@ def savehomedetail(request):
                                     savehomedetail.sub_heading_icon_2 = image_6
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home 356 page something wrong"}
+                           
                 else:
                     pass
 
@@ -5335,7 +5339,7 @@ def savehomedetail(request):
                                     savehomedetail.section_2_logo = image_7
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home 265 page something wrong"}
                 else:
                     pass
 
@@ -5361,7 +5365,8 @@ def savehomedetail(request):
                                     savehomedetail.section_2_background = image_8
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home 65 page something wrong"}
+                            
                 else:
                     pass
 
@@ -5385,7 +5390,8 @@ def savehomedetail(request):
                                     savehomedetail.section_3_feature_icons = image_9
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in 87 home page something wrong"}
+
                 else:
                     pass
 
@@ -5409,7 +5415,8 @@ def savehomedetail(request):
                                     savehomedetail.section_4_image = image_10
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home re page something wrong"}
+                         
                 else:
                     pass
 
@@ -5457,7 +5464,8 @@ def savehomedetail(request):
                                     savehomedetail.section_5_image = image_12
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home 4 page something wrong"}
+                           
                 else:
                     pass
 
@@ -5481,7 +5489,9 @@ def savehomedetail(request):
                                     savehomedetail.section_7_logo = image_13
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home 1 page something wrong"}
+
+                           
                 else:
                     pass
 
@@ -5505,7 +5515,8 @@ def savehomedetail(request):
                                     savehomedetail.section_7_image = image_14
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home 2 page something wrong"}
+
                 else:
                     pass
                 # dom = "True"
@@ -5529,7 +5540,7 @@ def savehomedetail(request):
             return JsonResponse(response_data)
 
     except Exception as e:
-        response_data = {"status": "error", "message": str(e)}
+        response_data = {"status": "error", "message": "in home page 3 something wrong"}
 
         return JsonResponse(response_data)
 
@@ -5720,7 +5731,7 @@ def savedashdetail(request):
                 messages.success(request, "Dashboard Page Updated Successfully")
 
             except Exception as e:
-                messages.error(request, str(e))
+                pass
 
             response_data = {
                 "status": "success",
@@ -5734,7 +5745,7 @@ def savedashdetail(request):
 
             return JsonResponse(response_data)
     except Exception as e:
-        response_data = {"status": "error", "message": str(e)}
+        response_data = {"status": "error", "message": "Something Went Wrong"}
 
         return JsonResponse(response_data)
 
