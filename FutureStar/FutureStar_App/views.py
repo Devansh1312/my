@@ -5440,7 +5440,8 @@ def savehomedetail(request):
                                     savehomedetail.section_4_background = image_11
 
                         except Exception as e:
-                            dom = str(e)
+                            response_data = {"status": "error", "message": "in home page something wrong"}
+                           
                 else:
                     pass
 
@@ -5524,7 +5525,7 @@ def savehomedetail(request):
                 messages.success(request, "Home Page Updated Successfully")
 
             except Exception as e:
-                messages.error(request, str(e))
+                messages.error(request, "invalid")
 
             response_data = {
                 "status": "success",
