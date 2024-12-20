@@ -24,9 +24,7 @@ urlpatterns = [
     path('api/training/mytraining/',MyTrainingsView.as_view()),
     path('api/training/jointarining/',MyJoinedTrainingsView.as_view()),
 
-    path('api/training/attendance_noti/',CheckTrainingTimeAndSendNotificationsAPIView.as_view()),
-    path('api/training/feedback_noti/', CheckEndTimeAndSendNotificationsAPIView.as_view()),
-
+  
 
 
 
