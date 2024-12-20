@@ -142,7 +142,7 @@ urlpatterns = [
     path('saveadvertisedetail/',saveadvertisedetail,name = "advertisedetail"),
 
     #cms home page
-    path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
+    path('cms-homepage/',cms_homepage.as_view(),name="cms_homepage"),
     path('savehomepage/',savehomedetail,name="savehomepage"),
     
     #cms_loginpage
@@ -156,10 +156,6 @@ urlpatterns = [
     #dashboard 
     path('cms-dashboardpage/',cms_dashboard.as_view(),name="cms_dashboard"),
     path('cms_dashboarddetail/',savedashdetail,name="savedashdetail"),
-
-    #cms home page
-    path('cms-homerpage/',cms_homepage.as_view(),name="cms_homepage"),
-    path('savehomepage/',savehomedetail,name="savehomepage"),
     
     #News List URL
     path('news_list/', NewsListView.as_view(), name='news_list'),

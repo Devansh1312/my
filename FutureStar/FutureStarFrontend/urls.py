@@ -23,6 +23,8 @@ urlpatterns = [
     path('register/', RegisterPage.as_view(),name="register"),
     path('privacy-policy/', PrivacyPolicyPage.as_view(),name="privacy-policy"),
     path('terms-of-services/', TermsofServicesPage.as_view(),name="terms-of-services"),
+    path('terms-and-conditions/', TermsAndConditionsPage.as_view(),name="terms-and-conditions"),
+
     path('player-dashboard/', PlayerDashboardPage.as_view(),name="player-dashboard"),
     path('player-dashboard-games/', UserDashboardGames.as_view(),name="player-dashboard-games"),
     path('player-dashboard-events/', UserEventBookingInfo.as_view(),name="player-dashboard-events"),

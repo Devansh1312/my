@@ -1,0 +1,84 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+
+{% block css %}
+<!-- Plugins css start-->
+<!-- Plugins css Ends-->
+{% endblock %}
+{% load lang_filter %} <!-- Loading your custom filter -->
+
+{% block title %} Future Star || Terms of Services{% endblock %}
+
+{% block content %}
+<!-- Conditional styles based on URL parameters -->
+{% if request.GET.reference == "app" %}
+    {% if request.GET.Language == "ar" or request.GET.Language == "en" %}
+        <style>
+            .header-upper {
+                display: none;
+            }
+            .main-footer {
+                display: none;
+            }
+        </style>
+    {% endif %}
+{% endif %}
+
+
+
+
+
+<!-- Page Banner Start -->
+<section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url(assets/images/banner/banner-bg-two.jpg);">
+    <div class="container">
+        <div class="banner-inner">
+            <div class="row">
+                <div class="col-xl-12">
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                    <h2 class="page-title wow fadeInUp delay-0-3s text-center">
+                        {{ heading_title }} 
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Page Banner End -->
+
+<!-- Blog Details Page Area start -->
+<section class="blog-details-page py-130 rpy-100 rel z-1">
+    <div class="container container-1290">
+        <div class="row gap-60">
+            <div class="col">
+                <div class="blog-single-content">
+                    {% lang cmsdata current_language "heading_content" as heading_content %}
+                    <p>
+                        {{ heading_content }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Details Page Area end -->
+
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
+
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}

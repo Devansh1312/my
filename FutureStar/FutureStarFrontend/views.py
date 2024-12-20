@@ -5,8 +5,6 @@ from FutureStarAPI.models import *
 from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
-
-
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,14 +12,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.utils.translation import activate
 from django.contrib.auth import authenticate, login
-import json
-import requests
-from django.conf import settings
-from jwt import decode, exceptions  # For Apple JWT decoding
-from django.core.exceptions import ValidationError
 import random
 from django.db.models import Q,Sum,When,Case,F
-from django.http import JsonResponse
 
 
 
@@ -324,15 +316,23 @@ class ContactPage(View):
 class PrivacyPolicyPage(View):
     
     def get(self, request, *args, **kwargs):
+        
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        else:
+            # If not, fall back to session language
+            language_from_url = request.session.get('language', 'en')
         try:
             cmsdata = cms_pages.objects.get(id=10)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
 
-        current_language = request.session.get('language', 'en')
 
         context = {
-            "current_language": current_language,
+            "current_language": language_from_url,
             "cmsdata": cmsdata,
         } 
         return render(request, "privacy-policy.html",context)
@@ -348,16 +348,24 @@ class PrivacyPolicyPage(View):
 class TermsofServicesPage(View):
     
     def get(self, request, *args, **kwargs):
+
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        else:
+            # If not, fall back to session language
+            language_from_url = request.session.get('language', 'en')
         
         try:
             cmsdata = cms_pages.objects.get(id=9)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
             
-        current_language = request.session.get('language', 'en')
 
         context = {
-            "current_language": current_language,
+            "current_language": language_from_url,
             "cmsdata": cmsdata,
         } 
 
@@ -368,6 +376,39 @@ class TermsofServicesPage(View):
         request.session['language'] = selected_language
         return redirect('terms-of-services')  
 
+
+######################### terms-of-conditions #####################
+
+class TermsAndConditionsPage(View):
+    
+    def get(self, request, *args, **kwargs):
+        # Check if the 'Language' parameter is in the URL
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        else:
+            # If not, fall back to session language
+            language_from_url = request.session.get('language', 'en')
+
+        # Fetch the CMS data
+        try:
+            cmsdata = cms_pages.objects.get(id=11)  # Use get() to fetch a single object
+        except cms_pages.DoesNotExist:
+            cmsdata = None  # Handle the case where the object does not exist
+        
+        context = {
+            "current_language": language_from_url,  # Pass the language to the context
+            "cmsdata": cmsdata,
+        } 
+
+        return render(request, "terms-and-conditions.html", context)
+    
+    def post(self, request, *args, **kwargs):
+        selected_language = request.POST.get('language', 'en')
+        request.session['language'] = selected_language
+        return redirect('terms-and-conditions')
 
 
 ##############################################   PlayerDashboardPage   ########################################################
