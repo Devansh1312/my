@@ -186,7 +186,7 @@ Testimonial Management
                      </div>
                      <div class="col-12 col-sm-6 mb-3">
                              <label for="image" class="form-label">Image</label>
-                             <input type="file" class="form-control" id="image" name="image">
+                             <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                              <div class="invalid-feedback" id="image-error"></div>
                      </div>
                      <div class="col-12 col-sm-6 mb-3">
@@ -276,7 +276,7 @@ Testimonial Management
                      </div>               
                      <div class="col-12 col-sm-6 mb-3">
                          <label for="editImage" class="form-label">Image</label>
-                         <input type="file" class="form-control" id="editImage" name="image">
+                         <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                          <img id="editTestimonialImagePreview" style="width: 100%; max-width: 100px; margin-top: 10px;">
                          <div class="invalid-feedback" id="edit-image-error"></div>
                      </div>
@@ -381,251 +381,256 @@ Testimonial Management
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-       // Edit Testimonial Modal
-       var editTestimonialModal = document.getElementById('editTestimonialModal');
-       if (editTestimonialModal) {
-           editTestimonialModal.addEventListener('show.bs.modal', function(event) {
-               var button = event.relatedTarget;
-               var testimonialId = button.getAttribute('data-testimonial-id');
-               var name_en = button.getAttribute('data-testimonial-name_en');
-               var designation_en = button.getAttribute('data-testimonial-designation_en');
-               var content_en = button.getAttribute('data-testimonial-content_en');
-               var name_ar = button.getAttribute('data-testimonial-name_ar');
-               var designation_ar = button.getAttribute('data-testimonial-designation_ar');
-               var content_ar = button.getAttribute('data-testimonial-content_ar');
-               var rattings = button.getAttribute('data-testimonial-rattings');
-               var imageUrl = button.getAttribute('data-testimonial-image');
-   
-               var form = document.getElementById('editTestimonialForm');
-               form.action = "{% url 'testimonial_edit' 0 %}".replace('0', testimonialId);
-   
-               form.querySelector('#editTestimonialId').value = testimonialId;
-               form.querySelector('#editName_en').value = name_en;
-               form.querySelector('#editDesignation_en').value = designation_en;
-               form.querySelector('#editContent_en').value = content_en;
-               form.querySelector('#editName_ar').value = name_ar;
-               form.querySelector('#editDesignation_ar').value = designation_ar;
-               form.querySelector('#editContent_ar').value = content_ar;
-               form.querySelector('#editRattings').value = rattings;
-   
-               var imagePreview = document.getElementById('editTestimonialImagePreview');
-               if (imageUrl) {
-                   imagePreview.src = imageUrl;
-                   imagePreview.style.display = 'block';
-               } else {
-                   imagePreview.style.display = 'none';
-               }
-           });
-       }
-   
-       // Delete Testimonial Modal
-       var deleteTestimonialModal = document.getElementById('deleteTestimonialModal');
-       if (deleteTestimonialModal) {
-           deleteTestimonialModal.addEventListener('show.bs.modal', function(event) {
-               var button = event.relatedTarget;
-               var testimonialId = button.getAttribute('data-testimonial-id');
-               var deleteForm = document.getElementById('deleteTestimonialForm');
-               deleteForm.action = "{% url 'testimonial_delete' 0 %}".replace('0', testimonialId);
-           });
-       }
-   
-       // Form validation for Add and Edit modals
-       function validateForm(form) {
-           var name_en = form.querySelector('input[name="name_en"]');
-           var designation_en = form.querySelector('input[name="designation_en"]');
-           var content_en = form.querySelector('textarea[name="content_en"]');
-           var name_ar = form.querySelector('input[name="name_ar"]');
-           var designation_ar = form.querySelector('input[name="designation_ar"]');
-           var content_ar = form.querySelector('textarea[name="content_ar"]');
-           var rattings = form.querySelector('select[name="rattings"]');
-           var image = form.querySelector('input[name="image"]');
-           var isValid = true;
-   
-           // Name validation for English and Arabic
-            if (name_en.value.trim() === '') {
-                name_en.classList.add('is-invalid');
-                var name_enErrorId = form.id === 'addTestimonialForm' ? 'name_en-error' : 'edit-name_en-error';
-                document.getElementById(name_enErrorId).textContent = 'This field is required in English.';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Edit Testimonial Modal
+        var editTestimonialModal = document.getElementById('editTestimonialModal');
+        if (editTestimonialModal) {
+            editTestimonialModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var testimonialId = button.getAttribute('data-testimonial-id');
+                var name_en = button.getAttribute('data-testimonial-name_en');
+                var designation_en = button.getAttribute('data-testimonial-designation_en');
+                var content_en = button.getAttribute('data-testimonial-content_en');
+                var name_ar = button.getAttribute('data-testimonial-name_ar');
+                var designation_ar = button.getAttribute('data-testimonial-designation_ar');
+                var content_ar = button.getAttribute('data-testimonial-content_ar');
+                var rattings = button.getAttribute('data-testimonial-rattings');
+                var imageUrl = button.getAttribute('data-testimonial-image');
+    
+                var form = document.getElementById('editTestimonialForm');
+                form.action = "{% url 'testimonial_edit' 0 %}".replace('0', testimonialId);
+    
+                form.querySelector('#editTestimonialId').value = testimonialId;
+                form.querySelector('#editName_en').value = name_en;
+                form.querySelector('#editDesignation_en').value = designation_en;
+                form.querySelector('#editContent_en').value = content_en;
+                form.querySelector('#editName_ar').value = name_ar;
+                form.querySelector('#editDesignation_ar').value = designation_ar;
+                form.querySelector('#editContent_ar').value = content_ar;
+                form.querySelector('#editRattings').value = rattings;
+    
+                var imagePreview = document.getElementById('editTestimonialImagePreview');
+                if (imageUrl) {
+                    imagePreview.src = imageUrl;
+                    imagePreview.style.display = 'block';
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+        }
+    
+        // Delete Testimonial Modal
+        var deleteTestimonialModal = document.getElementById('deleteTestimonialModal');
+        if (deleteTestimonialModal) {
+            deleteTestimonialModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var testimonialId = button.getAttribute('data-testimonial-id');
+                var deleteForm = document.getElementById('deleteTestimonialForm');
+                deleteForm.action = "{% url 'testimonial_delete' 0 %}".replace('0', testimonialId);
+            });
+        }
+    
+        // Form validation for Add and Edit modals
+        function validateForm(form) {
+            var name_en = form.querySelector('input[name="name_en"]');
+            var designation_en = form.querySelector('input[name="designation_en"]');
+            var content_en = form.querySelector('textarea[name="content_en"]');
+            var name_ar = form.querySelector('input[name="name_ar"]');
+            var designation_ar = form.querySelector('input[name="designation_ar"]');
+            var content_ar = form.querySelector('textarea[name="content_ar"]');
+            var rattings = form.querySelector('select[name="rattings"]');
+            var image = form.querySelector('input[name="image"]');
+            var isValid = true;
+    
+            // Name validation for English and Arabic
+             if (name_en.value.trim() === '') {
+                 name_en.classList.add('is-invalid');
+                 var name_enErrorId = form.id === 'addTestimonialForm' ? 'name_en-error' : 'edit-name_en-error';
+                 document.getElementById(name_enErrorId).textContent = 'This field is required in English.';
+                 isValid = false;
+             } else {
+                 name_en.classList.remove('is-invalid');
+                 var name_enErrorId = form.id === 'addTestimonialForm' ? 'name_en-error' : 'edit-name_en-error';
+                 document.getElementById(name_enErrorId).textContent = '';
+             }
+ 
+             if (name_ar.value.trim() === '') {
+                 name_ar.classList.add('is-invalid');
+                 var name_arErrorId = form.id === 'addTestimonialForm' ? 'name_ar-error' : 'edit-name_ar-error';
+                 document.getElementById(name_arErrorId).textContent = 'This field is required in Arabic.';
+                 isValid = false;
+             } else {
+                 name_ar.classList.remove('is-invalid');
+                 var name_arErrorId = form.id === 'addTestimonialForm' ? 'name_ar-error' : 'edit-name_ar-error';
+                 document.getElementById(name_arErrorId).textContent = '';
+             }
+ 
+             // Designation validation for English and Arabic
+             if (designation_en.value.trim() === '') {
+                 designation_en.classList.add('is-invalid');
+                 var designation_enErrorId = form.id === 'addTestimonialForm' ? 'designation_en-error' : 'edit-designation_en-error';
+                 document.getElementById(designation_enErrorId).textContent = 'This field is required in English.';
+                 isValid = false;
+             } else {
+                 designation_en.classList.remove('is-invalid');
+                 var designation_enErrorId = form.id === 'addTestimonialForm' ? 'designation_en-error' : 'edit-designation_en-error';
+                 document.getElementById(designation_enErrorId).textContent = '';
+             }
+ 
+             if (designation_ar.value.trim() === '') {
+                 designation_ar.classList.add('is-invalid');
+                 var designation_arErrorId = form.id === 'addTestimonialForm' ? 'designation_ar-error' : 'edit-designation_ar-error';
+                 document.getElementById(designation_arErrorId).textContent = 'This field is required in Arabic.';
+                 isValid = false;
+             } else {
+                 designation_ar.classList.remove('is-invalid');
+                 var designation_arErrorId = form.id === 'addTestimonialForm' ? 'designation_ar-error' : 'edit-designation_ar-error';
+                 document.getElementById(designation_arErrorId).textContent = '';
+             }
+ 
+             // Content validation for English and Arabic
+             if (content_en.value.trim() === '') {
+                 content_en.classList.add('is-invalid');
+                 var content_enErrorId = form.id === 'addTestimonialForm' ? 'content_en-error' : 'edit-content_en-error';
+                 document.getElementById(content_enErrorId).textContent = 'This field is required in English.';
+                 isValid = false;
+             } else {
+                 content_en.classList.remove('is-invalid');
+                 var content_enErrorId = form.id === 'addTestimonialForm' ? 'content_en-error' : 'edit-content_en-error';
+                 document.getElementById(content_enErrorId).textContent = '';
+             }
+ 
+             if (content_ar.value.trim() === '') {
+                 content_ar.classList.add('is-invalid');
+                 var content_arErrorId = form.id === 'addTestimonialForm' ? 'content_ar-error' : 'edit-content_ar-error';
+                 document.getElementById(content_arErrorId).textContent = 'This field is required in Arabic.';
+                 isValid = false;
+             } else {
+                 content_ar.classList.remove('is-invalid');
+                 var content_arErrorId = form.id === 'addTestimonialForm' ? 'content_ar-error' : 'edit-content_ar-error';
+                 document.getElementById(content_arErrorId).textContent = '';
+             }
+    
+            // Ratings validation
+            var rattingsValue = parseFloat(rattings.value);
+            if (isNaN(rattingsValue) || rattingsValue < 0.5 || rattingsValue > 5) {
+                rattings.classList.add('is-invalid');
+                var rattingsErrorId = form.id === 'addTestimonialForm' ? 'rattings-error' : 'edit-rattings-error';
+                document.getElementById(rattingsErrorId).textContent = 'Please select a valid rating.';
                 isValid = false;
             } else {
-                name_en.classList.remove('is-invalid');
-                var name_enErrorId = form.id === 'addTestimonialForm' ? 'name_en-error' : 'edit-name_en-error';
-                document.getElementById(name_enErrorId).textContent = '';
+                rattings.classList.remove('is-invalid');
+                var rattingsErrorId = form.id === 'addTestimonialForm' ? 'rattings-error' : 'edit-rattings-error';
+                document.getElementById(rattingsErrorId).textContent = '';
             }
-
-            if (name_ar.value.trim() === '') {
-                name_ar.classList.add('is-invalid');
-                var name_arErrorId = form.id === 'addTestimonialForm' ? 'name_ar-error' : 'edit-name_ar-error';
-                document.getElementById(name_arErrorId).textContent = 'This field is required in Arabic.';
+    
+            // Image validation (only for Add)
+            if (form.id === 'addTestimonialForm' && image.files.length === 0) {
+                image.classList.add('is-invalid');
+                document.getElementById('image-error').textContent = 'An image is required.';
                 isValid = false;
-            } else {
-                name_ar.classList.remove('is-invalid');
-                var name_arErrorId = form.id === 'addTestimonialForm' ? 'name_ar-error' : 'edit-name_ar-error';
-                document.getElementById(name_arErrorId).textContent = '';
+            } else if (form.id === 'addTestimonialForm' && image.files.length > 0) {
+                var file = image.files[0];
+                var fileType = file.type;
+                if (!fileType.startsWith('image/')) {
+                    image.classList.add('is-invalid');
+                    document.getElementById('image-error').textContent = 'Only image files are allowed.';
+                    isValid = false;
+                } else {
+                    image.classList.remove('is-invalid');
+                    document.getElementById('image-error').textContent = '';
+                }
             }
-
-            // Designation validation for English and Arabic
-            if (designation_en.value.trim() === '') {
-                designation_en.classList.add('is-invalid');
-                var designation_enErrorId = form.id === 'addTestimonialForm' ? 'designation_en-error' : 'edit-designation_en-error';
-                document.getElementById(designation_enErrorId).textContent = 'This field is required in English.';
-                isValid = false;
-            } else {
-                designation_en.classList.remove('is-invalid');
-                var designation_enErrorId = form.id === 'addTestimonialForm' ? 'designation_en-error' : 'edit-designation_en-error';
-                document.getElementById(designation_enErrorId).textContent = '';
+    
+            return isValid;
+        }
+    
+        document.getElementById('addTestimonialForm').addEventListener('submit', function(event) {
+            var form = event.target;
+            if (!validateForm(form)) {
+                event.preventDefault(); // Prevent form submission if invalid
             }
-
-            if (designation_ar.value.trim() === '') {
-                designation_ar.classList.add('is-invalid');
-                var designation_arErrorId = form.id === 'addTestimonialForm' ? 'designation_ar-error' : 'edit-designation_ar-error';
-                document.getElementById(designation_arErrorId).textContent = 'This field is required in Arabic.';
-                isValid = false;
-            } else {
-                designation_ar.classList.remove('is-invalid');
-                var designation_arErrorId = form.id === 'addTestimonialForm' ? 'designation_ar-error' : 'edit-designation_ar-error';
-                document.getElementById(designation_arErrorId).textContent = '';
-            }
-
-            // Content validation for English and Arabic
-            if (content_en.value.trim() === '') {
-                content_en.classList.add('is-invalid');
-                var content_enErrorId = form.id === 'addTestimonialForm' ? 'content_en-error' : 'edit-content_en-error';
-                document.getElementById(content_enErrorId).textContent = 'This field is required in English.';
-                isValid = false;
-            } else {
-                content_en.classList.remove('is-invalid');
-                var content_enErrorId = form.id === 'addTestimonialForm' ? 'content_en-error' : 'edit-content_en-error';
-                document.getElementById(content_enErrorId).textContent = '';
-            }
-
-            if (content_ar.value.trim() === '') {
-                content_ar.classList.add('is-invalid');
-                var content_arErrorId = form.id === 'addTestimonialForm' ? 'content_ar-error' : 'edit-content_ar-error';
-                document.getElementById(content_arErrorId).textContent = 'This field is required in Arabic.';
-                isValid = false;
-            } else {
-                content_ar.classList.remove('is-invalid');
-                var content_arErrorId = form.id === 'addTestimonialForm' ? 'content_ar-error' : 'edit-content_ar-error';
-                document.getElementById(content_arErrorId).textContent = '';
-            }
-
-
-   
-           // Ratings validation
-           var rattingsValue = parseFloat(rattings.value);
-           if (isNaN(rattingsValue) || rattingsValue < 0.5 || rattingsValue > 5) {
-               rattings.classList.add('is-invalid');
-               var rattingsErrorId = form.id === 'addTestimonialForm' ? 'rattings-error' : 'edit-rattings-error';
-               document.getElementById(rattingsErrorId).textContent = 'Please select a valid rating.';
-               isValid = false;
-           } else {
-               rattings.classList.remove('is-invalid');
-               var rattingsErrorId = form.id === 'addTestimonialForm' ? 'rattings-error' : 'edit-rattings-error';
-               document.getElementById(rattingsErrorId).textContent = '';
-           }
-   
-           // Image validation (only for Add)
-           if (form.id === 'addTestimonialForm' && image.files.length === 0) {
-               image.classList.add('is-invalid');
-               document.getElementById('image-error').textContent = 'An image is required.';
-               isValid = false;
-           } else {
-               image.classList.remove('is-invalid');
-               document.getElementById('image-error').textContent = '';
-           }
-   
-           return isValid;
-       }
-   
-       document.getElementById('addTestimonialForm').addEventListener('submit', function(event) {
-           var form = event.target;
-           if (!validateForm(form)) {
-               event.preventDefault(); // Prevent form submission
-           }
-       });
-   
-       document.getElementById('editTestimonialForm').addEventListener('submit', function(event) {
-           var form = event.target;
-           if (!validateForm(form)) {
-               event.preventDefault(); // Prevent form submission
-           }
-       });
-   
-       // Toggle visibility of the action card
-       document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-           menu.addEventListener('click', function(event) {
-               event.preventDefault();
-               var actionCard = menu.nextElementSibling;
-               actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-   
-               // Close other open action cards
-               document.querySelectorAll('.action-card').forEach(function(card) {
-                   if (card !== actionCard) {
-                       card.style.display = 'none';
-                   }
-               });
-           });
-       });
-   
-       // Hide action card when clicking outside
-       document.addEventListener('click', function(event) {
-           var isClickInside = event.target.closest('.action-menu-container');
-           if (!isClickInside) {
-               document.querySelectorAll('.action-card').forEach(function(card) {
-                   card.style.display = 'none';
-               });
-           }
-       });
-   
-       // Initialize star ratings
-       const starRatings = document.querySelectorAll('.star-rating');
-       starRatings.forEach(function(starRating) {
-           const rating = parseFloat(starRating.getAttribute('data-rating'));
-           const widthPercentage = (rating / 5) * 100;
-           starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
-       });
-   });
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // View Testimonial Modal
-    var viewTestimonialModal = document.getElementById('viewTestimonialModal');
-    if (viewTestimonialModal) {
-        viewTestimonialModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var name_en = button.getAttribute('data-testimonial-name_en');
-            var designation_en = button.getAttribute('data-testimonial-designation_en');
-            var content_en = button.getAttribute('data-testimonial-content_en');
-            var name_ar = button.getAttribute('data-testimonial-name_ar');
-            var designation_ar = button.getAttribute('data-testimonial-designation_ar');
-            var content_ar = button.getAttribute('data-testimonial-content_ar');
-            var rattings = button.getAttribute('data-testimonial-rattings');
-            var imageUrl = button.getAttribute('data-testimonial-image');
-
-            // Populate the modal with the data
-            document.getElementById('viewName_en').textContent = name_en;
-            document.getElementById('viewDesignation_en').textContent = designation_en;
-            document.getElementById('viewContent_en').textContent = content_en;
-            document.getElementById('viewName_ar').textContent = name_ar;
-            document.getElementById('viewDesignation_ar').textContent = designation_ar;
-            document.getElementById('viewContent_ar').textContent = content_ar;
-            
-            // Update ratings
-            var starRating = document.getElementById('viewRattings');
-            starRating.setAttribute('data-rating', rattings);
-            var widthPercentage = (rattings / 5) * 100;
-            starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
-
-            // Set image preview
-            var imagePreview = document.getElementById('viewTestimonialImagePreview');
-            imagePreview.src = imageUrl;
         });
-    }
-});
-
-</script>
+    
+        document.getElementById('editTestimonialForm').addEventListener('submit', function(event) {
+            var form = event.target;
+            if (!validateForm(form)) {
+                event.preventDefault(); // Prevent form submission if invalid
+            }
+        });
+    
+        // Toggle visibility of the action card
+        document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+            menu.addEventListener('click', function(event) {
+                event.preventDefault();
+                var actionCard = menu.nextElementSibling;
+                actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+    
+                // Close other open action cards
+                document.querySelectorAll('.action-card').forEach(function(card) {
+                    if (card !== actionCard) {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    
+        // Hide action card when clicking outside
+        document.addEventListener('click', function(event) {
+            var isClickInside = event.target.closest('.action-menu-container');
+            if (!isClickInside) {
+                document.querySelectorAll('.action-card').forEach(function(card) {
+                    card.style.display = 'none';
+                });
+            }
+        });
+    
+        // Initialize star ratings
+        const starRatings = document.querySelectorAll('.star-rating');
+        starRatings.forEach(function(starRating) {
+            const rating = parseFloat(starRating.getAttribute('data-rating'));
+            const widthPercentage = (rating / 5) * 100;
+            starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
+        });
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // View Testimonial Modal
+        var viewTestimonialModal = document.getElementById('viewTestimonialModal');
+        if (viewTestimonialModal) {
+            viewTestimonialModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var name_en = button.getAttribute('data-testimonial-name_en');
+                var designation_en = button.getAttribute('data-testimonial-designation_en');
+                var content_en = button.getAttribute('data-testimonial-content_en');
+                var name_ar = button.getAttribute('data-testimonial-name_ar');
+                var designation_ar = button.getAttribute('data-testimonial-designation_ar');
+                var content_ar = button.getAttribute('data-testimonial-content_ar');
+                var rattings = button.getAttribute('data-testimonial-rattings');
+                var imageUrl = button.getAttribute('data-testimonial-image');
+    
+                // Populate the modal with the data
+                document.getElementById('viewName_en').textContent = name_en;
+                document.getElementById('viewDesignation_en').textContent = designation_en;
+                document.getElementById('viewContent_en').textContent = content_en;
+                document.getElementById('viewName_ar').textContent = name_ar;
+                document.getElementById('viewDesignation_ar').textContent = designation_ar;
+                document.getElementById('viewContent_ar').textContent = content_ar;
+                
+                // Update ratings
+                var starRating = document.getElementById('viewRattings');
+                starRating.setAttribute('data-rating', rattings);
+                var widthPercentage = (rattings / 5) * 100;
+                starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
+    
+                // Set image preview
+                var imagePreview = document.getElementById('viewTestimonialImagePreview');
+                imagePreview.src = imageUrl;
+            });
+        }
+    });
+ </script>
+ 
    
 
 {% endblock %}

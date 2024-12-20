@@ -116,7 +116,7 @@ Global_Clients Management
                </div>
                <div class="mb-3">
                   <label for="image" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="image" name="image">
+                  <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                   <div class="invalid-feedback" id="image-error"></div>
                </div>
                <button type="submit" class="btn btn-primary">Add Global Clients</button>
@@ -145,7 +145,7 @@ Global_Clients Management
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
+                  <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                   <img id="editGlobal_ClientsImagePreview" style="width: 100px; margin-top: 10px;">
                </div>
                <button type="submit" class="btn btn-primary">Update Global Clients</button>
@@ -184,112 +184,136 @@ Global_Clients Management
 <!-- Plugins JS Ends-->
 <script>
    document.addEventListener('DOMContentLoaded', function() {
-    // Edit Global_Clients Modal
-    var editGlobal_ClientsModal = document.getElementById('editGlobal_ClientsModal');
-    if (editGlobal_ClientsModal) {
-        editGlobal_ClientsModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var global_clientsId = button.getAttribute('data-global_clients-id');
-            var global_clientsTitle = button.getAttribute('data-global_clients-title');
-            var global_clientsImageUrl = button.getAttribute('data-global_clients-image');
-
-            var form = document.getElementById('editGlobal_ClientsForm');
-            form.action = "{% url 'global_clients_edit' 0 %}".replace('0', global_clientsId);
-
-            form.querySelector('#editGlobal_ClientsId').value = global_clientsId;
-            form.querySelector('#editTitle').value = global_clientsTitle;
-
-            var imagePreview = document.getElementById('editGlobal_ClientsImagePreview');
-            if (global_clientsImageUrl) {
-                imagePreview.src = global_clientsImageUrl;
-                imagePreview.style.display = 'block';
-            } else {
-                imagePreview.style.display = 'none';
-            }
-        });
-    }
-
-    // Delete Global_Clients Modal
-    var deleteGlobal_ClientsModal = document.getElementById('deleteGlobal_ClientsModal');
-    if (deleteGlobal_ClientsModal) {
-        deleteGlobal_ClientsModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var global_clientsId = button.getAttribute('data-global_clients-id');
-            var deleteForm = document.getElementById('deleteGlobal_ClientsForm');
-            deleteForm.action = "{% url 'global_clients_delete' 0 %}".replace('0', global_clientsId);
-        });
-    }
-});
-
-// Form validation for Add and Edit Global_Clients modals
-function validateForm(form) {
-    var title = form.querySelector('input[name="title"]');
-    var image = form.querySelector('input[name="image"]');
-    var isValid = true;
-
-    // Title validation
-    if (title.value.trim() === '') {
-        title.classList.add('is-invalid');
-        var titleErrorId = form.id === 'addGlobal_ClientsForm' ? 'title-error' : 'edit-title-error';
-        document.getElementById(titleErrorId).textContent = 'This field is required.';
-        isValid = false;
-    } else {
-        title.classList.remove('is-invalid');
-        var titleErrorId = form.id === 'addGlobal_ClientsForm' ? 'title-error' : 'edit-title-error';
-        document.getElementById(titleErrorId).textContent = '';
-    }
-
-    // Image validation (only for Add Global_Clients)
-    if (form.id === 'addGlobal_ClientsForm' && image.files.length === 0) {
-        image.classList.add('is-invalid');
-        document.getElementById('image-error').textContent = 'An image is required.';
-        isValid = false;
-    } else {
-        image.classList.remove('is-invalid');
-        document.getElementById('image-error').textContent = '';
-    }
-
-    return isValid;
-}
-
-document.getElementById('addGlobal_ClientsForm').addEventListener('submit', function(event) {
-    var form = event.target;
-    if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
-    }
-});
-
-document.getElementById('editGlobal_ClientsForm').addEventListener('submit', function(event) {
-    var form = event.target;
-    if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
-    }
-});
-
-// Toggle the visibility of the action card
-document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-    menu.addEventListener('click', function(event) {
-        event.preventDefault();
-        var actionCard = menu.nextElementSibling;
-        actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-        // Close other open action cards
-        document.querySelectorAll('.action-card').forEach(function(card) {
-            if (card !== actionCard) {
-                card.style.display = 'none';
-            }
-        });
-    });
-});
-
-// Hide action card if clicking outside
-document.addEventListener('click', function(event) {
-    var isClickInside = event.target.closest('.action-menu-container');
-    if (!isClickInside) {
-        document.querySelectorAll('.action-card').forEach(function(card) {
-            card.style.display = 'none';
-        });
-    }
-});
+       // Edit Global_Clients Modal
+       var editGlobal_ClientsModal = document.getElementById('editGlobal_ClientsModal');
+       if (editGlobal_ClientsModal) {
+           editGlobal_ClientsModal.addEventListener('show.bs.modal', function(event) {
+               var button = event.relatedTarget;
+               var global_clientsId = button.getAttribute('data-global_clients-id');
+               var global_clientsTitle = button.getAttribute('data-global_clients-title');
+               var global_clientsImageUrl = button.getAttribute('data-global_clients-image');
+   
+               var form = document.getElementById('editGlobal_ClientsForm');
+               form.action = "{% url 'global_clients_edit' 0 %}".replace('0', global_clientsId);
+   
+               form.querySelector('#editGlobal_ClientsId').value = global_clientsId;
+               form.querySelector('#editTitle').value = global_clientsTitle;
+   
+               var imagePreview = document.getElementById('editGlobal_ClientsImagePreview');
+               if (global_clientsImageUrl) {
+                   imagePreview.src = global_clientsImageUrl;
+                   imagePreview.style.display = 'block';
+               } else {
+                   imagePreview.style.display = 'none';
+               }
+           });
+       }
+   
+       // Delete Global_Clients Modal
+       var deleteGlobal_ClientsModal = document.getElementById('deleteGlobal_ClientsModal');
+       if (deleteGlobal_ClientsModal) {
+           deleteGlobal_ClientsModal.addEventListener('show.bs.modal', function(event) {
+               var button = event.relatedTarget;
+               var global_clientsId = button.getAttribute('data-global_clients-id');
+               var deleteForm = document.getElementById('deleteGlobal_ClientsForm');
+               deleteForm.action = "{% url 'global_clients_delete' 0 %}".replace('0', global_clientsId);
+           });
+       }
+   });
+   
+   // Form validation for Add and Edit Global_Clients modals
+   function validateForm(form) {
+       var title = form.querySelector('input[name="title"]');
+       var image = form.querySelector('input[name="image"]');
+       var isValid = true;
+   
+       // Title validation
+       if (title.value.trim() === '') {
+           title.classList.add('is-invalid');
+           var titleErrorId = form.id === 'addGlobal_ClientsForm' ? 'title-error' : 'edit-title-error';
+           document.getElementById(titleErrorId).textContent = 'This field is required.';
+           isValid = false;
+       } else {
+           title.classList.remove('is-invalid');
+           var titleErrorId = form.id === 'addGlobal_ClientsForm' ? 'title-error' : 'edit-title-error';
+           document.getElementById(titleErrorId).textContent = '';
+       }
+   
+       // Image validation (only for Add Global_Clients)
+       if (form.id === 'addGlobal_ClientsForm') {
+           if (image.files.length === 0) {
+               image.classList.add('is-invalid');
+               document.getElementById('image-error').textContent = 'An image is required.';
+               isValid = false;
+           } else {
+               // Check if the file is an image
+               var file = image.files[0];
+               if (!file.type.startsWith('image/')) {
+                   image.classList.add('is-invalid');
+                   document.getElementById('image-error').textContent = 'Only image files are allowed.';
+                   isValid = false;
+               } else {
+                   image.classList.remove('is-invalid');
+                   document.getElementById('image-error').textContent = '';
+               }
+           }
+       } else if (form.id === 'editGlobal_ClientsForm') {
+           // If an image is provided for edit, check if it's an image
+           if (image.files.length > 0) {
+               var file = image.files[0];
+               if (!file.type.startsWith('image/')) {
+                   image.classList.add('is-invalid');
+                   document.getElementById('image-error').textContent = 'Only image files are allowed.';
+                   isValid = false;
+               } else {
+                   image.classList.remove('is-invalid');
+                   document.getElementById('image-error').textContent = '';
+               }
+           }
+       }
+   
+       return isValid;
+   }
+   
+   document.getElementById('addGlobal_ClientsForm').addEventListener('submit', function(event) {
+       var form = event.target;
+       if (!validateForm(form)) {
+           event.preventDefault(); // Prevent form submission
+       }
+   });
+   
+   document.getElementById('editGlobal_ClientsForm').addEventListener('submit', function(event) {
+       var form = event.target;
+       if (!validateForm(form)) {
+           event.preventDefault(); // Prevent form submission
+       }
+   });
+   
+   // Toggle the visibility of the action card
+   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+       menu.addEventListener('click', function(event) {
+           event.preventDefault();
+           var actionCard = menu.nextElementSibling;
+           actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+           // Close other open action cards
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                   card.style.display = 'none';
+               }
+           });
+       });
+   });
+   
+   // Hide action card if clicking outside
+   document.addEventListener('click', function(event) {
+       var isClickInside = event.target.closest('.action-menu-container');
+       if (!isClickInside) {
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+           });
+       }
+   });
 </script>
+   
 
 {% endblock %}

@@ -135,7 +135,7 @@ App Feature List
                </div>
                <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
+                    <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                     <div class="invalid-feedback" id="image-error"></div>
                 </div>
                <button type="submit" class="btn btn-primary">Add App Feature</button>
@@ -179,7 +179,7 @@ App Feature List
                </div>
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
+                  <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                   <div class="invalid-feedback" id="edit-image-error"></div>
                </div>
                <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -217,162 +217,207 @@ App Feature List
 <script src="{% static 'assets/js/tooltip-init.js'%}"></script>
 <!-- Plugins JS Ends-->
 <script>
-   document.addEventListener('DOMContentLoaded', function () {
-    // Edit App_Feature Modal
-    var editApp_FeatureModal = document.getElementById('editApp_FeatureModal');
-    if (editApp_FeatureModal) {
-        editApp_FeatureModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var app_featureId = button.getAttribute('data-app_feature-id');
-            var app_featureTitleEn = button.getAttribute('data-app_feature-title_en');
-            var app_featureTitleAr = button.getAttribute('data-app_feature-title_ar');
-            var app_featureSub_TitleEn = button.getAttribute('data-app_feature-sub_title_en');
-            var app_featureSub_TitleAr = button.getAttribute('data-app_feature-sub_title_ar');
-            var app_featureImageUrl = button.getAttribute('data-app_feature-image');
+   // Edit form validation on submit
+const editApp_FeatureForm = document.getElementById('editApp_FeatureForm');
+if (editApp_FeatureForm) {
+    editApp_FeatureForm.addEventListener('submit', function (event) {
+        let isValid = true;
 
-            var form = document.getElementById('editApp_FeatureForm');
-            form.action = "{% url 'app_feature_edit' 0 %}".replace('0', app_featureId);
+        // Validate all fields
+        function validateInput(inputSelector, errorSelector, errorMessage) {
+            const input = editApp_FeatureForm.querySelector(inputSelector);
+            const errorElement = editApp_FeatureForm.querySelector(errorSelector);
 
-            form.querySelector('#editApp_FeatureId').value = app_featureId;
-            form.querySelector('#editTitle_en').value = app_featureTitleEn;
-            form.querySelector('#editTitle_ar').value = app_featureTitleAr;
-            form.querySelector('#editSub_Title_en').value = app_featureSub_TitleEn;
-            form.querySelector('#editSub_Title_ar').value = app_featureSub_TitleAr;
-
-            var imagePreview = document.getElementById('editApp_FeatureImagePreview');
-            if (app_featureImageUrl) {
-                imagePreview.src = app_featureImageUrl;
-                imagePreview.style.display = 'block';
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                errorElement.textContent = errorMessage;
+                isValid = false;
             } else {
-                imagePreview.style.display = 'none';
+                input.classList.remove('is-invalid');
+                errorElement.textContent = '';
             }
-        });
-    }
-
-    // Delete App_Feature Modal
-    var deleteApp_FeatureModal = document.getElementById('deleteApp_FeatureModal');
-    if (deleteApp_FeatureModal) {
-        deleteApp_FeatureModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var app_featureId = button.getAttribute('data-app_feature-id');
-            var deleteForm = document.getElementById('deleteApp_FeatureForm');
-            deleteForm.action = "{% url 'app_feature_delete' 0 %}".replace('0', app_featureId);
-        });
-    }
-
-    // Function to validate forms
-    function validateForm(form) {
-        var isValid = true;
-
-        // Validation for title_en
-        var titleEnInput = form.querySelector('input[name="title_en"]');
-        var titleEnError = form.querySelector('#' + (form.id === 'addApp_FeatureForm' ? 'title_en-error' : 'edit-title_en-error'));
-        if (!titleEnInput.value.trim()) {
-            titleEnInput.classList.add('is-invalid');
-            titleEnError.textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            titleEnInput.classList.remove('is-invalid');
-            titleEnError.textContent = '';
         }
 
-        // Validation for title_ar
-        var titleArInput = form.querySelector('input[name="title_ar"]');
-        var titleArError = form.querySelector('#' + (form.id === 'addApp_FeatureForm' ? 'title_ar-error' : 'edit-title_ar-error'));
-        if (!titleArInput.value.trim()) {
-            titleArInput.classList.add('is-invalid');
-            titleArError.textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            titleArInput.classList.remove('is-invalid');
-            titleArError.textContent = '';
-        }
+        validateInput('input[name="title_en"]', '#edit-title_en-error', 'This field is required.');
+        validateInput('input[name="title_ar"]', '#edit-title_ar-error', 'This field is required.');
+        validateInput('input[name="sub_title_en"]', '#edit-sub_title_en-error', 'This field is required.');
+        validateInput('input[name="sub_title_ar"]', '#edit-sub_title_ar-error', 'This field is required.');
 
-        // Validation for sub_title_en
-        var subTitleEnInput = form.querySelector('input[name="sub_title_en"]');
-        var subTitleEnError = form.querySelector('#' + (form.id === 'addApp_FeatureForm' ? 'sub_title_en-error' : 'edit-sub_title_en-error'));
-        if (!subTitleEnInput.value.trim()) {
-            subTitleEnInput.classList.add('is-invalid');
-            subTitleEnError.textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            subTitleEnInput.classList.remove('is-invalid');
-            subTitleEnError.textContent = '';
-        }
+        // Optional image validation
+        const imageInput = editApp_FeatureForm.querySelector('input[name="image"]');
+        const imageError = editApp_FeatureForm.querySelector('#edit-image-error');
 
-        // Validation for sub_title_ar
-        var subTitleArInput = form.querySelector('input[name="sub_title_ar"]');
-        var subTitleArError = form.querySelector('#' + (form.id === 'addApp_FeatureForm' ? 'sub_title_ar-error' : 'edit-sub_title_ar-error'));
-        if (!subTitleArInput.value.trim()) {
-            subTitleArInput.classList.add('is-invalid');
-            subTitleArError.textContent = 'This field is required.';
-            isValid = false;
-        } else {
-            subTitleArInput.classList.remove('is-invalid');
-            subTitleArError.textContent = '';
-        }
+        if (imageInput.files.length > 0) {
+            const file = imageInput.files[0];
+            const validImageTypes = [
+                'image/jpeg', 'image/png', 'image/gif',
+                'image/bmp', 'image/webp', 'image/tiff',
+                'image/svg+xml', 'image/x-icon'
+            ];
 
-        // Image validation for Add form only
-        if (form.id === 'addApp_FeatureForm') {
-            var imageInput = form.querySelector('input[name="image"]');
-            var imageError = form.querySelector('#image-error');
-            if (imageInput.files.length === 0) {
+            if (!validImageTypes.includes(file.type)) {
                 imageInput.classList.add('is-invalid');
-                imageError.textContent = 'An image is required.';
+                imageError.textContent = 'Allowed image types: JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO.';
                 isValid = false;
             } else {
                 imageInput.classList.remove('is-invalid');
                 imageError.textContent = '';
             }
+        } else {
+            // No file uploaded, clear previous error if any
+            imageInput.classList.remove('is-invalid');
+            imageError.textContent = '';
         }
 
-        return isValid;
-    }
-
-    // Add form validation on submit
-    var addApp_FeatureForm = document.getElementById('addApp_FeatureForm');
-    if (addApp_FeatureForm) {
-        addApp_FeatureForm.addEventListener('submit', function (event) {
-            if (!validateForm(addApp_FeatureForm)) {
-                event.preventDefault();
-            }
-        });
-    }
-
-    // Edit form validation on submit
-    var editApp_FeatureForm = document.getElementById('editApp_FeatureForm');
-    if (editApp_FeatureForm) {
-        editApp_FeatureForm.addEventListener('submit', function (event) {
-            if (!validateForm(editApp_FeatureForm)) {
-                event.preventDefault();
-            }
-        });
-    }
-
-    // Toggle the visibility of the action card
-    document.querySelectorAll('.three-dots-menu').forEach(function (menu) {
-        menu.addEventListener('click', function (event) {
+        if (!isValid) {
             event.preventDefault();
-            var actionCard = menu.nextElementSibling;
-            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-
-            // Close other open action cards
-            document.querySelectorAll('.action-card').forEach(function (card) {
-                if (card !== actionCard) {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-
-    // Hide action card if clicking outside
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest('.action-menu-container')) {
-            document.querySelectorAll('.action-card').forEach(function (card) {
-                card.style.display = 'none';
-            });
         }
     });
-});
-</script>
+}
+   document.addEventListener('DOMContentLoaded', function () {
+       // Utility function for form validation
+       function validateForm(form) {
+           let isValid = true;
+   
+           // Helper function for input validation
+           function validateInput(inputSelector, errorSelector, errorMessage) {
+               const input = form.querySelector(inputSelector);
+               const errorElement = form.querySelector(errorSelector);
+   
+               if (!input.value.trim()) {
+                   input.classList.add('is-invalid');
+                   errorElement.textContent = errorMessage;
+                   isValid = false;
+               } else {
+                   input.classList.remove('is-invalid');
+                   errorElement.textContent = '';
+               }
+           }
+   
+           // Title and subtitle validations
+           validateInput('input[name="title_en"]', '#title_en-error', 'This field is required.');
+           validateInput('input[name="title_ar"]', '#title_ar-error', 'This field is required.');
+           validateInput('input[name="sub_title_en"]', '#sub_title_en-error', 'This field is required.');
+           validateInput('input[name="sub_title_ar"]', '#sub_title_ar-error', 'This field is required.');
+   
+           // Image validation for Add form only
+           if (form.id === 'addApp_FeatureForm') {
+               const imageInput = form.querySelector('input[name="image"]');
+               const imageError = form.querySelector('#image-error');
+               const file = imageInput.files[0];
+   
+               if (!file) {
+                   imageInput.classList.add('is-invalid');
+                   imageError.textContent = 'An image is required.';
+                   isValid = false;
+               } else {
+                   const validImageTypes = [
+                       'image/jpeg', 'image/png', 'image/gif',
+                       'image/bmp', 'image/webp', 'image/tiff',
+                       'image/svg+xml', 'image/x-icon'
+                   ];
+                   if (!validImageTypes.includes(file.type)) {
+                       imageInput.classList.add('is-invalid');
+                       imageError.textContent = 'Allowed image types: JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO.';
+                       isValid = false;
+                   } else {
+                       imageInput.classList.remove('is-invalid');
+                       imageError.textContent = '';
+                   }
+               }
+           }
+   
+           return isValid;
+       }
+   
+       // Attach validation to Add form
+       const addApp_FeatureForm = document.getElementById('addApp_FeatureForm');
+       if (addApp_FeatureForm) {
+           addApp_FeatureForm.addEventListener('submit', function (event) {
+               if (!validateForm(addApp_FeatureForm)) {
+                   event.preventDefault();
+               }
+           });
+       }
+   
+       // Attach validation to Edit form
+       const editApp_FeatureForm = document.getElementById('editApp_FeatureForm');
+       if (editApp_FeatureForm) {
+           editApp_FeatureForm.addEventListener('submit', function (event) {
+               if (!validateForm(editApp_FeatureForm)) {
+                   event.preventDefault();
+               }
+           });
+       }
+   
+       // Modal: Edit App_Feature
+       const editApp_FeatureModal = document.getElementById('editApp_FeatureModal');
+       if (editApp_FeatureModal) {
+           editApp_FeatureModal.addEventListener('show.bs.modal', function (event) {
+               const button = event.relatedTarget;
+               const appFeatureData = {
+                   id: button.getAttribute('data-app_feature-id'),
+                   titleEn: button.getAttribute('data-app_feature-title_en'),
+                   titleAr: button.getAttribute('data-app_feature-title_ar'),
+                   subTitleEn: button.getAttribute('data-app_feature-sub_title_en'),
+                   subTitleAr: button.getAttribute('data-app_feature-sub_title_ar'),
+                   imageUrl: button.getAttribute('data-app_feature-image')
+               };
+   
+               const form = document.getElementById('editApp_FeatureForm');
+               form.action = `{% url 'app_feature_edit' 0 %}`.replace('0', appFeatureData.id);
+   
+               form.querySelector('#editApp_FeatureId').value = appFeatureData.id;
+               form.querySelector('#editTitle_en').value = appFeatureData.titleEn;
+               form.querySelector('#editTitle_ar').value = appFeatureData.titleAr;
+               form.querySelector('#editSub_Title_en').value = appFeatureData.subTitleEn;
+               form.querySelector('#editSub_Title_ar').value = appFeatureData.subTitleAr;
+   
+               const imagePreview = document.getElementById('editApp_FeatureImagePreview');
+               if (appFeatureData.imageUrl) {
+                   imagePreview.src = appFeatureData.imageUrl;
+                   imagePreview.style.display = 'block';
+               } else {
+                   imagePreview.style.display = 'none';
+               }
+           });
+       }
+   
+       // Modal: Delete App_Feature
+       const deleteApp_FeatureModal = document.getElementById('deleteApp_FeatureModal');
+       if (deleteApp_FeatureModal) {
+           deleteApp_FeatureModal.addEventListener('show.bs.modal', function (event) {
+               const button = event.relatedTarget;
+               const appFeatureId = button.getAttribute('data-app_feature-id');
+               const deleteForm = document.getElementById('deleteApp_FeatureForm');
+               deleteForm.action = `{% url 'app_feature_delete' 0 %}`.replace('0', appFeatureId);
+           });
+       }
+   
+       // Toggle action cards
+       document.querySelectorAll('.three-dots-menu').forEach(function (menu) {
+           menu.addEventListener('click', function (event) {
+               event.preventDefault();
+               const actionCard = menu.nextElementSibling;
+               actionCard.style.display = actionCard.style.display === 'block' ? 'none' : 'block';
+   
+               // Hide other cards
+               document.querySelectorAll('.action-card').forEach(function (card) {
+                   if (card !== actionCard) {
+                       card.style.display = 'none';
+                   }
+               });
+           });
+       });
+   
+       // Hide action cards when clicking outside
+       document.addEventListener('click', function (event) {
+           if (!event.target.closest('.action-menu-container')) {
+               document.querySelectorAll('.action-card').forEach(function (card) {
+                   card.style.display = 'none';
+               });
+           }
+       });
+   });
+</script>   
 {% endblock %}

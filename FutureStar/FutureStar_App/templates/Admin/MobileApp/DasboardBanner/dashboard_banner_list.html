@@ -173,7 +173,7 @@ Mobile Dashboard Banners
                {% csrf_token %}
                <div class="mb-3">
                   <label for="image" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="image" name="image">
+                  <input type="file" class="form-control" id="image" name="image" accept="image/jpeg, image/png, image/gif">
                   <div class="invalid-feedback" id="image-error"></div> <!-- Error message container -->
                </div>
                <button type="submit" class="btn btn-primary w-100">Add Dashboard Banners</button> <!-- Full-width button -->
@@ -183,6 +183,7 @@ Mobile Dashboard Banners
    </div>
 </div>
 
+<!-- Edit Dashboard Banners Modal -->
 <!-- Edit Dashboard Banners Modal -->
 <div class="modal fade" id="editDashboardBannersModal" tabindex="-1" aria-labelledby="editDashboardBannersModalLabel" aria-hidden="true">
    <div class="modal-dialog modal-dialog-centered modal-sm modal-md"> <!-- Adjust dialog size for responsiveness -->
@@ -197,8 +198,9 @@ Mobile Dashboard Banners
                <input type="hidden" id="editDashboardBannersId" name="id">
                <div class="mb-3">
                   <label for="editImage" class="form-label">Image</label>
-                  <input type="file" class="form-control" id="editImage" name="image">
+                  <input type="file" class="form-control" id="editImage" name="image" accept="image/jpeg, image/png, image/gif">
                   <img id="editDashboardBannersPreview" style="width: 100px; margin-top: 10px;" alt="Preview">
+                  <div class="invalid-feedback" id="edit-image-error"></div> <!-- Error message container -->
                </div>
                <button type="submit" class="btn btn-primary w-100">Update Dashboard Banners</button> <!-- Full-width button -->
             </form>
@@ -206,6 +208,7 @@ Mobile Dashboard Banners
       </div>
    </div>
 </div>
+
 
 <!-- Delete Dashboard Banners Modal -->
 <div class="modal fade" id="deleteDashboardBannersModal" tabindex="-1" aria-labelledby="deleteDashboardBannersModalLabel" aria-hidden="true">
@@ -237,27 +240,27 @@ Mobile Dashboard Banners
 <!-- Plugins JS Ends-->
 <script>
       document.addEventListener("DOMContentLoaded", function () {
-      var editModal = document.getElementById("editDashboardBannersModal");
-      if (editModal) {
-         editModal.addEventListener("show.bs.modal", function (event) {
-               var button = event.relatedTarget; // Button that triggered the modal
-               var bannerId = button.getAttribute("data-dashboardbanners-id");
-               var bannerImage = button.getAttribute("data-dashboardbanners-image"); // Correct attribute name
-               var form = document.getElementById("editDashboardBannersForm");
-               form.action = "{% url 'dashboard_banner_edit' 0 %}".replace("0", bannerId);
-               form.querySelector("#editDashboardBannersId").value = bannerId;
+    var editModal = document.getElementById("editDashboardBannersModal");
+    if (editModal) {
+        editModal.addEventListener("show.bs.modal", function (event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var bannerId = button.getAttribute("data-dashboardbanners-id");
+            var bannerImage = button.getAttribute("data-dashboardbanners-image"); // Correct attribute name
+            var form = document.getElementById("editDashboardBannersForm");
+            form.action = "{% url 'dashboard_banner_edit' 0 %}".replace("0", bannerId);
+            form.querySelector("#editDashboardBannersId").value = bannerId;
 
-               var imagePreview = document.getElementById("editDashboardBannersPreview"); // Correct ID
-               if (bannerImage) {
-                  imagePreview.src = bannerImage;
-                  imagePreview.style.display = "block";
-               } else {
-                  imagePreview.style.display = "none";
-               }
-         });
-      }
+            var imagePreview = document.getElementById("editDashboardBannersPreview"); // Correct ID
+            if (bannerImage) {
+                imagePreview.src = bannerImage;
+                imagePreview.style.display = "block";
+            } else {
+                imagePreview.style.display = "none";
+            }
+        });
+    }
 
-    // Delete Partners Modal
+    // Delete Dashboard Banners Modal
     var deleteDashboardBannersModal = document.getElementById('deleteDashboardBannersModal');
     if (deleteDashboardBannersModal) {
         deleteDashboardBannersModal.addEventListener('show.bs.modal', function(event) {
@@ -269,39 +272,53 @@ Mobile Dashboard Banners
     }
 });
 
-// Form validation for Add and Edit Partners modals
+// Form validation for Add and Edit Banners modals
 function validateForm(form) {
-  
     var image = form.querySelector('input[name="image"]');
     var isValid = true;
+    var errorContainer = form.querySelector('.invalid-feedback'); // Default to form's error container
 
-   
-    // Image validation (only for Add Partners)
-    if (form.id === 'addDashboardBannersForm' && image.files.length === 0) {
+    // Check if it's the edit form and use the edit-specific error container
+    if (form.id === 'editDashboardBannersForm') {
+        errorContainer = document.getElementById('edit-image-error'); // Use the edit-specific error container
+    }
+
+    // Check if the file is an image
+    if (image.files.length === 0) {
         image.classList.add('is-invalid');
-        document.getElementById('image-error').textContent = 'An image is required.';
+        errorContainer.textContent = 'An image is required.';
         isValid = false;
     } else {
-        image.classList.remove('is-invalid');
-        document.getElementById('image-error').textContent = '';
+        var file = image.files[0];
+        // Only allow image files
+        if (!file.type.startsWith('image/')) {
+            image.classList.add('is-invalid');
+            errorContainer.textContent = 'Only image files are allowed (JPEG, PNG, GIF).';
+            isValid = false;
+        } else {
+            image.classList.remove('is-invalid');
+            errorContainer.textContent = '';
+        }
     }
 
     return isValid;
 }
 
+// Handle form submissions for Add and Edit forms
 document.getElementById('addDashboardBannersForm').addEventListener('submit', function(event) {
     var form = event.target;
     if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
+        event.preventDefault(); // Prevent form submission if validation fails
     }
 });
 
 document.getElementById('editDashboardBannersForm').addEventListener('submit', function(event) {
     var form = event.target;
     if (!validateForm(form)) {
-        event.preventDefault(); // Prevent form submission
+        event.preventDefault(); // Prevent form submission if validation fails
     }
 });
+
 
 // Toggle the visibility of the action card
 document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
@@ -327,6 +344,8 @@ document.addEventListener('click', function(event) {
         });
     }
 });
+
+
 </script>
 
 {% endblock %}

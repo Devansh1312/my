@@ -386,13 +386,46 @@ document.addEventListener('click', function(event) {
 $(document).ready(function () {
     function validateForm(form) {
         let isValid = true;
-        
+
         $(form).find('textarea, input[type="file"]').each(function () {
             const $this = $(this);
             const errorMessageId = $this.attr('id') + '-error';
             const $errorMessage = $('#' + errorMessageId);
 
-            if ($this.attr('name') !== 'image' || form.id === 'addNewsForm') {
+            if ($this.attr('type') === 'file') {
+                // Validate file input
+                const file = $this[0].files[0];
+                if (form.id === 'addNewsForm' && !file) {
+                    $this.addClass('is-invalid');
+                    $errorMessage.text('Please select an image.').css('color', 'red');
+                    isValid = false;
+                } else if (file) {
+                    // List of valid image MIME types
+                    const validImageTypes = [
+                        'image/jpeg',  // .jpg, .jpeg
+                        'image/png',   // .png
+                        'image/gif',   // .gif
+                        'image/bmp',   // .bmp
+                        'image/webp',  // .webp
+                        'image/tiff',  // .tif, .tiff
+                        'image/svg+xml', // .svg
+                        'image/x-icon', // .ico
+                    ];
+
+                    if (!validImageTypes.includes(file.type)) {
+                        $this.addClass('is-invalid');
+                        $errorMessage.text('Allowed image types: JPG, PNG, GIF, BMP, WEBP, TIFF, SVG, ICO.').css('color', 'red');
+                        isValid = false;
+                    } else {
+                        $this.removeClass('is-invalid');
+                        $errorMessage.text('');
+                    }
+                } else {
+                    $this.removeClass('is-invalid');
+                    $errorMessage.text('');
+                }
+            } else if ($this.attr('name') !== 'image' || form.id === 'addNewsForm') {
+                // Validate textareas and other inputs
                 if ($this.val().trim() === '') {
                     $this.addClass('is-invalid');
                     $errorMessage.text('This field is required.').css('color', 'red');
@@ -403,9 +436,22 @@ $(document).ready(function () {
                 }
             }
         });
-        
+
         return isValid;
     }
+
+    // Bind validation to forms
+    $('#addNewsForm').on('submit', function (e) {
+        if (!validateForm(this)) {
+            e.preventDefault(); // Prevent form submission if invalid
+        }
+    });
+
+    $('#editNewsForm').on('submit', function (e) {
+        if (!validateForm(this)) {
+            e.preventDefault(); // Prevent form submission if invalid
+        }
+    });
 
     // Add form validation
     $('#addNewsForm').on('submit', function (event) {
