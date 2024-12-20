@@ -5002,8 +5002,8 @@ def savehomedetail(request):
                     for i in range(int(feature_count) + 1):
 
                         dom = i + 1
-                        image = 0
-                     
+                        image = None  # Initialize as None, not 0
+
                         feature_title_en = request.POST.get(
                             "features_section_form_title_en_{}".format(str(dom))
                         )
@@ -5018,36 +5018,29 @@ def savehomedetail(request):
                         )
                         feature_field = request.POST.get("id")
                         unique_id = request.POST.get("uid_{}".format(dom))
-                   
+
                         existing_record = cms_home_dynamic_field.objects.filter(
                             field_id=unique_id
                         ).first()
                        
-
+                       
                         if "image_{}".format(str(dom)) in request.FILES:
 
                             image = request.FILES.get("image_{}".format(str(dom)), None)
-                      
 
-                            if image:
+                            if image and hasattr(image, "name"):
                                 try:
-                                    save_path = os.path.join(
-                                        settings.MEDIA_ROOT, "cmspages", image.name
-                                    )
-                                    os.makedirs(
-                                        os.path.dirname(save_path), exist_ok=True
-                                    )
+                                    save_path = os.path.join(settings.MEDIA_ROOT, "cmspages", image.name)
+                                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
                                     # Save the file
                                     with open(save_path, "wb+") as destination:
                                         for chunk in image.chunks():
                                             destination.write(chunk)
-                                            # imageName.append(heading_banner.name)
-                                            # savenewsdetail.heading_banner = heading_banner
-
                                 except Exception as e:
-                                    response_data = {"status": "error", "message": "in home 71 page something wrong"}
-
+                                    response_data = {"status": "error", "message": "File saving failed."}
+                            else:
+                                response_data = {"status": "error", "message": "Invalid or missing image file."}
 
                         if existing_record:
                             # Update the existing record
@@ -5060,7 +5053,7 @@ def savehomedetail(request):
                                 existing_record.images = image
 
                             existing_record.save()  # Save the updated record
-                          
+
                         else:
                             savehomedynamcidetail = cms_home_dynamic_field(
                                 field_id=unique_id,
@@ -5138,7 +5131,8 @@ def savehomedetail(request):
                         delete_record.delete()
 
                     else:
-                        pass
+                     response_data = {"status": "error", "message": "while delete in home page something went wrong"}
+
                 savehomedetail.save()
 
                 deletedField = request.POST.get("deletedField")
@@ -5171,7 +5165,7 @@ def savehomedetail(request):
                             ).delete()
                         )
                 else:
-                    pass
+                    response_data = {"status": "error", "message": "in home page something wrong"}
 
                 if "home_heading_section_image_1" in request.FILES:
 
@@ -5192,9 +5186,10 @@ def savehomedetail(request):
                                     savehomedetail.heading_image_1 = image_1
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in 7895 home page something wrong"}
+                            response_data = {"status": "error", "message": "in home heading section image 1 home page something wrong"}
                 else:
-                    pass
+                    response_data = {"status": "error", "message": "in home heading section image 1 home page something wrong"}
+
 
                 if "home_heading_section_image_2" in request.FILES:
 
@@ -5216,9 +5211,10 @@ def savehomedetail(request):
                                     savehomedetail.heading_image_2 = image_2
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in 49905645 home page something wrong"}
+                            response_data = {"status": "error", "message": "in home heading section image 2 home page something wrong"}
                 else:
-                    pass
+                     response_data = {"status": "error", "message": "in home heading section image 2 home page something wrong"}
+
 
                 if "home_heading_section_image_3" in request.FILES:
 
@@ -5240,10 +5236,11 @@ def savehomedetail(request):
                                     savehomedetail.heading_image_3 = image_3
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in 78978 home page something wrong"}
+                            response_data = {"status": "error", "message": "in home heading section image3 home page something wrong"}
 
                 else:
-                    pass
+                    response_data = {"status": "error", "message": "in home heading section image3 home page something wrong"}
+                
 
                 if "home_heading_section_icon" in request.FILES:
 
@@ -5265,9 +5262,10 @@ def savehomedetail(request):
                                     savehomedetail.sub_heading_logo = image_4
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in 088690 home page something wrong"}
+                            response_data = {"status": "error", "message": "in home heading section icon home page something wrong"}
                 else:
-                    pass
+                    response_data = {"status": "error", "message": "in home heading section icon home page something wrong"}
+
 
                 if "home_heading_section_2_icon_1" in request.FILES:
 
@@ -5289,10 +5287,11 @@ def savehomedetail(request):
                                     savehomedetail.sub_heading_icon_1 = image_5
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in 0890 home page something wrong"}
+                            response_data = {"status": "error", "message": "in home heading section 2 icon 1 home page something wrong"}
 
                 else:
-                    pass
+                      response_data = {"status": "error", "message": "in home heading section 2 icon 1 home page something wrong"}
+
 
                 if "home_heading_section_2_icon_2" in request.FILES:
 
@@ -5314,10 +5313,11 @@ def savehomedetail(request):
                                     savehomedetail.sub_heading_icon_2 = image_6
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home 356 page something wrong"}
+                            response_data = {"status": "error", "message": "in home heading section 2 icon 2 page something wrong"}
                            
                 else:
-                    pass
+                    response_data = {"status": "error", "message": "in home heading section 2 icon 2 page something wrong"}
+
 
                 if "empower_section_icon" in request.FILES:
 
@@ -5339,9 +5339,10 @@ def savehomedetail(request):
                                     savehomedetail.section_2_logo = image_7
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home 265 page something wrong"}
+                            response_data = {"status": "error", "message": "in home empower section icon  something wrong"}
                 else:
-                    pass
+                   response_data = {"status": "error", "message": "in home empower section icon  something wrong"}
+
 
                 if "empower_section_background_image" in request.FILES:
 
@@ -5365,10 +5366,11 @@ def savehomedetail(request):
                                     savehomedetail.section_2_background = image_8
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home 65 page something wrong"}
+                            response_data = {"status": "error", "message": "in home empower section background image  something wrong"}
                             
                 else:
-                    pass
+                     response_data = {"status": "error", "message": "in home empower section background image  something wrong"}
+
 
                 if "feature_image_1" in request.FILES:
 
@@ -5390,10 +5392,12 @@ def savehomedetail(request):
                                     savehomedetail.section_3_feature_icons = image_9
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in 87 home page something wrong"}
+                            response_data = {"status": "error", "message": "in feature image 1 home page something wrong"}
 
                 else:
-                    pass
+                     response_data = {"status": "error", "message": "in feature image 1 something went wrong"}
+
+    
 
                 if "spirit_icon_e" in request.FILES:
 
@@ -5415,10 +5419,11 @@ def savehomedetail(request):
                                     savehomedetail.section_4_image = image_10
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home re page something wrong"}
+                            response_data = {"status": "error", "message": "in spirit icon e something wrong"}
                          
                 else:
-                    pass
+                     response_data = {"status": "error", "message": "spirit icon e something wrong"}
+
 
                 if "spirit_background_image" in request.FILES:
 
@@ -5440,10 +5445,11 @@ def savehomedetail(request):
                                     savehomedetail.section_4_background = image_11
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home page something wrong"}
+                            response_data = {"status": "error", "message": "spirit background image something wrong"}
                            
                 else:
-                    pass
+                    response_data = {"status": "error", "message": "spirit background image something wrong"}
+
 
                 if "achivements_image_e" in request.FILES:
 
@@ -5465,10 +5471,10 @@ def savehomedetail(request):
                                     savehomedetail.section_5_image = image_12
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home 4 page something wrong"}
+                            response_data = {"status": "error", "message": "something went wrong achivements image e"}
                            
                 else:
-                    pass
+                    print("achivements_image_e")
 
                 if "testomonial_icon" in request.FILES:
 
@@ -5490,16 +5496,18 @@ def savehomedetail(request):
                                     savehomedetail.section_7_logo = image_13
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home 1 page something wrong"}
+                             response_data = {"status": "error", "message": "something went wrong testomonial icon"}
+
 
                            
                 else:
-                    pass
+                    print("testomonial_icon")
 
                 if "testomonial_image_1" in request.FILES:
 
                     image_14 = request.FILES.get("testomonial_image_1", None)
                  
+                    
                     if image_14:
                         try:
                             save_path = os.path.join(
@@ -5516,16 +5524,18 @@ def savehomedetail(request):
                                     savehomedetail.section_7_image = image_14
 
                         except Exception as e:
-                            response_data = {"status": "error", "message": "in home 2 page something wrong"}
+                            response_data = {"status": "error", "message": "something went wrong testomonial image 1"}
 
                 else:
-                    pass
+                    print("testomonial_image_1")
                 # dom = "True"
                 savehomedetail.save()
                 messages.success(request, "Home Page Updated Successfully")
 
             except Exception as e:
-                messages.error(request, "invalid")
+                print(str(e))
+                response_data = {"status": "error", "message": "in home page something went wrong"}
+
 
             response_data = {
                 "status": "success",
@@ -5541,7 +5551,7 @@ def savehomedetail(request):
             return JsonResponse(response_data)
 
     except Exception as e:
-        response_data = {"status": "error", "message": "in home page 3 something wrong"}
+        response_data = {"status": "error", "message": "in home page something went wrong"}
 
         return JsonResponse(response_data)
 
