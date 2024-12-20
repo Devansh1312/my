@@ -57,33 +57,7 @@
 {% endblock %}
 
 {% block script %}
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-    function handleCredentialResponse(response) {
-        const googleToken = response.credential;
-        document.getElementById('login_type').value = 2;  
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'google_token';
-        input.value = googleToken;
-        document.getElementById('teamForm').appendChild(input);
-        document.getElementById('teamForm').submit();
-    }
-
-    window.onload = function () {
-        google.accounts.id.initialize({
-            client_id: "383301504241-ldk6vs8db27e4ec0culn07a58cjt90jp.apps.googleusercontent.com",
-            callback: handleCredentialResponse
-        });
-        google.accounts.id.renderButton(
-            document.getElementById('googleLoginBtn'),
-            { theme: 'outline', size: 'large' }
-        );
-    };
-
     $(document).ready(function () {
         $('#teamForm').on('submit', function (e) {
             let isValid = true;
@@ -124,6 +98,7 @@
         right: 15px;
         transform: translateY(-50%);
         cursor: pointer;
+        color: black;
     }
     .error-message {
         font-size: 12px;

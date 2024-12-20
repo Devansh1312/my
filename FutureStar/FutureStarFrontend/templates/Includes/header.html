@@ -29,11 +29,11 @@
                                     <input type="hidden" name="language" value="">
                                 </form>
 
-                                <!-- Language Select Dropdown -->
-                                <select class="selectLanguage">
-                                    <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
-                                    <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
-                                </select>                                
+                               <!-- Language Select Dropdown -->
+                               <select class="selectLanguage">
+                                <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
+                                <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
+                            </select>                                      
 
                                 {% if user.is_authenticated %}
 
@@ -172,7 +172,7 @@
                     {% endif %}
 
                      <!-- Select Language -->
-                     <select class="selectLanguage">
+                    <select class="selectLanguage">
                         <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
                         <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
                     </select>
@@ -237,8 +237,13 @@
         // Handle language change
         $('.selectLanguage').change(function() {
             var selectedLanguage = $(this).val();
-            $('input[name="language"]').val(selectedLanguage);
-            $('#language-form').submit();
+            var currentUrl = new URL(window.location.href);
+
+            // Update the 'language' parameter in the URL
+            currentUrl.searchParams.set('Language', selectedLanguage);
+
+            // Reload the page with the updated URL
+            window.location.href = currentUrl.toString();
         });
     });
 </script>

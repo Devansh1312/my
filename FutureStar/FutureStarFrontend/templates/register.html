@@ -89,8 +89,13 @@
                         <div class="col-md-12">
                             <div class="d-flex mb-30 justify-content-between">
                                 <label>
-                                    <input type="checkbox" required /> You agree to our Terms and have read and acknowledge the Privacy Policy
-                                </label>
+                                    <input type="checkbox" required />
+                                    {% if current_language == 'en' %}
+                                        I agree to the <a href="{% url 'terms-and-conditions' %}">Terms & Conditions</a> and acknowledge that I have read the <a href="{% url 'privacy-policy' %}">Privacy Policy</a>.
+                                    {% elif current_language == 'ar' %}
+                                        أوافق على <a href="{% url 'terms-and-conditions' %}">الشروط والأحكام</a> وأقر بأنني قرأت <a href="{% url 'privacy-policy' %}">سياسة الخصوصية</a>.
+                                    {% endif %}
+                                </label>                                                               
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -108,7 +113,6 @@
 {% endblock %}
 
 {% block script %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function validateForm() {
         let valid = true;

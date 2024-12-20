@@ -103,6 +103,7 @@ def get_user_data(user, request):
 
     return {
         'id': user.id,
+        'created_by_id':user.id,
         'followers_count': followers_count,
         'following_count': following_count,
         'creator_type': 1,
@@ -1002,7 +1003,15 @@ class EditProfileAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        user = request.user
+        # Retrieve the user using 'created_by_id' from query parameters
+        created_by_id = request.query_params.get('created_by_id')
+        if not created_by_id:
+            return Response({
+                'status': 0,
+                'message': _('created_by_id parameter is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(User, id=created_by_id)
         
         return Response({
             'status': 1,
