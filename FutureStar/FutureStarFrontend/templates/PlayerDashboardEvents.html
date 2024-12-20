@@ -45,7 +45,9 @@
             <div class="col-lg-3">
                 <div class="sidebar-wrapper wow fadeInUp delay-0-5s animated">
                     <div class="user-info">
-                        <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png'%}" alt=""></div>
+                        <div class="user-img-wrapper">
+                            <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'frontend/assets/images/success-stories/player-1.png' %}{% endif %}" alt="">
+                        </div>
                         <div>
                             <h5 class="user-name">{{ user.username }}</h6>
                             <p class="user-desi">
