@@ -1353,7 +1353,6 @@ class LoginPage(View):
             if user:
                 if user.is_active:
                     login(request, user)
-                    user.device_type = "Website"
                     user.last_login = timezone.now()
                     user.save()
                     messages.success(request, "Login successful!")
@@ -1585,7 +1584,6 @@ class OTPVerificationView(View):
             phone=phone,
             email=email,  # Make sure to handle email properly
             role_id=5,
-            device_type="web"
         )
         user.set_password(password)  # Use the password stored in the session
         user.save()

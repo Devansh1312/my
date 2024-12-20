@@ -2311,10 +2311,9 @@ class Team_MembersListView(LoginRequiredMixin, View):
             self.template_name,
             {
                 "team_members": team_members,
-                "breadcrumb": {"child": "Team Members List"},
+                "breadcrumb": {"child": "Team Professionals"},
             },
         )
-
 
 @method_decorator(user_role_check, name="dispatch")
 class Team_MembersCreateView(View):
