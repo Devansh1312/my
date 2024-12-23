@@ -1436,7 +1436,8 @@ class PostCreateAPIView(APIView):
                 image = request.FILES["image"]
 
                 # Determine file extension based on media_type
-                file_extension = "jpg" if media_type == "1" else "mp4" if media_type == "2" else image.name.split('.')[-1]
+                file_extension = image.name.split('.')[-1]  # Always use the extension from the uploaded file
+
 
                 # Generate unique file name
                 unique_suffix = get_random_string(8)

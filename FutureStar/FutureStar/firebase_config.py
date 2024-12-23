@@ -77,5 +77,6 @@ def send_push_notification(device_token, title, body, device_type, data=None):
         return response
 
     except Exception as e:
+        pass
         logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
         raise
