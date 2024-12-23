@@ -87,6 +87,14 @@
                   </ul>
                </li>
                <li class="sidebar">
+                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'event_list' %}">
+                     <svg class="stroke-icon">
+                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-sample-page"></use>
+                     </svg>
+                     <span class="lan">Events</span>
+                  </a>
+               </li>
+               <li class="sidebar">
                   <a class="sidebar-link sidebar-title link-nav" href="{% url 'team_list' %}">
                      <svg class="stroke-icon">
                         <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>

@@ -103,6 +103,14 @@ urlpatterns = [
     path('eventtype/create/', EventTypeCreateView.as_view(), name='eventtype_create'),
     path('eventtype/update/<int:pk>/', EventTypeUpdateView.as_view(), name='eventtype_update'),
     path('eventtype/delete/<int:pk>/', EventTypeDeleteView.as_view(), name='eventtype_delete'),
+
+
+    # Events
+    path('events/', EventListView.as_view(), name='event_list'),
+    path('events_detail/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
+    
+
+    
     
    # CMS Pages URLS
     path('cmspages/',CMSPages.as_view(),name = "cmspages_urls"),

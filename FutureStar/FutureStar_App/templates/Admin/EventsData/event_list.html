@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}
+Manager List
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{ breadcrumb.child }}</h3>
+            </div>
+            <div class="col-6"></div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="table table-bordered" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Event Organizer</th>
+                              <th>Name</th>
+                              <th>Type</th>
+                              <th>Date</th>
+                            
+                            
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for event in events %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ event.event_organizer.username }}</td>
+                              <td>{{ event.event_name }}</td>
+                              <td>{{ event.event_type.name_en }}</td> 
+                              <td>{{ event.event_date }}</td>
+                              
+                        
+                              
+                              <td>
+                                 <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                    <!-- Three dots menu trigger -->
+                                    <a href="#" class="three-dots-menu" onclick="toggleMenu(this)" style="display: flex; align-items: center; justify-content: center;">
+                                       <i data-feather="more-vertical"></i> <!-- Icon for three dots -->
+                                    </a>
+                              
+                                    <!-- Action card for menu items -->
+                                     <!-- Action card for menu items -->
+                                     <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                            <!-- View action -->
+                                            <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                <a href="#" class="view-details" data-id="{{ event.id }}" onclick="submitViewForm(event, '{{ event.id }}')">View</a>
+                                                <form id="view-form-{{ event.id }}" method="post" action="{% url 'event_detail' event.id %}" style="display: none;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                 </div>
+                              </td>
+                              
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Add responsive styles -->
+<style>
+   @media (max-width: 767px) {
+      .table-responsive {
+         overflow-x: auto;
+      }
+
+      .action-card {
+         width: 120px;
+      }
+
+      .table th, .table td {
+         padding: 8px;
+         font-size: 12px;
+      }
+
+      .table th {
+         text-align: left;
+      }
+
+      .three-dots-menu {
+         font-size: 20px;
+         display: block;
+         margin: 0 auto;
+         padding: 10px;
+         cursor: pointer;
+      }
+
+      /* Add styles for the status column */
+      .text-success {
+         color: green;
+         font-weight: bold;
+      }
+
+      .text-danger {
+         color: red;
+         font-weight: bold;
+      }
+
+      /* Make the action menu appear properly */
+      .action-menu-container {
+         display: block;
+         position: relative;
+      }
+   }
+
+   /* Additional styling for tablet and larger screens */
+   @media (min-width: 768px) {
+      .three-dots-menu {
+         font-size: 18px;
+      }
+   }
+</style>
+
+{% endblock %}
+
+
+{% block script %}
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+
+
+<script>
+
+   
+
+   // Toggle the visibility of the action card
+   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+       menu.addEventListener('click', function(event) {
+           event.preventDefault();
+           var actionCard = menu.nextElementSibling;
+           actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+           // Close other open action cards
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                   card.style.display = 'none';
+               }
+           });
+       });
+   });
+
+
+   // View User Details
+document.querySelectorAll('.view-details').forEach(function(link) {
+   link.addEventListener('click', function(e) {
+       e.preventDefault();
+       var EventId = this.getAttribute('data-id');
+       var form = document.getElementById('view-form-' + EventId);
+       form.submit();
+   });
+});
+
+   // Hide action card if clicking outside
+   document.addEventListener('click', function(event) {
+       var isClickInside = event.target.closest('.action-menu-container');
+       if (!isClickInside) {
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+           });
+       }
+   });
+</script>
+
+
+{% endblock %}

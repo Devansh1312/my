@@ -72,10 +72,10 @@
                                                         <li style="padding: 8px 12px;">
                                                             <a style="font-size: small" href="#" data-bs-toggle="modal" data-bs-target="#editReportModal" data-report-id="{{ report_item.id }}" data-report-title_en="{{ report_item.title_en }}" data-report-content_en="{{ report_item.content_en }}" data-report-title_ar="{{ report_item.title_ar }}" data-report-content_ar="{{ report_item.content_ar }}"> Edit </a>
                                                         </li>
-                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee;">
+                                                        <!-- <li style="padding: 8px 12px; border-top: 1px solid #eee;">
                                                             <a style="font-size: small" href="#" data-bs-toggle="modal" data-bs-target="#deleteReportModal" data-app_feature-id="{{ report_item.id }}">
                                                              Delete </a>
-                                                        </li>
+                                                        </li> -->
                                                     </ul>
                                                 </div>
                                             </div>
@@ -210,7 +210,7 @@
         </div>
 
         <!-- Delete Report Modal -->
-        <div class="modal fade" id="deleteReportModal" tabindex="-1" aria-labelledby="deleteReportModalLabel" aria-hidden="true">
+        <!-- <div class="modal fade" id="deleteReportModal" tabindex="-1" aria-labelledby="deleteReportModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -227,7 +227,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div> 
 {% endblock %} {% block script %} <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
@@ -257,16 +257,8 @@
                 form.querySelector("#editContent_ar").value = reportContent_ar || "";
             });
         }
-        // Delete Report Modal
-        var deleteReportModal = document.getElementById("deleteReportModal");
-        if (deleteReportModal) {
-            deleteReportModal.addEventListener("show.bs.modal", function(event) {
-                var button = event.relatedTarget;
-                var reportId = button.getAttribute("data-report-id");
-                var deleteForm = document.getElementById("deleteReportForm");
-                deleteForm.action = "{% url 'report_delete' 0 %}".replace("0", reportId);
-            });
-        }
+       
+       
     });
     // View Report Modal
     document.querySelectorAll(".view-report-btn").forEach(function(button) {

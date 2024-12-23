@@ -1826,6 +1826,93 @@ class EventTypeListView(LoginRequiredMixin, View):
         )
 
 
+
+################################## Events Crud #######################################
+
+########### Event List #################
+
+@method_decorator(user_role_check, name="dispatch")
+class EventListView(LoginRequiredMixin, View):
+    template_name = "Admin/EventsData/event_list.html"
+
+    def get(self, request):
+        events = Event.objects.all()
+     
+         
+        return render(
+            request,
+            self.template_name,
+            {
+                "events": events,
+                "breadcrumb": {"child": "Events List"},
+            },
+        )
+
+
+############ Event Detail ###################
+@method_decorator(user_role_check, name="dispatch")
+class EventDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/EventsData/event_detail.html"
+
+    def get_event_creator_username(self, event):
+        """Fetch the creator's username for the event."""
+        if event.created_by_id:  # Check if created_by_id exists
+            try:
+                creator = Team.objects.get(id=event.created_by_id)
+                return creator.team_name
+            except Team.DoesNotExist:
+                return None
+        return None
+
+    def get(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        event.creator_user = self.get_event_creator_username(event)
+
+        # Fetch event bookings
+        bookings = EventBooking.objects.filter(event=event)
+        
+        # Add usernames to bookings
+        for booking in bookings:
+            try:
+                user = User.objects.get(id=booking.created_by_id)
+                booking.username = user.username  # Add username to each booking instance
+            except User.DoesNotExist:
+                booking.username = None
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "event": event,
+                "bookings": bookings,  # Pass booking data to the template
+                "breadcrumb": {"child": f"Event Details - {event.event_name}"},
+            },
+        )
+
+    def post(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        event.creator_user = self.get_event_creator_username(event)
+
+        # Fetch event bookings
+        bookings = EventBooking.objects.filter(event=event)
+        
+        # Add usernames to bookings
+        for booking in bookings:
+            try:
+                user = User.objects.get(id=booking.created_by_id)
+                booking.username = user.username  # Add username to each booking instance
+            except User.DoesNotExist:
+                booking.username = None
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "event": event,
+                "bookings": bookings,  # Pass booking data to the template
+                "breadcrumb": {"child": f"Event Details - {event.event_name}"},
+            },
+        )
 ######################################################### News Module ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class NewsListView(LoginRequiredMixin, View):
