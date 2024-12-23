@@ -110,7 +110,18 @@
               });
           {% endfor %}
       });
-  </script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Set default language from localStorage or 'en' by default
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
+
+        // On language change, update localStorage
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
 {% endif %}
 
   {% block script %} {% endblock %}

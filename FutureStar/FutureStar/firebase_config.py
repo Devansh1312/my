@@ -35,48 +35,54 @@ def send_push_notification(device_token, title, body, device_type, data=None):
             })
 
         # Android configuration (optional, only used for Android devices)
-        android_config = (
-            messaging.AndroidConfig(
-                priority="high",
-                data={str(k): str(v) for k, v in data.items()},  # Ensure all keys and values are strings
-            )
-            if device_type in [1, "1"]
-            else None
-        )
+        android_config = None
+        try:
+            if device_type in [1, "1"]:
+                android_config = messaging.AndroidConfig(
+                    priority="high",
+                    data={str(k): str(v) for k, v in data.items()},  # Ensure all keys and values are strings
+                )
+        except Exception as e:
+            logging.error(f"Error in Android config: {str(e)}", exc_info=True)
 
         # iOS configuration (only used for iOS devices)
-        ios_config = (
-            messaging.APNSConfig(
-                payload=messaging.APNSPayload(
-                    aps=messaging.Aps(
-                        alert=messaging.ApsAlert(
-                            title=title,  # Set the title for the notification
-                            body=body     # Set the body for the notification
+        ios_config = None
+        try:
+            if device_type in [2, "2"]:
+                ios_config = messaging.APNSConfig(
+                    payload=messaging.APNSPayload(
+                        aps=messaging.Aps(
+                            alert=messaging.ApsAlert(
+                                title=title,  # Set the title for the notification
+                                body=body     # Set the body for the notification
+                            ),
+                            content_available=True,
                         ),
-                        content_available=True,
-                    ),
-                    custom_data={str(k): str(v) for k, v in (data or {}).items()},  # Ensure all keys and values are strings
+                        custom_data={str(k): str(v) for k, v in (data or {}).items()},  # Ensure all keys and values are strings
+                    )
                 )
-            )
-            if device_type in [2, "2"]
-            else None
-        )
+        except Exception as e:
+            logging.error(f"Error in iOS config: {str(e)}", exc_info=True)
 
         # Creating the message with either Android or iOS configuration
-        message = messaging.Message(
-            token=device_token,
-            android=android_config,
-            apns=ios_config,
-        )
+        message = None
+        try:
+            message = messaging.Message(
+                token=device_token,
+                android=android_config,
+                apns=ios_config,
+            )
+        except Exception as e:
+            logging.error(f"Error creating message: {str(e)}", exc_info=True)
 
         # Send the notification
-        response = messaging.send(message)
-
-        # Log and return the response
-        logging.info(f"Firebase response: {response}")
-        return response
+        try:
+            if message:
+                response = messaging.send(message)
+                logging.info(f"Firebase response: {response}")
+                return response
+        except Exception as e:
+            logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 
     except Exception as e:
-        pass
-        logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
-        raise
+        logging.error(f"Unexpected error in send_push_notification: {str(e)}", exc_info=True)

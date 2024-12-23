@@ -24,30 +24,13 @@
 }
 
 </style>
-
 <section class="services-area-six pt-150 pb-100">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-7 col-lg-9 col-md-11">
-                <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
-                    {% lang cmsdata current_language "heading" as heading %}
-                    <h2>
-                        {{heading}}
-                    </h2>
-                    {% lang cmsdata current_language "heading_title" as heading_title %}
-                    <h4>
-                        {{heading_title}}
-                    </h4>
-                </div>
-            </div>                
-        </div>
         <div class="row">
             <div class="col-lg-3">
                 <div class="sidebar-wrapper wow fadeInUp delay-0-5s animated">
                     <div class="user-info">
-                        <div class="user-img-wrapper">
-                            <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'frontend/assets/images/success-stories/player-1.png' %}{% endif %}" alt="">
-                        </div>
+                        <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" alt=""></div>
                         <div>
                             <h5 class="user-name">{{ user.username }}</h6>
                             <p class="user-desi">
@@ -57,23 +40,47 @@
                         </div>
                     </div>
                     <ul>
-                        <li><a href="{% url 'player-dashboard' %}" class="sidebar-link"><span><i class="fas fa-th-large"></i></span> Dashboard</a></li>
-                    
-                        <!-- Team Dropdown -->
-                        <li class="sidebar-dropdown">
-                            <a href="#" class="sidebar-link"><span><i class="fas fa-users"></i></span> Team</a>
-                            <ul class="sidebar-submenu">
-                                <li><a href="{% url 'index' %}" class="sidebar-link">Team Page</a></li>
-                                <li><a href="{% url 'index' %}" class="sidebar-link">Teams</a></li>
-                            </ul>
+                        <li>
+                            <a href="{% url 'player-dashboard' %}" class="sidebar-link">
+                                <span><i class="fas fa-th-large"></i></span> Dashboard
+                            </a>
                         </li>
-                    
-                        <li><a href="{% url 'index' %}" class="sidebar-link"><span><i class="fas fa-running"></i></span> Training</a></li>
-                        <li><a href="{% url 'player-dashboard-games' %}" class="sidebar-link"><span><i class="fas fa-trophy"></i></span> Games</a></li>
-                        <li><a href="{% url 'player-dashboard-events' %}" class="sidebar-link active"><span><i class="fas fa-calendar-check"></i></span> Events</a></li>
-                        <li><a href="{% url 'player-dashboard-fileds' %}" class="sidebar-link"><span><i class="fas fa-shield-alt"></i></span> Fields</a></li>
-                        <li><a href="{% url 'index' %}" class="sidebar-link"><span><i class="fas fa-sign-out-alt"></i></span> Logout</a></li>
-                    </ul>                    
+                        <li>
+                            <a href="#" class="sidebar-link dropbtn" onclick="myFunction()"><span><i class="fas fa-users"></i></span>
+                                Team
+                            </a>
+                            <!-- Submenu for "Team" -->
+                            <div id="myDropdown" class="dropdown-content">
+                              <a href="#home">Home</a>
+                              <a href="#about">About</a>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link">
+                                <span><i class="fas fa-futbol"></i></span> Training
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'player-dashboard-games' %}" class="sidebar-link">
+                                <span><i class="fas fa-trophy"></i></span> Games
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'player-dashboard-fileds' %}" class="sidebar-link">
+                                <span><i class="fas fa-shield-alt"></i></span> Fields
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'player-dashboard-events' %}" class="sidebar-link active">
+                                <span><i class="fas fa-calendar-check"></i></span> Events
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}" class="sidebar-link">
+                                <span><i class="fas fa-sign-out-alt"></i></span> Logout
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="col-lg-9">
@@ -109,28 +116,33 @@
                             </tbody>
                         </table>
                     </div>
-                </div>    
+                </div>  
             </div>
         </div>
     </div>
-   </section>
-
+</section>
 <!-- Blog Page Area end -->
 {% endblock %}
 
 {% block scriptcontent %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set default language from localStorage or 'en' by default
-        const currentLanguage = localStorage.getItem('language') || 'en';
-        document.getElementById('language-selector').value = currentLanguage;
+    function myFunction() {
+ document.getElementById("myDropdown").classList.toggle("show");
+}
 
-        // On language change, update localStorage
-        document.getElementById('change-language-btn').addEventListener('click', function() {
-            const selectedLanguage = document.getElementById('language-selector').value;
-            localStorage.setItem('language', selectedLanguage);
-        });
-    });
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+ if (!event.target.matches('.dropbtn')) {
+   var dropdowns = document.getElementsByClassName("dropdown-content");
+   var i;
+   for (i = 0; i < dropdowns.length; i++) {
+     var openDropdown = dropdowns[i];
+     if (openDropdown.classList.contains('show')) {
+       openDropdown.classList.remove('show');
+     }
+   }
+ }
+}
 </script>
 {% endblock %}
 
