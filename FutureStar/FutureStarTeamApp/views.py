@@ -919,12 +919,25 @@ class UserSearchView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
-        search_type = request.query_params.get('search_type')
+        # Get the phone parameter
         phone = request.query_params.get('phone')
+
+        # Return empty result if phone is not provided
+        if not phone:
+            return Response({
+                'status': 1, 
+                'message': _('No data found.'), 
+                "total_records": 0,
+                "total_pages": 1,
+                "current_page": 1,
+                'data': []
+                }, status=status.HTTP_200_OK)
+
+        search_type = request.query_params.get('search_type')
         branch_id = request.query_params.get('branch_id')  # Get branch_id from request
 
         # Check for valid search_type, comparing with string values
-        if search_type not in ['1', '2', '3','4']:  # Add '3' to support coaching staff search
+        if search_type not in ['1', '2', '3', '4']:  # Add '3' to support coaching staff search
             return Response({'status': 0, 'message': _('Invalid search type. Must be 1, 2, 3, or 4.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Initialize a queryset
@@ -934,20 +947,17 @@ class UserSearchView(APIView):
         if search_type == '1':
             users = User.objects.filter(role_id=5, is_deleted=False)
         ###### Search for Coaching Staff ##########
-        if search_type == '2':
+        elif search_type == '2':
             users = User.objects.filter(role_id=3, is_deleted=False)
         ####### Search For Medical Staff##################            
-        if search_type == '3':
+        elif search_type == '3':
             users = User.objects.filter(role_id=5, is_deleted=False)
         ###### Search for Player ##########
-        if search_type == '4':
+        elif search_type == '4':
             users = User.objects.filter(role_id=5, is_deleted=False)
-        
-       
 
         # Filter by phone if provided
-        if phone:
-            users = users.filter(phone__icontains=phone)
+        users = users.filter(phone__icontains=phone)
 
         # Exclude users who have already joined the specified branch
         if branch_id:
@@ -975,6 +985,7 @@ class UserSearchView(APIView):
 
         # Return paginated response with custom data
         return paginator.get_paginated_response(user_data)
+
 
 
 class TeamStatsView(APIView):

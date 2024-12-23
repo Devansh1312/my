@@ -14351,7 +14351,7 @@ background: linear-gradient(to bottom,  #344A6C 0%,#284700 100%); /* W3C, IE10+,
   margin: 0;
 }
 .total-info-wrapper .score {
-  font-size: 15px;
+  font-size: 24px;
   font-weight: 500;
 }
 .stats-info-wrapper h5 {
@@ -16035,5 +16035,37 @@ header .menu-btns-mobile {
     margin-bottom: 3px;
   }
 }
+
+.dropbtn {
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  min-width: 160px;
+  overflow: auto;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #fff;
+  padding: 5px 50px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown a:hover {}
+
+.show {display: block;}
 
 
