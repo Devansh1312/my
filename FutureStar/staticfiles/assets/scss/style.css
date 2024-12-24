@@ -9,7 +9,6 @@
 
 -----------------------------------------------------------------------------------
  */
-/* // *** utils *** */
 :root {
   --theme-deafult: #7366ff;
   --theme-secondary: #f73164;
@@ -54,7 +53,6 @@ body[class='dark-only'] {
   --view-grid-bg: var(--light-bg);
   --view-border-marker: #2c2c45d4; }
 
-/* // *** base *** */
 /**=====================
      Reset css start
 ==========================**/
@@ -2234,7 +2232,6 @@ fieldset .input-group-lg .touchspin {
 /**=====================
     Typography css Ends
 ==========================**/
-/* //  *** components *** */
 /**=====================
     24. According CSS start
 ==========================**/
@@ -8514,7 +8511,6 @@ th {
 /**=====================
      Scrollbar CSS Ends
 ==========================**/
-/* //	*** pages *** */
 /**=====================
     46. Blog CSS start
 ==========================**/
@@ -12007,13 +12003,15 @@ select.crypto-select {
 .widget-with-chart .card-body {
   align-items: center; }
 
-.profile-box {
-  background: linear-gradient(103.75deg, #33B1EE -13.9%, var(--theme-deafult) 79.68%);
-  color: #fff; }
+  .profile-box {
+    background: linear-gradient(103.75deg, #262626 -13.9%, #78be20 79.68%);
+    color: #fff;
+}
   .profile-box .cartoon {
     position: absolute;
-    bottom: 0px;
-    right: 0px; }
+    bottom: -15px;
+    right: 20px;
+    animation: bounce-effect 5s infinite ease-in; }
     [dir="rtl"] .profile-box .cartoon {
       right: unset !important;
       left: 5px; }
@@ -22353,7 +22351,6 @@ button[data-toggle="dropdown"]:hover ~ .dropdown-menu {
   min-width: 300px;
   top: 35px; }
 
-/* // *** layout *** / */
 /**=====================
      47. Footer CSS Start
 ==========================**/
