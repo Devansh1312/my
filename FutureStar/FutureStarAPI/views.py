@@ -89,6 +89,11 @@ def get_user_data(user, request):
         serializer = UserGenderSerializer(user.gender, context={'request': request})
         gender_name = serializer.data['name']
     
+    playing_foot =None
+    if user.playing_foot:
+        serializer = UserPlayingFootSerializer(user.playing_foot, context={'request': request})
+        playing_foot = serializer.data['name']
+    
     # Main and secondary playing positions with id and combined name-shortname fields
     main_playing_position_name = None
     main_playing_position_id = user.main_playing_position.id if user.main_playing_position else None
@@ -130,7 +135,8 @@ def get_user_data(user, request):
         'main_playing_position_name': main_playing_position_name,
         'secondary_playing_position_id': secondary_playing_position_id,
         'secondary_playing_position_name': secondary_playing_position_name,
-        'playing_foot': user.playing_foot,
+        'playing_foot_id': user.playing_foot.id if user.playing_foot else None,
+        'playing_foot_name': playing_foot,
         'favourite_local_team': user.favourite_local_team,
         'favourite_team': user.favourite_team,
         'favourite_local_player': user.favourite_local_player,

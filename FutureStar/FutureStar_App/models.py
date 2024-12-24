@@ -136,6 +136,19 @@ class UserDeleteReason(models.Model):
     class Meta:
         db_table = 'futurestar_app_user_delete_reason'
 
+class PlayingFoot(models.Model):
+    name_en = models.TextField(blank=True,null=True)
+    name_ar = models.TextField(blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.name_en
+    
+    class Meta:
+        db_table = 'futurestar_app_playing_foot'
+        
+
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE = 1
     TEAM_TYPE = 2
@@ -165,7 +178,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     height = models.CharField(max_length=150, null=True, blank=True)
     main_playing_position = models.ForeignKey(PlayingPosition, null=True, blank=True, on_delete=models.CASCADE, related_name='main_position_users')
     secondary_playing_position = models.ForeignKey(PlayingPosition, null=True, blank=True, on_delete=models.CASCADE, related_name='secondary_position_users')
-    playing_foot = models.CharField(max_length=150, null=True, blank=True)
+    playing_foot = models.ForeignKey(PlayingFoot,on_delete=models.CASCADE,null=True,blank=True)
     favourite_local_team = models.CharField(max_length=150, null=True, blank=True)
     favourite_team = models.CharField(max_length=150, null=True, blank=True)
     favourite_local_player = models.CharField(max_length=150, null=True, blank=True)
