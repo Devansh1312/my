@@ -24,8 +24,8 @@ class Training(models.Model):
     )
 
     TRAINING_TYPE_CHOICES =(
-        (OPEN_TRAINING, 'Open Training'),
-        (CLOSED_TRAINING, 'Closed Training'),
+        (OPEN_TRAINING, 'Open'),
+        (CLOSED_TRAINING, 'Closed'),
     )
 
     training_name = models.CharField(max_length=255, null=True, blank=True)

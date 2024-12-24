@@ -964,7 +964,7 @@ a.theme-btn.style-three {
   background-position: center center;
 }
 
-.preloader .custom-loader {
+/* .preloader .custom-loader {
   width: 75px;
   height: 75px;
   border-radius: 50%;
@@ -974,7 +974,7 @@ a.theme-btn.style-three {
   border-bottom: 2px solid var(--future-primary-color);
   -webkit-animation: 1s preloader linear infinite;
   animation: 1s preloader linear infinite;
-}
+} */
 
 /* Pagination */
 .pagination {
