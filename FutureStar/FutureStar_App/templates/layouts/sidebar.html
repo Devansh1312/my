@@ -86,14 +86,34 @@
                      </li>
                   </ul>
                </li>
-               <li class="sidebar">
-                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'event_list' %}">
+
+
+               <li class="sidebar-list">
+                  <a class="sidebar-link sidebar-title" href="#">
                      <svg class="stroke-icon">
                         <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-sample-page"></use>
                      </svg>
+                     <svg class="fill-icon">
+                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-sample-page"></use>
+                     </svg>
                      <span class="lan">Events</span>
                   </a>
+                  <ul class="sidebar-submenu">
+                     <li>
+                        <a href="{% url 'event_list' %}">Events</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'PendingEventBookingListView' %}">
+                            Event Booking Approval
+                            {% if pending_event_approval_count %}
+                              <span style="right: 5px; top: 0px; color: aliceblue; "  class="badge badge-danger">{{ pending_event_approval_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>                    
+                     
+                  </ul>
                </li>
+
                <li class="sidebar">
                   <a class="sidebar-link sidebar-title link-nav" href="{% url 'team_list' %}">
                      <svg class="stroke-icon">

@@ -1,5 +1,6 @@
 from django.conf import settings
 from .models import SystemSettings, User
+from FutureStarAPI.models import EventBooking
 
 def system_settings(request):
     try:
@@ -22,6 +23,8 @@ def system_settings(request):
         # Get the total count of coach users and referee users combined
         pending_approval_count = User.objects.filter(role__id=5, is_coach=True).count() + User.objects.filter(role__id=5, is_referee=True).count()
 
+        pending_event_approval_count = EventBooking.objects.filter(booking_status=0).count()
+
     except SystemSettings.DoesNotExist:
         system_settings = None
 
@@ -31,4 +34,5 @@ def system_settings(request):
         'footer_logo': footer_logo_url,
         'header_logo': header_logo_url,
         'pending_approval_count': pending_approval_count,
+        'pending_event_approval_count':pending_event_approval_count,
     }

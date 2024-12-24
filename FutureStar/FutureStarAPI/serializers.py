@@ -631,7 +631,7 @@ class EventSerializer(serializers.ModelSerializer):
             booking = EventBooking.objects.filter(
                 event=obj,
                 creator_type=creator_type,
-                created_by_id=created_by_id
+                created_by_id=created_by_id,
             ).first()
             if booking:
                 return {
@@ -700,7 +700,7 @@ class EventBookingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventBooking
-        fields = ['id', 'event', 'event_details', 'tickets', 'creator_type', 'created_by_id', 'convenience_fee', 'ticket_amount', 'total_amount']
+        fields = ['id', 'event', 'event_details', 'tickets', 'booking_status', 'creator_type', 'created_by_id', 'convenience_fee', 'ticket_amount', 'total_amount']
 
 
   

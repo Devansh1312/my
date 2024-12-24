@@ -5560,7 +5560,7 @@ def savehomedetail(request):
                             response_data = {"status": "error", "message": "something went wrong achivements image e"}
                            
                 else:
-                    print("achivements_image_e")
+                    pass
 
                 if "testomonial_icon" in request.FILES:
 
@@ -5587,7 +5587,7 @@ def savehomedetail(request):
 
                            
                 else:
-                    print("testomonial_icon")
+                    pass
 
                 if "testomonial_image_1" in request.FILES:
 
@@ -5613,13 +5613,12 @@ def savehomedetail(request):
                             response_data = {"status": "error", "message": "something went wrong testomonial image 1"}
 
                 else:
-                    print("testomonial_image_1")
+                    pass
                 # dom = "True"
                 savehomedetail.save()
                 messages.success(request, "Home Page Updated Successfully")
 
             except Exception as e:
-                print(str(e))
                 response_data = {"status": "error", "message": "in home page something went wrong"}
 
 
@@ -7379,3 +7378,178 @@ class FriendlyGameDetailView(LoginRequiredMixin, View):
         return render(
             request, "Admin/Friendly_Games/friendly_game_detail.html", context
         )
+
+
+
+
+################ Pendding Event Approval List ##############
+class PendingEventBookingListView(LoginRequiredMixin, View):
+    template_name = "Admin/EventsData/eventbooking.html"
+
+    def get(self, request, *args, **kwargs):
+        # Filter all event bookings with status 'Pending'
+        pending_bookings = EventBooking.objects.filter(booking_status=EventBooking.PENDING)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "pending_bookings": pending_bookings,
+                "breadcrumb": {
+                    "parent": "Event Management",
+                    "child": "Pending Event Bookings",
+                },
+            },
+        )
+# Booking Detail View
+class PendingBookingDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/EventsData/booking_detail.html"
+
+    def post(self, request, *args, **kwargs):
+        # Fetch the specific booking by ID
+        booking_id = request.POST.get("booking_id")
+        booking = get_object_or_404(EventBooking, pk=booking_id)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "booking": booking,
+                "breadcrumb": {
+                    "parent": "Event Management",
+                    "child": f"Booking #{booking.id} Details",
+                },
+            },
+        )
+    
+class ApproveRejectBookingView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        booking_id = request.POST.get("booking_id")
+        status = int(request.POST.get("status"))
+        
+        # Fetch the booking
+        booking = get_object_or_404(EventBooking, pk=booking_id)
+
+        # Update booking status
+        booking.booking_status = status
+        booking.save()
+
+        # Notify the user who made the booking about the status
+        if status == EventBooking.APPROVED:
+            self.notify_user_about_booking_status(
+                created_by_id=booking.created_by_id,
+                event=booking.event,
+                status="approved"
+            )
+            self.notify_followers_event(
+                created_by_id=booking.created_by_id,
+                creator_type=booking.creator_type,
+                event=booking.event
+            )
+            messages.success(request, f"Booking #{booking_id} approved successfully.")
+        else:
+            self.notify_user_about_booking_status(
+                created_by_id=booking.created_by_id,
+                event=booking.event,
+                status="rejected"
+            )
+            messages.warning(request, f"Booking #{booking_id} rejected successfully.")
+
+        # Redirect back to the pending bookings list
+        return redirect("PendingEventBookingListView")
+
+    
+    def notify_user_about_booking_status(self, created_by_id, event, status):
+        # Retrieve the user who made the booking
+        user = User.objects.filter(id=created_by_id).first()
+
+        if user:
+            # Set the notification language based on the user's preference
+            notification_language = user.current_language
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+
+            # Title and body based on booking status
+            if status == "approved":
+                title = _('Booking Approved')
+                body = _(f'Your booking for the event "{event.event_name}" has been approved!')
+            else:
+                title = _('Booking Rejected')
+                body = _(f'Your booking for the event "{event.event_name}" has been rejected.')
+
+            # Send notification to the user who made the booking
+            push_data = {
+                'type': 'booking_status',
+                'event_id': event.id,
+                'status': status
+            }
+            send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
+
+
+    def notify_followers_event(self, created_by_id, creator_type, event):
+        # Fetch followers based on FollowRequest
+        followers = FollowRequest.objects.filter(
+            Q(target_id=created_by_id, target_type=creator_type)
+        )
+
+        # Retrieve creator name and user data based on creator_type
+        creator_name = None
+        notification_language = None
+        device_token = None
+        device_type = None
+
+        if creator_type in [1, "1"]:  # For individual user posts
+            creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
+        elif creator_type in [2, "2"]:  # For team posts
+            team = Team.objects.get(id=created_by_id)
+            creator_name = team.team_username
+            user = team.team_founder
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get the team founder's language
+        elif creator_type in [3, "3"]:  # For group posts
+            group = TrainingGroups.objects.get(id=created_by_id)
+            creator_name = group.group_name
+            user = group.group_founder
+            device_token = user.device_token
+            device_type = user.device_type
+            notification_language = user.current_language  # Get the group founder's language
+
+        # Notify followers based on their type
+        for follower in followers:
+            follower_user = User.objects.filter(id=follower.created_by_id).first()
+            if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
+                
+                # Set notification language based on the follower's preference
+                notification_language = follower_user.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                # Send notification to the follower
+                title = _('Event Notification!')
+                body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+                push_data = {
+                    'type': 'event',
+                    'event_id': event.id
+                }
+                send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+
+                # If the follower is a team, send notification to the team founder
+                if creator_type == 2:
+                    title = _('Event Notification!')
+                    body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+                    push_data = {
+                        'type': 'event',
+                        'event_id': event.id,
+                    }
+                    send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
+
+                # If the follower is a group, send notification to the group founder
+                elif creator_type == 3:
+                    title = _('Event Notification!')
+                    body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+                    push_data = {
+                        'type': 'event',
+                        'event_id': event.id,
+                    }
+                    send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)

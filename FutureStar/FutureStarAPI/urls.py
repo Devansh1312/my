@@ -141,6 +141,9 @@ urlpatterns = [
         
         path('api/dashboard/', DashboardAPI.as_view()),
 
+        ###### PlayingFootAPIView Drop Down ###########
+        path('api/playing_foot/', PlayingFootAPIView.as_view()),
+
 
         ######## searching APi #############
         path('api/search/', SearchAPIView.as_view(), name='search_api'),

@@ -296,4 +296,14 @@ urlpatterns = [
     path('user/role/apply/', UserRoleAppliedListView.as_view(), name='user_apply_list'),
     path('user/role/action/', UserRoleActionView.as_view(), name='user_role_action'),
 
+
+
+    ########## Pendding Booking of Event ############
+    path('requested-event-booking/', PendingEventBookingListView.as_view(), name='PendingEventBookingListView'),
+    path('booking-detail/', PendingBookingDetailView.as_view(), name='booking_detail'),
+    path('approve-reject-booking/', ApproveRejectBookingView.as_view(), name='approve_or_reject_booking'),
+
+
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   

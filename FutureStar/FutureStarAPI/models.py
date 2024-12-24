@@ -541,28 +541,49 @@ class Event(models.Model):
         db_table = 'futurestar_app_event'
 
 class EventBooking(models.Model):
+    # Constants
     USER_TYPE = 1
-  
     
+    # Creator Type Choices
     CREATOR_TYPE_CHOICES = (
         (USER_TYPE, 'User'),
-      
     )
-
+    
+    # Booking Status Choices
+    PENDING = 0
+    APPROVED = 1
+    REJECTED = 2
+    
+    BOOKING_STATUS_CHOICES = (
+        (PENDING, 'Pending'),
+        (APPROVED, 'Approved'),
+        (REJECTED, 'Rejected'),
+    )
+    
+    # Fields
     id = models.AutoField(primary_key=True)
     created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
     creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)    
-    event=models.ForeignKey(Event, on_delete=models.CASCADE)
-    tickets=models.IntegerField()
-    convenience_fee=models.FloatField(default=0.0)
-    ticket_amount=models.FloatField(default=0.0)
-    total_amount=models.FloatField(default=0.0)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    tickets = models.IntegerField()
+    convenience_fee = models.FloatField(default=0.0)
+    ticket_amount = models.FloatField(default=0.0)
+    total_amount = models.FloatField(default=0.0)
+    
+    # New Field - Booking Status
+    booking_status = models.IntegerField(
+        choices=BOOKING_STATUS_CHOICES,
+        default=PENDING  # Default status is 'Pending'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
+    # String Representation
     def __str__(self):
         return self.event.event_name
     
+    # Metadata
     class Meta:
         db_table = 'futurestar_app_eventbooking'
 

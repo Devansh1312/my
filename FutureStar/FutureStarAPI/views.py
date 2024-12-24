@@ -819,8 +819,6 @@ class ForgotPasswordAPIView(APIView):
                 user.otp = otp
                 user.save()
 
-                print(f"Sending OTP {otp} to {phone}")
-
                 return Response({
                     'status': 1,
                     'message': _('OTP sent to your phone.'),
@@ -1043,7 +1041,7 @@ class EditProfileAPIView(APIView):
 
         # Fields that should be set to NULL if provided as blank or None
         null_fields = ['fullname', 'bio', 'nationality', 'weight', 'height',
-                       'playing_foot', 'favourite_local_team', 'favourite_team',
+                        'favourite_local_team', 'favourite_team',
                        'favourite_local_player', 'favourite_player']
 
         for field in null_fields:
@@ -1052,6 +1050,23 @@ class EditProfileAPIView(APIView):
                 setattr(user, field, None)  # Set the field to null if blank or None
             else:
                 setattr(user, field, field_value)  # Otherwise, update with new value
+        
+        playing_foot = request.data.get('playing_foot')
+        if playing_foot not in [None, '0', '', 'null']:
+            try:
+                # Convert the playing_foot_value to integer (if it's a string or other type)
+                playing_foot_id = int(playing_foot)
+                user.playing_foot = PlayingFoot.objects.get(id=playing_foot_id)  # Assign PlayingFoot instance
+            except (ValueError, TypeError):
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid playing foot specified.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except PlayingFoot.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('The specified playing foot does not exist.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         # Handle date_of_birth - retain old value if None or blank
         date_of_birth = request.data.get('date_of_birth')
@@ -1522,26 +1537,26 @@ class PostCreateAPIView(APIView):
                 # If the follower is a team, send notification to the team founder
                 if creator_type == 2:
                     follower_user.id = team.team_founder.id
-                    title = _('Your team has a new post!')
-                    body = _(f'Team {creator_name} just posted a new update.')
+                    title = _('New Post Alert!')
+                    body = _(f'{creator_name} you are following just posted.')
                     push_data = {
                         'type': 'team_post',
                         'post_id': post.id,
                         'team_id': team.id
                     }
-                    send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+                    send_push_notification(follower_user.device_token, title, body,team.team_founder.device_type, data=push_data)
 
                 # If the follower is a group, send notification to the group founder
                 elif creator_type == 3 :
                     follower_user.id = group.group_founder.id
-                    title = _('Your group has a new post!')
-                    body = _(f'Group {creator_name} just posted a new update.')
+                    title = _('New Post Alert!')
+                    body = _(f'{creator_name} you are following just posted.')
                     push_data = {
                         'type': 'group_post',
                         'post_id': post.id,
                         'group_id': group.id
                     }
-                    send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+                    send_push_notification(follower_user.device_token, title, body,group.group_founder.device_type, data=push_data)
 
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
@@ -3177,6 +3192,29 @@ class PlayingPositionListAPIView(generics.ListAPIView):
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)
 
+####################### Playing Foot API ############
+
+class PlayingFootAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PlayingFoot.objects.all()
+    serializer_class = UserPlayingFootSerializer
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        # Get all playing positions
+        playing_foot = self.get_queryset()
+        serializer = self.get_serializer(playing_foot, many=True)
+
+        # Prepare the response with playing positions directly under 'data'
+        return Response({
+            'status': 1,
+            'message': _('Playing foot retrieved successfully.'),
+            'data': serializer.data  # Directly include the serialized data
+        }, status=status.HTTP_200_OK)
+
 
 #######################################################  USER ROLE API LIST VIEW #############################################################################################
 
@@ -4219,7 +4257,6 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
         # Fetch the Event instance using the provided event_id
         event_instance = get_object_or_404(Event, id=event_id)
-        print(event_instance.created_by_id)
 
         # Retrieve convenience_fee from request or SystemSettings
         convenience_fee = request.data.get('convenience_fee')
@@ -4245,7 +4282,6 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
             event_created_by_id=event_instance.created_by_id
             team = Team.objects.get(id=event_created_by_id)
             team_founder = team.team_founder
-            print(team_founder)
         except Team.DoesNotExist:
             return Response({
                 'status': 0,
@@ -4267,7 +4303,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=booking_data)
         if serializer.is_valid():
             booking_instance = serializer.save()
-            self.notify_followers_event(created_by_id, creator_type, event_instance)
+            # self.notify_followers_event(created_by_id, creator_type, event_instance)
 
             # Send notification to the team founder
             if team_founder:
@@ -4277,10 +4313,10 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                     activate(notification_language)
 
                 # Prepare notification title and body
-                title = _('%(user_name)s is attending your event!')% {
+                title = _('%(user_name)s wants to attend your event!')% {
                     'user_name': request.user.username
                     }
-                body = _('%(user_name)s has successfully booked a ticket for your event "%(event_name)s".') % {
+                body = _('%(user_name)s has Requested to booked a ticket for your event "%(event_name)s".') % {
                     'user_name': request.user.username,
                     'event_name': event_instance.event_name,
                 }
@@ -4992,7 +5028,6 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         # Get the current time and date
         current_time = timezone.now().time()
         current_date = timezone.now().date()
-        print(current_time)
 
         # Extract the current hour and minute
         current_hour = current_time.hour
@@ -5097,7 +5132,6 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
         # Extract the current hour and minute
         current_hour = current_time.hour
         current_minute = current_time.minute
-        print(current_time)
 
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
@@ -5200,8 +5234,6 @@ class LineupNotificationAPIView(APIView):
 
             # Calculate the time one hour from now
             one_hour_later = current_time + timedelta(hours=1)
-            print(current_time)
-            print(one_hour_later)
 
             # Get upcoming tournament games within the next 1 hour for today
             upcoming_tournament_games = TournamentGames.objects.filter(
@@ -5268,7 +5300,6 @@ class LineupNotificationAPIView(APIView):
                     team_id=game.team_b,
                     lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP
                 )
-            print(team_a_lineup.count())
 
             if team_a_lineup.count() < 11:
                 self._notify_team_staff(
@@ -5370,8 +5401,6 @@ class UniformConfirmationNotificationView(APIView):
         current_time = timezone.now()
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
-        print(current_time)
-        print(one_hour_later)
 
         # Retrieve upcoming tournament games that are not confirmed
         upcoming_tournament_games = TournamentGames.objects.filter(
@@ -5481,7 +5510,6 @@ class UniformAddNotificationAPIView(APIView):
 
         # Calculate the time one hour from now
         one_hour_later = current_time + timedelta(hours=1)
-        print(f"Current Time: {current_time}, One Hour Later: {one_hour_later}")
 
         # Get upcoming tournament games within the next 1 hour for today
         upcoming_tournament_games = TournamentGames.objects.filter(
@@ -5640,7 +5668,6 @@ class PlayerReadyNotificationAPIView(APIView):
 
         # Get the team founder from the team branch
         team_founder_a = staff.branch_id.team_id.team_founder
-        print(team_founder_a)
         if team_founder_a:
             send_push_notification(
                 device_token=team_founder_a.device_token,
@@ -5693,17 +5720,12 @@ class PlayerReadyNotificationAPIView(APIView):
                 for n in team_b_notifications
             ])
 
-        print(f"Team A not ready due to lineup_status=3 and player_ready=False: {team_a_not_ready}")
-        print(f"Team B not ready due to lineup_status=3 and player_ready=False: {team_b_not_ready}")
-
         return notifications
 
     def get(self, request, *args, **kwargs):
         current_time = timezone.now()
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
-        print(current_time)
-        print(one_hour_later)
 
         # Get upcoming tournament games within the next 1 hour for today
         upcoming_tournament_games = TournamentGames.objects.filter(
