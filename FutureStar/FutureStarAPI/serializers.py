@@ -643,14 +643,24 @@ class EventSerializer(serializers.ModelSerializer):
         return None
 
     def get_event_organizer(self, obj):
-        user = obj.event_organizer
-        return {
-            'username': user.username,
-            'fullname': user.fullname,
-            'phone': user.phone,
-            'email': user.email,
-            'profile_pic': user.profile_picture.url if user.profile_picture else None,
-        }
+        # Access the 'created_by_id' directly from the Event instance (obj)
+        team_id = obj.created_by_id
+        team_id = int(team_id)
+        if team_id:
+            # Fetch the team object using the 'created_by_id' (team ID)
+            try:
+                team = Team.objects.get(id=team_id)
+                return {
+                    'username': team.team_username,
+                    'fullname': team.team_name,
+                    'phone': team.phone,
+                    'email': team.email,
+                    'profile_pic': team.team_logo.url if team.team_logo else None,
+                }
+            except Team.DoesNotExist:
+                return None
+        return None
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

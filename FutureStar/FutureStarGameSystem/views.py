@@ -990,11 +990,13 @@ class AddPlayerJerseyAPIView(APIView):
                         'message': _('Jersey Number added Successfully')
                     })
 
-                except IntegrityError:
+                except IntegrityError as e:
+                    print(e)
                     response_data.append({
                         'player_id': player_id,
                         'status': 0,
-                        'message': _('An error occurred while adding the player to the lineup.')
+                        'message': _('An error occurred while adding the player to the lineup.'),
+                        'message1': f'An error occurred: {str(e)}'
                     })
             else:
                 # Handle case where jersey_number is 0 by setting it to null
@@ -1029,11 +1031,11 @@ class AddPlayerJerseyAPIView(APIView):
                         'message': _('Jersey number Deleted')
                     })
 
-                except IntegrityError:
+                except IntegrityError as e:
                     response_data.append({
                         'player_id': player_id,
                         'status': 0,
-                        'message': _('An error occurred while adding the player to the lineup.')
+                        'message': _('An error occurred while adding the player to the lineup.'),
                     })
 
         # Return response
