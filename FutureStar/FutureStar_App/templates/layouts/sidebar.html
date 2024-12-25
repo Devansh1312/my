@@ -1,313 +1,272 @@
-{% load static %} 
-{% load sass_tags %}
-<div class="sidebar-wrapper" sidebar-layout="stroke-svg">
-   <div>
-      <div class="logo-wrapper">
-         <a href="{% url 'Dashboard' %}">
-            <img style="width: 120px; height: 35px;" class="img-fluid for-light" src="{{ header_logo }}" alt="">
-            <img style="width: 120px; height: 35px;" class="img-fluid for-dark" src="{{  header_logo  }}" alt="">
-         </a>
-         <div class="back-btn">
-            <i class="fa fa-angle-left"></i>
-         </div>
-         <div class="toggle-sidebar">
-            <i class="status_toggle middle sidebar-toggle" data-feather="grid"></i>
-         </div>
-      </div>
-      <div class="logo-icon-wrapper">
-         <a href="{% url 'Dashboard' %}">
-            <img class="img-fluid" src="{{ fav_icon }}" style="width: 35px; height: 35px;" alt="">
-         </a>
-      </div>
-      <nav class="sidebar-main">
-         <div class="left-arrow" id="left-arrow">
-            <i data-feather="arrow-left"></i>
-         </div>
-         <div id="sidebar-menu">
-            <ul class="sidebar-links" id="simple-bar">
-               <li class="back-btn">
-                  <a href="#">
-                     <img class="img-fluid" src="{{fav_icon }}" style="width: 35px; height: 35px;" alt="">
-                  </a>
-                  <div class="mobile-back text-end">
-                     <span>Back</span>
-                     <i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
-                  </div>
-               </li>
-               <li class="sidebar">
-                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'Dashboard' %}">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-home"></use>
-                     </svg>
-                     <span class="lan">Dashboard</span>
-                  </a>
-               </li>
-
-               <!-- User Menu -->
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-user"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-user"></use>
-                     </svg>
-                     <span class="lan">User</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'role_list' %}">User Roles</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'player_list' %}">Player</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'coach_list' %}">Coach</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'manager_list' %}">Manager</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'referee_list' %}">Referee</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'default_user_list' %}">Default User</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'user_apply_list' %}">
-                            Coach/Referee Approval
-                            {% if pending_approval_count %}
-                              <span style="right: 5px; top: 0px; color: aliceblue; "  class="badge badge-danger">{{ pending_approval_count }}</span>
-                            {% endif %}
-                        </a>
-                    </li>                    
-                     <li>
-                        <a href="{% url 'accountdeletereason_list' %}">User Delete Reasons</a>
-                     </li>
-                  </ul>
-               </li>
-
-
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-sample-page"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-sample-page"></use>
-                     </svg>
-                     <span class="lan">Events</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'event_list' %}">Events</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'PendingEventBookingListView' %}">
-                            Event Booking Approval
-                            {% if pending_event_approval_count %}
-                              <span style="right: 5px; top: 0px; color: aliceblue; "  class="badge badge-danger">{{ pending_event_approval_count }}</span>
-                            {% endif %}
-                        </a>
-                    </li>                    
-                     
-                  </ul>
-               </li>
-
-               <li class="sidebar">
-                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'team_list' %}">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
-                     </svg>
-                     <span class="lan">Team Page</span>
-                  </a>
-               </li>
-               <li class="sidebar">
-                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'tournament_list' %}">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
-                     </svg>
-                     <span class="lan">Tournaments</span>
-                  </a>
-               </li>
-
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <i class="icofont icofont-football"></i>
-                     <span class="lan">Tournament Games</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'tournament_games_list' %}">Assign Game Handler</a>
-                     </li>
-                     <!-- <li>
-                        <a href="{% url 'games_list' %}">Game Static</a>
-                     </li> -->
-                  </ul>
-               </li>
-
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <i class="icofont icofont-football"></i>
-                     <span class="lan">Friendly Games</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'friendly_games_list' %}">Assign Game Handler</a>
-                     </li>
-                    
-                  </ul>
-               </li>
-
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-internationalization"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-internationalization"></use>
-                     </svg>
-                     <span class="lan">Website</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'cmspages_urls' %}">Website CMS Page</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'news_list' %}">Website News</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'team_members_list' %}">Our Team Professional</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'app_feature_list' %}">App Features</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'partners_list' %}">Partners</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'global_clients_list' %}">Global Clients</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'tryout_club_list' %}">Tryout Club</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'testimonial_list' %}">Testimonial</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'slider_content_list' %}">Slider Content</a>
-                     </li>
-                  </ul>
-               </li>
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-widget"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-widget"></use>
-                     </svg>
-                     <span class="lan">Mobile App</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'dashboard_banner_list' %}">Dashboard Banners</a>
-                     </li>
-                  </ul>
-               </li>
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-landing-page"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-landing-page"></use>
-                     </svg>
-                     <span class="lan">Post Actions</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'report_list' %}">Post Report</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'post_report_list' %}">Reported Post</a>
-                     </li>
-                  </ul>
-               </li>
-
-
-
-
-
-               
-
-
-               <li class="sidebar">
-                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'inquire_list' %}">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-sample-page"></use>
-                     </svg>
-                     <span class="lan">Contact-Us Inquires</span>
-                  </a>
-               </li>
-
-               
-
-               
-
-               
-               
-
-               <li class="sidebar-list">
-                  <a class="sidebar-link sidebar-title" href="#">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-widget"></use>
-                     </svg>
-                     <svg class="fill-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-widget"></use>
-                     </svg>
-                     <span class="lan">General Settings</span>
-                  </a>
-                  <ul class="sidebar-submenu">
-                     <li>
-                        <a href="{% url 'fieldcapacity_list' %}">Field Capacity</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'groundmaterial_list' %}">Ground Material</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'category_list' %}">Team Category Type</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'eventtype_list' %}">Event Type</a>
-                     </li>
-                     <li>
-                        <a href="{% url 'injurytype_list' %}">Injury Type </a>
-                     </li>
-                     <li>
-                        <a href="{% url 'gameofficialstype_list' %}">Game Officials Type </a>
-                     </li>
-                     <li>
-                        <a href="{% url 'agegroup_list' %}">Age Group</a>
-                     </li>
-                  </ul>
-               </li>
-               
-               <li class="sidebar">
-                  <a class="sidebar-link sidebar-title link-nav" href="{% url 'System_Settings' %}">
-                     <svg class="stroke-icon">
-                        <use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-icons"></use>
-                     </svg>
-                     <span class="lan">System Settings</span>
-                  </a>
-               </li>
-               
-            </ul>
-         </div>
-         <div class="right-arrow" id="right-arrow">
-            <i data-feather="arrow-right"></i>
-         </div>
-      </nav>
-   </div>
+{% load static %} {% load sass_tags %} <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
+	<div>
+		<div class="logo-wrapper">
+			<a href="{% url 'Dashboard' %}">
+				<img style="width: 120px; height: 35px;" class="img-fluid for-light" src="{{ header_logo }}" alt="">
+				<img style="width: 120px; height: 35px;" class="img-fluid for-dark" src="{{  header_logo  }}" alt="">
+			</a>
+			<div class="back-btn">
+				<i class="fa fa-angle-left"></i>
+			</div>
+			<div class="toggle-sidebar">
+				<i class="status_toggle middle sidebar-toggle" data-feather="grid"></i>
+			</div>
+		</div>
+		<div class="logo-icon-wrapper">
+			<a href="{% url 'Dashboard' %}">
+				<img class="img-fluid" src="{{ fav_icon }}" style="width: 35px; height: 35px;" alt="">
+			</a>
+		</div>
+		<nav class="sidebar-main">
+			<div class="left-arrow" id="left-arrow">
+				<i data-feather="arrow-left"></i>
+			</div>
+			<div id="sidebar-menu">
+				<ul class="sidebar-links" id="simple-bar">
+					<li class="back-btn">
+						<a href="#">
+							<img class="img-fluid" src="{{fav_icon }}" style="width: 35px; height: 35px;" alt="">
+						</a>
+						<div class="mobile-back text-end">
+							<span>Back</span>
+							<i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
+						</div>
+					</li>
+					<li class="sidebar">
+						<a class="sidebar-link sidebar-title link-nav" href="{% url 'Dashboard' %}">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-home"></use>
+							</svg>
+							<span class="lan">Dashboard</span>
+						</a>
+					</li>
+					<!-- User Menu -->
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-user"></use>
+							</svg>
+							<svg class="fill-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-user"></use>
+							</svg>
+							<span class="lan">User</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'role_list' %}">User Roles</a>
+							</li>
+							<li>
+								<a href="{% url 'player_list' %}">Player</a>
+							</li>
+							<li>
+								<a href="{% url 'coach_list' %}">Coach</a>
+							</li>
+							<li>
+								<a href="{% url 'manager_list' %}">Manager</a>
+							</li>
+							<li>
+								<a href="{% url 'referee_list' %}">Referee</a>
+							</li>
+							<li>
+								<a href="{% url 'default_user_list' %}">Default User</a>
+							</li>
+							<li>
+								<a href="{% url 'user_apply_list' %}"> Coach/Referee Approval {% if pending_approval_count %} <span style="right: 5px; top: 0px; color: aliceblue; " class="badge badge-danger">{{ pending_approval_count }}</span> {% endif %} </a>
+							</li>
+							<li>
+								<a href="{% url 'accountdeletereason_list' %}">User Delete Reasons</a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-sample-page"></use>
+							</svg>
+							<svg class="fill-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-sample-page"></use>
+							</svg>
+							<span class="lan">Events</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'event_list' %}">Events</a>
+							</li>
+							<li>
+								<a href="{% url 'PendingEventBookingListView' %}"> Event Booking Approval {% if pending_event_approval_count %} <span style="right: 5px; top: 0px; color: aliceblue; " class="badge badge-danger">{{ pending_event_approval_count }}</span> {% endif %} </a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar">
+						<a class="sidebar-link sidebar-title link-nav" href="{% url 'team_list' %}">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
+							</svg>
+							<span class="lan">Team Page</span>
+						</a>
+					</li>
+					<li class="sidebar">
+						<a class="sidebar-link sidebar-title link-nav" href="{% url 'tournament_list' %}">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
+							</svg>
+							<span class="lan">Tournaments</span>
+						</a>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<i class="icofont icofont-football"></i>
+							<span class="lan">Tournament Games</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'tournament_games_list' %}">Assign Game Handler</a>
+							</li>
+							<!-- <li><a href="{% url 'games_list' %}">Game Static</a></li> -->
+						</ul>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<i class="icofont icofont-football"></i>
+							<span class="lan">Friendly Games</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'friendly_games_list' %}">Assign Game Handler</a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-internationalization"></use>
+							</svg>
+							<svg class="fill-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-internationalization"></use>
+							</svg>
+							<span class="lan">Website</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'cmspages_urls' %}">Website CMS Page</a>
+							</li>
+							<li>
+								<a href="{% url 'news_list' %}">Website News</a>
+							</li>
+							<li>
+								<a href="{% url 'team_members_list' %}">Our Team Professional</a>
+							</li>
+							<li>
+								<a href="{% url 'app_feature_list' %}">App Features</a>
+							</li>
+							<li>
+								<a href="{% url 'partners_list' %}">Partners</a>
+							</li>
+							<li>
+								<a href="{% url 'global_clients_list' %}">Global Clients</a>
+							</li>
+							<li>
+								<a href="{% url 'tryout_club_list' %}">Tryout Club</a>
+							</li>
+							<li>
+								<a href="{% url 'testimonial_list' %}">Testimonial</a>
+							</li>
+							<li>
+								<a href="{% url 'slider_content_list' %}">Slider Content</a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-widget"></use>
+							</svg>
+							<svg class="fill-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-widget"></use>
+							</svg>
+							<span class="lan">Mobile App</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'dashboard_banner_list' %}">Dashboard Banners</a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-landing-page"></use>
+							</svg>
+							<svg class="fill-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-landing-page"></use>
+							</svg>
+							<span class="lan">Post Actions</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'report_list' %}">Post Report</a>
+							</li>
+							<li>
+								<a href="{% url 'post_report_list' %}">Reported Post</a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar">
+						<a class="sidebar-link sidebar-title link-nav" href="{% url 'inquire_list' %}">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-sample-page"></use>
+							</svg>
+							<span class="lan">Contact-Us Inquires</span>
+						</a>
+					</li>
+					<li class="sidebar-list">
+						<a class="sidebar-link sidebar-title" href="#">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-widget"></use>
+							</svg>
+							<svg class="fill-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#fill-widget"></use>
+							</svg>
+							<span class="lan">General Settings</span>
+						</a>
+						<ul class="sidebar-submenu">
+							<li>
+								<a href="{% url 'fieldcapacity_list' %}">Field Capacity</a>
+							</li>
+							<li>
+								<a href="{% url 'groundmaterial_list' %}">Ground Material</a>
+							</li>
+							<li>
+								<a href="{% url 'category_list' %}">Team Category Type</a>
+							</li>
+							<li>
+								<a href="{% url 'eventtype_list' %}">Event Type</a>
+							</li>
+							<li>
+								<a href="{% url 'injurytype_list' %}">Injury Type </a>
+							</li>
+							<li>
+								<a href="{% url 'gameofficialstype_list' %}">Game Officials Type </a>
+							</li>
+							<li>
+								<a href="{% url 'agegroup_list' %}">Age Group</a>
+							</li>
+						</ul>
+					</li>
+					<li class="sidebar">
+						<a class="sidebar-link sidebar-title link-nav" href="{% url 'System_Settings' %}">
+							<svg class="stroke-icon">
+								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-icons"></use>
+							</svg>
+							<span class="lan">System Settings</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="right-arrow" id="right-arrow">
+				<i data-feather="arrow-right"></i>
+			</div>
+		</nav>
+	</div>
 </div>
 <!-- Page Sidebar Ends-->
