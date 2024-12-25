@@ -36,6 +36,8 @@ urlpatterns = [
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
     path('social_signup/', SocialSignupView.as_view(), name='social_signup'),
     path('test-404/', custom_404_view),
+
+    path('search/', SearchView.as_view(), name='search'),
     # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
     # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
     # path('apple/login/', AppleLoginView.as_view(), name='apple_login'),
