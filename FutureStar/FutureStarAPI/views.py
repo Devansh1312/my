@@ -1247,18 +1247,20 @@ class PostLikeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        # Get post ID
         post_id = request.data.get('post_id')
-
         if not post_id:
             return Response({
                 'status': 0,
                 'message': _('Post ID is required.')
             }, status=400)
 
+        # Validate post existence
         try:
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
@@ -1267,70 +1269,82 @@ class PostLikeAPIView(APIView):
                 'message': _('Post not found.')
             }, status=404)
 
-        # Get creator type and created_by_id
-        creator_type = request.data.get('creator_type')
-        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user ID
+        # Get liker information
+        creator_type = request.data.get('creator_type')  # Who liked the post
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user
+
+        # Determine notifier name based on liker type
+        if creator_type in [1, "1"]:  # User
+            liker = User.objects.get(id=created_by_id)
+            notifier_name = liker.username
+        elif creator_type in [2, "2"]:  # Team
+            liker = Team.objects.get(id=created_by_id)
+            notifier_name = liker.team_username
+        elif creator_type in [3, "3"]:  # Group
+            liker = TrainingGroups.objects.get(id=created_by_id)
+            notifier_name = liker.group_username
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator type.')
+            }, status=400)
 
         # Toggle like/unlike
-        post_like, created = PostLike.objects.get_or_create(created_by_id=created_by_id, post=post, creator_type=creator_type)
+        post_like, created = PostLike.objects.get_or_create(
+            created_by_id=created_by_id, post=post, creator_type=creator_type
+        )
 
         if not created:
-            # If the user already liked the post, unlike it (delete the like)
+            # Unlike the post
             post_like.delete()
             message = _('Post unliked successfully.')
         else:
+            # Like the post
             post_like.date_liked = timezone.now()
             post_like.save()
             message = _('Post liked successfully.')
 
-            # Fetch the relevant user to send push notification
-            if creator_type in [1, "1"]:
-                user = User.objects.get(id=created_by_id)
-                notifier_name = user.username
-                device_token = user.device_token
-                device_type = user.device_type
-                notification_language = user.current_language  # Get user's language for notifications
-            elif creator_type in [2, "2"]:
-                team = Team.objects.get(id=created_by_id)
-                user = team.team_founder
-                notifier_name = team.team_username
-                device_token = user.device_token
-                device_type = user.device_type
-                notification_language = user.current_language  # Get team founder's language for notifications
-            elif creator_type in [3, "3"]:
-                group = TrainingGroups.objects.get(id=created_by_id)
-                user = group.group_founder
-                notifier_name = group.group_name
-                device_token = user.device_token
-                device_type = user.device_type
-                notification_language = user.current_language  # Get group founder's language for notifications
+            # Fetch post creator details for notification
+            post_creator_type = post.creator_type
+            post_created_by_id = post.created_by_id
+
+            if post_creator_type in [1, "1"]:  # User
+                recipient = User.objects.get(id=post_created_by_id)
+            elif post_creator_type in [2, "2"]:  # Team
+                team = Team.objects.get(id=post_created_by_id)
+                recipient = team.team_founder
+            elif post_creator_type in [3, "3"]:  # Group
+                group = TrainingGroups.objects.get(id=post_created_by_id)
+                recipient = group.group_founder
             else:
                 return Response({
                     'status': 0,
-                    'message': _('Invalid creator type.')
+                    'message': _('Invalid creator type for post.')
                 }, status=400)
 
-            # Set notification language based on user's preference
+            # Notification settings
+            device_token = recipient.device_token
+            device_type = recipient.device_type
+            notification_language = recipient.current_language
+
+            # Set notification language
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
 
-            # Sending push notification
+            # Send push notification
             if device_type in [1, 2, "1", "2"]:
                 title = _('Post Liked!')
                 body = _(f'{notifier_name} liked your post.')
-                push_data = {'type': 'post', 'post_id': post_id}  # Include the post ID in the notification payload
+                push_data = {'type': 'post', 'post_id': post_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
-        # Serialize the post data
+        # Serialize and return post data
         serializer = PostSerializer(post, context={'request': request})
-
-        # Return the full post data
         return Response({
             'status': 1,
             'message': message,
             'data': serializer.data
         }, status=200)
-
 
 
 ############################# ALL POST LIST VIEW ##########################
@@ -1767,24 +1781,27 @@ class CommentCreateAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract input data
         data = request.data
         post_id = data.get('post_id')
         comment_text = data.get('comment')
         parent_id = data.get('parent_id')
-        created_by_id = data.get('created_by_id')
-        creator_type = data.get('creator_type')
+        creator_type = data.get('creator_type')  # Can be 1 (User), 2 (Team), 3 (Group)
+        created_by_id = data.get('created_by_id', request.user.id)  # Default to user ID if not provided
 
-        # Validate the required fields
-        if not post_id or not comment_text or not created_by_id or not creator_type:
+        # Validate required fields
+        if not post_id or not comment_text:
             return Response({
                 'status': 0,
-                'message': _('post_id, comment, created_by_id and creator_type are required.')
+                'message': _('post_id and comment are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Validate post existence
         try:
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
@@ -1804,6 +1821,22 @@ class CommentCreateAPIView(APIView):
                     'message': _('Parent comment not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
+        # Determine notifier name based on creator type
+        if creator_type in [1, "1"]:  # User
+            commenter = User.objects.get(id=created_by_id)
+            notifier_name = commenter.username
+        elif creator_type in [2, "2"]:  # Team
+            commenter = Team.objects.get(id=created_by_id)
+            notifier_name = commenter.team_username
+        elif creator_type in [3, "3"]:  # Group
+            commenter = TrainingGroups.objects.get(id=created_by_id)
+            notifier_name = commenter.group_username
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator type.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Create the comment
         comment = Post_comment.objects.create(
             created_by_id=created_by_id,
@@ -1813,56 +1846,65 @@ class CommentCreateAPIView(APIView):
             parent=parent_comment
         )
 
-        # Determine the notifier and send a push notification
-        if creator_type in [1, "1"]:  # User as creator
-            user = User.objects.get(id=created_by_id)
-            notifier_name = user.username
+        # Determine notification recipient based on comment/reply case
+        if parent_comment:
+            # Notify parent comment creator (reply case)
+            recipient_id = parent_comment.created_by_id
+            recipient_type = parent_comment.creator_type
+        else:
+            # Notify post creator (new comment case)
+            recipient_id = post.created_by_id
+            recipient_type = post.creator_type
+
+        # Fetch recipient details
+        if recipient_type in [1, "1"]:  # User
+            recipient = User.objects.get(id=recipient_id)
+            device_token = recipient.device_token
+            device_type = recipient.device_type
+            notification_language = recipient.current_language
+        elif recipient_type in [2, "2"]:  # Team
+            recipient = Team.objects.get(id=recipient_id)
+            user = recipient.team_founder
             device_token = user.device_token
             device_type = user.device_type
-            notification_language = user.current_language  # Get user language for notification
-        elif creator_type in [2, "2"]:  # Team as creator
-            team = Team.objects.get(id=created_by_id)
-            user = team.team_founder
-            notifier_name = team.team_username
+            notification_language = user.current_language
+        elif recipient_type in [3, "3"]:  # Group
+            recipient = TrainingGroups.objects.get(id=recipient_id)
+            user = recipient.group_founder
             device_token = user.device_token
             device_type = user.device_type
-            notification_language = user.current_language  # Get team founder's language for notification
-        elif creator_type == 3:  # Group as creator
-            group = TrainingGroups.objects.get(id=created_by_id)
-            user = group.group_founder
-            notifier_name = group.group_name
-            device_token = user.device_token
-            device_type = user.device_type
-            notification_language = user.current_language  # Get group founder's language for notification
+            notification_language = user.current_language
         else:
             return Response({
                 'status': 0,
-                'message': _('Invalid creator type.')
+                'message': _('Invalid creator type for recipient.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Set notification language
         if notification_language in ['ar', 'en']:
             activate(notification_language)
 
-        # For replies
+        # Create notification content
         if parent_comment:
-            title = _('New Comment on Your Post!')
-            body = _(f'{notifier_name} commented on your post.')
+            title = _('New Reply on Your Comment!')
+            body = _(f'{notifier_name} replied to your comment.')
             push_data = {'type': 'comment', 'post_id': post_id, 'parent_id': parent_id, 'comment_id': comment.id}
         else:
             title = _('New Comment on Your Post!')
             body = _(f'{notifier_name} commented on your post.')
             push_data = {'type': 'comment', 'post_id': post_id, 'comment_id': comment.id}
 
-        # Sending push notification
+        # Send push notification
         if device_type in [1, 2, "1", "2"]:
             send_push_notification(device_token, title, body, device_type, data=push_data)
 
+        # Return response
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
             'data': PostCommentSerializer(comment).data
         }, status=status.HTTP_201_CREATED)
+
 
 ############### POST DELETE API ##############################
 class PostDeleteAPIView(APIView):
@@ -3632,23 +3674,28 @@ class DashboardAPI(APIView):
 
 ###################### Event LIKE ######################
 class EventLikeAPIView(APIView):
-    permission_classes = [IsAuthenticated]    
+    permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        event_id = request.data.get('event_id')
-        creator_type = request.data.get('creator_type', EventLike.USER_TYPE)
-        created_by_id = request.data.get('created_by_id', request.user.id)
 
+        # Extract input data
+        event_id = request.data.get('event_id')
+        creator_type = request.data.get('creator_type', EventLike.USER_TYPE)  # Default to user
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user
+
+        # Validate required data
         if not event_id:
             return Response({
                 'status': 0,
                 'message': _('Event ID is required.')
             }, status=400)
 
+        # Validate event existence
         try:
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
@@ -3657,22 +3704,60 @@ class EventLikeAPIView(APIView):
                 'message': _('Event not found.')
             }, status=404)
 
-        # Toggle like/unlike based on creator type and ID
+        # Determine notifier name based on liker type
+        if creator_type in [1, "1"]:  # User
+            liker = User.objects.get(id=created_by_id)
+            notifier_name = liker.username
+        elif creator_type in [2, "2"]:  # Team
+            liker = Team.objects.get(id=created_by_id)
+            notifier_name = liker.team_username
+        elif creator_type in [3, "3"]:  # Group
+            liker = TrainingGroups.objects.get(id=created_by_id)
+            notifier_name = liker.group_name
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator type.')
+            }, status=400)
+
+        # Toggle like/unlike
         event_like, created = EventLike.objects.get_or_create(
-            event=event,
             created_by_id=created_by_id,
+            event=event,
             creator_type=creator_type
         )
+
         if not created:
-            # If already liked, unlike it
+            # Unlike the event
             event_like.delete()
             message = _('Event unliked successfully.')
         else:
+            # Like the event
             message = _('Event liked successfully.')
+
+            # Fetch event organizer details for notification
+            organizer = event.event_organizer
+            recipient = organizer
+
+            # Notification settings
+            device_token = recipient.device_token
+            device_type = recipient.device_type
+            notification_language = recipient.current_language
+
+            # Set notification language
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+
+            # Send push notification
+            if device_type in [1, 2, "1", "2"]:
+                title = _('Event Liked!')
+                body = _(f'{notifier_name} liked your event.')
+                push_data = {'type': 'event_like', 'event_id': event_id}
+                send_push_notification(device_token, title, body, device_type, data=push_data)
 
         # Serialize the event data with updated like status
         serializer = EventSerializer(event, context={'request': request})
-        
+
         # Return response with updated event data
         return Response({
             'status': 1,
@@ -3741,25 +3826,29 @@ class EventCommentAPIView(APIView):
 class EventCommentCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    
+
     def post(self, request, *args, **kwargs):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract input data
         data = request.data
         event_id = data.get('event_id')
         comment_text = data.get('comment')
         parent_id = data.get('parent_id')
-        creator_type = data.get('creator_type', Event_comment.USER_TYPE)
-        created_by_id = data.get('created_by_id', request.user.id)
+        creator_type = data.get('creator_type', Event_comment.USER_TYPE)  # Default to user type
+        created_by_id = data.get('created_by_id', request.user.id)  # Default to current user ID
 
+        # Validate required fields
         if not event_id or not comment_text:
             return Response({
                 'status': 0,
                 'message': _('event_id and comment are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Validate event existence
         try:
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
@@ -3768,7 +3857,7 @@ class EventCommentCreateAPIView(APIView):
                 'message': _('Event not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Handle parent comment (if it's a reply)
+        # Validate parent comment if provided
         parent_comment = None
         if parent_id:
             try:
@@ -3779,6 +3868,22 @@ class EventCommentCreateAPIView(APIView):
                     'message': _('Parent comment not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
+        # Determine notifier name based on creator type
+        if creator_type in [1, "1"]:  # User
+            commenter = User.objects.get(id=created_by_id)
+            notifier_name = commenter.username
+        elif creator_type in [2, "2"]:  # Team
+            commenter = Team.objects.get(id=created_by_id)
+            notifier_name = commenter.team_username
+        elif creator_type in [3, "3"]:  # Group
+            commenter = TrainingGroups.objects.get(id=created_by_id)
+            notifier_name = commenter.group_name
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator type.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Create new comment
         comment = Event_comment.objects.create(
             created_by_id=created_by_id,
@@ -3787,31 +3892,42 @@ class EventCommentCreateAPIView(APIView):
             comment=comment_text,
             parent=parent_comment
         )
-        if creator_type in [1, "1"]:  # User as creator
-            user = User.objects.get(id=created_by_id)
-            notifier_name = user.username
+
+        # Determine notification recipient based on comment/reply case
+        if parent_comment:
+            # Notify the parent comment creator
+            recipient_id = parent_comment.created_by_id
+            recipient_type = parent_comment.creator_type
+        else:
+            # Notify the event organizer
+            recipient_id = event.event_organizer.id
+            recipient_type = 1  # Assuming organizer is a user
+
+        # Fetch recipient details
+        if recipient_type in [1, "1"]:  # User
+            recipient = User.objects.get(id=recipient_id)
+            recipient_name = recipient.username
+            device_token = recipient.device_token
+            device_type = recipient.device_type
+            notification_language = recipient.current_language
+        elif recipient_type in [2, "2"]:  # Team
+            recipient = Team.objects.get(id=recipient_id)
+            user = recipient.team_founder
+            recipient_name = recipient.team_username
             device_token = user.device_token
             device_type = user.device_type
-            notification_language = user.current_language  # Get user language for notification
-        elif creator_type in [2, "2"]:  # Team as creator
-            team = Team.objects.get(id=created_by_id)
-            user = team.team_founder
-            notifier_name = team.team_username
-            
+            notification_language = user.current_language
+        elif recipient_type in [3, "3"]:  # Group
+            recipient = TrainingGroups.objects.get(id=recipient_id)
+            user = recipient.group_founder
+            recipient_name = recipient.group_name
             device_token = user.device_token
             device_type = user.device_type
-            notification_language = user.current_language  # Get team founder's language for notification
-        elif creator_type == 3:  # Group as creator
-            group = TrainingGroups.objects.get(id=created_by_id)
-            user = group.group_founder
-            notifier_name = group.group_name
-            device_token = user.device_token
-            device_type = user.device_type
-            notification_language = user.current_language  # Get group founder's language for notification
+            notification_language = user.current_language
         else:
             return Response({
                 'status': 0,
-                'message': _('Invalid creator type.')
+                'message': _('Invalid recipient type.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Set notification language
@@ -3820,28 +3936,24 @@ class EventCommentCreateAPIView(APIView):
 
         # Prepare push notification data
         if parent_comment:
-            title = _('New Comment on Your Event!')
-            body = _(f'{notifier_name} commented on your event.')
+            title = _('New Reply on Your Comment!')
+            body = _(f'{notifier_name} replied to your comment.')
             push_data = {'type': 'comment', 'event_id': event.id, 'parent_id': parent_id, 'comment_id': comment.id}
         else:
             title = _('New Comment on Your Event!')
             body = _(f'{notifier_name} commented on your event.')
             push_data = {'type': 'comment', 'event_id': event.id, 'comment_id': comment.id}
 
-        # Sending push notification to the event organizer (creator of the event)
-        device_token = event.event_organizer.device_token
-        device_type = event.event_organizer.device_type
-
+        # Send push notification
         if device_type in [1, 2, "1", "2"]:
             send_push_notification(device_token, title, body, device_type, data=push_data)
 
-        # Return response with comment details
+        # Return response
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
-            'data': EventCommentSerializer(comment).data  # Serialized comment data
+            'data': EventCommentSerializer(comment).data
         }, status=status.HTTP_201_CREATED)
-
 
 
 
@@ -4342,7 +4454,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
             return Response({
                 'status': 1,
-                'message': _('Booking created successfully.'),
+                'message': _('Event Booking Requested successfully.'),
                 'data': serializer.data
             }, status=status.HTTP_201_CREATED)
         else:
