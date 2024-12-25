@@ -703,22 +703,30 @@ class JoinTrainingAPIView(APIView):
         training_id = request.data.get('training_id')
         if not training_id:
             return Response({
-               'status': 0,
-               'message': _('Training ID is required.')
+            'status': 0,
+            'message': _('Training ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Get the user from the request
         user = request.user
         if not user:
             return Response({
-               'status': 0,
-               'message': _('User not found.')
+            'status': 0,
+            'message': _('User not found.')
             }, status=status.HTTP_404_NOT_FOUND)
-        
+
+        # Check if gender is provided
+        if not user.gender:  # Assuming gender is a field in the user model
+            return Response({
+                'status': 0,
+                'message': _('Please add your gender first.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check user role
         if user.role.id != 2:
             return Response({
-              'status': 0,
-              'message': _('Only Players can Join training.')
+            'status': 0,
+            'message': _('Only Players can Join training.')
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Validate the training ID
@@ -726,8 +734,8 @@ class JoinTrainingAPIView(APIView):
             training = Training.objects.get(id=training_id)
         except Training.DoesNotExist:
             return Response({
-              'status': 0,
-              'message': _('Training not found.')
+            'status': 0,
+            'message': _('Training not found.')
             }, status=status.HTTP_404_NOT_FOUND)
         
         # Check if the user is already a member of the training
@@ -742,20 +750,20 @@ class JoinTrainingAPIView(APIView):
                 user=user,
                 training=training,
             )
-       
-
-        # Check if the user is already a member of the training
         else:
             return Response({
-              'status': 0,
-              'message': _('User is already a member of the training.')
+            'status': 0,
+            'message': _('User is already a member of the training.')
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Serialize and return the membership data
         serializer = TrainingMembershipSerializer(membership)
         return Response({
-          'status': 1,
-          'message': _('User joined the training successfully.'),
+        'status': 1,
+        'message': _('User joined the training successfully.'),
             'data': serializer.data
         }, status=status.HTTP_201_CREATED)
+
     
 
     def get(self, request, *args, **kwargs):

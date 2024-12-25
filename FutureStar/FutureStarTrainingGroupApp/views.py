@@ -69,7 +69,6 @@ class TrainingGroupAPI(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             # Log the exception and return an error response
-            print(f"Error checking existing group: {e}")
             return Response({
                 'status': 0,
                 'message': _('An error occurred while checking your existing Training Groups.')

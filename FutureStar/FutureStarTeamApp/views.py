@@ -703,7 +703,6 @@ class StaffManagementView(APIView):
                 if serializer.is_valid():
                     serializer.save()
                     notification_language = user.current_language if user.current_language in ['en', 'ar'] else 'en'
-                    print(f"User's preferred language: {notification_language}")  # Debugging
                     activate(notification_language)
                     # Translate and format notification title and body
                     joinning_type_name = dict(JoinBranch.JOINNING_TYPE_CHOICES).get(joinning_type, "Staff")
@@ -713,9 +712,6 @@ class StaffManagementView(APIView):
                     title = title_template.format(team_name=team_name)
                     body = body_template.format(team_name=team_name, joinning_type_name=joinning_type_name)
 
-                    print(f"Translated title: {title}")
-                    print(f"Translated body: {body}")
-
                     # Send push notification to the user
                     if user.device_type in [1, 2, "1", "2"]:
                         push_data = {
@@ -723,10 +719,7 @@ class StaffManagementView(APIView):
                             'branch_id': branch_id,
                             'joinning_type': joinning_type
                         }
-
-                        print(f"Sending push notification with title: {title}")  # Debugging
                         send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
-                        print(f"Notification sent successfully with title: {title} and body: {body}")
 
                     # Return API success message in the selected language
                     activate(language)  # Reactivate header language
@@ -736,7 +729,6 @@ class StaffManagementView(APIView):
                         'data': serializer.data
                     }, status=status.HTTP_201_CREATED)
                 else:
-                    print(f"Serializer errors: {serializer.errors}")  # Debugging
                     return Response({
                         'status': 0,
                         'message': _('Failed to add staff/player.'),

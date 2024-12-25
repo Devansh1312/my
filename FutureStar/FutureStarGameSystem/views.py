@@ -1363,7 +1363,6 @@ class LineupPlayerStatusAPIView(APIView):
             lineup_status=3,
             player_ready=True
         ).count()
-        print(team_b_ready_count)
 
         # Send notifications to team_a coaches and managers if they have 11 players ready
         if team_a_ready_count == 11:
@@ -1387,7 +1386,6 @@ class LineupPlayerStatusAPIView(APIView):
                 )
 
         # Send notifications to team_b coaches and managers if they have 11 players ready
-        print(team_b_ready_count == 11)
         if team_b_ready_count == 11:
             team_b_name = game.team_b.team_name
             team_b_coaches_and_managers = JoinBranch.objects.filter(
@@ -1645,8 +1643,6 @@ class OfficialSearchView(APIView):
         phone = request.query_params.get('phone', '').strip()  # Get phone and remove extra spaces
         game_id = request.query_params.get('game_id')  # Get game_id from request
 
-        print(search_type,phone,game_id)
-
         # Validate search_type: must be between 1 and 10
         if not search_type or not search_type.isdigit() or int(search_type) not in range(1, 11):
             return Response({
@@ -1772,7 +1768,6 @@ class GameOfficialsAPIView(APIView):
         game_id = request.data.get('game_id')
         official_id = request.data.get('official_id')
         officials_type_id = request.data.get('officials_type_id')
-        print(game_id)
 
         # Validate game_id
         if not game_id:
@@ -2061,13 +2056,10 @@ class PlayerGameStatsAPIView(APIView):
         message = stat_messages.get(stat, _('Your statistics have been updated!'))
 
         # Set the language based on player's current_language
-        print(f"Player's preferred language: {player_instance.current_language}")
         notification_language = player_instance.current_language  # Use player's preferred language
         
         if notification_language in ['en', 'ar']:
             activate(notification_language)  # Activate language for notification
-            print(f"Language activated: {notification_language}")
-            print(_('You just scored a goal!'))  # Check translation
 
         # Translate each part of the notification message
         translated_message = _(message)
@@ -2076,10 +2068,6 @@ class PlayerGameStatsAPIView(APIView):
 
         # Construct the notification body
         notification_body = f"{translated_message} in {translated_tournament_name} - {translated_game_number}"
-
-        # Print the notification details to verify the message content
-        print(f"Notification title: {_('Statistics Updated!')}")
-        print(f"Notification body: {notification_body}")
 
         # Send the notification to the player
         if player_instance.device_token:

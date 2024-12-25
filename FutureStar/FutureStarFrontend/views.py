@@ -1072,9 +1072,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             if time_filter is None:
                 time_filter = {}
 
-            # Debug: Print time_filter
-            print("Time filter:", time_filter)
-
             # 1. Tournament games officiated
             tournament_games_officiated = GameOfficials.objects.filter(
                 official_id=user.id,
@@ -1082,8 +1079,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 **time_filter
             ).values_list('game_id', flat=True)
 
-            # Debug: Print results for officiated tournament games
-            print("Tournament Games Officiated:", tournament_games_officiated)
+           
 
             # 2. Friendly games officiated
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
@@ -1092,14 +1088,8 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 **time_filter
             ).values_list('game_id', flat=True)
 
-            # Debug: Print results for officiated friendly games
-            print("Friendly Games Officiated:", friendly_games_officiated)
-
             # 3. Calculate total games officiated
             total_games_officiated = len(tournament_games_officiated) + len(friendly_games_officiated)
-
-            # Debug: Print total games officiated
-            print("Total Games Officiated:", total_games_officiated)
 
             # 4. Cards stats (yellow and red cards)
             cards_stats = PlayerGameStats.objects.filter(
@@ -1110,18 +1100,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 total_red_cards=Sum('red_cards')
             )
 
-            # Debug: Print cards stats
-            print("Cards Stats:", cards_stats)
 
             total_yellow_cards = cards_stats['total_yellow_cards'] or 0
             total_red_cards = cards_stats['total_red_cards'] or 0
-
             # 5. Fetch Upcoming Games
             current_datetime = datetime.now()
-
-            # Debug: Print current date and time
-            print("Current Date and Time:", current_datetime)
-
             # 6. Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
@@ -1129,18 +1112,12 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finish=False
             ).order_by('game_date')[:5]  # Get the next 5 upcoming games
 
-            # Debug: Print upcoming tournament games
-            print("Upcoming Tournament Games:", upcoming_tournament_games)
-
             # 7. Upcoming friendly games
             upcoming_friendly_games = FriendlyGame.objects.filter(
                 id__in=friendly_games_officiated,
                 game_date__gte=current_datetime.date(),
                 finish=False
             ).order_by('game_date')[:5]  # Get the next 5 upcoming games
-
-            # Debug: Print upcoming friendly games
-            print("Upcoming Friendly Games:", upcoming_friendly_games)
 
             upcoming_games = []
 
@@ -1175,17 +1152,11 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 # finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
 
-            # Debug: Print finished tournament games
-            print("Finished Tournament Games:", finished_tournament_games)
-
             finished_friendly_games = FriendlyGame.objects.filter(
                 id__in=friendly_games_officiated,
                 game_date__lt=current_datetime.date(),
                 # finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
-
-            # Debug: Print finished friendly games
-            print("Finished Friendly Games:", finished_friendly_games)
 
             finished_games = []
 
@@ -1218,9 +1189,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             # 13. Sort Finished Games by Date
             finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
 
-            # Debug: Print sorted finished games
-            print("Finished Games:", finished_games)
-
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
@@ -1230,8 +1198,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "finished_games": finished_games,
             }
         except Exception as e:
-            # Debugging: Print exception message
-            print("Error:", str(e))
             return {"status": 0, "message": "Failed to fetch referee stats.", "error": str(e)}
 
 
@@ -1901,9 +1867,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
             if time_filter is None:
                 time_filter = {}
 
-            # Debugging: Print time_filter
-            print("Time filter:", time_filter)
-
             # Check if the user is an official in any game (official types 2, 3, 4, 5)
             is_official = GameOfficials.objects.filter(
                 official_id=user.id,
@@ -1912,8 +1875,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5]
             ).exists()
-
-            print("Is user an official?", is_official)
 
             # If the user is not an official for any game, return an appropriate message
             if not is_official:
@@ -1925,7 +1886,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 officials_type_id__in=[2, 3, 4, 5],  # IDs representing referee roles
                 **time_filter
             ).values_list('game_id', flat=True)
-            print("Tournament Games Officiated:", tournament_games_officiated)
 
             # Friendly games officiated
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
@@ -1933,11 +1893,9 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 officials_type_id__in=[2, 3, 4, 5],
                 **time_filter
             ).values_list('game_id', flat=True)
-            print("Friendly Games Officiated:", friendly_games_officiated)
 
             # Fetch Upcoming Games
             current_datetime = datetime.now()
-            print("Current Date and Time:", current_datetime)
 
             # Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
@@ -1945,7 +1903,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 game_date__gte=current_datetime.date(),
                 finish=False  # Ensure the game is not finished
             ).order_by('game_date')
-            print("Upcoming Tournament Games:", upcoming_tournament_games)
 
             # Upcoming friendly games
             upcoming_friendly_games = FriendlyGame.objects.filter(
@@ -1953,7 +1910,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 game_date__gte=current_datetime.date(),
                 finish=False  # Ensure the game is not finished
             ).order_by('game_date')
-            print("Upcoming Friendly Games:", upcoming_friendly_games)
 
             upcoming_games = []
 
@@ -2034,7 +1990,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
 
 
     def get_player_games(self, user, time_filter): 
-        print("I'm Player")
         """
         Fetch upcoming and finished games where the player (role 2) is already in the lineup.
         """
@@ -2336,7 +2291,6 @@ class UserCreatedFieldsView(LoginRequiredMixin, View):
                 'city_id': field.city_id.name if field.city_id else None,  # Assuming `City` has a `name` attribute
             })
         
-        print(fields_data)
         context = {
             'fields': fields_data,
             "current_language": language_from_url,
@@ -3061,18 +3015,12 @@ class PlayerInfoPage(View):
             if time_filter is None:
                 time_filter = {}
 
-            # Debug: Print time_filter
-            print("Time filter:", time_filter)
-
             # 1. Tournament games officiated
             tournament_games_officiated = GameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # IDs representing referee roles
                 **time_filter
             ).values_list('game_id', flat=True)
-
-            # Debug: Print results for officiated tournament games
-            print("Tournament Games Officiated:", tournament_games_officiated)
 
             # 2. Friendly games officiated
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
@@ -3081,14 +3029,12 @@ class PlayerInfoPage(View):
                 **time_filter
             ).values_list('game_id', flat=True)
 
-            # Debug: Print results for officiated friendly games
-            print("Friendly Games Officiated:", friendly_games_officiated)
+        
 
             # 3. Calculate total games officiated
             total_games_officiated = len(tournament_games_officiated) + len(friendly_games_officiated)
 
-            # Debug: Print total games officiated
-            print("Total Games Officiated:", total_games_officiated)
+           
 
             # 4. Cards stats (yellow and red cards)
             cards_stats = PlayerGameStats.objects.filter(
@@ -3099,8 +3045,7 @@ class PlayerInfoPage(View):
                 total_red_cards=Sum('red_cards')
             )
 
-            # Debug: Print cards stats
-            print("Cards Stats:", cards_stats)
+           
 
             total_yellow_cards = cards_stats['total_yellow_cards'] or 0
             total_red_cards = cards_stats['total_red_cards'] or 0
@@ -3108,8 +3053,7 @@ class PlayerInfoPage(View):
             # 5. Fetch Upcoming Games
             current_datetime = datetime.now()
 
-            # Debug: Print current date and time
-            print("Current Date and Time:", current_datetime)
+           
 
             # 6. Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
@@ -3118,8 +3062,6 @@ class PlayerInfoPage(View):
                 finish=False
             ).order_by('game_date')[:5]  # Get the next 5 upcoming games
 
-            # Debug: Print upcoming tournament games
-            print("Upcoming Tournament Games:", upcoming_tournament_games)
 
             # 7. Upcoming friendly games
             upcoming_friendly_games = FriendlyGame.objects.filter(
@@ -3128,9 +3070,7 @@ class PlayerInfoPage(View):
                 finish=False
             ).order_by('game_date')[:5]  # Get the next 5 upcoming games
 
-            # Debug: Print upcoming friendly games
-            print("Upcoming Friendly Games:", upcoming_friendly_games)
-
+        
             upcoming_games = []
 
             # 8. Format upcoming tournament games
@@ -3164,17 +3104,11 @@ class PlayerInfoPage(View):
                 # finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
 
-            # Debug: Print finished tournament games
-            print("Finished Tournament Games:", finished_tournament_games)
-
             finished_friendly_games = FriendlyGame.objects.filter(
                 id__in=friendly_games_officiated,
                 game_date__lt=current_datetime.date(),
                 # finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
-
-            # Debug: Print finished friendly games
-            print("Finished Friendly Games:", finished_friendly_games)
 
             finished_games = []
 
@@ -3207,9 +3141,6 @@ class PlayerInfoPage(View):
             # 13. Sort Finished Games by Date
             finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
 
-            # Debug: Print sorted finished games
-            print("Finished Games:", finished_games)
-
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
@@ -3219,8 +3150,6 @@ class PlayerInfoPage(View):
                 "finished_games": finished_games,
             }
         except Exception as e:
-            # Debugging: Print exception message
-            print("Error:", str(e))
             return {"status": 0, "message": "Failed to fetch referee stats.", "error": str(e)}
 
 

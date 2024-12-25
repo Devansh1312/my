@@ -165,8 +165,6 @@ class CreateFriendlyGame(APIView):
                                 status=RequestedReferee.REQUESTED
                             )
                         except Exception as e:
-                            # Log or handle any specific errors (like invalid user_id)
-                            print(e)
                             continue
 
                 # Notify eligible team members (coaches and managers)
@@ -250,23 +248,16 @@ class CreateFriendlyGame(APIView):
         else:       
             user_datas = User.objects.filter(Q(role__id=3) | Q(role__id=6))
             for user_data in user_datas:
-                # print(user_datas)
-            
-            
-            
-            
                 team_members = JoinBranch.objects.filter(
                     user_id=user_data.id,  # Filter users by role (Coach or Manager)
                     joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]  # Staff types only
                 ).exclude(user_id=creator_user.id)  # Optimize query by prefetching related user data
-                # print("fghfgh",team_members)
+
 
             
 
             # Iterate through the filtered users and send notifications
                 for member in team_members:
-                    print(member.id)
-                    print(member)
                 
                     user = member.user_id
                     notification_language = user.current_language
@@ -2150,7 +2141,6 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             lineup_status=3,
             player_ready=True
         ).count()
-        print(team_b_ready_count)
 
         # Send notifications to team_a coaches and managers if they have 11 players ready
         if team_a_ready_count == 11:
@@ -2174,7 +2164,6 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 )
 
         # Send notifications to team_b coaches and managers if they have 11 players ready
-        print(team_b_ready_count == 11)
         if team_b_ready_count == 11:
             team_b_name = game.team_b.team_name
             team_b_coaches_and_managers = JoinBranch.objects.filter(
@@ -2878,13 +2867,10 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         message = stat_messages.get(stat, _('Your statistics have been updated!'))
 
         # Set the language based on player's current_language
-        print(f"Player's preferred language: {player_instance.current_language}")
         notification_language = player_instance.current_language  # Use player's preferred language
 
         if notification_language in ['en', 'ar']:
             activate(notification_language)  # Activate language for notification
-            print(f"Language activated: {notification_language}")
-            print(_('You just scored a goal!'))  # Check translation
 
         # Translate each part of the notification message
         translated_message = _(message)
@@ -2892,10 +2878,6 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
         # Construct the notification body
         notification_body = f"{translated_message} in Friendly Game - {translated_game_number}"
-
-        # Print the notification details to verify the message content
-        print(f"Notification title: {_('Statistics Updated!')}")
-        print(f"Notification body: {notification_body}")
 
         # Send the notification to the player
         if player_instance.device_token:
