@@ -30,7 +30,7 @@
            
           
             <div class="col-lg-9" style="width: auto">
-                {% if user.role.id == 2 %}
+                {% if infouser.role.id == 2 %}
                 <div class="row">
                     <div class="col-md-3 col-6">
                         <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
@@ -40,7 +40,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Game Played</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Win</h6>
-                                <h5 class="score">{{ stats.win }}</h5>
+                                <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Lost</h6>
-                                <h5 class="score">{{ stats.loss }}</h5>
+                                <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Draw</h6>
-                                <h5 class="score">{{ stats.draw }}</h5>
+                                <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Goal Scored</h6>
-                                <h5 class="score">{{ stats.goals }}</h5>
+                                <h5 class="score">{{ stats.goals|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -130,7 +130,7 @@
                     </div>
                 </div>
                 {% endif %}
-                {% if user.role.id == 3 %}
+                {% if infouser.role.id == 3 %}
                 <div class="row">
                     <div class="col-md-3 col-6">
                         <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
@@ -219,7 +219,7 @@
                     
                 </div>
                 {% endif %}
-                {% if user.role.id == 4 %}
+                {% if infouser.role.id == 4 %}
                 <div class="row">
                     <div class="col-md-3 col-6">
                         <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
@@ -259,7 +259,7 @@
                     </div>
                 </div>
                 {% endif %}
-                {% if user.role.id == 6 %}
+                {% if infouser.role.id == 6 %}
                 <div class="row">
                     <div class="col-md-3 col-6">
                         <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
@@ -393,7 +393,7 @@
  document.getElementById("myDropdown").classList.toggle("show");
 }
 
-// Close the dropdown if the user clicks outside of it
+// Close the dropdown if the infouser clicks outside of it
 window.onclick = function(event) {
  if (!event.target.matches('.dropbtn')) {
    var dropdowns = document.getElementsByClassName("dropdown-content");

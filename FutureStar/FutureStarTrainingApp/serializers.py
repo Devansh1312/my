@@ -347,7 +347,7 @@ class TrainingMembershipSerializer(serializers.ModelSerializer):
             'username': user.username,
             'phone': user.phone,
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
-            'gender':user.gender.id,
+            'gender':user.gender.id if user.gender else None,
             'country_id': user.country.id if user.country else None,
             'country_name': user.country.name if user.country else None,
         }

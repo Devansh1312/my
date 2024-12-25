@@ -14,7 +14,7 @@ from django.utils.translation import activate
 from django.contrib.auth import authenticate, login
 import random
 from django.db.models import Q,Sum,When,Case,F
-
+from datetime import datetime
 
 
 ##############################################   HomePage   ########################################################
@@ -481,7 +481,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
         return teams, stats
 
-    from datetime import datetime
+    
 
     def get_player_stats(self, user, time_filter):
         """
@@ -2444,7 +2444,7 @@ class TeamPageSearchResults(View):
 
 
 
-class PlayerInfoPage(LoginRequiredMixin, View):
+class PlayerInfoPage(View):
     
     def get_user_related_data(self, user, time_filter=None):
         """
@@ -2470,8 +2470,6 @@ class PlayerInfoPage(LoginRequiredMixin, View):
 
 
         return teams, stats
-
-    from datetime import datetime
 
     def get_player_stats(self, user, time_filter):
         """
@@ -3049,6 +3047,7 @@ class PlayerInfoPage(LoginRequiredMixin, View):
                 "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
             }
+        
         except Exception as e:
             return {"status": 0, "message": "Failed to fetch coach stats.", "error": str(e)}
 
@@ -3251,6 +3250,7 @@ class PlayerInfoPage(LoginRequiredMixin, View):
             "cmsdata": cms_pages.objects.filter(id=14).first(),
             "teams": teams,
             "stats": stats,
+            "infouser":user,
             
         }
 

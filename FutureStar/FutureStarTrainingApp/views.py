@@ -1093,14 +1093,15 @@ class TrainingFeedbackAPI(APIView):
                 "id": training_joined.user.id,
                 "username": training_joined.user.username,
                 "phone": training_joined.user.phone,  # Assuming a profile relationship
-                "profile_picture": training_joined.user.profile_picture.url,  # Assuming a profile relationship
-                "country_id": training_joined.user.country.id,  # Assuming a profile relationship
-                "country_name": training_joined.user.country.name,  # Assuming a profile relationship
+                "profile_picture": training_joined.user.profile_picture.url if training_joined.user.profile_picture else None,
+                "country_id": training_joined.user.country.id if training_joined.user.country else None,
+                "country_name": training_joined.user.country.name if training_joined.user.country else None,
             },
             "attendance_status": training_joined.attendance_status,
             "rating": training_joined.rating,
             "feedbacks": feedback_data
         }
+
 
         # Compile the message based on what was updated
         update_message = ", ".join(update_messages) if update_messages else _("No changes made")

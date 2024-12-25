@@ -94,7 +94,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Game Played</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Win</h6>
-                                <h5 class="score">{{ stats.win }}</h5>
+                                <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Lost</h6>
-                                <h5 class="score">{{ stats.loss }}</h5>
+                                <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -130,7 +130,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Draw</h6>
-                                <h5 class="score">{{ stats.draw }}</h5>
+                                <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Goal Scored</h6>
-                                <h5 class="score">{{ stats.goals }}</h5>
+                                <h5 class="score">{{ stats.goals|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -154,7 +154,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Assists</h6>
-                                <h5 class="score">{{ stats.assists }}</h5>
+                                <h5 class="score">{{ stats.assists|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Yellow Card</h6>
-                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                                <h5 class="score">{{ stats.yellow_card|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -178,7 +178,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Red Card</h6>
-                                <h5 class="score">{{ stats.red }}</h5>
+                                <h5 class="score">{{ stats.red|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -194,7 +194,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Game Coached</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -206,7 +206,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Win</h6>
-                                <h5 class="score">{{ stats.win }}</h5>
+                                <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -218,7 +218,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Lost</h6>
-                                <h5 class="score">{{ stats.loss }}</h5>
+                                <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -230,7 +230,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Draw</h6>
-                                <h5 class="score">{{ stats.draw }}</h5>
+                                <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -242,7 +242,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head"> Team Goal Conceded</h6>
-                                <h5 class="score">{{ stats.goals_conceded }}</h5>
+                                <h5 class="score">{{ stats.goals_conceded|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -254,7 +254,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Yellow Card</h6>
-                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                                <h5 class="score">{{ stats.yellow_card|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -266,7 +266,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Red Card</h6>
-                                <h5 class="score">{{ stats.red }}</h5>
+                                <h5 class="score">{{ stats.red|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -283,7 +283,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Game Officiating</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -295,7 +295,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Yellow Card</h6>
-                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                                <h5 class="score">{{ stats.yellow_card|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -307,7 +307,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Red Card</h6>
-                                <h5 class="score">{{ stats.red }}</h5>
+                                <h5 class="score">{{ stats.red|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -323,7 +323,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Game Manage</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -335,7 +335,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Win</h6>
-                                <h5 class="score">{{ stats.win }}</h5>
+                                <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -347,7 +347,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Lost</h6>
-                                <h5 class="score">{{ stats.loss }}</h5>
+                                <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -359,7 +359,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">Draw</h6>
-                                <h5 class="score">{{ stats.draw }}</h5>
+                                <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
