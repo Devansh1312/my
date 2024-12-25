@@ -206,8 +206,7 @@
 						<h5 class="player-name">{{ branch.team_name }}</h5>
 						<p class="player-designation">Team</p>
 						<div>
-							<form method="post" action="{% url 'TeamBranchPageSearchResults' %}">
-								{% csrf_token %}
+							<form method="get" action="{% url 'TeamBranchPageSearchResults' %}">
 								<input type="hidden" name="team_id" value="{{ branch.id }}">
 								<button type="submit" class="theme-btn style-two w-100">View Info <i class="fa-solid fa-arrow-right"></i></button>
 							</form>

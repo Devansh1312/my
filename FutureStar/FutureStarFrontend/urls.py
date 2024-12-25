@@ -41,7 +41,7 @@ urlpatterns = [
     path('search/', SearchView.as_view(), name='search'),
     path('team-page-detail/', TeamPageSearchResults.as_view(), name='TeamPageSearchResults'),
     path('player-page/', PlayerInfoPage.as_view(), name='player_info'),
-    path('team-detail-page/', TeamDetailsView.as_view(), name='TeamBranchPageSearchResults'),
+    path('team/', TeamDetailsView.as_view(), name='TeamBranchPageSearchResults'),
 
 
 

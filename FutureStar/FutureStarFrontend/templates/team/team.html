@@ -101,7 +101,8 @@ Goalactico || Team-Detail
                 <div class="team-profile-content wow fadeInRight delay-0-2s">
                     <h2>{{ team.team_name }}</h2>
                     <span class="designation">{{ team.team_type.name_en }}</span>
-                    <p>{{ team.team_id.bio }}</p>
+                    <p>{{ team.team_id.description }}</p>
+
                     <div class="team-sub-title mt-55 mb-30">
                         <h4>Get In Touch</h4>
                     </div>
@@ -184,7 +185,7 @@ Goalactico || Team-Detail
                     <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
                         <div>
                             <div class="img-wrapper">
-                                <img src="assets/images/dashboard/play-football.png" class="img-fluid" alt="">
+                                <img src="{% static 'assets/images/dashboard/play-football.png' %}" class="img-fluid" alt="">
                             </div>
                             <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                         </div>
@@ -200,7 +201,7 @@ Goalactico || Team-Detail
                     <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
                         <div>
                             <div class="img-wrapper">
-                                <img src="assets/images/dashboard/tennis-ball.png" class="img-fluid" alt="">
+                                <img src="{% static 'assets/images/dashboard/tennis-ball.png' %}" class="img-fluid" alt="">
                             </div>
                             <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                         </div>
@@ -216,7 +217,7 @@ Goalactico || Team-Detail
                     <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
                         <div>
                             <div class="img-wrapper">
-                                <img src="assets/images/dashboard/profile-fields.png" class="img-fluid" alt="">
+                                <img src="{% static 'assets/images/dashboard/profile-fields.png' %}" class="img-fluid" alt="">
                             </div>
                             <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                         </div>
@@ -232,7 +233,7 @@ Goalactico || Team-Detail
                     <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
                         <div>
                             <div class="img-wrapper">
-                                <img src="assets/images/dashboard/passport-duotone.png" class="img-fluid" alt="">
+                                <img src="{% static 'assets/images/dashboard/passport-duotone.png' %}" class="img-fluid" alt="">
                             </div>
                             <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                         </div>
@@ -248,7 +249,7 @@ Goalactico || Team-Detail
                     <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
                         <div>
                             <div class="img-wrapper">
-                                <img src="assets/images/dashboard/Mask group.png" class="img-fluid" alt="">
+                                <img src="{% static 'assets/images/dashboard/Mask group.png' %}" class="img-fluid" alt="">
                             </div>
                             <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                         </div>
@@ -264,7 +265,7 @@ Goalactico || Team-Detail
                     <div class="total-info-wrapper wow fadeInUp delay-0-5s animated bg-two">
                         <div>
                             <div class="img-wrapper">
-                                <img src="assets/images/dashboard/people-team.png" class="img-fluid" alt="">
+                                <img src="{% static 'assets/images/dashboard/people-team.png' %}" class="img-fluid" alt="">
                             </div>
                             <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                         </div>
@@ -424,7 +425,7 @@ Goalactico || Team-Detail
                             {% endfor %}
                             {% if not finished_games %}
                             <tr>
-                                <td colspan="5">No Tournament found.</td>
+                                <td colspan="5">No Tournament Games found.</td>
                             </tr>
                             {% endif %}
                         </tbody>

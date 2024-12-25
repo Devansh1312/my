@@ -3345,46 +3345,6 @@ class TeamDetailsView(View):
 
         return staff_members, players, joined_tournaments, finished_games, stats
 
-    def post(self, request, *args, **kwargs):
-        # Handle language selection
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            # Save to session if found in URL
-            request.session['language'] = language_from_url
-        else:
-            # Use session language or default to 'en'
-            language_from_url = request.session.get('language', 'en')
-
-        # Handle POST request to get the team_id from the form
-        team_id = request.POST.get("team_id")
-        if not team_id:
-            messages.error(request, "Team ID is missing. Please provide a valid team.")
-            return redirect("Dashboard")
-
-        try:
-            # Get the team object based on team_id
-            team = TeamBranch.objects.get(id=team_id)
-
-            # Fetch the required related data
-            staff_members, players, joined_tournaments, finished_games, stats = self.get_team_data(team)
-
-            # Add team data to the context
-            context = {
-                "team": team,
-                "staff_members": staff_members,
-                "players": players,
-                "joined_tournaments": joined_tournaments,
-                "finished_games": finished_games,
-                "stats": stats,  # Add stats to context
-                'current_language': language_from_url,  # Add language to context
-            }
-
-        except TeamBranch.DoesNotExist:
-            messages.error(request, "The specified team was not found.")
-            return redirect("index")
-
-        # Render the template with the updated context
-        return render(request, 'team/team.html', context)
 
     def get(self, request, *args, **kwargs):
         # Handle language selection
