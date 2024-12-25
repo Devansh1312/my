@@ -26,10 +26,40 @@
 </style>
 <section class="services-area-six pt-150 pb-100">
     <div class="container">
-        <div class="row" style="display: inline;">
-           
+        <div class="row">
+
+            <div class="col-lg-3 col-sm-6 custome-alignment success-players" style="padding: 0 10px;">
+                <div class="item-wrapper wow fadeInUp delay-0-3s animated">
+                    <div class="img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt=""></div>
+                    <h5 class="player-name">@Nathan S. Nguyen</h5>
+                    <p class="player-designation">Player</p>
+
+                        <div class="">
+                            <div class="contact-info-item mt-35">
+                                <div class="icon">
+                                    <i class="fa fa-phone"></i>
+                                </div>
+                                <div class="content" style="text-align: left;">
+                                    <b class="title">Phone</b>
+                                    <span class="text">+000 (123) 456 789</span>
+                                </div>
+
+                            </div>
+                            <div class="contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-envelope"></i>
+                                </div>
+                                <div class="content" style="text-align: left;">
+                                    <b class="title">Email</b>
+                                    <span class="text">player025@gmail.com</span>
+                                </div>
+
+                            </div>
+                        </div>
+                </div>
+            </div>
           
-            <div class="col-lg-9" style="width: auto">
+            <div class="col-lg-9">
                 {% if infouser.role.id == 2 %}
                 <div class="row">
                     <div class="col-md-3 col-6">
@@ -380,6 +410,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </section>
