@@ -1,0 +1,273 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+{% load lang_filter %}
+
+{% block css %}
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<link rel="stylesheet" href="{% static 'frontend/assets/css/bootstrap.min.css'%}">
+<!-- Magnific Popup -->
+<link rel="stylesheet" href="{% static 'frontend/assets/css/magnific-popup.min.css'%}">
+<!-- Nice Select -->
+<link rel="stylesheet" href="{% static 'frontend/assets/css/nice-select.min.css'%}">
+<!-- Animate -->
+<link rel="stylesheet" href="{% static 'frontend/assets/css/animate.min.css'%}">
+<!-- Slick -->
+<link rel="stylesheet" href="{% static 'frontend/assets/css/slick.min.css'%}">
+<!-- Main Style -->
+<link rel="stylesheet" href="{% static 'frontend/assets/css/style.css'%}">
+<!-- RTL -->
+<link rel="stylesheet" href="{% static 'frontend/assets/css/arabic.css'%}">
+
+
+<style>
+    .item-wrapper {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .item-wrapper:hover {
+        transform: scale(1.05);
+    }
+
+    .img-wrapper img {
+        object-fit: cover;
+        height: 150px; /* Adjusted height for the image */
+        width: 150px; /* Adjusted width for the image */
+        border-radius: 50%;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .player-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .player-designation {
+        font-size: 1em;
+        margin-bottom: 15px;
+    }
+
+    .theme-btn.style-two {
+        background-color: #78be20;
+        color: #ffffff;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .theme-btn.style-two:hover {
+        background-color: #66a517;
+    }
+
+    /* Style for No results found message */
+    .no-results-message {
+        background: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
+        color: white;                    /* White text */
+        padding: 20px;                   /* Space around the text */
+        border-radius: 10px;             /* Rounded corners */
+        text-align: center;              /* Center the text */
+        font-size: 1.2em;                /* Slightly larger text */
+        margin-top: 20px;                /* Add space from above */
+        width: 100%;                     /* Make it full width */
+        max-width: 600px;                /* Limit the width */
+        margin-left: auto;               /* Center horizontally */
+        margin-right: auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+    }
+
+    /* Responsive settings for the No results found message */
+    @media (max-width: 768px) {
+        .no-results-message {
+            font-size: 1em;             /* Adjust font size for smaller screens */
+            padding: 15px;              /* Adjust padding */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .no-results-message {
+            font-size: 0.9em;           /* Further adjust font size for very small screens */
+            padding: 10px;              /* Adjust padding */
+        }
+    }
+
+    /* Responsive settings */
+    @media (max-width: 768px) {
+        .col-lg-3, .col-sm-6 {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .item-wrapper {
+            padding: 10px;
+        }
+
+        .img-wrapper img {
+            height: 120px;
+            width: 120px;
+        }
+
+        .player-name {
+            font-size: 1em;
+        }
+
+        .player-designation {
+            font-size: 0.9em;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .item-wrapper {
+            padding: 8px;
+        }
+
+        .player-name {
+            font-size: 0.9em;
+        }
+
+        .player-designation {
+            font-size: 0.8em;
+        }
+
+        .theme-btn.style-two {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block title %} Future Star || Search {% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+    <!-- Preloader -->
+    <div class="preloader"><div class="custom-loader"></div></div>        
+
+    <!-- End Main Header-->
+<section class="success-players">
+    <div class="container">
+        <div class="row">
+            {% if user_results %}
+                {% for user in user_results %}
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="item-wrapper wow fadeInUp delay-0.3s animated">
+                            <div class="img-wrapper">
+                                {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" class="img-fluid" alt="{{ user.username }}'s Profile Picture">
+                                {% else %}
+                                    <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="Default Profile Picture">
+                                {% endif %}
+                            </div>
+                            <h5 class="player-name">{{ user.username }}</h5>
+                            <p class="player-designation">{{ user.role.name_en }}</p>
+                            <div>
+                                <a class="theme-btn style-two" href="#">View Info <i class="far fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if team_results %}
+                {% for team in team_results %}
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="item-wrapper wow fadeInUp delay-0.3s animated">
+                            <div class="img-wrapper">
+                                <img src="{{ team.team_logo.url }}" class="img-fluid" alt="{{ team.team_name }} Logo">
+                            </div>
+                            <h5 class="player-name">{{ team.team_name }}</h5>
+                            <p class="player-designation">Team Page</p>
+                            <div>
+                                <a class="theme-btn style-two" href="#">View Info <i class="far fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if team_branch_results %}
+                {% for branch in team_branch_results %}
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="item-wrapper wow fadeInUp delay-0.3s animated">
+                            <div class="img-wrapper">
+                                <img src="{{ branch.team_id.profile_picture.url }}" class="img-fluid" alt="{{ branch.team_name }} Branch Logo">
+                            </div>
+                            <h5 class="player-name">{{ branch.team_name }}</h5>
+                            <p class="player-designation">Team</p>
+                            <div>
+                                <a class="theme-btn style-two" href="#">View Info <i class="far fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if not user_results and not team_results and not team_branch_results %}
+        <div class="no-results-message">
+            {{ 'No results found.' }}
+        </div>
+        {% endif %}
+    </div>
+    <button class="scroll-top scroll-to-target" data-target="html"><span class="fas fa-angle-double-up"></span></button>
+</section>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
+
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block scriptcontent %}
+<script src="assets/js/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap -->
+<script src="assets/js/bootstrap.min.js"></script>
+<!-- Appear Js -->
+<script src="assets/js/appear.min.js"></script>
+<!-- Slick -->
+<script src="assets/js/slick.min.js"></script>
+<!-- Magnific Popup -->
+<script src="assets/js/jquery.magnific-popup.min.js"></script>
+<!-- Nice Select -->
+<script src="assets/js/jquery.nice-select.min.js"></script>
+<!-- Image Loader -->
+<script src="assets/js/imagesloaded.pkgd.min.js"></script>
+<!-- Circle Progress -->
+<script src="assets/js/circle-progress.min.js"></script>
+<!-- Isotope -->
+<script src="assets/js/isotope.pkgd.min.js"></script>
+<!--  WOW Animation -->
+<script src="assets/js/wow.min.js"></script>
+<!-- Custom script -->
+<script src="assets/js/script.js"></script>
+
+<!-- For Contact Form -->
+<script src="assets/js/jquery.ajaxchimp.min.js"></script>
+<script src="assets/js/form-validator.min.js"></script>
+<script src="assets/js/contact-form-script.js"></script>
+
+<script>new WOW().init();</script>
+{% endblock %}

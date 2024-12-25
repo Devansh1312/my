@@ -2343,3 +2343,35 @@ class UserCreatedFieldsView(LoginRequiredMixin, View):
             "cmsdata": cms_pages.objects.filter(id=14).first(),
         }
         return render(request, 'PlayerDashboardFields.html', context)
+
+
+
+
+class SearchView(View):
+    def get(self, request, *args, **kwargs):
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        else:
+            # If not, fall back to session language
+            language_from_url = request.session.get('language', 'en')
+        query = request.GET.get('q', '')
+        
+        # Filter results based on the query
+        user_results = User.objects.filter(Q(username__icontains=query) & ~Q(role=1)) if query else []
+        team_results = Team.objects.filter(team_name__icontains=query) if query else []
+        team_branch_results = TeamBranch.objects.filter(team_name__icontains=query) if query else []
+
+        # Create context to pass to the template
+        context = {
+            'query': query,
+            'user_results': user_results,
+            'team_results': team_results,
+            'team_branch_results': team_branch_results,
+            'current_language':language_from_url
+        }
+
+        # Render the template with the context data
+        return render(request, 'search.html', context)
