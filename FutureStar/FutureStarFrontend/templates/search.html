@@ -160,8 +160,13 @@
 						<h5 class="player-name">{{ user.username }}</h5>
 						<p class="player-designation">{{ user.role.name_en }}</p>
 						<div>
-							<button type="submit" class="theme-btn style-two w-100">View Info <i class="fa-solid fa-arrow-right"></i>
-							</button>
+							<form action="{% url 'player_info' %}" method="post">
+								{% csrf_token %}
+								<input type="hidden" name="user_id" value="{{ user.id }}">
+								<button type="submit" class="theme-btn style-two w-100">
+									View Info <i class="fa-solid fa-arrow-right"></i>
+								</button>
+							</form>
 						</div>
 					</div>
 				</div> {% endfor %} {% endif %} 

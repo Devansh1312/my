@@ -1,0 +1,414 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+{% load lang_filter %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}Goalactico || Player-Info{% endblock %}
+{% load lang_filter %} <!-- Loading your custom filter -->
+{% block content %}
+
+<style>
+    .team-logo {
+    width: 30px;  /* Adjust the size as needed */
+    height: 30px;
+    border-radius: 50%;  /* Makes the image round */
+    object-fit: cover;  /* Ensures the image fits the circle without distortion */
+    margin-right: 5px;  /* Space between logos */
+    margin-left: 5px;
+}
+
+</style>
+<section class="services-area-six pt-150 pb-100">
+    <div class="container">
+        <div class="row">
+           
+          
+            <div class="col-lg-9" style="width: auto;">
+                {% if user.role.id == 2 %}
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/game-played.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Game Played</h6>
+                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/win.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Win</h6>
+                                <h5 class="score">{{ stats.win }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/lost.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Lost</h6>
+                                <h5 class="score">{{ stats.loss }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/draw.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Draw</h6>
+                                <h5 class="score">{{ stats.draw }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/goal-scored.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Goal Scored</h6>
+                                <h5 class="score">{{ stats.goals }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/assists.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Assists</h6>
+                                <h5 class="score">{{ stats.assists }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/yellow-card.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Yellow Card</h6>
+                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/red-card.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Red Card</h6>
+                                <h5 class="score">{{ stats.red }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if user.role.id == 3 %}
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/game-played.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Game Coached</h6>
+                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/win.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Win</h6>
+                                <h5 class="score">{{ stats.win }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/lost.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Lost</h6>
+                                <h5 class="score">{{ stats.loss }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/draw.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Draw</h6>
+                                <h5 class="score">{{ stats.draw }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/goal-scored.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head"> Team Goal Conceded</h6>
+                                <h5 class="score">{{ stats.goals_conceded }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/yellow-card.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Yellow Card</h6>
+                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/red-card.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Red Card</h6>
+                                <h5 class="score">{{ stats.red }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                {% endif %}
+                {% if user.role.id == 4 %}
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/game-played.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Game Officiating</h6>
+                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/yellow-card.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Yellow Card</h6>
+                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated bg-two">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/red-card.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Red Card</h6>
+                                <h5 class="score">{{ stats.red }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if user.role.id == 6 %}
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/game-played.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Game Manage</h6>
+                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/win.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Win</h6>
+                                <h5 class="score">{{ stats.win }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/lost.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Lost</h6>
+                                <h5 class="score">{{ stats.loss }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
+                            <div>
+                                <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/draw.png' %}" class="img-fluid" alt=""></div>
+
+                            </div>
+                            <div>
+                                <h6 class="info-head">Draw</h6>
+                                <h5 class="score">{{ stats.draw }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <h5>Upcoming Game</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>id </th>
+                                    <th>Match Type</th>
+                                    <th>Teams</th>
+                                    <th>Game Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if stats.upcoming_games %}
+                                {% for game in stats.upcoming_games %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ game.game_type }}</td>
+                                        <td>
+                                            <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
+                                            <span> {{ game.team_a_vs_team_b }} </span>
+                                            <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                        </td>
+                                        <td>{{ game.game_date }}</td>
+                                    </tr>
+                                {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="4">No Games Found</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <h5>Latest Finish Game</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>id </th>
+                                    <th>Match Type</th>
+                                    <th>Teams</th>
+                                    <th>Game Date</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if stats.finished_games %}
+                                {% for game in stats.finished_games %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ game.game_type }}</td>
+                                        <td>
+                                            <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
+                                            <span> {{ game.team_a_vs_team_b }} </span>
+                                            <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                        </td>
+                                        <td>{{ game.game_date }}</td>
+                                        <td>{{ game.score }}</td>
+                                    </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr><td colspan="5">No Games Found</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Page Area end -->
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    function myFunction() {
+ document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+ if (!event.target.matches('.dropbtn')) {
+   var dropdowns = document.getElementsByClassName("dropdown-content");
+   var i;
+   for (i = 0; i < dropdowns.length; i++) {
+     var openDropdown = dropdowns[i];
+     if (openDropdown.classList.contains('show')) {
+       openDropdown.classList.remove('show');
+     }
+   }
+ }
+}
+</script>
+{% endblock %}
+
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}

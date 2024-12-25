@@ -39,6 +39,8 @@ urlpatterns = [
 
     path('search/', SearchView.as_view(), name='search'),
     path('Team-Page/', TeamPageSearchResults.as_view(), name='TeamPageSearchResults'),
+    path('player-page/', PlayerInfoPage.as_view(), name='player_info'),
+
 
     # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
     # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
