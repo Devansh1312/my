@@ -39,9 +39,9 @@ urlpatterns = [
     path('test-404/', custom_404_view),
 
     path('search/', SearchView.as_view(), name='search'),
-    path('team-page/', TeamPageSearchResults.as_view(), name='TeamPageSearchResults'),
+    path('team-page-detail/', TeamPageSearchResults.as_view(), name='TeamPageSearchResults'),
     path('player-page/', PlayerInfoPage.as_view(), name='player_info'),
-    path('team-branch-page/', TeamDetailsView.as_view(), name='TeamBranchPageSearchResults'),
+    path('team-detail-page/', TeamDetailsView.as_view(), name='TeamBranchPageSearchResults'),
 
 
 

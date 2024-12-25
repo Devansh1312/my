@@ -3384,7 +3384,7 @@ class TeamDetailsView(View):
             return redirect("index")
 
         # Render the template with the updated context
-        return render(request, 'team/team_branch_detail.html', context)
+        return render(request, 'team/team.html', context)
 
     def get(self, request, *args, **kwargs):
         # Handle language selection
@@ -3425,4 +3425,4 @@ class TeamDetailsView(View):
             return redirect("index")
 
         # Render the template with the updated context
-        return render(request, 'team/team_branch_detail.html', context)
+        return render(request, 'team/team.html', context)
