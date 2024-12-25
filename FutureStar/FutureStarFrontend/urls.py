@@ -29,6 +29,7 @@ urlpatterns = [
     path('player-dashboard-games/', UserDashboardGames.as_view(),name="player-dashboard-games"),
     path('player-dashboard-events/', UserEventBookingInfo.as_view(),name="player-dashboard-events"),
     path('player-dashboard-fileds/', UserCreatedFieldsView.as_view(),name="player-dashboard-fileds"),
+    path('player-dashboard-trainings/', UserDashboardTrainings.as_view(),name="player-dashboard-trainings"),
 
 
 

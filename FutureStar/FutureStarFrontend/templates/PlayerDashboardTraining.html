@@ -9,21 +9,9 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}Goalactico||Games{% endblock %}
+{% block title %}Goalactico||Trainings{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
-
-<style>
-    .team-logo {
-    width: 30px;  /* Adjust the size as needed */
-    height: 30px;
-    border-radius: 50%;  /* Makes the image round */
-    object-fit: cover;  /* Ensures the image fits the circle without distortion */
-    margin-right: 5px;  /* Space between logos */
-    margin-left: 5px;
-}
-
-</style>
 <section class="services-area-six pt-150 pb-100">
     <div class="container">
         <div class="row">
@@ -55,15 +43,16 @@
                               <a href="#about">About</a>
                             </div>
                         </li>
+
                         {% if user.role.id != 6 %}
                         <li>
-                            <a href="{% url 'player-dashboard-trainings' %}" class="sidebar-link">
+                            <a href="{% url 'player-dashboard-trainings' %}" class="sidebar-link active">
                                 <span><i class="fas fa-futbol"></i></span> Training
                             </a>
                         </li>
                         {% endif %}
                         <li>
-                            <a href="{% url 'player-dashboard-games' %}" class="sidebar-link active">
+                            <a href="{% url 'player-dashboard-games' %}" class="sidebar-link">
                                 <span><i class="fas fa-trophy"></i></span> Games
                             </a>
                         </li>
@@ -73,7 +62,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'player-dashboard-events' %}" class="sidebar-link ">
+                            <a href="{% url 'player-dashboard-events' %}" class="sidebar-link">
                                 <span><i class="fas fa-calendar-check"></i></span> Events
                             </a>
                         </li>
@@ -87,69 +76,69 @@
             </div>
             <div class="col-lg-9">
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Upcoming Game</h5>
+                    <!-- Joined Trainings Section -->
+                    {% if user.role.id == 2 %}
+                    <h5>Joined Trainings</h5>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>id </th>
-                                    <th>Match Type</th>
-                                    <th>Teams</th>
-                                    <th>Game Date</th>
+                                    <th>No.</th>
+                                    <th>Training Name</th>
+                                    <th>Training Date</th>
+                                    <th>Participants</th>
+                                    <th>Training Type</th>
+                                    <th>Cost</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if stats.upcoming_games %}
-                                    {% for game in stats.upcoming_games %}
+                                {% if joined_trainings %}
+                                    {% for training in joined_trainings %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ game.game_type }}</td>
-                                            <td>
-                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
-                                                <span> {{ game.team_a_vs_team_b }} </span>
-                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
-                                            </td>
-                                            <td>{{ game.game_date }}</td>
+                                            <td>{{ training.training_name }}</td>
+                                            <td>{{ training.training_date }}</td>
+                                            <td>{{ training.no_of_participants }}</td>
+                                            <td>{{ training.get_training_type_display }}</td>
+                                            <td>{{ training.cost }}</td>
                                         </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="4">No upcoming games</td></tr>
+                                    <tr><td colspan="5">No Joined Trainings Found</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
-                </div>
-                
-                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Latest Game</h5>
+                    {% endif %}
+    
+                    <!-- Created Trainings Section -->
+                    <h5>Created Trainings</h5>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>id </th>
-                                    <th>Match Type</th>
-                                    <th>Teams</th>
-                                    <th>Game Date</th>
-                                    <th>Score</th>
+                                    <th>No.</th>
+                                    <th>Training Name</th>
+                                    <th>Training Date</th>
+                                    <th>Participants</th>
+                                    <th>Training Type</th>
+                                    <th>Cost</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if stats.finished_games %}
-                                    {% for game in stats.finished_games %}
+                                {% if created_trainings %}
+                                    {% for training in created_trainings %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ game.game_type }}</td>
-                                            <td>
-                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
-                                                <span> {{ game.team_a_vs_team_b }} </span>
-                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
-                                            </td>
-                                            <td>{{ game.game_date }}</td>
-                                            <td>{{ game.score }}</td>
+                                            <td>{{ training.training_name }}</td>
+                                            <td>{{ training.training_date }}</td>
+                                            <td>{{ training.no_of_participants }}</td>
+                                            <td>{{ training.get_training_type_display }}</td>
+                                            <td>{{ training.cost }}</td>
                                         </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="5">No finished games</td></tr>
+                                    <tr><td colspan="5">No Created Trainings Found</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
@@ -159,7 +148,6 @@
         </div>
     </div>
 </section>
-
 <!-- Blog Page Area end -->
 {% endblock %}
 

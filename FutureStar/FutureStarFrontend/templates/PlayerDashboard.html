@@ -55,11 +55,13 @@
                               <a href="#about">About</a>
                             </div>
                         </li>
+                        {% if user.role.id != 6 %}
                         <li>
-                            <a href="#" class="sidebar-link">
+                            <a href="{% url 'player-dashboard-trainings' %}" class="sidebar-link">
                                 <span><i class="fas fa-futbol"></i></span> Training
                             </a>
                         </li>
+                        {% endif %}
                         <li>
                             <a href="{% url 'player-dashboard-games' %}" class="sidebar-link">
                                 <span><i class="fas fa-trophy"></i></span> Games

@@ -15,6 +15,7 @@ from django.contrib.auth import authenticate, login
 import random
 from django.db.models import Q,Sum,When,Case,F
 from datetime import datetime
+from FutureStarTrainingApp.models import *
 
 
 ##############################################   HomePage   ########################################################
@@ -2299,6 +2300,106 @@ class UserCreatedFieldsView(LoginRequiredMixin, View):
         return render(request, 'PlayerDashboardFields.html', context)
 
 
+
+#################### User Training List of Dashboard #############################
+class UserDashboardTrainings(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        else:
+            # If not, fall back to session language
+            language_from_url = request.session.get('language', 'en')
+
+        # Fetch user-related training data
+        stats = self.get_user_dashboard_trainings(user)
+        context = {
+            "current_language": language_from_url,
+            "cmsdata": cms_pages.objects.filter(id=14).first(),
+            "created_trainings": stats.get('created_trainings'),
+            "joined_trainings": stats.get('joined_trainings'),
+        }
+
+        return render(request, "PlayerDashboardTraining.html", context)
+
+    def get_user_dashboard_trainings(self, user):
+        """
+        Fetch user-related training data based on the user's role.
+        For Player role, return both joined and created trainings.
+        For other roles, return only created trainings.
+        """
+        stats = {
+                "joined_trainings": [],
+                "created_trainings": [],
+            }
+
+        # For Player role (id == 2), fetch both joined and created trainings
+        if user.role.id == 2:  # Player role
+            stats["joined_trainings"] = self.get_joined_trainings(user)
+            stats["created_trainings"] = self.get_created_trainings(user)
+        else:  # For other roles, fetch only created trainings
+            stats["created_trainings"] = self.get_created_trainings(user)
+
+        return stats
+
+    def get_joined_trainings(self, user):
+        """
+        Get the trainings that the user has joined. This calls the `MyJoinedTrainingsView` logic.
+        """
+        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')
+        
+        if not joined_trainings.exists():
+            return []
+
+        # Extract and return the training sessions
+        trainings = [entry.training for entry in joined_trainings]
+        return sorted(trainings, key=lambda x: x.training_date, reverse=True)
+
+    def get_created_trainings(self, user):
+        """
+        Get the trainings created by the user. This calls the `MyTrainingsView` logic.
+        """
+        created_trainings = Training.objects.filter(created_by_id=user.id)
+        accessible_trainings = [training for training in created_trainings if self._has_access(training, user)]
+        return sorted(accessible_trainings, key=lambda t: t.training_date, reverse=True)
+
+    def _has_access(self, training, user):
+        """
+        Helper function to check if the user has access to the given training.
+        This is a simplified version of the logic from the `MyTrainingsView`.
+        """
+        if training.creator_type == 1:  # USER_TYPE
+            if training.created_by_id == user.id:  # Creator is the same user
+                return True
+
+            creator_branches = JoinBranch.objects.filter(
+                user_id=training.created_by_id,
+                joinning_type=4
+            ).values_list('branch_id', flat=True)
+
+            user_branches = JoinBranch.objects.filter(user_id=user.id).values_list('branch_id', flat=True)
+
+            if not creator_branches or not user_branches:
+                return False
+
+            if any(branch in user_branches for branch in creator_branches):
+                return True
+        elif training.creator_type == 2:  # TEAM_TYPE
+            team = get_object_or_404(Team, id=training.created_by_id)
+            if team.team_founder_id == user.id:  # User is the team founder
+                return True
+
+        return False
+
+
+
+
+
+############################### SearchView ########################
 
 
 class SearchView(View):
