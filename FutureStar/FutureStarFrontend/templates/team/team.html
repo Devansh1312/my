@@ -82,358 +82,349 @@ Goalactico || Team-Detail
         }
     }
 </style>
-
-    <!-- Team Profile Area start -->
-    <div class="page-wrapper">
-        <section class="team-profile-area pt-220 rpt-150 pb-130 rpb-100 rel">
-            <div class="container container-1290">
-                <div class="row gap-100 align-items-center">
-                    <div class="col-lg-6">
-                        <div class="team-profile-image rmb-55 wow fadeInLeft delay-0-2s">
+<div class="page-wrapper">
+    <section class="team-profile-area pt-220 rpt-150 pb-130 rpb-100 rel">
+        <div class="container container-1290">
+            <div class="row gap-100 align-items-center">
+                <div class="col-lg-6">
+                    <div class="team-profile-image rmb-55 wow fadeInLeft delay-0-2s">
                         {% if team.team_id.team_logo %}
                             <img src="{{ team.team_id.team_logo.url }}" alt="{{ team.team_name }}">
                         {% else %}
                             <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ team.team_name }}">
                         {% endif %}
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="team-profile-content wow fadeInRight delay-0-2s">
-                    <h2>{{ team.team_name }}</h2>
-                    <span class="designation">{{ team.team_id.team_type.name_en }}</span>
-                    <p>{{ team.team_id.description }}</p>
+                <div class="col-lg-6">
+                    <div class="team-profile-content wow fadeInRight delay-0-2s">
+                        <h2>{{ team.team_name }}</h2>
+                        <span class="designation">{{ team.team_id.team_type.name_en }}</span>
+                        <p>{{ team.team_id.description }}</p>
 
-                    <div class="team-sub-title mt-55 mb-30">
-                        <h4>Get In Touch</h4>
-                    </div>
-                    <!-- Display Team Contact Information -->
-                    <div class="row">
-                        <div class="col-sm-6 contact-info-item">
-                            <div class="icon">
-                                <i class="fa fa-map-marker-alt"></i>
+                        <div class="team-sub-title mt-55 mb-30">
+                            <h4>Get In Touch</h4>
+                        </div>
+                        <!-- Display Team Contact Information -->
+                        <div class="row">
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-map-marker-alt"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Location</b>
+                                    <span class="text">{{ team.city }}</span>
+                                </div>
                             </div>
-                            <div class="content">
-                                <b class="title">Location</b>
-                                <span class="text">{{ team.city }}</span>
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Team Founder</b>
+                                    <span class="text">{{ team.team_id.team_founder.username }}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 contact-info-item">
-                            <div class="icon">
-                                <i class="fa fa-user"></i>
+                        <div class="row">
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="far fa-envelope"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Email Address</b>
+                                    <span class="text">
+                                        <a href="mailto:{{ team.email }}">{{ team.email }}</a>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="content">
-                                <b class="title">Team Founder</b>
-                                <span class="text">{{ team.team_id.team_founder.username }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6 contact-info-item">
-                            <div class="icon">
-                                <i class="far fa-envelope"></i>
-                            </div>
-                            <div class="content">
-                                <b class="title">Email Address</b>
-                                <span class="text">
-                                    <a href="mailto:{{ team.email }}">{{ team.email }}</a>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 contact-info-item">
-                            <div class="icon">
-                                <i class="far fa-calendar"></i>
-                            </div>
-                            <div class="content">
-                                <b class="title">Establishment Date</b>
-                                <span class="text">{{ team.team_id.team_establishment_date|date:"d M Y" }}</span>
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Establishment Date</b>
+                                    <span class="text">{{ team.team_id.team_establishment_date|date:"d M Y" }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6 contact-info-item">
-                            <div class="icon">
-                                <i class="fa fa-phone"></i>
+                        <div class="row">
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-phone"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Phone Us</b>
+                                    <span class="text">
+                                        <a href="callto:{{ team.phone }}">{{ team.phone }}</a>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="content">
-                                <b class="title">Phone Us</b>
-                                <span class="text">
-                                    <a href="callto:{{ team.phone }}">{{ team.phone }}</a>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 contact-info-item">
-                            <div class="icon">
-                                <i class="far fa-user"></i>
-                            </div>
-                            <div class="content">
-                                <b class="title">President</b>
-                                <span class="text">{{ team.team_id.team_president }}</span>
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="far fa-user"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">President</b>
+                                    <span class="text">{{ team.team_id.team_president }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-                </div>
-            </div>
-            
             </div>
         </div>
-        <div class="container px-4">
-            <div class="row">
-                <!-- Games Played -->
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
-                        <div>
-                            <div class="img-wrapper">
-                                <img src="{% static 'assets/images/dashboard/play-football.png' %}" class="img-fluid" alt="">
-                            </div>
-                            <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+    </section>
+    <div class="container px-4">
+        <div class="row">
+            <!-- Games Played -->
+            <div class="col-md-3 col-6 mb-4">
+                <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+                    <div>
+                        <div class="img-wrapper">
+                            <img src="{% static 'assets/images/dashboard/play-football.png' %}" class="img-fluid" alt="">
                         </div>
-                        <div>
-                            <h6 class="info-head">Games Played</h6>
-                            <h5 class="score">{{ stats.games_played }}</h5>
-                        </div>
+                        <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
                     </div>
-                </div>
-    
-                <!-- Wins -->
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
-                        <div>
-                            <div class="img-wrapper">
-                                <img src="{% static 'assets/images/dashboard/tennis-ball.png' %}" class="img-fluid" alt="">
-                            </div>
-                            <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
-                        </div>
-                        <div>
-                            <h6 class="info-head">Wins</h6>
-                            <h5 class="score">{{ stats.wins }}</h5>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Losses -->
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
-                        <div>
-                            <div class="img-wrapper">
-                                <img src="{% static 'assets/images/dashboard/profile-fields.png' %}" class="img-fluid" alt="">
-                            </div>
-                            <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
-                        </div>
-                        <div>
-                            <h6 class="info-head">Losses</h6>
-                            <h5 class="score">{{ stats.losses }}</h5>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Draws -->
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
-                        <div>
-                            <div class="img-wrapper">
-                                <img src="{% static 'assets/images/dashboard/passport-duotone.png' %}" class="img-fluid" alt="">
-                            </div>
-                            <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
-                        </div>
-                        <div>
-                            <h6 class="info-head">Draw</h6>
-                            <h5 class="score">{{ stats.draws }}</h5>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Goals Scored -->
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
-                        <div>
-                            <div class="img-wrapper">
-                                <img src="{% static 'assets/images/dashboard/Mask group.png' %}" class="img-fluid" alt="">
-                            </div>
-                            <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
-                        </div>
-                        <div>
-                            <h6 class="info-head">Goals Scored</h6>
-                            <h5 class="score">{{ stats.goals_scored }}</h5>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Goals Conceded -->
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-5s animated bg-two">
-                        <div>
-                            <div class="img-wrapper">
-                                <img src="{% static 'assets/images/dashboard/people-team.png' %}" class="img-fluid" alt="">
-                            </div>
-                            <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
-                        </div>
-                        <div>
-                            <h6 class="info-head">Conceded Goals</h6>
-                            <h5 class="score">{{ stats.goals_conceded }}</h5>
-                        </div>
+                    <div>
+                        <h6 class="info-head">Games Played</h6>
+                        <h5 class="score">{{ stats.games_played }}</h5>
                     </div>
                 </div>
             </div>
-    
-            <!-- Staff Members Section -->
-            <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                <h5>Staff Members</h5>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Mobile no.</th>
-                                <th>Role</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for staff in staff_members %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ staff.user_id.username }}</td>
-                                <td>
-                                    <a href="mailto:{{ staff.user_id.email }}">{{ staff.user_id.email }}</a>
-                                </td>
-                                <td>
-                                    <a href="tel:{{ staff.user_id.phone }}">{{ staff.user_id.phone }}</a>
-                                </td>
-                                <td>{{ staff.get_joinning_type_display }}</td>
-                            </tr>
-                            {% endfor %}
-                            {% if not staff_members %}
-                            <tr>
-                                <td colspan="5">No staff members found.</td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
+
+            <!-- Wins -->
+            <div class="col-md-3 col-6 mb-4">
+                <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
+                    <div>
+                        <div class="img-wrapper">
+                            <img src="{% static 'assets/images/dashboard/tennis-ball.png' %}" class="img-fluid" alt="">
+                        </div>
+                        <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                    </div>
+                    <div>
+                        <h6 class="info-head">Wins</h6>
+                        <h5 class="score">{{ stats.wins }}</h5>
+                    </div>
                 </div>
             </div>
-    
-            <!-- Players Section -->
-            <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                <h5>Players</h5>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Mobile no.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for player in players %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ player.user_id.username }}</td>
-                                <td>
-                                    <a href="mailto:{{ player.user_id.email }}">{{ player.user_id.email }}</a>
-                                </td>
-                                <td>
-                                    <a href="tel:{{ player.user_id.phone }}">{{ player.user_id.phone }}</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% if not players %}
-                            <tr>
-                                <td colspan="5">No Players found.</td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
+
+            <!-- Losses -->
+            <div class="col-md-3 col-6 mb-4">
+                <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
+                    <div>
+                        <div class="img-wrapper">
+                            <img src="{% static 'assets/images/dashboard/profile-fields.png' %}" class="img-fluid" alt="">
+                        </div>
+                        <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                    </div>
+                    <div>
+                        <h6 class="info-head">Losses</h6>
+                        <h5 class="score">{{ stats.losses }}</h5>
+                    </div>
                 </div>
             </div>
-    
-            <!-- Joined Tournaments Section -->
-            <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                <h5>Joined Tournaments</h5>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Tournament Name</th>
-                                <th>Start Date</th>
-                                <th>Age Group</th>
-                                <th>City</th>
-                                <th>Joining Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+
+            <!-- Draws -->
+            <div class="col-md-3 col-6 mb-4">
+                <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
+                    <div>
+                        <div class="img-wrapper">
+                            <img src="{% static 'assets/images/dashboard/passport-duotone.png' %}" class="img-fluid" alt="">
+                        </div>
+                        <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                    </div>
+                    <div>
+                        <h6 class="info-head">Draw</h6>
+                        <h5 class="score">{{ stats.draws }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Scored -->
+            <div class="col-md-3 col-6 mb-4">
+                <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
+                    <div>
+                        <div class="img-wrapper">
+                            <img src="{% static 'assets/images/dashboard/Mask group.png' %}" class="img-fluid" alt="">
+                        </div>
+                        <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                    </div>
+                    <div>
+                        <h6 class="info-head">Goals Scored</h6>
+                        <h5 class="score">{{ stats.goals_scored }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Conceded -->
+            <div class="col-md-3 col-6 mb-4">
+                <div class="total-info-wrapper wow fadeInUp delay-0-5s animated bg-two">
+                    <div>
+                        <div class="img-wrapper">
+                            <img src="{% static 'assets/images/dashboard/people-team.png' %}" class="img-fluid" alt="">
+                        </div>
+                        <div><a class="cstm-btn" href="#">View All <i class="fas fa-chevron-right"></i></a></div>
+                    </div>
+                    <div>
+                        <h6 class="info-head">Conceded Goals</h6>
+                        <h5 class="score">{{ stats.goals_conceded }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Members Section -->
+        <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+            <h5>Staff Members</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Mobile no.</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for staff in staff_members %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ staff.user_id.username }}</td>
+                            <td>
+                                <a href="mailto:{{ staff.user_id.email }}">{{ staff.user_id.email }}</a>
+                            </td>
+                            <td>
+                                <a href="tel:{{ staff.user_id.phone }}">{{ staff.user_id.phone }}</a>
+                            </td>
+                            <td>{{ staff.get_joinning_type_display }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not staff_members %}
+                        <tr>
+                            <td colspan="5">No staff members found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Players Section -->
+        <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+            <h5>Players</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Mobile no.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ player.user_id.username }}</td>
+                            <td>
+                                <a href="mailto:{{ player.user_id.email }}">{{ player.user_id.email }}</a>
+                            </td>
+                            <td>
+                                <a href="tel:{{ player.user_id.phone }}">{{ player.user_id.phone }}</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not players %}
+                        <tr>
+                            <td colspan="4">No Players found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Joined Tournaments Section -->
+        <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+            <h5>Joined Tournaments</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tournament Name</th>
+                            <th>Start Date</th>
+                            <th>Age Group</th>
+                            <th>City</th>
+                            <th>Joining Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for joined_tournament in joined_tournaments %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ joined_tournament.tournament_id.tournament_name }}</td>
+                            <td>{{ joined_tournament.tournament_id.tournament_starting_date }}</td>
+                            <td>{{ joined_tournament.tournament_id.age_group }}</td>
+                            <td>{{ joined_tournament.tournament_id.city.name }}</td>
+                            <td>{{ joined_tournament.tournament_id.tournament_joining_cost }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not joined_tournaments %}
+                        <tr>
+                            <td colspan="6">No Tournament found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tournament Games Section -->
+        <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+            <h5>Tournaments Joined Games</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tournament Name</th>
+                            <th>Game number</th>
+                            <th>Game Date</th>
+                            <th>Group Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for finished_game in finished_games %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ finished_game.tournament_id.tournament_name }}</td>
+                            <td>{{ finished_game.game_number }}</td>
+                            <td>{{ finished_game.game_date }}</td>
                             {% for joined_tournament in joined_tournaments %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ joined_tournament.tournament_id.tournament_name }}</td>
-                                <td>
-                                    {{ joined_tournament.tournament_id.tournament_starting_date }}
-                                </td>
-                                <td>
-                                    {{ joined_tournament.tournament_id.age_group }}
-                                </td>
-                                <td>
-                                    {{ joined_tournament.tournament_id.city.name }}
-                                </td>
-                                <td>
-                                    {{ joined_tournament.tournament_id.tournament_joining_cost }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% if not joined_tournaments %}
-                            <tr>
-                                <td colspan="6">No Tournament found.</td>
-                            </tr>
+                            {% if finished_game.tournament_id == joined_tournament.tournament_id %}
+                            <td>{{ joined_tournament.group_id.group_name }}</td>
                             {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-    
-            <!-- Tournament Games Section -->
-            <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                <h5>Tournaments Joined Games</h5>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Tournament Name</th>
-                                <th>Game number</th>
-                                <th>Game Date</th>
-                                <th>Group Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for finished_game in finished_games %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ finished_game.tournament_id.tournament_name }}</td>
-                                <td>{{ finished_game.game_number }}</td>
-                                <td>{{ finished_game.game_date }}</td>
-                                {% for joined_tournament in joined_tournaments %}
-                                {% if finished_game.tournament_id == joined_tournament.tournament_id %}
-                                <td>{{ joined_tournament.group_id.group_name }}</td>
-                                {% endif %}
-                                {% endfor %}
-                            </tr>
                             {% endfor %}
-                            {% if not finished_games %}
-                            <tr>
-                                <td colspan="5">No Tournament Games found.</td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
+                        </tr>
+                        {% endfor %}
+                        {% if not finished_games %}
+                        <tr>
+                            <td colspan="5">No Tournament Games found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
-        </section>
         </div>
+    </div>
+</div>
+
+</div>
+
     
 
     <!-- Scroll to top button -->
