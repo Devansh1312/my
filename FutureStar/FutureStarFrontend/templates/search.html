@@ -164,17 +164,38 @@
 							</button>
 						</div>
 					</div>
-				</div> {% endfor %} {% endif %} {% if team_results %} {% for team in team_results %} <div class="col-lg-3 col-sm-6">
-					<div class="item-wrapper wow fadeInUp delay-0.3s animated">
-						<div class="img-wrapper"> {% if team.team_logo %} <img src="{{ team.team_logo.url }}" class="img-fluid" alt="{{ team.team_name }}"> {% else %} <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ team.team_name }}"> {% endif %} </div>
-						<h5 class="player-name">{{ team.team_name }}</h5>
-						<p class="player-designation">Team Page</p>
-						<div>
-							<button type="submit" class="theme-btn style-two w-100">View Info <i class="fa-solid fa-arrow-right"></i>
-							</button>
+				</div> {% endfor %} {% endif %} 
+
+				{% if team_results %}
+					{% for team in team_results %}
+						<div class="col-lg-3 col-sm-6">
+							<div class="item-wrapper wow fadeInUp delay-0.3s animated">
+								<div class="img-wrapper">
+									{% if team.team_logo %}
+										<img src="{{ team.team_logo.url }}" class="img-fluid" alt="{{ team.team_name }}">
+									{% else %}
+										<img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ team.team_name }}">
+									{% endif %}
+								</div>
+								<h5 class="player-name">{{ team.team_name }}</h5>
+								<p class="player-designation">Team Page</p>
+
+								<!-- Form to submit team_id -->
+								<form action="{% url 'TeamPageSearchResults' %}" method="get">
+									<input type="hidden" name="team_id" value="{{ team.id }}">
+									<div>
+										<button type="submit" class="theme-btn style-two w-100">
+											View Info <i class="fa-solid fa-arrow-right"></i>
+										</button>
+									</div>
+								</form>
+							</div>
 						</div>
-					</div>
-				</div> {% endfor %} {% endif %} {% if team_branch_results %} {% for branch in team_branch_results %} <div class="col-lg-3 col-sm-6">
+					{% endfor %}
+				{% endif %}
+ 
+				
+				{% if team_branch_results %} {% for branch in team_branch_results %} <div class="col-lg-3 col-sm-6">
 					<div class="item-wrapper wow fadeInUp delay-0.3s animated">
 						<div class="img-wrapper"> {% if branch.team_id.team_logo %} <img src="{{ branch.team_id.team_logo.url }}" class="img-fluid" alt="{{ branch.team_name }}"> {% else %} <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ branch.team_name }}"> {% endif %} </div>
 						<h5 class="player-name">{{ branch.team_name }}</h5>

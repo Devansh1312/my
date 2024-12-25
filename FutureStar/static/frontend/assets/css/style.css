@@ -8943,7 +8943,7 @@ blockquote .blockquote-footer:before {
   display: block;
 }
 
-.contact-info-item:not(:last-child) {
+.contact-info-item {
   margin-bottom: 35px;
 }
 

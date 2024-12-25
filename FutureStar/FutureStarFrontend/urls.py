@@ -38,6 +38,8 @@ urlpatterns = [
     path('test-404/', custom_404_view),
 
     path('search/', SearchView.as_view(), name='search'),
+    path('Team-Page/', TeamPageSearchResults.as_view(), name='TeamPageSearchResults'),
+
     # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
     # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
     # path('apple/login/', AppleLoginView.as_view(), name='apple_login'),

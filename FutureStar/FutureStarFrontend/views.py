@@ -2375,3 +2375,68 @@ class SearchView(View):
 
         # Render the template with the context data
         return render(request, 'search.html', context)
+    
+
+
+class TeamPageSearchResults(View):
+    def get_team_related_data(self, team):
+        # Get branches sorted alphabetically by team_name
+        branches = TeamBranch.objects.filter(team_id=team).order_by('team_name')
+
+        # Get sponsors sorted alphabetically by name
+        sponsors = Sponsor.objects.filter(created_by_id=team.id, creator_type=2).order_by('name')
+
+        # Get the latest 5 events (ordered by date, assuming `event_date` is the field for event date)
+        events = Event.objects.filter(created_by_id=team.id, creator_type=2).order_by('-event_date')[:5]
+
+        # Calculate ticket sales for each event
+        events_with_sales = []
+        for event in events:
+            total_tickets_sold = (
+                EventBooking.objects.filter(event=event).aggregate(
+                    total=Sum("tickets")
+                )["total"]
+                or 0
+            )
+            events_with_sales.append(
+                {"event": event, "total_tickets_sold": total_tickets_sold}
+            )
+
+        return branches, sponsors, events_with_sales
+
+    def get(self, request, *args, **kwargs):
+        # Language handling
+        language_from_url = request.GET.get('Language', None)
+        if language_from_url:
+            request.session['language'] = language_from_url
+        else:
+            language_from_url = request.session.get('language', 'en')
+
+        # Fetch the team_id from GET parameters
+        team_id = request.GET.get("team_id")
+        if not team_id:
+            messages.error(request, "Team ID is missing. Please provide a valid team.")
+            return redirect("Dashboard")
+
+        try:
+            # Get the team object based on team_id
+            team = Team.objects.get(id=team_id)
+
+            # Fetch the required related data
+            branches, sponsors, events_with_sales = self.get_team_related_data(team)
+
+            # Add team data to the context
+            context = {
+                "team": team,
+                "branches": branches,
+                "sponsors": sponsors,
+                "events_with_sales": events_with_sales,
+                'current_language': language_from_url,
+            }
+
+        except Team.DoesNotExist:
+            messages.error(request, "The specified team was not found.")
+            return redirect("index")
+
+        # Render the template with the updated context
+        return render(request, 'team/teampage.html', context)

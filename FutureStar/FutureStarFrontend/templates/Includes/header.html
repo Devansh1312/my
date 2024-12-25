@@ -179,8 +179,22 @@
 </section>
 
 <!-- Add jQuery to handle form submission on change -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+    $(document).ready(function() {
+        // Handle language change
+        $('.selectLanguage').change(function() {
+            var selectedLanguage = $(this).val();
+            var currentUrl = new URL(window.location.href);
+
+            // Update the 'language' parameter in the URL
+            currentUrl.searchParams.set('Language', selectedLanguage);
+
+            // Reload the page with the updated URL
+            window.location.href = currentUrl.toString();
+        });
+    });
     // Toggle the visibility of the search input field below the button when the button is clicked
     $('#search-btn').click(function(event) {
         $('#search-container').toggle(); // Toggle the visibility of the container
