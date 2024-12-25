@@ -3186,3 +3186,142 @@ class PlayerInfoPage(View):
         return render(request, "PlayerInfo.html", context)
 
   
+class TeamDetailsView(View):
+    def get_team_data(self, team):
+        # 1. Get staff members from JoinBranch where role is 1, 2, or 3
+        staff_members = JoinBranch.objects.filter(
+            branch_id=team, 
+            joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE, JoinBranch.MEDICAL_STAFF_TYPE]
+        ).order_by('id')
+
+        # 2. Get players from JoinBranch where role is 4
+        players = JoinBranch.objects.filter(
+            branch_id=team, 
+            joinning_type=JoinBranch.PLAYER_TYPE
+        ).order_by('id')
+
+        # 3. Get joined tournaments from TournamentGroupTeam where status is 1
+        joined_tournaments = TournamentGroupTeam.objects.filter(
+            team_branch_id=team, 
+            status=TournamentGroupTeam.ACCEPTED
+        ).order_by('-created_at')[:5]
+
+        # 4. Get tournament games where finish is True (apply filters before slicing)
+        finished_games_filtered = TournamentGames.objects.filter(
+            Q(team_a=team) | Q(team_b=team), 
+            finish=True
+        ).order_by('-game_date')
+
+        # Now slice the queryset to get the first 5 results
+        finished_games = finished_games_filtered[:5]
+
+        # Calculate stats
+        wins = finished_games_filtered.filter(winner_id=team.id).count()
+        losses = finished_games_filtered.filter(loser_id=team.id).count()
+        draws = finished_games_filtered.filter(is_draw=True).count()
+
+        # Calculate goals scored and conceded
+        goals_scored = sum(
+            game.team_a_goal if game.team_a == team else game.team_b_goal 
+            for game in finished_games
+        )
+        goals_conceded = sum(
+            game.team_b_goal if game.team_a == team else game.team_a_goal 
+            for game in finished_games
+        )
+
+        # Add total games played (number of finished games the team participated in)
+        games_played = finished_games.count()
+
+        stats = {
+            "wins": wins,
+            "losses": losses,
+            "draws": draws,
+            "goals_scored": goals_scored,
+            "goals_conceded": goals_conceded,
+            "games_played": games_played,  # Add games played to stats
+        }
+
+        return staff_members, players, joined_tournaments, finished_games, stats
+
+    def post(self, request, *args, **kwargs):
+        # Handle language selection
+        language_from_url = request.GET.get('Language', None)
+        if language_from_url:
+            # Save to session if found in URL
+            request.session['language'] = language_from_url
+        else:
+            # Use session language or default to 'en'
+            language_from_url = request.session.get('language', 'en')
+
+        # Handle POST request to get the team_id from the form
+        team_id = request.POST.get("team_id")
+        if not team_id:
+            messages.error(request, "Team ID is missing. Please provide a valid team.")
+            return redirect("Dashboard")
+
+        try:
+            # Get the team object based on team_id
+            team = TeamBranch.objects.get(id=team_id)
+
+            # Fetch the required related data
+            staff_members, players, joined_tournaments, finished_games, stats = self.get_team_data(team)
+
+            # Add team data to the context
+            context = {
+                "team": team,
+                "staff_members": staff_members,
+                "players": players,
+                "joined_tournaments": joined_tournaments,
+                "finished_games": finished_games,
+                "stats": stats,  # Add stats to context
+                'current_language': language_from_url,  # Add language to context
+            }
+
+        except TeamBranch.DoesNotExist:
+            messages.error(request, "The specified team was not found.")
+            return redirect("index")
+
+        # Render the template with the updated context
+        return render(request, 'team/team_branch_detail.html', context)
+
+    def get(self, request, *args, **kwargs):
+        # Handle language selection
+        language_from_url = request.GET.get('Language', None)
+        if language_from_url:
+            # Save to session if found in URL
+            request.session['language'] = language_from_url
+        else:
+            # Use session language or default to 'en'
+            language_from_url = request.session.get('language', 'en')
+
+        # Fetch the team_id from GET parameters
+        team_id = request.GET.get("team_id")
+        if not team_id:
+            messages.error(request, "Team ID is missing. Please provide a valid team.")
+            return redirect("Dashboard")
+
+        try:
+            # Get the team object based on team_id
+            team = TeamBranch.objects.get(id=team_id)
+
+            # Fetch the required related data
+            staff_members, players, joined_tournaments, finished_games, stats = self.get_team_data(team)
+
+            # Add team data to the context
+            context = {
+                "team": team,
+                "staff_members": staff_members,
+                "players": players,
+                "joined_tournaments": joined_tournaments,
+                "finished_games": finished_games,
+                "stats": stats,  # Add stats to context
+                'current_language': language_from_url,  # Add language to context
+            }
+
+        except TeamBranch.DoesNotExist:
+            messages.error(request, "The specified team was not found.")
+            return redirect("index")
+
+        # Render the template with the updated context
+        return render(request, 'team/team_branch_detail.html', context)

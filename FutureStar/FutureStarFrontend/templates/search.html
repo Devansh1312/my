@@ -206,8 +206,11 @@
 						<h5 class="player-name">{{ branch.team_name }}</h5>
 						<p class="player-designation">Team</p>
 						<div>
-							<button type="submit" class="theme-btn style-two w-100">View Info <i class="fa-solid fa-arrow-right"></i>
-							</button>
+							<form method="post" action="{% url 'TeamBranchPageSearchResults' %}">
+								{% csrf_token %}
+								<input type="hidden" name="team_id" value="{{ branch.id }}">
+								<button type="submit" class="theme-btn style-two w-100">View Info <i class="fa-solid fa-arrow-right"></i></button>
+							</form>
 						</div>
 					</div>
 				</div> {% endfor %} {% endif %} </div> {% if not user_results and not team_results and not team_branch_results %} <div class="no-results-message">
