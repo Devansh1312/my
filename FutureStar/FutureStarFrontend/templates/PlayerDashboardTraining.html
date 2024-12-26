@@ -22,7 +22,7 @@
                             <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'frontend/assets/images/success-stories/player-1.png' %}{% endif %}" alt="">
                         </div>
                         <div>
-                            <h5 class="user-name">{{ user.username }}</h6>
+                            <h5 class="user-name">{{ user.fullname }}</h6>
                             <p class="user-desi">
                                 {% lang user.role current_language "name" as name %} 
                                 {{name}}
