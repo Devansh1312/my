@@ -1065,6 +1065,7 @@ class UserDetailView(LoginRequiredMixin, View):
 
             # Ensure time_filter is a valid dictionary
             time_filter = time_filter or {}
+            print(time_filter)
 
             # Fetch the games the player's team participated in
             games = TournamentGames.objects.filter(
@@ -1102,6 +1103,22 @@ class UserDetailView(LoginRequiredMixin, View):
             )
             total_yellow_cards = cards_stats["total_yellow_cards"] or 0
             total_red_cards = cards_stats["total_red_cards"] or 0
+            player = User.objects.get(id=user.id)
+            
+            performance_stats = {
+                "passing": player.passing,
+                "shooting": player.shooting,
+                "interception": player.interception,
+                "dribbling": player.dribbling,
+                "tackling": player.tackling,
+                "aerial_duals": player.aerial_duals,
+                "stamina": player.stamina,
+                "speed": player.speed,
+                "strength": player.strength,
+                "jump": player.jump,
+                "balance": player.balance,
+                "agility": player.agility,
+            }
 
             return {
                 "matchplayed": total_games_played,
@@ -1112,6 +1129,7 @@ class UserDetailView(LoginRequiredMixin, View):
                 "assists": total_assists_scored,
                 "yellow_card": total_yellow_cards,
                 "red": total_red_cards,
+                "player_stats": performance_stats,
             }
 
         except Exception as e:
@@ -1233,6 +1251,11 @@ class UserDetailView(LoginRequiredMixin, View):
             posts, events, event_bookings, teams, stats = self.get_user_related_data(
                 user
             )
+             
+       
+            time_filter = {}
+        # # Get player-specific stats, including passing time_filter
+            player_stats = self.get_player_stats(user, time_filter)["player_stats"]
             source_page = request.GET.get("source_page")
             title = request.GET.get("title")
             role = user.role_id
@@ -1250,6 +1273,7 @@ class UserDetailView(LoginRequiredMixin, View):
                     "events_bookings": event_bookings,
                     "teams": teams,
                     "stats": stats,  # Add stats to context
+                    "player_stats":player_stats,
                 },
             )
         except User.DoesNotExist:
@@ -1266,6 +1290,10 @@ class UserDetailView(LoginRequiredMixin, View):
             posts, events, event_bookings, teams, stats = self.get_user_related_data(
                 user
             )
+            time_filter = {}  # This will parse the time filter from the request
+        
+        # Get player-specific stats, including passing time_filter
+            player_stats = self.get_player_stats(user, time_filter)["player_stats"] 
             source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id
@@ -1283,10 +1311,62 @@ class UserDetailView(LoginRequiredMixin, View):
                     "events_bookings": event_bookings,
                     "teams": teams,
                     "stats": stats,  # Include stats in the context if needed
+                    "player_stats":player_stats,
+
                 },
             )
         except User.DoesNotExist:
             return redirect("Dashboard")
+
+
+
+class UpdatePlayerStatsView(View):
+       def post(self, request, *args, **kwargs):
+        user_id = kwargs.get("user_id")  # Now you can get user_id from kwargs
+        changes = json.loads(request.POST.get("changes", "{}"))  # Parse JSON string for changes
+
+        # Debugging: log the user_id and changes
+        print(f"User ID: {user_id}")  # Debug log
+        print(f"Changes: {changes}")  # Debug log
+
+        if not user_id:
+            return JsonResponse({"success": False, "error": "User ID is required."})
+
+        # Fetch the user object from the database
+        user = get_object_or_404(User, id=user_id)
+
+        # Define valid fields for stats update
+        valid_stats_fields = [
+            "passing", "shooting", "interception", "dribbling", "tackling",
+            "aerial_duals", "stamina", "speed", "strength", "jump", "balance", "agility"
+        ]
+
+        # Ensure changes is a dictionary
+        if not isinstance(changes, dict):
+            return JsonResponse({"success": False, "error": "Invalid changes format."})
+
+        # Process the changes
+        for field_name, new_value in changes.items():
+            field_name = field_name.replace("player_", "")  # Adjust frontend naming convention
+            if field_name not in valid_stats_fields:
+                return JsonResponse({"success": False, "error": f"Invalid field name: {field_name}"})
+
+            try:
+                new_value = float(new_value)  # Convert value to float
+            except ValueError:
+                return JsonResponse({"success": False, "error": f"Invalid value for {field_name}"})
+
+            # Set the new value for the field
+            print(f"Updating field: {field_name} with value: {new_value}")  # Debug log
+            setattr(user, field_name, new_value)
+
+        # Save the user object with updated stats
+        try:
+            user.save()  # Save the user object
+            return JsonResponse({"success": True, "message": "Player stats updated successfully"})
+        except Exception as e:
+            print(f"Error saving user data: {str(e)}")  # Debug log
+            return JsonResponse({"success": False, "error": str(e)})
 
 
 ##############################################  User Category Type Module  ################################################
