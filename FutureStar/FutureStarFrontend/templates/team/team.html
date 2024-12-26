@@ -288,7 +288,7 @@
 								</thead>
 								<tbody> {% for staff in staff_members %} <tr>
 										<td>{{ forloop.counter }}</td>
-										<td>{{ staff.user_id.username }}</td>
+										<td>@{{ staff.user_id.username }}</td>
 										<td>
 											{{ staff.user_id.fullname }}
 										</td>
@@ -316,7 +316,7 @@
 								</thead>
 								<tbody> {% for player in players %} <tr>
 										<td>{{ forloop.counter }}</td>
-										<td>{{ player.user_id.username }}</td>
+										<td>@{{ player.user_id.username }}</td>
 										<td>
 											{{ player.user_id.email }}
 										</td>
