@@ -1,369 +1,407 @@
-{% extends 'base1.html' %} {% load static %} {% load lang_filter %} {% block css %}
+{% extends 'base1.html' %} 
+{% load static %} 
+{% load lang_filter %} 
+{% block css %}
 <!-- Plugins css start-->
-<!-- Plugins css Ends--> {% endblock %} {% block title %} Goalactico || Team-Detail {% endblock %} {% block content %} <style>
+<!-- Plugins css Ends--> 
+ {% endblock %} 
+ {% block title %} Goalactico || Team-Detail {% endblock %} 
+ {% block content %} 
+<style>
 	.sponsor-logo {
-		width: 30px;
-		/* Adjust the size as needed */
-		height: 30px;
-		border-radius: 50%;
-		/* Makes the image round */
-		object-fit: cover;
-		/* Ensures the image fits the circle without distortion */
-		margin-right: 5px;
-		/* Space between logos */
-		margin-left: 5px;
-	}
+        width: 30px;
+        /* Adjust the size as needed */
+        height: 30px;
+        border-radius: 50%;
+        /* Makes the image round */
+        object-fit: cover;
+        /* Ensures the image fits the circle without distortion */
+        margin-right: 5px;
+        /* Space between logos */
+        margin-left: 5px;
+    }
 
-	/* Responsive styling */
-	@media (max-width: 768px) {
-		.team-profile-area {
-			padding-top: 100px;
-			padding-bottom: 80px;
-		}
+    /* Responsive styling */
+    @media (max-width: 768px) {
+    .team-profile-area {
+        padding-top: 100px;
+        padding-bottom: 80px;
+    }
 
-		.team-profile-image img {
-			max-width: 100%;
-			height: auto;
-		}
+    .team-profile-image img {
+        max-width: 100%;
+        height: auto;
+    }
 
-		.team-profile-content {
-			padding-left: 0;
-			padding-right: 0;
-		}
+    .team-profile-content {
+        padding-left: 0;
+        padding-right: 0;
+    }
 
-		.team-profile-content h2 {
-			font-size: 22px;
-		}
+    .team-profile-content h2 {
+        font-size: 22px;
+    }
 
-		.team-sub-title h4 {
-			font-size: 20px;
-		}
+    .team-sub-title h4 {
+        font-size: 20px;
+    }
 
-		.contact-info-item .icon {
-			font-size: 18px;
-		}
+    .contact-info-item .icon {
+        font-size: 18px;
+    }
 
-		.contact-info-item .content {
-			font-size: 14px;
-		}
+    .contact-info-item .content {
+        font-size: 14px;
+    }
 
-		.table th,
-		.table td {
-			font-size: 14px;
-		}
-	}
+    .table th,
+    .table td {
+        font-size: 14px;
+    }
+    }
 
-	/* For smaller screens like mobile */
-	@media (max-width: 576px) {
-		.team-profile-area {
-			padding-top: 80px;
-			padding-bottom: 60px;
-		}
+    /* For smaller screens like mobile */
+    @media (max-width: 576px) {
+    .team-profile-area {
+        padding-top: 80px;
+        padding-bottom: 60px;
+    }
 
-		.team-profile-image {
-			text-align: center;
-		}
+    .team-profile-image {
+        text-align: center;
+    }
 
-		.team-profile-content {
-			padding: 10px;
-		}
+    .team-profile-content {
+        padding: 10px;
+    }
 
-		.total-info-wrapper {
-			text-align: center;
-		}
+    .total-info-wrapper {
+        text-align: center;
+    }
 
-		.total-info-wrapper .img-wrapper img {
-			width: 60px;
-		}
+    .total-info-wrapper .img-wrapper img {
+        width: 60px;
+    }
 
-		.stats-info-wrapper h5 {
-			font-size: 18px;
-		}
+    .stats-info-wrapper h5 {
+        font-size: 18px;
+    }
 
-		.table-responsive {
-			overflow-x: auto;
-		}
-	}
+    .table-responsive {
+        overflow-x: auto;
+    }
+    }
+
+    .team-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 5px;
+        margin-left: 5px;
+    }
+
 </style>
 <div class="page-wrapper">
-    <section class="team-profile-area pt-220 rpt-150 pb-130 rpb-100 rel">
-        <div class="container container-1290">
-            <div class="row gap-100 align-items-center">
-                <!-- Team Profile Image -->
-                <div class="col-lg-6">
-                    <div class="team-profile-image rmb-55 wow fadeInLeft delay-0-2s">
-                        {% if team.team_id.team_logo %}
-                            <img src="{{ team.team_id.team_logo.url }}" alt="{{ team.team_name }}">
-                        {% else %}
-                            <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ team.team_name }}">
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Team Profile Content -->
-                <div class="col-lg-6">
-                    <div class="team-profile-content wow fadeInRight delay-0-2s">
-                        <h2>{{ team.team_name }}</h2>
-                        <span class="designation">{{ team.team_type.name_en }}</span>
-                        <p>{{ team.team_id.bio }}</p>
-                        <div class="team-sub-title mt-55 mb-30">
-                            <h4>Get In Touch</h4>
-                        </div>
-
-                        <!-- Contact Information -->
-                        <div class="row">
-                            <div class="col-sm-6 contact-info-item">
-                                <div class="icon"><i class="fa fa-map-marker-alt"></i></div>
-                                <div class="content"><b class="title">Location</b><span class="text">{{ team.city }}</span></div>
-                            </div>
-                            <div class="col-sm-6 contact-info-item">
-                                <div class="icon"><i class="fa fa-user"></i></div>
-                                <div class="content"><b class="title">Team Founder</b><span class="text">{{ team.team_id.team_founder.username }}</span></div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-sm-6 contact-info-item">
-                                <div class="icon"><i class="far fa-envelope"></i></div>
-                                <div class="content"><b class="title">Email Address</b><span class="text"><a href="mailto:{{ team.email }}">{{ team.email }}</a></span></div>
-                            </div>
-                            <div class="col-sm-6 contact-info-item">
-                                <div class="icon"><i class="far fa-calendar"></i></div>
-                                <div class="content"><b class="title">Establishment Date</b><span class="text">{{ team.team_id.team_establishment_date|date:"d M Y" }}</span></div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-sm-6 contact-info-item">
-                                <div class="icon"><i class="fa fa-phone"></i></div>
-                                <div class="content"><b class="title">Phone Us</b><span class="text"><a href="callto:{{ team.phone }}">{{ team.phone }}</a></span></div>
-                            </div>
-                            <div class="col-sm-6 contact-info-item">
-                                <div class="icon"><i class="far fa-user"></i></div>
-                                <div class="content"><b class="title">President</b><span class="text">{{ team.team_id.team_president }}</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Section -->
-        <div class="container px-4">
-            <div class="row">
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
-                        <div>
-                            <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/game-played.png' %}" class="img-fluid" alt=""></div>
-
-                        </div>
-                        <div>
-                            <h6 class="info-head">Game Played</h6>
-                            <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
-                        <div>
-                            <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/win.png' %}" class="img-fluid" alt=""></div>
-
-                        </div>
-                        <div>
-                            <h6 class="info-head">Win</h6>
-                            <h5 class="score">{{ stats.win|default:"0" }}</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
-                        <div>
-                            <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/lost.png' %}" class="img-fluid" alt=""></div>
-
-                        </div>
-                        <div>
-                            <h6 class="info-head">Lost</h6>
-                            <h5 class="score">{{ stats.loss|default:"0" }}</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
-                        <div>
-                            <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/draw.png' %}" class="img-fluid" alt=""></div>
-
-                        </div>
-                        <div>
-                            <h6 class="info-head">Draw</h6>
-                            <h5 class="score">{{ stats.draw|default:"0" }}</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
-                        <div>
-                            <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/goal-scored.png' %}" class="img-fluid" alt=""></div>
-
-                        </div>
-                        <div>
-                            <h6 class="info-head">Goal Scored</h6>
-                            <h5 class="score">{{ stats.goals|default:"0" }}</h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-6">
-                    <div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
-                        <div>
-                            <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/goal-scored.png' %}" class="img-fluid" alt=""></div>
-
-                        </div>
-                        <div>
-                            <h6 class="info-head"> Team Goal Conceded</h6>
-                            <h5 class="score">{{ stats.goals_conceded|default:"0" }}</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row" >
-                <div class="col-lg-12">
-                    <!-- Staff Members, Players, Tournaments Joined -->
-                    <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                        <h5>Staff Members</h5>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Mobile No.</th>
-                                        <th>Role</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for staff in staff_members %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ staff.user_id.username }}</td>
-                                            <td><a href="mailto:{{ staff.user_id.email }}">{{ staff.user_id.email }}</a></td>
-                                            <td><a href="tel:{{ staff.user_id.phone }}">{{ staff.user_id.phone }}</a></td>
-                                            <td>{{ staff.get_joinning_type_display }}</td>
-                                        </tr>
-                                    {% empty %}
-                                        <tr><td colspan="5">No staff members found.</td></tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                        <h5>Players</h5>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Mobile No.</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for player in players %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ player.user_id.username }}</td>
-                                            <td><a href="mailto:{{ player.user_id.email }}">{{ player.user_id.email }}</a></td>
-                                            <td><a href="tel:{{ player.user_id.phone }}">{{ player.user_id.phone }}</a></td>
-                                        </tr>
-                                    {% empty %}
-                                        <tr><td colspan="4">No Players found.</td></tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                        <h5>Joined Tournaments</h5>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Tournament Name</th>
-                                        <th>Start Date</th>
-                                        <th>Age Group</th>
-                                        <th>City</th>
-                                        <th>Joining Cost</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for joined_tournament in joined_tournaments %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ joined_tournament.tournament_id.tournament_name }}</td>
-                                            <td>{{ joined_tournament.tournament_id.tournament_starting_date }}</td>
-                                            <td>{{ joined_tournament.tournament_id.age_group }}</td>
-                                            <td>{{ joined_tournament.tournament_id.city.name }}</td>
-                                            <td>{{ joined_tournament.tournament_id.tournament_joining_cost }}</td>
-                                        </tr>
-                                    {% empty %}
-                                        <tr><td colspan="6">No Tournaments found.</td></tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                        <h5>Tournaments Joined Games</h5>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Tournament Name</th>
-                                        <th>Game Number</th>
-                                        <th>Game Date</th>
-                                        <th>Group Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for finished_game in finished_games %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ finished_game.tournament_id.tournament_name }}</td>
-                                            <td>{{ finished_game.game_number }}</td>
-                                            <td>{{ finished_game.game_date }}</td>
-                                            {% for joined_tournament in joined_tournaments %}
-                                                {% if finished_game.tournament_id == joined_tournament.tournament_id %}
-                                                    <td>{{ joined_tournament.group_id.group_name }}</td>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </tr>
-                                    {% empty %}
-                                        <tr><td colspan="5">No Tournament found.</td></tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-1"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Scroll to Top Button -->
-    <button class="scroll-top scroll-to-target" data-target="html">
-        <span class="fas fa-angle-double-up"></span>
-    </button>
+	<section class="team-profile-area pt-220 rpt-150 pb-130 rpb-100 rel">
+		<div class="container container-1290">
+			<div class="row gap-100 align-items-center">
+				<!-- Team Profile Image -->
+				<div class="col-lg-6">
+					<div class="team-profile-image rmb-55 wow fadeInLeft delay-0-2s"> {% if team.team_id.team_logo %} <img src="{{ team.team_id.team_logo.url }}" alt="{{ team.team_name }}"> {% else %} <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ team.team_name }}"> {% endif %} </div>
+				</div>
+				<!-- Team Profile Content -->
+				<div class="col-lg-6">
+					<div class="team-profile-content wow fadeInRight delay-0-2s">
+						<h2>{{ team.team_name }}</h2>
+						<span class="designation">{{ team.team_type.name_en }}</span>
+						<p>{{ team.team_id.bio }}</p>
+						<div class="team-sub-title mt-55 mb-30">
+							<h4>Get In Touch</h4>
+						</div>
+						<!-- Contact Information -->
+						<div class="row">
+							<div class="col-sm-6 contact-info-item">
+								<div class="icon">
+									<i class="fa fa-map-marker-alt"></i>
+								</div>
+								<div class="content">
+									<b class="title">Location</b>
+									<span class="text">{{ team.city }}</span>
+								</div>
+							</div>
+							<div class="col-sm-6 contact-info-item">
+								<div class="icon">
+									<i class="fa fa-user"></i>
+								</div>
+								<div class="content">
+									<b class="title">Team Founder</b>
+									<span class="text">{{ team.team_id.team_founder.username }}</span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6 contact-info-item">
+								<div class="icon">
+									<i class="far fa-envelope"></i>
+								</div>
+								<div class="content">
+									<b class="title">Email Address</b>
+									<span class="text">
+										<a href="mailto:{{ team.email }}">{{ team.email }}</a>
+									</span>
+								</div>
+							</div>
+							<div class="col-sm-6 contact-info-item">
+								<div class="icon">
+									<i class="far fa-calendar"></i>
+								</div>
+								<div class="content">
+									<b class="title">Establishment Date</b>
+									<span class="text">{{ team.team_id.team_establishment_date|date:"d M Y" }}</span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6 contact-info-item">
+								<div class="icon">
+									<i class="fa fa-phone"></i>
+								</div>
+								<div class="content">
+									<b class="title">Phone Us</b>
+									<span class="text">
+										<a href="callto:{{ team.phone }}">{{ team.phone }}</a>
+									</span>
+								</div>
+							</div>
+							<div class="col-sm-6 contact-info-item">
+								<div class="icon">
+									<i class="far fa-user"></i>
+								</div>
+								<div class="content">
+									<b class="title">President</b>
+									<span class="text">{{ team.team_id.team_president }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Stats Section -->
+		<div class="container px-4">
+			<div class="row">
+				<div class="col-md-3 col-6">
+					<div class="total-info-wrapper wow fadeInUp delay-0-3s animated">
+						<div>
+							<div class="img-wrapper">
+								<img src="{% static 'frontend/assets/images/dashboard/game-played.png' %}" class="img-fluid" alt="">
+							</div>
+						</div>
+						<div>
+							<h6 class="info-head">Game Played</h6>
+							<h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-6">
+					<div class="total-info-wrapper wow fadeInUp delay-0-5s animated">
+						<div>
+							<div class="img-wrapper">
+								<img src="{% static 'frontend/assets/images/dashboard/win.png' %}" class="img-fluid" alt="">
+							</div>
+						</div>
+						<div>
+							<h6 class="info-head">Win</h6>
+							<h5 class="score">{{ stats.win|default:"0" }}</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-6">
+					<div class="total-info-wrapper wow fadeInUp delay-0-7s animated">
+						<div>
+							<div class="img-wrapper">
+								<img src="{% static 'frontend/assets/images/dashboard/lost.png' %}" class="img-fluid" alt="">
+							</div>
+						</div>
+						<div>
+							<h6 class="info-head">Lost</h6>
+							<h5 class="score">{{ stats.loss|default:"0" }}</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-6">
+					<div class="total-info-wrapper wow fadeInUp delay-0-9s animated">
+						<div>
+							<div class="img-wrapper">
+								<img src="{% static 'frontend/assets/images/dashboard/draw.png' %}" class="img-fluid" alt="">
+							</div>
+						</div>
+						<div>
+							<h6 class="info-head">Draw</h6>
+							<h5 class="score">{{ stats.draw|default:"0" }}</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-6">
+					<div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
+						<div>
+							<div class="img-wrapper">
+								<img src="{% static 'frontend/assets/images/dashboard/goal-scored.png' %}" class="img-fluid" alt="">
+							</div>
+						</div>
+						<div>
+							<h6 class="info-head">Goal Scored</h6>
+							<h5 class="score">{{ stats.goals|default:"0" }}</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-6">
+					<div class="total-info-wrapper wow fadeInUp delay-0-3s animated bg-two">
+						<div>
+							<div class="img-wrapper">
+								<img src="{% static 'frontend/assets/images/dashboard/goal-scored.png' %}" class="img-fluid" alt="">
+							</div>
+						</div>
+						<div>
+							<h6 class="info-head"> Team Goal Conceded</h6>
+							<h5 class="score">{{ stats.goals_conceded|default:"0" }}</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<!-- Staff Members, Players, Tournaments Joined -->
+					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+						<h5>Staff Members</h5>
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>Username</th>
+										<th>Full Name</th>
+										<th>Mobile No.</th>
+										<th>Role</th>
+									</tr>
+								</thead>
+								<tbody> {% for staff in staff_members %} <tr>
+										<td>{{ forloop.counter }}</td>
+										<td>{{ staff.user_id.username }}</td>
+										<td>
+											{{ staff.user_id.fullname }}
+										</td>
+										<td>
+											<a href="tel:{{ staff.user_id.phone }}">{{ staff.user_id.phone }}</a>
+										</td>
+										<td>{{ staff.get_joinning_type_display }}</td>
+									</tr> {% empty %} <tr>
+										<td colspan="5">No staff members found.</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+						<h5>Players</h5>
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>Username</th>
+										<th>Full Name</th>
+										<th>Mobile No.</th>
+									</tr>
+								</thead>
+								<tbody> {% for player in players %} <tr>
+										<td>{{ forloop.counter }}</td>
+										<td>{{ player.user_id.username }}</td>
+										<td>
+											{{ player.user_id.email }}
+										</td>
+										<td>
+											<a href="tel:{{ player.user_id.phone }}">{{ player.user_id.phone }}</a>
+										</td>
+									</tr> {% empty %} <tr>
+										<td colspan="4">No Players found.</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+						<h5>Joined Tournaments</h5>
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>Tournament Name</th>
+										<th>Start Date</th>
+										<th>Age Group</th>
+										<th>City</th>
+										<th>Joining Cost</th>
+									</tr>
+								</thead>
+								<tbody> {% for joined_tournament in joined_tournaments %} <tr>
+										<td>{{ forloop.counter }}</td>
+										<td>{{ joined_tournament.tournament_id.tournament_name }}</td>
+										<td>{{ joined_tournament.tournament_id.tournament_starting_date }}</td>
+										<td>{{ joined_tournament.tournament_id.age_group }}</td>
+										<td>{{ joined_tournament.tournament_id.city.name }}</td>
+										<td>{{ system_settings.currency_symbol }} {{ joined_tournament.tournament_id.tournament_joining_cost }}</td>
+									</tr> {% empty %} <tr>
+										<td colspan="6">No Tournaments found.</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
+						<h5>Latest Games</h5>
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>Game Type</th>
+										<th>Tournament Name</th>
+										<th>Game Date</th>
+										<th>Teams</th>
+										<th>Score</th>
+									</tr>
+								</thead>
+								<tbody> {% for finished_game in finished_games %} <tr>
+										<td>{{ forloop.counter }}</td>
+										<td>{{ finished_game.game_type }}</td>
+										<td>{{ finished_game.tournament_name }}</td>
+										<td>{{ finished_game.game_date }}</td>
+										<td>
+											<img src="{{ finished_game.team_a_logo }}" class="team-logo">
+											<span> {{ finished_game.team_a_vs_team_b }} </span>
+											<img src="{{ finished_game.team_b_logo }}" class="team-logo">
+										</td>
+										<td>{{ finished_game.score }}</td>
+									</tr> {% empty %} <tr>
+										<td colspan="8">No games found.</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-1"></div>
+			</div>
+		</div>
+	</section>
+	<!-- Scroll to Top Button -->
+	<button class="scroll-top scroll-to-target" data-target="html">
+		<span class="fas fa-angle-double-up"></span>
+	</button>
 </div>
-
-{% endblock %} {% block scriptcontent %} {% endblock %} {% block script %} <script>
+{% endblock %}
+{% block scriptcontent %}
+{% endblock %} 
+{% block script %} 
+<script>
 	new WOW().init();
-</script> {% endblock %}
+</script> 
+{% endblock %}

@@ -16,6 +16,7 @@ import random
 from django.db.models import Q,Sum,When,Case,F
 from datetime import datetime
 from FutureStarTrainingApp.models import *
+from itertools import chain
 
 
 ##############################################   HomePage   ########################################################
@@ -3288,6 +3289,7 @@ class PlayerInfoPage(View):
 
   
 class TeamDetailsView(View):
+
     def get_team_data(self, team):
         # 1. Get staff members from JoinBranch where role is 1, 2, or 3
         staff_members = JoinBranch.objects.filter(
@@ -3307,43 +3309,88 @@ class TeamDetailsView(View):
             status=TournamentGroupTeam.ACCEPTED
         ).order_by('-created_at')[:5]
 
-        # 4. Get tournament games where finish is True (apply filters before slicing)
-        finished_games_filtered = TournamentGames.objects.filter(
+        # 4. Get finished friendly games
+        friendly_games = FriendlyGame.objects.filter(
             Q(team_a=team) | Q(team_b=team), 
-            finish=True
+            # finish=True
         ).order_by('-game_date')
 
-        # Now slice the queryset to get the first 5 results
-        finished_games = finished_games_filtered[:5]
+        # 5. Get finished tournament games
+        tournament_games = TournamentGames.objects.filter(
+            Q(team_a=team) | Q(team_b=team), 
+            # finish=True
+        ).order_by('-game_date')
+
+        # Combine friendly and tournament games
+        combined_games = sorted(
+            chain(friendly_games, tournament_games),  # Merge querysets
+            key=lambda game: game.game_date,  # Sort by date
+            reverse=True  # Show latest games first
+        )[:5]
 
         # Calculate stats
-        wins = finished_games_filtered.filter(winner_id=team.id).count()
-        losses = finished_games_filtered.filter(loser_id=team.id).count()
-        draws = finished_games_filtered.filter(is_draw=True).count()
+        total_wins = 0
+        total_losses = 0
+        total_draws = 0
+        total_goals_scored = 0
+        total_goals_conceded = 0
 
-        # Calculate goals scored and conceded
-        goals_scored = sum(
-            game.team_a_goal if game.team_a == team else game.team_b_goal 
-            for game in finished_games
-        )
-        goals_conceded = sum(
-            game.team_b_goal if game.team_a == team else game.team_a_goal 
-            for game in finished_games
-        )
+        # Process combined games
+        finished_games = []
+        for game in combined_games:
+            # Determine if it's a Friendly or Tournament Game
+            if isinstance(game, FriendlyGame):
+                game_type = "Friendly"
+                tournament_name = "N/A"
+                group_name = "N/A"
+            else:
+                game_type = "Tournament"
+                tournament_name = game.tournament_id.tournament_name if game.tournament_id else "N/A"
+                group_name = game.group_id.group_name if game.group_id else "N/A"
 
-        # Add total games played (number of finished games the team participated in)
-        games_played = finished_games.count()
+            # Calculate statistics
+            if game.winner_id == str(team.id):
+                total_wins += 1
+            elif game.loser_id == str(team.id):
+                total_losses += 1
+            elif game.is_draw:
+                total_draws += 1
 
+            # Goals scored and conceded
+            if game.team_a == team:
+                total_goals_scored += game.team_a_goal or 0
+                total_goals_conceded += game.team_b_goal or 0
+            else:
+                total_goals_scored += game.team_b_goal or 0
+                total_goals_conceded += game.team_a_goal or 0
+
+            # Append game data
+            finished_games.append({
+                "game_type": game_type,
+                "tournament_name": tournament_name,
+                "game_number": game.game_number,
+                "game_date": game.game_date,
+                "game_start_time": game.game_start_time,
+                "game_end_time": game.game_end_time,
+                "group_name": group_name,
+                "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
+                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
+                "score": f"{game.team_a_goal or 0} - {game.team_b_goal or 0}",
+            })
+
+        # Stats for all games combined
         stats = {
-            "wins": wins,
-            "losses": losses,
-            "draws": draws,
-            "goals_scored": goals_scored,
-            "goals_conceded": goals_conceded,
-            "games_played": games_played,  # Add games played to stats
+            "wins": total_wins,
+            "losses": total_losses,
+            "draws": total_draws,
+            "goals_scored": total_goals_scored,
+            "goals_conceded": total_goals_conceded,
+            "games_played": len(combined_games),  # Total games played
         }
 
         return staff_members, players, joined_tournaments, finished_games, stats
+
 
 
     def get(self, request, *args, **kwargs):
