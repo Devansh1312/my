@@ -3361,7 +3361,7 @@ class FollowUnfollowAPI(APIView):
             }, status=status.HTTP_200_OK)
         except FollowRequest.DoesNotExist:
             # Follow request does not exist, create one
-            FollowRequest.objects.create(
+            follow_request = FollowRequest.objects.create(
                 created_by_id=created_by_id,
                 creator_type=creator_type,
                 target_id=target_id,
@@ -3370,27 +3370,40 @@ class FollowUnfollowAPI(APIView):
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
 
-            # Fetch the relevant user for the target to send push notification
+            # Determine the follower (creator) name
+            if creator_type in [1, "1"]:  # Creator is a User
+                follower_user = User.objects.get(id=created_by_id)
+                recipient_name = follower_user.username
+            elif creator_type in [2, "2"]:  # Creator is a Team
+                follower_team = Team.objects.get(id=created_by_id)
+                recipient_name = follower_team.team_username
+            elif creator_type == 3:  # Creator is a Training Group
+                follower_group = TrainingGroups.objects.get(id=created_by_id)
+                recipient_name = follower_group.group_name
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid creator type.')
+                }, status=400)
+
+            # Now, determine the target (the one being followed)
             if target_type in [1, "1"]:  # Target is a User
                 target_user = User.objects.get(id=target_id)
-                recipient_name = target_user.username
-                device_token = target_user.device_token
-                device_type = target_user.device_type
-                notification_language = target_user.current_language  # Get user's language for notifications
+                target_device_token = target_user.device_token
+                target_device_type = target_user.device_type
+                notification_language = target_user.current_language  # Get target user's language for notifications
             elif target_type in [2, "2"]:  # Target is a Team
                 target_team = Team.objects.get(id=target_id)
                 target_user = target_team.team_founder
-                recipient_name = target_team.team_username
-                device_token = target_user.device_token
-                device_type = target_user.device_type
-                notification_language = target_user.current_language  # Get team founder's language for notifications
+                target_device_token = target_user.device_token
+                target_device_type = target_user.device_type
+                notification_language = target_user.current_language  # Get target user's language for notifications
             elif target_type == 3:  # Target is a Training Group
                 target_group = TrainingGroups.objects.get(id=target_id)
                 target_user = target_group.group_founder
-                recipient_name = target_group.group_name
-                device_token = target_user.device_token
-                device_type = target_user.device_type
-                notification_language = target_user.current_language  # Get group founder's language for notifications
+                target_device_token = target_user.device_token
+                target_device_type = target_user.device_type
+                notification_language = target_user.current_language  # Get target user's language for notifications
             else:
                 return Response({
                     'status': 0,
@@ -3401,12 +3414,12 @@ class FollowUnfollowAPI(APIView):
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
 
-            # Sending push notification to the target
-            if device_type in [1, 2, "1", "2"]:
+            # Sending push notification to the target using the target's device token and type
+            if target_device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
-                body = _(f'{recipient_name} started following you.')
-                push_data = {'type': 'follow', 'target_id': target_id, 'target_type': target_type}  # Include follow info in the notification payload
-                send_push_notification(device_token, title, body, device_type, data=push_data)
+                body = _(f'{recipient_name} started following you.')  # Notification message
+                push_data = {'type': 'follow', 'created_by_id': target_id, 'creator_type': target_type}  # Include follow info in the notification payload
+                send_push_notification(target_device_token, title, body, target_device_type, data=push_data)
 
             # Return the response for following
             return Response({
