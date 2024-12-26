@@ -51,8 +51,8 @@
                             </a>
                             <!-- Submenu for "Team" -->
                             <div id="myDropdown" class="dropdown-content">
-                              <a href="#home">Team Page</a>
-                              <a href="#about">Teams</a>
+                              <a href="{% url 'player-dashboard-team-page' %}">Team Page</a>
+                              <a href="{% url 'player-dashboard-joined-teams' %}">Teams</a>
                             </div>
                         </li>
                         {% if user.role.id != 6 %}
@@ -73,7 +73,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'player-dashboard-events' %}" class="sidebar-link ">
+                            <a href="{% url 'player-dashboard-events' %}" class="sidebar-link">
                                 <span><i class="fas fa-calendar-check"></i></span> Events
                             </a>
                         </li>

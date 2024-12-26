@@ -210,11 +210,14 @@
                            <table id="team-a-starting" class="table table-striped">
                               <thead>
                                  <tr>
+                                    <th>No.</th>
                                     <th>Player Name</th>
                                     <th>Jersey Number</th>
                                  </tr>
                               </thead>
-                              <tbody> {% for lineup in team_a_lineup %} {% if lineup.lineup_status == 3 %} <tr>
+                              <tbody> {% for lineup in team_a_lineup %} {% if lineup.lineup_status == 3 %} 
+                                 <tr>
+                                    <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
                                     <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
@@ -224,11 +227,13 @@
                            <table id="team-a-substitute" class="table table-striped">
                               <thead>
                                  <tr>
+                                    <th>No.</th>
                                     <th>Player Name</th>
                                     <th>Jersey Number</th>
                                  </tr>
                               </thead>
                               <tbody> {% for lineup in team_a_lineup %} {% if lineup.lineup_status == 2 %} <tr>
+                                    <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
                                     <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
@@ -241,11 +246,13 @@
                            <table id="team-b-starting" class="table table-striped">
                               <thead>
                                  <tr>
+                                    <th>No.</th>
                                     <th>Player Name</th>
                                     <th>Jersey Number</th>
                                  </tr>
                               </thead>
                               <tbody> {% for lineup in team_b_lineup %} {% if lineup.lineup_status == 3 %} <tr>
+                                    <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
                                     <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
@@ -255,11 +262,13 @@
                            <table id="team-b-substitute" class="table table-striped">
                               <thead>
                                  <tr>
+                                    <th>No.</th>
                                     <th>Player Name</th>
                                     <th>Jersey Number</th>
                                  </tr>
                               </thead>
                               <tbody> {% for lineup in team_b_lineup %} {% if lineup.lineup_status == 2 %} <tr>
+                                    <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
                                     <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
@@ -274,6 +283,7 @@
                      <table id="official_table" class="table table-bordered">
                         <thead>
                            <tr>
+                              <th>No.</th>
                               <th>Official FullName</th>
                               <th>Official Username</th>
                               <th>Role</th>
@@ -281,16 +291,10 @@
                            </tr>
                         </thead>
                         <tbody> {% for official in officials_data %} <tr>
+                              <td>{{ forloop.counter }}</td>  
                               <td>{{ official.fullname }}</td>
                               <td>{{ official.username }}</td>
                               <td>{{ official.official_type }}</td>
-                              <!-- <td>
-                                                {% if official.profile_picture %}
-                                                    <img src="{{ official.profile_picture }}" alt="{{ official.fullname }}" class="official-profile-picture" style="width: 50px; height: 50px; object-fit: cover;">
-                                                {% else %}
-                                                {{ official.profile_picture.url }}
-                                                {% endif %}
-                                            </td> -->
                            </tr> {% endfor %} </tbody>
                      </table>
                   </div>

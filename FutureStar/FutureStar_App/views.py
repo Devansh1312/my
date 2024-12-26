@@ -7393,7 +7393,7 @@ class TournamentGameDetailView(LoginRequiredMixin, View):
             official_type = official.officials_type_id
             officials_data.append(
                 {
-                    "fullname": f"{official_user.first_name} {official_user.last_name}",
+                    "fullname": f"{official_user.fullname}",
                     "username": f"{official_user.username}",
                     "official_type": official_type.name_en,  # Assuming you want the English name
                 }
@@ -7438,7 +7438,7 @@ class FriendlyGameDetailView(LoginRequiredMixin, View):
 
             officials_data.append(
                 {
-                    "fullname": f"{official_user.first_name} {official_user.last_name}",
+                    "fullname": f"{official_user.fullname}",
                     "username": f"{official_user.username}",
                     "official_type": official_type.name_en,  # Assuming you want the English name
                 }

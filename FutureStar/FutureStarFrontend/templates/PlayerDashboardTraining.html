@@ -39,8 +39,8 @@
                             </a>
                             <!-- Submenu for "Team" -->
                             <div id="myDropdown" class="dropdown-content">
-                              <a href="#home">Team Page</a>
-                              <a href="#about">Teams</a>
+                              <a href="{% url 'player-dashboard-team-page' %}">Team Page</a>
+                              <a href="{% url 'player-dashboard-joined-teams' %}">Teams</a>
                             </div>
                         </li>
                         {% if user.role.id != 6 %}
@@ -85,7 +85,7 @@
                                     <th>No.</th>
                                     <th>Training Name</th>
                                     <th>Training Date</th>
-                                    <th>Participants</th>
+                                    <th>Joined Players</th>
                                     <th>Training Type</th>
                                     <th>Cost</th>
                                 </tr>
@@ -93,23 +93,23 @@
                             <tbody>
                                 {% if joined_trainings %}
                                     {% for training in joined_trainings %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ training.training_name }}</td>
-                                            <td>{{ training.training_date }}</td>
-                                            <td>{{ training.no_of_participants }}</td>
-                                            <td>{{ training.get_training_type_display }}</td>
-                                            <td>{{ training.cost }}</td>
-                                        </tr>
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ training.training_name }}</td>
+                                        <td>{{ training.training_date }}</td>
+                                        <td>{{ training.joined.count }}</td>  <!-- Number of participants -->
+                                        <td>{{ training.get_training_type_display }}</td>
+                                        <td>{{ training.cost }}</td>
+                                    </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="5">No Joined Trainings Found</td></tr>
+                                    <tr><td colspan="6">No Joined Trainings Found</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
                     {% endif %}
-    
+            
                     <!-- Created Trainings Section -->
                     <h5>Created Trainings</h5>
                     <div class="table-responsive">
@@ -119,7 +119,7 @@
                                     <th>No.</th>
                                     <th>Training Name</th>
                                     <th>Training Date</th>
-                                    <th>Participants</th>
+                                    <th>Joined Players</th>
                                     <th>Training Type</th>
                                     <th>Cost</th>
                                 </tr>
@@ -127,23 +127,24 @@
                             <tbody>
                                 {% if created_trainings %}
                                     {% for training in created_trainings %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ training.training_name }}</td>
-                                            <td>{{ training.training_date }}</td>
-                                            <td>{{ training.no_of_participants }}</td>
-                                            <td>{{ training.get_training_type_display }}</td>
-                                            <td>{{ training.cost }}</td>
-                                        </tr>
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ training.training_name }}</td>
+                                        <td>{{ training.training_date }}</td>
+                                        <td>{{ training.joined.count }}</td>  <!-- Number of participants -->
+                                        <td>{{ training.get_training_type_display }}</td>
+                                        <td>{{ training.cost }}</td>
+                                    </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="5">No Created Trainings Found</td></tr>
+                                    <tr><td colspan="6">No Created Trainings Found</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </section>

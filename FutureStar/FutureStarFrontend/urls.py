@@ -31,6 +31,8 @@ urlpatterns = [
     path('player-dashboard-fileds/', UserCreatedFieldsView.as_view(),name="player-dashboard-fileds"),
     path('player-dashboard-trainings/', UserDashboardTrainings.as_view(),name="player-dashboard-trainings"),
     path('player-dashboard-team-page/', TeamPageDashboard.as_view(),name="player-dashboard-team-page"),
+    path('player-dashboard-joined-teams/', UserJoinedTeamInfo.as_view(), name='player-dashboard-joined-teams'),
+
 
 
 

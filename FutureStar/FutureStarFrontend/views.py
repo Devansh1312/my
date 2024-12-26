@@ -3467,3 +3467,48 @@ class TeamPageDashboard(LoginRequiredMixin, View):
             # Redirect if no team is found
             messages.error(request, 'You do not have any Team Page.')  # Escaped single quote
             return redirect('player-dashboard')
+
+
+class UserJoinedTeamInfo(LoginRequiredMixin, View):
+    template_name = 'PlayerDashboardTeams.html'  # Your template to display the team info
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        language_from_url = request.GET.get('Language', None)
+        
+        # Handle language selection from URL or session
+        if language_from_url:
+            request.session['language'] = language_from_url
+        else:
+            language_from_url = request.session.get('language', 'en')
+
+        # Fetch the user's team branches and their joining type
+        team_branches = self.get_user_team_branches(user)
+
+        context = {
+            "current_language": language_from_url,
+            "team_branches": team_branches,
+        }
+
+        return render(request, self.template_name, context)
+
+    def get_user_team_branches(self, user):
+        """
+        Fetches the team branches that the user is part of, including their joining type (Managerial, Coach, etc.)
+        """
+        # Only use select_related for ForeignKey fields (branch_id, user_id)
+        join_branches = JoinBranch.objects.filter(user_id=user.id).select_related('branch_id', 'user_id')
+        
+        team_branches = []
+        for join_branch in join_branches:
+            team_branch = join_branch.branch_id  # Get the related TeamBranch object
+            team_branches.append({
+                'team_name': team_branch.team_id.team_name,
+                'branch_name': team_branch.team_name,
+                'joinning_type': dict(JoinBranch.JOINNING_TYPE_CHOICES).get(join_branch.joinning_type),
+                'phone': team_branch.phone,
+                'age_group': team_branch.age_group_id.name_en,
+                'team_logo': team_branch.team_id.team_logo.url if team_branch.team_id.team_logo else None,
+            })
+        
+        return team_branches

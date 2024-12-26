@@ -9,7 +9,7 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}Goalactico||Games{% endblock %}
+{% block title %}Goalactico||Teams{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 
@@ -46,7 +46,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link dropbtn" onclick="myFunction()"><span><i class="fas fa-users"></i></span>
+                            <a href="#" class="sidebar-link active dropbtn" onclick="myFunction()"><span><i class="fas fa-users"></i></span>
                                 Team
                             </a>
                             <!-- Submenu for "Team" -->
@@ -63,7 +63,7 @@
                         </li>
                         {% endif %}
                         <li>
-                            <a href="{% url 'player-dashboard-games' %}" class="sidebar-link active">
+                            <a href="{% url 'player-dashboard-games' %}" class="sidebar-link">
                                 <span><i class="fas fa-trophy"></i></span> Games
                             </a>
                         </li>
@@ -87,79 +87,43 @@
             </div>
             <div class="col-lg-9">
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Upcoming Game</h5>
+                    <h5>Joined Teams</h5>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>id </th>
-                                    <th>Match Type</th>
-                                    <th>Teams</th>
-                                    <th>Game Date</th>
+                                    <th>No.</th>
+                                    <th>Team-Page & Logo</th>
+                                    <th>Team Name</th>
+                                    <th>Joining Type</th>
+                                    <th>Age Group</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if stats.upcoming_games %}
-                                    {% for game in stats.upcoming_games %}
+                                {% if team_branches %}
+                                    {% for branch in team_branches %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ game.game_type }}</td>
                                             <td>
-                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
-                                                <span> {{ game.team_a_vs_team_b }} </span>
-                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
+                                                <img src="{{ branch.team_logo }}" class="team-logo">
+                                                <span> {{ branch.team_name }} </span>
                                             </td>
-                                            <td>{{ game.game_date }}</td>
+                                            <td>{{ branch.branch_name }}</td>
+                                            <td>{{ branch.joinning_type }}</td>
+                                            <td>{{ branch.age_group }}</td>
                                         </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="4">No upcoming games</td></tr>
+                                    <tr><td colspan="5">You have not joined any teams.</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
-                </div>
-                
-                <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Latest Game</h5>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>id </th>
-                                    <th>Match Type</th>
-                                    <th>Teams</th>
-                                    <th>Game Date</th>
-                                    <th>Score</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if stats.finished_games %}
-                                    {% for game in stats.finished_games %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ game.game_type }}</td>
-                                            <td>
-                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
-                                                <span> {{ game.team_a_vs_team_b }} </span>
-                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
-                                            </td>
-                                            <td>{{ game.game_date }}</td>
-                                            <td>{{ game.score }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr><td colspan="5">No finished games</td></tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                </div>                 
             </div>
         </div>
     </div>
 </section>
-
 <!-- Blog Page Area end -->
 {% endblock %}
 
