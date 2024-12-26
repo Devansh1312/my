@@ -3433,3 +3433,37 @@ class TeamDetailsView(View):
 
         # Render the template with the updated context
         return render(request, 'team/team.html', context)
+
+
+class TeamPageDashboard(LoginRequiredMixin, View):
+    template_name = 'PlayerDashboardTeamPage.html'
+
+    def get(self, request, *args, **kwargs):
+        # Handle language selection
+        language_from_url = request.GET.get('Language', None)
+        if language_from_url:
+            # Save to session if found in URL
+            request.session['language'] = language_from_url
+        else:
+            # Use session language or default to 'en'
+            language_from_url = request.session.get('language', 'en')
+
+        user = request.user
+        user_id = user.id
+        
+        try:
+            # Attempt to fetch the team
+            team = Team.objects.get(team_founder=user_id)
+
+            # Prepare context data
+            context = {
+                'team': team,
+                'current_language': language_from_url,  # Add language to context
+                'user': user,
+            }
+            return render(request, self.template_name, context)
+
+        except Team.DoesNotExist:
+            # Redirect if no team is found
+            messages.error(request, 'You do not have any Team Page.')  # Escaped single quote
+            return redirect('player-dashboard')

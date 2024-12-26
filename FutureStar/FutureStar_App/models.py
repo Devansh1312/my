@@ -195,6 +195,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    ####### Skills & Physical ######
+    passing = models.FloatField(null=True,blank=True,default=0.0)
+    shooting = models.FloatField(null=True,blank=True,default=0.0)
+    interception = models.FloatField(null=True,blank=True,default=0.0)
+    dribbling = models.FloatField(null=True,blank=True,default=0.0)
+    tackling = models.FloatField(null=True,blank=True,default=0.0)
+    aerial_duals = models.FloatField(null=True,blank=True,default=0.0)
+    stamina = models.FloatField(null=True,blank=True,default=0.0)
+    speed = models.FloatField(null=True,blank=True,default=0.0)
+    strength = models.FloatField(null=True,blank=True,default=0.0)
+    jump = models.FloatField(null=True,blank=True,default=0.0)
+    balance = models.FloatField(null=True,blank=True,default=0.0)
+    agility = models.FloatField(null=True,blank=True,default=0.0)
+
     is_coach = models.BooleanField(default=False)
     is_referee = models.BooleanField(default=False)
 

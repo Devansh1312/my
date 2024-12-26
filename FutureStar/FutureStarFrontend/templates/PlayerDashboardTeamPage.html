@@ -1,0 +1,214 @@
+{% extends 'base1.html' %}
+
+{% load static %}
+{% load lang_filter %}
+
+{% block css %}
+<!-- Plugins css start-->
+
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}Goalactico||Events{% endblock %}
+{% load lang_filter %} <!-- Loading your custom filter -->
+{% block content %}
+
+<style>
+   .profile-img {
+    width: 200px;                  /* Adjust size */
+    height: 200px;                 /* Keep dimensions equal for a perfect circle */
+    border-radius: 50%;           /* Makes the image circular */
+    object-fit: cover;            /* Ensures the image fits inside the circle without distortion */
+    border: 1px solid black;      /* Adds a 1px black border around the image */
+    
+    /* Shadow effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Horizontal, Vertical, Blur, Spread, Color */
+}
+</style>
+
+<section class="services-area-six pt-150 pb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="sidebar-wrapper wow fadeInUp delay-0-5s animated">
+                    <div class="user-info">
+                        <div class="user-img-wrapper"><img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" alt=""></div>
+                        <div>
+                            <h5 class="user-name">{{ user.username }}</h6>
+                            <p class="user-desi">
+                                {% lang user.role current_language "name" as name %} 
+                                {{name}}
+                            </p>
+                        </div>
+                    </div>
+                    <ul>
+                        <li>
+                            <a href="{% url 'player-dashboard' %}" class="sidebar-link">
+                                <span><i class="fas fa-th-large"></i></span> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link active dropbtn" onclick="myFunction()"><span><i class="fas fa-users"></i></span>
+                                Team
+                            </a>
+                            <!-- Submenu for "Team" -->
+                            <div id="myDropdown" class="dropdown-content">
+                              <a href="{% url 'player-dashboard-team-page' %}">Team Page</a>
+                              <a href="#about">Teams</a>
+                            </div>
+                        </li>
+                        {% if user.role.id != 4 %}
+                        <li>
+                            <a href="{% url 'player-dashboard-trainings' %}" class="sidebar-link">
+                                <span><i class="fas fa-futbol"></i></span> Training
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <a href="{% url 'player-dashboard-games' %}" class="sidebar-link">
+                                <span><i class="fas fa-trophy"></i></span> Games
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'player-dashboard-fileds' %}" class="sidebar-link">
+                                <span><i class="fas fa-shield-alt"></i></span> Fields
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'player-dashboard-events' %}" class="sidebar-link">
+                                <span><i class="fas fa-calendar-check"></i></span> Events
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}" class="sidebar-link">
+                                <span><i class="fas fa-sign-out-alt"></i></span> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row gap-100 align-items-center">
+                    <div class="col-lg-3">
+                        <div class="team-profile-image rmb-55 wow fadeInCenter delay-0-2s">
+                            {% if team.team_logo %}
+                                <img src="{{ team.team_logo.url }}" alt="{{ team.team_name }}" class="profile-img">
+                            {% else %}
+                                <img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" alt="{{ team.team_name }}" class="profile-img">
+                            {% endif %}
+                        </div>                        
+                    </div> 
+                    <div class="col-lg-9">
+                        <div class="team-profile-content wow fadeInRight delay-0-2s">
+                            <h2>{{ team.team_name }}</h2>
+                            <span class="designation">{{ team.team_type.name_en }}</span>
+                            <p>{{ team.bio }}</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-9">
+                        <div class="team-sub-title mt-55 mb-30">
+                            <h4>Get In Touch</h4>
+                        </div>
+                        <!-- Display Team Contact Information -->
+                        <div class="row">
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-map-marker-alt"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Location</b>
+                                    <span class="text">{{ team.city_id.name }}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Team Founder</b>
+                                    <span class="text">{{ team.team_founder.username }}</span>
+                                    <!-- Adjust based on your model -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="far fa-envelope"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Email Address</b>
+                                    <span class="text">
+                                        <a href="mailto:{{ team.email }}">{{ team.email }}</a>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Establishment Date</b>
+                                    <span class="text">{{ team.team_establishment_date|date:"d M Y" }}</span>
+                                    <!-- Assuming you have this field -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="fa fa-phone"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">Phone Us</b>
+                                    <span class="text">
+                                        <a href="callto:{{ team.phone }}">{{ team.phone }}</a>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 contact-info-item">
+                                <div class="icon">
+                                    <i class="far fa-user"></i>
+                                </div>
+                                <div class="content">
+                                    <b class="title">President</b>
+                                    <span class="text">{{ team.team_president }}</span>
+                                    <!-- Assuming you have this field -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Page Area end -->
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    function myFunction() {
+ document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+ if (!event.target.matches('.dropbtn')) {
+   var dropdowns = document.getElementsByClassName("dropdown-content");
+   var i;
+   for (i = 0; i < dropdowns.length; i++) {
+     var openDropdown = dropdowns[i];
+     if (openDropdown.classList.contains('show')) {
+       openDropdown.classList.remove('show');
+     }
+   }
+ }
+}
+</script>
+{% endblock %}
+
+{% block script %} 
+<script>new WOW().init();</script>
+{% endblock %}
