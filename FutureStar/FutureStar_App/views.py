@@ -1255,7 +1255,10 @@ class UserDetailView(LoginRequiredMixin, View):
        
             time_filter = {}
         # # Get player-specific stats, including passing time_filter
-            player_stats = self.get_player_stats(user, time_filter)["player_stats"]
+            if user.role_id == 2:
+                player_stats = self.get_player_stats(user, time_filter)["player_stats"]
+            else:
+                player_stats = {}  # If the role isn't 2, don't fetch player stats
             source_page = request.GET.get("source_page")
             title = request.GET.get("title")
             role = user.role_id
@@ -1293,7 +1296,10 @@ class UserDetailView(LoginRequiredMixin, View):
             time_filter = {}  # This will parse the time filter from the request
         
         # Get player-specific stats, including passing time_filter
-            player_stats = self.get_player_stats(user, time_filter)["player_stats"] 
+            if user.role_id == 2:
+                player_stats = self.get_player_stats(user, time_filter)["player_stats"]
+            else:
+                player_stats = {}  # If the role isn't 2, don't fetch player stats
             source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id
