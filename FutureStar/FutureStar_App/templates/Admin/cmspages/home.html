@@ -14,1245 +14,918 @@
 {% include "components/loader.html" %}
 
 <div class="page-body">
-    <div class="container-fluid">
-        <div class="page-title"></div>
-        <div class="card">
-            <form class="form theme-form" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="card-body">
-                    <div>
-                        <button onclick="return backtolist()" class="btn btn-secondary" style="float: right;">Back</button>
-                        <h1 style="font-size:25px">Home Page</h1>
-                    </div>    
-
-                    <p class = "erro-heading" id="heading-error"></p>
-
-
-                    <br>
-                    <div>
-                        <p id = "heading-warning"></p>
-                    </div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Heading Section</h4>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-heading-title-en" name="home_heading_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-heading-title-ar" name="home_heading_title_ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--heading content-->
-                        
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-en" name="home_heading_content_en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-ar" name="home_heading_content_ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-section-image-1">Heading image-1 </label>
-                                <input class="form-control btn-pill" id="home-heading-section-image-1" name="home_heading_section_image_1" type="file"  onchange= "displayheadingImage1(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-home-image-1" src = "/media/{{data.heading_image_1}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-image-1"></p>
-
-                            </div>
-                        </div>
-                        <p id = "image1-home-warning"></p>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-section-image-2">Heading image-2 </label>
-                                <input class="form-control btn-pill" id="home-heading-section-image-2" name="home_heading_section_image_2" type="file"  onchange= "displayheadingImage2(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-home-image-2" src = "/media/{{data.heading_image_2}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-image-2"></p>
-
-                            </div>
-                        </div>
-                        <p id = "image2-home-warning"></p>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-section-image-3">Heading image-3 </label>
-                                <input class="form-control btn-pill" id="home-heading-section-image-3" name="home_heading_section_image_3" type="file"  onchange= "displayheadingImage3(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-home-image-3" src = "/media/{{data.heading_image_3}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-section-image-3"></p>
-
-                            </div>
-                        </div>
-                        <p id = "image3-home-warning"></p>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="font-size:20px"> Heading Sub Section-2</h4>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="font-size:20px"> Heading Section-2 Form-1</h4>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-1-name-en">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-1-name-en" name="home_sub_heading_1_name_en" type="text" value="{{data.sub_heading_name_en}}" placeholder="Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-name-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-1-name-ar">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-1-name-ar" name="home_sub_heading_1_name_en" type="text" value="{{data.sub_heading_name_ar}}" placeholder="Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-name-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-1-title_en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-1-title-en" name="home_sub_heading_1_title_en" type="text" value="{{data.sub_heading_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-1-title_ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-1-title-ar" name="home_sub_heading_1_title_en" type="text" value="{{data.sub_heading_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-1-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--heading content-->
-                        
-                    
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-section-icon">Heading Icon </label>
-                                <input class="form-control btn-pill" id="home-heading-section-icon" name="home_heading_section_icon" type="file"  onchange= "displayheadingicon(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-home-icon"  src = "/media/{{data.sub_heading_logo}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-section-icon"></p>
-
-                            </div>
-                        </div>
-                        <p id = "icon-home-warning"></p>
-                    </div>
-
-                   
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="font-size:20px"> Heading Sub Section-2</h4>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="font-size:15px"> Heading Sub Section-2 Form-1</h4>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-section-2-icon-1">Heading Icon </label>
-                                <input class="form-control btn-pill" id="home-heading-section-2-icon-1" name="home_heading_section_2_icon_1" type="file"  onchange= "displayheadingsection2icon1(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-section-2-icon-1" src = "/media/{{data.sub_heading_icon_1}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-heading-section-2-icon-1"></p>
-
-                            </div>
-                        </div>
-                        <p id = "icon1-home-section2-warning"></p>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-Title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-section-2-Title-en" name="home_sub_heading_section_2_Title_en" type="text" value="{{data.sub_heading_logo_title_1_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-Title-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-section-2-Title-ar" name="home_sub_heading_section_2_Title_ar" type="text" value="{{data.sub_heading_logo_title_1_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-content-en">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-en" name="home_sub_heading_section_2_content_en" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_1_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-content-ar">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-ar" name="home_sub_heading_section_2_content_ar" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_1_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="font-size:15px"> Heading Sub Section-2 Form-2</h4>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-heading-section-2-icon-2">Heading Icon </label>
-                                <input class="form-control btn-pill" id="home-heading-section-2-icon-2" name="home_heading_section_2_icon_2" type="file"  onchange= "displayheadingsection2icon2(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-section-2-icon-2" src = "/media/{{data.sub_heading_icon_2}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-selected-section-2-icon-2"></p>
-
-                            </div>
-                        </div>
-                        <p id = "icon2-home-section2-warning"></p>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-Title-1-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="home-sub-heading-section-2-Title-1-en" name="home_sub_heading_section_2_Title_1_en" type="text" value="{{data.sub_heading_logo_title_2_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-1-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-Title-1-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="home-sub-heading-section-2-Title-1-ar" name="home_sub_heading_section_2_Title_1_ar" type="text" value="{{data.sub_heading_logo_title_2_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-Title-1-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-content-1-en">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-en" name="home_sub_heading_section_2_content_1_en" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_2_en }}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-1-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="home-sub-heading-section-2-content-1-ar">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-ar" name="home_sub_heading_section_2_content_1_ar" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_2_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-home-sub-heading-section-2-content-1-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>                        
-                    
-
-                  <br> 
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4> Empower Section</h4>
-                    </div>
-
-                   
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-name-en">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="empower-section-name-en" name="empower_section_name_ar" type="text" value="{{data.section_2_heading_en}}" placeholder="Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-name-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-name-ar">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="empower-section-name-ar" name="empower_section_name_ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-name-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="empower-section-title-en" name="empower_section_title_en" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-title-ar">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="empower-section-title-ar" name="empower_section_title_en" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-content-en">Heading Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-en" name="empower_section_content_en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-content-ar">Heading Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-ar" name="empower-section-content-ar" type="text" placeholder="content (English)">{{data.section_2_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>     
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-icon">Icon </label>
-                                <input class="form-control btn-pill" id="empower-section-icon" name="empower_section_icon" type="file"  onchange= "displayheadingempowericon(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-empower-section-icon" src = "/media/{{data.section_2_logo}}" style="display: block; width: 100px; height: 100px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-icon"></p>
-
-                            </div>
-                        </div>
-                        <p id = "empower-section-icon-warning"></p>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="empower-section-background-image">Background Image </label>
-                                <input class="form-control btn-pill" id="empower-section-background-image" name="empower_section_background_image" type="file"  onchange= "displayheadingempowerbackimage(event)" accept="image/jpeg,image/png">
-                                <!--{% if system_settings.fav_icon %}-->
-                                    
-                                <!--{% endif %}-->
-
-                                <img id="selected-empower-section-background-image" src ="/media/{{data.section_2_background}}" style="display: block; width: 200px; height: 50px;" />
-                                <p style="color: red; display: none;" class="error-message" id ="error-empower-section-background-image"></p>
-
-                            </div>
-                        </div>
-                        <p id = "empower-section-background-image-warning"></p>
-                    </div>
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4> Features Section</h4>
-                    </div>
-
-                   
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="features-section-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="features-section-name-en" name="features_section_name_en" type="text" value="{{data.section_3_heading_en }}" placeholder="Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-name-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="features-section-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="features-section-name-ar" name="features_section_name_ar" type="text" value="{{data.section_3_heading_ar}}" placeholder="Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-name-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="features-section-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="features-section-title-en" name="features_section_title_en" type="text" value="{{data.section_3_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="features-section-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="features-section-title-ar" name="features_section_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="features-section-content-en">Section Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-en" name="features_section_content_en" type="text" placeholder="content (English)">{{data.section_3_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="features-section-content-ar">Section Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-ar" name="features-section-content-ar" type="text" placeholder="content (English)">{{data.section_3_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-features-section-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>  
-                        
-                    
-                    <div id="form-container-features">
-
-                        <div id="dynamic-features-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-1">Features Section-1</h1>
-
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-
-
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-title-en-1">Title (English)</label>
-                                    <input class="form-control btn-pill " id="features-section-form-title-en-1" name="features_section_form_title_en_1" type="text" value="{{data.section_3_feature_title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-en-1"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-title-ar-1">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="features-section-form-title-ar-1" name="features_section_form_title_ar_1" type="text" value="{{data.section_3_feature_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-ar-1"></p>
-
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-content-en-1">Section Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-1" name="features_section_form_content_en_1" type="text" placeholder="content (English)">{{data.section_3_feature_short_content_en}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-en-1"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-content-ar-1">Section Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-1" name="features_section_form_content_ar_1" type="text" placeholder="content (English)">{{data.section_3_feature_short_content_ar}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-ar-1"></p>
-
-                                </div>
-                            </div>
-                        </div>  
-                        
-                        <div class="row" id = "feature-icon-section-1">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="feature-image-1">Icon </label>
-                                    <input class="form-control btn-pill" id="feature-image-1" name="feature_image_1" type="file"  onchange= "displayImagefeatureicon(event,count=1)" accept="image/jpeg,image/png">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        
-                                    <!--{% endif %}-->
-    
-                                    <img id="selected-feature-icon-1" src= "/media/{{data.section_3_feature_icons}}"   style="display: block; width: 100px; height: 100px;" />
-                                    <input type="hidden" class="last-feature-field-id" value="1"/>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-feature-image-1"></p>
-
-                                </div>
-                            </div>
-                            <p id = "feature-icon-warning-1"></p>
-                        </div> 
-    
-                        
-                      
-                        
-
-
-                        
-                    <div>
-                        <br>
-
-
-                        
-
-                        {% if features %}
-
-
-                    <div id="form-container-features">
-                        {% for feature in features %}
-                        <div id = "section-{{feature.field_id}}">
-                        <div id="dynamic-features-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-2">Features Section-{{ forloop.counter|add:"1" }}</h1>
-                            <p id="field-id" style='display:none'>{{feature.field_id}}</p>
-                            <p id="field-roll-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{feature.field_id}}</p>
-
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-
-
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-title-en-{{ forloop.counter|add:'1' }}">Title (English)</label>
-                                    <input class="form-control btn-pill " id="features-section-form-title-en-{{ forloop.counter|add:'1' }}" name="features_section_form_title_en_{{feature.field_id}}" type="text" value="{{feature.title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-en-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-title-ar-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="features-section-form-title-ar-{{ forloop.counter|add:'1' }}" name="features_section_form_title_ar_{{ forloop.counter|add:'1' }}" type="text" value="{{feature.title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-title-ar-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-                        </div>
-    
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-content-en-{{ forloop.counter|add:'1' }}">Section Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-{{ forloop.counter|add:'1' }}" name="features_section_form_content_en_{{feature.field_id}}" type="text" placeholder="content (English)">{{feature.content_en}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-en-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="features-section-form-content-ar-{{ forloop.counter|add:'1' }}">Section Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-{{ forloop.counter|add:'1' }}" name="features_section_form_content_ar_{{feature.field_id}}" type="text" placeholder="content (English)">{{feature.content_ar}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-features-section-form-content-ar-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-                        </div>  
-                        
-                        <div class="row" id = "feature-icon-section-1">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="feature-image-1">Icon </label>
-                                    <input class="form-control btn-pill" id="feature-image-{{ forloop.counter|add:'1' }}" name="feature_image_{{ forloop.counter|add:'1' }}" type="file"  onchange= "displayImagefeatureicon(event,count=`{{ forloop.counter|add:'1' }}`)" accept="image/jpeg,image/png">
-                                    <!--{% if system_settings.fav_icon %}-->
-                                        
-                                    <!--{% endif %}-->
-    
-                                    <img id="selected-feature-icon-{{ forloop.counter|add:'1' }}"  src = "/media/{{feature.images}}" style="display: block; width: 100px; height: 100px;" />
-                                    <p style="color: red; display: none;" class="error-message" id ="error-selected-feature-icon-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-                            <p id = "feature-icon-warning-1"></p>
-                        </div> 
-                        {% if forloop.last %}
-                            <input type="hidden" class="last-feature-field-id" value="{{ forloop.counter|add:'1' }}"/>
-                         {% endif %}
-                        <div class="col-12  text-end " >
-
-                                        <button id="delete-row" onclick ="return deleteTheRow(`{{feature.field_id}}`)" class="btn btn-danger">-</button>
-                        </div> 
-
-
-                        
-
-                    </div>
-                        
-
-                   
-                        <br>
-                    {% endfor %}   
-                {% else %}
-                    <p></p>
-                {% endif %}     
-                <div id="dynamic-feature-section-field">
-                    <div class="col-12  text-end " >
-                        <button id="add-row" onclick ="return add_dynamic_features()" class="btn btn-success">+</button>
-
-                    </div>   
-                </div>
-                <br>
-<br>
-                        <div class="row" style="margin-bottom: 10px;">
-                            <h4> Features Star Spirit</h4>
-                        </div>
-    
-                       
-                        
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="spirit-section-title-en">Section Title (English)</label>
-                                    <input class="form-control btn-pill " id="spirit-section-title-en" name="spirit_section_title_en" type="text" value="{{data.section_4_title_en }}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-title-en"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="spirit-section-title-ar">Section Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="spirit-section-title-ar" name="spirit_section_title_ar" type="text" value="{{data.section_4_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-title-ar"></p>
-
-                                </div>
-                            </div>
-                        </div>
-    
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="spirit-section-content-en">Section Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-en" name="spirit_section_content_en" type="text" placeholder="content (English)">{{data.section_4_content_en}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-content-en"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="spirit-section-content-ar">Section Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-ar" name="spirit_section_content_ar" type="text" placeholder="content (English)">{{data.section_4_content_ar}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-spirit-section-content-ar"></p>
-
-                                </div>
-                            </div>
-                        </div>  
-
-                        <div id="img-container">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label class="form-label" for="spirit-icon">Icon </label>
-                                        <input class="form-control btn-pill" id="spirit-icon" name="spirit_icon" type="file"  onchange= "displayspiriticon(event)" accept="image/jpeg,image/png">
-                                        
-        
-                                        <img id="selected-spirit-icon" src ="/media/{{data.section_4_image}}" style="display: block; width: 100px; height: 100px;" />
-                                        <p style="color: red; display: none;" class="error-message" id ="error-spirit-icon"></p>
-
-                                    </div>
-                                </div>
-                                <p id = "spirit-icon-warning"></p>
-                            </div>
-                        </div>
-
-                        <div id="img-container">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label class="form-label" for="spirit-background-image">Background Image </label>
-                                        <input class="form-control btn-pill" id="spirit-background-image" name="spirit_background_image" type="file"  onchange= "displayspiritbackgroundimage(event)" accept="image/jpeg,image/png">
-                                        
-        
-                                        <img id="selected-spirit-background-image" src ="/media/{{data.section_4_background}}" style="display: block; width: 200px; height: 50px;" />
-                                        <p style="color: red; display: none;" class="error-message" id ="error-spirit-background-image"></p>
-
-                                    </div>
-                                </div>
-                                <p id = "spirit-background-image-warning"></p>
-                            </div>
-                        </div>
-                   
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4> Team Member</h4>
-                    </div>
-
-                   
-                    
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="Team-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="Team-name-en" name="Team_name_en" type="text" value="{{data.section_5_heading_en}}" placeholder="Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-Team-name-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="Team-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="Team-name-ar" name="Team_name_ar" type="text" value="{{data.section_5_heading_ar}}" placeholder="Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-Team-name-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="Team-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="Team-title-en" name="Team_title_en" type="text" value="{{data.section_5_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-Team-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="Team-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="Team-title-ar" name="Team_title_ar" type="text" value="{{data.section_5_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-Team-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-<br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4> My Achivements </h4>
-                    </div>
-
-                   
-                    
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="achivements-heading-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="achivements-heading-name-en" name="achivements_heading_name_en" type="text" value="{{data.section_6_heading_en}}" placeholder="Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-name-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="achivements-heading-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="achivements-heading-name-ar" name="achivements_heading_name_ar" type="text" value="{{data.section_6_heading_ar}}" placeholder="Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-name-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="achivements-heading-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="achivements-heading-title-en" name="achivements_heading_title_en" type="text" value="{{data.section_6_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="achivements-heading-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="achivements-heading-title-ar" name="achivements-heading_title_ar" type="text" value="{{data.section_6_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-achivements-heading-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="img-container">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achivements-image">Image </label>
-                                    <input class="form-control btn-pill" id="achivements-image" name="achivements-image" type="file"  onchange= "displayachivementsimage(event)" accept="image/jpeg,image/png">
-                                    
-    
-                                    <img id="selected-achivements-image" src ="/media/{{data.section_5_image }}" style="display: block; width: 100px; height: 100px;" />
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achivements-image"></p>
-
-                                </div>
-                            </div>
-                            <p id = "achivements-image-warning"></p>
-                        </div>
-                    </div>
-                    <br>
-
-                    <div id="form-container-features"></div>
-                         <div id="section-achive-1">
-
-                        <div id="dynamic-features-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="feature-section-field-1">Achivements Section-1</h1>
-
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-
-
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-en-1">Heading Name (English)</label>
-                                    <input class="form-control btn-pill " id="achive-section-form-htitle-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_heading_en }}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-en-1"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-ar-1">Heading Name (Arabic)</label>
-                                    <input class="form-control btn-pill" id="achive-section-form-htitle-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_heading_ar }}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-ar-1"></p>
-
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-en-1">Title (English)</label>
-                                    <input class="form-control btn-pill " id="achive-section-form-title-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_title_en }}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-1"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-ar-1">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="achive-section-form-title-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-1"></p>
-
-                                </div>
-                            </div>
-                        </div>
-                     
-                        <input type="hidden" class="last-achive-field-id" value="1"/>
-
-                         
-                        
-
-
-                        
-                        {% if achivements %}
-
-                        <div id="form-container-achive">
-                        {%for achive in achivements %}
-                        <div id = "section-achive-{{achive.field_id}}">
-                        <div id="dynamic-achive-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey" id ="achive-section-field-2">Achivements Section-{{ forloop.counter|add:"1" }}</h1>
-                            <p id="field-achive-id" style='display:none'>{{achive.field_id}}</p>
-                            <p id="field-achive-roll-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{achive.field_id}}</p>
-
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-
-
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-en-{{ forloop.counter|add:'1' }}">Heading Name (English)</label>
-                                    <input class="form-control btn-pill " id="achive-section-form-htitle-en-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_en_1" type="text" value="{{achive.heading_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-en-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}">Heading Name (Arabic)</label>
-                                    <input class="form-control btn-pill" id="achive-section-form-htitle-ar-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_ar_1" type="text" value="{{achive.heading_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-htitle-ar-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-en-{{ forloop.counter|add:'1' }}">Title (English)</label>
-                                    <input class="form-control btn-pill " id="achive-section-form-title-en-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_en_1" type="text" value="{{achive.title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-en-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_ar_1" type="text" value="{{achive.heading_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-achive-section-form-title-ar-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-                        </div>
-                        {% if forloop.last %}
-                        <input type="hidden" class="last-achive-field-id" value="{{ forloop.counter|add:'1' }}"/>
-                        {% endif %}
-                        <div class="col-12  text-end " >
-
-                                        <button id="delete-row" onclick ="return deleteachiveTheRow(`{{achive.field_id}}`)" class="btn btn-danger">-</button>
-                        </div> 
-                        </div>
-                        <br>
-                        {% endfor %}
-                        {% else %}
-                        <p></p>
-                    {% endif %}  
-
-
-                        <div id="dynamic-achive-section-field">
-                            <div class="col-12  text-end " >
-                                <button id="add-row" onclick ="return add_dynamic_achivements()" class="btn btn-success">+</button>
-        
-                            </div>   
-                        </div>
-                    <br>
-<br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Explore App Feature</h4>
-                    </div>
-
-
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="explore-heading-name-en">Section Name (English)</label>
-                                <input class="form-control btn-pill " id="explore-heading-name-en" name="explore_heading_name_en" type="text" value="{{data.section_8_heading_en}}" placeholder="Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-name-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="explore-heading-name-ar">Section Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="explore-heading-name-ar" name="explore_heading_name_ar" type="text" value="{{data.section_8_heading_ar}}" placeholder="Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-name-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="explore-heading-title-en">Section Title (English)</label>
-                                <input class="form-control btn-pill " id="explore-heading-title-en" name="explore_heading_title_en" type="text" value="{{data.section_8_title_en }}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="explore-heading-title-ar">Section Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="explore-heading-title-ar" name="explore_heading_title_ar" type="text" value="{{data.section_8_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-explore-heading-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Testomonial Section</h4>
-                    </div>
-
-                    <div id="img-container">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="testomonial-icon">Icon </label>
-                                    <input class="form-control btn-pill" id="testomonial-icon" name="testomonial_icon" type="file"  onchange= "displaytestomonialicon(event)" accept="image/jpeg,image/png">
-                                    
-    
-                                    <img id="selected-testomonial-icon" src ="/media/{{data.section_7_logo}}" style="display: block; width: 100px; height: 100px;" />
-                                    <p style="color: red; display: none;" class="error-message" id ="error-testomonial-icon"></p>
-
-                                </div>
-                            </div>
-                            <p id = "testomonial-icon-warning"></p>
-                        </div>
-                    </div>
-
-                    
-                    <div id="img-container">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="testomonial-image">Image </label>
-                                    <input class="form-control btn-pill" id="testomonial-image" name="testomonial_image" type="file"  onchange= "displaytestomonialimage(event)" accept="image/jpeg,image/png">
-                                    
-    
-                                    <img id="selected-testomonial-image" src="/media/{{data.section_7_image}}" style="display: block; width: 100px; height: 100px;" />
-                                    <p style="color: red; display: none;" class="error-message" id ="error-testomonial-image"></p>
-
-                                </div>
-                            </div>
-                            <p id = "testomonial-image-warning"></p>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Blog & News</h4>
-                    </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="blognews-heading-name-en">Section Name (English)</label>
-                                    <input class="form-control btn-pill " id="blognews-heading-name-en" name="blognews_heading_name_en" type="text" value="{{data.section_9_heading_en}}" placeholder="Name (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-name-en"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="blognews-heading-name-ar">Section Name (Arabic)</label>
-                                    <input class="form-control btn-pill" id="blognews-heading-name-ar" name="blognews_heading_name_ar" type="text" value="{{data.section_9_heading_ar}}" placeholder="Name (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-name-ar"></p>
-
-                                </div>
-                            </div>
-                        </div>
-    
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="blognews-heading-title-en">Section Title (English)</label>
-                                    <input class="form-control btn-pill " id="blognews-heading-title-en" name="blognews_heading_title_en" type="text" value="{{data.section_9_title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-title-en"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="blognews-heading-title-ar">Section Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="blognews-heading-title-ar" name="blognews_heading_title_ar" type="text" value="{{data.section_9_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-blognews-heading-title-ar"></p>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Partners</h4>
-                    </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partners-heading-name-en">Section Name (English)</label>
-                                    <input class="form-control btn-pill " id="partners-heading-name-en" name="partners_heading_name_en" type="text" value="{{data.section_10_heading_en}}" placeholder="Name (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-name-en"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partners-heading-name-ar">Section Name (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partners-heading-name-ar" name="partners_heading_name_ar" type="text" value="{{data.section_10_heading_ar}}" placeholder="Name (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-name-ar"></p>
-
-                                </div>
-                            </div>
-                        </div>
-    
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partners-heading-title-en">Section Title (English)</label>
-                                    <input class="form-control btn-pill " id="partners-heading-title-en" name="partners_heading_title_en" type="text" value="{{data.section_10_title_en }}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-title-en"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="partners-heading-title-ar">Section Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="partners-heading-title-ar" name="partners_heading_title_ar" type="text" value="{{data.section_10_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-partners-heading-title-ar"></p>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-<br>
-                 
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>SEO Section</h4>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    
-                   
-                </div>
-                <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
-                    <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
-                </div>
-            </form>
-        </div>
-    </div>
+	<div class="container-fluid">
+		<div class="page-title"></div>
+		<div class="card">
+			<form class="form theme-form" method="post" enctype="multipart/form-data"> {% csrf_token %} <div class="card-body">
+					<div>
+						<button onclick="return backtolist()" class="btn btn-secondary" style="float: right;">Back</button>
+						<h1 style="font-size:25px">Home Page</h1>
+					</div>
+					<p class="erro-heading" id="heading-error"></p>
+					<br>
+					<div>
+						<p id="heading-warning"></p>
+					</div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4>Heading Section</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-title">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="home-heading-title-en" name="home_heading_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-heading-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-title-arabic">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="home-heading-title-ar" name="home_heading_title_ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-heading-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<!--heading content-->
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-content-en">Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-en" name="home_heading_content_en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-home-heading-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-content-ar">Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-heading-content-ar" name="home_heading_content_ar" type="text" placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-home-heading-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-section-image-1">Heading image-1 </label>
+								<input class="form-control btn-pill" id="home-heading-section-image-1" name="home_heading_section_image_1" type="file" onchange="displayheadingImage1(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-home-image-1" src="/media/{{data.heading_image_1}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-heading-section-image-1"></p>
+							</div>
+						</div>
+						<p id="image1-home-warning"></p>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-section-image-2">Heading image-2 </label>
+								<input class="form-control btn-pill" id="home-heading-section-image-2" name="home_heading_section_image_2" type="file" onchange="displayheadingImage2(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-home-image-2" src="/media/{{data.heading_image_2}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-heading-section-image-2"></p>
+							</div>
+						</div>
+						<p id="image2-home-warning"></p>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-section-image-3">Heading image-3 </label>
+								<input class="form-control btn-pill" id="home-heading-section-image-3" name="home_heading_section_image_3" type="file" onchange="displayheadingImage3(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-home-image-3" src="/media/{{data.heading_image_3}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-heading-section-image-3"></p>
+							</div>
+						</div>
+						<p id="image3-home-warning"></p>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="font-size:20px"> Heading Sub Section-2</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="font-size:20px"> Heading Section-2 Form-1</h4>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-1-name-en">Heading Name (English)</label>
+								<input class="form-control btn-pill " id="home-sub-heading-1-name-en" name="home_sub_heading_1_name_en" type="text" value="{{data.sub_heading_name_en}}" placeholder="Name (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-1-name-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-1-name-ar">Heading Name (Arabic)</label>
+								<input class="form-control btn-pill" id="home-sub-heading-1-name-ar" name="home_sub_heading_1_name_en" type="text" value="{{data.sub_heading_name_ar}}" placeholder="Name (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-1-name-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-1-title_en">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="home-sub-heading-1-title-en" name="home_sub_heading_1_title_en" type="text" value="{{data.sub_heading_title_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-1-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-1-title_ar">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="home-sub-heading-1-title-ar" name="home_sub_heading_1_title_en" type="text" value="{{data.sub_heading_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-1-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<!--heading content-->
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-section-icon">Heading Icon </label>
+								<input class="form-control btn-pill" id="home-heading-section-icon" name="home_heading_section_icon" type="file" onchange="displayheadingicon(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-home-icon" src="/media/{{data.sub_heading_logo}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-home-heading-section-icon"></p>
+							</div>
+						</div>
+						<p id="icon-home-warning"></p>
+					</div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="font-size:20px"> Heading Sub Section-2</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="font-size:15px"> Heading Sub Section-2 Form-1</h4>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-section-2-icon-1">Heading Icon </label>
+								<input class="form-control btn-pill" id="home-heading-section-2-icon-1" name="home_heading_section_2_icon_1" type="file" onchange="displayheadingsection2icon1(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-section-2-icon-1" src="/media/{{data.sub_heading_icon_1}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-home-heading-section-2-icon-1"></p>
+							</div>
+						</div>
+						<p id="icon1-home-section2-warning"></p>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-Title-en">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="home-sub-heading-section-2-Title-en" name="home_sub_heading_section_2_Title_en" type="text" value="{{data.sub_heading_logo_title_1_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-Title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-Title-ar">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="home-sub-heading-section-2-Title-ar" name="home_sub_heading_section_2_Title_ar" type="text" value="{{data.sub_heading_logo_title_1_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-Title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-content-en">Heading Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-en" name="home_sub_heading_section_2_content_en" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_1_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-content-ar">Heading Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-ar" name="home_sub_heading_section_2_content_ar" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_1_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="font-size:15px"> Heading Sub Section-2 Form-2</h4>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="home-heading-section-2-icon-2">Heading Icon </label>
+								<input class="form-control btn-pill" id="home-heading-section-2-icon-2" name="home_heading_section_2_icon_2" type="file" onchange="displayheadingsection2icon2(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-section-2-icon-2" src="/media/{{data.sub_heading_icon_2}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-selected-section-2-icon-2"></p>
+							</div>
+						</div>
+						<p id="icon2-home-section2-warning"></p>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-Title-1-en">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="home-sub-heading-section-2-Title-1-en" name="home_sub_heading_section_2_Title_1_en" type="text" value="{{data.sub_heading_logo_title_2_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-Title-1-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-Title-1-ar">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="home-sub-heading-section-2-Title-1-ar" name="home_sub_heading_section_2_Title_1_ar" type="text" value="{{data.sub_heading_logo_title_2_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-Title-1-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-content-1-en">Heading Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-en" name="home_sub_heading_section_2_content_1_en" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_2_en }}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-content-1-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="home-sub-heading-section-2-content-1-ar">Heading Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="home-sub-heading-section-2-content-1-ar" name="home_sub_heading_section_2_content_1_ar" type="text" placeholder="content (English)">{{data.sub_heading_logo_content_2_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-home-sub-heading-section-2-content-1-ar"></p>
+							</div>
+						</div>
+					</div>
+					<br>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4> Empower Section</h4>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-name-en">Heading Name (English)</label>
+								<input class="form-control btn-pill " id="empower-section-name-en" name="empower_section_name_ar" type="text" value="{{data.section_2_heading_en}}" placeholder="Name (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-name-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-name-ar">Heading Name (Arabic)</label>
+								<input class="form-control btn-pill" id="empower-section-name-ar" name="empower_section_name_ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Name (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-name-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-title-en">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="empower-section-title-en" name="empower_section_title_en" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-title-ar">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="empower-section-title-ar" name="empower_section_title_en" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-content-en">Heading Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-en" name="empower_section_content_en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-content-ar">Heading Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="empower-section-content-ar" name="empower-section-content-ar" type="text" placeholder="content (English)">{{data.section_2_content_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-icon">Icon </label>
+								<input class="form-control btn-pill" id="empower-section-icon" name="empower_section_icon" type="file" onchange="displayheadingempowericon(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-empower-section-icon" src="/media/{{data.section_2_logo}}" style="display: block; width: 100px; height: 100px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-icon"></p>
+							</div>
+						</div>
+						<p id="empower-section-icon-warning"></p>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="empower-section-background-image">Background Image </label>
+								<input class="form-control btn-pill" id="empower-section-background-image" name="empower_section_background_image" type="file" onchange="displayheadingempowerbackimage(event)" accept="image/jpeg,image/png">
+								<!--{% if system_settings.fav_icon %}-->
+								<!--{% endif %}-->
+								<img id="selected-empower-section-background-image" src="/media/{{data.section_2_background}}" style="display: block; width: 200px; height: 50px;" />
+								<p style="color: red; display: none;" class="error-message" id="error-empower-section-background-image"></p>
+							</div>
+						</div>
+						<p id="empower-section-background-image-warning"></p>
+					</div>
+					<br>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4> Features Section</h4>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="features-section-name-en">Section Name (English)</label>
+								<input class="form-control btn-pill " id="features-section-name-en" name="features_section_name_en" type="text" value="{{data.section_3_heading_en }}" placeholder="Name (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-features-section-name-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="features-section-name-ar">Section Name (Arabic)</label>
+								<input class="form-control btn-pill" id="features-section-name-ar" name="features_section_name_ar" type="text" value="{{data.section_3_heading_ar}}" placeholder="Name (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-features-section-name-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="features-section-title-en">Section Title (English)</label>
+								<input class="form-control btn-pill " id="features-section-title-en" name="features_section_title_en" type="text" value="{{data.section_3_title_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-features-section-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="features-section-title-ar">Section Title (Arabic)</label>
+								<input class="form-control btn-pill" id="features-section-title-ar" name="features_section_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-features-section-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="features-section-content-en">Section Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-en" name="features_section_content_en" type="text" placeholder="content (English)">{{data.section_3_content_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-features-section-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="features-section-content-ar">Section Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-content-ar" name="features-section-content-ar" type="text" placeholder="content (English)">{{data.section_3_content_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-features-section-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div id="form-container-features">
+						<div id="dynamic-features-1">
+							<h1 style="font-weight:bold;font-size:16px;color:grey" id="feature-section-field-1">Features Section-1</h1>
+						</div>
+						<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+						<br>
+						<div class="row">
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="features-section-form-title-en-1">Title (English)</label>
+									<input class="form-control btn-pill " id="features-section-form-title-en-1" name="features_section_form_title_en_1" type="text" value="{{data.section_3_feature_title_en}}" placeholder="Title (English)">
+									<p style="color: red; display: none;" class="error-message" id="error-features-section-form-title-en-1"></p>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="features-section-form-title-ar-1">Title (Arabic)</label>
+									<input class="form-control btn-pill" id="features-section-form-title-ar-1" name="features_section_form_title_ar_1" type="text" value="{{data.section_3_feature_title_ar}}" placeholder="Title (Arabic)">
+									<p style="color: red; display: none;" class="error-message" id="error-features-section-form-title-ar-1"></p>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="features-section-form-content-en-1">Section Content (English)</label>
+									<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-1" name="features_section_form_content_en_1" type="text" placeholder="content (English)">{{data.section_3_feature_short_content_en}}</textarea>
+									<p style="color: red; display: none;" class="error-message" id="error-features-section-form-content-en-1"></p>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="features-section-form-content-ar-1">Section Content (Arabic)</label>
+									<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-1" name="features_section_form_content_ar_1" type="text" placeholder="content (English)">{{data.section_3_feature_short_content_ar}}</textarea>
+									<p style="color: red; display: none;" class="error-message" id="error-features-section-form-content-ar-1"></p>
+								</div>
+							</div>
+						</div>
+						<div class="row" id="feature-icon-section-1">
+							<div class="col-12">
+								<div class="mb-3">
+									<label class="form-label" for="feature-image-1">Icon </label>
+									<input class="form-control btn-pill" id="feature-image-1" name="feature_image_1" type="file" onchange="displayImagefeatureicon(event,count=1)" accept="image/jpeg,image/png">
+									<!--{% if system_settings.fav_icon %}-->
+									<!--{% endif %}-->
+									<img id="selected-feature-icon-1" src="/media/{{data.section_3_feature_icons}}" style="display: block; width: 100px; height: 100px;" />
+									<input type="hidden" class="last-feature-field-id" value="1" />
+									<p style="color: red; display: none;" class="error-message" id="error-feature-image-1"></p>
+								</div>
+							</div>
+							<p id="feature-icon-warning-1"></p>
+						</div>
+						<div>
+							<br> {% if features %} <div id="form-container-features"> {% for feature in features %} <div id="section-{{feature.field_id}}">
+									<div id="dynamic-features-1">
+										<h1 style="font-weight:bold;font-size:16px;color:grey" id="feature-section-field-2">Features Section-{{ forloop.counter|add:"1" }}</h1>
+										<p id="field-id" style='display:none'>{{feature.field_id}}</p>
+										<p id="field-roll-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{feature.field_id}}</p>
+									</div>
+									<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+									<br>
+									<div class="row">
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="features-section-form-title-en-{{ forloop.counter|add:'1' }}">Title (English)</label>
+												<input class="form-control btn-pill " id="features-section-form-title-en-{{ forloop.counter|add:'1' }}" name="features_section_form_title_en_{{feature.field_id}}" type="text" value="{{feature.title_en}}" placeholder="Title (English)">
+												<p style="color: red; display: none;" class="error-message" id="error-features-section-form-title-en-{{ forloop.counter|add:'1' }}"></p>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="features-section-form-title-ar-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
+												<input class="form-control btn-pill" id="features-section-form-title-ar-{{ forloop.counter|add:'1' }}" name="features_section_form_title_ar_{{ forloop.counter|add:'1' }}" type="text" value="{{feature.title_ar}}" placeholder="Title (Arabic)">
+												<p style="color: red; display: none;" class="error-message" id="error-features-section-form-title-ar-{{ forloop.counter|add:'1' }}"></p>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="features-section-form-content-en-{{ forloop.counter|add:'1' }}">Section Content (English)</label>
+												<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-en-{{ forloop.counter|add:'1' }}" name="features_section_form_content_en_{{feature.field_id}}" type="text" placeholder="content (English)">{{feature.content_en}}</textarea>
+												<p style="color: red; display: none;" class="error-message" id="error-features-section-form-content-en-{{ forloop.counter|add:'1' }}"></p>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="features-section-form-content-ar-{{ forloop.counter|add:'1' }}">Section Content (Arabic)</label>
+												<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="features-section-form-content-ar-{{ forloop.counter|add:'1' }}" name="features_section_form_content_ar_{{feature.field_id}}" type="text" placeholder="content (English)">{{feature.content_ar}}</textarea>
+												<p style="color: red; display: none;" class="error-message" id="error-features-section-form-content-ar-{{ forloop.counter|add:'1' }}"></p>
+											</div>
+										</div>
+									</div>
+									<div class="row" id="feature-icon-section-1">
+										<div class="col-12">
+											<div class="mb-3">
+												<label class="form-label" for="feature-image-1">Icon </label>
+												<input class="form-control btn-pill" id="feature-image-{{ forloop.counter|add:'1' }}" name="feature_image_{{ forloop.counter|add:'1' }}" type="file" onchange="displayImagefeatureicon(event,count=`{{ forloop.counter|add:'1' }}`)" accept="image/jpeg,image/png">
+												<!--{% if system_settings.fav_icon %}-->
+												<!--{% endif %}-->
+												<img id="selected-feature-icon-{{ forloop.counter|add:'1' }}" src="/media/{{feature.images}}" style="display: block; width: 100px; height: 100px;" />
+												<p style="color: red; display: none;" class="error-message" id="error-selected-feature-icon-{{ forloop.counter|add:'1' }}"></p>
+											</div>
+										</div>
+										<p id="feature-icon-warning-1"></p>
+									</div> {% if forloop.last %} <input type="hidden" class="last-feature-field-id" value="{{ forloop.counter|add:'1' }}" /> {% endif %} <div class="col-12  text-end ">
+										<button id="delete-row" onclick="return deleteTheRow(`{{feature.field_id}}`)" class="btn btn-danger">-</button>
+									</div>
+								</div>
+								<br> {% endfor %} {% else %} <p></p> {% endif %} <div id="dynamic-feature-section-field">
+									<div class="col-12  text-end ">
+										<button id="add-row" onclick="return add_dynamic_features()" class="btn btn-success">+</button>
+									</div>
+								</div>
+								<br>
+								<br>
+								<div class="row" style="margin-bottom: 10px;">
+									<h4> Features Star Spirit</h4>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="spirit-section-title-en">Section Title (English)</label>
+											<input class="form-control btn-pill " id="spirit-section-title-en" name="spirit_section_title_en" type="text" value="{{data.section_4_title_en }}" placeholder="Title (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-spirit-section-title-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="spirit-section-title-ar">Section Title (Arabic)</label>
+											<input class="form-control btn-pill" id="spirit-section-title-ar" name="spirit_section_title_ar" type="text" value="{{data.section_4_title_ar}}" placeholder="Title (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-spirit-section-title-ar"></p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="spirit-section-content-en">Section Content (English)</label>
+											<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-en" name="spirit_section_content_en" type="text" placeholder="content (English)">{{data.section_4_content_en}}</textarea>
+											<p style="color: red; display: none;" class="error-message" id="error-spirit-section-content-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="spirit-section-content-ar">Section Content (Arabic)</label>
+											<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="spirit-section-content-ar" name="spirit_section_content_ar" type="text" placeholder="content (English)">{{data.section_4_content_ar}}</textarea>
+											<p style="color: red; display: none;" class="error-message" id="error-spirit-section-content-ar"></p>
+										</div>
+									</div>
+								</div>
+								<div id="img-container">
+									<div class="row">
+										<div class="col-12">
+											<div class="mb-3">
+												<label class="form-label" for="spirit-icon">Icon </label>
+												<input class="form-control btn-pill" id="spirit-icon" name="spirit_icon" type="file" onchange="displayspiriticon(event)" accept="image/jpeg,image/png">
+												<img id="selected-spirit-icon" src="/media/{{data.section_4_image}}" style="display: block; width: 100px; height: 100px;" />
+												<p style="color: red; display: none;" class="error-message" id="error-spirit-icon"></p>
+											</div>
+										</div>
+										<p id="spirit-icon-warning"></p>
+									</div>
+								</div>
+								<div id="img-container">
+									<div class="row">
+										<div class="col-12">
+											<div class="mb-3">
+												<label class="form-label" for="spirit-background-image">Background Image </label>
+												<input class="form-control btn-pill" id="spirit-background-image" name="spirit_background_image" type="file" onchange="displayspiritbackgroundimage(event)" accept="image/jpeg,image/png">
+												<img id="selected-spirit-background-image" src="/media/{{data.section_4_background}}" style="display: block; width: 200px; height: 50px;" />
+												<p style="color: red; display: none;" class="error-message" id="error-spirit-background-image"></p>
+											</div>
+										</div>
+										<p id="spirit-background-image-warning"></p>
+									</div>
+								</div>
+								<br>
+								<div class="row" style="margin-bottom: 10px;">
+									<h4> Team Member</h4>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="Team-name-en">Section Name (English)</label>
+											<input class="form-control btn-pill " id="Team-name-en" name="Team_name_en" type="text" value="{{data.section_5_heading_en}}" placeholder="Name (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-Team-name-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="Team-name-ar">Section Name (Arabic)</label>
+											<input class="form-control btn-pill" id="Team-name-ar" name="Team_name_ar" type="text" value="{{data.section_5_heading_ar}}" placeholder="Name (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-Team-name-ar"></p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="Team-title-en">Section Title (English)</label>
+											<input class="form-control btn-pill " id="Team-title-en" name="Team_title_en" type="text" value="{{data.section_5_title_en}}" placeholder="Title (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-Team-title-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="Team-title-ar">Section Title (Arabic)</label>
+											<input class="form-control btn-pill" id="Team-title-ar" name="Team_title_ar" type="text" value="{{data.section_5_title_ar}}" placeholder="Title (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-Team-title-ar"></p>
+										</div>
+									</div>
+								</div>
+								<br>
+								<div class="row" style="margin-bottom: 10px;">
+									<h4> My Achivements </h4>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="achivements-heading-name-en">Section Name (English)</label>
+											<input class="form-control btn-pill " id="achivements-heading-name-en" name="achivements_heading_name_en" type="text" value="{{data.section_6_heading_en}}" placeholder="Name (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-achivements-heading-name-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="achivements-heading-name-ar">Section Name (Arabic)</label>
+											<input class="form-control btn-pill" id="achivements-heading-name-ar" name="achivements_heading_name_ar" type="text" value="{{data.section_6_heading_ar}}" placeholder="Name (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-achivements-heading-name-ar"></p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="achivements-heading-title-en">Section Title (English)</label>
+											<input class="form-control btn-pill " id="achivements-heading-title-en" name="achivements_heading_title_en" type="text" value="{{data.section_6_title_en}}" placeholder="Title (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-achivements-heading-title-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="achivements-heading-title-ar">Section Title (Arabic)</label>
+											<input class="form-control btn-pill" id="achivements-heading-title-ar" name="achivements-heading_title_ar" type="text" value="{{data.section_6_title_ar}}" placeholder="Title (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-achivements-heading-title-ar"></p>
+										</div>
+									</div>
+								</div>
+								<div id="img-container">
+									<div class="row">
+										<div class="col-12">
+											<div class="mb-3">
+												<label class="form-label" for="achivements-image">Image </label>
+												<input class="form-control btn-pill" id="achivements-image" name="achivements-image" type="file" onchange="displayachivementsimage(event)" accept="image/jpeg,image/png">
+												<img id="selected-achivements-image" src="/media/{{data.section_5_image }}" style="display: block; width: 100px; height: 100px;" />
+												<p style="color: red; display: none;" class="error-message" id="error-achivements-image"></p>
+											</div>
+										</div>
+										<p id="achivements-image-warning"></p>
+									</div>
+								</div>
+								<br>
+								<div id="form-container-features"></div>
+								<div id="section-achive-1">
+									<div id="dynamic-features-1">
+										<h1 style="font-weight:bold;font-size:16px;color:grey" id="feature-section-field-1">Achivements Section-1</h1>
+									</div>
+									<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+									<br>
+									<div class="row">
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="achive-section-form-title-en-1">Heading Name (English)</label>
+												<input class="form-control btn-pill " id="achive-section-form-htitle-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_heading_en }}" placeholder="Title (English)">
+												<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-htitle-en-1"></p>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="achive-section-form-title-ar-1">Heading Name (Arabic)</label>
+												<input class="form-control btn-pill" id="achive-section-form-htitle-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_heading_ar }}" placeholder="Title (Arabic)">
+												<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-htitle-ar-1"></p>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="achive-section-form-title-en-1">Title (English)</label>
+												<input class="form-control btn-pill " id="achive-section-form-title-en-1" name="achive_section_form_title_en_1" type="text" value="{{data.achivement_title_en }}" placeholder="Title (English)">
+												<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-title-en-1"></p>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="achive-section-form-title-ar-1">Title (Arabic)</label>
+												<input class="form-control btn-pill" id="achive-section-form-title-ar-1" name="achive_section_form_title_ar_1" type="text" value="{{data.achivement_title_ar}}" placeholder="Title (Arabic)">
+												<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-title-ar-1"></p>
+											</div>
+										</div>
+									</div>
+									<input type="hidden" class="last-achive-field-id" value="1" /> {% if achivements %} <div id="form-container-achive"> {%for achive in achivements %} <div id="section-achive-{{achive.field_id}}">
+											<div id="dynamic-achive-1">
+												<h1 style="font-weight:bold;font-size:16px;color:grey" id="achive-section-field-2">Achivements Section-{{ forloop.counter|add:"1" }}</h1>
+												<p id="field-achive-id" style='display:none'>{{achive.field_id}}</p>
+												<p id="field-achive-roll-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{achive.field_id}}</p>
+											</div>
+											<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+											<br>
+											<div class="row">
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="achive-section-form-title-en-{{ forloop.counter|add:'1' }}">Heading Name (English)</label>
+														<input class="form-control btn-pill " id="achive-section-form-htitle-en-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_en_1" type="text" value="{{achive.heading_en}}" placeholder="Title (English)">
+														<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-htitle-en-{{ forloop.counter|add:'1' }}"></p>
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}">Heading Name (Arabic)</label>
+														<input class="form-control btn-pill" id="achive-section-form-htitle-ar-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_ar_1" type="text" value="{{achive.heading_ar}}" placeholder="Title (Arabic)">
+														<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-htitle-ar-{{ forloop.counter|add:'1' }}"></p>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="achive-section-form-title-en-{{ forloop.counter|add:'1' }}">Title (English)</label>
+														<input class="form-control btn-pill " id="achive-section-form-title-en-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_en_1" type="text" value="{{achive.title_en}}" placeholder="Title (English)">
+														<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-title-en-{{ forloop.counter|add:'1' }}"></p>
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="mb-3">
+														<label class="form-label" for="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
+														<input class="form-control btn-pill" id="achive-section-form-title-ar-{{ forloop.counter|add:'1' }}" name="achive_section_form_title_ar_1" type="text" value="{{achive.heading_ar}}" placeholder="Title (Arabic)">
+														<p style="color: red; display: none;" class="error-message" id="error-achive-section-form-title-ar-{{ forloop.counter|add:'1' }}"></p>
+													</div>
+												</div>
+											</div> {% if forloop.last %} <input type="hidden" class="last-achive-field-id" value="{{ forloop.counter|add:'1' }}" /> {% endif %} <div class="col-12  text-end ">
+												<button id="delete-row" onclick="return deleteachiveTheRow(`{{achive.field_id}}`)" class="btn btn-danger">-</button>
+											</div>
+										</div>
+										<br> {% endfor %} {% else %} <p></p> {% endif %} <div id="dynamic-achive-section-field">
+											<div class="col-12  text-end ">
+												<button id="add-row" onclick="return add_dynamic_achivements()" class="btn btn-success">+</button>
+											</div>
+										</div>
+										<br>
+										<br>
+										<div class="row" style="margin-bottom: 10px;">
+											<h4>Explore App Feature</h4>
+										</div>
+										<div class="row">
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="explore-heading-name-en">Section Name (English)</label>
+													<input class="form-control btn-pill " id="explore-heading-name-en" name="explore_heading_name_en" type="text" value="{{data.section_8_heading_en}}" placeholder="Name (English)">
+													<p style="color: red; display: none;" class="error-message" id="error-explore-heading-name-en"></p>
+												</div>
+											</div>
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="explore-heading-name-ar">Section Name (Arabic)</label>
+													<input class="form-control btn-pill" id="explore-heading-name-ar" name="explore_heading_name_ar" type="text" value="{{data.section_8_heading_ar}}" placeholder="Name (Arabic)">
+													<p style="color: red; display: none;" class="error-message" id="error-explore-heading-name-ar"></p>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="explore-heading-title-en">Section Title (English)</label>
+													<input class="form-control btn-pill " id="explore-heading-title-en" name="explore_heading_title_en" type="text" value="{{data.section_8_title_en }}" placeholder="Title (English)">
+													<p style="color: red; display: none;" class="error-message" id="error-explore-heading-title-en"></p>
+												</div>
+											</div>
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="explore-heading-title-ar">Section Title (Arabic)</label>
+													<input class="form-control btn-pill" id="explore-heading-title-ar" name="explore_heading_title_ar" type="text" value="{{data.section_8_title_ar}}" placeholder="Title (Arabic)">
+													<p style="color: red; display: none;" class="error-message" id="error-explore-heading-title-ar"></p>
+												</div>
+											</div>
+										</div>
+										<br>
+										<div class="row" style="margin-bottom: 10px;">
+											<h4>Testomonial Section</h4>
+										</div>
+										<div id="img-container">
+											<div class="row">
+												<div class="col-12">
+													<div class="mb-3">
+														<label class="form-label" for="testomonial-icon">Icon </label>
+														<input class="form-control btn-pill" id="testomonial-icon" name="testomonial_icon" type="file" onchange="displaytestomonialicon(event)" accept="image/jpeg,image/png">
+														<img id="selected-testomonial-icon" src="/media/{{data.section_7_logo}}" style="display: block; width: 100px; height: 100px;" />
+														<p style="color: red; display: none;" class="error-message" id="error-testomonial-icon"></p>
+													</div>
+												</div>
+												<p id="testomonial-icon-warning"></p>
+											</div>
+										</div>
+										<div id="img-container">
+											<div class="row">
+												<div class="col-12">
+													<div class="mb-3">
+														<label class="form-label" for="testomonial-image">Image </label>
+														<input class="form-control btn-pill" id="testomonial-image" name="testomonial_image" type="file" onchange="displaytestomonialimage(event)" accept="image/jpeg,image/png">
+														<img id="selected-testomonial-image" src="/media/{{data.section_7_image}}" style="display: block; width: 100px; height: 100px;" />
+														<p style="color: red; display: none;" class="error-message" id="error-testomonial-image"></p>
+													</div>
+												</div>
+												<p id="testomonial-image-warning"></p>
+											</div>
+										</div>
+										<br>
+										<div class="row" style="margin-bottom: 10px;">
+											<h4>Blog & News</h4>
+										</div>
+										<div class="row">
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="blognews-heading-name-en">Section Name (English)</label>
+													<input class="form-control btn-pill " id="blognews-heading-name-en" name="blognews_heading_name_en" type="text" value="{{data.section_9_heading_en}}" placeholder="Name (English)">
+													<p style="color: red; display: none;" class="error-message" id="error-blognews-heading-name-en"></p>
+												</div>
+											</div>
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="blognews-heading-name-ar">Section Name (Arabic)</label>
+													<input class="form-control btn-pill" id="blognews-heading-name-ar" name="blognews_heading_name_ar" type="text" value="{{data.section_9_heading_ar}}" placeholder="Name (Arabic)">
+													<p style="color: red; display: none;" class="error-message" id="error-blognews-heading-name-ar"></p>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="blognews-heading-title-en">Section Title (English)</label>
+													<input class="form-control btn-pill " id="blognews-heading-title-en" name="blognews_heading_title_en" type="text" value="{{data.section_9_title_en}}" placeholder="Title (English)">
+													<p style="color: red; display: none;" class="error-message" id="error-blognews-heading-title-en"></p>
+												</div>
+											</div>
+											<div class="col-6">
+												<div class="mb-3">
+													<label class="form-label" for="blognews-heading-title-ar">Section Title (Arabic)</label>
+													<input class="form-control btn-pill" id="blognews-heading-title-ar" name="blognews_heading_title_ar" type="text" value="{{data.section_9_title_ar}}" placeholder="Title (Arabic)">
+													<p style="color: red; display: none;" class="error-message" id="error-blognews-heading-title-ar"></p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row" style="margin-bottom: 10px;">
+										<h4>Partners</h4>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="partners-heading-name-en">Section Name (English)</label>
+												<input class="form-control btn-pill " id="partners-heading-name-en" name="partners_heading_name_en" type="text" value="{{data.section_10_heading_en}}" placeholder="Name (English)">
+												<p style="color: red; display: none;" class="error-message" id="error-partners-heading-name-en"></p>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="partners-heading-name-ar">Section Name (Arabic)</label>
+												<input class="form-control btn-pill" id="partners-heading-name-ar" name="partners_heading_name_ar" type="text" value="{{data.section_10_heading_ar}}" placeholder="Name (Arabic)">
+												<p style="color: red; display: none;" class="error-message" id="error-partners-heading-name-ar"></p>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="partners-heading-title-en">Section Title (English)</label>
+												<input class="form-control btn-pill " id="partners-heading-title-en" name="partners_heading_title_en" type="text" value="{{data.section_10_title_en }}" placeholder="Title (English)">
+												<p style="color: red; display: none;" class="error-message" id="error-partners-heading-title-en"></p>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label" for="partners-heading-title-ar">Section Title (Arabic)</label>
+												<input class="form-control btn-pill" id="partners-heading-title-ar" name="partners_heading_title_ar" type="text" value="{{data.section_10_title_ar}}" placeholder="Title (Arabic)">
+												<p style="color: red; display: none;" class="error-message" id="error-partners-heading-title-ar"></p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<br>
+								<div class="row" style="margin-bottom: 10px;">
+									<h4>SEO Section</h4>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="meta-title-en">SEO Title (English)</label>
+											<input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-meta-title-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
+											<input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-meta-title-ar"></p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="meta-content-en">SEO Content (English)</label>
+											<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+											<p style="color: red; display: none;" class="error-message" id="error-meta-content-en"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
+											<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text" placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+											<p style="color: red; display: none;" class="error-message" id="error-meta-content-ar"></p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer text-end">
+								<button class="btn btn-primary" type="submit" onclick="return savethedata()">Save</button>
+								<input class="btn btn-light" type="reset" value="Cancel" onclick="return backtolist()">
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
 
 
