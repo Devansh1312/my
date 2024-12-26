@@ -2002,6 +2002,18 @@ class ProfileTypeView(APIView):
         certificates = request.FILES.getlist('certificates')  # Uploaded files
         user = request.user  # Assuming user is authenticated
 
+        if user.is_coach:
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a coach and cannot create a new coach profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.is_referee:
+            return Response({
+                'status': 0,
+                'message': _('You are already registered as a referee and cannot create a new referee profile.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Validate profile type
         if profile_type not in ['3', '4']:
             return Response({
