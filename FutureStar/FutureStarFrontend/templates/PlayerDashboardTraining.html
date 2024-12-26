@@ -34,16 +34,19 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link dropbtn" onclick="myFunction()"><span><i class="fas fa-users"></i></span>
+                            <a href="#" class="sidebar-link dropbtn" onclick="myFunction()">
+                                <span><i class="fas fa-users"></i></span>
                                 Team
                             </a>
                             <!-- Submenu for "Team" -->
                             <div id="myDropdown" class="dropdown-content">
-                              <a href="{% url 'player-dashboard-team-page' %}">Team Page</a>
-                              <a href="{% url 'player-dashboard-joined-teams' %}">Teams</a>
+                                {% if is_founder %}
+                                    <a href="{% url 'player-dashboard-team-page' %}">Team Page</a>
+                                {% endif %}
+                                <a href="{% url 'player-dashboard-joined-teams' %}">Teams</a>
                             </div>
                         </li>
-                        {% if user.role.id != 6 %}
+                        {% if user.role.id != 4 %}
                         <li>
                             <a href="{% url 'player-dashboard-trainings' %}" class="sidebar-link active">
                                 <span><i class="fas fa-futbol"></i></span> Training

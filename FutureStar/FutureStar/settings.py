@@ -94,7 +94,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'FutureStar_App.context_processor.system_settings'
+                'FutureStar_App.context_processor.system_settings',
+                'FutureStarFrontend.context_processor.user_is_team_founder'
             ],
         },
     },
