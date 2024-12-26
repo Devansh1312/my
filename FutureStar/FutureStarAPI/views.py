@@ -4808,6 +4808,19 @@ class UserRoleStatsAPIView(APIView):
                     "games_lost": total_games_lost,
                     "games_drawn": total_games_drawn,
                     "type": "Player",
+                    # Skills & Physical stats
+                    "passing": user.passing,
+                    "shooting": user.shooting,
+                    "interception": user.interception,
+                    "dribbling": user.dribbling,
+                    "tackling": user.tackling,
+                    "aerial_duals": user.aerial_duals,
+                    "stamina": user.stamina,
+                    "speed": user.speed,
+                    "strength": user.strength,
+                    "jump": user.jump,
+                    "balance": user.balance,
+                    "agility": user.agility,
                 },
             }, status=200)
         except Exception as e:
