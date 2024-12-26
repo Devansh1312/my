@@ -25,13 +25,13 @@ urlpatterns = [
     path('terms-of-services/', TermsofServicesPage.as_view(),name="terms-of-services"),
     path('terms-and-conditions/', TermsAndConditionsPage.as_view(),name="terms-and-conditions"),
 
-    path('player-dashboard/', PlayerDashboardPage.as_view(),name="player-dashboard"),
-    path('player-dashboard-games/', UserDashboardGames.as_view(),name="player-dashboard-games"),
-    path('player-dashboard-events/', UserEventBookingInfo.as_view(),name="player-dashboard-events"),
-    path('player-dashboard-fileds/', UserCreatedFieldsView.as_view(),name="player-dashboard-fileds"),
-    path('player-dashboard-trainings/', UserDashboardTrainings.as_view(),name="player-dashboard-trainings"),
-    path('player-dashboard-team-page/', TeamPageDashboard.as_view(),name="player-dashboard-team-page"),
-    path('player-dashboard-joined-teams/', UserJoinedTeamInfo.as_view(), name='player-dashboard-joined-teams'),
+    path('user-dashboard/', PlayerDashboardPage.as_view(),name="player-dashboard"),
+    path('user-dashboard-games/', UserDashboardGames.as_view(),name="player-dashboard-games"),
+    path('user-dashboard-events/', UserEventBookingInfo.as_view(),name="player-dashboard-events"),
+    path('user-dashboard-fileds/', UserCreatedFieldsView.as_view(),name="player-dashboard-fileds"),
+    path('user-dashboard-trainings/', UserDashboardTrainings.as_view(),name="player-dashboard-trainings"),
+    path('user-dashboard-team-page/', TeamPageDashboard.as_view(),name="player-dashboard-team-page"),
+    path('user-dashboard-joined-teams/', UserJoinedTeamInfo.as_view(), name='player-dashboard-joined-teams'),
 
 
 
