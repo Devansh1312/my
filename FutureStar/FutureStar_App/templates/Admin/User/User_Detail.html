@@ -390,7 +390,116 @@
 									</div>
 								</div>
 							</div>
-						</div> {% elif user.role.id == 3 %}
+						</div>
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">Player Performance Stats</div>
+								<div class="card-body">
+									<button id="edit-player-performence" class="btn btn-primary">Edit</button>
+									<div class="row">
+										<div class="col-md-6">
+											<table class="table">
+												<tbody>
+													<tr>
+														<td>Passing</td>
+														<td>
+															<span class="editable" data-field="player_passing">{{ player_stats.passing }}</span>
+															<input type="text" value="{{ player_stats.passing }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Shooting</td>
+														<td>
+															<span class="editable" data-field="player_shooting">{{ player_stats.shooting }}</span>
+															<input type="text" value="{{ player_stats.shooting }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Interception</td>
+														<td>
+															<span class="editable" data-field="player_interception">{{ player_stats.interception }}</span>
+															<input type="text" value="{{ player_stats.interception }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Dribbling</td>
+														<td>
+															<span class="editable" data-field="player_dribbling">{{ player_stats.dribbling }}</span>
+															<input type="text" value="{{ player_stats.dribbling }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Tackling</td>
+														<td>
+															<span class="editable" data-field="player_tackling">{{ player_stats.tackling }}</span>
+															<input type="text" value="{{ player_stats.tackling }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Aerial Duels</td>
+														<td>
+															<span class="editable" data-field="player_aerial_duals">{{ player_stats.aerial_duals }}</span>
+															<input type="text" value="{{ player_stats.aerial_duals }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										
+										<div class="col-md-6">
+											<table class="table">
+												<tbody>
+													<tr>
+														<td>Stamina</td>
+														<td>
+															<span class="editable" data-field="player_stamina">{{ player_stats.stamina }}</span>
+															<input type="text" value="{{ player_stats.stamina }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Speed</td>
+														<td>
+															<span class="editable" data-field="player_speed">{{ player_stats.speed }}</span>
+															<input type="text" value="{{ player_stats.speed }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Strength</td>
+														<td>
+															<span class="editable" data-field="player_strength">{{ player_stats.strength }}</span>
+															<input type="text" value="{{ player_stats.strength }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Jump</td>
+														<td>
+															<span class="editable" data-field="player_jump">{{ player_stats.jump }}</span>
+															<input type="text" value="{{ player_stats.jump }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Balance</td>
+														<td>
+															<span class="editable" data-field="player_balance">{{ player_stats.balance }}</span>
+															<input type="text" value="{{ player_stats.balance }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+													<tr>
+														<td>Agility</td>
+														<td>
+															<span class="editable" data-field="player_agility">{{ player_stats.agility }}</span>
+															<input type="text" value="{{ player_stats.agility }}" class="form-control" style="display:none">
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						{% elif user.role.id == 3 %}
 						<!-- Coach Stats -->
 						<div class="col-12 col-sm-6 col-md-4 col-lg-3">
 							<div class="card widget-1">
@@ -723,6 +832,134 @@
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        let changes = {}; // Store changes for later saving
+
+        // Function to initialize fields with existing data
+        function initializeFields() {
+            $('.editable').each(function () {
+                let fieldName = $(this).data('field');
+                let currentValue = $(this).text(); // Get the current value from the span
+
+                // If there's existing data, populate the corresponding input field
+                if (currentValue) {
+                    $(this).next('input').val(currentValue); // Set input value to current value
+                }
+
+                // Ensure the input field is hidden and span is visible initially
+                $(this).show();
+                $(this).next('input').hide();
+            });
+        }
+
+        // Initialize fields with existing data on page load
+        initializeFields();
+
+        // Edit player performance button
+        $('#edit-player-performence').click(function () {
+            console.log('Edit button clicked for Player Stats');
+            $('.editable').each(function () {
+                let fieldName = $(this).data('field');
+                console.log('Toggling visibility for:', fieldName);
+                $(this).hide(); // Hide the span
+                $(this).next('input').show(); // Show the input field
+            });
+        });
+
+        // Handle blur event on text inputs
+        $('input[type="text"]').on('blur', function () {
+            let newValue = $(this).val(); // Get the new value
+            let fieldName = $(this).closest('tr').find('.editable').data('field'); // Get the field name from the span element
+            console.log('Blur event triggered. Field:', fieldName, 'New Value:', newValue);
+
+            if (!fieldName) {
+                console.error('Field name is missing or undefined. Check the data-field attribute.');
+                return; // Exit if the field name is undefined
+            }
+
+            // Update the local changes object
+            changes[fieldName] = newValue;
+            console.log('Updated changes object:', changes);
+
+            // Hide the input field and update the corresponding span
+            $(this).hide();
+            $(this).prev('span').text(newValue).show();
+
+            // Save changes to the backend
+            saveChanges();
+        });
+
+        function saveChanges() {
+            // Use {{ user.id }} to get the user ID from Django context
+            let userId = "{{ user.id }}"; // Injecting user ID from Django template context
+            console.log('Saving changes for user ID:', userId);
+            console.log('Changes data being sent:', JSON.stringify(changes));
+
+            if (Object.keys(changes).length > 0) {
+                $.ajax({
+                    url: `/player-games/${userId}/update-stats/`, // Correct the endpoint URL
+                    method: 'POST',
+                    data: {
+                        changes: JSON.stringify(changes),
+                        user_id: userId,
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                    },
+                    success: function (response) {
+                        console.log('Response from server:', response);
+                        if (response.success) {
+                            console.log('Data saved successfully!');
+                            changes = {}; // Clear the changes object
+                        } else {
+                            console.error('Error saving data:', response.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX request failed:', status, error);
+                        console.log(xhr.responseText);
+                    }
+                });
+            } else {
+                console.log('No changes to save.');
+            }
+        }
+
+        // Handle Enter key press event on text inputs
+        $('input[type="text"]').on('keydown', function (event) {
+            if (event.key === 'Enter') {
+                let input = $(this);
+                let newValue = input.val();
+                let fieldName = input.closest('tr').find('.editable').data('field');
+                console.log('Enter key pressed. Field:', fieldName, 'New Value:', newValue);
+
+                if (!fieldName) {
+                    console.error('Field name is missing or undefined. Check the data-field attribute.');
+                    return; // Exit if the field name is undefined
+                }
+
+                changes[fieldName] = newValue;
+
+                saveChanges();
+                input.hide();
+                input.prev('span').text(newValue).show();
+                event.preventDefault();
+            }
+        });
+
+        // Handle input event on text inputs to allow only numbers and dots
+        $('input[type="text"]').on('input', function () {
+            var value = $(this).val();
+            var regex = /^[0-9.]*$/;
+            console.log('Input event triggered. Current value:', value);
+            if (!regex.test(value)) {
+                console.log('Invalid character removed.');
+                $(this).val(value.replace(/[^0-9.]/g, ''));
+            }
+        });
+    });
+</script>
+
+
 <!-- Plugins JS Ends-->
 <script>
 	$(document).ready(function() {

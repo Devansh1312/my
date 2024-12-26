@@ -40,6 +40,10 @@ urlpatterns = [
     path('referee/', RefereeListView.as_view(), name='referee_list'),
     path('default-user/', DefaultUserList.as_view(), name='default_user_list'),
     path('user/', UserDetailView.as_view(), name='user_detail'),
+
+    path('player-games/<int:user_id>/update-stats/', UpdatePlayerStatsView.as_view(), name='update_player_game_stats'),
+
+
     # path('manager/<int:pk>/', ManagerDetailView.as_view(), name='manager_detail'),
     path('tournament_list/', TournamentListView.as_view(), name='tournament_list'),
     path('tournament_detail/<int:pk>/', TournamentDetailView.as_view(), name='tournament_detail'),
