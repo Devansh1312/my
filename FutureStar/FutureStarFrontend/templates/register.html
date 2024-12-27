@@ -5,14 +5,20 @@
 <!-- Plugins css start-->
 <!-- Plugins css Ends-->
 <style>
-    /* Style for the eye icon */
+    /* Default position for left-to-right (LTR) direction */
     .eye-icon {
         position: absolute;
-        right: 15px;
         top: 70%;
+        right: 15px;
         transform: translateY(-50%);
         cursor: pointer;
-        z-index: 1; /* Ensure it appears above input */
+        color: black;
+    }
+
+    /* Adjust position for right-to-left (RTL) direction */
+    html[dir="rtl"] .eye-icon {
+        right: auto;
+        left: 15px;
     }
 
     .form-group {
@@ -70,22 +76,32 @@
                                 <div class="error-message" id="phoneError">This field is required</div>
                             </div>
                         </div>
+                        <!-- Password Field -->
+                        <!-- Password Field -->
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="password">Password</label>
                                 <input type="password" id="password" name="password" class="form-control" required placeholder="">
-                                <span class="eye-icon" id="togglePassword"><i class="fa fa-eye" aria-hidden="true"></i></span>
+                                <span class="eye-icon" id="togglePassword">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </span>
                                 <div class="error-message" id="passwordError">This field is required</div>
                             </div>
                         </div>
+
+                        <!-- Confirm Password Field -->
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="confirmPassword">Confirm Password</label>
                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required placeholder="">
-                                <span class="eye-icon" id="toggleConfirmPassword"><i class="fa fa-eye" aria-hidden="true"></i></span>
+                                <span class="eye-icon" id="toggleConfirmPassword">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </span>
                                 <div class="error-message" id="confirmPasswordError">This field is required</div>
                             </div>
                         </div>
+
+
                         <div class="col-md-12">
                             <div class="d-flex mb-30 justify-content-between">
                                 <label>
@@ -134,24 +150,18 @@
         return valid; // Allow form submission if all required fields are filled
     }
 
-    // Handle password visibility toggle
     $('#togglePassword').on('click', function() {
         const passwordField = $('#password');
         const passwordFieldType = passwordField.attr('type');
-
-        // Toggle the type attribute
         passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
-        $(this).find('i').toggleClass('fa-eye fa-eye-slash'); // Change the icon
-    });
+        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+    }); 
 
-    // Handle confirm password visibility toggle
     $('#toggleConfirmPassword').on('click', function() {
-        const confirmPasswordField = $('#confirmPassword');
-        const confirmPasswordFieldType = confirmPasswordField.attr('type');
-
-        // Toggle the type attribute
-        confirmPasswordField.attr('type', confirmPasswordFieldType === 'password' ? 'text' : 'password');
-        $(this).find('i').toggleClass('fa-eye fa-eye-slash'); // Change the icon
+        const passwordField = $('#confirmPassword');
+        const passwordFieldType = passwordField.attr('type');
+        passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
+        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
     });
 
     // Ensure that the phone field accepts only numeric input

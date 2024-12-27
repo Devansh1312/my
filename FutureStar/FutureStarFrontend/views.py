@@ -17,6 +17,7 @@ from django.db.models import Q,Sum,When,Case,F
 from datetime import datetime
 from FutureStarTrainingApp.models import *
 from itertools import chain
+from django.urls import reverse
 
 
 ##############################################   HomePage   ########################################################
@@ -1459,6 +1460,19 @@ class RegisterPage(View):
             return self.handle_social_signup(email, register_type)
 
     def handle_normal_registration(self, request):
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        else:
+            # If not, fall back to session language
+            language_from_url = request.session.get('language', 'en')
+
+        context = {
+            "current_language": language_from_url,
+        }
+
         username = request.POST.get("username")
         phone = request.POST.get("phone")
         password = request.POST.get("password")
@@ -1485,7 +1499,9 @@ class RegisterPage(View):
         request.session['username'] = username
         request.session['password'] = password  # Store password in the session temporarily
         messages.success(request, f"Your OTP is {otp}")
-        return redirect("verify_otp")
+        
+        # Instead of passing context, include language as GET parameter
+        return redirect(f"{reverse('verify_otp')}?Language={language_from_url}")
 
     def handle_social_signup(self, email, register_type):
         # Redirect to the username and phone entry page
@@ -1529,9 +1545,28 @@ class SocialSignupView(View):
 #################################### OTP Verification #######################################
 class OTPVerificationView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, "otp_verification.html")
+        language_from_url = request.GET.get('Language')
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        
+        context = {
+            "current_language":language_from_url,
+        }
+
+        return render(request, "otp_verification.html",context)
 
     def post(self, request, *args, **kwargs):
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        
+        context = {
+            "current_language":language_from_url,
+        }
         otp_input = request.POST.get("otp")
 
         # Retrieve the saved username and phone from the session

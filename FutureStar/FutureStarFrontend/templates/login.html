@@ -92,16 +92,21 @@
 </script>
 
 <style>
-    .form-group.position-relative .eye-icon {
-        position: absolute;
-        top: 70%;
-        right: 15px;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: black;
-    }
-    .error-message {
-        font-size: 12px;
-    }
+/* Default position for left-to-right (LTR) direction */
+.form-group.position-relative .eye-icon {
+    position: absolute;
+    top: 70%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: black;
+}
+
+/* Adjust position for right-to-left (RTL) direction */
+html[dir="rtl"] .form-group.position-relative .eye-icon {
+    right: auto;
+    left: 15px;
+}
+
 </style>
 {% endblock %}

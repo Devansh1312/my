@@ -1991,9 +1991,9 @@ class FetchTeamUniformColorAPIView(APIView):
 
         # Validate is_confirm input
         if is_confirm in [1, True, '1', 'true', 'True']:
-            is_confirm = True
-        elif is_confirm in [0, False, '0', 'false', 'False']:
             is_confirm = False
+        elif is_confirm in [0, False, '0', 'false', 'False']:
+            is_confirm = True
         else:
             return Response({
                 'status': 0,
