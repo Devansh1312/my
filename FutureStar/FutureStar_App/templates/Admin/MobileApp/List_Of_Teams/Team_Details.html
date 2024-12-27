@@ -190,8 +190,12 @@
                                                             <td>{{ sponsor.name }}</td>
                                                             <td> {% if sponsor.upload_image %} <img src="{{ sponsor.upload_image }}" width="100" height="100"> {% else %} No Image Available {% endif %} </td>
                                                             <td>
-                                                                <a href="{{ sponsor.url }}" target="_blank">{{ sponsor.url }}</a>
-                                                            </td>
+                                                                {% if sponsor.url %}
+                                                                    <a href="http://{{ sponsor.url }}" target="_blank">{{ sponsor.url }}</a>
+                                                                {% else %}
+                                                                    No URL available
+                                                                {% endif %}
+                                                            </td>                                                            
                                                         </tr> {% endfor %} </tbody>
                                                 </table>
                                             </div>
