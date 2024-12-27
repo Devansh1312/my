@@ -1956,13 +1956,15 @@ class FetchTeamUniformColorAPIView(APIView):
             'status': 1,
             'message': _('Uniform information fetched successfully.'),
             'data': {
+                'game_id': game.id,
+                'tournament_id': game.tournament_id,
+                'is_confirm': game.is_confirm,
                 'team_a': team_a_data,
                 'team_b': team_b_data
             },
         }, status=status.HTTP_200_OK)
     
     def post(self, request):
-     
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -1970,9 +1972,8 @@ class FetchTeamUniformColorAPIView(APIView):
         game_id = request.data.get('game_id')
         tournament_id = request.data.get('tournament_id')
         is_confirm = request.data.get('is_confirm')
-        game_id=int(game_id)
-        tournament_id=int(tournament_id)
 
+        # Validate required fields
         if not game_id or not tournament_id:
             return Response({
                 'status': 0,
@@ -1987,6 +1988,7 @@ class FetchTeamUniformColorAPIView(APIView):
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Check access permissions
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
             return Response({
                 'status': 0,
@@ -2002,13 +2004,35 @@ class FetchTeamUniformColorAPIView(APIView):
             game.is_confirm = True
             game.save()
 
+            # Prepare team data similar to the GET response
+            team_a_data = {
+                "team_id": game.team_a.id,
+                "team_name": game.team_a.team_name,
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+            }
+
+            team_b_data = {
+                "team_id": game.team_b.id,
+                "team_name": game.team_b.team_name,
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+            }
+
+            # Return response matching GET
             return Response({
                 'status': 1,
                 'message': _('Uniform confirmation status updated successfully.'),
                 'data': {
-                    'game_id': game_id,
-                    'tournament_id': tournament_id,
+                    'game_id': game.id,
+                    'tournament_id': game.tournament_id,
                     'is_confirm': game.is_confirm,
+                    'team_a': team_a_data,
+                    'team_b': team_b_data
                 },
             }, status=status.HTTP_200_OK)
 
@@ -2019,10 +2043,6 @@ class FetchTeamUniformColorAPIView(APIView):
                 'data': None,
             }, status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-            
 
 ################################
 # class TournamentGameStatsAPIView(APIView):

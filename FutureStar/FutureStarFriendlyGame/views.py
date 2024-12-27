@@ -3941,10 +3941,86 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
             'status': 1,
             'message': _('Uniform information fetched successfully.'),
             'data': {
+                'game_id':game.id,
                 'team_a': team_a_data,
-                'team_b': team_b_data
+                'team_b': team_b_data,
+                'is_confirm':game.is_confirm,
             },
         }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        game_id = request.data.get('game_id')
+        is_confirm = request.data.get('is_confirm')
+
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('game_id is required.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if is_confirm not in [1, True, '1', 'true', 'True']:
+            return Response({
+                'status': 0,
+                'message': _('Invalid is_confirm value. It must be 1 or true.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not self._has_access(request.user, game_id=game_id):
+            return Response({
+                'status': 0,
+                'message': _('Access denied. You do not have permission to update this game.'),
+                'data': None,
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Fetch the game record
+            game = FriendlyGame.objects.get(id=game_id)
+
+            # Update the `is_confirm` field
+            game.is_confirm = True
+            game.save()
+
+            # Prepare team data similar to the GET response
+            team_a_data = {
+                "team_id": game.team_a.id,
+                "team_name": game.team_a.team_name,
+                "primary_color_player": game.team_a_primary_color_player,
+                "secondary_color_player": game.team_a_secondary_color_player,
+                "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+            }
+
+            team_b_data = {
+                "team_id": game.team_b.id,
+                "team_name": game.team_b.team_name,
+                "primary_color_player": game.team_b_primary_color_player,
+                "secondary_color_player": game.team_b_secondary_color_player,
+                "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+            }
+
+            return Response({
+                'status': 1,
+                'message': _('Uniform confirmation status updated successfully.'),
+                'data': {
+                    'game_id': game.id,
+                    'team_a': team_a_data,
+                    'team_b': team_b_data,
+                    'is_confirm': game.is_confirm,
+                },
+            }, status=status.HTTP_200_OK)
+
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': None,
+            }, status=status.HTTP_404_NOT_FOUND)
 
 
 
