@@ -4460,12 +4460,15 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
                 # Prepare push_data for additional details
                 push_data = {
-                    'event_id': str(event_instance.id),
-                    'event_name': event_instance.event_name,
-                    'user_id': str(request.user.id),
-                    'user_name': request.user.username,
-                    'tickets': booking_data['tickets'],
-                    'total_amount': booking_data['total_amount'],
+                    'event_id': (event_instance.id),
+                    "team id": (team.id),
+                    
+                   
+                    "creator id": (request.user.id),
+                    "type": "event booking requested",
+                   
+                    "team founder id": (team_founder.id),
+                    
                 }
 
                 # Send the notification
@@ -5215,10 +5218,9 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Prepare push data
                     push_data = {
                         "training_id": training.id,
-                        "training_name": training.training_name,
-                        "start_time": str(training.start_time),
-                        "cost": training.cost,
-                        "description": training.description
+                        "user_id":user.id,
+                        "type":"Training Reminder",
+
                     }
 
                     # Send push notifications to the user
@@ -5234,10 +5236,9 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
                     push_data = {
                         "training_id": training.id,
-                        "training_name": training.training_name,
-                        "start_time": str(training.start_time),
-                        "cost": training.cost,
-                        "description": training.description
+                        "team_id":team.id,
+                        "type":"Training Reminder",
+
                     }
 
                     # Send push notifications to the team founder
@@ -5253,10 +5254,10 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
                     push_data = {
                         "training_id": training.id,
-                        "training_name": training.training_name,
-                        "start_time": str(training.start_time),
-                        "cost": training.cost,
-                        "description": training.description
+                        "training_group_id":training_group.id,
+                        "type":"Training Reminder",
+
+                       
                     }
 
                     # Send push notifications to the group founder
@@ -5316,10 +5317,8 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     # Prepare push data
                     push_data = {
                         "training_id": training.id,
-                        "training_name": training.training_name,
-                        "end_time": str(training.end_time),
-                        "cost": training.cost,
-                        "description": training.description
+                        "user_id": user.id,
+                        "type" : "Training Reminder",
                     }
 
                     # Send push notification to the user
@@ -5336,10 +5335,9 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
 
                     push_data = {
                         "training_id": training.id,
-                        "training_name": training.training_name,
-                        "end_time": str(training.end_time),
-                        "cost": training.cost,
-                        "description": training.description
+                        "team_id": team.id,
+                        "type": "Training Reminder",
+                       
                     }
 
                     # Send push notification to the team founder
@@ -5356,10 +5354,9 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
 
                     push_data = {
                         "training_id": training.id,
-                        "training_name": training.training_name,
-                        "end_time": str(training.end_time),
-                        "cost": training.cost,
-                        "description": training.description
+                        "training_group_id": training_group.id,
+                        "type": "Training Reminder",
+                      
                     }
 
                     # Send push notification to the group founder

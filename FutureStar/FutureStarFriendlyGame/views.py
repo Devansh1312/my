@@ -267,8 +267,8 @@ class CreateFriendlyGame(APIView):
                     # Prepare and send push notification
                     device_token = user.device_token  # Assuming `device_token` is stored in the User model
                     device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
-                    title = _("A new friendly game has been created!")
-                    body = _("Make sure to check it out.")
+                    title = _("Friendly Game Reminder")
+                    body = _("A new friendly game has been created! Make sure to check it out.")
 
                     push_data = {
                             "game_id": game_id,  # Include the game ID
@@ -2588,6 +2588,8 @@ class FriendlyGameOfficialsAPIView(APIView):
                 )
                 push_data={
                     "game_id": game.id,  # The game ID
+                    "official_id": official.id,
+                  
                 }
 
 

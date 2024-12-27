@@ -1846,6 +1846,9 @@ class GameOfficialsAPIView(APIView):
                 push_data = {
                     "tournament_id": game.tournament_id.id,  # The tournament ID
                     "game_id": game.id,  # The game ID
+                    "official_id": official.id,
+                    "officials_type_id": officials_type.id,
+                 
                     "game_type":"tournament"
                 }
 

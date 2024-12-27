@@ -994,19 +994,20 @@ class TrainingFeedbackAPI(APIView):
 
                 # Send notification for injuries
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
-                push_data = {
-                    "training_id": training.id,
-                    "training_name": training.training_name,
-                    "start_time": str(training.start_time),
-                    "cost": training.cost,
-                    "description": training.description
-                }
+                
 
                 if training.creator_type == Training.USER_TYPE:
                     user = User.objects.get(id=training.created_by_id)
                     notification_language = user.current_language
                     if notification_language in ['ar', 'en']:
                         activate(notification_language)
+                    push_data = {
+                        "training_id": training.id,
+                        "user_id": user.id,
+                    
+                        "type": "injury",
+                    
+                    }
                     send_push_notification(user.device_token, _("Injury Notification"), notification_message, device_type=user.device_type, data=push_data)
 
                 elif training.creator_type == Training.TEAM_TYPE:
@@ -1014,6 +1015,12 @@ class TrainingFeedbackAPI(APIView):
                     notification_language = team.team_founder.current_language
                     if notification_language in ['ar', 'en']:
                         activate(notification_language)
+                    push_data = {
+                        "training_id": training.id,
+                        "team_founder_id": team.team_founder.id,
+                        "type": "injury",
+                    
+                    }
                     send_push_notification(team.team_founder.device_token, _("Injury Notification"), notification_message, device_type=team.team_founder.device_type, data=push_data)
 
                 elif training.creator_type == Training.GROUP_TYPE:
@@ -1021,6 +1028,11 @@ class TrainingFeedbackAPI(APIView):
                     notification_language = training_group.group_founder.current_language
                     if notification_language in ['ar', 'en']:
                         activate(notification_language)
+                    push_data = {
+                        "training_id": training.id,
+                        "group_founder_id": training_group.group_founder.id,
+                        "type": "injury",
+                    }
                     send_push_notification(training_group.group_founder.device_token, _("Injury Notification"), notification_message, device_type=training_group.group_founder.device_type, data=push_data)
 
                 update_messages.append(_("Injury details updated and notification sent"))
@@ -1046,10 +1058,8 @@ class TrainingFeedbackAPI(APIView):
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
                 push_data = {
                     "training_id": training.id,
-                    "training_name": training.training_name,
-                    "start_time": str(training.start_time),
-                    "cost": training.cost,
-                    "description": training.description
+                    "type": "injury",
+                   
                 }
 
                 if training.creator_type == Training.USER_TYPE:
