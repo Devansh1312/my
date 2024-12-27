@@ -777,8 +777,11 @@ class TeamJoiningRequest(APIView):
                   # Include tournament_id in the push data
                 push_data = {
                     "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
-
+                    "team_id": team_branch.id,  # Assuming `team_branch.id` is the correct attribute for the ID
+                    "type": "team joining request",  # Assuming `type` is the correct attribute for the type of notification
                 }
+
+
                 
                 send_push_notification(device_token, title, body, device_type=team_founder.device_type, data=push_data)
         return Response({
@@ -861,7 +864,8 @@ class TeamRequestApproved(APIView):
                     # Send push notification with translated content
                     push_data = {
                         "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
-                        "branch_id": team_branch_id,  # Include the branch_id
+                        "team_id": team_branch_id,  # Include the branch_id
+                        "type": "team approved",  # Assuming `type` is the correct attribute for the type of notification
                     }
                     send_push_notification(
                         device_token=device_token,
@@ -870,6 +874,7 @@ class TeamRequestApproved(APIView):
                         device_type=device_type,
                         data=push_data,
                     )
+
 
             return Response({
                 'status': 1,
@@ -1387,8 +1392,11 @@ class TournamentGamesAPIView(APIView):
             push_data = {
                     "tournament_id": tournament.id,  # The tournament ID
                     "game_id": game.id,  # The game ID
-                    "team_branch_id": team_branch_id,  # The team branch ID
+                    "team_id": team_branch_id,  # The team branch ID
+                    "type": "game_scheduled",  # The notification type
                 }
+
+
 
             # Send notification to each team member
             for member in team_members:
