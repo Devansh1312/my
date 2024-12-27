@@ -1003,11 +1003,12 @@ class EditProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        # Handle language preference
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        # Retrieve the user using 'created_by_id' from query parameters
+        # Get 'created_by_id' from query parameters
         created_by_id = request.query_params.get('created_by_id')
         if not created_by_id:
             return Response({
@@ -1015,16 +1016,24 @@ class EditProfileAPIView(APIView):
                 'message': _('created_by_id parameter is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = get_object_or_404(User, id=created_by_id)
-        
+        # Retrieve the user, return 0 if not found
+        try:
+            user = User.objects.get(id=created_by_id)
+        except User.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('User not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Return user details if found
         return Response({
             'status': 1,
             'message': _('Player Details.'),
             'data': {
-                'user':get_user_data(user, request),
-                'team':get_team_data(user, request),
-                'group':get_group_data(user, request),
-                'current_type':user.current_type,
+                'user': get_user_data(user, request),
+                'team': get_team_data(user, request),
+                'group': get_group_data(user, request),
+                'current_type': user.current_type,
             }
         }, status=status.HTTP_200_OK)
 
@@ -3430,7 +3439,7 @@ class FollowUnfollowAPI(APIView):
             if target_device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
                 body = _(f'{recipient_name} started following you.')  # Notification message
-                push_data = {'type': 'follow', 'target_id': target_id, 'target_type': target_type}  # Include follow info in the notification payload
+                push_data = {'type': 'follow', 'target_id': created_by_id, 'target_type': creator_type}  # Include follow info in the notification payload
                 send_push_notification(target_device_token, title, body, target_device_type, data=push_data)
 
             # Return the response for following
