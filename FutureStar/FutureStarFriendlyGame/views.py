@@ -3954,14 +3954,13 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
             activate(language)
 
         game_id = request.data.get('game_id')
-        tournament_id = request.data.get('tournament_id')
         is_confirm = request.data.get('is_confirm')
 
         # Validate required fields
-        if not game_id or not tournament_id:
+        if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id and tournament_id are required.'),
+                'message': _('game_id is required.'),
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3978,7 +3977,7 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check access permissions
-        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+        if not self._has_access(request.user, game_id=game_id):
             return Response({
                 'status': 0,
                 'message': _('Access denied. You do not have permission to update this game.'),
@@ -3987,9 +3986,23 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
 
         try:
             # Fetch the game record
-            game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+            game = FriendlyGame.objects.get(id=game_id)
 
-            # Update the `is_confirm` field based on input
+            # If the uniform is rejected, set uniform colors to None (null)
+            if not is_confirm:
+                game.team_a_primary_color_player = None
+                game.team_a_secondary_color_player = None
+                game.team_a_primary_color_goalkeeper = None
+                game.team_a_secondary_color_goalkeeper = None
+                game.team_b_primary_color_player = None
+                game.team_b_secondary_color_player = None
+                game.team_b_primary_color_goalkeeper = None
+                game.team_b_secondary_color_goalkeeper = None
+
+                # Send rejection notification to both teams' managers
+                self.notify_team_managers(game)
+
+            # Save the game with updated uniform colors (if rejected)
             game.is_confirm = is_confirm
             game.save()
 
@@ -4021,19 +4034,68 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
                 'message': success_message,
                 'data': {
                     'game_id': game.id,
-                    'tournament_id': game.tournament_id,
                     'is_confirm': game.is_confirm,
                     'team_a': team_a_data,
                     'team_b': team_b_data
                 },
             }, status=status.HTTP_200_OK)
 
-        except TournamentGames.DoesNotExist:
+        except FriendlyGame.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Game not found.'),
                 'data': None,
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+    def notify_team_managers(self, game):
+        """
+        Send notifications to both teams' managers that the uniform has been rejected.
+        """
+        try:
+            # Fetch the managers for both teams
+            team_a_managers = JoinBranch.objects.filter(
+                branch_id=game.team_a, joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+            )
+            team_b_managers = JoinBranch.objects.filter(
+                branch_id=game.team_b, joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+            )
+
+            # Create the notification message
+            notification_message = _("Your uniform has been rejected for the friendly game. Please add a new uniform ASAP.")
+
+            # Send notification to team A managers
+            self.send_rejection_notification(team_a_managers, notification_message, game)
+
+            # Send notification to team B managers
+            self.send_rejection_notification(team_b_managers, notification_message, game)
+
+        except Exception as e:
+            logging.error(f"Error notifying team managers: {str(e)}", exc_info=True)
+
+    def send_rejection_notification(self, team_managers, message, game):
+        """
+        Send rejection notification to each manager.
+        """
+        for manager in team_managers:
+            user = manager.user_id  # Assuming JoinBranch.user_id is a ForeignKey to User
+            device_token = user.device_token  # Assuming User model has `device_token` field
+            device_type = user.device_type  # Assuming User model has `device_type` field
+            notification_language = user.current_language  # Assuming User model has `current_language` field
+
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+
+            if device_token and device_type:
+                send_push_notification(
+                    device_token=device_token,
+                    title=_("Uniform Rejected"),
+                    body=message,
+                    device_type=device_type,
+                    data={
+                        "game_id": game.id
+                    }
+                )
 
 
 
