@@ -13914,7 +13914,7 @@ background: linear-gradient(to bottom,  #344A6C 0%,#284700 100%); /* W3C, IE10+,
   transition: 0.5s;
   content: "\f105";
   position: absolute;
-  font-family: "Font Awesome 5 Pro";
+  font-family: "Font Awesome 6 Free";
 }
 
 .footer-six .widget_nav_menu .list-style-two li a:hover {
@@ -13923,6 +13923,7 @@ background: linear-gradient(to bottom,  #344A6C 0%,#284700 100%); /* W3C, IE10+,
 
 .footer-six .widget_nav_menu .list-style-two li a:hover:before {
   opacity: 1;
+  font-weight: 900;
 }
 
 .footer-six .footer-info .list-style-two li:not(:last-child) {
