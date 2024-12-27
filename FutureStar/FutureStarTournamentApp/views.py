@@ -1981,10 +1981,15 @@ class FetchTeamUniformColorAPIView(APIView):
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if is_confirm not in [1, True, '1', 'true', 'True']:
+        # Validate is_confirm input
+        if is_confirm in [1, True, '1', 'true', 'True']:
+            is_confirm = True
+        elif is_confirm in [0, False, '0', 'false', 'False']:
+            is_confirm = False
+        else:
             return Response({
                 'status': 0,
-                'message': _('Invalid is_confirm value. It must be 1 or true.'),
+                'message': _('Invalid is_confirm value. It must be 1, 0, true, or false.'),
                 'data': None,
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2000,8 +2005,8 @@ class FetchTeamUniformColorAPIView(APIView):
             # Fetch the game record
             game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
 
-            # Update the `is_confirm` field
-            game.is_confirm = True
+            # Update the `is_confirm` field based on input
+            game.is_confirm = is_confirm
             game.save()
 
             # Prepare team data similar to the GET response
@@ -2023,10 +2028,13 @@ class FetchTeamUniformColorAPIView(APIView):
                 "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
             }
 
+            # Dynamic success message based on is_confirm value
+            success_message = _('Uniform confirmed successfully.') if is_confirm else _('Uniform rejected successfully.')
+
             # Return response matching GET
             return Response({
                 'status': 1,
-                'message': _('Uniform confirmation status updated successfully.'),
+                'message': success_message,
                 'data': {
                     'game_id': game.id,
                     'tournament_id': game.tournament_id,
@@ -2042,6 +2050,7 @@ class FetchTeamUniformColorAPIView(APIView):
                 'message': _('Game not found.'),
                 'data': None,
             }, status=status.HTTP_404_NOT_FOUND)
+
 
 
 ################################
