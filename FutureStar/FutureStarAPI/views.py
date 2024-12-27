@@ -217,7 +217,7 @@ class send_otp(APIView):
                 if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
                     return Response({
                         'status': 0,
-                        'message': _('Username already exists.')
+                        'message': _('Username already taken.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Check if phone exists and is deleted (soft deleted), allowing re-registration
@@ -238,7 +238,7 @@ class send_otp(APIView):
                 elif User.objects.filter(phone=phone).exists():
                     return Response({
                         'status': 0,
-                        'message': _('Phone number already exists.')
+                        'message': _('Phone number already in use.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Generate OTP and save it if no soft-deleted user is found
@@ -263,7 +263,7 @@ class send_otp(APIView):
                 if not email:
                     return Response({
                         'status': 0,
-                        'message': _('Email is required.')
+                        'message': _('Email already in use.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Check email format using regex
@@ -278,7 +278,7 @@ class send_otp(APIView):
                 if User.objects.filter(email=email).exists():
                     return Response({
                         'status': 0,
-                        'message': _('Email already exists.')
+                        'message': _('Email already in use.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Validate if username or phone already exists if provided
@@ -287,7 +287,7 @@ class send_otp(APIView):
                     if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
                         return Response({
                             'status': 0,
-                            'message': _('Username already exists.')
+                            'message': _('Username already taken.')
                         }, status=status.HTTP_400_BAD_REQUEST)
 
                     # Check if phone exists and is deleted (soft deleted), allowing re-registration
@@ -310,7 +310,7 @@ class send_otp(APIView):
                     if User.objects.filter(phone=phone).exists():
                         return Response({
                             'status': 0,
-                            'message': _('Phone number already exists.')
+                            'message': _('Phone number already in use.')
                         }, status=status.HTTP_400_BAD_REQUEST)
 
                     otp = generate_otp()
@@ -366,19 +366,19 @@ class verify_and_register(APIView):
         if not phone:
             return Response({
                 'status': 0,
-                'message': _('Phone is a required field.')
+                'message': _('Phone is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not otp_input:
             return Response({
                 'status': 0,
-                'message': _('OTP is a required field.')
+                'message': _('OTP is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not username:
             return Response({
                 'status': 0,
-                'message': _('Username is a required field.')
+                'message': _('Username is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the OTP and phone exist in the OTPSave table
@@ -394,7 +394,7 @@ class verify_and_register(APIView):
         if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
             return Response({
                 'status': 0,
-                'message': _('Username already exists.')
+                'message': _('Username already taken.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the phone already exists in the User table, and is not deleted
@@ -406,7 +406,7 @@ class verify_and_register(APIView):
             else:
                 return Response({
                     'status': 0,
-                    'message': _('Phone number already exists.')
+                    'message': _('Phone number already in use.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         if email : 
@@ -414,7 +414,7 @@ class verify_and_register(APIView):
             if User.objects.filter(email=email).exists():
                 return Response({
                     'status': 0,
-                    'message': _('Email already exists.')
+                    'message': _('Email already in use.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -476,19 +476,19 @@ class verify_and_register(APIView):
         if not phone:
             return Response({
                 'status': 0,
-                'message': _('Phone is a required field.')
+                'message': _('Phone is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not otp_input:
             return Response({
                 'status': 0,
-                'message': _('OTP is a required field.')
+                'message': _('OTP is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if not username:
             return Response({
                 'status': 0,
-                'message': _('Username is a required field.')
+                'message': _('Username is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -505,7 +505,7 @@ class verify_and_register(APIView):
         if Team.objects.filter(team_username=username).exists() or User.objects.filter(username=username) or TrainingGroups.objects.filter(group_username=username).exists():
             return Response({
                 'status': 0,
-                'message': _('Username already exists.')
+                'message': _('Username already taken.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -513,7 +513,7 @@ class verify_and_register(APIView):
         if User.objects.filter(phone=phone).exists():
             return Response({
                 'status': 0,
-                'message': _('Phone number already exists.')
+                'message': _('Phone number already in use.')
             }, status=status.HTTP_400_BAD_REQUEST)
         
         if email : 
@@ -521,7 +521,7 @@ class verify_and_register(APIView):
             if User.objects.filter(email=email).exists():
                 return Response({
                     'status': 0,
-                    'message': _('Email already exists.')
+                    'message': _('Email already in use.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -596,7 +596,7 @@ class LoginAPIView(APIView):
                     if not user:
                         return Response({
                             'status': 0,
-                            'message': _('This phone number is linked to a deleted account. Please register again.'),
+                            'message': _('This phone number is associated with a deleted account, you have to register again.'),
                         }, status=status.HTTP_400_BAD_REQUEST)
 
                 # Now check if the phone number is linked to a normal (non-deleted) user
@@ -639,7 +639,7 @@ class LoginAPIView(APIView):
                 else:
                     return Response({
                         'status': 0,
-                        'message': _('User does not exist with this username or phone.'),
+                        'message': _('User does not exist for the given username or phone.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             elif login_type in [2, 3]:
@@ -821,7 +821,7 @@ class ForgotPasswordAPIView(APIView):
 
                 return Response({
                     'status': 1,
-                    'message': _('OTP sent to your phone.'),
+                    'message': _('OTP sent to your phone number.'),
                     'data': otp,
                 }, status=status.HTTP_200_OK)
 
@@ -988,7 +988,7 @@ class UpdateProfilePictureAPIView(APIView):
 
         return Response({
             'status': 1,
-            'message': _('Profile Image updated successfully.'),
+            'message': _('Profile Picture updated successfully.'),
             'data': {
                 'user':get_user_data(user, request),
                 'team':get_team_data(user, request),
@@ -1076,7 +1076,7 @@ class EditProfileAPIView(APIView):
             except (ValueError, TypeError):
                 return Response({
                     'status': 2,
-                    'message': _('Invalid date format for date_of_birth.')
+                    'message': _('Invalid date format.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Handle age - retain old value if None or blank
@@ -1214,7 +1214,7 @@ class CustomPostPagination(PageNumberPagination):
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError(_("Page number must be a positive integer."))
+                raise ValidationError(_("Page number must be positive."))
         except (ValueError, TypeError):
             # If the page number is invalid, return a custom error response
             return Response({
@@ -1541,7 +1541,7 @@ class PostCreateAPIView(APIView):
 
                 # Send notification to the follower
                 title = _('New Post Alert!')
-                body = _(f'{creator_name} you are following just posted.')
+                body = _(f'{creator_name} just added a new post.')
                 push_data = {
                     'type': 'post',
                     'post_id': post.id
@@ -1552,7 +1552,7 @@ class PostCreateAPIView(APIView):
                 if creator_type == 2:
                     follower_user.id = team.team_founder.id
                     title = _('New Post Alert!')
-                    body = _(f'{creator_name} you are following just posted.')
+                    body = _(f'{creator_name} just added a new post.')
                     push_data = {
                         'type': 'team_post',
                         'post_id': post.id,
@@ -1564,7 +1564,7 @@ class PostCreateAPIView(APIView):
                 elif creator_type == 3 :
                     follower_user.id = group.group_founder.id
                     title = _('New Post Alert!')
-                    body = _(f'{creator_name} you are following just posted.')
+                    body = _(f'{creator_name} just added a new post.')
                     push_data = {
                         'type': 'group_post',
                         'post_id': post.id,
@@ -1886,11 +1886,11 @@ class CommentCreateAPIView(APIView):
 
         # Create notification content
         if parent_comment:
-            title = _('New Reply on Your Comment!')
+            title = _('Someone replied to your comment')
             body = _(f'{notifier_name} replied to your comment.')
             push_data = {'type': 'comment', 'post_id': post_id, 'parent_id': parent_id, 'comment_id': comment.id}
         else:
-            title = _('New Comment on Your Post!')
+            title = _('Someone commented on your post')
             body = _(f'{notifier_name} commented on your post.')
             push_data = {'type': 'comment', 'post_id': post_id, 'comment_id': comment.id}
 
@@ -2102,7 +2102,7 @@ class CustomMediaPagination(PageNumberPagination):
             page_number = request.data.get(self.page_query_param, 1)
             self.page = int(page_number)
             if self.page < 1:
-                raise ValidationError(_("Page number must be a positive integer."))
+                raise ValidationError(_("Page number must be positive."))
         except (ValueError, TypeError):
             # If the page number is invalid, return a custom error response
             return Response({
@@ -2701,7 +2701,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
 
         return Response({
             'status': 1,
-            'message': _('gallary entries and latest albums fetched successfully.'),
+            'message': _('gallery entries and latest albums fetched successfully.'),
             'data': {
                 'images': formatted_images,
                 'videos': formatted_videos,
@@ -2736,7 +2736,7 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
         try:
             return Gallary.objects.get(id=id)
         except Gallary.DoesNotExist:
-            raise ({"message": _("gallary entry not found.")})
+            raise ({"message": _("gallery entry not found.")})
 
     def delete(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -2755,13 +2755,13 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
 
             return Response({
                 'status': 1,
-                'message': _('gallary entry deleted successfully.')
+                'message': _('gallery entry deleted successfully.')
             }, status=status.HTTP_200_OK)
 
         except Gallary.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('gallary entry not found.')
+                'message': _('gallery entry not found.')
             }, status=status.HTTP_404_NOT_FOUND)
         
 ###########  album list delete ################
@@ -3184,7 +3184,7 @@ class ListFieldsAPIView(APIView):
         # Return the serialized data
         return Response({
             'status': 1,
-            'message': 'Fields fetched successfully.',
+            'message': _('Fields fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
@@ -3489,7 +3489,7 @@ class CustomFollowRequestPagination(PageNumberPagination):
     def get_paginated_response(self, data):
         return Response({
             'status': 1,
-            'message': 'Data fetched successfully.',
+            'message': _('Data fetched successfully.'),
             'total_records': self.total_records,
             'total_pages': self.total_pages,
             'current_page': self.page,
@@ -3786,7 +3786,7 @@ class EventLikeAPIView(APIView):
         # Return response with updated event data
         return Response({
             'status': 1,
-            'message': message,
+            'message': _(message),
             'data': serializer.data
         }, status=200)
 
@@ -4197,7 +4197,7 @@ class EventCreateAPIView(generics.CreateAPIView):
             if not Team.objects.filter(id=created_by_id).exists():
                 return Response({
                     'status': 0,
-                    'message': 'Invalid team ID.'
+                    'message': _('Invalid team ID.')
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             data['created_by_id'] = created_by_id  # Use the provided team ID
@@ -4722,7 +4722,7 @@ class UserRoleStatsAPIView(APIView):
         except ValueError:
             return Response({
                 "status": 0,
-                "message": "Invalid value for 'years'. Please provide a comma-separated list of valid years.",
+                "message": _("Invalid value for 'years'. Please provide a comma-separated list of valid years."),
                 "data": []
             }, status=400)
 
@@ -4747,19 +4747,19 @@ class UserRoleStatsAPIView(APIView):
             else:
                 return Response({
                     "status": 1,
-                    "message": "You don't have Any Statstics",
+                    "message": _("You don't have Any Statstics"),
                     "data":{},
                 }, status=200)
 
         except User.DoesNotExist:
             return Response({
                 "status": 0,
-                "message": "User not found or has been deleted.",
+                "message":_("User not found or has been deleted."),
             }, status=404)
         except Exception as e:
             return Response({
                 "status": 0,
-                "message": "An error occurred.",
+                "message": _("An error occurred."),
                 "error": str(e),
             }, status=500)
 
@@ -4824,7 +4824,7 @@ class UserRoleStatsAPIView(APIView):
 
             return Response({
                 "status": 1,
-                "message": "Player stats fetched successfully.",
+                "message": _("Player stats fetched successfully."),
                 "data": {
                     "user_id": user.id,
                     "total_goals": total_goals,
@@ -4858,7 +4858,7 @@ class UserRoleStatsAPIView(APIView):
         except Exception as e:
             return Response({
                 "status": 0,
-                "message": "Failed to fetch player stats.",
+                "message": _("Failed to fetch player stats."),
                 "error": str(e),
             }, status=500)
 
@@ -4947,7 +4947,7 @@ class UserRoleStatsAPIView(APIView):
 
             return Response({
                 "status": 1,
-                "message": "Coach stats fetched successfully.",
+                "message": _("Coach stats fetched successfully."),
                 "data": {
                     "user_id": user.id,
                     "total_games_played": total_games_played,
@@ -4963,7 +4963,7 @@ class UserRoleStatsAPIView(APIView):
         except Exception as e:
             return Response({
                 "status": 0,
-                "message": "Failed to fetch coach stats.",
+                "message": _("Failed to fetch coach stats."),
                 "error": str(e),
             }, status=500)
 
@@ -5003,7 +5003,7 @@ class UserRoleStatsAPIView(APIView):
 
             return Response({
                 "status": 1,
-                "message": "Referee stats fetched successfully.",
+                "message": _("Referee stats fetched successfully."),
                 "data": {
                     "user_id": user.id,
                     "total_games_played": total_games_officiated,
@@ -5015,7 +5015,7 @@ class UserRoleStatsAPIView(APIView):
         except Exception as e:
             return Response({
                 "status": 0,
-                "message": "Failed to fetch referee stats.",
+                "message": _("Failed to fetch referee stats."),
                 "error": str(e),
             }, status=500)
 
@@ -5106,7 +5106,7 @@ class SearchAPIView(APIView):
             
             return Response({
                 "status": 1,
-                "message": "Data fetched successfully.",
+                "message": _("Data fetched successfully."),
                 "results": {
                     "data": team_data
                 }
@@ -5119,7 +5119,7 @@ class SearchAPIView(APIView):
             serializer = FieldSerializer(fields, many=True, context={'request': request})
             return Response({
                 "status": 1,
-                "message": "Data fetched successfully.",
+                "message": _("Data fetched successfully."),
                 "results": {
                     "data": serializer.data
                 }
@@ -5205,7 +5205,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             # Check if the training's start time (hour and minute) matches the current time
             if start_hour == current_hour and start_minute == current_minute:
                 # Define notification messages
-                attendance_message = _("Don't forget to take attendance")
+                attendance_message = _("Don't forget to mark your attendance")
                 comments_message = _("Don't forget to add your comments on your players' performance.")
 
                 # Get user language preference, assuming `User` model has `current_language` field
@@ -5218,9 +5218,10 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Prepare push data
                     push_data = {
                         "training_id": training.id,
-                        "user_id":user.id,
-                        "type":"Training Reminder",
-
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
                     }
 
                     # Send push notifications to the user
@@ -5236,9 +5237,10 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
                     push_data = {
                         "training_id": training.id,
-                        "team_id":team.id,
-                        "type":"Training Reminder",
-
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
                     }
 
                     # Send push notifications to the team founder
@@ -5254,10 +5256,10 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
                     push_data = {
                         "training_id": training.id,
-                        "training_group_id":training_group.id,
-                        "type":"Training Reminder",
-
-                       
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
                     }
 
                     # Send push notifications to the group founder
@@ -5337,7 +5339,6 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         "training_id": training.id,
                         "team_id": team.id,
                         "type": "Training Reminder",
-                       
                     }
 
                     # Send push notification to the team founder
@@ -5406,7 +5407,7 @@ class LineupNotificationAPIView(APIView):
             if not upcoming_tournament_games and not upcoming_friendly_games:
                 return Response({
                     "status": "success",
-                    "message": "No upcoming games found for today.",
+                    "message": _("No upcoming games found for today."),
                     "details": []
                 }, status=status.HTTP_200_OK)
 
@@ -5422,7 +5423,7 @@ class LineupNotificationAPIView(APIView):
 
             return Response({
                 "status": "success",
-                "message": "Notifications sent for incomplete lineups",
+                "message": _("Notifications sent for incomplete lineups"),
                 "details": notifications_sent
             }, status=status.HTTP_200_OK)
 
@@ -5574,7 +5575,7 @@ class UniformConfirmationNotificationView(APIView):
         if not upcoming_tournament_games and not upcoming_friendly_games:
             return Response({
                 "status": "success",
-                "message": "No upcoming games found for today.",
+                "message": _("No upcoming games scheduled for today."),
                 "details": []  # No notifications to send
             }, status=status.HTTP_200_OK)
 
@@ -5644,7 +5645,7 @@ class UniformConfirmationNotificationView(APIView):
 
         return Response({
             "status": "success",
-            "message": "Notifications sent for uniform confirmation.",
+            "message": _("Notifications sent for uniform confirmation."),
             "details": notifications_sent
         }, status=status.HTTP_200_OK)
 
@@ -5684,7 +5685,7 @@ class UniformAddNotificationAPIView(APIView):
             
             return Response({
                 "status": "success",
-                "message": "No upcoming games found for today.",
+                "message": _("No upcoming games scheduled for today."),
                 "details": []  # Empty list as no games are found
             }, status=status.HTTP_200_OK)
 
@@ -5704,7 +5705,7 @@ class UniformAddNotificationAPIView(APIView):
 
         return Response({
             "status": "success",
-            "message": "Notifications sent for missing uniforms",
+            "message":_("Notifications sent for missing uniforms"),
             "details": notifications_sent
         }, status=status.HTTP_200_OK)
     
@@ -5851,8 +5852,8 @@ class PlayerReadyNotificationAPIView(APIView):
         if team_a_not_ready:
             team_a_notifications = self.send_notifications_to_team_staff(
                 team_branch=team_a_id,
-                message_title="Player Not Ready",
-                message_body="One or more of your players are not ready for the match! Make sure that they are ASAP."
+                message_title=_("Player Not Ready"),
+                message_body=_("One or more of your players are not ready for the match! Make sure that they are ready ASAP.")
             )
             notifications.extend([
                 f"Notification sent to {n['role']} ({n['username']}) for Team A"
@@ -5863,8 +5864,8 @@ class PlayerReadyNotificationAPIView(APIView):
         if team_b_not_ready:
             team_b_notifications = self.send_notifications_to_team_staff(
                 team_branch=team_b_id,
-                message_title="Player Not Ready",
-                message_body="One or more of your players are not ready for the match! Make sure that they are ASAP."
+                message_title=_("Player Not Ready"),
+                message_body=_("One or more of your players are not ready for the match! Make sure that they are ready ASAP.")
             )
             notifications.extend([
                 f"Notification sent to {n['role']} ({n['username']}) for Team B"
@@ -5898,7 +5899,7 @@ class PlayerReadyNotificationAPIView(APIView):
         if not upcoming_tournament_games and not upcoming_friendly_games:
             return Response({
                 "status": "success",
-                "message": "No upcoming games found for today.",
+                "message": _("No upcoming games scheduled for today."),
                 "details": []
             }, status=status.HTTP_200_OK)
 
@@ -5952,6 +5953,6 @@ class PlayerReadyNotificationAPIView(APIView):
 
         return Response({
             "status": "success",
-            "message": "Notifications processed",
+            "message": _("Notifications processed"),
             "details": notifications_sent
         }, status=status.HTTP_200_OK)
