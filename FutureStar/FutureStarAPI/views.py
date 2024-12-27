@@ -3430,7 +3430,7 @@ class FollowUnfollowAPI(APIView):
             if target_device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
                 body = _(f'{recipient_name} started following you.')  # Notification message
-                push_data = {'type': 'follow', 'created_by_id': target_id, 'creator_type': target_type}  # Include follow info in the notification payload
+                push_data = {'type': 'follow', 'target_id': target_id, 'target_type': target_type}  # Include follow info in the notification payload
                 send_push_notification(target_device_token, title, body, target_device_type, data=push_data)
 
             # Return the response for following
