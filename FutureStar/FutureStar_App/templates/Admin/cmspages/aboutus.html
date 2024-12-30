@@ -260,6 +260,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <h4>Youtube URL Section</h4>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="achivement_title_en">Youtube URL</label>
+                                <input class="form-control btn-pill " id="achivement_title_en" name="achivement_title_en" type="text" value="{{data.achivement_title_en}}" placeholder="Youtube URL">
+                                <p style="color: red; display: none;" class="error-message" id ="error-achivement_title_en"></p>
+
+                            </div>
+                        </div>
+                    </div>
 
 
 
@@ -342,6 +356,7 @@
                 var global_client_heading_en = document.getElementById('global-section-title-en')
                 var global_client_heading_ar = document.getElementById('global-section-title-ar')
                 var seo_title_en = document.getElementById("meta-title-en")
+                var achivement_title_en = document.getElementById("achivement_title_en")
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
                 var seo_content_ar = document.getElementById("meta-content-ar")
@@ -368,6 +383,7 @@
                     { id: "global-section-title-en", name: "Title (English)" },
                     { id: "global-section-title-ar", name: "Title (Arabic)" },
                     { id: "meta-title-en", name: "SEO Title (English)" },
+                    { id: "achivement_title_en", name: "Youtube Url" },
                     { id: "meta-title-ar", name: "SEO Title (Arabic)" },
                     { id: "meta-content-en", name: "SEO Content (English)" },
                     { id: "meta-content-ar", name: "SEO Content (Arabic)" }
@@ -440,6 +456,8 @@
                     formData.append('seo_title_ar', seo_title_ar.value );
                     formData.append('seo_content_en', seo_content_en.value );
                     formData.append('seo_content_ar', seo_content_ar.value );
+                    formData.append('achivement_title_en', achivement_title_en.value );
+
 
                     
                     //images

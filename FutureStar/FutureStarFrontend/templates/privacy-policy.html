@@ -26,7 +26,7 @@
 
 
 <!-- Page Banner Start -->
-<section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url(assets/images/banner/banner-bg-two.jpg);">
+<!-- <section class="page-banner-area" style="margin-top: 100px;">
     <div class="container">
         <div class="banner-inner">
             <div class="row">
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> -->
 <!-- Page Banner End -->
 
 
@@ -47,7 +47,13 @@
 <section class="blog-details-page py-130 rpy-100 rel z-1">
     <div class="container container-1290">
         <div class="row gap-60">
-            <div class="col">
+            <div class="col-xl-12">
+                {% lang cmsdata current_language "heading_title" as heading_title %}
+                <h2 class="page-title wow fadeInUp delay-0-3s text-center">
+                    {{heading_title}}   
+                </h2>
+            </div>
+            <div class="col" style="margin-top: 50px;">
                 <div class="blog-single-content">
                     {% lang cmsdata current_language "heading_content" as heading_content %}
                     <p>

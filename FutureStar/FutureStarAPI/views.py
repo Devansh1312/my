@@ -15,7 +15,7 @@ from FutureStarFriendlyGame.models import *
 from FutureStarGameSystem.models import *
 from FutureStarTrainingApp.models import *
 from datetime import date
-
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 import random
 from django.utils import timezone
@@ -69,17 +69,23 @@ class UpdateCurrentTypeAPIView(APIView):
 #################################################### Get User data ##########################################################################################################
 def get_user_data(user, request):
     """Returns a dictionary with all user details."""
+    created_by_id = request.query_params.get('created_by_id') or request.data.get('created_by_id', request.user.id)
+    creator_type = request.query_params.get('creator_type') or request.data.get('creator_type', FollowRequest.USER_TYPE)
     
+
     # Calculate follower and following counts for the user
+    # Counting followers for a user, team, or group
     followers_count = FollowRequest.objects.filter(target_id=user.id, target_type=FollowRequest.USER_TYPE).count()
+    # Counting following for a user, team, or group
     following_count = FollowRequest.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
+
     
     post_count = Post.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
     
     # Check if the current user is following this user
     is_follow = FollowRequest.objects.filter(
-        created_by_id=request.user.id,
-        creator_type=FollowRequest.USER_TYPE,
+        created_by_id=created_by_id,
+        creator_type=creator_type,
         target_id=user.id,
         target_type=FollowRequest.USER_TYPE
     ).exists()
@@ -1009,16 +1015,17 @@ class EditProfileAPIView(APIView):
             activate(language)
 
         # Get 'created_by_id' from query parameters
-        created_by_id = request.query_params.get('created_by_id')
-        if not created_by_id:
+        user_id = request.query_params.get('user_id')
+
+        if not user_id:
             return Response({
                 'status': 0,
-                'message': _('created_by_id parameter is required.')
+                'message': _('user_id is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve the user, return 0 if not found
         try:
-            user = User.objects.get(id=created_by_id)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return Response({
                 'status': 0,
@@ -1697,7 +1704,7 @@ class PostDetailAPIView(APIView):
 
         # Track the post view
         creator_type = request.data.get('creator_type')
-        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user ID
+        created_by_id = request.data.get('created_by_id')  # Default to logged-in user ID
 
         PostView.objects.get_or_create(created_by_id=created_by_id, post=post, creator_type=creator_type)
 
@@ -3516,17 +3523,20 @@ class ListFollowersAPI(generics.ListAPIView):
         language = self.request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        target_id = self.request.query_params.get('created_by_id')
-        target_type = self.request.query_params.get('creator_type')
-        search_key = self.request.query_params.get('search_key', '')
+        creator_type = self.request.query_params.get('creator_type')
+        created_by_id = self.request.query_params.get('created_by_id')
+        search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
 
-        queryset = FollowRequest.objects.filter(target_id=target_id, target_type=target_type)
+        # Filter followers based on target_id and target_type
+        queryset = FollowRequest.objects.filter(target_type=creator_type, target_id=created_by_id)
 
         if search_key:
+            # Separate filtering for each type
             user_ids = User.objects.filter(username__icontains=search_key).values_list('id', flat=True)
             team_ids = Team.objects.filter(team_username__icontains=search_key).values_list('id', flat=True)
             group_ids = TrainingGroups.objects.filter(group_username__icontains=search_key).values_list('id', flat=True)
 
+            # Filter queryset by matching IDs in each creator type
             queryset = queryset.filter(
                 Q(creator_type=FollowRequest.USER_TYPE, created_by_id__in=user_ids) |
                 Q(creator_type=FollowRequest.TEAM_TYPE, created_by_id__in=team_ids) |
@@ -3539,9 +3549,10 @@ class ListFollowersAPI(generics.ListAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        # Get target ID and type for is_follow check
-        target_id = self.request.query_params.get('created_by_id')
-        target_type = self.request.query_params.get('creator_type')
+
+        # Get the target ID and type for the is_follow check
+        created_by_id = self.request.query_params.get('created_by_id')
+        creator_type = self.request.query_params.get('creator_type')
 
         # Get the paginated page object
         page = self.paginate_queryset(self.get_queryset())
@@ -3550,45 +3561,49 @@ class ListFollowersAPI(generics.ListAPIView):
         # Loop through the paginated results and build the response data
         for follow in page:
             is_follow = FollowRequest.objects.filter(
-                created_by_id=target_id,
-                creator_type=target_type,
+                created_by_id=created_by_id,
+                creator_type=creator_type,
                 target_id=follow.created_by_id,
                 target_type=follow.creator_type
             ).exists()
 
-            if follow.creator_type == FollowRequest.USER_TYPE:
-                user = User.objects.get(id=follow.created_by_id)
-                followers.append({
-                    'creator_type': 1,
-                    'creator_id': user.id,
-                    'username': user.username,
-                    'role': user.role.id,
-                    'profile': user.profile_picture.url if user.profile_picture else None,
-                    'is_follow': is_follow
-                })
-            elif follow.creator_type == FollowRequest.TEAM_TYPE:
-                team = Team.objects.get(id=follow.created_by_id)
-                followers.append({
-                    'creator_type': 2,
-                    'creator_id': team.id,
-                    'username': team.team_username,
-                    'role': 7,
-                    'profile': team.team_logo.url if team.team_logo else None,
-                    'is_follow': is_follow
-                })
-            elif follow.creator_type == FollowRequest.GROUP_TYPE:
-                group = TrainingGroups.objects.get(id=follow.created_by_id)
-                followers.append({
-                    'creator_type': 3,
-                    'creator_id': group.id,
-                    'username': group.group_username,
-                    'role': 8,
-                    'profile': group.group_logo.url if group.group_logo else None,
-                    'is_follow': is_follow
-                })
+            try:
+                if follow.creator_type == FollowRequest.USER_TYPE:
+                    user = User.objects.get(id=follow.created_by_id)
+                    followers.append({
+                        'creator_type': 1,
+                        'creator_id': user.id,
+                        'username': user.username,
+                        'role': user.role.id,
+                        'profile': user.profile_picture.url if user.profile_picture else None,
+                        'is_follow': is_follow
+                    })
+                elif follow.creator_type == FollowRequest.TEAM_TYPE:
+                    team = Team.objects.get(id=follow.created_by_id)
+                    followers.append({
+                        'creator_type': 2,
+                        'creator_id': team.id,
+                        'username': team.team_username,
+                        'role': 7,
+                        'profile': team.team_logo.url if team.team_logo else None,
+                        'is_follow': is_follow
+                    })
+                elif follow.creator_type == FollowRequest.GROUP_TYPE:
+                    group = TrainingGroups.objects.get(id=follow.created_by_id)
+                    followers.append({
+                        'creator_type': 3,
+                        'creator_id': group.id,
+                        'username': group.group_username,
+                        'role': 8,
+                        'profile': group.group_logo.url if group.group_logo else None,
+                        'is_follow': is_follow
+                    })
+            except ObjectDoesNotExist:
+                continue  # If any object is not found, skip this iteration
 
         # Use the paginated response method
         return self.get_paginated_response(followers)
+
 
 
 ##################################### LIST OF FOLLOWING #######################################

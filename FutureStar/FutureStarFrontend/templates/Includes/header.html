@@ -77,7 +77,7 @@
                                 </li>
                                 <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
                                     <a href="{% url 'contact' %}">
-                                        {% if current_language == 'en' %} Contacts {% elif current_language == 'ar' %} جهات الاتصال {% endif %}
+                                        {% if current_language == 'en' %} Contact Us {% elif current_language == 'ar' %}اتصل بنا{% endif %}
                                     </a>
                                 </li>
                                 {% if not user.is_authenticated %}

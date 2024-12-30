@@ -2955,6 +2955,7 @@ def saveAboutUspage(request):
             seo_title_ar = request.POST.get("seo_title_ar")
             seo_content_en = request.POST.get("seo_content_en")
             seo_content_ar = request.POST.get("seo_content_ar")
+            achivement_title_en = request.POST.get("achivement_title_en")
             # images
             dom = "Done"
             imageName = []
@@ -3004,6 +3005,8 @@ def saveAboutUspage(request):
                 aboutussave.meta_title_ar = seo_title_ar
                 aboutussave.meta_content_ar = seo_content_en
                 aboutussave.meta_content_en = seo_content_ar
+                #youtube URl
+                aboutussave.achivement_title_en = achivement_title_en
 
                 aboutussave.save()
                 dom = "True"

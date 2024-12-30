@@ -55,18 +55,13 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div>                                
                         <div class="our-location-address">
-                            {% lang cmsdata current_language "section_2_country" as section_2_country %}
-                           
-                            
-                            <h4>
-                                {{section_2_country}}
-                             
-                            </h4>
+                            {% lang cmsdata current_language "section_2_country_name" as section_2_country_name %}
+                            <h4>{{section_2_country_name}}</h4>
                             <p>{{ system_settings.address }}</p>
-                            <div><a class="mailto" href="mailto:{{ system_settings.email }}"><i class="fa-solid fa-envelope"></i> {{ system_settings.email }}</a></div>
-                            <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fa-solid fa-phone"></i>{{ system_settings.phone }}</a></div>
+                            <div><a class="callto" href="mailto:{{ system_settings.email }}"><i class="fas fa-envelope"></i>{{ system_settings.email }}</a></div>
+                            <div><a class="callto" href="callto:{{ system_settings.phone }}"><i class="fas fa-phone"></i>{{ system_settings.phone }}</a></div>
                         </div>
                     </div>
                     <h5>Follow Us</h5>
