@@ -259,7 +259,13 @@ class AboutPage(View):
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         global_clients = Global_Clients.objects.all()
         team_members = Team_Members.objects.all().order_by('id')
+        number_of_users=User.objects.all().count()
+        tournament_organized = Tournament.objects.all().count()
+        team_created=Team.objects.all().count()
+        games_played=TournamentGames.objects.all().count()
         language_from_url = request.GET.get('Language', None)
+
+        print(number_of_users)
         
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session
@@ -279,6 +285,10 @@ class AboutPage(View):
             "current_language":language_from_url,
             "cmsdata" : cmsdata,
             "team_members" : team_members,
+            "number_of_users": number_of_users,
+            "tournament_organized": tournament_organized,
+            "team_created": team_created,
+            "games_played": games_played,
 
         }
         return render(request, "about.html",context)
