@@ -60,7 +60,13 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
                                 <img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="">
                             {% endif %}
                         </div>
-                        <h5 class="player-name">{{ item.user.fullname|default:"None" }}</h5>
+                        <h5 class="player-name">
+                            {% if item.user.fullname %}
+                            {{ item.user.fullname}}
+                            {% else %}  
+                            @{{ item.user.username }}
+                            {% endif %}
+                        </h5>
                         <p class="player-designation">{{ item.user.role.name_en |default:"None" }}</p>
                         <div class="social-info-wrapper">
                             <div class="social-info-item">
@@ -76,9 +82,17 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
                                 <p class="des">Followers</p>
                             </div>
                         </div>
+                        {% if user.is_authenticated %}
                         <div>
-                            <a class="theme-btn style-two" href="#">View Info <i class="fa-solid fa-arrow-right"></i></a>
+                            <form action="{% url 'player_info' %}" method="post">
+								{% csrf_token %}
+								<input type="hidden" name="user_id" value="{{ item.user.id }}">
+								<button type="submit" class="theme-btn style-two w-100">
+									View Info <i class="fa-solid fa-arrow-right"></i>
+								</button>
+							</form>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -94,28 +108,19 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
             <h2>{{ section_2_title }}</h2>
         </div>
         <div class="tryouts-slider">
-            {% for team in top_6_teams %}
-                <div class="wow fadeInUp delay-{{ forloop.counter|add:0.1 }}s animated">
-                    <div class="img-wrapper">
-                        <img src="{{ team.team_branch.team_id.team_logo.url }}" class="img-fluid" alt="{{ team.team_branch.team_id.team_name }}">
-                    </div>
+            {% for tryout_club in top_6_teams %}
+            <div class="wow fadeInUp delay-{{ forloop.counter|add:0.1 }}s animated">
+                <div class="img-wrapper">
+                    <img src="{{ tryout_club.team_branch.team_id.team_logo.url }}" class="img-fluid" alt="">
                 </div>
+            </div>
             {% endfor %}
-        </div>
-        
-        <div class="work-gallery-controls">
-            <button class="tryouts-slider-prev">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <div class="tryouts-slider-dots"></div>
-            <button class="tryouts-slider-next">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
         </div>
     </div>
 </section>
 
 <!-- Tryouts Clubs Area End -->
+
 
 {% endblock %}
 
