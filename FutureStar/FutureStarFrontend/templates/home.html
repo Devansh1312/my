@@ -36,7 +36,7 @@
                         <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
                         {% lang cmsdata current_language "heading_content" as heading_content %}
                         <p>{{ heading_content }}</p>
-                        <a href="" class="theme-btn style-two">{% trans "Read More" %}<i class="fa-solid fa-arrow-right"></i>
+                        <a href="{% url 'discover' %}" class="theme-btn style-two">{% trans "Read More" %}<i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -392,7 +392,7 @@
                             </span>
                         </span>
                         <span class="details-btn">
-                            <i class="fal fa-long-arrow-right"></i>
+                            <i class="fa fa-long-arrow-right"></i>
                         </span>
                     </button>
 
@@ -413,7 +413,7 @@
                             </span>
                         </span>
                         <span class="details-btn">
-                            <i class="fal fa-long-arrow-right"></i>
+                            <i class="fa fa-long-arrow-right"></i>
                         </span>
                     </button>
                     {% endfor %}

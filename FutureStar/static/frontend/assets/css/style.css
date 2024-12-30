@@ -837,7 +837,7 @@ a.theme-btn.style-three {
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  margin: 21px 0 0;
+  /* margin: 21px 0 0; */
 }
 
 .social-style-two a {
@@ -4932,7 +4932,7 @@ h6,
   z-index: 777;
   display: -webkit-box;
   display: -ms-flexbox;
-  display: flex;
+  display: flex !important;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;

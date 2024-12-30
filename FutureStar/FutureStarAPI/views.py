@@ -1410,13 +1410,34 @@ class PostListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         # Get created_by_id and creator_type from query_params
-        created_by_id = self.request.query_params.get('created_by_id')
         creator_type = self.request.query_params.get('creator_type')
+        created_by_id = self.request.query_params.get('created_by_id')
 
         # Set default values if either parameter is missing
-        if not created_by_id or not creator_type:
-            created_by_id = self.request.user.id  # Default to the logged-in user’s ID
-            creator_type = 1  # Default type
+        if not creator_type:
+            return Response({
+                    'status': 0,
+                    'message': _('creator_type is required when creator_type is 2.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not created_by_id:
+            return Response({
+                    'status': 0,
+                    'message': _('created_by_id is required when creator_type is 2.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Check creator_type and adjust the created_by_id accordingly
+        if creator_type in [1,"1"]:  # If creator_type is 1, use user_id
+            created_by_id = self.request.query_params.get('user_id', self.request.user.id)
+        elif creator_type in [2,"2"]:  # If creator_type is 2, use team_id
+            created_by_id = self.request.query_params.get('team_id')
+            if not created_by_id:
+                # Return an error if team_id is missing for creator_type 2
+                return Response({
+                    'status': 0,
+                    'message': _('Team ID is required when creator_type is 2.')
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         # Filter posts based on created_by_id and creator_type
         return Post.objects.filter(
@@ -1457,7 +1478,6 @@ class PostListAPIView(generics.ListAPIView):
             'data': serializer.data,
             'post_count': post_count  # Add post_count here
         }, status=status.HTTP_200_OK)
-
 ######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -3446,7 +3466,7 @@ class FollowUnfollowAPI(APIView):
             if target_device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
                 body = _(f'{recipient_name} started following you.')  # Notification message
-                push_data = {'type': 'follow', 'target_id': created_by_id, 'target_type': creator_type}  # Include follow info in the notification payload
+                push_data = {'type': 'follow', 'notifier_id': created_by_id, 'target_type': creator_type}
                 send_push_notification(target_device_token, title, body, target_device_type, data=push_data)
 
             # Return the response for following

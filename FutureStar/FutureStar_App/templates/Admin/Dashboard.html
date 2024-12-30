@@ -17,6 +17,7 @@
         border: 1px solid #ddd;
         border-radius: 8px;
         background-color: #fff;
+        height: 208px;
     }
 
     .card-body {
@@ -26,6 +27,10 @@
     .img-fluid {
         max-width: 100%;
         height: auto;
+    }
+
+    .whatsnew-btn{
+        margin-top: 30px !important;
     }
 
     .cartoon {
@@ -43,6 +48,7 @@
     .widget h4 {
         font-size: 1.5rem;
         font-weight: 600;
+        text-align: left !important;
     }
 
     .widget-content {
@@ -60,6 +66,15 @@
         width: 40px;
         height: 40px;
     }
+
+    .greeting-user h4{
+
+        font-size: 18px !important;
+    }
+    .col-xxl-auto .col-xl-3 .col-sm-6 .box-col-6 .row .col-xl-12 .card .widget-1 .card-body .widget-content h4 {
+    text-align: left !important; /* Aligns text to the left */
+}
+
 </style>
 
 <div class="page-body">
@@ -143,7 +158,7 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h4>{{ model_counts.teams }}</h4>
+                                        <h4 style="text-align: left !important;">{{ model_counts.teams }}</h4>
                                         <span class="f-light">Team Profiles</span>
                                     </div>
                                 </div>
