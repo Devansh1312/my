@@ -110,6 +110,7 @@ class SuccessStoriesPage(View):
     def get(self, request, *args, **kwargs):
         tryout_clubs = Tryout_Club.objects.all()
         language_from_url = request.GET.get('Language', None)
+
         
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session
@@ -119,11 +120,46 @@ class SuccessStoriesPage(View):
             language_from_url = request.session.get('language', 'en')
         try:
             cmsdata = cms_pages.objects.get(id=3)  # Use get() to fetch a single object
+            latest_users=User.objects.all().order_by('-id')[:4]
+            
+            team_branches=TeamBranch.objects.all()
+            print(team_branches)
+            team_wins=[]
+            for team_branch in team_branches:
+
+                branches_win = TournamentGames.objects.filter(winner_id=team_branch.id, finish=True)
+
+                print(branches_win)
+                team_wins.append(branches_win.count())
+            print(team_wins)
+
+
+
+            user_data = []
+            for user in latest_users:
+                followers_count = FollowRequest.objects.filter(target_id=user.id, target_type=FollowRequest.USER_TYPE).count()
+                following_count = FollowRequest.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
+                post_count = Post.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
+                
+                user_data.append({
+                    "user": user,
+                    "followers_count": followers_count,
+                    "following_count": following_count,
+                    "post_count": post_count,
+                })
+            
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle the case where the object does not exist
+            cmsdata = None
+            user_data = []
+             
+          # Handle the case where the object does not exist
         context = {
             "tryout_clubs": tryout_clubs,
-            "cmsdata":cmsdata,                        
+            "cmsdata":cmsdata,          
+            'latest_users':latest_users, 
+            'user_data': user_data,
+            
+                     
             "current_language": language_from_url,
 
         }
