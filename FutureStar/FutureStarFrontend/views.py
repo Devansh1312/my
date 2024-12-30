@@ -105,13 +105,13 @@ class DiscoverPage(View):
 
 ##############################################   SuccessStoriesPage   ########################################################
 
+
+
 class SuccessStoriesPage(View):
-    
     def get(self, request, *args, **kwargs):
-        tryout_clubs = Tryout_Club.objects.all()
+        # tryout_clubs = Tryout_Club.objects.all()
         language_from_url = request.GET.get('Language', None)
 
-        
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session
             request.session['language'] = language_from_url
@@ -120,26 +120,39 @@ class SuccessStoriesPage(View):
             language_from_url = request.session.get('language', 'en')
         try:
             cmsdata = cms_pages.objects.get(id=3)  # Use get() to fetch a single object
-            latest_users=User.objects.all().order_by('-id')[:4]
+            latest_users = User.objects.all().order_by('-id')[:4]
             
-            team_branches=TeamBranch.objects.all()
-            print(team_branches)
-            team_wins=[]
+            team_branches = TeamBranch.objects.all()
+            
+            
+            team_wins = []
+
             for team_branch in team_branches:
+                branches_win = TournamentGames.objects.filter(
+                    winner_id=team_branch.id, finish=True
+                )
+                win_count = branches_win.count()
+               
+                team_wins.append({"team_branch": team_branch, "win_count": win_count})
 
-                branches_win = TournamentGames.objects.filter(winner_id=team_branch.id, finish=True)
-
-                print(branches_win)
-                team_wins.append(branches_win.count())
-            print(team_wins)
-
-
-
+            # Sort the team_wins list by win_count in descending order
+            team_wins = sorted(team_wins, key=lambda x: x['win_count'], reverse=True)
+           
+            # Get the top 6 teams
+            top_6_teams = team_wins[:6]
+      
+            
             user_data = []
             for user in latest_users:
-                followers_count = FollowRequest.objects.filter(target_id=user.id, target_type=FollowRequest.USER_TYPE).count()
-                following_count = FollowRequest.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
-                post_count = Post.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
+                followers_count = FollowRequest.objects.filter(
+                    target_id=user.id, target_type=FollowRequest.USER_TYPE
+                ).count()
+                following_count = FollowRequest.objects.filter(
+                    created_by_id=user.id, creator_type=FollowRequest.USER_TYPE
+                ).count()
+                post_count = Post.objects.filter(
+                    created_by_id=user.id, creator_type=FollowRequest.USER_TYPE
+                ).count()
                 
                 user_data.append({
                     "user": user,
@@ -151,21 +164,20 @@ class SuccessStoriesPage(View):
         except cms_pages.DoesNotExist:
             cmsdata = None
             user_data = []
-             
-          # Handle the case where the object does not exist
+            team_wins = []
+            top_6_teams = []
+        
+        # Pass the data to the context
         context = {
-            "tryout_clubs": tryout_clubs,
-            "cmsdata":cmsdata,          
-            'latest_users':latest_users, 
-            'user_data': user_data,
             
-                     
+            "cmsdata": cmsdata,
+            "latest_users": latest_users,
+            "user_data": user_data,
+            "team_wins": team_wins,
+            "top_6_teams": top_6_teams,  # Pass top 6 teams to context
             "current_language": language_from_url,
-
         }
-        return render(request, "success-stories.html",context)
-    
-    
+        return render(request, "success-stories.html", context)
 
 ##############################################   NewsPage   ########################################################
 
