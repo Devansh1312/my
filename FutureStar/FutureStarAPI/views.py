@@ -1580,7 +1580,7 @@ class PostCreateAPIView(APIView):
                 body = _(f'{creator_name} just added a new post.')
                 push_data = {
                     'type': 'post',
-                    'post_id': post.id
+                    'notifier_id': post.id
                 }
                 send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
 
