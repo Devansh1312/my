@@ -3269,6 +3269,8 @@ def savetermconditionpage(request):
                 messages.success(
                     request, "Term and Condition Page Updated Successfully"
                 )
+                return redirect("termcondition")
+
 
             except Exception as e:
                 messages.error(request, str(e))
@@ -3334,7 +3336,7 @@ def saveprivacypolicypage(request):
                 privacypolicy.save()
 
                 messages.success(request, "Privacy Policy Page Updated Successfully")
-
+                return redirect("cms_privacypolicy")
             except Exception as e:
                 messages.error(request, str(e))
 
@@ -3406,6 +3408,7 @@ def savetermservicepage(request):
                 dom = "True"
 
                 messages.success(request, "Term and service Page Updated Successfully")
+                return redirect("cms_termandservicepage")
 
             except Exception as e:
                 messages.error(request, str(e))
