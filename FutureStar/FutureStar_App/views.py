@@ -4947,6 +4947,7 @@ def savehomedetail(request):
             heading_title_en = request.POST.get("home_heading_title_en")
             heading_title_ar = request.POST.get("home_heading_title_ar")
             heading_content_en = request.POST.get("home_heading_content_en")
+            section_3_sub_title_en = request.POST.get("section_3_sub_title_en")
             heading_content_ar = request.POST.get("home_heading_content_ar")
             sub_heading_1_name_en = request.POST.get("home_sub_heading_1_name_en")
             sub_heading_1_name_ar = request.POST.get("home_sub_heading_1_name_ar")
@@ -5082,6 +5083,7 @@ def savehomedetail(request):
                 savehomedetail.heading_title_en = heading_title_en
                 savehomedetail.heading_title_ar = heading_title_ar
                 savehomedetail.heading_content_en = heading_content_en
+                savehomedetail.section_3_sub_title_en = section_3_sub_title_en
                 savehomedetail.heading_content_ar = heading_content_ar
                 savehomedetail.sub_heading_name_en = sub_heading_1_name_en
                 savehomedetail.sub_heading_name_ar = sub_heading_1_name_ar
