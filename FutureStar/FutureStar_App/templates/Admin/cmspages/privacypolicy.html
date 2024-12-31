@@ -17,6 +17,8 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+
 </head>  
 <div class="page-body">
     <div class="container-fluid">
@@ -155,6 +157,21 @@
 
 <!--javascript-->
 <script>
+    ClassicEditor
+        .create(document.querySelector('#tc-content-en'))
+        .catch(error => {
+            console.error(error);
+        });
+
+    ClassicEditor
+        .create(document.querySelector('#tc-content-ar'))
+        .catch(error => {
+            console.error(error);
+        });
+
+
+</script>
+<script>
 
 
     function  backtolist(){
@@ -178,6 +195,17 @@
  
               
                 try{
+
+
+                    document.querySelectorAll('textarea').forEach(textarea => {
+                        const editorInstance = textarea.nextElementSibling.querySelector('.ck-editor__editable');
+                        if (editorInstance) {
+                            // Set textarea value to the HTML content (not plain text)
+                            textarea.value = editorInstance.innerHTML || editorInstance.getData();
+                        }
+                    });
+    
+
                     var tc_title_en = document.getElementById("tc-title-en")
                     var tc_title_ar = document.getElementById("tc-title-ar")
                     var tc_content_en = document.getElementById("tc-content-en")

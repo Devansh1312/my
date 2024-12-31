@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils import timezone
+from ckeditor.fields import RichTextField
 from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime 
 
@@ -474,8 +475,8 @@ class cms_pages(models.Model):
     heading_title_en = models.CharField(max_length=100,blank = True,null=True)
     heading_title_ar = models.CharField(max_length=100,blank = True,null=True)
 
-    heading_content_en = models.TextField(blank = True,null=True)
-    heading_content_ar = models.TextField(blank = True,null=True)
+    heading_content_en = RichTextField(blank = True,null=True)
+    heading_content_ar = RichTextField(blank = True,null=True)
     heading_url = models.TextField(blank =True,null=True)
     heading_banner = models.ImageField(upload_to='cmspages/', blank=True, null=True)
     heading_image_1 = models.ImageField(upload_to='cmspages/',blank=True,null = True)

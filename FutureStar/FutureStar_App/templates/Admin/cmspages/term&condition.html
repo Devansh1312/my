@@ -14,8 +14,10 @@
 {% include "components/loader.html" %}
 <head>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script> -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
 </head>  
 <div class="page-body">
     <div class="container-fluid">
@@ -56,7 +58,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="policy-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="policy-title-ar" name="policy-title-ar" type="text" value="{{data.heading_content_ar}}" placeholder="Title (Arabic)">
+                                <input class="form-control btn-pill" id="policy-title-ar" name="policy-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-policy-title-ar"></p>
 
                             </div>
@@ -118,7 +120,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en|safe}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
 
                             </div>
@@ -127,7 +129,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar|safe}}</textarea>
                                 <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
 
                             </div>
@@ -153,6 +155,31 @@
 
 
 <!--javascript-->
+<!-- <script>
+    window.onload = function() {
+        CKEDITOR.replace('policy-content-en');
+        CKEDITOR.replace('policy-content-ar');
+        CKEDITOR.replace('meta-content-en');
+        CKEDITOR.replace('meta-content-ar');
+    };
+</script> -->
+
+<script>
+    ClassicEditor
+        .create(document.querySelector('#policy-content-en'))
+        .catch(error => {
+            console.error(error);
+        });
+
+    ClassicEditor
+        .create(document.querySelector('#policy-content-ar'))
+        .catch(error => {
+            console.error(error);
+        });
+
+
+</script>
+
 <script>
 
 
@@ -175,6 +202,14 @@
             try{
 
                 //text
+                  // Extract HTML content (with formatting) from CKEditor instances
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    const editorInstance = textarea.nextElementSibling.querySelector('.ck-editor__editable');
+                    if (editorInstance) {
+                        // Set textarea value to the HTML content (not plain text)
+                        textarea.value = editorInstance.innerHTML || editorInstance.getData();
+                    }
+                });
 
                 var tc_title_en = document.getElementById("policy-title-en")
                 var tc_title_ar = document.getElementById("policy-title-ar")

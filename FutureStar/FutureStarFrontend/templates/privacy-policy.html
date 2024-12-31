@@ -57,7 +57,7 @@
                 <div class="blog-single-content">
                     {% lang cmsdata current_language "heading_content" as heading_content %}
                     <p>
-                    {{heading_content}}
+                    {{heading_content|safe}}
                     </p>
                 </div>
             </div>
