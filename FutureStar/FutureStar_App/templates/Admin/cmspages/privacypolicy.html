@@ -195,7 +195,7 @@
  
               
                 try{
-                    alert("Form submitted successfully");
+                    
 
 
                     document.querySelectorAll('textarea').forEach(textarea => {
@@ -205,7 +205,7 @@
                             textarea.value = editorInstance.innerHTML || editorInstance.getData();
                         }
                     });
-                    alert("Form dfhdfh successfully");
+                   
     
 
                     var tc_title_en = document.getElementById("tc-title-en")
@@ -275,8 +275,7 @@
                         formData.append('meta-title-ar', seo_title_ar.value );
                         formData.append('meta-content-en', seo_content_en.value );
                         formData.append('meta-content-ar', seo_content_ar.value );
-                        
-                        alert("post start")
+
                         fetch("/saveprivacypolicypage/", {
                             method: 'POST',
                             body: formData,
@@ -295,7 +294,7 @@
                             location.reload()                            
                             return false
                         });
-                        alert("post end")
+                        
                     
                    
                         function getCookie(name) {
