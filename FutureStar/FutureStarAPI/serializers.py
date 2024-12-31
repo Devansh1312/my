@@ -132,7 +132,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
             team = Team.objects.get(id=obj.created_by_id)
             return {
                 'created_by_id': team.id,
-                'name': team.team_name,
+                'username': team.team_name,
                 'profile_image': team.team_logo.url if team.team_logo else None,
                 'creator_type': 1
             }
@@ -140,7 +140,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
             group = TrainingGroups.objects.get(id=obj.created_by_id)
             return {
                 'created_by_id': group.id,
-                'name': group.group_name,
+                'username': group.group_name,
                 'profile_image': group.group_logo.url if group.group_logo else None,
                 'creator_type': 2
             }
@@ -732,7 +732,7 @@ class EventCommentSerializer(serializers.ModelSerializer):
             team = Team.objects.get(id=obj.created_by_id)
             return {
                 'id': team.id,
-                'name': team.team_name,
+                'username': team.team_name,
                 'profile_image': team.team_logo.url if team.team_logo else None,
                 'type': 'team'
             }

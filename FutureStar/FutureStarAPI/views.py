@@ -1351,7 +1351,7 @@ class PostLikeAPIView(APIView):
             if device_type in [1, 2, "1", "2"]:
                 title = _('Post Liked!')
                 body = _(f'{notifier_name} liked your post.')
-                push_data = {'type': 'post', 'post_id': post_id}
+                push_data = {'type': 'post', 'notifier_id': post_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
         # Serialize and return post data
@@ -1580,7 +1580,8 @@ class PostCreateAPIView(APIView):
                 body = _(f'{creator_name} just added a new post.')
                 push_data = {
                     'type': 'post',
-                    'notifier_id': post.id
+                    'notifier_id': post.id,
+                    'target_type':post.creator_type,
                 }
                 send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
 
@@ -1591,8 +1592,9 @@ class PostCreateAPIView(APIView):
                     body = _(f'{creator_name} just added a new post.')
                     push_data = {
                         'type': 'team_post',
-                        'post_id': post.id,
-                        'team_id': team.id
+                        'notifier_id': post.id,
+                        'team_id': team.id,
+                        'target_type':post.creator_type,
                     }
                     send_push_notification(follower_user.device_token, title, body,team.team_founder.device_type, data=push_data)
 
@@ -1603,8 +1605,9 @@ class PostCreateAPIView(APIView):
                     body = _(f'{creator_name} just added a new post.')
                     push_data = {
                         'type': 'group_post',
-                        'post_id': post.id,
-                        'group_id': group.id
+                        'notifier_id': post.id,
+                        'group_id': group.id,
+                        'target_type':post.creator_type,
                     }
                     send_push_notification(follower_user.device_token, title, body,group.group_founder.device_type, data=push_data)
 
@@ -1924,11 +1927,11 @@ class CommentCreateAPIView(APIView):
         if parent_comment:
             title = _('Someone replied to your comment')
             body = _(f'{notifier_name} replied to your comment.')
-            push_data = {'type': 'comment', 'post_id': post_id, 'parent_id': parent_id, 'comment_id': comment.id}
+            push_data = {'type': 'post', 'notifier_id': post_id}
         else:
             title = _('Someone commented on your post')
             body = _(f'{notifier_name} commented on your post.')
-            push_data = {'type': 'comment', 'post_id': post_id, 'comment_id': comment.id}
+            push_data = {'type': 'post', 'notifier_id': post_id}
 
         # Send push notification
         if device_type in [1, 2, "1", "2"]:
@@ -3821,7 +3824,7 @@ class EventLikeAPIView(APIView):
             if device_type in [1, 2, "1", "2"]:
                 title = _('Event Liked!')
                 body = _(f'{notifier_name} liked your event.')
-                push_data = {'type': 'event_like', 'event_id': event_id}
+                push_data = {'type': 'event_like', 'notifier_id': event_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
         # Serialize the event data with updated like status
@@ -4297,7 +4300,7 @@ class EventCreateAPIView(generics.CreateAPIView):
                         body=notification_body,
                         device_type=user.device_type,
                         data={
-                            "event_id": event.id,
+                            "notifier_id": event.id,
                             "team_id": created_by_id,
                             "type":"event"
 
@@ -4504,11 +4507,11 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
                 # Prepare push_data for additional details
                 push_data = {
-                    'event_id': (event_instance.id),
-                    "team id": (team.id),
+                    'notifier_id': (event_instance.id),
+                    "team_id": (team.id),
                     
                    
-                    "creator id": (request.user.id),
+                    "creator_id": (request.user.id),
                     "type": "event booking requested",
                    
                     "team founder id": (team_founder.id),
