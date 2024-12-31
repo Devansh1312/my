@@ -7492,8 +7492,7 @@ class PendingEventBookingListView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         # Filter all event bookings with status 'Pending'
-        pending_bookings = EventBooking.objects.filter(booking_status=EventBooking.PENDING)
-
+        pending_bookings = EventBooking.objects.filter(booking_status=EventBooking.PENDING).order_by('-id') 
         return render(
             request,
             self.template_name,
@@ -7584,7 +7583,7 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
             # Send notification to the user who made the booking
             push_data = {
                 'type': 'booking_status',
-                'event_id': event.id,
+                'notifier_id': event.id,
                 'status': status
             }
             send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
@@ -7634,7 +7633,7 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
                 push_data = {
                     'type': 'event',
-                    'event_id': event.id
+                    'notifier_id': event.id
                 }
                 send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
 
@@ -7644,7 +7643,7 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                     body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
                     push_data = {
                         'type': 'event',
-                        'event_id': event.id,
+                        'notifier_id': event.id,
                     }
                     send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
 
@@ -7654,6 +7653,6 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                     body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
                     push_data = {
                         'type': 'event',
-                        'event_id': event.id,
+                        'notifier_id': event.id,
                     }
                     send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
