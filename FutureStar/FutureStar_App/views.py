@@ -3237,6 +3237,9 @@ class cms_termcondition(LoginRequiredMixin, View):
 
         return render(request, self.template_name, context)
 
+    def post(self, request):
+        return savetermconditionpage(request)  # Reuse the existing function
+
 
 @csrf_exempt
 @user_role_check
@@ -3304,6 +3307,10 @@ class cms_privacypolicy(LoginRequiredMixin, View):
 
         context = {"data": dataFilter}
         return render(request, self.template_name, context)
+    
+    # Handle POST requests
+    def post(self, request):
+        return saveprivacypolicypage(request)  # Reuse the existing function
 
 
 @csrf_exempt
@@ -3336,7 +3343,7 @@ def saveprivacypolicypage(request):
                 privacypolicy.save()
 
                 messages.success(request, "Privacy Policy Page Updated Successfully")
-                return redirect("cms_privacypolicy")
+                return redirect("cms_privacypolicypage")
             except Exception as e:
                 messages.error(request, str(e))
 
@@ -3371,6 +3378,9 @@ class cms_termandserice(LoginRequiredMixin, View):
         }
         dataFilter.meta_title_en
         return render(request, self.template_name, context)
+    
+    def post(self, request):
+        return savetermservicepage(request)  # Reuse the existing function
 
 
 # save term and condition
