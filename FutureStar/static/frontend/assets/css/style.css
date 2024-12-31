@@ -14224,23 +14224,42 @@ background: linear-gradient(to bottom,  #344A6C 0%,#284700 100%); /* W3C, IE10+,
 .tryouts-club {
   padding: 32px 0 82px;
 }
+
 .tryouts-club .img-wrapper {
   width: 190px;
   height: 190px;
-  overflow: hidden;
-  clip-path: polygon(25% 0, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden; /* Hide any overflow to enforce circular shape */
+  border-radius: 50%; /* Makes the container circular */
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: rotate(90deg);
   margin: 0 auto;
+  background: rgba(0, 0, 0, 0.2); /* Optional background color for the wrapper */
 }
+
 .tryouts-club .img-wrapper img {
-  height: 85px;
-  object-fit: contain;
-  transform: rotate(-90deg);
+  width: 100%; /* Scale image to fit container */
+  height: 100%; /* Maintain aspect ratio */
+  object-fit: cover; /* Ensures the image covers the area while preserving aspect ratio */
+  border-radius: 50%; /* Ensures the image itself is circular */
 }
+
+/* Style for the team name */
+.tryouts-club span {
+  display: flex;
+  width: 190px; /* Same width as the image */
+  height: 50px; /* Fixed height to align with the image size */
+  margin: 10px auto 0; /* Add spacing from the image */
+  text-align: center; /* Center the text horizontally */
+  align-items: center; /* Center the text vertically */
+  justify-content: center; /* Ensure text aligns properly */
+  font-size: 16px; /* Adjust font size for readability */
+  font-weight: 600; /* Make it bold for better visibility */
+  word-wrap: break-word; /* Break long words to fit within the box */
+  overflow-wrap: break-word; /* Alternative for word wrapping */
+  line-height: 1.2; /* Adjust line height for multiline text */
+}
+
 
 .sidebar-wrapper {
   background-color: rgba(255, 255, 255, 0.15);
