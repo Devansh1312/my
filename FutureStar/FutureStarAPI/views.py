@@ -3824,7 +3824,7 @@ class EventLikeAPIView(APIView):
             if device_type in [1, 2, "1", "2"]:
                 title = _('Event Liked!')
                 body = _(f'{notifier_name} liked your event.')
-                push_data = {'type': 'event_like', 'notifier_id': event_id}
+                push_data = {'type': 'event_list', 'notifier_id': event_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
         # Serialize the event data with updated like status
@@ -4010,11 +4010,11 @@ class EventCommentCreateAPIView(APIView):
         if parent_comment:
             title = _('New Reply on Your Comment!')
             body = _(f'{notifier_name} replied to your comment.')
-            push_data = {'type': 'comment', 'event_id': event.id, 'parent_id': parent_id, 'comment_id': comment.id}
+            push_data = {'type': 'event_list'}
         else:
             title = _('New Comment on Your Event!')
             body = _(f'{notifier_name} commented on your event.')
-            push_data = {'type': 'comment', 'event_id': event.id, 'comment_id': comment.id}
+            push_data = {'type': 'event_list'}
 
         # Send push notification
         if device_type in [1, 2, "1", "2"]:

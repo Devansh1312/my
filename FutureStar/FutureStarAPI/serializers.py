@@ -651,8 +651,8 @@ class EventSerializer(serializers.ModelSerializer):
             try:
                 team = Team.objects.get(id=team_id)
                 return {
-                    'username': team.team_username,
-                    'fullname': team.team_name,
+                    'username': team.team_name,
+                    'fullname': team.team_username,
                     'phone': team.phone,
                     'email': team.email,
                     'profile_pic': team.team_logo.url if team.team_logo else None,
