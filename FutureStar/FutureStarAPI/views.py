@@ -4508,14 +4508,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 # Prepare push_data for additional details
                 push_data = {
                     'notifier_id': (event_instance.id),
-                    "team_id": (team.id),
-                    
-                   
-                    "creator_id": (request.user.id),
-                    "type": "event booking requested",
-                   
-                    "team founder id": (team_founder.id),
-                    
+                    "type": "my_events",
                 }
 
                 # Send the notification

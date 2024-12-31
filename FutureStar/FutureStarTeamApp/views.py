@@ -715,9 +715,8 @@ class StaffManagementView(APIView):
                     # Send push notification to the user
                     if user.device_type in [1, 2, "1", "2"]:
                         push_data = {
-                            'type': 'branch',
-                            'branch_id': branch_id,
-                            'joinning_type': joinning_type
+                            'type': 'join_branch',
+                            'notifier_id': branch_id,
                         }
                         send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
 
