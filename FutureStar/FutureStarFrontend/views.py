@@ -40,6 +40,8 @@ class HomePage(View):
         team_members = Team_Members.objects.all().order_by('id')
         cmsfeatures = cms_home_dynamic_field.objects.all() or None
         cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all() or None
+        number_of_users=User.objects.all().count()
+
 
         try:
             cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
@@ -57,6 +59,7 @@ class HomePage(View):
             "current_language":language_from_url,
             "cmsfeatures":cmsfeatures,
             "cms_home_dynamic_achivements":cms_home_dynamic_achivements,
+            "number_of_users":number_of_users,
 
 
         }

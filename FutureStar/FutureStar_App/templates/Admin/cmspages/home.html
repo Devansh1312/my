@@ -64,6 +64,15 @@
 							</div>
 						</div>
 					</div>
+                    <div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="section_3_sub_title_en">About Company Youtube URL</label>
+                                <input class="form-control btn-pill" id="section_3_sub_title_en" name="section_3_sub_title_en" type="text" value="{{data.section_3_sub_title_en}}" placeholder="About Company Youtube URl">
+								<p style="color: red; display: none;" class="error-message" id="error-section_3_sub_title_en"></p>
+							</div>
+						</div>
+					</div>
 					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
 					<div class="row">
 						<div class="col-12">
@@ -957,6 +966,8 @@
                 var home_heading_title_en = document.getElementById("home-heading-title-en")
                 var home_heading_title_ar = document.getElementById("home-heading-title-ar")
                 var home_heading_content_en = document.getElementById("home-heading-content-en")
+                var section_3_sub_title_en = document.getElementById("section_3_sub_title_en")
+
                 var home_heading_content_ar = document.getElementById("home-heading-content-ar")
                 var home_sub_heading_1_name_en = document.getElementById("home-sub-heading-1-name-en")
                 var home_sub_heading_1_name_ar = document.getElementById("home-sub-heading-1-name-ar")
@@ -1229,6 +1240,7 @@
                         { id: "home-heading-title-en", name: "Home Heading Title (English)" },
                         { id: "home-heading-title-ar", name: "Home Heading Title (Arabic)" },
                         { id: "home-heading-content-en", name: "Home Heading Content (English)" },
+                        { id: "section_3_sub_title_en", name: "about Company URL" },
                         { id: "home-heading-content-ar", name: "Home Heading Content (Arabic)" },
                         { id: "home-sub-heading-1-name-en", name: "Home Sub Heading 1 Name (English)" },
                         { id: "home-sub-heading-1-name-ar", name: "Home Sub Heading 1 Name (Arabic)" },
@@ -1471,6 +1483,8 @@
                     formData.append('home_heading_title_en', home_heading_title_en.value );                    
                     formData.append('home_heading_title_ar', home_heading_title_ar.value );
                     formData.append('home_heading_content_en',home_heading_content_en.value );
+                    formData.append('section_3_sub_title_en',section_3_sub_title_en.value );
+
                     formData.append('home_heading_content_ar',home_heading_content_ar.value );
                     formData.append('home_sub_heading_1_name_en',home_sub_heading_1_name_en.value );
                     formData.append('home_sub_heading_1_name_ar',home_sub_heading_1_name_ar.value );
