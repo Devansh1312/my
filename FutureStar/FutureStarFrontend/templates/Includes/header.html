@@ -171,17 +171,17 @@
         <ul class="details-wrapper">
             <li>
                 <span><i class="fa-solid fa-location-dot"></i></span>
-                <a href="https://maps.google.com/?q={{ system_settings.address|urlencode }}">
+                <a href="https://maps.google.com/?q={{ system_settings.address|urlencode }}" target="_blank">
                     {{ system_settings.address }}
                 </a>
             </li>
             <li>
                 <span><i class="far fa-envelope"></i></span>
-                <a href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a>
+                <a href="mailto:{{ system_settings.email }}"  target="_blank">{{ system_settings.email }}</a>
             </li>
             <li>
                 <span><i class="fa-solid fa-phone"></i></span>
-                <a href="tel:{{ system_settings.phone }}">{{ system_settings.phone }}</a>
+                <a href="tel:{{ system_settings.phone }}"  target="_blank">{{ system_settings.phone }}</a>
             </li>
         </ul>
 

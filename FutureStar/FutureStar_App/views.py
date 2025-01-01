@@ -275,19 +275,45 @@ class UserUpdateProfileView(View):
                     request,
                     "Your password has been changed successfully. Please log in again.",
                 )
-                return redirect("adminlogin")
+                return redirect("login")
             else:
-                form = UserUpdateProfileForm(instance=request.user)
-                # Render the same template with the form errors
-                return render(
-                    request,
-                    "Admin/Dashboard.html",
-                    {
-                        "form": form,
-                        "password_change_form": password_change_form,
-                        "show_change_password_modal": True,
-                    },
-                )
+                 # Retrieve the referrer (previous page)
+                referer_url = request.META.get('HTTP_REFERER', None)
+            
+            # If referer_url is available, stay on the same page
+                if referer_url:
+                            print(f"Redirecting to {referer_url}")
+
+                            # Add form errors to messages framework
+                            for field in password_change_form:
+                                for error in field.errors:
+                                    messages.error(request, error)
+
+                            # Return redirect to the referrer URL
+                            return redirect(referer_url)
+              
+               
+                # form = UserUpdateProfileForm(instance=request.user)
+                # return render(
+                #     request,
+                #     referer_url,  # Pass the referer URL as a template to render the same page
+                #     {
+                #         "form": form,
+                #         "password_change_form": password_change_form,
+                #         "show_change_password_modal": True,
+                #     }
+                # )
+                else:
+                    # If no referer, fallback to a default page (or you can just render the form on a specific template)
+                    return render(
+                        request,
+                        "Admin/User/edit_profile.html",
+                        {
+                            "form": form,
+                            "password_change_form": password_change_form,
+                            "show_change_password_modal": True,
+                        }
+                    )
         else:
             # Handle profile update
             user = request.user
