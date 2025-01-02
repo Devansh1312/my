@@ -756,8 +756,11 @@ class DeleteAccountReasonsListView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
-        reason = UserDeleteReason.objects.all()
-        serializer = DeleteAccountReasonSerializer(reason, many=True,context={'request': request})
+        # Order by 'name' field alphabetically
+        reason = UserDeleteReason.objects.all().order_by('name_en')
+        
+        serializer = DeleteAccountReasonSerializer(reason, many=True, context={'request': request})
+        
         return Response({
            'status': 1,
            'message': _('Reasons fetched successfully.'),
@@ -2325,7 +2328,7 @@ class AlbumListAPIView(generics.ListAPIView):
         creator_type = self.request.query_params.get('creator_type', None)
         created_by_id = self.request.query_params.get('created_by_id', None)
 
-        queryset = Album.objects.all()
+        queryset = Album.objects.all().order_by('-created_at')
 
         # Validate creator_type and created_by_id
         if creator_type is not None:
@@ -2753,7 +2756,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
 
 
 class GallaryDeleteAPIView(generics.DestroyAPIView):
-    queryset = Gallary.objects.all()
+    queryset = Gallary.objects.all().order_by('-created_at')
     serializer_class = GallarySerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -2806,7 +2809,7 @@ class GallaryDeleteAPIView(generics.DestroyAPIView):
 ###########  album list delete ################
 
 class AlbumDeleteAPIView(generics.DestroyAPIView):
-    queryset = Album.objects.all()
+    queryset = Album.objects.all().order_by('-created_at')
     serializer_class = AlbumSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -3090,7 +3093,7 @@ class SponsorDetailAPIView(APIView):
 ######################################################################## Report API View ###################################################################################
 class ReportListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Report.objects.all()
+    queryset = Report.objects.all().order_by('title_en')
     serializer_class = ReportSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -3110,7 +3113,7 @@ class ReportListAPIView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 class PostReportCreateView(generics.CreateAPIView):
-    queryset = PostReport.objects.all()
+    queryset = PostReport.objects.all().order_by('-created_at')
     serializer_class = PostReportSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3152,7 +3155,7 @@ class FieldAPIView(APIView):
 
         # Fetch all field capacities and ground types
         field_capacity = FieldCapacity.objects.all()
-        ground_type = GroundMaterial.objects.all()
+        ground_type = GroundMaterial.objects.all().order_by('name_en')
 
         # Serialize the data and pass the request context for language-based translation
         field_capacity_serializer = FieldCapacitySerializer(field_capacity, many=True)
@@ -3233,7 +3236,7 @@ class ListFieldsAPIView(APIView):
 ##################################################################### User Gender List API View ##############################################################################
 class UserGenderListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = UserGender.objects.all()
+    queryset = UserGender.objects.all().order_by('name_en')
     serializer_class = UserGenderSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -3266,7 +3269,7 @@ class UserGenderListAPIView(generics.ListAPIView):
 ############################################################## Playing Position API List View ################################################################################
 class PlayingPositionListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = PlayingPosition.objects.all()
+    queryset = PlayingPosition.objects.all().order_by('name_en')
     serializer_class = PlayingPositionSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -3289,7 +3292,7 @@ class PlayingPositionListAPIView(generics.ListAPIView):
 
 class PlayingFootAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = PlayingFoot.objects.all()
+    queryset = PlayingFoot.objects.all().order_by('name_en')
     serializer_class = UserPlayingFootSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -3313,7 +3316,7 @@ class PlayingFootAPIView(generics.ListAPIView):
 
 class UserRoleListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Role.objects.all()
+    queryset = Role.objects.all().order_by('name_en')
     serializer_class = UserRoleSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -3713,7 +3716,7 @@ class DashboardAPI(APIView):
             activate(language)
 
         # Fetch banners
-        banners = MobileDashboardBanner.objects.all()
+        banners = MobileDashboardBanner.objects.all().order_by('-created_at')
         banner_serializer = MobileDashboardBannerSerializer(banners, many=True)
 
         # Fetch latest post
@@ -4094,14 +4097,15 @@ class EventsAPIView(APIView):
 
         if events_section == 1:
             # Show all events
-            events = Event.objects.all()
+            events = Event.objects.all().order_by('-event_date')
 
         elif events_section == 2:
             # Show events created by the specified creator_type and created_by_id
             events = Event.objects.filter(
                 creator_type=creator_type,
                 created_by_id=created_by_id
-            )
+            ).order_by('-event_date')
+
 
             if not events.exists():
                 # If no created events, look up joined events in EventBooking
@@ -4188,7 +4192,7 @@ class EventCreateAPIView(generics.CreateAPIView):
             activate(language)
 
         # Fetch all event types
-        event_types = EventType.objects.all()
+        event_types = EventType.objects.all().order_by('name_en')
         serializer = EventTypeSerializer(event_types, many=True, context={'request': request})
 
         return Response({
@@ -4643,7 +4647,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 ############################################################### FAQ API #####################################################################################################
 class FAQListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = FAQ.objects.all()
+    queryset = FAQ.objects.all().order_by('question_en')
     serializer_class = FAQSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -4707,7 +4711,7 @@ class AgeGroupListAPIView(APIView):
             activate(language)
 
         try:
-            age_groups = AgeGroup.objects.all()
+            age_groups = AgeGroup.objects.all().order_by('name_en')
             # Pass the request in the context to make it accessible in the serializer
             serializer = AgeGroupSerializer(age_groups, many=True, context={'request': request})
 
@@ -4736,7 +4740,7 @@ class InjuryListAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
-        injury = InjuryType.objects.all()
+        injury = InjuryType.objects.all().order_by('name_en')
         serializer = InjurySerializer(injury, many=True,context={'request': request})
         return Response({
            'status': 1,
@@ -5115,7 +5119,7 @@ class SearchAPIView(APIView):
             return Response({"status": 0, "message": _("Type is required."), "data": {}}, status=status.HTTP_400_BAD_REQUEST)
 
         if search_type.lower() == 'users':
-            users = User.objects.all()
+            users = User.objects.all().order_by('username')
             if search_query:
                 users = users.filter(username__icontains=search_query)
             # if creator_type and created_by_id:
@@ -5125,7 +5129,7 @@ class SearchAPIView(APIView):
             return paginator.get_paginated_response(user_data)
 
         if search_type.lower() == 'posts':
-            posts = Post.objects.all()
+            posts = Post.objects.all().order_by('title')
             if search_query:
                 posts = posts.filter(title__icontains=search_query)
             # if creator_type and created_by_id:
@@ -5135,7 +5139,7 @@ class SearchAPIView(APIView):
             return paginator.get_paginated_response(serializer.data)
 
         if search_type.lower() == 'teams':
-            teams = Team.objects.all()
+            teams = Team.objects.all().order_by('team_username')
             if search_query:
                 teams = teams.filter(
                 Q(team_name__icontains=search_query) | Q(team_username__icontains=search_query)
@@ -5153,7 +5157,7 @@ class SearchAPIView(APIView):
             })
 
         if search_type.lower() == 'fields':
-            fields = Field.objects.all()
+            fields = Field.objects.all().order_by('field_name')
             if search_query:
                 fields = fields.filter(field_name__icontains=search_query)
             serializer = FieldSerializer(fields, many=True, context={'request': request})
@@ -5167,7 +5171,7 @@ class SearchAPIView(APIView):
 
 
         if search_type.lower() == 'events':
-            events = Event.objects.all()
+            events = Event.objects.all().order_by('event_name')
             if search_query:
                 events = events.filter(event_name__icontains=search_query)
             # if creator_type and created_by_id:
