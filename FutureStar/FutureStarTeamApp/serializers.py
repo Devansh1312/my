@@ -131,9 +131,6 @@ class TeamSerializer(serializers.ModelSerializer):
         if request:
             creator_type = request.data.get('creator_type') or request.query_params.get('creator_type')
             created_by_id = request.data.get('created_by_id') or request.query_params.get('created_by_id')
-            print(creator_type)
-            print(created_by_id)
-
         else:
             creator_type = None
             created_by_id = None

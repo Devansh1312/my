@@ -315,8 +315,6 @@ class AboutPage(View):
         team_created=Team.objects.all().count()
         games_played=TournamentGames.objects.all().count()
         language_from_url = request.GET.get('Language', None)
-
-        print(number_of_users)
         
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session

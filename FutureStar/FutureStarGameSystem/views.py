@@ -991,7 +991,6 @@ class AddPlayerJerseyAPIView(APIView):
                     })
 
                 except IntegrityError as e:
-                    print(e)
                     response_data.append({
                         'player_id': player_id,
                         'status': 0,
