@@ -57,8 +57,16 @@
         <div class="video-area-two pb-50">
             <div class="container">
                 <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
+                    
                     <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
-                    <a href="{{ cmsdata.achivement_title_en }}" class="mfp-iframe video-play"><i class="fas fa-play"></i></a>
+                    <!-- <a href="{{ cmsdata.achivement_title_en }}" class="mfp-iframe video-play"><i class="fas fa-play"></i></a> -->
+                    <a href="{{cmsdata.heading_url}}" class="mfp-iframe video-play mt-45" id="video-link">
+                        <iframe id="video-iframe" title="YouTube video player" frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                        </iframe>
+                        <i class="fas fa-play"></i>
+                    </a>
                 </div>
             </div>
             <div class="container">

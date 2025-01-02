@@ -9362,7 +9362,42 @@ blockquote .blockquote-footer:before {
   line-height: 100px;
   border-radius: 50%;
   text-align: center;
+  position: relative;
 }
+
+.video-play img {
+  position: relative; 
+  z-index: 2; /* Image stays on top initially */
+}
+
+.video-play iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: none;
+  display: none; /* Initially hidden */
+  z-index: 1; /* Iframe stays behind the image initially */
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 3; /* Close button should be on top */
+}
+
 
 .video-play:hover {
   color: var(--future-primary-color);
