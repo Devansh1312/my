@@ -14,1931 +14,1802 @@
 {% include "components/loader.html" %}
 
 <div class="page-body">
-    <div class="container-fluid">
-        <div class="page-title"></div>
-        <div class="card">
-            <form class="form theme-form" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
+	<div class="container-fluid">
+		<div class="page-title"></div>
+		<div class="card">
+			<form class="form theme-form" method="post" enctype="multipart/form-data"> {% csrf_token %} 
                 <div class="card-body">
-                    <div>
-                        <button onclick="return backtolist()" class="btn btn-secondary" style="float: right;">Back</button>                        
-                        <h1 style="font-size:25px">Discover Page</h1>
-                    </div>    
-                    <p class = "erro-heading" id="heading-error"></p>
-
-
-                    <br>
-                    <div>
-                        <p id = "heading-warning"></p>
+					<div>
+						<button onclick="return backtolist()" class="btn btn-secondary" style="float: right;">Back</button>
+						<h1 style="font-size:25px">Discover Page</h1>
+					</div>
+					<p class="erro-heading" id="heading-error"></p>
+					<br>
+					<div>
+						<p id="heading-warning"></p>
+					</div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4>Heading Section</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="heading-title">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="heading-title-en" name="heading_title" type="text" value="{{data.heading_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-heading-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="heading-title-arabic">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="heading-title-ar" name="heading-title-ar" type="text" value="{{data.heading_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-heading-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="discovery-title">Title (English)</label>
+								<input class="form-control btn-pill " id="discovery-title-en" name="discovery_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-discovery-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="discovery-title-arabic">Title (Arabic)</label>
+								<input class="form-control btn-pill" id="discovery-title-ar" name="discovery-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-discovery-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<!--heading content-->
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="heading-content-en">Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-content-en" name="heading-content-en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-heading-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="heading-content-ar">Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-content-ar" name="heading-content-ar" type="text" placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-heading-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="discovery-heading-section-banner">Heading banner </label>
+								<input class="form-control btn-pill" id="discovery-heading-section-banner" name="discovery_heading_section_banner" type="file" onchange="displayImageBanner(event)" accept="image/*">
+								<img id="selected-banner" src="/media/{{data.heading_banner}}" style="display: block; width: 200px; height: 50px;" />
+							</div>
+						</div>
+						<p style="color: red; display: none;" class="error-message" id="error-discovery-heading-section-banner"></p>
+						<p id="banner-warning"></p>
+					</div>
+					<br>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4>Games</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<!--heading-->
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="game-title">Title (English)</label>
+								<input class="form-control btn-pill " id="game-title-en" name="game_title" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-game-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="game-title-arabic">Title (Arabic)</label>
+								<input class="form-control btn-pill" id="game-title-ar" name="game-title-ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-game-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<!--heading content-->
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="game-content-en">Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-en" name="newsdetail-content-en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-newsdetail-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="game-content-ar">Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-ar" name="newsdetail-content-ar" type="text" placeholder="content (Arabic)">{{data.section_2_content_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-newsdetail-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<br>
+					<div id="form-container"></div>
+					<div id="dynamic-who-content-1">
+						<h1 style="font-weight:bold;font-size:16px;color:grey">Image-1</h1>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+					<br>
+					<div id="section-heading-photo-1">
+						<div id="img-container">
+							<div class="row">
+								<div class="col-12">
+									<div class="mb-3">
+										<label class="form-label" for="game-section-image-1">Image-1 </label>
+										<input class="form-control btn-pill" id="game-section-banner-1" name="game_section_banner_1" type="file" onchange="displaygameImage(event,count=1)" accept="image/*">
+										<img id="selected-game-image-1" src="/media/{{data.section_2_images}}" style="display: block; width: 100px; height: 100px;" />
+									</div>
+								</div>
+								<input type="hidden" class="last-header-image-field-id" value="1" />
+								<p style="color: red; display: none;" class="error-message" id="error-game-section-banner-1"></p>
+								<p id="game-image-warning-1"></p>
+							</div>
+						</div>
+					</div> {% if game_image %} {% for image in game_image %} <div id="section-heading-photo-{{image.field_id}}">
+						<div id="img-container">
+							<div class="row">
+								<div class="col-12">
+									<div class="mb-3">
+										<label class="form-label" for="game-section-image-1">Image-{{forloop.counter| add:'1'}} </label>
+										<p id="field-id" style='display:none'>{{image.field_id}}</p>
+										<p id="field-roll-image-id-{{ forloop.counter| add:'1' }}" style='display:none'>{{image.field_id}}</p>
+										<input class="form-control btn-pill" id="game-section-banner-{{ forloop.counter| add:'1' }}" name="game_section_banner_{{ forloop.counter| add:'1' }}" type="file" onchange="displaygameImage(event,count=`{{ forloop.counter| add:'1' }}`)" accept="image/*">
+										<img id="selected-game-image-{{ forloop.counter| add:'1' }}" src="/media/{{image.images}}" style="display: block; width: 100px; height: 100px;" />
+									</div>
+								</div> {% if forloop.last %} <input type="hidden" class="last-header-image-field-id" value="{{ forloop.counter|add:'1' }}" /> {% endif %} <div class="col-12  text-end ">
+									<button id="delete-row" onclick="return deleteheaderimage_finalrow(`{{image.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
+								</div>
+								<p style="color: red; display: none;" class="error-message" id="error-game-section-banner-{{ forloop.counter| add:'1' }}"></p>
+								<p id="game-image-warning-{{ forloop.counter| add:'1' }}"></p>
+							</div>
+						</div>
+					</div> {% endfor %} {% endif %} <br>
+					<div id="dynamic-image-field">
+						<div class="col-12  text-end ">
+							<button id="add-row" onclick="return add_image()" class="btn btn-success">+</button>
+						</div>
+					</div>
+					<br>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4>Training</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<!--heading-->
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="color:grey;font-size:16px;font-weight:bold">Training Section-1</h4>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-section-1-heading">Heading (English)</label>
+								<input class="form-control btn-pill " id="training-section-1-heading-en" name="training_section_1_heading" type="text" value="{{data.section_2_heading_en }}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-1-heading-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-title-arabic">Heading (Arabic)</label>
+								<input class="form-control btn-pill" id="training-section-1-heading-ar" name="training-section-1-heading-ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-1-heading-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-section-1-title">Title (English)</label>
+								<textarea class="form-control btn-pill " id="training-section-1-title-en" name="training_section_1_title" type="text" placeholder="Title (English)">{{data.section_2_discover_title_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-1-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-title-arabic">Title (Arabic)</label>
+								<textarea class="form-control btn-pill" id="training-section-1-title-ar" name="training-section-1-title-ar" type="text" placeholder="Title (Arabic)">{{data.section_2_discover_title_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-1-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="traning-section-1-content-en">Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="traning-section-1-content-en" name="traning_section_1_content_en" type="text" placeholder="content (English)">{{data.sub_section_2_content_1_en }}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-traning-section-1-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="traning-section-1-content-ar">Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="traning-section-1-content-ar" name="traning_section_1_content_ar" type="text" placeholder="content (Arabic)">{{data.sub_section_2_content_1_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-traning-section-1-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div id="section-heading-1">
+						<div class="row">
+							<div class="col-12">
+								<div class="mb-3">
+									<label class="form-label" for="training-section-1-image">Heading banner </label>
+									<input class="form-control btn-pill" id="training-section-1-image" name="training_section_1_image" type="file" onchange="displayImagetraining_section1(event)" accept="image/*">
+									<img id="selected-section-1-image" src="/media/{{data.sub_section_2_1_icon}}" style="display: block; width: 200px; height: 50px;" />
+								</div>
+							</div>
+							<p style="color: red; display: none;" class="error-message" id="error-training-section-1-image"></p>
+							<p id="section-1-image-warning"></p>
+						</div>
+					</div>
+					<br>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4 style="color:grey;font-size:16px;font-weight:bold">Training Section-2</h4>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-section-2-title">Title (English)</label>
+								<input class="form-control btn-pill " id="training-section-2-title-en" name="training_section_2_title_en" type="text" value="{{data.sub_section_2_title_2_en }}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-2-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-section-2-title-arabic">Title (Arabic)</label>
+								<input class="form-control btn-pill" id="training-section-2-title-ar" name="training_section_2_title_ar" type="text" value="{{data.sub_section_2_title_2_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-2-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="training-section-2-content-en">Content (English)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="training-section-2-content-en" name="training-section-2-content-en" type="text" placeholder="content (English)">{{data.sub_section_2_content_2_en}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-2-content-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="game-content-ar">Content (Arabic)</label>
+								<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="training-section-2-content-ar" name="training-section-2-content-ar" type="text" placeholder="content (Arabic)">{{data.sub_section_2_content_2_ar}}</textarea>
+								<p style="color: red; display: none;" class="error-message" id="error-training-section-2-content-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div class="mb-3">
+								<label class="form-label" for="training-section-2-image">Heading banner </label>
+								<input class="form-control btn-pill" id="training-section-2-image" name="training-section-2-image" type="file" onchange="displayImagetraining_section2(event)" accept="image/*">
+								<img id="selected-section-2-image" src="/media/{{data.sub_section_2_2_icon}}" style="display: block; width: 200px; height: 50px;" />
+							</div>
+						</div>
+						<p style="color: red; display: none;" class="error-message" id="error-training-section-2-image"></p>
+						<p id="section-1-image-warning"></p>
+					</div>
+					<div class="row" style="margin-bottom: 10px;">
+						<h4>Why Choose Us</h4>
+					</div>
+					<div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="why-choose-us-heading-name-title-en">Heading Name (English)</label>
+								<input class="form-control btn-pill " id="why-choose-us-heading-name-title-en" name="why_choose_us_heading_name_title_en" type="text" value="{{data.section_3_heading_en }}" placeholder="Heading Name (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-name-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="why-choose-us-heading-name-title-arabic">Heading Name (Arabic)</label>
+								<input class="form-control btn-pill" id="why-choose-us-heading-name-title-ar" name="why_choose_us_heading_name_title_ar" type="text" value="{{data.section_3_heading_ar}}" placeholder="Heading Name (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-name-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="why-choose-us-heading-title-en">Heading Title (English)</label>
+								<input class="form-control btn-pill " id="why-choose-us-heading-title-en" name="why_choose_us_heading_title_en" type="text" value="{{data.section_3_title_en }}" placeholder="Title (English)">
+								<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-title-en"></p>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="mb-3">
+								<label class="form-label" for="why-choose-us-heading-title-arabic">Heading Title (Arabic)</label>
+								<input class="form-control btn-pill" id="why-choose-us-heading-title-ar" name="why_choose_us_heading_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
+								<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-title-ar"></p>
+							</div>
+						</div>
+					</div>
+					<br>
+					<div id="form-container">
+						<div id="dynamic-who-content-1">
+							<h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
+						</div>
+						<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+						<br>
+						<div class="row">
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="why-choose-us-heading-title-en-1"> Title (English)</label>
+									<input class="form-control btn-pill " id="why-choose-us-heading-title-en-1" name="why_choose_us_heading_title_en_1" type="text" value="{{data.section_3_sub_title_en}}" placeholder="Title (English)">
+									<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-title-en-1"></p>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="why-choose-us-heading-title-arabic-1">Title (Arabic)</label>
+									<input class="form-control btn-pill" id="why-choose-us-heading-title-ar-1" name="why_choose_us_heading_title_ar_1" type="text" value="{{data.section_3_sub_title_ar}}" placeholder="Title (Arabic)">
+									<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-title-ar-1"></p>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="why-choose-us-content-en-1">Content (English)</label>
+									<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-1" name="why_choose_us_content_en_1" type="text" placeholder="content (English)">{{data.section_3_sub_content_en}}</textarea>
+									<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-content-en-1"></p>
+								</div>
+							</div>
+							<div class="col-6">
+								<div class="mb-3">
+									<label class="form-label" for="why-choose-us-content-ar-1">Content (Arabic)</label>
+									<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-1" name="why_choose_us_content_ar_1" type="text" placeholder="content (Arabic)">{{data.section_3_sub_content_ar}}</textarea>
+									<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-content-ar-1"></p>
+								</div>
+							</div>
+							<input type="hidden" class="last-who-field-id" value="1" />
+						</div>
+						<br> {% if who_detail %} {% for whodetail in who_detail %} <div id="form-container">
+							<div id="section-who-{{whodetail.field_id}}">
+								<div id="dynamic-who-content-1">
+									<h1 style="font-weight:bold;font-size:16px;color:grey">Form-{{ forloop.counter| add:'1' }}</h1>
+									<p id="field-id" style='display:none'>{{whodetail.field_id}}</p>
+									<p id="field-roll-who-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{whodetail.field_id}}</p>
+								</div>
+								<div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+								<br>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="why-choose-us-heading-title-en-{{ forloop.counter|add:'1' }}"> Title (English)</label>
+											<input class="form-control btn-pill " id="why-choose-us-heading-title-en-{{ forloop.counter|add:'1' }}" name="why_choose_us_heading_title_en_{{ forloop.counter|add:'1' }}" type="text" value="{{whodetail.title_en}}" placeholder="Title (English)">
+											<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-title-en-{{ forloop.counter|add:'1' }}"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="why-choose-us-heading-title-arabic-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
+											<input class="form-control btn-pill" id="why-choose-us-heading-title-ar-{{ forloop.counter|add:'1' }}" name="why_choose_us_heading_title_ar_{{ forloop.counter|add:'1' }}" type="text" value="{{whodetail.title_ar}}" placeholder="Title (Arabic)">
+											<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-heading-title-ar-{{ forloop.counter|add:'1' }}"></p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="why-choose-us-content-en-{{ forloop.counter|add:'1' }}">Content (English)</label>
+											<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-{{ forloop.counter|add:'1' }}" name="why_choose_us_content_en_{{ forloop.counter|add:'1' }}" type="text" placeholder="content (English)">{{whodetail.content_en}}</textarea>
+											<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-content-en-{{ forloop.counter|add:'1' }}"></p>
+										</div>
+									</div>
+									<div class="col-6">
+										<div class="mb-3">
+											<label class="form-label" for="why-choose-us-content-ar-1">Content (Arabic)</label>
+											<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-{{ forloop.counter|add:'1' }}" name="why_choose_us_content_ar_{{ forloop.counter|add:'1' }}" type="text" placeholder="content (Arabic)">{{whodetail.title_ar}}</textarea>
+											<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-content-ar-{{ forloop.counter|add:'1' }}"></p>
+										</div>
+									</div>
+								</div> {% if forloop.last %} <input type="hidden" class="last-who-field-id" value="{{ forloop.counter|add:'1' }}" /> {% endif %} <div class="col-12  text-end ">
+									<button id="delete-row" onclick="return deletewhorow(`{{whodetail.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
+								</div>
+							</div>
+							<br> {% endfor  %} {% endif %} <div id="dynamic-field">
+								<div class="col-12  text-end ">
+									<button id="add-row" onclick="return add_content()" class="btn btn-success">+</button>
+								</div>
+							</div>
+							<div class="row" id="image-section">
+								<div class="col-12">
+									<div class="mb-3">
+										<label class="form-label" for="why-choose-us-section-image">Banner </label>
+										<input class="form-control btn-pill" id="why-choose-us-section-image" name="why_choose_us_section_image" type="file" onchange="displayImagewhychooseus(event)" accept="image/*">
+										<img id="selected-why-choose-us-image" src="/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
+									</div>
+								</div>
+								<p style="color: red; display: none;" class="error-message" id="error-why-choose-us-section-image"></p>
+								<p id="section-1-image-warning"></p>
+							</div>
+							<!--section 2-->
+							<br>
+							<div class="row" style="margin-bottom: 10px;">
+								<h4>SEO Section</h4>
+							</div>
+							<div class="row">
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="meta-title-en">SEO Title (English)</label>
+										<input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
+										<p style="color: red; display: none;" class="error-message" id="error-meta-title-en"></p>
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
+										<input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar }}" placeholder="Title (Arabic)">
+										<p style="color: red; display: none;" class="error-message" id="error-meta-title-ar"></p>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="meta-content-en">SEO Content (English)</label>
+										<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
+										<p style="color: red; display: none;" class="error-message" id="error-meta-content-en"></p>
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="mb-3">
+										<label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
+										<textarea style="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text" placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
+										<p style="color: red; display: none;" class="error-message" id="error-meta-content-ar"></p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card-footer text-end">
+							<button class="btn btn-primary" type="submit" onclick="return savethedata()">Save</button>
+							<input class="btn btn-light" type="reset" value="Cancel" onclick="return backtolist()">
+						</div>
                     </div>
-
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Heading Section</h4>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="heading-title">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="heading-title-en" name="heading_title" type="text" value="{{data.heading_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="heading-title-ar" name="heading-title-ar" type="text" value="{{data.heading_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="discovery-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="discovery-title-en" name="discovery_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-discovery-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="discovery-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="discovery-title-ar" name="discovery-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-discovery-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                   
-                    
-                    <!--heading content-->
-                        
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="heading-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-content-en" name="heading-content-en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="heading-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="heading-content-ar" name="heading-content-ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-heading-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="discovery-heading-section-banner">Heading banner </label>
-                                <input class="form-control btn-pill" id="discovery-heading-section-banner" name="discovery_heading_section_banner" type="file"  onchange= "displayImageBanner(event)" accept="image/*">
-                                
-
-                                <img id="selected-banner" src = "/media/{{data.heading_banner}}" style="display: block; width: 200px; height: 50px;" />
-
-                            </div>
-                        </div>
-                        <p style="color: red; display: none;" class="error-message" id ="error-discovery-heading-section-banner"></p>
-
-                        <p id = "banner-warning"></p>
-                    </div>
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Games</h4>
-                    </div>
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    
-                    <!--heading-->
-                        
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="game-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="game-title-en" name="game_title" type="text" value="{{data.section_2_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-game-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="game-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="game-title-ar" name="game-title-ar" type="text" value="{{data.section_2_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-game-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                   
-                    
-                    <!--heading content-->
-                        
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="game-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-en" name="newsdetail-content-en" type="text" placeholder="content (English)">{{data.section_2_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-newsdetail-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="game-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="newsdetail-content-ar" name="newsdetail-content-ar" type="text"  placeholder="content (Arabic)">{{data.section_2_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-newsdetail-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div id="form-container"></div>
-                        <div id="dynamic-who-content-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Image-1</h1>
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-                        
-                        <div id = "section-heading-photo-1">
-                        <div id="img-container">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <label class="form-label" for="game-section-image-1">Image-1 </label>
-                                        <input class="form-control btn-pill" id="game-section-banner-1" name="game_section_banner_1" type="file"  onchange= "displaygameImage(event,count=1)" accept="image/*">
-                                        
-                                        <img id="selected-game-image-1" src = "/media/{{data.section_2_images}}" style="display: block; width: 100px; height: 100px;" />
-        
-                                    </div>
-                                </div>
-                                <input type="hidden" class="last-header-image-field-id" value="1"/>
-
-                                <p style="color: red; display: none;" class="error-message" id ="error-game-section-banner-1"></p>
-
-                                <p id = "game-image-warning-1"></p>
-                            </div>
-                        </div>
-                        </div>
-
-                        
-
-
-                        
-                        {% if game_image %}
-                        {% for image in game_image %}
-                        <div id = "section-heading-photo-{{image.field_id}}">
-                            <div id="img-container">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="mb-3">
-                                            <label class="form-label" for="game-section-image-1">Image-{{forloop.counter| add:'1'}} </label>
-                                            <p id="field-id" style='display:none'>{{image.field_id}}</p>
-                                            <p id="field-roll-image-id-{{ forloop.counter| add:'1' }}" style='display:none'>{{image.field_id}}</p>
-                                            <input class="form-control btn-pill" id="game-section-banner-{{ forloop.counter| add:'1' }}" name="game_section_banner_{{ forloop.counter| add:'1' }}" type="file"  onchange= "displaygameImage(event,count=`{{ forloop.counter| add:'1' }}`)" accept="image/*">
-                                            
-            
-                                            <img id="selected-game-image-{{ forloop.counter| add:'1' }}" src = "/media/{{image.images}}" style="display: block; width: 100px; height: 100px;" />
-            
-                                        </div>
-                                    </div>
-                                    {% if forloop.last %}
-                                        <input type="hidden" class="last-header-image-field-id" value="{{ forloop.counter|add:'1' }}"/>
-                                    {% endif %}
-                                    <div class="col-12  text-end " >
-
-                                        <button id="delete-row" onclick ="return deleteheaderimage_finalrow(`{{image.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
-                                    </div> 
-
-                                    <p style="color: red; display: none;" class="error-message" id ="error-game-section-banner-{{ forloop.counter| add:'1' }}"></p>
-    
-                                    <p id = "game-image-warning-{{ forloop.counter| add:'1' }}"></p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                       
-                        <br>
-
-                        <div id="dynamic-image-field">
-                            <div class="col-12  text-end " >
-                                <button id="add-row" onclick ="return add_image()" class="btn btn-success">+</button>
-
-                            </div>   
-                        </div>
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Training</h4>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    
-                    <!--heading-->
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="color:grey;font-size:16px;font-weight:bold">Training Section-1</h4>
-                    </div>  
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-1-heading">Heading (English)</label>
-                                <input class="form-control btn-pill " id="training-section-1-heading-en" name="training_section_1_heading" type="text" value="{{data.section_2_heading_en }}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-heading-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-title-arabic">Heading (Arabic)</label>
-                                <input class="form-control btn-pill" id="training-section-1-heading-ar" name="training-section-1-heading-ar" type="text" value="{{data.section_2_heading_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-heading-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-1-title">Title (English)</label>
-                                <textarea class="form-control btn-pill " id="training-section-1-title-en" name="training_section_1_title" type="text"  placeholder="Title (English)">{{data.section_2_discover_title_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-title-arabic">Title (Arabic)</label>
-                                <textarea class="form-control btn-pill" id="training-section-1-title-ar" name="training-section-1-title-ar" type="text"  placeholder="Title (Arabic)">{{data.section_2_discover_title_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="traning-section-1-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="traning-section-1-content-en" name="traning_section_1_content_en" type="text" placeholder="content (English)">{{data.sub_section_2_content_1_en }}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-traning-section-1-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="traning-section-1-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="traning-section-1-content-ar" name="traning_section_1_content_ar" type="text"  placeholder="content (Arabic)">{{data.sub_section_2_content_1_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-traning-section-1-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div id="section-heading-1">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-1-image">Heading banner </label>
-                                <input class="form-control btn-pill" id="training-section-1-image" name="training_section_1_image" type="file"  onchange= "displayImagetraining_section1(event)" accept="image/*">
-                                
-
-                                <img id="selected-section-1-image"  src ="/media/{{data.sub_section_2_1_icon}}"style="display: block; width: 200px; height: 50px;" />
-
-                            </div>
-                        </div>
-                        <p style="color: red; display: none;" class="error-message" id ="error-training-section-1-image"></p>
-
-                        <p id = "section-1-image-warning"></p>
-                    </div>
-                    </div>
-
-
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4 style="color:grey;font-size:16px;font-weight:bold">Training Section-2</h4>
-                    </div>  
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-2-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="training-section-2-title-en" name="training_section_2_title_en" type="text" value="{{data.sub_section_2_title_2_en }}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-2-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-2-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="training-section-2-title-ar" name="training_section_2_title_ar" type="text" value="{{data.sub_section_2_title_2_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-2-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-2-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="training-section-2-content-en" name="training-section-2-content-en" type="text" placeholder="content (English)">{{data.sub_section_2_content_2_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-2-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="game-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="training-section-2-content-ar" name="training-section-2-content-ar" type="text"  placeholder="content (Arabic)">{{data.sub_section_2_content_2_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-training-section-2-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label" for="training-section-2-image">Heading banner </label>
-                                <input class="form-control btn-pill" id="training-section-2-image" name="training-section-2-image" type="file"  onchange= "displayImagetraining_section2(event)" accept="image/*">
-                                
-
-                                <img id="selected-section-2-image" src = "/media/{{data.sub_section_2_2_icon}}" style="display: block; width: 200px; height: 50px;" />
-
-                            </div>
-                        </div>
-                        <p style="color: red; display: none;" class="error-message" id ="error-training-section-2-image"></p>
-
-                        <p id = "section-1-image-warning"></p>
-                    </div>
-
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>Why Choose Us</h4>
-                    </div>
-
-                    <div style="border-top: 1px solid #ccc; margin-top: 5px; margin-bottom: 20px;"></div>
-                    
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="why-choose-us-heading-name-title-en">Heading Name (English)</label>
-                                <input class="form-control btn-pill " id="why-choose-us-heading-name-title-en" name="why_choose_us_heading_name_title_en" type="text" value="{{data.section_3_heading_en }}" placeholder="Heading Name (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-name-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="why-choose-us-heading-name-title-arabic">Heading Name (Arabic)</label>
-                                <input class="form-control btn-pill" id="why-choose-us-heading-name-title-ar" name="why_choose_us_heading_name_title_ar" type="text" value="{{data.section_3_heading_ar}}" placeholder="Heading Name (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-name-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="why-choose-us-heading-title-en">Heading Title (English)</label>
-                                <input class="form-control btn-pill " id="why-choose-us-heading-title-en" name="why_choose_us_heading_title_en" type="text" value="{{data.section_3_title_en }}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="why-choose-us-heading-title-arabic">Heading Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="why-choose-us-heading-title-ar" name="why_choose_us_heading_title_ar" type="text" value="{{data.section_3_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <br>
-                    <div id="form-container">
-                        <div id="dynamic-who-content-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-1</h1>
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-heading-title-en-1"> Title (English)</label>
-                                    <input class="form-control btn-pill " id="why-choose-us-heading-title-en-1" name="why_choose_us_heading_title_en_1" type="text" value="{{data.section_3_sub_title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-en-1"></p>
-
-                                </div>
-                            </div>
-
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-heading-title-arabic-1">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="why-choose-us-heading-title-ar-1" name="why_choose_us_heading_title_ar_1" type="text" value="{{data.section_3_sub_title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-ar-1"></p>
-
-                                
-                                </div>
-                            </div>
-                            
-                        </div>
-                    
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-content-en-1">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-1" name="why_choose_us_content_en_1" type="text" placeholder="content (English)">{{data.section_3_sub_content_en}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-en-1"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-content-ar-1">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-1" name="why_choose_us_content_ar_1" type="text"  placeholder="content (Arabic)">{{data.section_3_sub_content_ar}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-ar-1"></p>
-
-                                </div>
-                            </div>
-                            <input type="hidden" class="last-who-field-id" value="1"/>
-
-                        </div>
-                        
-
-
-                        
-                        <br>
-                        {% if who_detail %}
-                        {% for whodetail in who_detail %}
-                        <div id="form-container">
-                        <div id = "section-who-{{whodetail.field_id}}">
-
-                        <div id="dynamic-who-content-1">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-{{ forloop.counter| add:'1' }}</h1>
-                            <p id="field-id" style='display:none'>{{whodetail.field_id}}</p>
-                            <p id="field-roll-who-id-{{ forloop.counter|add:'1' }}" style='display:none'>{{whodetail.field_id}}</p>
-                        </div>
-
-                        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
-
-                        <br>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-heading-title-en-{{ forloop.counter|add:'1' }}"> Title (English)</label>
-                                    <input class="form-control btn-pill " id="why-choose-us-heading-title-en-{{ forloop.counter|add:'1' }}" name="why_choose_us_heading_title_en_{{ forloop.counter|add:'1' }}" type="text" value="{{whodetail.title_en}}" placeholder="Title (English)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-en-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-heading-title-arabic-{{ forloop.counter|add:'1' }}">Title (Arabic)</label>
-                                    <input class="form-control btn-pill" id="why-choose-us-heading-title-ar-{{ forloop.counter|add:'1' }}" name="why_choose_us_heading_title_ar_{{ forloop.counter|add:'1' }}" type="text" value="{{whodetail.title_ar}}" placeholder="Title (Arabic)">
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-ar-{{ forloop.counter|add:'1' }}"></p>
-
-                                
-                                </div>
-                            </div>
-                            
-                        </div>
-                    
-
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-content-en-{{ forloop.counter|add:'1' }}">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-{{ forloop.counter|add:'1' }}" name="why_choose_us_content_en_{{ forloop.counter|add:'1' }}" type="text" placeholder="content (English)">{{whodetail.content_en}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-en-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-content-ar-1">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-{{ forloop.counter|add:'1' }}" name="why_choose_us_content_ar_{{ forloop.counter|add:'1' }}" type="text"  placeholder="content (Arabic)">{{whodetail.title_ar}}</textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-ar-{{ forloop.counter|add:'1' }}"></p>
-
-                                </div>
-                            </div>
-
-                        </div>
-                        {% if forloop.last %}
-                            <input type="hidden" class="last-who-field-id" value="{{ forloop.counter|add:'1' }}"/>
-                         {% endif %}
-                        <div class="col-12  text-end " >
-
-                            <button id="delete-row" onclick ="return deletewhorow(`{{whodetail.field_id}}`,`{{forloop.counter | add:'1'}}`)" class="btn btn-danger">-</button>
-                        </div> 
-
-                        </div>
-                        
-                        <br>
-                        {% endfor  %}
-                        {% endif %}
-
-                        <div id="dynamic-field">
-                            <div class="col-12  text-end " >
-                                <button id="add-row" onclick ="return add_content()" class="btn btn-success">+</button>
-
-                            </div>   
-                        </div>
-                   
-                        <div class="row" id = "image-section">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-section-image">Banner </label>
-                                    <input class="form-control btn-pill" id="why-choose-us-section-image" name="why_choose_us_section_image" type="file"  onchange= "displayImagewhychooseus(event)" accept="image/*">
-                                    
-    
-                                    <img id="selected-why-choose-us-image" src="/media/{{data.section_3_image}}" style="display: block; width: 100px; height: 100px;" />
-    
-                                </div>
-                            </div>
-                            <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-section-image"></p>
-
-                            <p id = "section-1-image-warning"></p>
-                        </div>   
-
-
-
-                    <!--section 2-->
-                    <br>
-                    <div class="row" style="margin-bottom: 10px;">
-                        <h4>SEO Section</h4>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar }}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-content-en">SEO Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-en" name="meta-content-en" type="text" placeholder="content (English)">{{data.meta_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-en"></p>
-
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="meta-content-ar">SEO Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="meta-content-ar" name="meta-content-ar" type="text"  placeholder="content (Arabic)">{{data.meta_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-content-ar"></p>
-
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    
-                   
                 </div>
-                <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
-                    <input class="btn btn-light" type="reset" value="Cancel" onclick = "return backtolist()">
-                </div>
-            </form>
-        </div>
-    </div>
+			</form>
+		</div>
+	</div>
 </div>
 
 
 
 <!--javascript-->
 <script>
+function backtolist() {
 
-    function  backtolist(){
+url = "{% url 'cmspages_urls' %}";
 
-        url = "{% url 'cmspages_urls' %}";
-        
 
-        window.location.href = url
+window.location.href = url
+return false
+
+
+}
+
+
+
+function savethedata() {
+
+
+try {
+
+
+
+    //text
+
+    var discover_heading_title_en = document.getElementById("heading-title-en")
+    var discover_heading_title_ar = document.getElementById("heading-title-ar")
+    var discover_title_en = document.getElementById("discovery-title-en")
+    var discover_title_ar = document.getElementById("discovery-title-ar")
+    var discover_content_en = document.getElementById("heading-content-en")
+    var discover_content_ar = document.getElementById("heading-content-ar")
+    //left//
+    var discover_game_title_en = document.getElementById("game-title-en")
+    var discover_game_title_ar = document.getElementById("game-title-ar")
+    var discover_game_content_en = document.getElementById("newsdetail-content-en")
+    var discover_game_content_ar = document.getElementById("newsdetail-content-ar")
+    //left//
+    var discover_training_sec_1_title_en = document.getElementById("training-section-1-title-en")
+    var discover_training_sec_1_title_ar = document.getElementById("training-section-1-title-ar")
+    var discover_training_sec_1_content_en = document.getElementById("traning-section-1-content-en")
+    var discover_training_sec_1_content_ar = document.getElementById("traning-section-1-content-ar")
+    //left//
+    var discover_training_sec_2_title_en = document.getElementById("training-section-2-title-en")
+    var discover_training_sec_2_title_ar = document.getElementById("training-section-2-title-ar")
+    var discover_training_sec_2_content_en = document.getElementById("training-section-2-content-en")
+    var discover_training_sec_2_content_ar = document.getElementById("training-section-2-content-ar")
+    //left//
+
+    var why_Choose_us_heading_en = document.getElementById("why-choose-us-heading-name-title-en")
+    var why_Choose_us_heading_ar = document.getElementById("why-choose-us-heading-name-title-ar")
+    var why_Choose_us_title_en = document.getElementById("why-choose-us-heading-title-en")
+    var why_Choose_us_title_ar = document.getElementById("why-choose-us-heading-title-ar")
+    var why_Choose_us_form_title_en = document.getElementById("why-choose-us-heading-title-en-1")
+    var why_Choose_us_form_title_ar = document.getElementById("why-choose-us-heading-title-ar-1")
+    var why_Choose_us_form_content_en = document.getElementById("why-choose-us-content-en-1")
+    var why_Choose_us_form_content_ar = document.getElementById("why-choose-us-content-ar-1")
+    //left//
+
+    //training
+
+    var traning_heading_en = document.getElementById("training-section-1-heading-en")
+    var traning_heading_ar = document.getElementById("training-section-1-heading-ar")
+
+    var seo_title_en = document.getElementById("meta-title-en")
+    var seo_title_ar = document.getElementById("meta-title-ar")
+    var seo_content_en = document.getElementById("meta-content-en")
+    var seo_content_ar = document.getElementById("meta-content-ar")
+    var top_error = document.getElementById('heading-warning')
+    var missing_text = document.getElementById('heading-error')
+
+    //images
+    var discover_heading_image = document.getElementById("discovery-heading-section-banner")
+    var discover_heading_image_field = document.getElementById("selected-banner")
+
+    var discover_game_image = document.getElementById("game-section-banner-1")
+
+
+
+
+    var heading_image_1 = document.getElementById('selected-game-image-1')
+
+
+    const discover_data = [{
+            id: "heading-title-en",
+            name: "Heading Title (English)"
+        },
+        {
+            id: "heading-title-ar",
+            name: "Heading Title (arabic)"
+        },
+        {
+            id: "discovery-title-en",
+            name: "Title (English)"
+        },
+        {
+            id: "discovery-title-ar",
+            name: "Title (Arabic)"
+        },
+        {
+            id: "heading-content-en",
+            name: "Content (English)"
+        },
+        {
+            id: "heading-content-ar",
+            name: "Content (Arabic)"
+        },
+        {
+            id: "game-title-en",
+            name: "Title (English)"
+        },
+        {
+            id: "game-title-ar",
+            name: "Title (Arabic)"
+        },
+        {
+            id: "newsdetail-content-en",
+            name: "Content (English)"
+        },
+        {
+            id: "newsdetail-content-ar",
+            name: "Content (Arabic)"
+        },
+
+        {
+            id: "training-section-1-heading-en",
+            name: "Heading (Arabic)"
+        },
+        {
+            id: "training-section-1-heading-ar",
+            name: "Heading (Arabic)"
+        },
+
+
+
+        {
+            id: "training-section-1-title-en",
+            name: "Title (English)"
+        },
+        {
+            id: "training-section-1-title-ar",
+            name: "Title (Arabic)"
+        },
+        {
+            id: "traning-section-1-content-en",
+            name: "Content (English)"
+        },
+        {
+            id: "traning-section-1-content-ar",
+            name: "Content (Arabic)"
+        },
+        {
+            id: "training-section-2-title-en",
+            name: "Title (English)"
+        },
+        {
+            id: "training-section-2-title-ar",
+            name: "Title (Arabic)"
+        },
+        {
+            id: "training-section-2-content-en",
+            name: "Content (English)"
+        },
+        {
+            id: "training-section-2-content-ar",
+            name: "Content (Arabic)"
+        },
+
+        {
+            id: "why-choose-us-heading-name-title-en",
+            name: "Heading Title (English)"
+        },
+        {
+            id: "why-choose-us-heading-name-title-ar",
+            name: "Heading Title (Arabic)"
+        },
+        {
+            id: "why-choose-us-heading-title-en",
+            name: "Title (English)"
+        },
+        {
+            id: "why-choose-us-heading-title-ar",
+            name: "Title (Arabic)"
+        },
+        {
+            id: "why-choose-us-heading-title-en-1",
+            name: "Title (English)"
+        },
+        {
+            id: "why-choose-us-heading-title-ar-1",
+            name: "Title (Arabic)"
+        },
+        {
+            id: "why-choose-us-content-en-1",
+            name: "Content (English)"
+        },
+        {
+            id: "why-choose-us-content-ar-1",
+            name: "Content (Arabic)"
+        },
+        {
+            id: "meta-title-en",
+            name: "SEO Title (English)"
+        },
+        {
+            id: "meta-title-ar",
+            name: "SEO Title (Arabic)"
+        },
+        {
+            id: "meta-content-en",
+            name: "SEO Content (English)"
+        },
+        {
+            id: "meta-content-ar",
+            name: "SEO Content (Arabic)"
+        }
+    ];
+
+    document.querySelectorAll('.error-message').forEach((msg) => {
+        msg.style.display = 'none';
+        msg.innerText = '';
+    });
+
+    top_error.innerText = ""
+
+    var sendData = "true"
+
+    try {
+
+        let errorFound
+        for (const field of discover_data) {
+            const input = document.getElementById(field.id);
+            console.log(input)
+            const errorMsg = document.getElementById(`error-${field.id}`);
+
+            //console.log(input.value)
+            if (!input.value.trim()) {
+
+                errorMsg.innerText = `Please fill in ${field.name}.`;
+                errorMsg.style.display = 'block';
+
+                top_error.innerText = "There Should be no empty Field"
+                top_error.style.color = "red"
+
+                //document.documentElement.scrollTop = 0
+                errorMsg.scrollIntoView();
+
+                sendData = "false";
+                errorFound = true;
+
+
+
+            }
+        }
+        if (errorFound) {
+            sendData = "false";
+            return false
+        }
+    } catch (err) {
+        console.log(err)
         return false
+    }
+    if (heading_image_1.src == "") {
 
-        
+        error_image = document.getElementById('error-game-section-banner-1')
+
+        error_image.innerText = `Please fill in game image 1`;
+        error_image.style.display = 'block';
+        error_image.scrollIntoView()
+        return false
     }
 
-    
 
-    function savethedata(){
-        
 
-        try{
 
-        
+    if (discover_heading_image.value.length == 0 && discover_heading_image_field.src.endsWith("/media/")) {
+        const errorMsg = document.getElementById(`error-discovery-heading-section-banner`);
 
-                //text
+        try {
+            errorMsg.innerText = `Please Upload Image.`;
+            errorMsg.style.display = 'block';
+            top_error.innerText = "There Should be no empty Field"
+            top_error.style.color = "red"
 
-                var discover_heading_title_en = document.getElementById("heading-title-en")
-                var discover_heading_title_ar = document.getElementById("heading-title-ar")
-                var discover_title_en = document.getElementById("discovery-title-en")
-                var discover_title_ar = document.getElementById("discovery-title-ar")
-                var discover_content_en = document.getElementById("heading-content-en")
-                var discover_content_ar = document.getElementById("heading-content-ar")
-                //left//
-                var discover_game_title_en = document.getElementById("game-title-en")
-                var discover_game_title_ar = document.getElementById("game-title-ar")
-                var discover_game_content_en = document.getElementById("newsdetail-content-en")
-                var discover_game_content_ar = document.getElementById("newsdetail-content-ar")
-                //left//
-                var discover_training_sec_1_title_en = document.getElementById("training-section-1-title-en")
-                var discover_training_sec_1_title_ar  = document.getElementById("training-section-1-title-ar")
-                var discover_training_sec_1_content_en  = document.getElementById("traning-section-1-content-en")
-                var discover_training_sec_1_content_ar  = document.getElementById("traning-section-1-content-ar")
-                //left//
-                var discover_training_sec_2_title_en = document.getElementById("training-section-2-title-en")
-                var discover_training_sec_2_title_ar  = document.getElementById("training-section-2-title-ar")
-                var discover_training_sec_2_content_en  = document.getElementById("training-section-2-content-en")
-                var discover_training_sec_2_content_ar  = document.getElementById("training-section-2-content-ar")
-                //left//
+            //document.documentElement.scrollTop = 0
+            errorMsg.scrollIntoView();
 
-                var why_Choose_us_heading_en  = document.getElementById("why-choose-us-heading-name-title-en")
-                var why_Choose_us_heading_ar  = document.getElementById("why-choose-us-heading-name-title-ar")
-                var why_Choose_us_title_en  = document.getElementById("why-choose-us-heading-title-en")
-                var why_Choose_us_title_ar  = document.getElementById("why-choose-us-heading-title-ar")
-                var why_Choose_us_form_title_en = document.getElementById("why-choose-us-heading-title-en-1")
-                var why_Choose_us_form_title_ar = document.getElementById("why-choose-us-heading-title-ar-1")
-                var why_Choose_us_form_content_en = document.getElementById("why-choose-us-content-en-1")
-                var why_Choose_us_form_content_ar = document.getElementById("why-choose-us-content-ar-1")
-                //left//
-
-                //training
-
-                var traning_heading_en =  document.getElementById("training-section-1-heading-en")
-                var traning_heading_ar =  document.getElementById("training-section-1-heading-ar")
-
-                var seo_title_en = document.getElementById("meta-title-en")
-                var seo_title_ar = document.getElementById("meta-title-ar")
-                var seo_content_en = document.getElementById("meta-content-en")
-                var seo_content_ar = document.getElementById("meta-content-ar")
-                var top_error = document.getElementById('heading-warning')
-                var missing_text = document.getElementById('heading-error')
-
-                //images
-                var discover_heading_image = document.getElementById("discovery-heading-section-banner")
-                var discover_heading_image_field = document.getElementById("selected-banner")
-
-                var discover_game_image = document.getElementById("game-section-banner-1")
-                
-           
-                
-                
-                var heading_image_1 = document.getElementById('selected-game-image-1')
-
-                
-                const discover_data = [
-                    { id: "heading-title-en", name: "Heading Title (English)" },
-                    { id: "heading-title-ar", name: "Heading Title (arabic)" },
-                    { id: "discovery-title-en", name: "Title (English)" },
-                    { id: "discovery-title-ar", name: "Title (Arabic)" },
-                    { id: "heading-content-en", name: "Content (English)" },
-                    { id: "heading-content-ar", name: "Content (Arabic)" },
-                    { id: "game-title-en", name: "Title (English)" },
-                    { id: "game-title-ar", name: "Title (Arabic)" },
-                    { id: "newsdetail-content-en", name: "Content (English)" },
-                    { id: "newsdetail-content-ar", name: "Content (Arabic)" },
-
-                    { id: "training-section-1-heading-en", name: "Heading (Arabic)" },
-                    { id: "training-section-1-heading-ar", name: "Heading (Arabic)" },
-
-
-
-                    { id: "training-section-1-title-en", name: "Title (English)" },
-                    { id: "training-section-1-title-ar", name: "Title (Arabic)" },
-                    { id: "traning-section-1-content-en", name: "Content (English)" },
-                    { id: "traning-section-1-content-ar", name: "Content (Arabic)" },
-                    { id: "training-section-2-title-en", name: "Title (English)" },
-                    { id: "training-section-2-title-ar", name: "Title (Arabic)" },
-                    { id: "training-section-2-content-en", name: "Content (English)" },
-                    { id: "training-section-2-content-ar", name: "Content (Arabic)" },
-                    
-                    { id: "why-choose-us-heading-name-title-en", name: "Heading Title (English)" },
-                    { id: "why-choose-us-heading-name-title-ar", name: "Heading Title (Arabic)" },
-                    { id: "why-choose-us-heading-title-en", name: "Title (English)" },
-                    { id: "why-choose-us-heading-title-ar", name: "Title (Arabic)" },
-                    { id: "why-choose-us-heading-title-en-1", name: "Title (English)" },
-                    { id: "why-choose-us-heading-title-ar-1", name: "Title (Arabic)" },
-                    { id: "why-choose-us-content-en-1", name: "Content (English)" },
-                    { id: "why-choose-us-content-ar-1", name: "Content (Arabic)" },
-                    { id: "meta-title-en", name: "SEO Title (English)" },
-                    { id: "meta-title-ar", name: "SEO Title (Arabic)" },
-                    { id: "meta-content-en", name: "SEO Content (English)" },
-                    { id: "meta-content-ar", name: "SEO Content (Arabic)" }
-                ];
-
-                document.querySelectorAll('.error-message').forEach((msg) => {
-                        msg.style.display = 'none';
-                        msg.innerText = '';
-                    });
-    
-                    top_error.innerText =""
-    
-                    var sendData = "true"
-
-                try{
-
-                let errorFound                   
-                for (const field of discover_data) {
-                    const input = document.getElementById(field.id);
-                    console.log(input)
-                    const errorMsg = document.getElementById(`error-${field.id}`);
-
-                    //console.log(input.value)
-                    if (!input.value.trim()) {
-                        
-                        errorMsg.innerText = `Please fill in ${field.name}.`;
-                        errorMsg.style.display = 'block'; 
-                            
-                            top_error.innerText = "There Should be no empty Field"
-                            top_error.style.color = "red"
-
-                            //document.documentElement.scrollTop = 0
-                            errorMsg.scrollIntoView();
-
-                            sendData = "false";
-                            errorFound = true;
-
-
-                            
-                    }
-                }
-                if (errorFound) {
-                    sendData = "false";
-                    return false
-                }
-                }
-                catch(err)
-                {
-                    console.log(err)
-                    return false
-                }
-                if( heading_image_1.src == ""){
-
-                    error_image = document.getElementById('error-game-section-banner-1')
-
-                    error_image.innerText = `Please fill in game image 1`;
-                    error_image.style.display = 'block'; 
-                    error_image.scrollIntoView()
-                    return false
-                }
-
-              
-
-
-                if(discover_heading_image.value.length == 0 && discover_heading_image_field.src.endsWith("/media/")){
-                    const errorMsg = document.getElementById(`error-discovery-heading-section-banner`);
-                        
-                        try{
-                            errorMsg.innerText = `Please Upload Image.`;
-                            errorMsg.style.display = 'block'; 
-                            top_error.innerText = "There Should be no empty Field"
-                            top_error.style.color = "red"
-    
-                            //document.documentElement.scrollTop = 0
-                            errorMsg.scrollIntoView();
-
-                            sendData = "false"
-                            return false
-                        }
-                        catch(err){
-                            console.log(err)
-                            return false
-                        }
-                }
-                var discover_training_sec_1_image_field  = document.getElementById("training-section-1-image")
-                var discover_training_sec_1_image = document.getElementById("selected-section-1-image")
-
-                if(discover_training_sec_1_image_field.value.length == 0 && discover_training_sec_1_image.src.endsWith("/media/")){
-                    const errorMsg = document.getElementById(`error-training-section-1-image`);
-                        
-                        try{
-                            errorMsg.innerText = `Please Upload Image.`;
-                            errorMsg.style.display = 'block'; 
-                            top_error.innerText = "There Should be no empty Field"
-                            top_error.style.color = "red"
-    
-                            //document.documentElement.scrollTop = 0
-                            errorMsg.scrollIntoView();
-
-                            sendData = "false"
-                            return false
-                        }
-                        catch(err){
-                            console.log(err)
-                            return false
-                        }
-                }
-
-                var discover_training_sec_2_image_field  = document.getElementById("training-section-2-image")
-                var discover_training_sec_2_image  = document.getElementById("selected-section-2-image")
-                
-                if(discover_training_sec_2_image_field.value.length == 0 && discover_training_sec_2_image.src.endsWith("/media/")){
-                    const errorMsg = document.getElementById(`error-training-section-2-image`);
-                        
-                        try{
-                            errorMsg.innerText = `Please Upload Image.`;
-                            errorMsg.style.display = 'block'; 
-                            top_error.innerText = "There Should be no empty Field"
-                            top_error.style.color = "red"
-    
-                            //document.documentElement.scrollTop = 0
-                            errorMsg.scrollIntoView();
-
-                            sendData = "false"
-                            return false
-                        }
-                        catch(err){
-                            console.log(err)
-                            return false
-                        }
-                }
-
-                var why_Choose_us_image_field = document.getElementById("why-choose-us-section-image")
-                var why_Choose_us_image = document.getElementById("selected-why-choose-us-image")
-                if(why_Choose_us_image_field.value.length == 0 && why_Choose_us_image.src.endsWith("/media/")){
-                    const errorMsg = document.getElementById(`error-why-choose-us-section-image`);
-                        
-                        try{
-                            errorMsg.innerText = `Please Upload Image.`;
-                            errorMsg.style.display = 'block'; 
-                            top_error.innerText = "There Should be no empty Field"
-                            top_error.style.color = "red"
-    
-                            //document.documentElement.scrollTop = 0
-                            errorMsg.scrollIntoView();
-
-                            sendData = "false"
-                            return false
-                        }
-                        catch(err){
-                            console.log(err)
-                            return false
-                        }
-                }
-                
-
-                /*let errorimageFound                   
-                for (const field of discover_data) {
-                    const input = document.getElementById(field.id);
-                    console.log(input)
-                    const errorMsg = document.getElementById(`error-${field.id}`);
-
-                    //console.log(input.value)
-                    if (!input.value.trim()) {
-                        
-                        errorMsg.innerText = `Please fill in ${field.name}.`;
-                        errorMsg.style.display = 'block'; 
-                            
-                            top_error.innerText = "There Should be no empty Field"
-                            top_error.style.color = "red"
-
-                            //document.documentElement.scrollTop = 0
-                            errorMsg.scrollIntoView();
-
-                            sendData = "false";
-                            errorimageFound = true;
-
-
-                            
-                    }
-                }
-                if (errorFound) {
-                    sendData = "false";
-                    return false
-                }
-                }
-                catch(err)
-                {
-                    console.log(err)
-                    return false
-                }*/
-
-                try{
-
-                        if(typeof whoCount !== "undefined"){
-                        for (let i = 1; i <= whoCount; i++) {
-
-                            const dynamicTitleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
-                            const dynamicTitleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
-                            const dynamicContentEn = document.getElementById(`why-choose-us-content-en-${i}`);
-                            const dynamicContentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
-                            const dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${i}`);
-                            const dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${i}`);
-                            const dynamicErrorMsgContentEn = document.getElementById(`error-why-choose-us-content-en-${i}`);
-                            const dynamicErrorMsgContentAr = document.getElementById(`error-why-choose-us-content-ar-${i}`);
-
-                           
-                            
-                            if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
-                                {
-                                dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
-                                dynamicErrorMsgTitleEn.style.display = 'block';
-                                dynamicErrorMsgTitleEn.scrollIntoView();
-
-                                sendData = "false";
-
-                            }
-
-
-                            if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
-                                dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
-                                dynamicErrorMsgTitleAr.style.display = 'block';
-                                dynamicErrorMsgTitleAr.scrollIntoView();
-
-                                sendData = "false";
-
-                            }
-
-                            if (dynamicContentEn && !dynamicContentEn.value.trim())  {
-                                dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
-                                dynamicErrorMsgContentEn.style.display = 'block';
-                                dynamicErrorMsgContentEn.scrollIntoView();
-
-                                sendData = "false";
-
-                            }
-
-                            if (dynamicContentAr && !dynamicContentAr.value.trim()){
-                                dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
-                                dynamicErrorMsgContentAr.style.display = 'block';
-                                dynamicErrorMsgContentEn.scrollIntoView();
-
-                                sendData = "false";
-
-
-                            }
-                        }
-
-
-                        }
-                        }
-                        }
-
-                        catch(err){
-                            console.log("1: "+err)
-                        return false
-                        }
-                if(sendData == 'true'){
-                    
-                    const formData = new FormData();
-                    //text
-                    formData.append('discover_heading_title_en', discover_heading_title_en.value );                  
-                    formData.append('discover_heading_title_ar', discover_heading_title_ar.value );
-                    formData.append('discover_title_en', discover_title_en.value );
-                    formData.append('discover_title_ar', discover_title_ar.value );
-                    formData.append('discover_content_en', discover_content_en.value );
-                    formData.append('discover_content_ar', discover_content_ar.value );
-                    formData.append('discover_game_title_en', discover_game_title_en.value );
-                    formData.append('discover_game_title_ar', discover_game_title_ar.value );
-                    formData.append('discover_game_content_en', discover_game_content_en.value );
-                    formData.append('discover_game_content_ar', discover_game_content_ar.value );
-                    
-                    formData.append('training_section_1_heading_en', traning_heading_en.value );
-                    formData.append('training_section_1_heading_ar', traning_heading_ar.value );
-
-                    
-                    formData.append('discover_training_sec_1_title_en', discover_training_sec_1_title_en.value );
-                    formData.append('discover_training_sec_1_title_ar', discover_training_sec_1_title_ar.value );
-                    formData.append('discover_training_sec_1_content_en', discover_training_sec_1_content_en.value );
-                    formData.append('discover_training_sec_1_content_ar', discover_training_sec_1_content_ar.value );
-                    formData.append('discover_training_sec_2_title_en', discover_training_sec_2_title_en.value );
-                    formData.append('discover_training_sec_2_title_ar', discover_training_sec_2_title_ar.value );
-                    formData.append('discover_training_sec_2_content_en', discover_training_sec_2_content_en.value );
-                    formData.append('discover_training_sec_2_content_ar', discover_training_sec_2_content_ar.value );
-                    formData.append('why_Choose_us_heading_en',  why_Choose_us_heading_en.value );
-                    formData.append('why_Choose_us_heading_ar',  why_Choose_us_heading_ar.value );                    
-                    formData.append('why_Choose_us_title_en',  why_Choose_us_title_en.value );                    
-                    formData.append('why_Choose_us_title_ar',  why_Choose_us_title_ar.value );   
-                    formData.append('why_Choose_us_form_title_en',  why_Choose_us_form_title_en.value );                    
-                    formData.append('why_Choose_us_form_title_ar',  why_Choose_us_form_title_ar.value );       
-                    formData.append('why_Choose_us_form_content_en',  why_Choose_us_form_content_en.value );                    
-                    formData.append('why_Choose_us_form_content_ar',  why_Choose_us_form_content_ar.value );  
-                    formData.append('seo_title_en',seo_title_en.value );
-                    formData.append('seo_title_ar',seo_title_ar.value );
-                    formData.append('seo_content_en',seo_content_en.value );
-                    formData.append('seo_content_ar',seo_content_ar.value );
-                                   
-                    
-
-                    if(typeof whoCount === "undefined" ){
-                        console.log("yes")
-                        return false
-                        whoCount = document.getElementById('last-who-field-id').value;
-
-                    }
-                    /*else{
-                        
-                        IntCount = parseInt(last_value,10)
-                        counter = IntCount + dynamic_numFuntion.length
-                        console.log("counter: "+counter)
-                    }*/
-                    if(whoCount >=2){
-
-                        try{
-
-                    let uwid = 0
-                    for (let i = 2; i <= whoCount;i++) {
-
-                        if(deleteing_who_field){
-                            var dump2 = deleteing_who_field.indexOf(i)
-                            if(dump2 == -1){
-                                console.log("number: "+i)
-                                formData.append('who_passed',whoCount)
-                                
-                                const titleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
-                                
-                                
-                                
-                                const titleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
-                                const contentEn = document.getElementById(`why-choose-us-content-en-${i}`);
-                                const contentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
-                            
-                                const unique_field = document.getElementById(`field-roll-who-id-${i}`)
-                                console.log("this is uni: "+unique_field.innerText)
-                                if (titleEn) {
-                                    formData.append(`why_choose_us_heading_title_en_${i}`, titleEn.value);
-                                }
-                                if (titleAr) {
-                                    formData.append(`why_choose_us_heading_title_ar_${i}`, titleAr.value);
-                                }
-                                if (contentEn) {
-                                    formData.append(`why_choose_us_content_en_${i}`, contentEn.value);
-                                }
-                                if (contentAr) {
-                                    formData.append(`why_choose_us_content_ar_${i}`, contentAr.value);
-                                }
-                            
-                                if(unique_field){
-                                    formData.append(`uwid_${i}`,unique_field.innerText)
-                                    uwid = unique_field.innerText
-                                    console.log(unique_field.innerText)
-                                }
-                             
-                                formData.append(`id`, i);
-
-
-
-                        }
-                        else if(dump2 != -1){
-                            console.log("it is there in deteting field")
-
-                        }
-                    }
-
-
-                    if(deleteing_who_field.length > 0){
-                        console.log("yes")
-
-                                            
-                        formData.append(`deleted_who_field`,deleteing_who_field)
-                    }
-                    else{
-                        console.log("No value inside deleteing field")
-                    }
-
-
-                        
-                        
-                        
-
-                    }
-                    if(dynamic_deleted_who_field.length !== 0 ){
-                            formData.append("dyanmic_deleted_who_field",dynamic_deleted_who_field)
-                        }
-                        else{
-                            console.log("its zero")
-                        }    
-                    
-                    
-                    console.log(uwid)
-
-                }
-                catch(err){
-                    console.log("1: "+whoCount)
-                    console.log(err)
-                    return false
-                }
-                }
-
-                if(typeof headerimageCount === "undefined" ){
-                    console.log("yes")
-                        headerimageCount = document.getElementById('last-header-image-field-id').value;
-
-                    }
-
-                /*for(i=2;i<=headerimageCount;i++){
-
-                    if(deleteing_field != 0){
-                        if(deleteing_field[i] == )
-
-                    }
-                    
-                } */   
-
-                
-                
-                if(headerimageCount >=2){
-
-                        try{
-
-                        let uwid = 0
-                        console.log("heading Count is: "+headerimageCount)
-                        for (let i = 2; i <= headerimageCount;i++) {
-                        
-                        if(deleteing_field){
-                            var dump1 = deleteing_field.indexOf(i)
-                            console.log("field is "+i)
-                            if(dump1 == -1){
-                                console.log("number: "+i)
-                                formData.append('header_image',headerimageCount)
-
-                                const image = document.getElementById(`game-section-banner-${i}`);
-                       
-                                const unique_field = document.getElementById(`field-roll-image-id-${i}`)
-                                console.log("this is uni: "+unique_field.innerText)
-           
-                                    if(image && image.files && image.files.length > 0) {
-                                            const game_image = image.files[0];
-                                            formData.append(`image_${i}`, game_image);
-                                            formData.append(`ugid_${i}`,unique_field.innerText)
-
-                                    } 
-                                        else {
-                                            console.log("already have image")
-                                        }
-                           
-                      
-                                formData.append(`id`, i);
-
-                        }
-                        else if(dump1 !== -1){
-                            console.log("it is there in deteting field")
-
-                            }
-                        }
-
-                        if(deleteing_field.length > 0){
-
-                        
-                            formData.append(`deleted_image_field`,deleteing_field)
-                        }
-                        else{
-                            console.log("No value inside deleteing field")
-                        }
-
-                        
-                        
-
-
-
-                        console.log(uwid)
-                            }
-                        if(dynamic_deleted_field.length !== 0 ){
-                            formData.append("dyanmic_deleted_field",dynamic_deleted_field)
-                        }
-                        else{
-                            console.log("its zero")
-                        }    
-                            
-                     
-
-                        }
-                    
-                        catch(err){
-                        console.log("1: "+headerimageCount)
-                        console.log(err)
-                        return false
-                        }
-                        }
-                        if (discover_game_image.files.length > 0) {
-                            formData.append('discovery_game_image', discover_game_image.files[0]);
-
-                    } 
-                        else {
-                            console.log("already have image")
-                        } 
-
-                        if (discover_heading_image.files.length > 0) {
-                            console.log(discover_heading_image.files[0])
-                            formData.append('discover_heading_image', discover_heading_image.files[0]);
-
-                    } 
-                        else {
-                            console.log("already have image")
-                        }
-
-                        if (discover_training_sec_1_image_field.files.length > 0) {
-                            formData.append('discover_training_sec_1_image_field', discover_training_sec_1_image_field.files[0]);
-
-                    } 
-                        else {
-                            console.log("already have image")
-                        }
-
-                        if (discover_training_sec_2_image_field.files.length > 0) {
-                            formData.append('discover_training_sec_2_image_field', discover_training_sec_2_image_field.files[0]);
-
-                    } 
-                        else {
-                            console.log("already have image")
-                        }
-
-                        if (why_Choose_us_image_field.files.length > 0) {
-                            formData.append('why_Choose_us_image_field',why_Choose_us_image_field.files[0]);
-
-                    } 
-                        else {
-                            console.log("already have image")
-                        }
-
-
-                    fetch("/saveDiscoverdetail/", {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': getCookie('csrftoken') 
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-                        
-                        location.reload()
-                        
-                        
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                        location.reload()
-                    });
-
-                    function getCookie(name) {
-                        let cookieValue = null;
-                        if (document.cookie && document.cookie !== '') {
-                            const cookies = document.cookie.split(';');
-                            for (let i = 0; i < cookies.length; i++) {
-                                const cookie = cookies[i].trim();
-                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                    break;
-                                }
-                            }
-                        }
-                        return cookieValue;
-                    }
-                }
-                
-                
-                    
-                
-                return false
-            }            
-        
-            catch(err){
-
-                console.log("this is error: "+err)
-
-                return false;
-            }
-
-        }
-    
-    
-        
-        
-                
-      
-
-    function displayImagewhychooseus(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-why-choose-us-image');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('banner-warning')
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
-    }
-    function displayImageBanner(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-banner');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('banner-warning')
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
-    }
-
-    function displaygameImage(event,count) {
-
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById(`selected-game-image-${count}`);
-        console.log(count)
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
+            sendData = "false"
+            return false
+        } catch (err) {
             console.log(err)
-            var icon_warning = document.getElementById(`game-image-warning-1${count}`)
-
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
+            return false
         }
-        
+    }
+    var discover_training_sec_1_image_field = document.getElementById("training-section-1-image")
+    var discover_training_sec_1_image = document.getElementById("selected-section-1-image")
+
+    if (discover_training_sec_1_image_field.value.length == 0 && discover_training_sec_1_image.src.endsWith("/media/")) {
+        const errorMsg = document.getElementById(`error-training-section-1-image`);
+
+        try {
+            errorMsg.innerText = `Please Upload Image.`;
+            errorMsg.style.display = 'block';
+            top_error.innerText = "There Should be no empty Field"
+            top_error.style.color = "red"
+
+            //document.documentElement.scrollTop = 0
+            errorMsg.scrollIntoView();
+
+            sendData = "false"
+            return false
+        } catch (err) {
+            console.log(err)
+            return false
+        }
     }
 
-    
-    
-    
-    let whoCount
-            try{
-                const lastwhofield = document.querySelectorAll('.last-who-field-id');
+    var discover_training_sec_2_image_field = document.getElementById("training-section-2-image")
+    var discover_training_sec_2_image = document.getElementById("selected-section-2-image")
+
+    if (discover_training_sec_2_image_field.value.length == 0 && discover_training_sec_2_image.src.endsWith("/media/")) {
+        const errorMsg = document.getElementById(`error-training-section-2-image`);
+
+        try {
+            errorMsg.innerText = `Please Upload Image.`;
+            errorMsg.style.display = 'block';
+            top_error.innerText = "There Should be no empty Field"
+            top_error.style.color = "red"
+
+            //document.documentElement.scrollTop = 0
+            errorMsg.scrollIntoView();
+
+            sendData = "false"
+            return false
+        } catch (err) {
+            console.log(err)
+            return false
+        }
+    }
+
+    var why_Choose_us_image_field = document.getElementById("why-choose-us-section-image")
+    var why_Choose_us_image = document.getElementById("selected-why-choose-us-image")
+    if (why_Choose_us_image_field.value.length == 0 && why_Choose_us_image.src.endsWith("/media/")) {
+        const errorMsg = document.getElementById(`error-why-choose-us-section-image`);
+
+        try {
+            errorMsg.innerText = `Please Upload Image.`;
+            errorMsg.style.display = 'block';
+            top_error.innerText = "There Should be no empty Field"
+            top_error.style.color = "red"
+
+            //document.documentElement.scrollTop = 0
+            errorMsg.scrollIntoView();
+
+            sendData = "false"
+            return false
+        } catch (err) {
+            console.log(err)
+            return false
+        }
+    }
+
+
+    /*let errorimageFound                   
+    for (const field of discover_data) {
+        const input = document.getElementById(field.id);
+        console.log(input)
+        const errorMsg = document.getElementById(`error-${field.id}`);
+
+        //console.log(input.value)
+        if (!input.value.trim()) {
+            
+            errorMsg.innerText = `Please fill in ${field.name}.`;
+            errorMsg.style.display = 'block'; 
                 
-                whoCount = lastwhofield[lastwhofield.length -1].value;
+                top_error.innerText = "There Should be no empty Field"
+                top_error.style.color = "red"
 
-               
+                //document.documentElement.scrollTop = 0
+                errorMsg.scrollIntoView();
 
-             
-               
-                console.log("whoCount Value: "+whoCount)
-            }
-            catch(err){
-                console.log("1: "+err)
-                
-            }
-            console.log(whoCount)
+                sendData = "false";
+                errorimageFound = true;
 
-
-    function add_content(){
-            dom = "true"
-
-
-         
-                console.log("value:"+whoCount)
-
-                if(whoCount >= 1){
-                    try{
-                    const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${whoCount}`);
-                    const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${whoCount}`);
-
-                    const reset_dynamicErrorMsgContentEn = document.getElementById(`error-why-choose-us-content-en-${whoCount}`);
-
-                    const reset_dynamicErrorMsgContentAr = document.getElementById(`error-why-choose-us-content-ar-${whoCount}`)
-
-                reset_dynamicErrorMsgTitleEn.innerText = ""
-                reset_dynamicErrorMsgTitleAr.innerText = ""
-                reset_dynamicErrorMsgContentEn.innerText = ""
-                reset_dynamicErrorMsgContentAr.innerText = ""
-
-                if(whoCount >= 1){
-                   
-                    const dynamicTitleEn = document.getElementById(`why-choose-us-heading-title-en-${whoCount}`);
-                    const dynamicTitleAr = document.getElementById(`why-choose-us-heading-title-ar-${whoCount}`);
-                    const dynamicContentEn = document.getElementById(`why-choose-us-content-en-${whoCount}`);
-                    const dynamicContentAr = document.getElementById(`why-choose-us-content-ar-${whoCount}`);
-                    const dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${whoCount}`);
-                    const dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${whoCount}`);
-                    const dynamicErrorMsgContentEn = document.getElementById(`error-why-choose-us-content-en-${whoCount}`);
-                    const dynamicErrorMsgContentAr = document.getElementById(`error-why-choose-us-content-ar-${whoCount}`);
 
                 
+        }
+    }
+    if (errorFound) {
+        sendData = "false";
+        return false
+    }
+    }
+    catch(err)
+    {
+        console.log(err)
+        return false
+    }*/
 
-                    if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
-                        
+    try {
+
+        if (typeof whoCount !== "undefined") {
+            for (let i = 1; i <= whoCount; i++) {
+
+                const dynamicTitleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
+                const dynamicTitleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
+                const dynamicContentEn = document.getElementById(`why-choose-us-content-en-${i}`);
+                const dynamicContentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
+                const dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${i}`);
+                const dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${i}`);
+                const dynamicErrorMsgContentEn = document.getElementById(`error-why-choose-us-content-en-${i}`);
+                const dynamicErrorMsgContentAr = document.getElementById(`error-why-choose-us-content-ar-${i}`);
+
+
+
+                if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+                    {
                         dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
                         dynamicErrorMsgTitleEn.style.display = 'block';
                         dynamicErrorMsgTitleEn.scrollIntoView();
 
-                        dom = "false";
+                        sendData = "false";
 
                     }
 
-            
+
                     if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
                         dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
                         dynamicErrorMsgTitleAr.style.display = 'block';
                         dynamicErrorMsgTitleAr.scrollIntoView();
 
-                        dom = "false";
-                        console.log(dom)
-
+                        sendData = "false";
 
                     }
-            
-                    if (dynamicContentEn && !dynamicContentEn.value.trim())  {
+
+                    if (dynamicContentEn && !dynamicContentEn.value.trim()) {
                         dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
                         dynamicErrorMsgContentEn.style.display = 'block';
                         dynamicErrorMsgContentEn.scrollIntoView();
 
-                        dom = "false";
+                        sendData = "false";
 
                     }
-            
-                    if (dynamicContentAr && !dynamicContentAr.value.trim()){
+
+                    if (dynamicContentAr && !dynamicContentAr.value.trim()) {
                         dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
                         dynamicErrorMsgContentAr.style.display = 'block';
                         dynamicErrorMsgContentEn.scrollIntoView();
 
-                        dom = "false";
+                        sendData = "false";
 
 
                     }
-                    
                 }
-            } 
-        
-        catch(err){
-            console.log("error: "+err)
+
+
+            }
+        }
+    } catch (err) {
+        console.log("1: " + err)
+        return false
+    }
+    if (sendData == 'true') {
+
+        const formData = new FormData();
+        //text
+        formData.append('discover_heading_title_en', discover_heading_title_en.value);
+        formData.append('discover_heading_title_ar', discover_heading_title_ar.value);
+        formData.append('discover_title_en', discover_title_en.value);
+        formData.append('discover_title_ar', discover_title_ar.value);
+        formData.append('discover_content_en', discover_content_en.value);
+        formData.append('discover_content_ar', discover_content_ar.value);
+        formData.append('discover_game_title_en', discover_game_title_en.value);
+        formData.append('discover_game_title_ar', discover_game_title_ar.value);
+        formData.append('discover_game_content_en', discover_game_content_en.value);
+        formData.append('discover_game_content_ar', discover_game_content_ar.value);
+
+        formData.append('training_section_1_heading_en', traning_heading_en.value);
+        formData.append('training_section_1_heading_ar', traning_heading_ar.value);
+
+
+        formData.append('discover_training_sec_1_title_en', discover_training_sec_1_title_en.value);
+        formData.append('discover_training_sec_1_title_ar', discover_training_sec_1_title_ar.value);
+        formData.append('discover_training_sec_1_content_en', discover_training_sec_1_content_en.value);
+        formData.append('discover_training_sec_1_content_ar', discover_training_sec_1_content_ar.value);
+        formData.append('discover_training_sec_2_title_en', discover_training_sec_2_title_en.value);
+        formData.append('discover_training_sec_2_title_ar', discover_training_sec_2_title_ar.value);
+        formData.append('discover_training_sec_2_content_en', discover_training_sec_2_content_en.value);
+        formData.append('discover_training_sec_2_content_ar', discover_training_sec_2_content_ar.value);
+        formData.append('why_Choose_us_heading_en', why_Choose_us_heading_en.value);
+        formData.append('why_Choose_us_heading_ar', why_Choose_us_heading_ar.value);
+        formData.append('why_Choose_us_title_en', why_Choose_us_title_en.value);
+        formData.append('why_Choose_us_title_ar', why_Choose_us_title_ar.value);
+        formData.append('why_Choose_us_form_title_en', why_Choose_us_form_title_en.value);
+        formData.append('why_Choose_us_form_title_ar', why_Choose_us_form_title_ar.value);
+        formData.append('why_Choose_us_form_content_en', why_Choose_us_form_content_en.value);
+        formData.append('why_Choose_us_form_content_ar', why_Choose_us_form_content_ar.value);
+        formData.append('seo_title_en', seo_title_en.value);
+        formData.append('seo_title_ar', seo_title_ar.value);
+        formData.append('seo_content_en', seo_content_en.value);
+        formData.append('seo_content_ar', seo_content_ar.value);
+
+
+
+        if (typeof whoCount === "undefined") {
+            console.log("yes")
             return false
-        }  
+            whoCount = document.getElementById('last-who-field-id').value;
+
+        }
+        /*else{
+            
+            IntCount = parseInt(last_value,10)
+            counter = IntCount + dynamic_numFuntion.length
+            console.log("counter: "+counter)
+        }*/
+        if (whoCount >= 2) {
+
+            try {
+
+                let uwid = 0
+                for (let i = 2; i <= whoCount; i++) {
+
+                    if (deleteing_who_field) {
+                        var dump2 = deleteing_who_field.indexOf(i)
+                        if (dump2 == -1) {
+                            console.log("number: " + i)
+                            formData.append('who_passed', whoCount)
+
+                            const titleEn = document.getElementById(`why-choose-us-heading-title-en-${i}`);
+
+
+
+                            const titleAr = document.getElementById(`why-choose-us-heading-title-ar-${i}`);
+                            const contentEn = document.getElementById(`why-choose-us-content-en-${i}`);
+                            const contentAr = document.getElementById(`why-choose-us-content-ar-${i}`);
+
+                            const unique_field = document.getElementById(`field-roll-who-id-${i}`)
+                            console.log("this is uni: " + unique_field.innerText)
+                            if (titleEn) {
+                                formData.append(`why_choose_us_heading_title_en_${i}`, titleEn.value);
+                            }
+                            if (titleAr) {
+                                formData.append(`why_choose_us_heading_title_ar_${i}`, titleAr.value);
+                            }
+                            if (contentEn) {
+                                formData.append(`why_choose_us_content_en_${i}`, contentEn.value);
+                            }
+                            if (contentAr) {
+                                formData.append(`why_choose_us_content_ar_${i}`, contentAr.value);
+                            }
+
+                            if (unique_field) {
+                                formData.append(`uwid_${i}`, unique_field.innerText)
+                                uwid = unique_field.innerText
+                                console.log(unique_field.innerText)
+                            }
+
+                            formData.append(`id`, i);
+
+
+
+                        } else if (dump2 != -1) {
+                            console.log("it is there in deteting field")
+
+                        }
+                    }
+
+
+                    if (deleteing_who_field.length > 0) {
+                        console.log("yes")
+
+
+                        formData.append(`deleted_who_field`, deleteing_who_field)
+                    } else {
+                        console.log("No value inside deleteing field")
+                    }
+
+
+
+
+
+
                 }
-         
-        
-        
-            if(dom == "true"){
-            try{
-            whoCount++;
-            var who_id = "id" + Math.random().toString(16).slice(2)
+                if (dynamic_deleted_who_field.length !== 0) {
+                    formData.append("dyanmic_deleted_who_field", dynamic_deleted_who_field)
+                } else {
+                    console.log("its zero")
+                }
 
 
-            let newRow = `
-            <div id="section-who-${whoCount}">
+                console.log(uwid)
 
-            <div id="dynamic-who-content-${whoCount}">
-                            <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${whoCount}</h1>
-                            <p class="field-roll-id" style='display:none'>${who_id}</p>
-                            <p id="field-roll-who-id-${whoCount}" style='display:none'>${who_id}</p>
+            } catch (err) {
+                console.log("1: " + whoCount)
+                console.log(err)
+                return false
+            }
+        }
 
-             </div>
-            <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+        if (typeof headerimageCount === "undefined") {
+            console.log("yes")
+            headerimageCount = document.getElementById('last-header-image-field-id').value;
 
-            <div class="row" id="row-${whoCount}">
-                <div class="col-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="why-choose-us-heading-title-en-${whoCount}">Heading Title (English)</label>
-                        <input class="form-control btn-pill" id="why-choose-us-heading-title-en-${whoCount}" name="why_choose_us_heading_title_en_${whoCount}" type="text" placeholder="Title (English)">
-                        <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-en-${whoCount}"></p>
+        }
 
-                    </div>
+        /*for(i=2;i<=headerimageCount;i++){
+
+            if(deleteing_field != 0){
+                if(deleteing_field[i] == )
+
+            }
+            
+        } */
+
+
+
+        if (headerimageCount >= 2) {
+
+            try {
+
+                let uwid = 0
+                console.log("heading Count is: " + headerimageCount)
+                for (let i = 2; i <= headerimageCount; i++) {
+
+                    if (deleteing_field) {
+                        var dump1 = deleteing_field.indexOf(i)
+                        console.log("field is " + i)
+                        if (dump1 == -1) {
+                            console.log("number: " + i)
+                            formData.append('header_image', headerimageCount)
+
+                            const image = document.getElementById(`game-section-banner-${i}`);
+
+                            const unique_field = document.getElementById(`field-roll-image-id-${i}`)
+                            console.log("this is uni: " + unique_field.innerText)
+
+                            if (image && image.files && image.files.length > 0) {
+                                const game_image = image.files[0];
+                                formData.append(`image_${i}`, game_image);
+                                formData.append(`ugid_${i}`, unique_field.innerText)
+
+                            } else {
+                                console.log("already have image")
+                            }
+
+
+                            formData.append(`id`, i);
+
+                        } else if (dump1 !== -1) {
+                            console.log("it is there in deteting field")
+
+                        }
+                    }
+
+                    if (deleteing_field.length > 0) {
+
+
+                        formData.append(`deleted_image_field`, deleteing_field)
+                    } else {
+                        console.log("No value inside deleteing field")
+                    }
+
+
+
+
+
+
+                    console.log(uwid)
+                }
+                if (dynamic_deleted_field.length !== 0) {
+                    formData.append("dyanmic_deleted_field", dynamic_deleted_field)
+                } else {
+                    console.log("its zero")
+                }
+
+
+
+            } catch (err) {
+                console.log("1: " + headerimageCount)
+                console.log(err)
+                return false
+            }
+        }
+        if (discover_game_image.files.length > 0) {
+            formData.append('discovery_game_image', discover_game_image.files[0]);
+
+        } else {
+            console.log("already have image")
+        }
+
+        if (discover_heading_image.files.length > 0) {
+            console.log(discover_heading_image.files[0])
+            formData.append('discover_heading_image', discover_heading_image.files[0]);
+
+        } else {
+            console.log("already have image")
+        }
+
+        if (discover_training_sec_1_image_field.files.length > 0) {
+            formData.append('discover_training_sec_1_image_field', discover_training_sec_1_image_field.files[0]);
+
+        } else {
+            console.log("already have image")
+        }
+
+        if (discover_training_sec_2_image_field.files.length > 0) {
+            formData.append('discover_training_sec_2_image_field', discover_training_sec_2_image_field.files[0]);
+
+        } else {
+            console.log("already have image")
+        }
+
+        if (why_Choose_us_image_field.files.length > 0) {
+            formData.append('why_Choose_us_image_field', why_Choose_us_image_field.files[0]);
+
+        } else {
+            console.log("already have image")
+        }
+
+
+        fetch("/saveDiscoverdetail/", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+
+                location.reload()
+
+
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                location.reload()
+            });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    }
+
+
+
+
+    return false
+} catch (err) {
+
+    console.log("this is error: " + err)
+
+    return false;
+}
+
+}
+
+
+
+
+
+
+
+function displayImagewhychooseus(event) {
+try {
+    const file = event.target.files[0];
+    const imgElement = document.getElementById('selected-why-choose-us-image');
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
+        }
+
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+    }
+} catch (err) {
+    var icon_warning = document.getElementById('banner-warning')
+
+    icon_warning.value = err
+
+    icon_warning.style.color = "red";
+
+}
+
+}
+
+function displayImageBanner(event) {
+try {
+    const file = event.target.files[0];
+    const imgElement = document.getElementById('selected-banner');
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
+        }
+
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+    }
+} catch (err) {
+    var icon_warning = document.getElementById('banner-warning')
+
+    icon_warning.value = err
+
+    icon_warning.style.color = "red";
+
+}
+
+}
+
+function displaygameImage(event, count) {
+
+try {
+    const file = event.target.files[0];
+    const imgElement = document.getElementById(`selected-game-image-${count}`);
+    console.log(count)
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
+        }
+
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+    }
+} catch (err) {
+    console.log(err)
+    var icon_warning = document.getElementById(`game-image-warning-1${count}`)
+
+    icon_warning.value = err
+
+    icon_warning.style.color = "red";
+
+}
+
+}
+
+
+
+
+let whoCount
+try {
+const lastwhofield = document.querySelectorAll('.last-who-field-id');
+
+whoCount = lastwhofield[lastwhofield.length - 1].value;
+
+
+
+
+
+console.log("whoCount Value: " + whoCount)
+} catch (err) {
+console.log("1: " + err)
+
+}
+console.log(whoCount)
+
+
+function add_content() {
+dom = "true"
+
+
+
+console.log("value:" + whoCount)
+
+if (whoCount >= 1) {
+    try {
+        const reset_dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${whoCount}`);
+        const reset_dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${whoCount}`);
+
+        const reset_dynamicErrorMsgContentEn = document.getElementById(`error-why-choose-us-content-en-${whoCount}`);
+
+        const reset_dynamicErrorMsgContentAr = document.getElementById(`error-why-choose-us-content-ar-${whoCount}`)
+
+        reset_dynamicErrorMsgTitleEn.innerText = ""
+        reset_dynamicErrorMsgTitleAr.innerText = ""
+        reset_dynamicErrorMsgContentEn.innerText = ""
+        reset_dynamicErrorMsgContentAr.innerText = ""
+
+        if (whoCount >= 1) {
+
+            const dynamicTitleEn = document.getElementById(`why-choose-us-heading-title-en-${whoCount}`);
+            const dynamicTitleAr = document.getElementById(`why-choose-us-heading-title-ar-${whoCount}`);
+            const dynamicContentEn = document.getElementById(`why-choose-us-content-en-${whoCount}`);
+            const dynamicContentAr = document.getElementById(`why-choose-us-content-ar-${whoCount}`);
+            const dynamicErrorMsgTitleEn = document.getElementById(`error-why-choose-us-heading-title-en-${whoCount}`);
+            const dynamicErrorMsgTitleAr = document.getElementById(`error-why-choose-us-heading-title-ar-${whoCount}`);
+            const dynamicErrorMsgContentEn = document.getElementById(`error-why-choose-us-content-en-${whoCount}`);
+            const dynamicErrorMsgContentAr = document.getElementById(`error-why-choose-us-content-ar-${whoCount}`);
+
+
+
+            if (dynamicTitleEn && !dynamicTitleEn.value.trim()) {
+
+                dynamicErrorMsgTitleEn.innerText = "Please fill in the Title (English).";
+                dynamicErrorMsgTitleEn.style.display = 'block';
+                dynamicErrorMsgTitleEn.scrollIntoView();
+
+                dom = "false";
+
+            }
+
+
+            if (dynamicTitleAr && !dynamicTitleAr.value.trim()) {
+                dynamicErrorMsgTitleAr.innerText = "Please fill in the Title (Arabic).";
+                dynamicErrorMsgTitleAr.style.display = 'block';
+                dynamicErrorMsgTitleAr.scrollIntoView();
+
+                dom = "false";
+                console.log(dom)
+
+
+            }
+
+            if (dynamicContentEn && !dynamicContentEn.value.trim()) {
+                dynamicErrorMsgContentEn.innerText = "Please fill in the Section Content (English).";
+                dynamicErrorMsgContentEn.style.display = 'block';
+                dynamicErrorMsgContentEn.scrollIntoView();
+
+                dom = "false";
+
+            }
+
+            if (dynamicContentAr && !dynamicContentAr.value.trim()) {
+                dynamicErrorMsgContentAr.innerText = "Please fill in the Section Content (Arabic).";
+                dynamicErrorMsgContentAr.style.display = 'block';
+                dynamicErrorMsgContentEn.scrollIntoView();
+
+                dom = "false";
+
+
+            }
+
+        }
+    } catch (err) {
+        console.log("error: " + err)
+        return false
+    }
+}
+
+
+
+if (dom == "true") {
+    try {
+        whoCount++;
+        var who_id = "id" + Math.random().toString(16).slice(2)
+
+
+        let newRow = `
+        <div id="section-who-${whoCount}">
+
+        <div id="dynamic-who-content-${whoCount}">
+                        <h1 style="font-weight:bold;font-size:16px;color:grey">Form-${whoCount}</h1>
+                        <p class="field-roll-id" style='display:none'>${who_id}</p>
+                        <p id="field-roll-who-id-${whoCount}" style='display:none'>${who_id}</p>
+
+         </div>
+        <div style="border-top: 1px solid #ccc; margin-top: 3px; margin-bottom: 20px;"></div>
+
+        <div class="row" id="row-${whoCount}">
+            <div class="col-6">
+                <div class="mb-3">
+                    <label class="form-label" for="why-choose-us-heading-title-en-${whoCount}">Heading Title (English)</label>
+                    <input class="form-control btn-pill" id="why-choose-us-heading-title-en-${whoCount}" name="why_choose_us_heading_title_en_${whoCount}" type="text" placeholder="Title (English)">
+                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-en-${whoCount}"></p>
+
                 </div>
+            </div>
 
-                <div class="col-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="why-choose-us-heading-title-ar-${whoCount}">Heading Title (Arabic)</label>
-                        <input class="form-control btn-pill" id="why-choose-us-heading-title-ar-${whoCount}" name="why_choose_us_heading_title_ar_${whoCount}" type="text" placeholder="Title (Arabic)">
-                        <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-ar-${whoCount}"></p>
+            <div class="col-6">
+                <div class="mb-3">
+                    <label class="form-label" for="why-choose-us-heading-title-ar-${whoCount}">Heading Title (Arabic)</label>
+                    <input class="form-control btn-pill" id="why-choose-us-heading-title-ar-${whoCount}" name="why_choose_us_heading_title_ar_${whoCount}" type="text" placeholder="Title (Arabic)">
+                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-heading-title-ar-${whoCount}"></p>
 
-                    </div>
                 </div>
+            </div>
 
-                <div class="row">
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-content-en-${whoCount}">Content (English)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-${whoCount}" name="why_choose_us_content_en_${whoCount}" type="text" placeholder="content (English)"></textarea>
-                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-en-${whoCount}"></p>
-    
-                                </div>
-                            </div>
-    
-                            <div class="col-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="why-choose-us-content-ar-${whoCount}">Content (Arabic)</label>
-                                    <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-${whoCount}" name="why_choose_us_content_ar_${whoCount}" type="text"  placeholder="content (Arabic)"></textarea>
-                                        <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-ar-${whoCount}"></p>
+            <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="why-choose-us-content-en-${whoCount}">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-en-${whoCount}" name="why_choose_us_content_en_${whoCount}" type="text" placeholder="content (English)"></textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-en-${whoCount}"></p>
 
-                                </div>
                             </div>
                         </div>
-                        <input type="hidden" class="last-form-1-field-id-1" value="${whoCount}"/>
 
-                <div class="col-12  text-end " >
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="why-choose-us-content-ar-${whoCount}">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="why-choose-us-content-ar-${whoCount}" name="why_choose_us_content_ar_${whoCount}" type="text"  placeholder="content (Arabic)"></textarea>
+                                    <p style="color: red; display: none;" class="error-message" id ="error-why-choose-us-content-ar-${whoCount}"></p>
 
-                                <button id="delete-row" onclick="return dedletethedynamicwho(${whoCount})" class="btn btn-danger">-</button>
-                </div>  
-            </div>
-            <br>`;
-            
-            document.getElementById('dynamic-field').insertAdjacentHTML('beforebegin', newRow);
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" class="last-form-1-field-id-1" value="${whoCount}"/>
 
-            return false;
-            
-        }
-        
-        catch(err){
-            console.log(err)
+            <div class="col-12  text-end " >
 
-            return false
-        }
-    }
-                else{
-                    console.log("please fill the detail")
-                    return false
-                }
-    }
+                            <button id="delete-row" onclick="return dedletethedynamicwho(${whoCount})" class="btn btn-danger">-</button>
+            </div>  
+        </div>
+        <br>`;
 
-    deleteing_who_field = []
-    function dedletethedynamicwho(id){
+        document.getElementById('dynamic-field').insertAdjacentHTML('beforebegin', newRow);
 
-        try {
-        let deletingField = document.getElementById(`section-who-${id}`);
-        if (deletingField) {
-            //deletingField.innerHTML = `form ${id} has been deleted`;
-            deletingField.remove()
-            deleteing_who_field.push(id)
-            //whoCount--
-            const lastwhofield = document.querySelectorAll('.last-who-field-id');
-                
-            whoCount = lastwhofield[lastwhofield.length -1].value;
-            console.log(whoCount)
-           console.log(deleteing_who_field)
-        }
-        } catch (err) {
-            console.log(err)
-            return false
+        return false;
 
-        }
+    } catch (err) {
+        console.log(err)
 
-    }
-    //let deleted_who_function = []
-    dynamic_deleted_who_field = []
-
-
-    function deletewhorow(id,counter){
-
-    
-        try{
-        
-        dynamic_deleted_who_field.push(id)
-        deleteing_who_field.push(counter)
-
-        console.log(id)
-
-        document.getElementById(`section-who-${id}`).style.display = "none"
-        console.log(deleteing_who_field)
-        
-        console.log(dynamic_deleted_who_field)
         return false
-        }
-        catch(err){
-            console.log(err)
-            return false
-        }
-    
-
-
-
     }
-    let headerimageCount
-            try{
-                const lasthimagefield = document.querySelectorAll('.last-header-image-field-id');
-                
-                headerimageCount = lasthimagefield[lasthimagefield.length -1].value;
+} else {
+    console.log("please fill the detail")
+    return false
+}
+}
 
-               
+deleteing_who_field = []
 
-             
-               
-                console.log("imageCOunt Value: "+headerimageCount)
+function dedletethedynamicwho(id) {
+
+try {
+    let deletingField = document.getElementById(`section-who-${id}`);
+    if (deletingField) {
+        //deletingField.innerHTML = `form ${id} has been deleted`;
+        deletingField.remove()
+        deleteing_who_field.push(id)
+        //whoCount--
+        const lastwhofield = document.querySelectorAll('.last-who-field-id');
+
+        whoCount = lastwhofield[lastwhofield.length - 1].value;
+        console.log(whoCount)
+        console.log(deleteing_who_field)
+    }
+} catch (err) {
+    console.log(err)
+    return false
+
+}
+
+}
+//let deleted_who_function = []
+dynamic_deleted_who_field = []
+
+
+function deletewhorow(id, counter) {
+
+
+try {
+
+    dynamic_deleted_who_field.push(id)
+    deleteing_who_field.push(counter)
+
+    console.log(id)
+
+    document.getElementById(`section-who-${id}`).style.display = "none"
+    console.log(deleteing_who_field)
+
+    console.log(dynamic_deleted_who_field)
+    return false
+} catch (err) {
+    console.log(err)
+    return false
+}
+
+
+
+
+}
+let headerimageCount
+try {
+const lasthimagefield = document.querySelectorAll('.last-header-image-field-id');
+
+headerimageCount = lasthimagefield[lasthimagefield.length - 1].value;
+
+
+
+
+
+console.log("imageCOunt Value: " + headerimageCount)
+} catch (err) {
+console.log("1: " + err)
+
+}
+console.log(headerimageCount)
+
+//let imgcount = 1
+let dynamic_imagenumFuntion = []
+
+function add_image() {
+dump = "true"
+
+
+console.log("value:" + headerimageCount)
+
+if (headerimageCount > 1) {
+    try {
+        const reset_dynamicErrorMsgimage = document.getElementById(`error-game-section-banner-${headerimageCount}`);
+
+
+
+        reset_dynamicErrorMsgimage.innerText = ""
+
+
+
+
+
+        if (headerimageCount > 1) {
+            const dynamicimage = document.getElementById(`game-section-banner-${headerimageCount}`);
+            const dynamicimagesrc = document.getElementById(`selected-game-image-${headerimageCount}`)
+            const dynamicErrorMsgimage = document.getElementById(`error-game-section-banner-${headerimageCount}`);
+
+
+            if (dynamicimage.files.length == 0 && dynamicimagesrc.src == "") {
+                reset_dynamicErrorMsgimage.innerText = "Please insert image."
+                reset_dynamicErrorMsgimage.style.display = 'block';
+
+                dump = "false"
             }
-            catch(err){
-                console.log("1: "+err)
-                
-            }
-            console.log(headerimageCount)
-
-    //let imgcount = 1
-    let dynamic_imagenumFuntion = [] 
-
-    function add_image(){
-                    dump = "true"
-
-
-        console.log("value:"+headerimageCount)
-        
-        if(headerimageCount > 1){
-            try{
-                const reset_dynamicErrorMsgimage = document.getElementById(`error-game-section-banner-${headerimageCount}`);
-
-
-                
-                reset_dynamicErrorMsgimage.innerText = ""
-
-                
-                
-                
-
-                if(headerimageCount > 1){
-                    const dynamicimage = document.getElementById(`game-section-banner-${headerimageCount}`);
-                    const dynamicimagesrc = document.getElementById(`selected-game-image-${headerimageCount}`)
-                    const dynamicErrorMsgimage= document.getElementById(`error-game-section-banner-${headerimageCount}`);
-                    
-                
-                    if(dynamicimage.files.length == 0 && dynamicimagesrc.src == "" ){
-                        reset_dynamicErrorMsgimage.innerText = "Please insert image."
-                        reset_dynamicErrorMsgimage.style.display = 'block';
-
-                        dump = "false"
-                    }   
-                }
-                
-                    
-                }
-                
-        
-        
-        catch(err){
-            console.log("error: "+err)
-        }  
-
-                }
-        else if(headerimageCount == 1){
-            var heading_image_1 = document.getElementById('selected-game-image-1')
-            var heading_image_1_field = document.getElementById('game-section-banner-1')
-
-            if( heading_image_1_field.files.length === 0 && heading_image_1.src.endsWith("/media/")  ){
-
-                    error_image = document.getElementById('error-game-section-banner-1')
-
-                    error_image.innerText = `Please fill in game image 1`;
-                    error_image.style.display = 'block'; 
-                    dump = "false"
-                    return false
-            }
-            
-
         }
-                
-        if(dump == "true"){
 
-        try{
+
+    } catch (err) {
+        console.log("error: " + err)
+    }
+
+} else if (headerimageCount == 1) {
+    var heading_image_1 = document.getElementById('selected-game-image-1')
+    var heading_image_1_field = document.getElementById('game-section-banner-1')
+
+    if (heading_image_1_field.files.length === 0 && heading_image_1.src.endsWith("/media/")) {
+
+        error_image = document.getElementById('error-game-section-banner-1')
+
+        error_image.innerText = `Please fill in game image 1`;
+        error_image.style.display = 'block';
+        dump = "false"
+        return false
+    }
+
+
+}
+
+if (dump == "true") {
+
+    try {
         headerimageCount++;
         var image_id = "id" + Math.random().toString(16).slice(2)
         dynamic_imagenumFuntion.push(headerimageCount)
 
 
         let newRow = `
-         <div id = "section-heading-photo-${headerimageCount}">
-                            <div id="img-container">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="mb-3">
-                                            <label class="form-label" for="game-section-image-1">Image-${headerimageCount} </label>
-                                            <p id="field-id" style='display:none'>${image_id}</p>
-                                            <p id="field-roll-image-id-${headerimageCount}" style='display:none'>${image_id}</p>
-                                            <input class="form-control btn-pill" id="game-section-banner-${headerimageCount}" name="game_section_banner_${headerimageCount}" type="file"  onchange= "displaygameImage(event,count=${headerimageCount})" accept="image/*">
-                                            
-            
-                                            <img id="selected-game-image-${headerimageCount}" style="display: none; width: 100px; height: 100px;" />
-            
-                                        </div>
+     <div id = "section-heading-photo-${headerimageCount}">
+                        <div id="img-container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="game-section-image-1">Image-${headerimageCount} </label>
+                                        <p id="field-id" style='display:none'>${image_id}</p>
+                                        <p id="field-roll-image-id-${headerimageCount}" style='display:none'>${image_id}</p>
+                                        <input class="form-control btn-pill" id="game-section-banner-${headerimageCount}" name="game_section_banner_${headerimageCount}" type="file"  onchange= "displaygameImage(event,count=${headerimageCount})" accept="image/*">
+                                        
+        
+                                        <img id="selected-game-image-${headerimageCount}" style="display: none; width: 100px; height: 100px;" />
+        
                                     </div>
-                                    
-                                        <input type="hidden" class="last-header-image-field-id" value="${headerimageCount}"/>
-                                    
-                                    <div class="col-12  text-end " >
-
-                                        <button id="delete-row" onclick ="return deleteheadingimagerow(${headerimageCount})" class="btn btn-danger">-</button>
-                                    </div> 
-
-                                    <p style="color: red; display: none;" class="error-message" id ="error-game-section-banner-${headerimageCount}"></p>
-    
-                                    <p id = "game-image-warning-${headerimageCount}"></p>
                                 </div>
+                                
+                                    <input type="hidden" class="last-header-image-field-id" value="${headerimageCount}"/>
+                                
+                                <div class="col-12  text-end " >
+
+                                    <button id="delete-row" onclick ="return deleteheadingimagerow(${headerimageCount})" class="btn btn-danger">-</button>
+                                </div> 
+
+                                <p style="color: red; display: none;" class="error-message" id ="error-game-section-banner-${headerimageCount}"></p>
+
+                                <p id = "game-image-warning-${headerimageCount}"></p>
                             </div>
                         </div>
-                        <br>
-        `;
+                    </div>
+                    <br>
+    `;
 
         document.getElementById('dynamic-image-field').insertAdjacentHTML('beforebegin', newRow);
 
         return false;
-        }
-        catch(err){
-            console.log(err)
+    } catch (err) {
+        console.log(err)
 
         return false
-        }
-        }
-        else{
-            return false
-        }
     }
-        deleteing_field = []
-        function deleteheadingimagerow(id){
-            console.log(id)
-            try {
+} else {
+    return false
+}
+}
+deleteing_field = []
 
-                let deletingimageField = document.getElementById(`section-heading-photo-${id}`);
-                console.log(deletingimageField)
-            if (deletingimageField) {
-                deletingimageField.remove()
-                
-                
-                deleteing_field.push(id)
+function deleteheadingimagerow(id) {
+console.log(id)
+try {
+
+    let deletingimageField = document.getElementById(`section-heading-photo-${id}`);
+    console.log(deletingimageField)
+    if (deletingimageField) {
+        deletingimageField.remove()
 
 
-                //headerimageCount--
-                const lasthimagefield = document.querySelectorAll('.last-header-image-field-id');
-                
-                headerimageCount = lasthimagefield[lasthimagefield.length -1].value;
-                console.log(headerimageCount)
-                console.log(deleteing_field)
-                return false
-            }
-            } catch (err) {
-                console.log(err)
-                return false
+        deleteing_field.push(id)
 
-            }
-        }
 
-        dynamic_deleted_field = []
-        function deleteheaderimage_finalrow(id,counter){
-            console.log(id)
-        try{
-        console.log(id)
-        dynamic_deleted_field.push(id)
-        deleteing_field.push(counter)
-        document.getElementById(`section-heading-photo-${id}`).style.display = "none"
-        //featureCount--
-        console.log(dynamic_deleted_field)
+        //headerimageCount--
+        const lasthimagefield = document.querySelectorAll('.last-header-image-field-id');
+
+        headerimageCount = lasthimagefield[lasthimagefield.length - 1].value;
+        console.log(headerimageCount)
+        console.log(deleteing_field)
         return false
-        }
-        catch(err){
-            console.log(err)
-            return false
-        }
     }
+} catch (err) {
+    console.log(err)
+    return false
 
-    
+}
+}
 
-    function displayImagetraining_section1(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-section-1-image');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
+dynamic_deleted_field = []
+
+function deleteheaderimage_finalrow(id, counter) {
+console.log(id)
+try {
+    console.log(id)
+    dynamic_deleted_field.push(id)
+    deleteing_field.push(counter)
+    document.getElementById(`section-heading-photo-${id}`).style.display = "none"
+    //featureCount--
+    console.log(dynamic_deleted_field)
+    return false
+} catch (err) {
+    console.log(err)
+    return false
+}
+}
+
+
+
+function displayImagetraining_section1(event) {
+try {
+    const file = event.target.files[0];
+    const imgElement = document.getElementById('selected-section-1-image');
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
         }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('section-3-image-warning')
 
-            icon_warning.value = err
-
-            icon_warning.style.color = "red";
-
-        }
-        
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
     }
-    
-    function displayImagetraining_section2(event) {
-        try{
-            const file = event.target.files[0];
-        const imgElement = document.getElementById('selected-section-2-image');
-        
-        if (file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imgElement.src = e.target.result;
-                imgElement.style.display = 'block'; // Show the selected image
-            }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
-        }
-        }
-        catch(err){
-            var icon_warning = document.getElementById('section-3-image-warning')
+} catch (err) {
+    var icon_warning = document.getElementById('section-3-image-warning')
 
-            icon_warning.value = err
+    icon_warning.value = err
 
-            icon_warning.style.color = "red";
+    icon_warning.style.color = "red";
 
+}
+
+}
+
+function displayImagetraining_section2(event) {
+try {
+    const file = event.target.files[0];
+    const imgElement = document.getElementById('selected-section-2-image');
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            imgElement.src = e.target.result;
+            imgElement.style.display = 'block'; // Show the selected image
         }
-        
+
+        reader.readAsDataURL(file);
+    } else {
+        imgElement.style.display = 'none'; // Hide the placeholder if no file is selected
     }
+} catch (err) {
+    var icon_warning = document.getElementById('section-3-image-warning')
 
-    
+    icon_warning.value = err
+
+    icon_warning.style.color = "red";
+
+}
+
+}
 </script>
 {% endblock %}
 
