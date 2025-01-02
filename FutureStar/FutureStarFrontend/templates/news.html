@@ -12,6 +12,12 @@
 {% block title %} Future Star || News{% endblock %}
 
 {% block content %}
+<style>
+    .fa {
+    font-family: var(--fa-style-family,"Font Awesome 6 Free");
+    font-weight: var(--fa-style,900) !important;
+}
+</style>
 
 <!-- Page Banner Start -->
 <section class="page-banner-area common-banner-two text-center"
@@ -74,7 +80,7 @@
                           
                     </a>
                     <a class="read-more" href="{% url 'news-detail' news.id %}">
-                        Read More <i class="fa-solid fa-arrow-right"></i>
+                        Read More <i class="fa fa-arrow-right"></i>
                     </a>
                     
                 </div>
