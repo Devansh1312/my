@@ -610,17 +610,26 @@ class EventSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField()
     event_organizer = serializers.SerializerMethodField()
     booking_details = serializers.SerializerMethodField()  # New field for booking details
+    is_finished = serializers.SerializerMethodField()  # New field for checking if the event is finished
 
 
     class Meta:
         model = Event
         fields = [
             'id', 'event_organizer','booking_details', 'event_name', 'event_type', 'event_type_name', 'event_date',
-            'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address',
+            'event_start_time', 'event_end_time', 'event_image', 'latitude', 'longitude', 'address','is_finished',
             'house_no', 'premises', 'street', 'city', 'state', 'country_name', 'country_code',
             'event_description', 'event_cost',   'created_by_id','creator_type', 'comments', 'like_count', 'is_like', 'created_at', 'updated_at'
         ]
         read_only_fields = ['event_organizer']  # Make 'event_organizer' read-only since it will be auto-assigned
+    
+    def get_is_finished(self, obj):
+        # Compare the event_date with the current date
+        if obj.event_date:
+            today = datetime.today().date()
+            if obj.event_date < today:
+                return True
+        return False
 
     def get_booking_details(self, obj):
         request = self.context.get('request')

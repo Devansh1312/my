@@ -7608,7 +7608,7 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
 
             # Send notification to the user who made the booking
             push_data = {
-                'type': 'booking_status',
+                'type': 'my_events',
                 'notifier_id': event.id,
                 'status': status
             }
