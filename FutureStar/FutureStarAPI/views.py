@@ -68,7 +68,6 @@ class UpdateCurrentTypeAPIView(APIView):
 
 #################################################### Get User data ##########################################################################################################
 def get_user_data(user, request):
-    """Returns a dictionary with all user details."""
     created_by_id = request.query_params.get('created_by_id') or request.data.get('created_by_id', request.user.id)
     creator_type = request.query_params.get('creator_type') or request.data.get('creator_type', FollowRequest.USER_TYPE)
     
@@ -157,7 +156,6 @@ def get_user_data(user, request):
 
 ######################################################################################### Get Team Data ###################################################################
 def get_team_data(user, request):
-    """Returns a dictionary with the user's team details."""
     
     # Get the user's team (assuming only one team is allowed per user)
     try:
@@ -174,7 +172,6 @@ def get_team_data(user, request):
 
 ############################################################################# Get Group Data ######################################################
 def get_group_data(user, request):
-    """Returns a dictionary with the user's group details."""
     
     # Get the user's group (assuming only one group is allowed per user)
     try:
@@ -198,7 +195,6 @@ class send_otp(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def generate_random_password(self, length=8):
-        """Generate a random password with letters and digits."""
         characters = string.ascii_letters + string.digits
         return ''.join(random.choice(characters) for i in range(length))
     
@@ -4908,9 +4904,6 @@ class UserRoleStatsAPIView(APIView):
 
 
     def get_coach_stats(self, user, time_filter):
-        """
-        Fetch coach-specific stats, including stats for tournament and friendly games.
-        """
         try:
             # Get branches where the user is a coach
             coach_branches = JoinBranch.objects.filter(
@@ -5014,9 +5007,6 @@ class UserRoleStatsAPIView(APIView):
 
 
     def get_referee_stats(self, user, time_filter):
-        """
-        Fetch referee-specific stats, including stats for tournament and friendly games.
-        """
         try:
             # Tournament games officiated
             tournament_games_officiated = GameOfficials.objects.filter(
@@ -5220,10 +5210,6 @@ class UpdateCurrentLanguageView(APIView):
 
 ############### Training #####################
 class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
-    """
-    This API view checks all training sessions for today, compares the training's start time with the current time,
-    and sends push notifications to the appropriate users (creator, team founder, or group founder).
-    """
 
     def get(self, request, *args, **kwargs):
         # Get the current time and date
@@ -5319,11 +5305,6 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
 
 class CheckEndTimeAndSendNotificationsAPIView(APIView):
-    """
-    This API view checks all training sessions for today, compares the training's end time
-    (hour and minute) with the current time (hour and minute), and sends push notifications
-    to the appropriate users (creator, team founder, or group founder).
-    """
 
     def get(self, request, *args, **kwargs):
         # Get the current time and date
@@ -5591,9 +5572,7 @@ class LineupNotificationAPIView(APIView):
 
 class UniformConfirmationNotificationView(APIView):
     def get(self, request, *args, **kwargs):
-        """
-        API endpoint to send notifications for confirming uniforms.
-        """
+
         current_time = timezone.now()
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
@@ -5834,10 +5813,6 @@ class UniformAddNotificationAPIView(APIView):
 class PlayerReadyNotificationAPIView(APIView):
  
     def send_notifications_to_team_staff(self, team_branch, message_title, message_body):
-        """
-        Sends notifications to the coach, manager, and team founder of the given team.
-        Returns the list of recipients with their roles and usernames.
-        """
         roles = {
             JoinBranch.COACH_STAFF_TYPE: "Coach",
             JoinBranch.MANAGERIAL_STAFF_TYPE: "Manager",
@@ -5879,11 +5854,6 @@ class PlayerReadyNotificationAPIView(APIView):
         return notifications
 
     def check_and_notify(self, game, team_a_lineup, team_b_lineup, team_a_id, team_b_id):
-        """
-        Checks if any player in both teams has lineup_status=3 and player_ready=False,
-        and sends notifications if so.
-        Returns a list of notification details for each team.
-        """
         notifications = []
 
         # Check if any player in Team A has lineup_status=3 and player_ready=False
