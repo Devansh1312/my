@@ -282,8 +282,6 @@ class UserUpdateProfileView(View):
             
             # If referer_url is available, stay on the same page
                 if referer_url:
-                            print(f"Redirecting to {referer_url}")
-
                             # Add form errors to messages framework
                             for field in password_change_form:
                                 for error in field.errors:
@@ -504,25 +502,18 @@ class System_Settings(LoginRequiredMixin, View):
                 "awards_winning": None,
             }
 
-            # Debugging: Print all incoming POST fields and their values
-            print("Request POST data:", request.POST)
-
             for field, error_message in settings_fields.items():
                 field_value = request.POST.get(field)
-                print(f"Field: {field}, Value: {field_value}")  # Debugging: log field value
 
                 if not field_value and error_message:
                     errors[field] = error_message
                 else:
                     setattr(system_settings, field, field_value)
 
-            # Debugging: Print the errors to see what fields are not being filled correctly
-            print("Errors found:", errors)
 
             # Check if there are any errors
             if errors:
                 messages.error(request, "Please correct the errors below.")
-                print(errors)  # Log errors to the console
             else:
                 system_settings.save()
                 success = True
@@ -1100,7 +1091,6 @@ class UserDetailView(LoginRequiredMixin, View):
 
             # Ensure time_filter is a valid dictionary
             time_filter = time_filter or {}
-            print(time_filter)
 
             # Fetch the games the player's team participated in
             games = TournamentGames.objects.filter(
@@ -1366,10 +1356,6 @@ class UpdatePlayerStatsView(View):
         user_id = kwargs.get("user_id")  # Now you can get user_id from kwargs
         changes = json.loads(request.POST.get("changes", "{}"))  # Parse JSON string for changes
 
-        # Debugging: log the user_id and changes
-        print(f"User ID: {user_id}")  # Debug log
-        print(f"Changes: {changes}")  # Debug log
-
         if not user_id:
             return JsonResponse({"success": False, "error": "User ID is required."})
 
@@ -1398,7 +1384,6 @@ class UpdatePlayerStatsView(View):
                 return JsonResponse({"success": False, "error": f"Invalid value for {field_name}"})
 
             # Set the new value for the field
-            print(f"Updating field: {field_name} with value: {new_value}")  # Debug log
             setattr(user, field_name, new_value)
 
         # Save the user object with updated stats
@@ -1406,7 +1391,6 @@ class UpdatePlayerStatsView(View):
             user.save()  # Save the user object
             return JsonResponse({"success": True, "message": "Player stats updated successfully"})
         except Exception as e:
-            print(f"Error saving user data: {str(e)}")  # Debug log
             return JsonResponse({"success": False, "error": str(e)})
 
 
