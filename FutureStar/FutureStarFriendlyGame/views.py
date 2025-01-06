@@ -150,7 +150,7 @@ class CreateFriendlyGame(APIView):
                     created_by=request.user
                 )
 
-                # Process requested referees
+                # Process requested referees and send notifications
                 referees_data = request.data.get('referees', [])
                 for referee_data in referees_data:
                     user_id = referee_data.get('user_id')
@@ -158,13 +158,58 @@ class CreateFriendlyGame(APIView):
 
                     if fees and int(fees) > 0:  # Only create entry if fees > 0
                         try:
-                            RequestedReferee.objects.create(
+                            # Create Requested Referee Entry
+                            requested_referee = RequestedReferee.objects.create(
                                 game_id=friendly_game,
                                 user_id_id=user_id,
                                 fees=fees,
                                 status=RequestedReferee.REQUESTED
                             )
+
+                            # Send push notification to referees
+                            referee = User.objects.get(id=user_id)  # Fetch referee details from User table
+                            notification_language = referee.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            # Prepare push notification content
+                            title = _("Referee Request: Friendly Game")
+                            body = _("You have been requested as a referee for a friendly game on {date} at {time} at {field}. Please review the request.").format(
+                                date=friendly_game.game_date.strftime('%d-%m'),
+                                time=friendly_game.game_start_time.strftime('%H:%M'),
+                                field=friendly_game.game_field_id.field_name
+                            )
+
+                            push_data = {
+                                "id": friendly_game.id,  # Game ID
+                                "game_type": "friendly",
+                                "type": "referee_request"  # Notification type
+                            }
+
+                            # Check device type and token
+                            device_token = referee.device_token
+                            device_type = referee.device_type
+
+                            if device_token:  # Send push notification only if device token exists
+                                send_push_notification(
+                                    device_token=device_token,
+                                    title=title,
+                                    body=body,
+                                    device_type=device_type,
+                                    data=push_data
+                                )
+
+                            # Create notification record in database
+                            Notifictions.objects.create(
+                                created_by_id=request.user.id,  # Creator ID
+                                creator_type=request.user.role.id,
+                                title=title,
+                                content=body
+                            )
+
                         except Exception as e:
+                            # Log error for debugging purposes and continue
+                            print(f"Error sending notification to referee {user_id}: {str(e)}")
                             continue
 
                 # Notify eligible team members (coaches and managers)
@@ -1917,12 +1962,12 @@ class FriendlyGameStatsLineupPlayers(APIView):
 
         # Validate team_a_id, team_b_id, game_id, tournament_id as before...
 
-        # if not self._has_access(request.user, game_id=game_id):
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('You do not have access to this resource.'),
-        #         'data': {}
-        #     }, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id):
+            return Response({
+                'status': 0,
+                'message': _('You do not have access to this resource.'),
+                'data': {}
+            }, status=status.HTTP_403_FORBIDDEN)
         
            # Calculate team goals
     
@@ -3072,8 +3117,8 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
         if not game_id:
             return Response({'status': 0, 'message': _('game_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # if not self._has_access(request.user, game_id=game_id):
-        #     return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id):
+            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch game and calculate total goals for both teams
