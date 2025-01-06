@@ -227,7 +227,7 @@ class CreateFriendlyGame(APIView):
                 push_data = {
               
                 "game_id": game_id,  # Team ID to associate with the notification
-                "game_type": "friendly",  # Specify that this is a friendly game
+                "game_type": "friendly_game_scheduled",  # Specify that this is a friendly game
               
                     
             
@@ -272,7 +272,8 @@ class CreateFriendlyGame(APIView):
 
                     push_data = {
                             "game_id": game_id,  # Include the game ID
-                            "game_type": "friendly",  # Specify that this is a friendly game
+                            "game_type": "friendly",
+                            "type":"friendly_game"  # Specify that this is a friendly game
                             
                     }
 
@@ -1837,24 +1838,24 @@ class FriendlyGameStatsLineupPlayers(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def _has_access(self, user, game_id=None, tournament_id=None):
+    def _has_access(self, user, game_id=None):
         # Same access check code as before
-        if game_id and tournament_id:
+        if game_id:
             try:
-                game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
+                game = FriendlyGame.objects.get(id=game_id)
                 if game.game_statistics_handler == user:
                     return True
-            except TournamentGames.DoesNotExist:
+            except FriendlyGame.DoesNotExist:
                 pass
 
         return False   
 
     # Function to get the last update for a player
-    def get_last_update(self, player_id, game_id, tournament_id):  # Add self to the method definition
+    def get_last_update(self, player_id, game_id):  # Add self to the method definition
         last_stat = FriendlyGamesPlayerGameStats.objects.filter(
             Q(player_id_id=player_id) | Q(in_player_id=player_id) | Q(out_player_id=player_id),
             game_id=game_id,
-            tournament_id=tournament_id
+         
         ).order_by('-updated_at').first()  # Fetch the most recent update
 
         if last_stat:
@@ -1884,14 +1885,28 @@ class FriendlyGameStatsLineupPlayers(APIView):
         team_b_id = request.query_params.get('team_b_id')
         game_id = request.query_params.get('game_id')
 
-        # Validate team_a_id, team_b_id, game_id, tournament_id as before...
+         # Fetch single objects instead of querysets
+        team_a = FriendlyGame.objects.filter(team_a_id=team_a_id).first()
+        team_b = FriendlyGame.objects.filter(team_b_id=team_b_id).first()
+        game = FriendlyGame.objects.filter(id=game_id).first()
 
-        if not self._has_access(request.user, game_id=game_id):
+        if not team_a or not team_b or not game:
             return Response({
                 'status': 0,
-                'message': _('You do not have access to this resource.'),
+                'message': _('No such friendly game exists.'),
                 'data': {}
-            }, status=status.HTTP_403_FORBIDDEN)
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        
+
+        # Validate team_a_id, team_b_id, game_id, tournament_id as before...
+
+        # if not self._has_access(request.user, game_id=game_id):
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('You do not have access to this resource.'),
+        #         'data': {}
+        #     }, status=status.HTTP_403_FORBIDDEN)
         
            # Calculate team goals
     
@@ -1939,6 +1954,7 @@ class FriendlyGameStatsLineupPlayers(APIView):
                 'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
                 'lastupdate': self.get_last_update(lineup.player_id.id, game_id)  # Use self to call the method
             } for lineup in already_added_lineups]
+            print(already_added_data)
 
             managerial_staff = JoinBranch.objects.filter(
                 branch_id=team_id,
@@ -1977,7 +1993,7 @@ class FriendlyGameStatsLineupPlayers(APIView):
                     'team_b_total_goals': team_b_goals,
                     'team_b_logo': friendly_game.team_b.team_id.team_logo.url if friendly_game.team_b.team_id.team_logo else None,
                 },
-                'lineup': lineup_data
+                **lineup_data
             }
         }, status=status.HTTP_200_OK)
 
@@ -2820,9 +2836,12 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         **{stat: 1},  # Set the specific stat to 1
                         created_by_id=request.user.id
                     )
+                    created_by_id_role = request.user.role.id
+                    print(f'Created by role: {created_by_id_role}')
+
 
                     # Send push notification
-                    self._send_stat_notification(player_instance, stat, game_instance)
+                    self._send_stat_notification(player_instance, stat, game_instance,created_by_id_role)
 
                     # Update team goals
                     self._update_team_goals(game_instance)
@@ -2852,7 +2871,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
-    def _send_stat_notification(self, player_instance, stat, game_instance):
+    def _send_stat_notification(self, player_instance, stat, game_instance,created_by_id_role):
         """
         Sends a push notification when a player's statistics are updated in a friendly game.
         """
@@ -2883,7 +2902,27 @@ class FriendlyPlayerGameStatsAPIView(APIView):
 
         # Send the notification to the player
         if player_instance.device_token:
-            push_data = {'type': 'player_stat', 'player_id': player_instance.id, 'game_id': game_instance.id}
+            game_data= {
+                        "game_type": "Friendly",
+                        "game_start_time": game_instance.game_start_time.strftime("%H:%M:%S") if game_instance.game_start_time else None,
+                        "game_end_time": game_instance.game_end_time.strftime("%H:%M:%S") if game_instance.game_end_time else None,
+                        "game_details": {
+                            "game_id": game_instance.id,
+                            "team_a": {
+                                "id": game_instance.team_a.id,
+                                "name": game_instance.team_a.team_name,
+                            },
+                            "team_b": {
+                                "id": game_instance.team_b.id,
+                                "name": game_instance.team_b.team_name,
+                            },
+                            "user_role": created_by_id_role,
+                          
+                        },}
+            push_data = {'type': 'player_stat','player_id': player_instance.id, 'game_data' : game_data,
+                       }
+            
+
             send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
 
 
@@ -3013,8 +3052,8 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
         if not game_id:
             return Response({'status': 0, 'message': _('game_id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not self._has_access(request.user, game_id=game_id):
-            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
+        # if not self._has_access(request.user, game_id=game_id):
+        #     return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch game and calculate total goals for both teams
@@ -4121,20 +4160,20 @@ class FriendlyGameResult(APIView):
         except FriendlyGame.DoesNotExist:
             return Response({
                 "status": 0,
-                "message": _("Game not found for the given tournament.")
+                "message": _("Game not found for the given Game.")
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Retrieve the goals scored by each team in the game
         team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
             team_id=game.team_a.id,
             game_id=game.id,
-            tournament_id=game.tournament_id.id
+           
         ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
         team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
             team_id=game.team_b.id,
             game_id=game.id,
-            tournament_id=game.tournament_id.id
+          
         ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
 
         # Check if the finish status is provided and is true
@@ -4166,7 +4205,7 @@ class FriendlyGameResult(APIView):
                 "message": _("Game updated successfully."),
                 "data": {
                     "id": game.id,
-                    "tournament_id": game.tournament_id.id,
+                 
                     "is_draw": game.is_draw,
                     "finish": game.finish,
                     "team_a_goal": game.team_a_goal,
@@ -4183,7 +4222,7 @@ class FriendlyGameResult(APIView):
                 "message": _("Match is still running."),
                 "data": {
                     "id": game.id,
-                    "tournament_id": game.tournament_id.id,
+                  
                     "is_draw": game.is_draw if game.is_draw is not None else None,
                     "finish": game.finish if game.finish is not None else None,
                     "team_a_goal": game.team_a_goal,

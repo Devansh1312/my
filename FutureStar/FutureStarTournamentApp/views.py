@@ -761,7 +761,8 @@ class TeamJoiningRequest(APIView):
         
         # Serialize and return the created or updated object
         serializer = TournamentGroupTeamSerializer(tournament_group_team)
-        team_founder = team_branch.team_id.team_founder
+        team_founder = tournament.team_id.team_founder
+        print(tournament.team_id.id)
         if team_founder:
             device_token = team_founder.device_token  # Ensure the `device_token` is available
             if device_token:
@@ -771,15 +772,17 @@ class TeamJoiningRequest(APIView):
                 
                 title = _("Tournament Joining Request")  # Use the translation function
                 body = _("Team {team_name} has sent a request to join the tournament {tournament_name}.").format(
-                    team_name=team_branch.team_id.team_name,
+                    team_name=team_branch.team_name,
                     tournament_name=tournament.tournament_name
                 )
                   # Include tournament_id in the push data
                 push_data = {
                     "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
-                    "team_id": team_branch.id,  # Assuming `team_branch.id` is the correct attribute for the ID
-                    "type": "team joining request",  # Assuming `type` is the correct attribute for the type of notification
+                    "team_brach_id": team_branch.id,
+                    "notifier_id":tournament.team_id.id , # Assuming `team_branch.id` is the correct attribute for the ID
+                    "type": "team_joining_request",  # Assuming `type` is the correct attribute for the type of notification
                 }
+                
 
 
                 
@@ -862,10 +865,13 @@ class TeamRequestApproved(APIView):
 
                 if device_token and device_type:
                     # Send push notification with translated content
+                    print("done")
                     push_data = {
                         "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
-                        "team_id": team_branch_id,  # Include the branch_id
-                        "type": "team approved",  # Assuming `type` is the correct attribute for the type of notification
+                        "team_branch_id": team_branch_id, 
+                        "notifier_id":tournament.team_id.id, # Include the branch_id
+                        "type": "team_approved",  # Assuming `type` is the correct attribute for the type of notification
+                        "team_list":"1",
                     }
                     send_push_notification(
                         device_token=device_token,
@@ -1392,7 +1398,7 @@ class TournamentGamesAPIView(APIView):
             push_data = {
                     "tournament_id": tournament.id,  # The tournament ID
                     "game_id": game.id,  # The game ID
-                    "team_id": team_branch_id,  # The team branch ID
+                    "team_branch_id": team_branch_id,  # The team branch ID
                     "type": "game_scheduled",  # The notification type
                 }
 

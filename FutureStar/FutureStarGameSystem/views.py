@@ -1100,12 +1100,12 @@ class GameStatsLineupPlayers(APIView):
 
         # Validate team_a_id, team_b_id, game_id, tournament_id as before...
 
-        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-            return Response({
-                'status': 0,
-                'message': _('You do not have access to this resource.'),
-                'data': {}
-            }, status=status.HTTP_403_FORBIDDEN)
+        # if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('You do not have access to this resource.'),
+        #         'data': {}
+        #     }, status=status.HTTP_403_FORBIDDEN)
         
            # Calculate team goals
     
@@ -2009,9 +2009,11 @@ class PlayerGameStatsAPIView(APIView):
                         **{stat: 1},
                         created_by_id=request.user.id
                     )
+                    created_by_id_role = request.user.role.id
+                    print(f'Created by role: {created_by_id_role}')
 
                     # Send push notification
-                    self._send_stat_notification(player_instance, stat, tournament_instance, game_instance)
+                    self._send_stat_notification(player_instance, stat, tournament_instance, game_instance,created_by_id_role)
 
                     # Update team goals
                     self._update_team_goals(game_instance)
@@ -2043,7 +2045,7 @@ class PlayerGameStatsAPIView(APIView):
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
-    def _send_stat_notification(self, player_instance, stat, tournament_instance, game_instance):
+    def _send_stat_notification(self, player_instance, stat, tournament_instance, game_instance,created_by_id_role):
         """
         Sends a push notification when a player's statistics are updated.
         """
@@ -2073,9 +2075,33 @@ class PlayerGameStatsAPIView(APIView):
         # Construct the notification body
         notification_body = f"{translated_message} in {translated_tournament_name} - {translated_game_number}"
 
+        
+
+
         # Send the notification to the player
         if player_instance.device_token:
-            push_data = {'type': 'player_stat', 'player_id': player_instance.id, 'game_id': game_instance.id}
+
+            game_data= {"game_type": "Tournament",
+                        "game_start_time": game_instance.game_start_time.strftime("%H:%M:%S") if game_instance.game_start_time else None,
+                        "game_end_time": game_instance.game_end_time.strftime("%H:%M:%S") if game_instance.game_end_time else None,
+                        "game_details": {
+                            "game_id": game_instance.id,
+                            "team_a": {
+                                "id": game_instance.team_a.id,
+                                "name": game_instance.team_a.team_name,
+                            },
+                            "team_b": {
+                                "id": game_instance.team_b.id,
+                                "name": game_instance.team_b.team_name,
+                            },
+                            "user_role": created_by_id_role,
+                            "tournament_id": tournament_instance.id,
+                            "tournament_name": tournament_instance.tournament_name,
+                        },}
+            push_data = {'type': 'player_stat','player_id': player_instance.id, 'game_data' : game_data,
+                       }
+            
+
             send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
 
     def _update_team_goals(self, game_instance):
@@ -2314,8 +2340,8 @@ class TeamGameStatsTimelineAPIView(APIView):
         if not tournament_id:
             return Response({'status': 0, 'message': _('Tournament id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
+        # if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+        #     return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch game and calculate total goals for both teams
