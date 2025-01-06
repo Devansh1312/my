@@ -489,7 +489,6 @@ class System_Settings(LoginRequiredMixin, View):
                 "address": "This field is required.",
                 "currency_symbol": "This field is required.",
                 "event_convenience_fee": "This field is required.",
-                "happy_user": "This field is required.",
                 "line_of_code": "This field is required.",
                 "downloads": "This field is required.",
                 "app_rate": "This field is required.",
