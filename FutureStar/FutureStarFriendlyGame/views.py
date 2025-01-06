@@ -677,11 +677,18 @@ class UpdateFriendlyGame(APIView):
                 start_time=start_time,
                 game_field_name=game_field_name
             )
+           
+              
+            friendly_data= {"id": game_id,  # Include the game ID
+                    "game_type": "friendly",}
             push_data = {
-               
-                "game_type": "friendly",  # Specify that this is a friendly game
-                "team_b_id": team_b_id  # Add team_b_name to give more context in the notification
-            }
+                   
+                    "game_data": friendly_data,  # Include the game data,
+                    
+                    "type":"friendly_game_scheduled"
+
+            
+                }
             if device_token:
                 send_push_notification(
                     device_token=device_token,
