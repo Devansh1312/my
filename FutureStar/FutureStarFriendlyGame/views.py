@@ -173,11 +173,12 @@ class CreateFriendlyGame(APIView):
                 game_field_name=friendly_game.game_field_id.field_name
                 start_time = friendly_game.game_start_time.strftime('%H:%M')
                 date=friendly_game.game_date.strftime('%d-%m')
+                game_id = friendly_game.id
               
 
 
                 # Notify eligible team members (coaches and managers)
-                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date,start_time)
+                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date,start_time,game_id)
 
 
                 return Response({
