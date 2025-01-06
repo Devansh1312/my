@@ -1100,12 +1100,12 @@ class GameStatsLineupPlayers(APIView):
 
         # Validate team_a_id, team_b_id, game_id, tournament_id as before...
 
-        # if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('You do not have access to this resource.'),
-        #         'data': {}
-        #     }, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+            return Response({
+                'status': 0,
+                'message': _('You do not have access to this resource.'),
+                'data': {}
+            }, status=status.HTTP_403_FORBIDDEN)
         
            # Calculate team goals
     
@@ -2340,8 +2340,8 @@ class TeamGameStatsTimelineAPIView(APIView):
         if not tournament_id:
             return Response({'status': 0, 'message': _('Tournament id is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
-        #     return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
+        if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
+            return Response({'status': 0, 'message': _('You do not have access to this resource.'), 'data': {}}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             # Fetch game and calculate total goals for both teams

@@ -7044,7 +7044,7 @@ class AssignUserToGameView(LoginRequiredMixin, View):
 
             device_token = user.device_token
             device_type = user.device_type
-            push_data = {"type": "game system", "user_id": user_id}  # Custom payload
+            push_data = {"type": "game_handler", "user_id": user_id}  # Custom payload
 
             # Send push notification if valid token and type
             if device_type in [1, 2, "1", "2"]:
