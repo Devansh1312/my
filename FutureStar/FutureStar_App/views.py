@@ -515,6 +515,7 @@ class System_Settings(LoginRequiredMixin, View):
             # Check if there are any errors
             if errors:
                 messages.error(request, "Please correct the errors below.")
+                print(errors)
             else:
                 system_settings.save()
                 success = True
