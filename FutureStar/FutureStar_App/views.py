@@ -505,17 +505,25 @@ class System_Settings(LoginRequiredMixin, View):
                 "awards_winning": None,
             }
 
+            # Debugging: Print all incoming POST fields and their values
+            print("Request POST data:", request.POST)
+
             for field, error_message in settings_fields.items():
                 field_value = request.POST.get(field)
+                print(f"Field: {field}, Value: {field_value}")  # Debugging: log field value
+
                 if not field_value and error_message:
                     errors[field] = error_message
                 else:
                     setattr(system_settings, field, field_value)
 
+            # Debugging: Print the errors to see what fields are not being filled correctly
+            print("Errors found:", errors)
+
             # Check if there are any errors
             if errors:
                 messages.error(request, "Please correct the errors below.")
-                print(errors)
+                print(errors)  # Log errors to the console
             else:
                 system_settings.save()
                 success = True
@@ -540,6 +548,7 @@ class System_Settings(LoginRequiredMixin, View):
             return redirect("System_Settings")
         else:
             return redirect("System_Settings")
+
 
 
 #######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
