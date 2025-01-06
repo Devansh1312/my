@@ -213,7 +213,7 @@ class CreateFriendlyGame(APIView):
             for member in team_b_members:
                 user = member.user_id
                 print(user.id)
-                print(game_id)
+                print(type(game_id))
 
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
@@ -229,7 +229,7 @@ class CreateFriendlyGame(APIView):
                     start_time=start_time,
                     game_field_name=game_field_name
                 )
-                friendly_data= {"game_id": game_id,  # Include the game ID
+                friendly_data= {"id": game_id,  # Include the game ID
                     "game_type": "friendly",}
                 push_data = {
                     "created_by_id":created_by_id,  # Include the creator user ID,
