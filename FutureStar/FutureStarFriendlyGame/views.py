@@ -637,7 +637,7 @@ class UpdateFriendlyGame(APIView):
         
 
             # Notify team_a's coach and manager
-            self.notify_team_a_coach_and_manager(team_a_id,team_b_id,team_b_name, date, start_time, game_field_name)
+            self.notify_team_a_coach_and_manager(team_a_id,team_b_id,team_b_name, date, start_time, game_field_name,game_id)
 
             data = FriendlyGameSerializer(game).data
             return Response({
@@ -2618,10 +2618,14 @@ class FriendlyGameOfficialsAPIView(APIView):
                     location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
                     officials_type=type_serializer.data['name']
                 )
-                push_data={
-                    "game_id": game.id,  # The game ID
-                    "official_id": official.id,
+                print(type(game_id))
+                friendly_data= {"id": game_id,  # Include the game ID
+                    "game_type": "friendly",}
+                push_data = {
                   
+                    "game_data": friendly_data,  # Include the game data,
+                    
+                    "type":"friendly_game_scheduled"
                 }
 
 
