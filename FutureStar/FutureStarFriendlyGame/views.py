@@ -174,11 +174,12 @@ class CreateFriendlyGame(APIView):
                 start_time = friendly_game.game_start_time.strftime('%H:%M')
                 date=friendly_game.game_date.strftime('%d-%m')
                 game_id = friendly_game.id
+                created_by_id=friendly_game.created_by_id
               
 
 
                 # Notify eligible team members (coaches and managers)
-                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date,start_time,game_id)
+                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date,start_time,game_id,created_by_id)
 
 
                 return Response({
@@ -199,7 +200,7 @@ class CreateFriendlyGame(APIView):
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None,game_id=None):
+    def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None,game_id=None,created_by_id=None):
         """
         Notify eligible team members (coaches and managers) about a new friendly game.
         """
@@ -228,10 +229,12 @@ class CreateFriendlyGame(APIView):
                     start_time=start_time,
                     game_field_name=game_field_name
                 )
+                friendly_data= {"game_id": game_id,  # Include the game ID
+                    "game_type": "friendly",}
                 push_data = {
-                    "created_by_id":user.id,  # Include the creator user ID,
-                    "game_id": game_id,  # Include the game ID
-                    "game_type": "friendly",
+                    "created_by_id":created_by_id,  # Include the creator user ID,
+                    "game_data": friendly_data,  # Include the game data,
+                    
                     "type":"friendly_game_scheduled"
 
             
