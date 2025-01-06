@@ -211,6 +211,9 @@ class CreateFriendlyGame(APIView):
             )
             for member in team_b_members:
                 user = member.user_id
+                print(user.id)
+                print(game_id)
+
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
@@ -226,6 +229,7 @@ class CreateFriendlyGame(APIView):
                     game_field_name=game_field_name
                 )
                 push_data = {
+                    "created_by_id":user.id,  # Include the creator user ID,
                     "game_id": game_id,  # Include the game ID
                     "game_type": "friendly",
                     "type":"friendly_game_scheduled"
@@ -269,6 +273,8 @@ class CreateFriendlyGame(APIView):
                     device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
                     title = _("Friendly Game Reminder")
                     body = _("A new friendly game has been created! Make sure to check it out.")
+
+                    print(game_id)
 
                     push_data = {
                             "game_id": game_id,  # Include the game ID
