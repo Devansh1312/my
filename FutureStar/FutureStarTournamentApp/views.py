@@ -1971,7 +1971,7 @@ class FetchTeamUniformColorAPIView(APIView):
             'message': _('Uniform information fetched successfully.'),
             'data': {
                 'game_id': game.id,
-                'tournament_id': game.tournament_id,
+                'tournament_id': game.tournament_id.id,
                 'is_confirm': game.is_confirm,
                 'team_a': team_a_data,
                 'team_b': team_b_data
@@ -2065,7 +2065,7 @@ class FetchTeamUniformColorAPIView(APIView):
                 'message': success_message,
                 'data': {
                     'game_id': game.id,
-                    'tournament_id': game.tournament_id,
+                    'tournament_id': game.tournament_id.id,
                     'is_confirm': game.is_confirm,
                     'team_a': team_a_data,
                     'team_b': team_b_data

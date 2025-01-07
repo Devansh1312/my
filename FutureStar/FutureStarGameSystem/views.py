@@ -1352,113 +1352,113 @@ class LineupPlayerStatusAPIView(APIView):
                         'team_name': game.team_b.team_name,  # Assuming `team_name` field exists in `TeamBranch`
                     })
 
-        team_a_ready_count = Lineup.objects.filter(
-            team_id=game.team_a,
-            tournament_id=tournament_id,
-            game_id=game_id,
-            lineup_status=3,
-            player_ready=True
-        ).count()
+        # team_a_ready_count = Lineup.objects.filter(
+        #     team_id=game.team_a,
+        #     tournament_id=tournament_id,
+        #     game_id=game_id,
+        #     lineup_status=3,
+        #     player_ready=True
+        # ).count()
 
-        team_b_ready_count = Lineup.objects.filter(
-            team_id=game.team_b,
-            tournament_id=tournament_id,
-            game_id=game_id,
-            lineup_status=3,
-            player_ready=True
-        ).count()
+        # team_b_ready_count = Lineup.objects.filter(
+        #     team_id=game.team_b,
+        #     tournament_id=tournament_id,
+        #     game_id=game_id,
+        #     lineup_status=3,
+        #     player_ready=True
+        # ).count()
 
-        # Send notifications to team_a coaches and managers if they have 11 players ready
-        if team_a_ready_count == 11:
-            team_a_name = game.team_a.team_name
-            team_a_coaches_and_managers = JoinBranch.objects.filter(
-                branch_id=game.team_a,
-                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
-            )
-            for join in team_a_coaches_and_managers:
-                user = join.user_id
-                notification_language = user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_a.id}
-                data={'type': "add_lineup_player", 'game_data': game_data}
+        # # Send notifications to team_a coaches and managers if they have 11 players ready
+        # if team_a_ready_count == 11:
+        #     team_a_name = game.team_a.team_name
+        #     team_a_coaches_and_managers = JoinBranch.objects.filter(
+        #         branch_id=game.team_a,
+        #         joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+        #     )
+        #     for join in team_a_coaches_and_managers:
+        #         user = join.user_id
+        #         notification_language = user.current_language
+        #         if notification_language in ['ar', 'en']:
+        #             activate(notification_language)
+        #         game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_a.id}
+        #         data={'type': "add_lineup_player", 'game_data': game_data}
 
-                send_push_notification(
-                    device_token=user.device_token,
-                    title=_("Let's Go"),
-                    body=_("Your {team_name} team is ready to play!").format(team_name=team_a_name),
-                    device_type=user.device_type,
-                    data=data
-                )
+        #         send_push_notification(
+        #             device_token=user.device_token,
+        #             title=_("Let's Go"),
+        #             body=_("Your {team_name} team is ready to play!").format(team_name=team_a_name),
+        #             device_type=user.device_type,
+        #             data=data
+        #         )
 
-        # Send notifications to team_b coaches and managers if they have 11 players ready
-        if team_b_ready_count == 11:
-            team_b_name = game.team_b.team_name
-            team_b_coaches_and_managers = JoinBranch.objects.filter(
-                branch_id=game.team_b,
-                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
-            )
-            for join in team_b_coaches_and_managers:
-                user = join.user_id
-                notification_language = user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_b.id}
-                data={'type': "add_lineup_player", 'game_data': game_data}
+        # # Send notifications to team_b coaches and managers if they have 11 players ready
+        # if team_b_ready_count == 11:
+        #     team_b_name = game.team_b.team_name
+        #     team_b_coaches_and_managers = JoinBranch.objects.filter(
+        #         branch_id=game.team_b,
+        #         joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+        #     )
+        #     for join in team_b_coaches_and_managers:
+        #         user = join.user_id
+        #         notification_language = user.current_language
+        #         if notification_language in ['ar', 'en']:
+        #             activate(notification_language)
+        #         game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_b.id}
+        #         data={'type': "add_lineup_player", 'game_data': game_data}
 
-                send_push_notification(
-                    device_token=user.device_token,
-                    title=_("Let's Go"),
-                    body=_("Your {team_name} team is ready to play!").format(team_name=team_b_name),
-                    device_type=user.device_type,
-                    data=data
-                )
+        #         send_push_notification(
+        #             device_token=user.device_token,
+        #             title=_("Let's Go"),
+        #             body=_("Your {team_name} team is ready to play!").format(team_name=team_b_name),
+        #             device_type=user.device_type,
+        #             data=data
+        #         )
 
-        # If both teams are ready, send a notification to coaches and managers of both teams
-        if team_a_ready_count == 11 and team_b_ready_count == 11:
-            team_a_coaches_and_managers = JoinBranch.objects.filter(
-                branch_id=game.team_a,
-                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
-            )
-            team_b_coaches_and_managers = JoinBranch.objects.filter(
-                branch_id=game.team_b,
-                joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
-            )
+        # # If both teams are ready, send a notification to coaches and managers of both teams
+        # if team_a_ready_count == 11 and team_b_ready_count == 11:
+        #     team_a_coaches_and_managers = JoinBranch.objects.filter(
+        #         branch_id=game.team_a,
+        #         joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+        #     )
+        #     team_b_coaches_and_managers = JoinBranch.objects.filter(
+        #         branch_id=game.team_b,
+        #         joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+        #     )
 
-            for join in team_a_coaches_and_managers:
-                user = join.user_id
-                notification_language = user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
+        #     for join in team_a_coaches_and_managers:
+        #         user = join.user_id
+        #         notification_language = user.current_language
+        #         if notification_language in ['ar', 'en']:
+        #             activate(notification_language)
               
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_a.id}
-                data={'type': "add_lineup_player", 'game_data': game_data}
+        #         game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_a.id}
+        #         data={'type': "add_lineup_player", 'game_data': game_data}
 
 
 
-                send_push_notification(
-                    device_token=user.device_token,
-                    title=_("Let's Go"),
-                    body=_("Both teams are ready to play! Let's Go"),
-                    device_type=user.device_type,
-                    data=data
-                )
+        #         send_push_notification(
+        #             device_token=user.device_token,
+        #             title=_("Let's Go"),
+        #             body=_("Both teams are ready to play! Let's Go"),
+        #             device_type=user.device_type,
+        #             data=data
+        #         )
 
-            for join in team_b_coaches_and_managers:
-                user = join.user_id
-                notification_language = user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_b.id}
-                data={'type': "add_lineup_player", 'game_data': game_data}
+        #     for join in team_b_coaches_and_managers:
+        #         user = join.user_id
+        #         notification_language = user.current_language
+        #         if notification_language in ['ar', 'en']:
+        #             activate(notification_language)
+        #         game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_b.id}
+        #         data={'type': "add_lineup_player", 'game_data': game_data}
 
-                send_push_notification(
-                    device_token=user.device_token,
-                    title=_("Let's Go"),
-                    body=_("Both teams are ready to play! Let's Go"),
-                    device_type=user.device_type,
-                    data=data
-                )
+        #         send_push_notification(
+        #             device_token=user.device_token,
+        #             title=_("Let's Go"),
+        #             body=_("Both teams are ready to play! Let's Go"),
+        #             device_type=user.device_type,
+        #             data=data
+        #         )
 
         # Return the response with players classified into team_a and team_b and also by lineup status
         return Response({
@@ -1546,6 +1546,42 @@ class LineupPlayerStatusAPIView(APIView):
         lineup_entry.created_by_id = request.user.id
         lineup_entry.save()
 
+        game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
+
+
+        team_a_ready_count = Lineup.objects.filter(
+            team_id=game.team_a.id,
+            tournament_id=tournament_id,
+            game_id=game_id,
+            lineup_status=3,
+            player_ready=True
+        ).count()
+
+        team_b_ready_count = Lineup.objects.filter(
+            team_id=game.team_b.id,
+            tournament_id=tournament_id,
+            game_id=game_id,
+            lineup_status=3,
+            player_ready=True
+        ).count()
+        print(team_a_ready_count)
+        print(team_b_ready_count)
+
+        # Send notifications based on ready counts
+        is_team_a = team_id == game.team_a.id
+        is_team_b = team_id == game.team_b.id
+
+        # Send notifications based on the change and ready counts
+        if is_team_a and team_a_ready_count == 11:
+            self.send_notifications(game, game.team_a, tournament_id, "Your {team_name} team is ready to play!")
+
+        if is_team_b and team_b_ready_count == 11:
+            self.send_notifications(game, game.team_b, tournament_id, "Your {team_name} team is ready to play!")
+
+        if team_a_ready_count == 11 and team_b_ready_count == 11:
+            self.send_notifications(game, game.team_a, tournament_id, "Both teams are ready to play! Let's Go")
+            self.send_notifications(game, game.team_b, tournament_id, "Both teams are ready to play! Let's Go")
+
         return Response({
             'status': 1,
             'message': _('Player ready status updated successfully.'),
@@ -1557,6 +1593,34 @@ class LineupPlayerStatusAPIView(APIView):
                 'player_ready': lineup_entry.player_ready
             }
         }, status=status.HTTP_200_OK)
+
+    def send_notifications(self, game, team, tournament_id, message):
+        team_name = team.team_name
+        coaches_and_managers = JoinBranch.objects.filter(
+            branch_id=team.id,
+            joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]
+        )
+
+        for join in coaches_and_managers:
+            user = join.user_id
+            notification_language = user.current_language
+            if notification_language in ['ar', 'en']:
+                activate(notification_language)
+            print(type(tournament_id))
+
+            game_data = {"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament", "team_id": team.id}
+            data = {'type': "add_lineup_player", 'game_data': game_data}
+            body_message = _(message).format(team_name=team_name)
+
+            send_push_notification(
+                device_token=user.device_token,
+                title=_("Let's Go"),
+                body=body_message,
+                device_type=user.device_type,
+                data=data
+            )
+            
+    
 
 ###### Game Official Types API Views ######
 class GameOficialTypesList(APIView):
