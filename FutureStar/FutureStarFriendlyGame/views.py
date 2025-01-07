@@ -2239,13 +2239,15 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
+                game_data={"id": game.id,"game_type": "friendly", "team_id": game.team_b.id}
+                data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
                     device_token=user.device_token,
                     title=_("Let's Go"),
                     body=_("Your {team_name} team is ready to play!").format(team_name=team_a_name),
                     device_type=user.device_type,
-                    data={"game_id":game.id,"team_id": game.team_a.id,"game_type":"friendly"}
+                    data=data
                 )
 
         # Send notifications to team_b coaches and managers if they have 11 players ready
@@ -2260,13 +2262,16 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
+                game_data={"id": game.id,"game_type": "friendly", "team_id": game.team_b.id}
+                data={'type': "add_lineup_player", 'game_data': game_data}
+
 
                 send_push_notification(
                     device_token=user.device_token,
                     title=_("Let's Go"),
                     body=_("Your {team_name} team is ready to play!").format(team_name=team_b_name),
                     device_type=user.device_type,
-                    data={"game_id":game.id,"team_id": game.team_b.id,"game_type":"friendly"}
+                    data=data
                 )
 
         # If both teams are ready, send a notification to coaches and managers of both teams
@@ -2285,13 +2290,15 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
+                game_data={"id": game.id,"game_type": "friendly"}
+                data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
                     device_token=user.device_token,
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"game_id":game.id,"team_id": game.team_a.id,"game_type":"friendly"}
+                    data=data
                 )
 
             for join in team_b_coaches_and_managers:
@@ -2299,13 +2306,16 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
+                game_data={"id": game.id,"game_type": "friendly"}
+                data={'type': "add_lineup_player", 'game_data': game_data}
+                
 
                 send_push_notification(
                     device_token=user.device_token,
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"game_id":game.id,"team_id": game.team_b.id,"game_type":"friendly"}
+                    data=data
                 )
 
 
