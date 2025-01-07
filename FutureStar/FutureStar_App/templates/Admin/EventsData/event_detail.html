@@ -165,12 +165,11 @@
                                                 <tr>
                                                     <th>No</th>
                                                     <th>Username</th>
+                                                    <th>Full Name</th>
+                                                    <th>Phone</th>
+                                                    <th>Email</th>
                                                     <th>Booking Date</th>
                                                     <th>Ticket Amount</th>
-
-                                                    <th>Tickets</th>
-                                                    <th>Convenience Fee</th>
-                                                    <th>Total Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -178,16 +177,15 @@
                                                     <tr>
                                                         <td>{{ forloop.counter }}</td>
                                                         <td>{{ booking.username }}</td>
+                                                        <td>{{ booking.full_name }}</td>
+                                                        <td>{{ booking.phone }}</td>
+                                                        <td>{{ booking.email }}</td>
                                                         <td>{{ booking.created_at.date }}</td>
-                                                        <td>{{ booking.ticket_amount}}</td>
-
-                                                        <td>{{ booking.tickets }}</td>
-                                                        <td>{{ booking.convenience_fee }}</td>
-                                                        <td>{{ booking.total_amount }}</td>
+                                                        <td>{{ booking.ticket_amount }}</td>
                                                     </tr>
                                                 {% empty %}
                                                     <tr>
-                                                        <td colspan="5">No booking history available.</td>
+                                                        <td colspan="7">No booking history available.</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -195,6 +193,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                 </div>

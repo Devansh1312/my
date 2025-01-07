@@ -37,8 +37,7 @@ Manager List
                               <th>Name</th>
                               <th>Type</th>
                               <th>Date</th>
-                            
-                            
+                              <th>City</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
@@ -50,9 +49,7 @@ Manager List
                               <td>{{ event.event_name }}</td>
                               <td>{{ event.event_type.name_en }}</td> 
                               <td>{{ event.event_date }}</td>
-                              
-                        
-                              
+                              <td>{{ event.city|default:"None" }}</td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <!-- Three dots menu trigger -->

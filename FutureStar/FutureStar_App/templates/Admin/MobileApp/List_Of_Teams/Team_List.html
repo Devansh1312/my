@@ -39,8 +39,9 @@ Team List View
                                 <th>No.</th>
                                 <th>Team Name</th>
                                 <th>Username</th>
-                                <th>Founder Username</th>
-                                <th>President</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Team Type</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -50,8 +51,9 @@ Team List View
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ team.team_name }}</td>
                                 <td>{{ team.team_username }}</td>
-                                <td>{{ team.team_founder.username }}</td>
-                                <td>{{ team.team_president }}</td>
+                                <td>{{ team.phone }}</td>
+                                <td>{{ team.city_id.name|default:"None" }}</td>
+                                <td>{{ team.team_type.name_en}}</td>
                                 <td>
                                     <!-- Action buttons -->
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">

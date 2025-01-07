@@ -27,10 +27,10 @@
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Friendly Game Name</th>
                                         <th>Game Number</th>
-                                        <th colspan="2">Teams</th>
+                                        <th>Teams</th>
                                         <th colspan="2">Game Date & time</th>
+                                        <th>Field</th>
                                         <th>Game Created By</th>
                                         <th>Assigned User</th>
                                      
@@ -43,12 +43,11 @@
                                     {% for game in friendly_games %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ game.game_name }}</td>
                                         <td>{{ game.game_number }}</td>
-                                        <td>{{ game.team_a.team_name }}</td>
-                                        <td>{{ game.team_b.team_name }}</td>
+                                        <td>{{ game.team_a.team_name }}<b> VS </b>{{ game.team_b.team_name }}</td>
                                         <td>{{ game.game_date }}</td>
                                         <td>{{ game.game_start_time }}</td>
+                                        <td>{{ game.game_field_id.field_name}}</td>
                                         <td>{{ game.created_by.username }}</td>
 
                                         <td>{{ game.assigned_user_name }}</td>

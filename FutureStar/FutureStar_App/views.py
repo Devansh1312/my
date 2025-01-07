@@ -2058,10 +2058,18 @@ class NewsCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "news"))
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "news/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"news/{unique_suffix}{file_extension}"
 
+            # Save the image file to the correct location
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the news entry
         news = News.objects.create(
             title_en=title_en,
             title_ar=title_ar,
@@ -2090,21 +2098,34 @@ class NewsEditView(View):
             messages.error(request, "Title and Description are required.")
             return redirect("news_list")
 
+        # Update news item with the new values
         news_item.title_en = title_en
         news_item.title_ar = title_ar
         news_item.description_ar = description_ar
         news_item.description_en = description_en
 
+        # Handling image update
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "news"))
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"news/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if news_item.image and news_item.image.path:
                 old_image_path = news_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            news_item.image = "news/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the news item
+            fs.save(image_name, image_file)
+            news_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated news item
         news_item.save()
 
         messages.success(request, "News updated successfully.")
@@ -2137,6 +2158,7 @@ class PartnersListView(LoginRequiredMixin, View):
         )
 
 
+# Partner Creation View
 @method_decorator(user_role_check, name="dispatch")
 class PartnersCreateView(View):
     def post(self, request):
@@ -2150,21 +2172,27 @@ class PartnersCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "partners")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "partners/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"partners/{unique_suffix}{file_extension}"
+
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
 
         partners = Partners.objects.create(
             title=title,
             image=image_name,  # Save the relative image path in the database
         )
 
-        messages.success(request, "Partners created successfully.")
+        messages.success(request, "Partner created successfully.")
         return redirect("partners_list")
 
 
+# Partner Edit View
 @method_decorator(user_role_check, name="dispatch")
 class PartnersEditView(View):
     template_name = "Admin/General_Settings/Partners_List.html"
@@ -2181,19 +2209,28 @@ class PartnersEditView(View):
         partners_item.title = title
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "partners")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"partners/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if partners_item.image and partners_item.image.path:
                 old_image_path = partners_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            partners_item.image = "partners/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the partners item
+            fs.save(image_name, image_file)
+            partners_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated partners item
         partners_item.save()
 
-        messages.success(request, "Partners updated successfully.")
+        messages.success(request, "Partner updated successfully.")
         return redirect("partners_list")
 
 
@@ -2223,6 +2260,7 @@ class Global_ClientsListView(LoginRequiredMixin, View):
         )
 
 
+# Global Clients Creation View
 @method_decorator(user_role_check, name="dispatch")
 class Global_ClientsCreateView(View):
     def post(self, request):
@@ -2236,12 +2274,18 @@ class Global_ClientsCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "global_clients")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "global_clients/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"global_clients/{unique_suffix}{file_extension}"
 
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the Global Client entry
         global_clients = Global_Clients.objects.create(
             title=title,
             image=image_name,  # Save the relative image path in the database
@@ -2251,6 +2295,7 @@ class Global_ClientsCreateView(View):
         return redirect("global_clients_list")
 
 
+# Global Clients Edit View
 @method_decorator(user_role_check, name="dispatch")
 class Global_ClientsEditView(View):
     template_name = "Admin/General_Settings/Global_Clients_List.html"
@@ -2267,16 +2312,25 @@ class Global_ClientsEditView(View):
         global_clients_item.title = title
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "global_clients")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"global_clients/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if global_clients_item.image and global_clients_item.image.path:
                 old_image_path = global_clients_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            global_clients_item.image = "global_clients/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the global client entry
+            fs.save(image_name, image_file)
+            global_clients_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated global client entry
         global_clients_item.save()
 
         messages.success(request, "Global Client updated successfully.")
@@ -2309,6 +2363,7 @@ class Tryout_ClubListView(LoginRequiredMixin, View):
         )
 
 
+# Tryout Club Creation View
 @method_decorator(user_role_check, name="dispatch")
 class Tryout_ClubCreateView(View):
     def post(self, request):
@@ -2322,12 +2377,18 @@ class Tryout_ClubCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "tryout_club")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "tryout_club/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"tryout_club/{unique_suffix}{file_extension}"
 
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the Tryout Club entry
         tryout_club = Tryout_Club.objects.create(
             title=title,
             image=image_name,  # Save the relative image path in the database
@@ -2337,6 +2398,7 @@ class Tryout_ClubCreateView(View):
         return redirect("tryout_club_list")
 
 
+# Tryout Club Edit View
 @method_decorator(user_role_check, name="dispatch")
 class Tryout_ClubEditView(View):
     template_name = "Admin/General_Settings/Tryout_Club_List.html"
@@ -2353,16 +2415,25 @@ class Tryout_ClubEditView(View):
         tryout_club_item.title = title
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "tryout_club")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"tryout_club/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if tryout_club_item.image and tryout_club_item.image.path:
                 old_image_path = tryout_club_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            tryout_club_item.image = "tryout_club/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the tryout club entry
+            fs.save(image_name, image_file)
+            tryout_club_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated tryout club entry
         tryout_club_item.save()
 
         messages.success(request, "Tryout Club updated successfully.")
@@ -2413,6 +2484,7 @@ class TestimonialListView(LoginRequiredMixin, View):
         )
 
 
+# Testimonial Creation View
 @method_decorator(user_role_check, name="dispatch")
 class TestimonialCreateView(View):
     def post(self, request):
@@ -2428,12 +2500,18 @@ class TestimonialCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "testimonial")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "testimonial/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"testimonial/{unique_suffix}{file_extension}"
 
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the Testimonial entry
         testimonial = Testimonial.objects.create(
             name_en=name_en,
             designation_en=designation_en,
@@ -2449,6 +2527,7 @@ class TestimonialCreateView(View):
         return redirect("testimonial_list")
 
 
+# Testimonial Edit View
 @method_decorator(user_role_check, name="dispatch")
 class TestimonialEditView(View):
     template_name = "Admin/General_Settings/Testimonial_List.html"
@@ -2473,16 +2552,25 @@ class TestimonialEditView(View):
         testimonial_item.rattings = rattings
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "testimonial")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"testimonial/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if testimonial_item.image and testimonial_item.image.path:
                 old_image_path = testimonial_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            testimonial_item.image = "testimonial/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the testimonial entry
+            fs.save(image_name, image_file)
+            testimonial_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated testimonial entry
         testimonial_item.save()
 
         messages.success(request, "Testimonial updated successfully.")
@@ -2514,6 +2602,7 @@ class Team_MembersListView(LoginRequiredMixin, View):
             },
         )
 
+# Team Member Creation View
 @method_decorator(user_role_check, name="dispatch")
 class Team_MembersCreateView(View):
     def post(self, request):
@@ -2526,12 +2615,18 @@ class Team_MembersCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "team_members")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "team_members/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"team_members/{unique_suffix}{file_extension}"
 
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the Team Member entry
         team_members = Team_Members.objects.create(
             name_en=name_en,
             designations_en=designations_en,
@@ -2544,6 +2639,7 @@ class Team_MembersCreateView(View):
         return redirect("team_members_list")
 
 
+# Team Member Edit View
 @method_decorator(user_role_check, name="dispatch")
 class Team_MembersEditView(View):
     template_name = "Admin/Team_Members_List.html"
@@ -2563,16 +2659,25 @@ class Team_MembersEditView(View):
 
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "team_members")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"team_members/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if team_members_item.image and team_members_item.image.path:
                 old_image_path = team_members_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            team_members_item.image = "team_members/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the team member entry
+            fs.save(image_name, image_file)
+            team_members_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated team member entry
         team_members_item.save()
 
         messages.success(request, "Team Member updated successfully.")
@@ -2605,6 +2710,7 @@ class App_FeatureListView(LoginRequiredMixin, View):
         )
 
 
+# App Feature Creation View
 @method_decorator(user_role_check, name="dispatch")
 class App_FeatureCreateView(View):
     def post(self, request):
@@ -2617,12 +2723,18 @@ class App_FeatureCreateView(View):
         image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "app_feature")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "app_feature/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"app_feature/{unique_suffix}{file_extension}"
 
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the App Feature entry
         app_feature = App_Feature.objects.create(
             title_en=title_en,
             sub_title_en=sub_title_en,
@@ -2635,6 +2747,7 @@ class App_FeatureCreateView(View):
         return redirect("app_feature_list")
 
 
+# App Feature Edit View
 @method_decorator(user_role_check, name="dispatch")
 class App_FeatureEditView(View):
     template_name = "Admin/App_Feature_List.html"
@@ -2654,16 +2767,25 @@ class App_FeatureEditView(View):
 
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "app_feature")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"app_feature/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if app_feature_item.image and app_feature_item.image.path:
                 old_image_path = app_feature_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            app_feature_item.image = "app_feature/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
 
+            # Save the new image file and update the app feature entry
+            fs.save(image_name, image_file)
+            app_feature_item.image = image_name  # Save the relative image path in the database
+
+        # Save the updated app feature entry
         app_feature_item.save()
 
         messages.success(request, "App Feature updated successfully.")
@@ -5992,23 +6114,27 @@ class MobileDashboardBannerListView(View):
         )
 
 
-# @method_decorator(user_role_check, name='dispatch')
+# Mobile Dashboard Banner Create View
+@method_decorator(user_role_check, name='dispatch')
 class MobileDashboardBannerCreateView(View):
-    # template_name = "Admin/General_Settings/MobileDashboardBanner_Create.html"
-
     def post(self, request):
         image_file = request.FILES.get("image")
 
         # Handling image upload
-        image_file = request.FILES.get("image")
         image_name = None
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "dashboardbanner_images")
-            )
-            image_name = fs.save(image_file.name, image_file)
-            image_name = "dashboardbanner_images/" + image_name
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"dashboardbanner_images/{unique_suffix}{file_extension}"
 
+            # Save the image file to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+            fs.save(image_name, image_file)
+
+        # Create the Mobile Dashboard Banner entry
         MobileDashboardBanner.objects.create(
             image=image_name,  # Save the relative image path in the database
         )
@@ -6017,31 +6143,39 @@ class MobileDashboardBannerCreateView(View):
         return redirect("dashboard_banner_list")
 
 
-# @method_decorator(user_role_check, name='dispatch')
+# Mobile Dashboard Banner Edit View
+@method_decorator(user_role_check, name='dispatch')
 class MobileDashboardBannerEditView(View):
-    # template_name = "Admin/General_Settings/MobileDashboardBanner_Edit.html"
-
     def post(self, request, pk):
         banner_item = get_object_or_404(MobileDashboardBanner, pk=pk)
 
         image_file = request.FILES.get("image")
         if image_file:
-            fs = FileSystemStorage(
-                location=os.path.join(settings.MEDIA_ROOT, "dashboardbanner_images")
-            )
+            # Generate a random string of 8 characters for the file name
+            unique_suffix = get_random_string(8)
+            # Extract the file extension from the uploaded image
+            file_extension = os.path.splitext(image_file.name)[1]
+            # Create a new unique image name
+            image_name = f"dashboardbanner_images/{unique_suffix}{file_extension}"
+
+            # Save the new image to the file system
+            fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if banner_item.image and banner_item.image.path:
                 old_image_path = banner_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
-            image_name = fs.save(image_file.name, image_file)
-            banner_item.image = "dashboardbanner_images/" + image_name
+                    os.remove(old_image_path)  # Delete the old image
+
+            # Save the new image file and update the banner entry
+            fs.save(image_name, image_file)
+            banner_item.image = image_name  # Save the relative image path in the database
 
         banner_item.save()
+
         messages.success(request, "Banner updated successfully.")
         return redirect("dashboard_banner_list")
 
 
-# @method_decorator(user_role_check, name='dispatch')
+@method_decorator(user_role_check, name='dispatch')
 class MobileDashboardBannerDeleteView(View):
     def post(self, request, pk):
         banner = get_object_or_404(MobileDashboardBanner, pk=pk)

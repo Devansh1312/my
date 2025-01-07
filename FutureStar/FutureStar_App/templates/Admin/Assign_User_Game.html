@@ -21,10 +21,10 @@
                            <tr>
                               <th>No.</th>
                               <th>Tournament Name</th>
-                              <th>Number</th>
+                              <th>Game Number</th>
                               <th>Teams</th>
-                              <th >Date</th>
-                              <th>Team/User</th>
+                              <th>Date</th>
+                              <th>Field</th>
                               <th>Handler Name</th>
                               <th>Detail</th>
                            </tr>
@@ -33,9 +33,9 @@
                               <td>{{ forloop.counter }}</td>
                               <td>{{ game.tournament_id.tournament_name }}</td>
                               <td>{{ game.game_number }}</td>
-                              <td>{{ game.team_a.team_name }} & {{ game.team_b.team_name }}</td>
+                              <td>{{ game.team_a.team_name }} <b>VS</b> {{ game.team_b.team_name }}</td>
                               <td>{{ game.game_date }} {{ game.game_start_time }}</td>
-                              <td>{{ game.tournament_id.team_id.team_name }}/{{ game.tournament_id.team_id.team_founder.username }}</td>
+                              <td>{{ game.game_field_id.field_name }}</td>
                               <td>{{ game.assigned_user_name }}</td>
                               <td>
                                  <!-- Action buttons -->
