@@ -7,8 +7,8 @@ from django.shortcuts import redirect
 urlpatterns = [
 
       path('api/friendlygames/create/', CreateFriendlyGame.as_view()),
-      path('api/friendlygames/requested_referee/fee/', RefereeFeeCreateUpdateView.as_view()),
-      path('api/friendlygames/requested_referee/status/', RefereeFeeCreateUpdateView.as_view()),
+      # path('api/friendlygames/requested_referee/fee/', RefereeFeeCreateUpdateView.as_view()),
+      # path('api/friendlygames/requested_referee/status/', RefereeFeeCreateUpdateView.as_view()),
       # path('api/friendlygames/requested_referee/search/', SearchOfficialView.as_view()),
       path('api/friendlygames/requested_referee/list/', OfficialListView.as_view()),
 

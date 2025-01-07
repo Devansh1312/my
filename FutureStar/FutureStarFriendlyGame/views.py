@@ -179,12 +179,17 @@ class CreateFriendlyGame(APIView):
                                 time=friendly_game.game_start_time.strftime('%H:%M'),
                                 field=friendly_game.game_field_id.field_name
                             )
-
+                            friendly_data= {"id": friendly_game.id,  # Include the game ID
+                                "game_type": "friendly",}
                             push_data = {
-                                "id": friendly_game.id,  # Game ID
-                                "game_type": "friendly",
-                                "type": "referee_request"  # Notification type
+                              
+                                "game_data": friendly_data,  # Include the game data,
+                                
+                                "type":"friendly_game_scheduled"
+
+                        
                             }
+
 
                             # Check device type and token
                             device_token = referee.device_token
@@ -200,12 +205,12 @@ class CreateFriendlyGame(APIView):
                                 )
 
                             # Create notification record in database
-                            Notifictions.objects.create(
-                                created_by_id=request.user.id,  # Creator ID
-                                creator_type=request.user.role.id,
-                                title=title,
-                                content=body
-                            )
+                            # Notifictions.objects.create(
+                            #     created_by_id=request.user.id,  # Creator ID
+                            #     creator_type=request.user.role.id,
+                            #     title=title,
+                            #     content=body
+                            # )
 
                         except Exception as e:
                             # Log error for debugging purposes and continue
@@ -1501,38 +1506,41 @@ class FriendlyGameLineupPlayers(APIView):
                 else:
                     lineup.position_1 = position_1
                     lineup.lineup_status = FriendlyGameLineup.ALREADY_IN_LINEUP  # Set status to ALREADY_IN_LINEUP
+                    game = FriendlyGame.objects.get(id=game_id)
+           
+                    opponent_team = game.team_b if game.team_a.id == team_id else game.team_a
+
+                    # Get the user's current language for notification
+                    notification_language = lineup.player_id.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
+                    game_data={"id": game.id,"game_type": "friendly", "team_id": team_id}
+                    data={'type': "add_lineup_player", "opponent_team_id": opponent_team.id, 'game_data': game_data}
+
+                    # Send notification to the player
+                    send_push_notification(
+                        device_token=lineup.player_id.device_token,
+                        title=_("You have been added to a game"),
+                        body=_(
+                            "You have been added to a game of {game_name} against {opponent_team}"
+                        ).format(
+                            game_name=game.game_name,
+                    
+                        
+                        
+                            opponent_team=opponent_team.team_name
+                        ),
+                        device_type=lineup.player_id.device_type,
+                        data=data
+                    )
+
+
 
                 lineup.created_by_id = user.id  # Set the updated user
                 lineup.save()
 
                   
-                game = FriendlyGame.objects.get(id=game_id)
-           
-                opponent_team = game.team_b if game.team_a.id == team_id else game.team_a
-
-                # Get the user's current language for notification
-                notification_language = lineup.player_id.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
-
-                # Send notification to the player
-                send_push_notification(
-                    device_token=lineup.player_id.device_token,
-                    title=_("You have been added to a game"),
-                    body=_(
-                        "You have been added to a game of {game_name} against {opponent_team}"
-                    ).format(
-                        game_name=game.game_name,
-                
-                       
-                     
-                        opponent_team=opponent_team.team_name
-                    ),
-                    device_type=lineup.player_id.device_type,
-                    data={"game_id": game.id, "team_id": team_id, "opponent_team_id": opponent_team.id,"game_type":"friendly"}
-                )
-
-
+              
 
             except FriendlyGameLineup.DoesNotExist:
                 errors.append({

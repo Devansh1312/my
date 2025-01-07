@@ -609,6 +609,10 @@ class LineupPlayers(APIView):
                 notification_language = lineup.player_id.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
+                    
+                game_data={"id": game.id, 'tournament_id': tournament.id, "game_type": "Tournament", "team_id": team_id}
+                data={'type': "add_lineup_player", "opponent_team_id": opponent_team.id, 'game_data': game_data}
+
 
                 # Send notification to the player
                 send_push_notification(
@@ -617,12 +621,11 @@ class LineupPlayers(APIView):
                     body=_(
                         "You have been added to a game of {tournament_name} against {opponent_team}"
                     ).format(
-                       
                         tournament_name=tournament.tournament_name,
                         opponent_team=opponent_team.team_name
                     ),
                     device_type=lineup.player_id.device_type,
-                    data={"game_id": game.id,"game_type":"tournament", "team_id": team_id, "opponent_team_id": opponent_team.id}
+                    data=data
                 )
 
 
