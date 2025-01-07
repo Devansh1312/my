@@ -1975,24 +1975,28 @@ class EventDetailView(LoginRequiredMixin, View):
 
         # Fetch event bookings
         bookings = EventBooking.objects.filter(event=event)
-        
-        # Add usernames to bookings
+
+        # Add user details to bookings
         for booking in bookings:
             try:
                 user = User.objects.get(id=booking.created_by_id)
-                booking.username = user.username  # Add username to each booking instance
+                booking.username = user.username
+                booking.full_name = user.fullname  # Use 'full_name' instead
+                booking.phone = user.phone
             except User.DoesNotExist:
                 booking.username = None
-
+                booking.full_name = None
+                booking.phone = None
         return render(
             request,
             self.template_name,
             {
                 "event": event,
-                "bookings": bookings,  # Pass booking data to the template
+                "bookings": bookings,
                 "breadcrumb": {"child": f"Event Details - {event.event_name}"},
             },
         )
+
 
     def post(self, request, pk):
         event = get_object_or_404(Event, pk=pk)
@@ -2005,16 +2009,19 @@ class EventDetailView(LoginRequiredMixin, View):
         for booking in bookings:
             try:
                 user = User.objects.get(id=booking.created_by_id)
-                booking.username = user.username  # Add username to each booking instance
+                booking.username = user.username
+                booking.full_name = user.fullname  # Use 'full_name' instead
+                booking.phone = user.phone
             except User.DoesNotExist:
                 booking.username = None
-
+                booking.full_name = None
+                booking.phone = None
         return render(
             request,
             self.template_name,
             {
                 "event": event,
-                "bookings": bookings,  # Pass booking data to the template
+                "bookings": bookings,
                 "breadcrumb": {"child": f"Event Details - {event.event_name}"},
             },
         )
