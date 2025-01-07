@@ -5411,6 +5411,7 @@ class LineupNotificationAPIView(APIView):
 
             # Calculate the time one hour from now
             one_hour_later = current_time + timedelta(hours=1)
+            print(one_hour_later)
 
             # Get upcoming tournament games within the next 1 hour for today
             upcoming_tournament_games = TournamentGames.objects.filter(
@@ -5557,12 +5558,15 @@ class LineupNotificationAPIView(APIView):
             "Please add your line-up for your match against {opponent_team}."
         ).format(opponent_team=opponent_team_name)
 
+        push_data = {'type': "assign_handler"}
+
         # Send the notification
         send_push_notification(
             user.device_token,
             title=title,
             body=body,
-            device_type=user.device_type
+            device_type=user.device_type,
+            data=push_data
         )
 
         # Append details to notifications_sent
@@ -5576,6 +5580,8 @@ class UniformConfirmationNotificationView(APIView):
         current_time = timezone.now()
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
+        print(current_time)
+        print(one_hour_later)
 
         # Retrieve upcoming tournament games that are not confirmed
         upcoming_tournament_games = TournamentGames.objects.filter(
@@ -5625,11 +5631,14 @@ class UniformConfirmationNotificationView(APIView):
                         f"Please confirm the uniform colors for the {game_type_label} game (Game #{game_number}) "
                         f"between {game.team_a} and {game.team_b}."
                     )
+                data = {'type': "assign_handler"}
+                
                 send_push_notification(
                     device_token=official_user.device_token,
                     title=title,
                     body=body,
-                    device_type=official_user.device_type
+                    device_type=official_user.device_type,
+                    data=data
                 )
                 notifications_sent.append({
                     "user": official_user.id,
@@ -5647,11 +5656,13 @@ class UniformConfirmationNotificationView(APIView):
                     f"Please confirm the uniforms colors for the {game_type_label} game (Game #{game_number}) "
                     f"between {game.team_a} and {game.team_b}."
                 )
+                data = {'type': "assign_handler"}
                 send_push_notification(
                     device_token=handler.device_token,
                     title=title,
                     body=body,
-                    device_type=handler.device_type
+                    device_type=handler.device_type,
+                    data=data   
                 )
                 notifications_sent.append({
                     "user": handler.id,
@@ -5685,6 +5696,7 @@ class UniformAddNotificationAPIView(APIView):
 
         # Calculate the time one hour from now
         one_hour_later = current_time + timedelta(hours=1)
+        print(one_hour_later)
 
         # Get upcoming tournament games within the next 1 hour for today
         upcoming_tournament_games = TournamentGames.objects.filter(
@@ -5800,12 +5812,15 @@ class UniformAddNotificationAPIView(APIView):
         )
         title = _("Missing Uniform Colors!!")
 
+        push_data = {'type': "assign_handler"}
+
         # Send the notification
         send_push_notification(
             device_token=user.device_token,
             title=title,
             body=body,
-            device_type=user.device_type
+            device_type=user.device_type,
+            data=push_data
         )
 
         # Log notification sent
