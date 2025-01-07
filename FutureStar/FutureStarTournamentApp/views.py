@@ -2118,6 +2118,7 @@ class FetchTeamUniformColorAPIView(APIView):
 
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
+            data={'type': "assign_handler"}
 
             if device_token and device_type:
                 send_push_notification(
@@ -2125,10 +2126,7 @@ class FetchTeamUniformColorAPIView(APIView):
                     title=_("Uniform Rejected"),
                     body=message,
                     device_type=device_type,
-                    data={
-                        "game_id": game.id,
-                        "tournament_id": game.tournament_id.id
-                    }
+                    data=data
                 )
 
 

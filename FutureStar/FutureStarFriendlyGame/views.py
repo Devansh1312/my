@@ -4275,6 +4275,7 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
 
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
+            data = {'type': "assign_handler"}
 
             if device_token and device_type:
                 send_push_notification(
@@ -4282,9 +4283,7 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
                     title=_("Uniform Rejected"),
                     body=message,
                     device_type=device_type,
-                    data={
-                        "game_id": game.id
-                    }
+                    data=data
                 )
 
 
