@@ -667,3 +667,36 @@ class InjuryType(models.Model):
     class Meta:
         db_table = 'futurestar_app_injurytype'
 
+class Notifictions(models.Model):
+    USER_TYPE = 1
+    TEAM_TYPE = 2
+    GROUP_TYPE = 3
+    
+    NOTIFICATION_TYPE_CHOICES = (
+        (USER_TYPE, 'User'),
+        (TEAM_TYPE, 'Team'),
+        (GROUP_TYPE, 'Group'),
+    )
+    
+    id = models.AutoField(primary_key=True)
+    
+    # Creator details (who created the notification)
+    created_by_id = models.IntegerField(default=0)  # ID of the creator
+    creator_type = models.IntegerField(choices=NOTIFICATION_TYPE_CHOICES, default=USER_TYPE)  # Type of creator
+    
+    # Targeted details (for whom the notification is created)
+    targeted_id = models.IntegerField(default=0)  # ID of the target
+    targeted_type = models.IntegerField(choices=NOTIFICATION_TYPE_CHOICES, default=USER_TYPE)  # Type of target
+    
+    title = models.TextField(null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
+    read = models.BooleanField(default=False)
+    date_created = models.DateTimeField(default=now)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
+    def __str__(self):
+        return f'Notification from {self.created_by_id} to {self.targeted_id}'
+    
+    class Meta:
+        db_table = 'futurestar_app_notifictions'

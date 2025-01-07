@@ -7139,9 +7139,10 @@ class UpdateGameStatsView(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class AssignUserToGameView(LoginRequiredMixin, View):
     def post(self, request, game_id):
+        # Activate the language from the request header
         language = request.headers.get("Language", "en")
         if language in ["en", "ar"]:
-            activate(language)  # Activate the requested language
+            activate(language)
 
         try:
             # Parse JSON request body
@@ -7159,9 +7160,6 @@ class AssignUserToGameView(LoginRequiredMixin, View):
                 game.game_date == current_time.date()
                 and game.game_start_time <= current_time.time()
             ):
-                messages.success(
-                    request, _("Cannot assign user; game already started.")
-                )
                 return JsonResponse(
                     {"error": _("Cannot assign user; game already started.")},
                     status=400,
@@ -7171,40 +7169,59 @@ class AssignUserToGameView(LoginRequiredMixin, View):
             game.game_statistics_handler = user
             game.save()
 
-            # Activate the user's current language or use header language
-            if user.current_language:
-                activate(user.current_language)
-            else:
-                activate(language)  # Fall back to header language
+            # Activate the user's preferred language for notifications
+            notification_language = user.current_language or language
+            if notification_language in ["en", "ar"]:
+                activate(notification_language)
 
             # Prepare notification details
             title = _("Match Assignment")
             body = _(
-                f"You have been assigned to handle the match between {game.team_a.team_name} and {game.team_b.team_name} on {game.game_date.strftime('%Y-%m-%d')} at {game.game_start_time.strftime('%H:%M')} at {game.game_field_id.field_name}."
-            )
+                "You have been assigned to handle the match between %(team_a)s and %(team_b)s on %(date)s at %(time)s at %(field)s."
+            ) % {
+                "team_a": game.team_a.team_name,
+                "team_b": game.team_b.team_name,
+                "date": game.game_date.strftime("%Y-%m-%d"),
+                "time": game.game_start_time.strftime("%H:%M"),
+                "field": game.game_field_id.field_name,
+            }
 
-            device_token = user.device_token
-            device_type = user.device_type
-          
+            # Create notification record with targeted_id and targeted_type
+            notification = Notifictions.objects.create(
+                created_by_id=request.user.id,  # Assigned by the logged-in user
+                creator_type=1,                # Creator type = User
+                targeted_id=user.id,           # Targeted user ID
+                targeted_type=1,               # Target type = User
+                title=title,
+                content=body,
+            )
+            notification.save()
+
+            # Prepare push notification data
             data = {'type': "assign_handler", 'role': 5}
             push_data = data
 
-            # Send push notification if valid token and type
-            if device_type in [1, 2, "1", "2"]:
+            # Send push notification if device details are available
+            if user.device_token and user.device_type in [1, 2, "1", "2"]:
                 send_push_notification(
-                    device_token, title, body, device_type, data=push_data
+                    device_token=user.device_token,
+                    title=title,
+                    body=body,
+                    device_type=user.device_type,
+                    data=push_data,
                 )
 
-            activate(language)
-            messages.success(request, _("User assigned successfully!"))
-            activate(language)
+            # Return success response
+            activate(language)  # Revert to request language
             return JsonResponse(
                 {"message": _("User assigned successfully!")}, status=200
             )
 
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
+            return JsonResponse(
+                {"error": _("An error occurred: %(error)s") % {"error": str(e)}},
+                status=400,
+            )
 
 def fetch_users(request):
     role_id = request.GET.get("role_id")
@@ -7750,6 +7767,14 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
             }
             send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
 
+            # **CREATE NOTIFICATION RECORD FOR USER**
+            Notifictions.objects.create(
+                created_by_id=user.id,  # User who made the booking
+                creator_type=1,  # User type = 1
+                title=title,
+                content=body,
+            )
+
 
     def notify_followers_event(self, created_by_id, creator_type, event):
         # Fetch followers based on FollowRequest
@@ -7782,39 +7807,70 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
 
         # Notify followers based on their type
         for follower in followers:
-            follower_user = User.objects.filter(id=follower.created_by_id).first()
-            if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
-                
-                # Set notification language based on the follower's preference
-                notification_language = follower_user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
+            follower_user = None
+            title = _('Event Notification!')
+            body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+            
+            # If the follower is a user
+            if follower.target_type == 1:
+                follower_user = User.objects.filter(id=follower.created_by_id).first()
+                if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
+                    # Set notification language based on the follower's preference
+                    notification_language = follower_user.current_language
+                    if notification_language in ['ar', 'en']:
+                        activate(notification_language)
 
-                # Send notification to the follower
+                    # Send notification to the follower
+                    push_data = {
+                        'type': 'event',
+                        'notifier_id': event.id
+                    }
+                    send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+
+                    # **CREATE NOTIFICATION RECORD FOR FOLLOWER USER**
+                    Notifictions.objects.create(
+                        created_by_id=follower_user.id,  # Follower user
+                        creator_type=1,  # User type = 1
+                        title=title,
+                        content=body,
+                    )
+
+            # If the follower is a team
+            elif follower.target_type == 2:
+                team = Team.objects.get(id=follower.target_id)
+                # Notify team founder
                 title = _('Event Notification!')
                 body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
                 push_data = {
                     'type': 'event',
                     'notifier_id': event.id
                 }
-                send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+                send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
 
-                # If the follower is a team, send notification to the team founder
-                if creator_type == 2:
-                    title = _('Event Notification!')
-                    body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
-                    push_data = {
-                        'type': 'event',
-                        'notifier_id': event.id,
-                    }
-                    send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
+                # **CREATE NOTIFICATION RECORD FOR TEAM FOUNDER**
+                Notifictions.objects.create(
+                    created_by_id=team.id,  # Team founder
+                    creator_type=2,  # Team type = 2
+                    title=title,
+                    content=body,
+                )
 
-                # If the follower is a group, send notification to the group founder
-                elif creator_type == 3:
-                    title = _('Event Notification!')
-                    body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
-                    push_data = {
-                        'type': 'event',
-                        'notifier_id': event.id,
-                    }
-                    send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
+            # If the follower is a group
+            elif follower.target_type == 3:
+                group = TrainingGroups.objects.get(id=follower.target_id)
+                # Notify group founder
+                title = _('Event Notification!')
+                body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+                push_data = {
+                    'type': 'event',
+                    'notifier_id': event.id
+                }
+                send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
+
+                # **CREATE NOTIFICATION RECORD FOR GROUP FOUNDER**
+                Notifictions.objects.create(
+                    created_by_id=group.id,  # Group founder
+                    creator_type=3,  # Group type = 3
+                    title=title,
+                    content=body,
+                )

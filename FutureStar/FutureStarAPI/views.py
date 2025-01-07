@@ -1337,6 +1337,19 @@ class PostLikeAPIView(APIView):
                     'message': _('Invalid creator type for post.')
                 }, status=400)
 
+            # Create the notification record with target details
+            notification = Notifictions.objects.create(
+                created_by_id=created_by_id,  # Who liked the post
+                creator_type=creator_type,   # Type of liker
+                
+                targeted_id=post_created_by_id,  # For whom the notification is created
+                targeted_type=post_creator_type,  # Type of post creator
+                
+                title=_('Post Liked!'),
+                content=_('{} liked your post.').format(notifier_name)
+            )
+            notification.save()
+
             # Notification settings
             device_token = recipient.device_token
             device_type = recipient.device_type
@@ -1349,7 +1362,7 @@ class PostLikeAPIView(APIView):
             # Send push notification
             if device_type in [1, 2, "1", "2"]:
                 title = _('Post Liked!')
-                body = _(f'{notifier_name} liked your post.')
+                body = _('{} liked your post.').format(notifier_name)
                 push_data = {'type': 'post', 'notifier_id': post_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
@@ -1536,79 +1549,113 @@ class PostCreateAPIView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
     def notify_followers(self, created_by_id, creator_type, post):
+        """
+        Notify followers and create a notification record when a post is created.
+        """
         # Fetch followers based on FollowRequest
         followers = FollowRequest.objects.filter(
             Q(target_id=created_by_id, target_type=creator_type)
         )
 
-        # Retrieve creator name and user data based on creator_type
+        # Retrieve creator name based on creator_type
         creator_name = None
-        notification_language = None
-        device_token = None
-        device_type = None
-
         if creator_type in [1, "1"]:  # For individual user posts
             creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
         elif creator_type in [2, "2"]:  # For team posts
-            team = Team.objects.get(id=created_by_id)
-            creator_name = team.team_username
-            user = team.team_founder
-            device_token = user.device_token
-            device_type = user.device_type
-            notification_language = user.current_language  # Get the team founder's language
+            creator_name = Team.objects.get(id=created_by_id).team_username
         elif creator_type in [3, "3"]:  # For group posts
-            group = TrainingGroups.objects.get(id=created_by_id)
-            creator_name = group.group_name
-            user = group.group_founder
-            device_token = user.device_token
-            device_type = user.device_type
-            notification_language = user.current_language  # Get the group founder's language
+            creator_name = TrainingGroups.objects.get(id=created_by_id).group_name
 
-        # Notify followers based on their type
+        # Notify followers
         for follower in followers:
-            follower_user = User.objects.filter(id=follower.created_by_id).first()
-            if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
-                
+            title = _('New Post Alert!')
+            body = _(f'{creator_name} just added a new post.')
+
+            # Set notification target details
+            targeted_id = follower.created_by_id  # Follower ID
+            targeted_type = follower.creator_type  # Follower type (User, Team, Group)
+
+            # Check follower type and send notification
+            if targeted_type == 1:  # User
+                follower_user = User.objects.get(id=targeted_id)
+
                 # Set notification language based on the follower's preference
                 notification_language = follower_user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
 
-                # Send notification to the follower
-                title = _('New Post Alert!')
-                body = _(f'{creator_name} just added a new post.')
+                # Send push notification
                 push_data = {
                     'type': 'post',
-                    'notifier_id': post.id,
-                    'target_type':post.creator_type,
+                    'notifier_id': post.id
                 }
-                send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+                send_push_notification(
+                    follower_user.device_token,
+                    title,
+                    body,
+                    follower_user.device_type,
+                    data=push_data
+                )
 
-                # If the follower is a team, send notification to the team founder
-                if creator_type == 2:
-                    follower_user.id = team.team_founder.id
-                    title = _('New Post Alert!')
-                    body = _(f'{creator_name} just added a new post.')
-                    push_data = {
-                        'type': 'team_post',
-                        'notifier_id': post.id,
-                        'team_id': team.id,
-                        'target_type':post.creator_type,
-                    }
-                    send_push_notification(follower_user.device_token, title, body,team.team_founder.device_type, data=push_data)
+                # **CREATE NOTIFICATION RECORD**
+                Notifictions.objects.create(
+                    created_by_id=created_by_id,  # Post creator
+                    creator_type=creator_type,   # Creator type
 
-                # If the follower is a group, send notification to the group founder
-                elif creator_type == 3 :
-                    follower_user.id = group.group_founder.id
-                    title = _('New Post Alert!')
-                    body = _(f'{creator_name} just added a new post.')
-                    push_data = {
-                        'type': 'group_post',
-                        'notifier_id': post.id,
-                        'group_id': group.id,
-                        'target_type':post.creator_type,
-                    }
-                    send_push_notification(follower_user.device_token, title, body,group.group_founder.device_type, data=push_data)
+                    targeted_id=targeted_id,     # Targeted follower
+                    targeted_type=targeted_type, # Follower type
+
+                    title=title,
+                    content=body
+                )
+
+            elif targeted_type == 2:  # Team
+                team = Team.objects.get(id=targeted_id)
+
+                # Notify team founder
+                send_push_notification(
+                    team.team_founder.device_token,
+                    title,
+                    body,
+                    team.team_founder.device_type,
+                    data={'type': 'post', 'notifier_id': post.id}
+                )
+
+                # **CREATE NOTIFICATION RECORD**
+                Notifictions.objects.create(
+                    created_by_id=created_by_id,
+                    creator_type=creator_type,
+
+                    targeted_id=targeted_id,
+                    targeted_type=targeted_type,
+
+                    title=title,
+                    content=body
+                )
+
+            elif targeted_type == 3:  # Group
+                group = TrainingGroups.objects.get(id=targeted_id)
+
+                # Notify group founder
+                send_push_notification(
+                    group.group_founder.device_token,
+                    title,
+                    body,
+                    group.group_founder.device_type,
+                    data={'type': 'post', 'notifier_id': post.id}
+                )
+
+                # **CREATE NOTIFICATION RECORD**
+                Notifictions.objects.create(
+                    created_by_id=created_by_id,
+                    creator_type=creator_type,
+
+                    targeted_id=targeted_id,
+                    targeted_type=targeted_type,
+
+                    title=title,
+                    content=body
+                )
 
 ##########################   EDIT POST API ##################################
 class PostEditAPIView(generics.GenericAPIView):
@@ -1932,11 +1979,24 @@ class CommentCreateAPIView(APIView):
             body = _(f'{notifier_name} commented on your post.')
             push_data = {'type': 'post', 'notifier_id': post_id}
 
-        # Send push notification
+        # **Create Notification Record with Targeted ID and Type**
+        notification = Notifictions.objects.create(
+            created_by_id=created_by_id,      # Comment creator
+            creator_type=creator_type,       # Creator type
+
+            targeted_id=recipient_id,        # Recipient ID
+            targeted_type=recipient_type,    # Recipient type
+
+            title=title,
+            content=body
+        )
+        notification.save()
+
+        # **Send Push Notification**
         if device_type in [1, 2, "1", "2"]:
             send_push_notification(device_token, title, body, device_type, data=push_data)
 
-        # Return response
+        # **Return response**
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
@@ -3378,15 +3438,18 @@ class FollowUnfollowAPI(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract input data
         creator_type = request.data.get('creator_type')
-        created_by_id = request.data.get('created_by_id')
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to current user
         target_id = request.data.get('target_id')
         target_type = request.data.get('target_type')
 
+        # Handle Follow/Unfollow Logic
         try:
             follow_request = FollowRequest.objects.get(
                 created_by_id=created_by_id,
@@ -3394,12 +3457,12 @@ class FollowUnfollowAPI(APIView):
                 target_id=target_id,
                 target_type=target_type
             )
-            # If follow request exists, unfollow
+            # **Unfollow** case
             follow_request.delete()
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
 
-            # Return the response for unfollowing
+            # Return response for unfollowing
             return Response({
                 'status': 1,
                 'message': _('Unfollowed successfully.'),
@@ -3409,8 +3472,9 @@ class FollowUnfollowAPI(APIView):
                     'is_follow': False,
                 }
             }, status=status.HTTP_200_OK)
+
         except FollowRequest.DoesNotExist:
-            # Follow request does not exist, create one
+            # **Follow** case
             follow_request = FollowRequest.objects.create(
                 created_by_id=created_by_id,
                 creator_type=creator_type,
@@ -3420,58 +3484,71 @@ class FollowUnfollowAPI(APIView):
             followers_count = FollowRequest.objects.filter(target_id=created_by_id, target_type=creator_type).count()
             following_count = FollowRequest.objects.filter(created_by_id=created_by_id, creator_type=creator_type).count()
 
-            # Determine the follower (creator) name
-            if creator_type in [1, "1"]:  # Creator is a User
-                follower_user = User.objects.get(id=created_by_id)
-                recipient_name = follower_user.username
-            elif creator_type in [2, "2"]:  # Creator is a Team
-                follower_team = Team.objects.get(id=created_by_id)
-                recipient_name = follower_team.team_username
-            elif creator_type == 3:  # Creator is a Training Group
-                follower_group = TrainingGroups.objects.get(id=created_by_id)
-                recipient_name = follower_group.group_name
+            # **Determine Follower Name (Creator)**
+            if creator_type in [1, "1"]:  # User
+                follower = User.objects.get(id=created_by_id)
+                notifier_name = follower.username
+            elif creator_type in [2, "2"]:  # Team
+                follower = Team.objects.get(id=created_by_id)
+                notifier_name = follower.team_username
+            elif creator_type in [3, "3"]:  # Training Group
+                follower = TrainingGroups.objects.get(id=created_by_id)
+                notifier_name = follower.group_name
             else:
                 return Response({
                     'status': 0,
                     'message': _('Invalid creator type.')
                 }, status=400)
 
-            # Now, determine the target (the one being followed)
-            if target_type in [1, "1"]:  # Target is a User
-                target_user = User.objects.get(id=target_id)
-                target_device_token = target_user.device_token
-                target_device_type = target_user.device_type
-                notification_language = target_user.current_language  # Get target user's language for notifications
-            elif target_type in [2, "2"]:  # Target is a Team
-                target_team = Team.objects.get(id=target_id)
-                target_user = target_team.team_founder
-                target_device_token = target_user.device_token
-                target_device_type = target_user.device_type
-                notification_language = target_user.current_language  # Get target user's language for notifications
-            elif target_type == 3:  # Target is a Training Group
-                target_group = TrainingGroups.objects.get(id=target_id)
-                target_user = target_group.group_founder
-                target_device_token = target_user.device_token
-                target_device_type = target_user.device_type
-                notification_language = target_user.current_language  # Get target user's language for notifications
+            # **Determine Target Name (Recipient)**
+            if target_type in [1, "1"]:  # User
+                target = User.objects.get(id=target_id)
+                device_token = target.device_token
+                device_type = target.device_type
+                notification_language = target.current_language
+            elif target_type in [2, "2"]:  # Team
+                target = Team.objects.get(id=target_id)
+                owner = target.team_founder
+                device_token = owner.device_token
+                device_type = owner.device_type
+                notification_language = owner.current_language
+            elif target_type in [3, "3"]:  # Training Group
+                target = TrainingGroups.objects.get(id=target_id)
+                owner = target.group_founder
+                device_token = owner.device_token
+                device_type = owner.device_type
+                notification_language = owner.current_language
             else:
                 return Response({
                     'status': 0,
                     'message': _('Invalid target type.')
                 }, status=400)
 
-            # Set notification language based on the target user's preference
+            # **Set Notification Language**
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
 
-            # Sending push notification to the target using the target's device token and type
-            if target_device_type in [1, 2, "1", "2"]:
+            # **Send Push Notification**
+            if device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
-                body = _(f'{recipient_name} started following you.')  # Notification message
+                body = _(f'{notifier_name} started following you.')
                 push_data = {'type': 'follow', 'notifier_id': created_by_id, 'target_type': creator_type}
-                send_push_notification(target_device_token, title, body, target_device_type, data=push_data)
+                send_push_notification(device_token, title, body, device_type, data=push_data)
 
-            # Return the response for following
+            # **Create Notification Record with Targeted ID and Type**
+            notification = Notifictions.objects.create(
+                created_by_id=created_by_id,      # Follower ID
+                creator_type=creator_type,       # Follower Type
+
+                targeted_id=target_id,           # Target ID
+                targeted_type=target_type,       # Target Type
+
+                title=_('New Follower!'),
+                content=_(f'{notifier_name} started following you.')
+            )
+            notification.save()
+
+            # Return response for following
             return Response({
                 'status': 1,
                 'message': _('Followed successfully.'),
@@ -3756,8 +3833,8 @@ class EventLikeAPIView(APIView):
 
         # Extract input data
         event_id = request.data.get('event_id')
-        creator_type = request.data.get('creator_type', EventLike.USER_TYPE)  # Default to user
-        created_by_id = request.data.get('created_by_id', request.user.id)  # Default to logged-in user
+        creator_type = request.data.get('creator_type', EventLike.USER_TYPE)  # Default: User
+        created_by_id = request.data.get('created_by_id', request.user.id)  # Default: Logged-in user
 
         # Validate required data
         if not event_id:
@@ -3791,7 +3868,7 @@ class EventLikeAPIView(APIView):
                 'message': _('Invalid creator type.')
             }, status=400)
 
-        # Toggle like/unlike
+        # Toggle like/unlike functionality
         event_like, created = EventLike.objects.get_or_create(
             created_by_id=created_by_id,
             event=event,
@@ -3799,18 +3876,18 @@ class EventLikeAPIView(APIView):
         )
 
         if not created:
-            # Unlike the event
+            # **Unlike the event**
             event_like.delete()
             message = _('Event unliked successfully.')
         else:
-            # Like the event
+            # **Like the event**
             message = _('Event liked successfully.')
 
-            # Fetch event organizer details for notification
-            organizer = event.event_organizer
+            # **Fetch event organizer details for notification**
+            organizer = event.event_organizer  # Organizer object
             recipient = organizer
 
-            # Notification settings
+            # Notification recipient details
             device_token = recipient.device_token
             device_type = recipient.device_type
             notification_language = recipient.current_language
@@ -3825,6 +3902,18 @@ class EventLikeAPIView(APIView):
                 body = _(f'{notifier_name} liked your event.')
                 push_data = {'type': 'event_list', 'notifier_id': event_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
+
+            # **CREATE NOTIFICATION RECORD WITH TARGETED ID AND TYPE**
+            Notifictions.objects.create(
+                created_by_id=created_by_id,      # Liker ID
+                creator_type=creator_type,       # Liker type
+                
+                targeted_id=event.created_by_id,  # Organizer ID
+                targeted_type=event.creator_type, # Organizer type
+
+                title=title,
+                content=body,
+            )
 
         # Serialize the event data with updated like status
         serializer = EventSerializer(event, context={'request': request})
@@ -3909,8 +3998,8 @@ class EventCommentCreateAPIView(APIView):
         event_id = data.get('event_id')
         comment_text = data.get('comment')
         parent_id = data.get('parent_id')
-        creator_type = data.get('creator_type', Event_comment.USER_TYPE)  # Default to user type
-        created_by_id = data.get('created_by_id', request.user.id)  # Default to current user ID
+        creator_type = data.get('creator_type', Event_comment.USER_TYPE)  # Default: User type
+        created_by_id = data.get('created_by_id', request.user.id)  # Default: Logged-in user
 
         # Validate required fields
         if not event_id or not comment_text:
@@ -3955,7 +4044,7 @@ class EventCommentCreateAPIView(APIView):
                 'message': _('Invalid creator type.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create new comment
+        # Create the comment
         comment = Event_comment.objects.create(
             created_by_id=created_by_id,
             creator_type=creator_type,
@@ -3964,15 +4053,15 @@ class EventCommentCreateAPIView(APIView):
             parent=parent_comment
         )
 
-        # Determine notification recipient based on comment/reply case
+        # Determine recipient based on comment or reply
         if parent_comment:
-            # Notify the parent comment creator
+            # Notify parent comment creator (reply case)
             recipient_id = parent_comment.created_by_id
             recipient_type = parent_comment.creator_type
         else:
-            # Notify the event organizer
-            recipient_id = event.event_organizer.id
-            recipient_type = 1  # Assuming organizer is a user
+            # Notify event organizer (new comment case)
+            recipient_id = event.created_by_id
+            recipient_type = event.creator_type
 
         # Fetch recipient details
         if recipient_type in [1, "1"]:  # User
@@ -4005,21 +4094,33 @@ class EventCommentCreateAPIView(APIView):
         if notification_language in ['ar', 'en']:
             activate(notification_language)
 
-        # Prepare push notification data
+        # Notification Title and Body
         if parent_comment:
             title = _('New Reply on Your Comment!')
             body = _(f'{notifier_name} replied to your comment.')
-            push_data = {'type': 'event_list'}
+            push_data = {'type': 'event_comment_reply', 'event_id': event_id}
         else:
             title = _('New Comment on Your Event!')
             body = _(f'{notifier_name} commented on your event.')
-            push_data = {'type': 'event_list'}
+            push_data = {'type': 'event_comment', 'event_id': event_id}
 
         # Send push notification
         if device_type in [1, 2, "1", "2"]:
             send_push_notification(device_token, title, body, device_type, data=push_data)
 
-        # Return response
+        # **CREATE NOTIFICATION RECORD WITH TARGETED ID AND TYPE**
+        Notifictions.objects.create(
+            created_by_id=created_by_id,      # Commenter ID
+            creator_type=creator_type,       # Commenter type
+            
+            targeted_id=recipient_id,        # Recipient ID (Organizer/Parent Commenter)
+            targeted_type=recipient_type,    # Recipient type
+
+            title=title,
+            content=body,
+        )
+
+        # Return response with comment data
         return Response({
             'status': 1,
             'message': _('Comment created successfully.'),
@@ -4183,11 +4284,12 @@ class EventCreateAPIView(generics.CreateAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        # Fetch all event types
+        # Retrieve event types
         event_types = EventType.objects.all().order_by('name_en')
         serializer = EventTypeSerializer(event_types, many=True, context={'request': request})
 
@@ -4198,18 +4300,19 @@ class EventCreateAPIView(generics.CreateAPIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        # Set language
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        data = request.data.copy()
-        data['event_organizer'] = request.user.id  # Set the event organizer to the logged-in user
 
-        # Extract and validate creator_type and created_by_id
+        data = request.data.copy()
+        data['event_organizer'] = request.user.id  # Set logged-in user as organizer
+
+        # Validate creator_type and created_by_id
         creator_type = data.get('creator_type')
         created_by_id = data.get('created_by_id')
 
-        # Validate creator_type and created_by_id
-        if creator_type is None:
+        if not creator_type:
             return Response({
                 'status': 0,
                 'message': _('creator_type must be provided.')
@@ -4217,104 +4320,88 @@ class EventCreateAPIView(generics.CreateAPIView):
 
         try:
             creator_type = int(creator_type)
-        except (ValueError, TypeError):
+        except ValueError:
             return Response({
                 'status': 0,
                 'message': _('creator_type must be a valid integer.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Logic for handling creator_type and created_by_id
+        # Validate creator type and created_by_id
         if creator_type == Event.TEAM_TYPE:
-            # If creator_type is TEAM_TYPE, check if created_by_id is provided and valid
-            if created_by_id is None:
+            if not created_by_id:
                 return Response({
                     'status': 0,
                     'message': _('created_by_id must be provided for TEAM_TYPE.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            try:
-                created_by_id = int(created_by_id)
-            except (ValueError, TypeError):
-                return Response({
-                    'status': 0,
-                    'message': _('created_by_id must be a valid integer.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # Validate if created_by_id exists in Team model
             if not Team.objects.filter(id=created_by_id).exists():
                 return Response({
                     'status': 0,
                     'message': _('Invalid team ID.')
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-            data['created_by_id'] = created_by_id  # Use the provided team ID
-        
+
+            data['created_by_id'] = int(created_by_id)
+
         else:
             return Response({
                 'status': 0,
                 'message': _('Invalid creator type.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Add validated creator_type to data
-        data['creator_type'] = creator_type
-
+        # Create Event
         serializer = self.serializer_class(data=data, context={'request': request})
         if serializer.is_valid():
-            # Save the event instance first to generate an ID
             event = serializer.save()
 
-            # Check if an event image was provided in the request
+            # Handle event image upload
             if 'event_image' in request.FILES:
                 event_image = request.FILES['event_image']
-                file_extension = event_image.name.split('.')[-1]
-                unique_suffix = get_random_string(8)  # Ensure unique filename
-                file_name = f"event_images/{event.id}_{event.creator_type}_{event.created_by_id}_{unique_suffix}.{file_extension}"
+                unique_suffix = get_random_string(8)
+                file_name = f"event_images/{event.id}_{event.creator_type}_{event.created_by_id}_{unique_suffix}.{event_image.name.split('.')[-1]}"
                 image_path = default_storage.save(file_name, event_image)
                 event.event_image = image_path
-                event.save()  # Save the event with the updated image path
+                event.save()
 
-            team_name = Team.objects.get(id=created_by_id).team_name if created_by_id else _("Team")
-
-        # Notify all active users
+            # Send notifications to all active users
+            team_name = Team.objects.get(id=created_by_id).team_name
             all_users = User.objects.filter(is_active=True)
+
             for user in all_users:
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
-                    activate(notification_language)  # Activate the user's preferred language
+                    activate(notification_language)
 
-                # Fetch the event type name based on the user's language
-                if notification_language == 'ar' and event.event_type.name_ar:
-                    event_type_name = event.event_type.name_ar
-                else:
-                    event_type_name = event.event_type.name_en
+                event_type_name = event.event_type.name_ar if notification_language == 'ar' else event.event_type.name_en
+                title = _("New Event Added")
+                body = _("%s has added a %s event.") % (team_name, event_type_name)
 
-                # Construct the notification message
-                notification_title = _("New Event Added")
-                notification_body = _("%s has added a %s event.") % (team_name, event_type_name)
+                # Create notification record with targeted_id and targeted_type
+                Notifictions.objects.create(
+                    created_by_id=request.user.id,  # Event creator ID
+                    creator_type=creator_type,      # Event creator type
+                    targeted_id=user.id,            # Notification recipient ID
+                    targeted_type=1,                # Assuming recipient is always a user
+                    title=title,
+                    content=body
+                )
 
-                # Send the notification
+                # Send push notification
                 if user.device_token:
                     send_push_notification(
                         device_token=user.device_token,
-                        title=notification_title,
-                        body=notification_body,
+                        title=title,
+                        body=body,
                         device_type=user.device_type,
-                        data={
-                            "notifier_id": event.id,
-                            "team_id": created_by_id,
-                            "type":"event"
-
-                        }
+                        data={"notifier_id": event.id, "type": "event"}
                     )
-
 
             return Response({
                 'status': 1,
-                'message': _('Events Fetched successfully.'),
+                'message': _('Event created successfully.'),
                 'data': serializer.data
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 ###################### Event Detail Update ######################
 class UpdateEventAPIView(APIView):
@@ -4451,7 +4538,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
             except SystemSettings.DoesNotExist:
                 convenience_fee = 0
 
-        # Extract and validate creator_type and created_by_id
+        # Validate creator_type and created_by_id
         creator_type = request.data.get('creator_type')
         created_by_id = request.data.get('created_by_id')
 
@@ -4463,7 +4550,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
         # Match created_by_id with a Team and fetch the team founder
         try:
-            event_created_by_id=event_instance.created_by_id
+            event_created_by_id = event_instance.created_by_id
             team = Team.objects.get(id=event_created_by_id)
             team_founder = team.team_founder
         except Team.DoesNotExist:
@@ -4487,36 +4574,46 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=booking_data)
         if serializer.is_valid():
             booking_instance = serializer.save()
-            # self.notify_followers_event(created_by_id, creator_type, event_instance)
 
             # Send notification to the team founder
             if team_founder:
                 # Activate founder's preferred language for notification
-                notification_language = team_founder.current_language  # Assuming `current_language` exists in User
+                notification_language = team_founder.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
 
                 # Prepare notification title and body
-                title = _('%(user_name)s wants to attend your event!')% {
+                title = _('%(user_name)s wants to attend your event!') % {
                     'user_name': request.user.username
-                    }
-                body = _('%(user_name)s has Requested to booked a ticket for your event "%(event_name)s".') % {
+                }
+                body = _('%(user_name)s has requested to book a ticket for your event "%(event_name)s".') % {
                     'user_name': request.user.username,
                     'event_name': event_instance.event_name,
                 }
 
+                # Create notification record with targeted_id and targeted_type
+                notification = Notifictions.objects.create(
+                    created_by_id=request.user.id,  # Requestor ID
+                    creator_type=creator_type,      # Creator type
+                    targeted_id=team_founder.id,    # Team founder ID
+                    targeted_type=1,                # Assuming target is always a user
+                    title=title,
+                    content=body
+                )
+                notification.save()
+
                 # Prepare push_data for additional details
                 push_data = {
-                    'notifier_id': (event_instance.id),
+                    'notifier_id': event_instance.id,
                     "type": "my_events",
                 }
 
-                # Send the notification
+                # Send push notification
                 send_push_notification(
-                    device_token=team_founder.device_token,  # Assuming `device_token` exists in the User model
+                    device_token=team_founder.device_token,
                     title=title,
                     body=body,
-                    device_type=team_founder.device_type,  # Adjust for IOS if necessary
+                    device_type=team_founder.device_type,
                     data=push_data
                 )
 
@@ -4525,6 +4622,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'message': _('Event Booking Requested successfully.'),
                 'data': serializer.data
             }, status=status.HTTP_201_CREATED)
+
         else:
             return Response({
                 'status': 0,
@@ -4532,67 +4630,68 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    def notify_followers_event(self, created_by_id, creator_type, event):
-        # Fetch followers based on FollowRequest
-        followers = FollowRequest.objects.filter(
-            Q(target_id=created_by_id, target_type=creator_type)
-        )
 
-        # Retrieve creator name and user data based on creator_type
-        creator_name = None
-        notification_language = None
+    # def notify_followers_event(self, created_by_id, creator_type, event):
+    #     # Fetch followers based on FollowRequest
+    #     followers = FollowRequest.objects.filter(
+    #         Q(target_id=created_by_id, target_type=creator_type)
+    #     )
 
-        if creator_type in [1, "1"]:  # For individual users
-            creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
-        elif creator_type in [2, "2"]:  # For teams
-            team = Team.objects.get(id=created_by_id)
-            creator_name = team.team_username
-            notification_language = team.team_founder.current_language  # Get the team founder's language
-        elif creator_type in [3, "3"]:  # For groups
-            group = TrainingGroups.objects.get(id=created_by_id)
-            creator_name = group.group_name
-            notification_language = group.group_founder.current_language  # Get the group founder's language
+    #     # Retrieve creator name and user data based on creator_type
+    #     creator_name = None
+    #     notification_language = None
 
-        # Notify followers based on their type
-        for follower in followers:
-            follower_user = User.objects.filter(id=follower.created_by_id).first()
-            if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
+    #     if creator_type in [1, "1"]:  # For individual users
+    #         creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
+    #     elif creator_type in [2, "2"]:  # For teams
+    #         team = Team.objects.get(id=created_by_id)
+    #         creator_name = team.team_username
+    #         notification_language = team.team_founder.current_language  # Get the team founder's language
+    #     elif creator_type in [3, "3"]:  # For groups
+    #         group = TrainingGroups.objects.get(id=created_by_id)
+    #         creator_name = group.group_name
+    #         notification_language = group.group_founder.current_language  # Get the group founder's language
 
-                # Set notification language based on the follower's preference
-                notification_language = follower_user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
+    #     # Notify followers based on their type
+    #     for follower in followers:
+    #         follower_user = User.objects.filter(id=follower.created_by_id).first()
+    #         if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
 
-                # Send notification to the follower
-                title = _('Event Notification')
-                body = _(f'{creator_name}, whom you are following, is attending an event.')
-                push_data = {
-                    'type': 'event',
-                    'event_id': event.id
-                }
-                send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
+    #             # Set notification language based on the follower's preference
+    #             notification_language = follower_user.current_language
+    #             if notification_language in ['ar', 'en']:
+    #                 activate(notification_language)
 
-                # If the follower is a team, send notification to the team founder
-                if creator_type == 2:
-                    title = _('Your team is attending an event!')
-                    body = _(f'Team {creator_name} is attending an event.')
-                    push_data = {
-                        'type': 'team_event',
-                        'event_id': event.id,
-                        'team_id': team.id
-                    }
-                    send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
+    #             # Send notification to the follower
+    #             title = _('Event Notification')
+    #             body = _(f'{creator_name}, whom you are following, is attending an event.')
+    #             push_data = {
+    #                 'type': 'event',
+    #                 'event_id': event.id
+    #             }
+    #             send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
 
-                # If the follower is a group, send notification to the group founder
-                elif creator_type == 3:
-                    title = _('Your group is attending an event!')
-                    body = _(f'Group {creator_name} is attending an event.')
-                    push_data = {
-                        'type': 'group_event',
-                        'event_id': event.id,
-                        'group_id': group.id
-                    }
-                    send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
+    #             # If the follower is a team, send notification to the team founder
+    #             if creator_type == 2:
+    #                 title = _('Your team is attending an event!')
+    #                 body = _(f'Team {creator_name} is attending an event.')
+    #                 push_data = {
+    #                     'type': 'team_event',
+    #                     'event_id': event.id,
+    #                     'team_id': team.id
+    #                 }
+    #                 send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
+
+    #             # If the follower is a group, send notification to the group founder
+    #             elif creator_type == 3:
+    #                 title = _('Your group is attending an event!')
+    #                 body = _(f'Group {creator_name} is attending an event.')
+    #                 push_data = {
+    #                     'type': 'group_event',
+    #                     'event_id': event.id,
+    #                     'group_id': group.id
+    #                 }
+    #                 send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
 
 
 
