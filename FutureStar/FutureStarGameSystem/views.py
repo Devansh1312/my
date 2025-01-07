@@ -1380,7 +1380,7 @@ class LineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament"}
+                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_a.id}
                 data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
@@ -1403,7 +1403,7 @@ class LineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament"}
+                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_b.id}
                 data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
@@ -1430,7 +1430,8 @@ class LineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament"}
+              
+                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_a.id}
                 data={'type': "add_lineup_player", 'game_data': game_data}
 
 
@@ -1448,13 +1449,15 @@ class LineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
+                game_data={"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament","team_id": game.team_b.id}
+                data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
                     device_token=user.device_token,
                     title=_("Let's Go"),
                     body=_("Both teams are ready to play! Let's Go"),
                     device_type=user.device_type,
-                    data={"game_id":game_id,"team_id": game.team_b.id,"game_type":"tournament"}
+                    data=data
                 )
 
         # Return the response with players classified into team_a and team_b and also by lineup status

@@ -2239,7 +2239,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                game_data={"id": game.id,"game_type": "friendly", "team_id": game.team_b.id}
+                game_data={"id": game.id,"game_type": "friendly", "team_id": game.team_a.id}
                 data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
@@ -2290,7 +2290,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                game_data={"id": game.id,"game_type": "friendly"}
+                game_data={"id": game.id,"game_type": "friendly","team_id": game.team_a.id}
                 data={'type': "add_lineup_player", 'game_data': game_data}
 
                 send_push_notification(
@@ -2306,7 +2306,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
                     activate(notification_language)
-                game_data={"id": game.id,"game_type": "friendly"}
+                game_data={"id": game.id,"game_type": "friendly","team_id": game.team_b.id}
                 data={'type': "add_lineup_player", 'game_data': game_data}
                 
 
