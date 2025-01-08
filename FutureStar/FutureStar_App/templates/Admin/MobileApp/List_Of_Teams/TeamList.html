@@ -35,20 +35,23 @@ Team List View
                  <div class="card-body">
                      <!-- Filter Form -->
                      <form method="GET" id="filter-form">
-                         <label for="category-filter">Filter by Category:</label>
-                         <select id="category-filter" 
-                              name="category_id" 
-                              class="form-control" 
-                              style="width: 200px;" 
-                              onchange="document.getElementById('filter-form').submit();">
-                           <option value="">-- Select Category --</option>
-                           {% for category in categories %}
-                           <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category_id|stringformat:"s" %}selected{% endif %}>
-                              {{ category.name_en }}
-                           </option>
-                           {% endfor %}
-                     </select>
-                     </form>
+                        <label for="category-filter">Filter by Category:</label>
+                        <select id="category-filter" 
+                            name="category_id[]" 
+                            class="form-control" 
+                            style="width: 200px;" 
+                            multiple 
+                            onchange="document.getElementById('filter-form').submit();">
+                            <option value="" disabled>-- Select Categories --</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" 
+                                {% if category.id|stringformat:"s" in selected_category_ids|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name_en }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    
      
                      <!-- Table -->
                      <div class="table-responsive mt-3">
