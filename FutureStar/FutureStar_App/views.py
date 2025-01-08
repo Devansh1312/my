@@ -764,24 +764,29 @@ class TournamentListView(LoginRequiredMixin, View):
     def get(self, request):
         # Fetch all tournaments from the Tournament model
         tournaments = Tournament.objects.all()
-        city_names = (
-            TournamentGames.objects.filter(game_field_id__isnull=False)
-            .select_related('game_field_id__city_id')
-            .exclude(game_field_id__city_id__isnull=True)
-            .values_list('game_field_id__city_id__name', flat=True)
-            .distinct()
-        )
-
-        # Convert the QuerySet to a list for template rendering
-        city_names_list = list(city_names)
-        print(city_names)
+        tournament_data = []
+        for tournament in tournaments:
+            # Fetch unique city names for the tournament's games
+            city_names = (
+                TournamentGames.objects.filter(tournament_id=tournament.id, game_field_id__isnull=False)
+                .select_related('game_field_id__city_id')
+                .exclude(game_field_id__city_id__isnull=True)
+                .values_list('game_field_id__city_id__name', flat=True)
+                .distinct()
+            )
+            # Convert to a comma-separated string
+            city_names_str = ", ".join(city_names)
+            tournament_data.append({
+                "tournament": tournament,
+                "cities": city_names_str,
+            })
 
         # Render the template and pass the tournaments as context
         return render(
             request,
             self.template_name,  # Render the template file
             {
-                "tournaments": tournaments,  # The list of tournaments passed to the template
+                "tournament_data": tournament_data,  # The list of tournaments passed to the template
                 "breadcrumb": {"child": "Tournament List"},  # Breadcrumb for navigation
             },
         )
@@ -6454,12 +6459,12 @@ class TeamListView(LoginRequiredMixin, View):
         # Get all categories for the filter dropdown
         categories = Category.objects.all()
         
-        # Get the selected category ID from the request
-        selected_category_id = request.GET.get('category_id')
+        # Get the selected category IDs from the request
+        selected_category_ids = request.GET.getlist('category_id[]')  # Adjusted to handle multiple IDs
 
-        # Filter teams by the selected category, or show all if none selected
-        if selected_category_id:
-            teams = Team.objects.filter(team_type=selected_category_id)
+        # Filter teams by the selected categories, or show all if none selected
+        if selected_category_ids:
+            teams = Team.objects.filter(team_type__in=selected_category_ids)  # Use __in for multiple values
         else:
             teams = Team.objects.all()
 
@@ -6469,7 +6474,7 @@ class TeamListView(LoginRequiredMixin, View):
             {
                 "teams": teams,
                 "categories": categories,
-                "selected_category_id": selected_category_id,
+                "selected_category_ids": selected_category_ids,  # Pass the list to the template
                 "breadcrumb": {"child": "Team Lists"},
             },
         )
