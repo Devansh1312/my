@@ -1312,28 +1312,29 @@ class TournamentGamesAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def generate_game_number(self, tournament_id):
-        """Generate the game number in the format #TSYYYYNNNGGG."""
-        # Get current year (e.g., 2025)
-        current_year = timezone.now().year
-
+        """Generate the game number in the format #TSYYNNNGGG."""
+        # Get the last two digits of the current year (e.g., 2025 → 25)
+        current_year = timezone.now().year % 100  # Extract last 2 digits
+        
         # Pad tournament_id to 3 digits (e.g., 001 for ID 1)
         tournament_id_str = str(tournament_id).zfill(3)
 
-        # Find the last game number for the tournament
+        # Find the last game number for the given tournament
         last_game = TournamentGames.objects.filter(tournament_id=tournament_id).order_by('-game_number').first()
 
-        # If no games exist for this tournament, start with game number 1
+        # Determine the next game number
         if last_game:
-            last_game_number = last_game.game_number
-            # Increment the last game number by 1
+            # Extract the numeric part of the game number and increment
+            last_game_number = int(last_game.game_number[-3:])  # Extract last 3 digits
             game_number = last_game_number + 1
         else:
-            game_number = 1  # Start from 1 if no games exist
+            # Start from 1 if no games exist
+            game_number = 1  
 
         # Pad the game number to 3 digits (e.g., 001)
         game_number_str = str(game_number).zfill(3)
 
-        # Format game number as #TSYYYYNNNGGG
+        # Format game number as #TSYYNNNGGG
         game_number_final = f"#TS{current_year:02d}{tournament_id_str}{game_number_str}"
         
         return game_number_final
