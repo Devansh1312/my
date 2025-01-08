@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+{% endblock %}
+
+<style>
+   .is-invalid {
+       border-color: #dc3545;
+       background-color: #f8d7da;
+   }
+</style>
+
+{% block title %}
+Team List View
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-12 col-md-6">
+               <h3>{{ breadcrumb.child }}</h3>
+            </div>
+         </div>
+      </div>
+      
+      <div class="row">
+         <div class="col-12">
+             <div class="card">
+                 <div class="card-body">
+                     <!-- Filter Form -->
+                     <form method="GET" id="filter-form">
+                         <label for="category-filter">Filter by Category:</label>
+                         <select id="category-filter" 
+                              name="category_id" 
+                              class="form-control" 
+                              style="width: 200px;" 
+                              onchange="document.getElementById('filter-form').submit();">
+                           <option value="">-- Select Category --</option>
+                           {% for category in categories %}
+                           <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category_id|stringformat:"s" %}selected{% endif %}>
+                              {{ category.name_en }}
+                           </option>
+                           {% endfor %}
+                     </select>
+                     </form>
+     
+                     <!-- Table -->
+                     <div class="table-responsive mt-3">
+                         <table class="table table-bordered" id="basic-1">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Team Name</th>
+                                <th>Username</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in teams %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ team.team_name }}</td>
+                                <td>{{ team.team_username }}</td>
+                                <td>{{ team.phone }}</td>
+                                <td>{{ team.city_id.name|default:"None" }}</td>
+                                <td>
+                                    <!-- Action buttons -->
+                                    <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                       <!-- Three dots menu trigger -->
+                                       <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                           <i data-feather="more-vertical"></i>
+                                       </a>
+                                       <!-- Action card -->
+                                       <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                           <ul style="list-style: none; padding: 0; margin: 0;">
+                                               <!-- View action -->
+                                               <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                   <a href="#" class="view-details" data-id="{{ team.id }}" onclick="submitViewForm(event, '{{ team.id }}')">View</a>
+                                                   <form id="view-form-{{ team.id }}" method="post" action="{% url 'team_detail' %}" style="display: none;">
+                                                       {% csrf_token %}
+                                                       <input type="hidden" name="team_id" value="{{ team.id }}">
+                                                   </form>
+                                               </li>
+                                           </ul>
+                                       </div>
+                                   </div>                                   
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Add responsive styles -->
+<style>
+   /* Make table scrollable on small screens */
+   .table-responsive {
+      overflow-x: auto;
+   }
+
+   /* For small screens, adjust font size and padding */
+   @media (max-width: 767px) {
+      .table th, .table td {
+         font-size: 12px;
+         padding: 6px;
+      }
+
+      /* Action menu button styling */
+      .three-dots-menu {
+         font-size: 20px;
+      }
+
+      .action-card {
+         width: auto;
+         min-width: 120px;
+      }
+
+      /* Ensure action buttons are not overflowing */
+      .action-menu-container {
+         display: block;
+         margin-top: 10px;
+      }
+
+      /* Adjust modal dialog for smaller screens */
+      .modal-dialog {
+         max-width: 90%;
+         margin: 0;
+      }
+
+      .modal-body {
+         padding: 10px;
+      }
+
+      .btn {
+         font-size: 14px;
+         padding: 10px;
+      }
+   }
+
+   /* For larger screens, retain normal layout */
+   @media (min-width: 768px) {
+      .modal-dialog {
+         max-width: 500px;
+      }
+   }
+</style>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
+<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
+
+
+<script>
+
+   
+
+   // Toggle the visibility of the action card
+   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+       menu.addEventListener('click', function(event) {
+           event.preventDefault();
+           var actionCard = menu.nextElementSibling;
+           actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+           // Close other open action cards
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                   card.style.display = 'none';
+               }
+           });
+       });
+   });
+
+
+   // View User Details
+document.querySelectorAll('.view-details').forEach(function(link) {
+   link.addEventListener('click', function(e) {
+       e.preventDefault();
+       var TeamId = this.getAttribute('data-id');
+       var form = document.getElementById('view-form-' + TeamId);
+       form.submit();
+   });
+});
+
+   // Hide action card if clicking outside
+   document.addEventListener('click', function(event) {
+       var isClickInside = event.target.closest('.action-menu-container');
+       if (!isClickInside) {
+           document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+           });
+       }
+   });
+</script>
+
+
+{% endblock %}

@@ -764,6 +764,17 @@ class TournamentListView(LoginRequiredMixin, View):
     def get(self, request):
         # Fetch all tournaments from the Tournament model
         tournaments = Tournament.objects.all()
+        city_names = (
+            TournamentGames.objects.filter(game_field_id__isnull=False)
+            .select_related('game_field_id__city_id')
+            .exclude(game_field_id__city_id__isnull=True)
+            .values_list('game_field_id__city_id__name', flat=True)
+            .distinct()
+        )
+
+        # Convert the QuerySet to a list for template rendering
+        city_names_list = list(city_names)
+        print(city_names)
 
         # Render the template and pass the tournaments as context
         return render(
@@ -6434,51 +6445,32 @@ class PostReportDeleteView(LoginRequiredMixin, View):
 
 ######################################################### Team List Module ###############################################
 
-#################### Schools & Universities	s #############
+#################### Team List #############
 @method_decorator(user_role_check, name="dispatch")
-class SchoolsUniversitiesTeamListView(LoginRequiredMixin, View):
-    template_name = "Admin/MobileApp/List_Of_Teams/SchoolsUniversitiesTeamList.html"
+class TeamListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/List_Of_Teams/TeamList.html"
 
     def get(self, request):
-        teams = Team.objects.filter(team_type_id=1).order_by('-id')
+        # Get all categories for the filter dropdown
+        categories = Category.objects.all()
+        
+        # Get the selected category ID from the request
+        selected_category_id = request.GET.get('category_id')
+
+        # Filter teams by the selected category, or show all if none selected
+        if selected_category_id:
+            teams = Team.objects.filter(team_type=selected_category_id)
+        else:
+            teams = Team.objects.all()
+
         return render(
             request,
             self.template_name,
             {
                 "teams": teams,
-                "breadcrumb": {"child": "Schools & Universities Teams"},
-            },
-        )
-
-#################### Clubs & Academics	 ###############
-@method_decorator(user_role_check, name="dispatch")
-class ClubsAcademicsTeamListView(LoginRequiredMixin, View):
-    template_name = "Admin/MobileApp/List_Of_Teams/ClubsAcademicsTeamList.html"
-
-    def get(self, request):
-        teams = Team.objects.filter(team_type_id=2).order_by('-id')
-        return render(
-            request,
-            self.template_name,
-            {
-                "teams": teams,
-                "breadcrumb": {"child": "Clubs & Academics Teams"},
-            },
-        )
-
-######################## Corporate ####################
-@method_decorator(user_role_check, name="dispatch")
-class CorporateTeamListView(LoginRequiredMixin, View):
-    template_name = "Admin/MobileApp/List_Of_Teams/CorporateTeamList.html"
-
-    def get(self, request):
-        teams = Team.objects.filter(team_type_id=3).order_by('-id')
-        return render(
-            request,
-            self.template_name,
-            {
-                "teams": teams,
-                "breadcrumb": {"child": "Corporate Teams"},
+                "categories": categories,
+                "selected_category_id": selected_category_id,
+                "breadcrumb": {"child": "Team Lists"},
             },
         )
 

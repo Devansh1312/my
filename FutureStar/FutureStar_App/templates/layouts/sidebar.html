@@ -99,7 +99,7 @@
 					</li>
 					<li class="sidebar">
 						
-						<a class="sidebar-link sidebar-title" href="#">
+						<a class="sidebar-link sidebar-title" href="{% url 'team_list' %}">
 							<svg class="stroke-icon">
 								<use href="{% static 'assets/svg/icon-sprite.svg'%}#stroke-social"></use>
 							</svg>
@@ -107,18 +107,7 @@
 							<span class="lan">Team Page</span>
 
 						</a>
-						<ul class="sidebar-submenu">
-							<li>
-								<a href="{% url 'Schools_Universities_Team' %}">Schools & Universities</a>
-							</li>
-							<li>
-								<a href="{% url 'Clubs_Academics_Team' %}">Clubs & Academics</a>
-							</li>
-							<li>
-								<a href="{% url 'Corporate_Team' %}">Corporate</a>
-							</li>
-							
-						</ul>
+					
 
 					</li>
 					<li class="sidebar">
