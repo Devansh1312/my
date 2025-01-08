@@ -6036,13 +6036,13 @@ class PlayerReadyNotificationAPIView(APIView):
         # Process Tournament Games
         for game in upcoming_tournament_games:
             team_a_lineup = Lineup.objects.filter(
-                game_id=game,
-                lineup_status=Lineup.ALREADY_IN_LINEUP,
+                game_id=game.id,
+                lineup_status=3,
                 player_ready=False
             )
             team_b_lineup = Lineup.objects.filter(
-                game_id=game,
-                lineup_status=Lineup.ALREADY_IN_LINEUP,
+                game_id=game.id,
+                lineup_status=3,
                 player_ready=False
             )
             notifications = self.check_and_notify(
@@ -6059,12 +6059,12 @@ class PlayerReadyNotificationAPIView(APIView):
         # Process Friendly Games
         for game in upcoming_friendly_games:
             team_a_lineup = FriendlyGameLineup.objects.filter(
-                game_id=game,
+                game_id=game.id,
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP,
                 player_ready=False
             )
             team_b_lineup = FriendlyGameLineup.objects.filter(
-                game_id=game,
+                game_id=game.id,
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP,
                 player_ready=False
             )
