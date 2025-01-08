@@ -1931,6 +1931,88 @@ class EventTypeListView(LoginRequiredMixin, View):
         )
 
 
+################################## Fields Crud #######################################
+########### Field List #################
+@method_decorator(user_role_check, name="dispatch")
+class FieldListView(LoginRequiredMixin, View):
+    template_name = "Admin/FieldsData/field_list.html"
+
+    def get(self, request):
+        fields = Field.objects.all()
+     
+         
+        return render(
+            request,
+            self.template_name,
+            {
+                "fields": fields,
+                "breadcrumb": {"child": "Field List"},
+            },
+        )
+    def post(self, request):
+        fields = Field.objects.all()
+     
+         
+        return render(
+            request,
+            self.template_name,
+            {
+                "fields": fields,
+                "breadcrumb": {"child": "Field List"},
+            },
+        )
+
+
+############ Event Detail ###################
+@method_decorator(user_role_check, name="dispatch")
+class FieldDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/FieldsData/field_detail.html"
+
+   
+
+    def get(self, request, pk):
+        field = get_object_or_404(Field, pk=pk)
+        tournament_games = TournamentGames.objects.filter(game_field_id=field)
+        friendly_games=FriendlyGame.objects.filter(game_field_id=field)
+
+       
+        
+        
+        return render(
+            request,
+            self.template_name, 
+            {
+                "field": field,
+                "tournament_games": tournament_games,
+                "friendly_games": friendly_games,
+             
+              
+                "breadcrumb": {"child": f"Field Details - {field.field_name}"},
+            },
+        )
+
+    def post(self, request, pk):
+        field = get_object_or_404(Field, pk=pk)
+        tournament_games = TournamentGames.objects.filter(game_field_id=field)
+        friendly_games=FriendlyGame.objects.filter(game_field_id=field)
+
+       
+        return render(
+            request,
+            self.template_name,
+            {
+                "field": field,
+                "tournament_games": tournament_games,
+                "friendly_games": friendly_games,
+             
+              
+                "breadcrumb": {"child": f"Field Details - {field.field_name}"},
+            },
+        )
+
+
+   
+
 
 ################################## Events Crud #######################################
 

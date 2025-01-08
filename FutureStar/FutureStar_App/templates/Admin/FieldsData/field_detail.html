@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+<!-- Bootstrap JS (with Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+<style>
+    .is-invalid {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+    }
+    /* Styling for the DataTable */
+    .table-bordered {
+        border: 1px solid #ddd;
+    }
+
+    .table-bordered th, .table-bordered td {
+        padding: 10px; /* Add padding for better spacing */
+        text-align: center;
+    }
+
+    .table th, .table td {
+        border-top: 1px solid #dee2e6; /* Adds a light border to the top of each cell */
+    }
+
+    .table th {
+        background-color: #f8f9fa; /* Light gray background for headers */
+    }
+
+    .table td {
+        vertical-align: middle; /* Centers content vertically */
+    }
+
+    .table-responsive {
+        overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
+        margin-bottom: 20px; /* Space below the table */
+    }
+
+    /* Customizing the hover effect */
+    .table tbody tr:hover {
+        background-color: #f1f1f1; /* Light gray hover effect */
+    }
+
+    /* Ensuring the pagination is styled consistently */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 5px 15px;
+        margin-left: 5px;
+        border-radius: 3px;
+        color: #007bff;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #f1f1f1;
+        border-color: #ddd;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    /* Customizing the search input */
+    .dataTables_wrapper .dataTables_filter input {
+        margin-left: 10px;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+</style>
+
+{% block title %}
+    Field Detail Page
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+
+         </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <button onclick="history.back()" class="btn btn-secondary" style="float: right;"><i class="fa fa-arrow-left"></i> Back</button>
+                        <h3>{{ breadcrumb.child }}</h3>
+                        <hr>
+
+                        <!-- Field Info Section -->
+                        <div class="container mt-5">
+                            <div class="row">
+                                <div class="col-12 col-md-4 mb-3">
+                                    <strong>Field Name:</strong> {{ field.field_name }}
+                                </div>
+                                <div class="col-12 col-md-4 mb-3">
+                                    <strong>Field Capacity:</strong> {{ field.field_capacity.name }}
+                                </div>
+                                <div class="col-12 col-md-4 mb-3">
+                                    <strong>Field Type:</strong> {{ field.ground_type.name_en }}
+                                </div>
+                                <div class="col-12 col-md-4 mb-3">
+                                    <strong>Field Location:</strong>{% if field.city_id.name and field.country_id.name %}
+                                    {{ field.city_id.name }}, {{ field.country_id.name }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                                </div>
+                                
+                                <div class="col-12 col-md-4 mb-3">
+                                    <strong>Additional Info:</strong> {{ field.additional_information }}
+                                </div>
+                                <div class="col-12 col-md-4 mb-3">
+                                    <strong>Field Creator:</strong>   {% if field.user_id.fullname %}
+                                    {{ field.user_id.fullname }}
+                                {% else %}
+                                    {{ field.user_id.first_name }} {{ field.user_id.last_name }}
+                                {% endif %}
+                                </div>
+                            </div>
+                            
+
+                            <!-- Logo Section -->
+                            <h4 class="mt-5">Field</h4>
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-4 mb-3">
+                                    <strong>Field Image:</strong>
+                                    {% if field.image %}
+                                    <img src="{{ field.image.url }}" alt="Field Image" class="img-fluid" height="50" width="100">
+                                    {% else %}
+                                    No Image Available
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Games</h3>
+                            <hr>
+                            <!-- Add tab navigation -->
+                            <ul class="nav nav-tabs" id="dataTab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="tournament-tab" data-bs-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="true">Tournament Games</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="friendly-tab" data-bs-toggle="tab" href="#friendly" role="tab" aria-controls="friendly" aria-selected="false">Friendly Games</a>
+                                </li>
+                            </ul>
+            
+                            <div class="tab-content" id="dataTabContent">
+                            
+                                <!-- Tournament Games Tab -->
+                                <div class="tab-pane fade show active" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered" id="tournament-game-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Game Number</th>
+                                                    <th>Team A</th>
+                                                    <th>Team B</th>
+
+                                                    <th>Game Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for tournament_game in tournament_games %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ tournament_game.game_number }}</td>
+                                                        <td>{{ tournament_game.team_a.team_name }}</td>
+                                                        <td>{{ tournament_game.team_b.team_name }}</td>
+                                                        <td>{{ tournament_game.game_date }}</td>
+                                                    </tr>
+                                                {% empty %}
+                                                    <tr>
+                                                        <td colspan="4">No Data available.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+            
+                                <!-- Friendly Games Tab -->
+                                <div class="tab-pane fade" id="friendly" role="tabpanel" aria-labelledby="friendly-tab">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-bordered" id="friendly-game-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Game Name</th>
+
+                                                    <th>Game Number</th>
+                                                    <th>Team A</th>
+                                                    <th>Team B</th>
+                                                    <th>Game Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for friendly_game in friendly_games %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ friendly_game.game_name }}</td>
+                                                        <td>{{ friendly_game.game_number }}</td>
+                                                        <td>{{ friendly_game.team_a.team_name }}</td>
+                                                        <td>{{ friendly_game.team_b.team_name }}</td>
+                                                       
+                                                        <td>{{ friendly_game.game_date }}</td>
+                                                    </tr>
+                                                {% empty %}
+                                                    <tr>
+                                                        <td colspan="4">No Data available.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Include jQuery and DataTables JS -->
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+
+<!-- Initialize DataTables for the booking table -->
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable with custom settings
+        $('#tournament-game-table').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true,
+            "lengthChange": true,
+            "pageLength": 10
+        });
+
+        $('#friendly-game-table').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true,
+            "lengthChange": true,
+            "pageLength": 10
+        });
+
+        // Toggle the visibility of the action card
+        document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+            menu.addEventListener('click', function(field) {
+                field.preventDefault();
+                var actionCard = menu.nextElementSibling;
+                actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+                // Close other open action cards
+                document.querySelectorAll('.action-card').forEach(function(card) {
+                    if (card !== actionCard) {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // View User Details
+        document.querySelectorAll('.view-details').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var FieldId = this.getAttribute('data-id');
+                var form = document.getElementById('view-form-' + FieldId);
+                form.submit();
+            });
+        });
+
+        // Hide action card if clicking outside
+        document.addEventListener('click', function(field) {
+            var isClickInside = field.target.closest('.action-menu-container');
+            if (!isClickInside) {
+                document.querySelectorAll('.action-card').forEach(function(card) {
+                    card.style.display = 'none';
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
