@@ -90,10 +90,10 @@
 						</a>
 						<ul class="sidebar-submenu">
 							<li>
-								<a href="{% url 'event_list' %}">Events</a>
+								<a href="{% url 'event_list' %}"> Event Booking Approval {% if pending_event_approval_count %} <span style="right: 5px; top: 0px; color: aliceblue; " class="badge badge-danger">{{ pending_event_approval_count }}</span> {% endif %} </a>
 							</li>
 							<li>
-								<a href="{% url 'PendingEventBookingListView' %}"> Event Booking Approval {% if pending_event_approval_count %} <span style="right: 5px; top: 0px; color: aliceblue; " class="badge badge-danger">{{ pending_event_approval_count }}</span> {% endif %} </a>
+								<a href="{% url 'PendingEventBookingListView' %}"> Event Booking Approval {% if pending_event_booking_approval_count %} <span style="right: 5px; top: 0px; color: aliceblue; " class="badge badge-danger">{{ pending_event_booking_approval_count }}</span> {% endif %} </a>
 							</li>
 						</ul>
 					</li>

@@ -492,6 +492,16 @@ class MobileDashboardBanner(models.Model):
 
 
 class Event(models.Model):
+
+    STATUS_PENDING = 0
+    STATUS_APPROVED = 1
+    STATUS_REJECTED = 2
+
+    EVENT_STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_APPROVED, 'Approved'),
+        (STATUS_REJECTED, 'Rejected'),
+    )
   
     TEAM_TYPE = 2
 
@@ -500,6 +510,7 @@ class Event(models.Model):
         (TEAM_TYPE, 'Team'),
        
     )
+    event_status = models.IntegerField(choices=EVENT_STATUS_CHOICES,default=STATUS_PENDING,null=True,blank=True)
 
     id = models.AutoField(primary_key=True)
     # team=models.ForeignKey('Team', on_delete=models.CASCADE)

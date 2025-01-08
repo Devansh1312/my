@@ -13,7 +13,7 @@ class FriendlyGame(models.Model):
     team_b = models.ForeignKey(TeamBranch, related_name="team_b",on_delete=models.CASCADE,null=True, blank=True)
     game_statistics_handler=models.ForeignKey(User,on_delete=models.CASCADE,blank=True, null=True)
     game_name = models.CharField(max_length=255, null=True, blank=True)
-    game_number = models.IntegerField(default=0)
+    game_number = models.CharField(max_length=255,blank=True, null=True)
     game_date = models.DateField(blank=True, null=True)
     game_start_time = models.TimeField(blank=True, null=True)
     game_end_time = models.TimeField(blank=True, null=True)

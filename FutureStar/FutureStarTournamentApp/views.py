@@ -1311,6 +1311,33 @@ class TournamentGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
+    def generate_game_number(self, tournament_id):
+        """Generate the game number in the format #TSYYYYNNNGGG."""
+        # Get current year (e.g., 2025)
+        current_year = timezone.now().year
+
+        # Pad tournament_id to 3 digits (e.g., 001 for ID 1)
+        tournament_id_str = str(tournament_id).zfill(3)
+
+        # Find the last game number for the tournament
+        last_game = TournamentGames.objects.filter(tournament_id=tournament_id).order_by('-game_number').first()
+
+        # If no games exist for this tournament, start with game number 1
+        if last_game:
+            last_game_number = last_game.game_number
+            # Increment the last game number by 1
+            game_number = last_game_number + 1
+        else:
+            game_number = 1  # Start from 1 if no games exist
+
+        # Pad the game number to 3 digits (e.g., 001)
+        game_number_str = str(game_number).zfill(3)
+
+        # Format game number as #TSYYYYNNNGGG
+        game_number_final = f"#TS{current_year:02d}{tournament_id_str}{game_number_str}"
+        
+        return game_number_final
+
     def post(self, request, *args, **kwargs):
         # Set language
         language = request.headers.get('Language', 'en')
@@ -1319,15 +1346,15 @@ class TournamentGamesAPIView(APIView):
 
         # Extract data from the request
         tournament_id = request.data.get("tournament_id")
-        game_number = request.data.get("game_number")
+        game_number = self.generate_game_number(tournament_id)  # Generate game number
         team_a = request.data.get("team_a")  # Team A ID
         team_b = request.data.get("team_b")  # Team B ID
         group_id = request.data.get("group_id")  # Optional field
 
-        if not tournament_id or not game_number or not team_a or not team_b:
+        if not tournament_id or not team_a or not team_b:
             return Response({
                 'status': 0,
-                'message': _('Both tournament_id, game_number, team_a, and team_b are required.')
+                'message': _('Both tournament_id, team_a, and team_b are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if TournamentGames.objects.filter(Q(tournament_id=tournament_id) & Q(game_number=game_number)).exists():
@@ -1339,6 +1366,9 @@ class TournamentGamesAPIView(APIView):
         if group_id == 0 or group_id == "0":
             request.data["group_id"] = None
 
+        # Add generated game number to the request data
+        request.data["game_number"] = game_number
+
         serializer = TournamentGamesSerializer(data=request.data)
         try:
             if serializer.is_valid():
@@ -1347,7 +1377,6 @@ class TournamentGamesAPIView(APIView):
                 # Notify coaches and managers of both teams
                 self.notify_team_members(team_a, tournament_id, game, "team_a")
                 self.notify_team_members(team_b, tournament_id, game, "team_b")
-
 
                 return Response({
                     'status': 1,

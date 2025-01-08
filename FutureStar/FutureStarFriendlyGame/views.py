@@ -141,13 +141,17 @@ class CreateFriendlyGame(APIView):
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
+            # Generate the game number for the friendly game
+            game_number = self.generate_game_number()
+
             try:
                 # Save the friendly game instance
                 friendly_game = serializer.save(
                     team_a_id=team_a_id, 
                     team_b_id=team_b_id, 
                     game_field_id=game_field,
-                    created_by=request.user
+                    created_by=request.user,
+                    game_number=game_number  # Add the generated game number here
                 )
 
                 # Process requested referees and send notifications
@@ -182,14 +186,9 @@ class CreateFriendlyGame(APIView):
                             friendly_data= {"id": friendly_game.id,  # Include the game ID
                                 "game_type": "friendly",}
                             push_data = {
-                              
                                 "game_data": friendly_data,  # Include the game data,
-                                
                                 "type":"friendly_game_scheduled"
-
-                        
                             }
-
 
                             # Check device type and token
                             device_token = referee.device_token
@@ -204,14 +203,6 @@ class CreateFriendlyGame(APIView):
                                     data=push_data
                                 )
 
-                            # Create notification record in database
-                            # Notifictions.objects.create(
-                            #     created_by_id=request.user.id,  # Creator ID
-                            #     creator_type=request.user.role.id,
-                            #     title=title,
-                            #     content=body
-                            # )
-
                         except Exception as e:
                             # Log error for debugging purposes and continue
                             print(f"Error sending notification to referee {user_id}: {str(e)}")
@@ -225,12 +216,9 @@ class CreateFriendlyGame(APIView):
                 date=friendly_game.game_date.strftime('%d-%m')
                 game_id = friendly_game.id
                 created_by_id=friendly_game.created_by_id
-              
-
 
                 # Notify eligible team members (coaches and managers)
-                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date,start_time,game_id,created_by_id)
-
+                self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date, start_time, game_id, created_by_id)
 
                 return Response({
                     'status': 1,
@@ -249,6 +237,32 @@ class CreateFriendlyGame(APIView):
             'message': _('Invalid data.'),
             'data': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+    def generate_game_number(self):
+        """Generate the game number in the format #FSYYGGGGGG."""
+        # Get the last two digits of the current year (e.g., 2025 -> 25)
+        current_year = timezone.now().year % 100  # Get last two digits of the year
+        
+        # Find the last game number for the current year
+        last_game = FriendlyGame.objects.filter(game_date__year=timezone.now().year).order_by('-game_number').first()
+        
+        # If no games exist for this year, start with game number 1
+        if last_game:
+            last_game_number = last_game.game_number
+            # Increment the last game number by 1
+            game_number = last_game_number + 1
+        else:
+            game_number = 1  # Start from 1 if no games exist
+
+        # Pad the game number to 6 digits (e.g., 000001)
+        game_number_str = str(game_number).zfill(6)
+
+        # Format game number as #FSYYGGGGGG (using the last two digits of the year)
+        game_number_final = f"#FS{current_year:02d}{game_number_str}"
+        
+        return game_number_final
+
+
 
     def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None,game_id=None,created_by_id=None):
         """

@@ -1941,9 +1941,9 @@ class EventListView(LoginRequiredMixin, View):
     template_name = "Admin/EventsData/event_list.html"
 
     def get(self, request):
-        events = Event.objects.all()
-     
-         
+        # Fetch events with pending status first and sort by event_date in descending order
+        events = Event.objects.all().order_by('-event_date')
+
         return render(
             request,
             self.template_name,
@@ -1953,6 +1953,27 @@ class EventListView(LoginRequiredMixin, View):
             },
         )
 
+
+@method_decorator(user_role_check, name="dispatch")
+class EventApprovalView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        # Fetch the event object
+        event = get_object_or_404(Event, pk=pk)
+        
+        # Retrieve the action from the form
+        action = request.POST.get('action')  # Values: 'approve' or 'reject'
+
+        # Update the event status based on the action
+        if action == "approve" and event.event_status != Event.STATUS_APPROVED:
+            event.event_status = Event.STATUS_APPROVED
+        elif action == "reject" and event.event_status != Event.STATUS_REJECTED:
+            event.event_status = Event.STATUS_REJECTED
+        
+        # Save the updated status
+        event.save()
+
+        # Redirect back to the Event Detail page
+        return redirect('event_detail', pk=pk)
 
 ############ Event Detail ###################
 @method_decorator(user_role_check, name="dispatch")

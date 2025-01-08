@@ -38,6 +38,7 @@ Event List
                               <th>Type</th>
                               <th>Date</th>
                               <th>City</th>
+                              <th>Status</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
@@ -50,6 +51,15 @@ Event List
                               <td>{{ event.event_type.name_en }}</td> 
                               <td>{{ event.event_date }}</td>
                               <td>{{ event.city|default:"None" }}</td>
+                              <td>
+                                 {% if event.event_status == 0 %}
+                                    <span class="badge badge-warning">Pending</span>
+                                 {% elif event.event_status == 1 %}
+                                    <span class="badge badge-success">Approved</span>
+                                 {% elif event.event_status == 2 %}
+                                    <span class="badge badge-danger">Rejected</span>
+                                 {% endif %}
+                              </td>
                               <td>
                                  <div class="action-menu-container" style="position: relative; display: inline-block;">
                                     <!-- Three dots menu trigger -->

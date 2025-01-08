@@ -160,7 +160,7 @@ class TournamentGroupTeam(models.Model):
 class TournamentGames(models.Model):
     id = models.AutoField(primary_key=True)
     tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=True, null=True)
-    game_number = models.IntegerField(blank=True, null=True)
+    game_number = models.CharField(max_length=255,blank=True, null=True)
     game_statistics_handler=models.ForeignKey(User,on_delete=models.CASCADE,blank=True, null=True)
     game_date = models.DateField(blank=True, null=True)
     game_start_time = models.TimeField(blank=True, null=True)

@@ -722,12 +722,12 @@ class JoinTrainingAPIView(APIView):
                 'message': _('Please add your gender first.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check user role
-        if user.role.id != 2:
-            return Response({
-            'status': 0,
-            'message': _('Only Players can Join training.')
-            }, status=status.HTTP_403_FORBIDDEN)
+        # # Check user role
+        # if user.role.id != 2:
+        #     return Response({
+        #     'status': 0,
+        #     'message': _('Only Players can Join training.')
+        #     }, status=status.HTTP_403_FORBIDDEN)
 
         # Validate the training ID
         try:
