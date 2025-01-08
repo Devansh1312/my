@@ -116,6 +116,12 @@ urlpatterns = [
 
     
 
+       
+
+    #field
+    path('fields/', FieldListView.as_view(), name='field_list'),
+    path('fields_detail/<int:pk>/', FieldDetailView.as_view(), name='field_detail'),
+
     
     
    # CMS Pages URLS
