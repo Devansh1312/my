@@ -237,7 +237,9 @@ urlpatterns = [
     path('post_reports/delete/<int:pk>/', PostReportDeleteView.as_view(), name='report_delete'),
     
     #Team list URL's
-    path('team_lists/', TeamListView.as_view(), name='team_list'),
+    path('Schools_Universities_Team/', SchoolsUniversitiesTeamListView.as_view(), name='Schools_Universities_Team'),
+    path('Clubs_Academics_Team/', ClubsAcademicsTeamListView.as_view(), name='Clubs_Academics_Team'),
+    path('Corporate_Team/', CorporateTeamListView.as_view(), name='Corporate_Team'),
     path('team_details/', TeamDetailView.as_view(), name='team_detail'),
     path('branch_details/', BranchDetailView.as_view(), name='branch_detail'),
     

@@ -6331,23 +6331,55 @@ class PostReportDeleteView(LoginRequiredMixin, View):
 
 ######################################################### Team List Module ###############################################
 
-
+#################### Schools & Universities	s #############
 @method_decorator(user_role_check, name="dispatch")
-class TeamListView(LoginRequiredMixin, View):
-    template_name = "Admin/MobileApp/List_Of_Teams/Team_List.html"
+class SchoolsUniversitiesTeamListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/List_Of_Teams/SchoolsUniversitiesTeamList.html"
 
     def get(self, request):
-        teams = Team.objects.all()
+        teams = Team.objects.filter(team_type_id=1).order_by('-id')
         return render(
             request,
             self.template_name,
             {
                 "teams": teams,
-                "breadcrumb": {"child": "Team Lists"},
+                "breadcrumb": {"child": "Schools & Universities Teams"},
             },
         )
 
+#################### Clubs & Academics	 ###############
+@method_decorator(user_role_check, name="dispatch")
+class ClubsAcademicsTeamListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/List_Of_Teams/ClubsAcademicsTeamList.html"
 
+    def get(self, request):
+        teams = Team.objects.filter(team_type_id=2).order_by('-id')
+        return render(
+            request,
+            self.template_name,
+            {
+                "teams": teams,
+                "breadcrumb": {"child": "Clubs & Academics Teams"},
+            },
+        )
+
+######################## Corporate ####################
+@method_decorator(user_role_check, name="dispatch")
+class CorporateTeamListView(LoginRequiredMixin, View):
+    template_name = "Admin/MobileApp/List_Of_Teams/CorporateTeamList.html"
+
+    def get(self, request):
+        teams = Team.objects.filter(team_type_id=3).order_by('-id')
+        return render(
+            request,
+            self.template_name,
+            {
+                "teams": teams,
+                "breadcrumb": {"child": "Corporate Teams"},
+            },
+        )
+
+################ Team Detail Page ###############################
 class TeamDetailView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/List_Of_Teams/Team_Details.html"
 

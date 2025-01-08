@@ -660,6 +660,7 @@ class EventSerializer(serializers.ModelSerializer):
             try:
                 team = Team.objects.get(id=team_id)
                 return {
+                    'id': team.id,
                     'username': team.team_name,
                     'fullname': team.team_username,
                     'phone': team.phone,
