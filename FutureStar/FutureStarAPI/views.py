@@ -4194,7 +4194,7 @@ class EventsAPIView(APIView):
 
         if events_section == 1:
             # Show all events
-            events = Event.objects.all().order_by('-event_date')
+            events = Event.objects.filter(event_status=1).order_by('-event_date')
 
         elif events_section == 2:
             # Show events created by the specified creator_type and created_by_id
