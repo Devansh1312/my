@@ -45,13 +45,7 @@ Field List
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ field.field_name }}</td>
                                 <td>{{ field.city_id.name|default:"None" }}</td>
-                                <td>
-                                    {% if field.user_id.fullname %}
-                                        {{ field.user_id.fullname }}
-                                    {% else %}
-                                        {{ field.user_id.first_name }} {{ field.user_id.last_name }}
-                                    {% endif %}
-                                </td>
+                                <td>{{ field.user_id.fullname }}</td>
                              
                                 <td>
                                     <div class="action-menu-container" style="position: relative; display: inline-block;">

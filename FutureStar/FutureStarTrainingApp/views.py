@@ -722,13 +722,6 @@ class JoinTrainingAPIView(APIView):
                 'message': _('Please add your gender first.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # # Check user role
-        # if user.role.id != 2:
-        #     return Response({
-        #     'status': 0,
-        #     'message': _('Only Players can Join training.')
-        #     }, status=status.HTTP_403_FORBIDDEN)
-
         # Validate the training ID
         try:
             training = Training.objects.get(id=training_id)
@@ -737,6 +730,14 @@ class JoinTrainingAPIView(APIView):
             'status': 0,
             'message': _('Training not found.')
             }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check training type
+        if training.training_type == Training.CLOSED_TRAINING:  # Closed training
+            if not hasattr(user, 'role') or user.role.id != 2:  # Only Players (role 2) can join
+                return Response({
+                    'status': 0,
+                    'message': _('Only Players can join closed training.')
+                }, status=status.HTTP_403_FORBIDDEN)
         
         # Check if the user is already a member of the training
         try:

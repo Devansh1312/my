@@ -4619,7 +4619,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
 
             return Response({
                 'status': 1,
-                'message': _('Event Booking Requested successfully.'),
+                'message': _('Your event booking request has been submitted successfully. The admin will connect with you for further steps.'),
                 'data': serializer.data
             }, status=status.HTTP_201_CREATED)
 
