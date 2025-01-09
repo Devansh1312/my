@@ -202,6 +202,15 @@ class CreateFriendlyGame(APIView):
                                     device_type=device_type,
                                     data=push_data
                                 )
+                                notification = Notifictions.objects.create(
+                                        created_by_id=request.user.id,  # Requestor ID
+                                        creator_type=1,  # Assuming 1 represents the requestor type
+                                        targeted_id=referee.id,  # Referee ID
+                                        targeted_type=referee.current_type,  # Assuming 1 represents a user
+                                        title=title,
+                                        content=body
+                                    )
+                                notification.save()
 
                         except Exception as e:
                             # Log error for debugging purposes and continue
@@ -312,6 +321,16 @@ class CreateFriendlyGame(APIView):
                         data=push_data  # Optionally include game-related data
 
                     )
+                    notification = Notifictions.objects.create(
+                        created_by_id=created_by_id,  # Creator ID
+                        creator_type=1,  # Creator type
+                        targeted_id=user.id,  # Team member's user ID
+                        targeted_type=user.current_type,  # Assuming target is a user
+                        title=title,
+                        content=body
+                    )
+                    notification.save()
+                    
 
 
 
@@ -358,6 +377,15 @@ class CreateFriendlyGame(APIView):
                             device_type=device_type,
                             data=push_data  # Optionally include game-related data
                         )
+                        notification = Notifictions.objects.create(
+                            created_by_id=created_by_id,  # Creator ID
+                            creator_type=1,  # Creator type
+                            targeted_id=user.id,  # Team member's user ID
+                            targeted_type=user.current_type,  # Assuming target is a user
+                            title=title,
+                            content=body
+                        )
+                        notification.save()
 
 
 
@@ -408,179 +436,179 @@ class CreateFriendlyGame(APIView):
             'data': data
         }, status=status.HTTP_200_OK)
     
-################## Request Referee ##################
-########## Add fee #################
-class RefereeFeeCreateUpdateView(APIView):
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        game_id = data.get('game_id')
-        officials_data = data.get('officials')
+# ################## Request Referee ##################
+# ########## Add fee #################
+# class RefereeFeeCreateUpdateView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         data = request.data
+#         game_id = data.get('game_id')
+#         officials_data = data.get('officials')
         
-        if not game_id or not officials_data:
-            return Response({
-                'status': 0,
-                'message': _('Game ID and officials are required.'),
-                'data': None
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         if not game_id or not officials_data:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Game ID and officials are required.'),
+#                 'data': None
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the game exists
-        try:
-            game = FriendlyGame.objects.get(id=game_id)
-        except FriendlyGame.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Game not exists'),
-                'data': []
-            }, status=status.HTTP_404_NOT_FOUND)
+#         # Check if the game exists
+#         try:
+#             game = FriendlyGame.objects.get(id=game_id)
+#         except FriendlyGame.DoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Game not exists'),
+#                 'data': []
+#             }, status=status.HTTP_404_NOT_FOUND)
         
-        # Create or update referees for the game in a transaction to ensure atomicity
-        try:
-            updated_referees = []
-            with transaction.atomic():
-                for official in officials_data:
-                    user_id = official.get('user_id')
-                    fees = official.get('fees')
+#         # Create or update referees for the game in a transaction to ensure atomicity
+#         try:
+#             updated_referees = []
+#             with transaction.atomic():
+#                 for official in officials_data:
+#                     user_id = official.get('user_id')
+#                     fees = official.get('fees')
                     
-                    # Try to get or update the RequestedReferee entry
-                    referee, created = RequestedReferee.objects.update_or_create(
-                        game_id_id=game_id,  # ForeignKey, hence game_id_id is used here
-                        user_id_id=user_id,  # ForeignKey, hence user_id_id is used here
-                        defaults={'fees': fees, 'status': RequestedReferee.REQUESTED}
-                    )
+#                     # Try to get or update the RequestedReferee entry
+#                     referee, created = RequestedReferee.objects.update_or_create(
+#                         game_id_id=game_id,  # ForeignKey, hence game_id_id is used here
+#                         user_id_id=user_id,  # ForeignKey, hence user_id_id is used here
+#                         defaults={'fees': fees, 'status': RequestedReferee.REQUESTED}
+#                     )
                     
-                    # Append the updated or created referee details
-                    updated_referees.append({
-                        'user_id': user_id,
-                        'fees': fees
-                    })
+#                     # Append the updated or created referee details
+#                     updated_referees.append({
+#                         'user_id': user_id,
+#                         'fees': fees
+#                     })
             
-            return Response({
-                'status': 1,
-                'message': _('Referees requested successfully.'),
-                'data': [{
-                    'game_id': game_id,
-                    'officials': updated_referees
-                }]
-            }, status=status.HTTP_200_OK)
+#             return Response({
+#                 'status': 1,
+#                 'message': _('Referees requested successfully.'),
+#                 'data': [{
+#                     'game_id': game_id,
+#                     'officials': updated_referees
+#                 }]
+#             }, status=status.HTTP_200_OK)
         
-        except Exception as e:
-            return Response({
-                'status': 0,
-                'message': str(e),
-                'data': None
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({
+#                 'status': 0,
+#                 'message': str(e),
+#                 'data': None
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-################ Raferee status update ############
+# ################ Raferee status update ############
 
 
-    def patch(self, request, *args, **kwargs):
-        # Extract the game_id, user_id, and status from the request data
-        game_id = request.data.get('game_id')
-        user_id = request.data.get('user_id')
-        status_value = request.data.get('status')
-        status_value=int(status_value)
-        game_id=int(game_id)
-        user_id=int(user_id)
+#     def patch(self, request, *args, **kwargs):
+#         # Extract the game_id, user_id, and status from the request data
+#         game_id = request.data.get('game_id')
+#         user_id = request.data.get('user_id')
+#         status_value = request.data.get('status')
+#         status_value=int(status_value)
+#         game_id=int(game_id)
+#         user_id=int(user_id)
 
-        # Validate the input
-        if not game_id or not user_id or not status_value:
-            return Response({
-                'status': 0,
-                'message': _('game_id, user_id, and status are required'),
-                'data': None
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         # Validate the input
+#         if not game_id or not user_id or not status_value:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('game_id, user_id, and status are required'),
+#                 'data': None
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate the status value to ensure it is only APPROVED (1) or REJECT (2)
-        if status_value not in [1, 2]:
-            return Response({
-                'status': 0,
-                'message': _('Invalid status value. Only APPROVED or REJECT are allowed'),
-                'data': None
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         # Validate the status value to ensure it is only APPROVED (1) or REJECT (2)
+#         if status_value not in [1, 2]:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Invalid status value. Only APPROVED or REJECT are allowed'),
+#                 'data': None
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Try to get the RequestedReferee object based on game_id and user_id
-        try:
-            referee = RequestedReferee.objects.get(game_id_id=game_id, user_id_id=user_id)
-        except RequestedReferee.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Requested Referee not found for the provided game_id and user_id'),
-                'data': None
-            }, status=status.HTTP_404_NOT_FOUND)
-        if referee.fees is None:
-            return Response({
-                'status': 0,
-                'message': _('Referee must have a fee assigned to be approved'),
-                'data': None
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         # Try to get the RequestedReferee object based on game_id and user_id
+#         try:
+#             referee = RequestedReferee.objects.get(game_id_id=game_id, user_id_id=user_id)
+#         except RequestedReferee.DoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Requested Referee not found for the provided game_id and user_id'),
+#                 'data': None
+#             }, status=status.HTTP_404_NOT_FOUND)
+#         if referee.fees is None:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Referee must have a fee assigned to be approved'),
+#                 'data': None
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Update the status field
-        referee.status = status_value
-        referee.save()
-        if status_value == 1:
-            game = referee.game_id
-            user = referee.user_id
+#         # Update the status field
+#         referee.status = status_value
+#         referee.save()
+#         if status_value == 1:
+#             game = referee.game_id
+#             user = referee.user_id
 
-            # Activate the user's notification language
-            notification_language = user.current_language
-            if notification_language in ['ar', 'en']:
-                activate(notification_language)
+#             # Activate the user's notification language
+#             notification_language = user.current_language
+#             if notification_language in ['ar', 'en']:
+#                 activate(notification_language)
 
-            # Notification message (assumes translated strings are available in locale files)
-            notification_title = _("You have been selected as a referee!")
-            notification_body = _(
-                "You have been selected as a referee for the friendly game {game_name} "
-                "of {team_a_name} and {team_b_name} on {date} "
-                "at {start_time} in {field_name}. Check it out!"
-            ).format(
-                game_name=game.game_name,
-                team_a_name=game.team_a.team_name,
-                team_b_name=game.team_b.team_name,
-                date=game.game_date,
-                start_time=game.game_start_time,
-                field_name=game.game_field_id.field_name
-            )
+#             # Notification message (assumes translated strings are available in locale files)
+#             notification_title = _("You have been selected as a referee!")
+#             notification_body = _(
+#                 "You have been selected as a referee for the friendly game {game_name} "
+#                 "of {team_a_name} and {team_b_name} on {date} "
+#                 "at {start_time} in {field_name}. Check it out!"
+#             ).format(
+#                 game_name=game.game_name,
+#                 team_a_name=game.team_a.team_name,
+#                 team_b_name=game.team_b.team_name,
+#                 date=game.game_date,
+#                 start_time=game.game_start_time,
+#                 field_name=game.game_field_id.field_name
+#             )
 
-            # Fetch device token and type
-            device_token = user.device_token
-            device_type = user.device_type  # ANDROID or IOS
+#             # Fetch device token and type
+#             device_token = user.device_token
+#             device_type = user.device_type  # ANDROID or IOS
 
-            # Send push notification
-            push_data = {
-                "game_id": game_id,
-                "game_type": "friendly",  # Specify that this is a friendly game
-                "user_id": user_id  # Add user_id to the push data
-            }
-            try:
-                send_push_notification(
-                    device_token=device_token,
-                    title=notification_title,
-                    body=notification_body,
-                    device_type=device_type,
-                    data=push_data,
+#             # Send push notification
+#             push_data = {
+#                 "game_id": game_id,
+#                 "game_type": "friendly",  # Specify that this is a friendly game
+#                 "user_id": user_id  # Add user_id to the push data
+#             }
+#             try:
+#                 send_push_notification(
+#                     device_token=device_token,
+#                     title=notification_title,
+#                     body=notification_body,
+#                     device_type=device_type,
+#                     data=push_data,
                 
-                )
-            except Exception as e:
-                return Response({
-                    'status': 0,
-                    'message': _('Failed to send notification: ') + str(e),
-                    'data': None
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#                 )
+#             except Exception as e:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('Failed to send notification: ') + str(e),
+#                     'data': None
+#                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response({
-            'status': 1,
-            'message': _('Referee status updated successfully'),
-            'data': {
-                'game_id': game_id,
-                'user_id': user_id,
-                'status': referee.status
-            }
-        }, status=status.HTTP_200_OK)
+#         return Response({
+#             'status': 1,
+#             'message': _('Referee status updated successfully'),
+#             'data': {
+#                 'game_id': game_id,
+#                 'user_id': user_id,
+#                 'status': referee.status
+#             }
+#         }, status=status.HTTP_200_OK)
 
 
 
-########### search referee ############
+# ########### search referee ############
 
 
 class OfficialListView(APIView):
@@ -761,6 +789,15 @@ class UpdateFriendlyGame(APIView):
                     device_type=device_type,
                     data=push_data  # Optionally include game-related data
                 )
+                notification = Notifictions.objects.create(
+                    created_by_id=team_b_id,  # Requestor ID (assumes request.user is available)
+                    creator_type=1,  # Assuming 1 represents the creator type
+                    targeted_id=user.id,  # Team A's coach or manager ID
+                    targeted_type=user.current_type,  # Assuming 1 represents a user
+                    title=title,
+                    content=body
+                )
+                notification.save()
 
 
 class DeleteFriendlyGame(APIView):
@@ -1547,6 +1584,23 @@ class FriendlyGameLineupPlayers(APIView):
                         device_type=lineup.player_id.device_type,
                         data=data
                     )
+                    notification = Notifictions.objects.create(
+                        created_by_id=user.id,  # Requestor ID (assumes request.user is available)
+                        creator_type=1,  # Assuming 1 represents the creator type
+                        targeted_id=lineup.player_id.id,  # Team A's coach or manager ID
+                        targeted_type=lineup.player_id.current_type,  # Assuming 1 represents a user
+                        title=_("You have been added to a game"),
+                        content=_(
+                            "You have been added to a game of {game_name} against {opponent_team}"
+                        ).format(
+                            game_name=game.game_name,
+                    
+                        
+                        
+                            opponent_team=opponent_team.team_name
+                        ),
+                    )
+                    notification.save()
 
 
 
@@ -2438,14 +2492,14 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
 
         # Send notifications based on the change and ready counts
         if is_team_a and team_a_ready_count == 11:
-            self.send_notifications(game, game.team_a,  "Your {team_name} team is ready to play!")
+            self.send_notifications(game, game.team_a,  "Your {team_name} team is ready to play!",lineup_entry.created_by_id)
 
         if is_team_b and team_b_ready_count == 11:
-            self.send_notifications(game, game.team_b,  "Your {team_name} team is ready to play!")
+            self.send_notifications(game, game.team_b,  "Your {team_name} team is ready to play!",lineup_entry.created_by_id)
 
         if team_a_ready_count == 11 and team_b_ready_count == 11:
-            self.send_notifications(game, game.team_a,  "Both teams are ready to play! Let's Go")
-            self.send_notifications(game, game.team_b,  "Both teams are ready to play! Let's Go")
+            self.send_notifications(game, game.team_a,  "Both teams are ready to play! Let's Go",lineup_entry.created_by_id)
+            self.send_notifications(game, game.team_b,  "Both teams are ready to play! Let's Go",lineup_entry.created_by_id)
 
         return Response({
             'status': 1,
@@ -2458,7 +2512,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-    def send_notifications(self, game, team, message):
+    def send_notifications(self, game, team, message,referee):
         team_name = team.team_name
         coaches_and_managers = JoinBranch.objects.filter(
             branch_id=team.id,
@@ -2483,6 +2537,15 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
                 device_type=user.device_type,
                 data=data
             )
+            notification = Notifictions.objects.create(
+                created_by_id=referee,
+                creator_type=1,  # Assuming 1 is the type for creators
+                targeted_id=user.id,
+                targeted_type=1,  # Assuming 1 is the type for users
+                title=_("Let's Go"),
+                content=body_message
+            )
+            notification.save()
             
 
   
@@ -2774,6 +2837,15 @@ class FriendlyGameOfficialsAPIView(APIView):
 
                 # Send the push notification to the official
                 send_push_notification(device_token, title, body, device_type=official.device_type,data=push_data)  # device_type: 1 for Android, 2 for iOS
+                notification = Notifictions.objects.create(
+                    created_by_id=request.user.id,
+                    creator_type=1,  # Assuming 1 is for user
+                    targeted_id=official.id,
+                    targeted_type=official.current_type,  # Assuming 1 is for user
+                    title=title,
+                    content=body
+                )
+                notification.save()
         except Exception as e:
             logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 
@@ -3087,7 +3159,15 @@ class FriendlyPlayerGameStatsAPIView(APIView):
             
 
             send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
-
+            notification = Notifictions.objects.create(
+                created_by_id=self.request.user.id,
+                creator_type=1,  # Assuming 1 is for user
+                targeted_id=player_instance.id,
+                targeted_type=1,  # Assuming 1 is for user
+                title=_('Statistics Updated!'),
+                content=notification_body
+            )
+            notification.save()
 
     def get(self, request, *args, **kwargs):
         # Set language based on the request headers
@@ -4299,6 +4379,15 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
                     device_type=device_type,
                     data=data
                 )
+                notification = Notifictions.objects.create(
+                    created_by_id=self.request.user.id,
+                    creator_type=1,  # Assuming 1 is for user
+                    targeted_id=user.id,
+                    targeted_type=user.current_type,  # Assuming 1 is for user
+                    title=_("Uniform Rejected"),
+                    content=message
+                )
+                notification.save()
 
 
 
