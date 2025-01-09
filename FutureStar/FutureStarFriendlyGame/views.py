@@ -206,7 +206,7 @@ class CreateFriendlyGame(APIView):
                                         created_by_id=request.user.id,  # Requestor ID
                                         creator_type=1,  # Assuming 1 represents the requestor type
                                         targeted_id=referee.id,  # Referee ID
-                                        targeted_type=referee.current_type,  # Assuming 1 represents a user
+                                        targeted_type=1,  # Assuming 1 represents a user
                                         title=title,
                                         content=body
                                     )
@@ -325,7 +325,7 @@ class CreateFriendlyGame(APIView):
                         created_by_id=created_by_id,  # Creator ID
                         creator_type=1,  # Creator type
                         targeted_id=user.id,  # Team member's user ID
-                        targeted_type=user.current_type,  # Assuming target is a user
+                        targeted_type=1,  # Assuming target is a user
                         title=title,
                         content=body
                     )
@@ -381,7 +381,7 @@ class CreateFriendlyGame(APIView):
                             created_by_id=created_by_id,  # Creator ID
                             creator_type=1,  # Creator type
                             targeted_id=user.id,  # Team member's user ID
-                            targeted_type=user.current_type,  # Assuming target is a user
+                            targeted_type=1,  # Assuming target is a user
                             title=title,
                             content=body
                         )
@@ -790,10 +790,10 @@ class UpdateFriendlyGame(APIView):
                     data=push_data  # Optionally include game-related data
                 )
                 notification = Notifictions.objects.create(
-                    created_by_id=team_b_id,  # Requestor ID (assumes request.user is available)
+                    created_by_id=self.request.user.id,  # Requestor ID (assumes request.user is available)
                     creator_type=1,  # Assuming 1 represents the creator type
                     targeted_id=user.id,  # Team A's coach or manager ID
-                    targeted_type=user.current_type,  # Assuming 1 represents a user
+                    targeted_type=1,  # Assuming 1 represents a user
                     title=title,
                     content=body
                 )
@@ -1588,7 +1588,7 @@ class FriendlyGameLineupPlayers(APIView):
                         created_by_id=user.id,  # Requestor ID (assumes request.user is available)
                         creator_type=1,  # Assuming 1 represents the creator type
                         targeted_id=lineup.player_id.id,  # Team A's coach or manager ID
-                        targeted_type=lineup.player_id.current_type,  # Assuming 1 represents a user
+                        targeted_type=1,  # Assuming 1 represents a user
                         title=_("You have been added to a game"),
                         content=_(
                             "You have been added to a game of {game_name} against {opponent_team}"
@@ -2841,7 +2841,7 @@ class FriendlyGameOfficialsAPIView(APIView):
                     created_by_id=request.user.id,
                     creator_type=1,  # Assuming 1 is for user
                     targeted_id=official.id,
-                    targeted_type=official.current_type,  # Assuming 1 is for user
+                    targeted_type=1,  # Assuming 1 is for user
                     title=title,
                     content=body
                 )
@@ -4383,7 +4383,7 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
                     created_by_id=self.request.user.id,
                     creator_type=1,  # Assuming 1 is for user
                     targeted_id=user.id,
-                    targeted_type=user.current_type,  # Assuming 1 is for user
+                    targeted_type=1,  # Assuming 1 is for user
                     title=_("Uniform Rejected"),
                     content=message
                 )
