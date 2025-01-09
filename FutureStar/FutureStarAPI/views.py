@@ -5356,6 +5356,18 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Send push notifications to the user
                     send_push_notification(user.device_token, _("Training Reminder"), attendance_message, device_type=user.device_type, data=push_data)
                     send_push_notification(user.device_token, _("Training Reminder"), comments_message, device_type=user.device_type, data=push_data)
+                    
+                    # Create notification for the user
+                    notification = Notifictions.objects.create(
+                        created_by_id=1,  # Requestor ID (assumed to be 1 for now, can be dynamic)
+                        creator_type=1,  # Creator type
+                        targeted_id=user.id,  # Targeted user (training creator)
+                        targeted_type=user.current_type,  # Assuming the target type is a user
+                        title=_("Training Reminder"),
+                        content=attendance_message + "\n" + comments_message
+                    )
+                    notification.save()
+
                     notifications_sent += 1
 
                 elif training.creator_type == Training.TEAM_TYPE:
@@ -5375,6 +5387,18 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Send push notifications to the team founder
                     send_push_notification(team.team_founder.device_token, _("Training Reminder"), attendance_message, device_type=team.team_founder.device_type, data=push_data)
                     send_push_notification(team.team_founder.device_token, _("Training Reminder"), comments_message, device_type=team.team_founder.device_type, data=push_data)
+                    
+                    # Create notification for the team founder
+                    notification = Notifictions.objects.create(
+                        created_by_id=1,  # Requestor ID
+                        creator_type=2,  # Creator type
+                        targeted_id=team.team_founder.id,  # Targeted user (team founder)
+                        targeted_type=team.team_founder.current_type,  # Assuming the target type is a user
+                        title=_("Training Reminder"),
+                        content=attendance_message + "\n" + comments_message
+                    )
+                    notification.save()
+
                     notifications_sent += 1
 
                 elif training.creator_type == Training.GROUP_TYPE:
@@ -5394,6 +5418,18 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Send push notifications to the group founder
                     send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), attendance_message, device_type=training_group.group_founder.device_type, data=push_data)
                     send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), comments_message, device_type=training_group.group_founder.device_type, data=push_data)
+                    
+                    # Create notification for the group founder
+                    notification = Notifictions.objects.create(
+                        created_by_id=1,  # Requestor ID
+                        creator_type=3,  # Creator type
+                        targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
+                        targeted_type=training_group.group_founder.current_type,  # Assuming the target type is a user
+                        title=_("Training Reminder"),
+                        content=attendance_message + "\n" + comments_message
+                    )
+                    notification.save()
+
                     notifications_sent += 1
 
         # Return a response with the number of notifications sent
@@ -5432,7 +5468,6 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                 message = _("Don't forget to rate your players after the training session.")
                 comments_message = _("Don't forget to add your comments on your players' performance.")
 
-
                 # Get user language preference, assuming `User` model has `current_language` field
                 if training.creator_type == Training.USER_TYPE:
                     user = User.objects.get(id=training.created_by_id)
@@ -5444,13 +5479,24 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     push_data = {
                         "training_id": training.id,
                         "user_id": user.id,
-                        "type" : "Training Reminder",
+                        "type": "Training Reminder",
                     }
 
                     # Send push notification to the user
                     send_push_notification(user.device_token, _("Training Reminder"), message, device_type=user.device_type, data=push_data)
                     send_push_notification(user.device_token, _("Training Reminder"), comments_message, device_type=user.device_type, data=push_data)
-                   
+                    
+                    # Create notification for the user
+                    notification = Notifictions.objects.create(
+                        created_by_id=1,  # Requestor ID (this can be dynamic)
+                        creator_type=1,  # Creator type
+                        targeted_id=user.id,  # Targeted user (training creator)
+                        targeted_type=user.current_type,  # Assuming the target type is a user
+                        title=_("Training Reminder"),
+                        content=message + "\n" + comments_message
+                    )
+                    notification.save()
+
                     notifications_sent += 1
 
                 elif training.creator_type == Training.TEAM_TYPE:
@@ -5468,7 +5514,18 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     # Send push notification to the team founder
                     send_push_notification(team.team_founder.device_token, _("Training Reminder"), message, device_type=team.team_founder.device_type, data=push_data)
                     send_push_notification(team.team_founder.device_token, _("Training Reminder"), comments_message, device_type=team.team_founder.device_type, data=push_data)
-  
+                    
+                    # Create notification for the team founder
+                    notification = Notifictions.objects.create(
+                        created_by_id=1,  # Requestor ID
+                        creator_type=2,  # Creator type
+                        targeted_id=team.team_founder.id,  # Targeted user (team founder)
+                        targeted_type=team.team_founder.current_Type,  # Assuming the target type is a user
+                        title=_("Training Reminder"),
+                        content=message + "\n" + comments_message
+                    )
+                    notification.save()
+
                     notifications_sent += 1
 
                 elif training.creator_type == Training.GROUP_TYPE:
@@ -5481,12 +5538,22 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         "training_id": training.id,
                         "training_group_id": training_group.id,
                         "type": "Training Reminder",
-                      
                     }
 
                     # Send push notification to the group founder
                     send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), message, device_type=training_group.group_founder.device_type, data=push_data)
                     send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), comments_message, device_type=training_group.group_founder.device_type, data=push_data)
+                    
+                    # Create notification for the group founder
+                    notification = Notifictions.objects.create(
+                        created_by_id=1,  # Requestor ID
+                        creator_type=3,  # Creator type
+                        targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
+                        targeted_type=training_group.group_founder.current_type,  # Assuming the target type is a user
+                        title=_("Training Reminder"),
+                        content=message + "\n" + comments_message
+                    )
+                    notification.save()
 
                     notifications_sent += 1
 
@@ -5618,6 +5685,17 @@ class LineupNotificationAPIView(APIView):
                     notifications_sent=notifications_sent,
                     team_name=team_name
                 )
+                notification = Notifictions.objects.create(
+                    created_by_id=1,  # Requestor ID (could be dynamic)
+                    creator_type=1,  # Creator type (could vary based on game type)
+                    targeted_id=staff_member.user_id.id,  # Targeted user (staff member)
+                    targeted_type=staff_member.user_id.current_type,  # Assuming the target is a user
+                    title=_("Please add your line-up for your match against {opponent_team}").format(opponent_team=opponent_team_name),
+                    content=_("Lineup is missing for game {game_number} in the {game_type} match.").format(
+                        game_number=game.game_number, game_type=game_type)
+                )
+                notification.save()
+
 
         # Notify team founder (if present)
         team_founder = team.team_id.team_founder
@@ -5632,6 +5710,17 @@ class LineupNotificationAPIView(APIView):
                 team_name=team_name
 
             )
+            notification = Notifictions.objects.create(
+                created_by_id=1,  # Requestor ID (could be dynamic)
+                creator_type=1,  # Creator type (could vary based on game type)
+                targeted_id=team_founder.id,  # Targeted user (team founder)
+                targeted_type=team_founder.current_type,  # Assuming the target is a user
+                title=_("Please add your line-up for your match against {opponent_team}").format(opponent_team=opponent_team_name),
+                content=_("Lineup is missing for game {game_number} in the {game_type} match.").format(
+                        game_number=game.game_number, game_type=game_type)
+
+            )
+            notification.save()
 
     def _send_notification(self, user, game, game_type, opponent_team_name, role, notifications_sent,team_name):
         # Set the notification title and body based on language
@@ -5739,6 +5828,16 @@ class UniformConfirmationNotificationView(APIView):
                     device_type=official_user.device_type,
                     data=data
                 )
+                notification = Notifictions.objects.create(
+                    created_by_id=1,  # Requestor ID (could be dynamic)
+                    creator_type=1,  # Creator type (could vary based on game type)
+                    targeted_id=official_user.id,  # Targeted user (official)
+                    targeted_type=official_user.current_type,  # Assuming the target is a user
+                    title=title,
+                    content=body
+                )
+                notification.save()
+
                 notifications_sent.append({
                     "user": official_user.id,
                     "message": body
@@ -5763,6 +5862,16 @@ class UniformConfirmationNotificationView(APIView):
                     device_type=handler.device_type,
                     data=data   
                 )
+                notification = Notifictions.objects.create(
+                    created_by_id=1,  # Requestor ID (could be dynamic)
+                    creator_type=1,  # Creator type (could vary based on game type)
+                    targeted_id=handler.id,  # Targeted user (official)
+                    targeted_type=handler.currrent_type,  # Assuming the target is a user
+                    title=title,
+                    content=body
+                )
+                notification.save()
+
                 notifications_sent.append({
                     "user": handler.id,
                     "message": body
@@ -5882,6 +5991,8 @@ class UniformAddNotificationAPIView(APIView):
             if missing_team_a_colors:
                 for staff_member in team_a_staff:
                     self._send_notification(staff_member.user_id, game, game_type, game.team_b.team_name, "Manager" if staff_member.joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE else "Coach", notifications_sent, game.team_a.team_name)
+                  
+
             
                 # Notify the team founder for Team A
                 if team_founder_a and team_founder_a.device_token:
@@ -5921,6 +6032,17 @@ class UniformAddNotificationAPIView(APIView):
             device_type=user.device_type,
             data=push_data
         )
+    
+        notification = Notifictions.objects.create(
+                created_by_id=1,  # Replace with appropriate user ID or dynamic value
+                creator_type=1,
+                targeted_id=user.id,
+                targeted_type=user.current_type,  # Assuming 1 represents a user in your system
+                title=title,
+                content=body
+        )
+        notification.save()
+    
 
         # Log notification sent
         notifications_sent.append(f"Notification sent to {user.username} ({role}) for {game_type} game against {opponent_team_name}")
@@ -5946,6 +6068,17 @@ class PlayerReadyNotificationAPIView(APIView):
                     body=message_body,
                     device_type=staff.user_id.device_type
                 )
+                notification = Notifictions.objects.create(
+                        created_by_id=1,  # Replace with appropriate user ID or dynamic value
+                        creator_type=1,
+                        targeted_id=staff.user_id.id,
+                        targeted_type=staff.user_id.current_type,  # Assuming 1 represents a user in your system
+                        title=message_title,
+                        content=message_body
+                )
+                notification.save()
+
+
                 notifications.append({
                     "role": roles[staff.joinning_type],
                     "username": staff.user_id.username
@@ -5960,6 +6093,15 @@ class PlayerReadyNotificationAPIView(APIView):
                 body=message_body,
                 device_type=team_founder_a.device_type
             )
+            notification = Notifictions.objects.create(
+                        created_by_id=1,  # Replace with appropriate user ID or dynamic value
+                        creator_type=1,
+                        targeted_id=team_founder_a.id,
+                        targeted_type=team_founder_a.current_type,  # Assuming 1 represents a user in your system
+                        title=message_title,
+                        content=message_body
+                )
+            notification.save()
             notifications.append({
                 "role": roles["founder"],
                 "username": team_founder_a.username
