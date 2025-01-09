@@ -5362,7 +5362,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                         created_by_id=1,  # Requestor ID (assumed to be 1 for now, can be dynamic)
                         creator_type=1,  # Creator type
                         targeted_id=user.id,  # Targeted user (training creator)
-                        targeted_type=user.current_type,  # Assuming the target type is a user
+                        targeted_type=1,  # Assuming the target type is a user
                         title=_("Training Reminder"),
                         content=attendance_message + "\n" + comments_message
                     )
@@ -5391,9 +5391,9 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Create notification for the team founder
                     notification = Notifictions.objects.create(
                         created_by_id=1,  # Requestor ID
-                        creator_type=2,  # Creator type
+                        creator_type=1,  # Creator type
                         targeted_id=team.team_founder.id,  # Targeted user (team founder)
-                        targeted_type=team.team_founder.current_type,  # Assuming the target type is a user
+                        targeted_type=1,  # Assuming the target type is a user
                         title=_("Training Reminder"),
                         content=attendance_message + "\n" + comments_message
                     )
@@ -5422,9 +5422,9 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     # Create notification for the group founder
                     notification = Notifictions.objects.create(
                         created_by_id=1,  # Requestor ID
-                        creator_type=3,  # Creator type
+                        creator_type=1,  # Creator type
                         targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
-                        targeted_type=training_group.group_founder.current_type,  # Assuming the target type is a user
+                        targeted_type=1,  # Assuming the target type is a user
                         title=_("Training Reminder"),
                         content=attendance_message + "\n" + comments_message
                     )
@@ -5491,7 +5491,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         created_by_id=1,  # Requestor ID (this can be dynamic)
                         creator_type=1,  # Creator type
                         targeted_id=user.id,  # Targeted user (training creator)
-                        targeted_type=user.current_type,  # Assuming the target type is a user
+                        targeted_type=1,  # Assuming the target type is a user
                         title=_("Training Reminder"),
                         content=message + "\n" + comments_message
                     )
@@ -5518,9 +5518,9 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     # Create notification for the team founder
                     notification = Notifictions.objects.create(
                         created_by_id=1,  # Requestor ID
-                        creator_type=2,  # Creator type
+                        creator_type=1,  # Creator type
                         targeted_id=team.team_founder.id,  # Targeted user (team founder)
-                        targeted_type=team.team_founder.current_Type,  # Assuming the target type is a user
+                        targeted_type=1,  # Assuming the target type is a user
                         title=_("Training Reminder"),
                         content=message + "\n" + comments_message
                     )
@@ -5547,9 +5547,9 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     # Create notification for the group founder
                     notification = Notifictions.objects.create(
                         created_by_id=1,  # Requestor ID
-                        creator_type=3,  # Creator type
+                        creator_type=1,  # Creator type
                         targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
-                        targeted_type=training_group.group_founder.current_type,  # Assuming the target type is a user
+                        targeted_type=1,  # Assuming the target type is a user
                         title=_("Training Reminder"),
                         content=message + "\n" + comments_message
                     )
@@ -5689,7 +5689,7 @@ class LineupNotificationAPIView(APIView):
                     created_by_id=1,  # Requestor ID (could be dynamic)
                     creator_type=1,  # Creator type (could vary based on game type)
                     targeted_id=staff_member.user_id.id,  # Targeted user (staff member)
-                    targeted_type=staff_member.user_id.current_type,  # Assuming the target is a user
+                    targeted_type=1,  # Assuming the target is a user
                     title=_("Please add your line-up for your match against {opponent_team}").format(opponent_team=opponent_team_name),
                     content=_("Lineup is missing for game {game_number} in the {game_type} match.").format(
                         game_number=game.game_number, game_type=game_type)
@@ -5714,7 +5714,7 @@ class LineupNotificationAPIView(APIView):
                 created_by_id=1,  # Requestor ID (could be dynamic)
                 creator_type=1,  # Creator type (could vary based on game type)
                 targeted_id=team_founder.id,  # Targeted user (team founder)
-                targeted_type=team_founder.current_type,  # Assuming the target is a user
+                targeted_type=1,  # Assuming the target is a user
                 title=_("Please add your line-up for your match against {opponent_team}").format(opponent_team=opponent_team_name),
                 content=_("Lineup is missing for game {game_number} in the {game_type} match.").format(
                         game_number=game.game_number, game_type=game_type)
@@ -5832,7 +5832,7 @@ class UniformConfirmationNotificationView(APIView):
                     created_by_id=1,  # Requestor ID (could be dynamic)
                     creator_type=1,  # Creator type (could vary based on game type)
                     targeted_id=official_user.id,  # Targeted user (official)
-                    targeted_type=official_user.current_type,  # Assuming the target is a user
+                    targeted_type=1,  # Assuming the target is a user
                     title=title,
                     content=body
                 )
@@ -5866,7 +5866,7 @@ class UniformConfirmationNotificationView(APIView):
                     created_by_id=1,  # Requestor ID (could be dynamic)
                     creator_type=1,  # Creator type (could vary based on game type)
                     targeted_id=handler.id,  # Targeted user (official)
-                    targeted_type=handler.currrent_type,  # Assuming the target is a user
+                    targeted_type=1,  # Assuming the target is a user
                     title=title,
                     content=body
                 )
@@ -6037,7 +6037,7 @@ class UniformAddNotificationAPIView(APIView):
                 created_by_id=1,  # Replace with appropriate user ID or dynamic value
                 creator_type=1,
                 targeted_id=user.id,
-                targeted_type=user.current_type,  # Assuming 1 represents a user in your system
+                targeted_type=1,  # Assuming 1 represents a user in your system
                 title=title,
                 content=body
         )
@@ -6072,7 +6072,7 @@ class PlayerReadyNotificationAPIView(APIView):
                         created_by_id=1,  # Replace with appropriate user ID or dynamic value
                         creator_type=1,
                         targeted_id=staff.user_id.id,
-                        targeted_type=staff.user_id.current_type,  # Assuming 1 represents a user in your system
+                        targeted_type=1,  # Assuming 1 represents a user in your system
                         title=message_title,
                         content=message_body
                 )
@@ -6097,7 +6097,7 @@ class PlayerReadyNotificationAPIView(APIView):
                         created_by_id=1,  # Replace with appropriate user ID or dynamic value
                         creator_type=1,
                         targeted_id=team_founder_a.id,
-                        targeted_type=team_founder_a.current_type,  # Assuming 1 represents a user in your system
+                        targeted_type=1,  # Assuming 1 represents a user in your system
                         title=message_title,
                         content=message_body
                 )
