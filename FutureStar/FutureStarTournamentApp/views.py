@@ -688,6 +688,50 @@ class TeamJoiningRequest(APIView):
         if language in ['en', 'ar']:
             activate(language)
         user = request.user
+        if request.user.role_id in [6, 3]:  # Managers (6) or Coaches (3)
+        # Determine joinning_type based on role
+            joinning_type = (
+                JoinBranch.MANAGERIAL_STAFF_TYPE if request.user.role_id == 6
+                else JoinBranch.COACH_STAFF_TYPE
+            )
+            try:
+                user_branch = JoinBranch.objects.filter(
+                    user_id=request.user,
+                    joinning_type=joinning_type
+                )
+               
+            except JoinBranch.DoesNotExist:
+                role_message = (
+                    _('You are not assigned as a manager to any branch.')
+                    if request.user.role_id == 6
+                    else _('You are not assigned as a coach to any branch.')
+                )
+                return Response({
+                    'status': 0,
+                    'message': role_message,
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif TeamBranch.objects.filter(team_id__team_founder=request.user).exists():  # Check if user is a team founder
+            try:
+                # Retrieve the first branch associated with the team where the user is the founder
+                team_branch = TeamBranch.objects.filter(team_id__team_founder=request.user).first()
+                if not team_branch:
+                    return Response({
+                        'status': 0,
+                        'message': _('No Team Exists'),
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+               
+            except TeamBranch.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('You are not associated with any team branch as a founder.'),
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Only managers, coaches, or team founders can perform this action.'),
+            }, status=status.HTTP_403_FORBIDDEN)
 
         # Initialize classification dictionaries
         coach_teams = []
@@ -712,7 +756,7 @@ class TeamJoiningRequest(APIView):
 
         # Filter teams by age group
         tournament_age_group = tournament.age_group
-
+     
         # Retrieve founder teams
         if TeamBranch.objects.filter(team_id__team_founder=user).exists():
             founder_team_branches = TeamBranch.objects.filter(team_id__team_founder=user, age_group_id=tournament_age_group)
