@@ -719,6 +719,16 @@ class StaffManagementView(APIView):
                             'notifier_id': branch_id,
                         }
                         send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
+                        notification = Notifictions.objects.create(
+                            created_by_id=request.user.id,
+                            creator_type=1,  # Assuming 1 is for user
+                            targeted_id=user.id,
+                            targeted_type=1,  # Assuming 1 is for user
+                            title=title,
+                            content=body
+                        )
+                        notification.save()
+
 
                     # Return API success message in the selected language
                     activate(language)  # Reactivate header language

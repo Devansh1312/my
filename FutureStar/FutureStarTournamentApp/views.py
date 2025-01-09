@@ -937,6 +937,16 @@ class TeamJoiningRequest(APIView):
 
                 
                 send_push_notification(device_token, title, body, device_type=team_founder.device_type, data=push_data)
+                notification = Notifictions.objects.create(
+                    created_by_id=request.user.id,
+                    creator_type=1,  # Assuming 1 is for user
+                    targeted_id=team_founder.id,
+                    targeted_type=1,  # Assuming 1 is for user
+                    title=title,
+                    content=body
+                )
+                notification.save()
+
         return Response({
             'status': 1,
             'message': _('Team joining request created successfully.' if not existing_request else _('Team joining request updated successfully.')),
@@ -1032,6 +1042,16 @@ class TeamRequestApproved(APIView):
                         device_type=device_type,
                         data=push_data,
                     )
+                    notification = Notifictions.objects.create(
+                        created_by_id=request.user.id,
+                        creator_type=1,  # Assuming 1 is for user
+                        targeted_id=user.id,
+                        targeted_type=1,  # Assuming 1 is for user
+                        title=_("Team Approved"),
+                        content=_("Your team has been accepted to join the {} tournament.").format(tournament.tournament_name),
+                    )
+                    notification.save()
+
 
 
             return Response({
@@ -1604,6 +1624,16 @@ class TournamentGamesAPIView(APIView):
                         device_type=device_type,
                         data=push_data
                     )
+                    notification = Notifictions.objects.create(
+                        created_by_id=self.request.user.id,  # Requestor ID (could be dynamically set, e.g., the admin or the user making the change)
+                        creator_type=2,      # Creator type (admin or system)
+                        targeted_id=user.id,    # Targeted user ID (team member)
+                        targeted_type=1,                # Assuming target is always a user
+                        title=_("Game Scheduled"),
+                        content=notification_message
+                    )
+                    notification.save()
+                    
         except Tournament.DoesNotExist:
             logging.error(f"Tournament with ID {tournament_id} does not exist.")
         except Exception as e:
@@ -2310,6 +2340,15 @@ class FetchTeamUniformColorAPIView(APIView):
                     device_type=device_type,
                     data=data
                 )
+                notification = Notifictions.objects.create(
+                    created_by_id=self.request.user.id,  # Requestor ID (could be dynamically set, e.g., the admin or the user making the change)
+                    creator_type=1,      # Creator type (admin or system)
+                    targeted_id=user.id,    # Targeted user ID (team member)
+                    targeted_type=1,                # Assuming target is always a user
+                    title=_("Uniform Rejected"),
+                    content=message
+                )
+                notification.save()
 
 
 

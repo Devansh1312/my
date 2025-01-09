@@ -627,6 +627,24 @@ class LineupPlayers(APIView):
                     device_type=lineup.player_id.device_type,
                     data=data
                 )
+              
+                notification = Notifictions.objects.create(
+                        created_by_id=user.id,  # Requestor ID (assumes request.user is available)
+                        creator_type=1,  # Assuming 1 represents the creator type
+                        targeted_id=lineup.player_id.id,  # Team A's coach or manager ID
+                        targeted_type=1,  # Assuming 1 represents a user
+                        title=_("You have been added to a game"),
+                        content=_(
+                        "You have been added to a game of {tournament_name} against {opponent_team}"
+                        ).format(
+                            tournament_name=tournament.tournament_name,
+                            opponent_team=opponent_team.team_name
+                        ),
+                    )
+                notification.save()
+
+            
+
 
 
             except Lineup.DoesNotExist:
@@ -1573,14 +1591,14 @@ class LineupPlayerStatusAPIView(APIView):
 
         # Send notifications based on the change and ready counts
         if is_team_a and team_a_ready_count == 11:
-            self.send_notifications(game, game.team_a, tournament_id, "Your {team_name} team is ready to play!")
+            self.send_notifications(game, game.team_a, tournament_id, "Your {team_name} team is ready to play!",lineup_entry.created_by_id)
 
         if is_team_b and team_b_ready_count == 11:
-            self.send_notifications(game, game.team_b, tournament_id, "Your {team_name} team is ready to play!")
+            self.send_notifications(game, game.team_b, tournament_id, "Your {team_name} team is ready to play!",lineup_entry.created_by_id)
 
         if team_a_ready_count == 11 and team_b_ready_count == 11:
-            self.send_notifications(game, game.team_a, tournament_id, "Both teams are ready to play! Let's Go")
-            self.send_notifications(game, game.team_b, tournament_id, "Both teams are ready to play! Let's Go")
+            self.send_notifications(game, game.team_a, tournament_id, "Both teams are ready to play! Let's Go",lineup_entry.created_by_id)
+            self.send_notifications(game, game.team_b, tournament_id, "Both teams are ready to play! Let's Go",lineup_entry.created_by_id)
 
         return Response({
             'status': 1,
@@ -1594,7 +1612,7 @@ class LineupPlayerStatusAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-    def send_notifications(self, game, team, tournament_id, message):
+    def send_notifications(self, game, team, tournament_id, message,referee):
         team_name = team.team_name
         coaches_and_managers = JoinBranch.objects.filter(
             branch_id=team.id,
@@ -1619,6 +1637,15 @@ class LineupPlayerStatusAPIView(APIView):
                 device_type=user.device_type,
                 data=data
             )
+            notification = Notifictions.objects.create(
+                created_by_id=referee,
+                creator_type=1,  # Assuming 1 is the type for creators
+                targeted_id=user.id,
+                targeted_type=1,  # Assuming 1 is the type for users
+                title=_("Let's Go"),
+                content=body_message
+            )
+            notification.save()
             
     
 
@@ -1931,6 +1958,15 @@ class GameOfficialsAPIView(APIView):
 
                 # Send the push notification to the official
                 send_push_notification(device_token, title, body, device_type=official.device_type,data=push_data)  # device_type: 1 for Android, 2 for iOS
+                notification = Notifictions.objects.create(
+                    created_by_id=request.user.id,
+                    creator_type=1,  # Assuming 1 is for user
+                    targeted_id=official.id,
+                    targeted_type=1,  # Assuming 1 is for user
+                    title=title,
+                    content=body
+                )
+                notification.save()
         except Exception as e:
             logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
 
@@ -2181,6 +2217,15 @@ class PlayerGameStatsAPIView(APIView):
             
 
             send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
+            notification = Notifictions.objects.create(
+                created_by_id=self.request.user.id,
+                creator_type=1,  # Assuming 1 is for user
+                targeted_id=player_instance.id,
+                targeted_type=1,  # Assuming 1 is for user
+                title=_('Statistics Updated!'),
+                content=notification_body
+            )
+            notification.save()
 
     def _update_team_goals(self, game_instance):
         """
