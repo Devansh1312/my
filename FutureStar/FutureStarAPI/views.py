@@ -5368,61 +5368,32 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         # Extract the current hour and minute
         current_hour = current_time.hour
         current_minute = current_time.minute
+        print(current_time)
 
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
 
-        # A variable to track if notifications were sent (for logging purposes)
-        notifications_sent = 0
+        notifications_sent = 0  # Counter for sent notifications
 
         for training in trainings:
-            # Extract the hour and minute from the training start time
             start_time = training.start_time
             start_hour = start_time.hour
             start_minute = start_time.minute
 
-            # Check if the training's start time (hour and minute) matches the current time
             if start_hour == current_hour and start_minute == current_minute:
-                # Define notification messages
                 attendance_message = _("Don't forget to mark your attendance")
                 comments_message = _("Don't forget to add your comments on your players' performance.")
 
-                # Get user language preference, assuming `User` model has `current_language` field
-                if training.creator_type == Training.USER_TYPE:
-                    user = User.objects.get(id=training.created_by_id)
-                    notification_language = user.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
+                # Check if created_by_id is a coach or manager directly
+                creator_roles = JoinBranch.objects.filter(
+                    user_id=training.created_by_id,
+                    joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
+                )
 
-                    # Prepare push data
-                    push_data = {
-                        "training_id": training.id,
-                        "training_name": training.training_name,
-                        "start_time": str(training.start_time),
-                        "cost": training.cost,
-                        "description": training.description
-                    }
-
-                    # Send push notifications to the user
-                    send_push_notification(user.device_token, _("Training Reminder"), attendance_message, device_type=user.device_type, data=push_data)
-                    send_push_notification(user.device_token, _("Training Reminder"), comments_message, device_type=user.device_type, data=push_data)
-                    
-                    # Create notification for the user
-                    notification = Notifictions.objects.create(
-                        created_by_id=1,  # Requestor ID (assumed to be 1 for now, can be dynamic)
-                        creator_type=1,  # Creator type
-                        targeted_id=user.id,  # Targeted user (training creator)
-                        targeted_type=1,  # Assuming the target type is a user
-                        title=_("Training Reminder"),
-                        content=attendance_message + "\n" + comments_message
-                    )
-                    notification.save()
-
-                    notifications_sent += 1
-
-                elif training.creator_type == Training.TEAM_TYPE:
-                    team = Team.objects.get(id=training.created_by_id)
-                    notification_language = team.team_founder.current_language
+                if creator_roles.exists():
+                    # If training.created_by_id is a coach or manager, notify them directly
+                    creator = User.objects.get(id=training.created_by_id)
+                    notification_language = creator.current_language
                     if notification_language in ['ar', 'en']:
                         activate(notification_language)
 
@@ -5434,59 +5405,190 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                         "description": training.description
                     }
 
-                    # Send push notifications to the team founder
-                    send_push_notification(team.team_founder.device_token, _("Training Reminder"), attendance_message, device_type=team.team_founder.device_type, data=push_data)
-                    send_push_notification(team.team_founder.device_token, _("Training Reminder"), comments_message, device_type=team.team_founder.device_type, data=push_data)
-                    
-                    # Create notification for the team founder
+                    send_push_notification(
+                        creator.device_token,
+                        _("Training Reminder"),
+                        attendance_message,
+                        device_type=creator.device_type,
+                        data=push_data
+                    )
+                    send_push_notification(
+                        creator.device_token,
+                        _("Training Reminder"),
+                        comments_message,
+                        device_type=creator.device_type,
+                        data=push_data
+                    )
+
                     notification = Notifictions.objects.create(
-                        created_by_id=1,  # Requestor ID
-                        creator_type=1,  # Creator type
-                        targeted_id=team.team_founder.id,  # Targeted user (team founder)
-                        targeted_type=1,  # Assuming the target type is a user
+                        created_by_id=1,
+                        creator_type=1,
+                        targeted_id=creator.id,
+                        targeted_type=1,
                         title=_("Training Reminder"),
                         content=attendance_message + "\n" + comments_message
                     )
                     notification.save()
-
                     notifications_sent += 1
+                else:
+                    # If training.created_by_id is a player, find their coach or manager
+                    creator_branches = JoinBranch.objects.filter(
+                        user_id=training.created_by_id,
+                        joinning_type=4  # Assuming 4 means team creator/player
+                    ).values_list('branch_id', flat=True)
+                    print(creator_branches)
 
-                elif training.creator_type == Training.GROUP_TYPE:
-                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
-                    notification_language = training_group.group_founder.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
+                    coaches_or_managers = JoinBranch.objects.filter(
+                        branch_id__in=creator_branches,
+                        joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
+                    ).select_related('user_id')
 
-                    push_data = {
-                        "training_id": training.id,
-                        "training_name": training.training_name,
-                        "start_time": str(training.start_time),
-                        "cost": training.cost,
-                        "description": training.description
-                    }
+                    if coaches_or_managers.exists():
+                        # Notify coaches or managers
+                        for branch in coaches_or_managers:
+                            coach_or_manager = branch.user_id
+                            notification_language = coach_or_manager.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
 
-                    # Send push notifications to the group founder
-                    send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), attendance_message, device_type=training_group.group_founder.device_type, data=push_data)
-                    send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), comments_message, device_type=training_group.group_founder.device_type, data=push_data)
-                    
-                    # Create notification for the group founder
-                    notification = Notifictions.objects.create(
-                        created_by_id=1,  # Requestor ID
-                        creator_type=1,  # Creator type
-                        targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
-                        targeted_type=1,  # Assuming the target type is a user
-                        title=_("Training Reminder"),
-                        content=attendance_message + "\n" + comments_message
-                    )
-                    notification.save()
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
 
-                    notifications_sent += 1
+                            send_push_notification(
+                                coach_or_manager.device_token,
+                                _("Training Reminder"),
+                                attendance_message,
+                                device_type=coach_or_manager.device_type,
+                                data=push_data
+                            )
+                            send_push_notification(
+                                coach_or_manager.device_token,
+                                _("Training Reminder"),
+                                comments_message,
+                                device_type=coach_or_manager.device_type,
+                                data=push_data
+                            )
 
-        # Return a response with the number of notifications sent
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,
+                                creator_type=1,
+                                targeted_id=coach_or_manager.id,
+                                targeted_type=1,
+                                title=_("Training Reminder"),
+                                content=attendance_message + "\n" + comments_message
+                            )
+                            notification.save()
+                            notifications_sent += 1
+                    else:
+                        # If no coach or manager is found, notify the training creator
+                        if training.creator_type == Training.USER_TYPE:
+                            user = User.objects.get(id=training.created_by_id)
+                            notification_language = user.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            # Prepare push data
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
+
+                            # Send push notifications to the user
+                            send_push_notification(user.device_token, _("Training Reminder"), attendance_message, device_type=user.device_type, data=push_data)
+                            send_push_notification(user.device_token, _("Training Reminder"), comments_message, device_type=user.device_type, data=push_data)
+                            
+                            # Create notification for the user
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,  # Requestor ID (assumed to be 1 for now, can be dynamic)
+                                creator_type=1,  # Creator type
+                                targeted_id=user.id,  # Targeted user (training creator)
+                                targeted_type=1,  # Assuming the target type is a user
+                                title=_("Training Reminder"),
+                                content=attendance_message + "\n" + comments_message
+                            )
+                            notification.save()
+
+                            notifications_sent += 1
+
+                        elif training.creator_type == Training.TEAM_TYPE:
+                            team = Team.objects.get(id=training.created_by_id)
+                            notification_language = team.team_founder.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
+
+                            # Send push notifications to the team founder
+                            send_push_notification(team.team_founder.device_token, _("Training Reminder"), attendance_message, device_type=team.team_founder.device_type, data=push_data)
+                            send_push_notification(team.team_founder.device_token, _("Training Reminder"), comments_message, device_type=team.team_founder.device_type, data=push_data)
+                            
+                            # Create notification for the team founder
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,  # Requestor ID
+                                creator_type=1,  # Creator type
+                                targeted_id=team.team_founder.id,  # Targeted user (team founder)
+                                targeted_type=1,  # Assuming the target type is a user
+                                title=_("Training Reminder"),
+                                content=attendance_message + "\n" + comments_message
+                            )
+                            notification.save()
+
+                            notifications_sent += 1
+
+                        elif training.creator_type == Training.GROUP_TYPE:
+                            training_group = TrainingGroups.objects.get(id=training.created_by_id)
+                            notification_language = training_group.group_founder.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
+
+                            # Send push notifications to the group founder
+                            send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), attendance_message, device_type=training_group.group_founder.device_type, data=push_data)
+                            send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), comments_message, device_type=training_group.group_founder.device_type, data=push_data)
+                            
+                            # Create notification for the group founder
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,  # Requestor ID
+                                creator_type=1,  # Creator type
+                                targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
+                                targeted_type=1,  # Assuming the target type is a user
+                                title=_("Training Reminder"),
+                                content=attendance_message + "\n" + comments_message
+                            )
+                            notification.save()
+
+                            notifications_sent += 1
+
+                # Return a response with the number of notifications sent
+                return Response(
+                    {"message": f"Notifications sent to {notifications_sent} users."},
+                    status=status.HTTP_200_OK
+                )
         return Response(
-            {"message": f"Notifications sent to {notifications_sent} users."},
-            status=status.HTTP_200_OK
-        )
+                    {"message": f"Notifications sent to {notifications_sent} users."},
+                    status=status.HTTP_200_OK
+                )
 
 
 class CheckEndTimeAndSendNotificationsAPIView(APIView):
@@ -5499,6 +5601,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
         # Extract the current hour and minute
         current_hour = current_time.hour
         current_minute = current_time.minute
+        print(current_time)
 
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
@@ -5519,99 +5622,210 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                 comments_message = _("Don't forget to add your comments on your players' performance.")
 
                 # Get user language preference, assuming `User` model has `current_language` field
-                if training.creator_type == Training.USER_TYPE:
-                    user = User.objects.get(id=training.created_by_id)
-                    notification_language = user.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
+                creator_roles = JoinBranch.objects.filter(
+                    user_id=training.created_by_id,
+                    joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
+                )
 
-                    # Prepare push data
-                    push_data = {
-                        "training_id": training.id,
-                        "user_id": user.id,
-                        "type": "Training Reminder",
-                    }
-
-                    # Send push notification to the user
-                    send_push_notification(user.device_token, _("Training Reminder"), message, device_type=user.device_type, data=push_data)
-                    send_push_notification(user.device_token, _("Training Reminder"), comments_message, device_type=user.device_type, data=push_data)
-                    
-                    # Create notification for the user
-                    notification = Notifictions.objects.create(
-                        created_by_id=1,  # Requestor ID (this can be dynamic)
-                        creator_type=1,  # Creator type
-                        targeted_id=user.id,  # Targeted user (training creator)
-                        targeted_type=1,  # Assuming the target type is a user
-                        title=_("Training Reminder"),
-                        content=message + "\n" + comments_message
-                    )
-                    notification.save()
-
-                    notifications_sent += 1
-
-                elif training.creator_type == Training.TEAM_TYPE:
-                    team = Team.objects.get(id=training.created_by_id)
-                    notification_language = team.team_founder.current_language
+                if creator_roles.exists():
+                    # If training.created_by_id is a coach or manager, notify them directly
+                    creator = User.objects.get(id=training.created_by_id)
+                    notification_language = creator.current_language
                     if notification_language in ['ar', 'en']:
                         activate(notification_language)
 
                     push_data = {
                         "training_id": training.id,
-                        "team_id": team.id,
-                        "type": "Training Reminder",
+                        "training_name": training.training_name,
+                        "start_time": str(training.start_time),
+                        "cost": training.cost,
+                        "description": training.description
                     }
 
-                    # Send push notification to the team founder
-                    send_push_notification(team.team_founder.device_token, _("Training Reminder"), message, device_type=team.team_founder.device_type, data=push_data)
-                    send_push_notification(team.team_founder.device_token, _("Training Reminder"), comments_message, device_type=team.team_founder.device_type, data=push_data)
-                    
-                    # Create notification for the team founder
+                    send_push_notification(
+                        creator.device_token,
+                        _("Training Reminder"),
+                        message,
+                        device_type=creator.device_type,
+                        data=push_data
+                    )
+                    send_push_notification(
+                        creator.device_token,
+                        _("Training Reminder"),
+                        comments_message,
+                        device_type=creator.device_type,
+                        data=push_data
+                    )
+
                     notification = Notifictions.objects.create(
-                        created_by_id=1,  # Requestor ID
-                        creator_type=1,  # Creator type
-                        targeted_id=team.team_founder.id,  # Targeted user (team founder)
-                        targeted_type=1,  # Assuming the target type is a user
+                        created_by_id=1,
+                        creator_type=1,
+                        targeted_id=creator.id,
+                        targeted_type=1,
                         title=_("Training Reminder"),
                         content=message + "\n" + comments_message
                     )
                     notification.save()
-
                     notifications_sent += 1
+                else:
+                    # If training.created_by_id is a player, find their coach or manager
+                    creator_branches = JoinBranch.objects.filter(
+                        user_id=training.created_by_id,
+                        joinning_type=4  # Assuming 4 means team creator/player
+                    ).values_list('branch_id', flat=True)
 
-                elif training.creator_type == Training.GROUP_TYPE:
-                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
-                    notification_language = training_group.group_founder.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
+                    coaches_or_managers = JoinBranch.objects.filter(
+                        branch_id__in=creator_branches,
+                        joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
+                    ).select_related('user')
 
-                    push_data = {
-                        "training_id": training.id,
-                        "training_group_id": training_group.id,
-                        "type": "Training Reminder",
-                    }
+                    if coaches_or_managers.exists():
+                        # Notify coaches or managers
+                        for branch in coaches_or_managers:
+                            coach_or_manager = branch.user
+                            notification_language = coach_or_manager.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
 
-                    # Send push notification to the group founder
-                    send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), message, device_type=training_group.group_founder.device_type, data=push_data)
-                    send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), comments_message, device_type=training_group.group_founder.device_type, data=push_data)
-                    
-                    # Create notification for the group founder
-                    notification = Notifictions.objects.create(
-                        created_by_id=1,  # Requestor ID
-                        creator_type=1,  # Creator type
-                        targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
-                        targeted_type=1,  # Assuming the target type is a user
-                        title=_("Training Reminder"),
-                        content=message + "\n" + comments_message
-                    )
-                    notification.save()
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
 
-                    notifications_sent += 1
+                            send_push_notification(
+                                coach_or_manager.device_token,
+                                _("Training Reminder"),
+                                message,
+                                device_type=coach_or_manager.device_type,
+                                data=push_data
+                            )
+                            send_push_notification(
+                                coach_or_manager.device_token,
+                                _("Training Reminder"),
+                                comments_message,
+                                device_type=coach_or_manager.device_type,
+                                data=push_data
+                            )
 
-        # Return a response with the number of notifications sent
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,
+                                creator_type=1,
+                                targeted_id=coach_or_manager.id,
+                                targeted_type=1,
+                                title=_("Training Reminder"),
+                                content=message + "\n" + comments_message
+                            )
+                            notification.save()
+                            notifications_sent += 1
+                    else:
+                        # If no coach or manager is found, notify the training creator
+                        if training.creator_type == Training.USER_TYPE:
+                            user = User.objects.get(id=training.created_by_id)
+                            notification_language = user.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            # Prepare push data
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
+
+                            # Send push notifications to the user
+                            send_push_notification(user.device_token, _("Training Reminder"), message, device_type=user.device_type, data=push_data)
+                            send_push_notification(user.device_token, _("Training Reminder"), comments_message, device_type=user.device_type, data=push_data)
+                            
+                            # Create notification for the user
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,  # Requestor ID (assumed to be 1 for now, can be dynamic)
+                                creator_type=1,  # Creator type
+                                targeted_id=user.id,  # Targeted user (training creator)
+                                targeted_type=1,  # Assuming the target type is a user
+                                title=_("Training Reminder"),
+                                content=message + "\n" + comments_message
+                            )
+                            notification.save()
+
+                            notifications_sent += 1
+
+                        elif training.creator_type == Training.TEAM_TYPE:
+                            team = Team.objects.get(id=training.created_by_id)
+                            notification_language = team.team_founder.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
+
+                            # Send push notifications to the team founder
+                            send_push_notification(team.team_founder.device_token, _("Training Reminder"), message, device_type=team.team_founder.device_type, data=push_data)
+                            send_push_notification(team.team_founder.device_token, _("Training Reminder"), comments_message, device_type=team.team_founder.device_type, data=push_data)
+                            
+                            # Create notification for the team founder
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,  # Requestor ID
+                                creator_type=1,  # Creator type
+                                targeted_id=team.team_founder.id,  # Targeted user (team founder)
+                                targeted_type=1,  # Assuming the target type is a user
+                                title=_("Training Reminder"),
+                                content=message + "\n" + comments_message
+                            )
+                            notification.save()
+
+                            notifications_sent += 1
+
+                        elif training.creator_type == Training.GROUP_TYPE:
+                            training_group = TrainingGroups.objects.get(id=training.created_by_id)
+                            notification_language = training_group.group_founder.current_language
+                            if notification_language in ['ar', 'en']:
+                                activate(notification_language)
+
+                            push_data = {
+                                "training_id": training.id,
+                                "training_name": training.training_name,
+                                "start_time": str(training.start_time),
+                                "cost": training.cost,
+                                "description": training.description
+                            }
+
+                            # Send push notifications to the group founder
+                            send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), message, device_type=training_group.group_founder.device_type, data=push_data)
+                            send_push_notification(training_group.group_founder.device_token, _("Training Reminder"), comments_message, device_type=training_group.group_founder.device_type, data=push_data)
+                            
+                            # Create notification for the group founder
+                            notification = Notifictions.objects.create(
+                                created_by_id=1,  # Requestor ID
+                                creator_type=1,  # Creator type
+                                targeted_id=training_group.group_founder.id,  # Targeted user (group founder)
+                                targeted_type=1,  # Assuming the target type is a user
+                                title=_("Training Reminder"),
+                                content=message + "\n" + comments_message
+                            )
+                            notification.save()
+
+                            notifications_sent += 1
+
+                # Return a response with the number of notifications sent
+                return Response(
+                    {"message": f"Notifications sent to {notifications_sent} users."},
+                    status=status.HTTP_200_OK
+                )
         return Response(
-            {"message": f"Notifications sent to {notifications_sent} users."},
-            status=status.HTTP_200_OK
-        )
+                    {"message": f"Notifications sent to {notifications_sent} users."},
+                    status=status.HTTP_200_OK
+                )
+
 
 
 
