@@ -1490,6 +1490,43 @@ class PostListAPIView(generics.ListAPIView):
             'data': serializer.data,
             'post_count': post_count  # Add post_count here
         }, status=status.HTTP_200_OK)
+
+######################## Post Media Delete #######################
+class PostMediaDelete(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def delete(self, request, *args, **kwargs):
+        media_id = request.query_params.get('media_id')
+        if not media_id:
+            return Response({
+                'status': 0,
+                'message': _('Media ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            post_media = PostMedia.objects.get(id=media_id)
+
+            # Delete the file from the file system
+            if post_media.file:
+                file_path = post_media.file.path
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            
+            # Delete the PostMedia instance
+            post_media.delete()
+
+            return Response({
+                'status': 1,
+                'message': _('Post Media deleted successfully.')
+            }, status=status.HTTP_200_OK)
+
+        except PostMedia.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post Media not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
 ######################### POST CREATE API ###########################################
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
