@@ -1538,6 +1538,8 @@ class PostCreateAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
+        print(request.data)
+
         # Get created_by_id, creator_type, and media_type from request data
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
@@ -1553,26 +1555,28 @@ class PostCreateAPIView(APIView):
             post = serializer.save(created_by_id=created_by_id, creator_type=creator_type)
 
             # Handle media files (images/videos)
-            media_data = request.data.getlist('media')
+            media_data = request.data.get('media')  # Fixed this line
             print(media_data)
-            for media_item in media_data:
-                media_type = media_item.get('media_type')
-                media_file = media_item.get('file')
+            if media_data:
+                for media_item in media_data:
+                    media_type = media_item.get('media_type')
+                    media_file = media_item.get('file')
 
-                if media_file:
-                    # Save the media file
-                    unique_suffix = get_random_string(8)
-                    file_extension = media_file.name.split('.')[-1]
-                    file_name = f"post_media/{post.id}_{created_by_id}_{unique_suffix}.{file_extension}"
-                    media_path = default_storage.save(file_name, media_file)
+                    if media_file:
+                        # Save the media file
+                        unique_suffix = get_random_string(8)
+                        file_extension = os.path.splitext(media_file)[-1]
+                        file_name = f"post_media/{post.id}_{created_by_id}_{unique_suffix}{file_extension}"
+                        with open(media_file, 'rb') as file:
+                            media_path = default_storage.save(file_name, file)
 
-                    # Save the media file in the PostMedia model
-                    PostMedia.objects.create(
-                        post=post,
-                        media_type=media_type,  # media_type from the input
-                        file=media_path
-                    )
-                    
+                        # Save the media file in the PostMedia model
+                        PostMedia.objects.create(
+                            post=post,
+                            media_type=media_type,  # media_type from the input
+                            file=media_path
+                        )
+
             self.notify_followers(created_by_id, creator_type, post)
 
             post.refresh_from_db()
@@ -1704,6 +1708,22 @@ class PostEditAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
+    def handle_media_files(self, post, media_files, created_by_id):
+        """
+        Save media files and associate them with the given post.
+        """
+        for media in media_files:
+            unique_suffix = get_random_string(8)
+            file_extension = os.path.splitext(media.name)[-1]
+            file_name = f"post_media/{post.id}_{created_by_id}_{unique_suffix}{file_extension}"
+            media_path = default_storage.save(file_name, media)
+
+            PostMedia.objects.create(
+                post=post,
+                media_type=media.content_type.split('/')[0],  # Infer type (e.g., 'image' or 'video')
+                file=media_path
+            )
+
     def get_queryset(self):
         # Get created_by_id and creator_type from request data
         created_by_id = self.request.data.get('created_by_id')
@@ -1743,10 +1763,9 @@ class PostEditAPIView(generics.GenericAPIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-                
+
         created_by_id = self.request.data.get('created_by_id')
         creator_type = self.request.data.get('creator_type')
-
 
         post_id = request.data.get('post_id')
         if not post_id:
@@ -1755,27 +1774,23 @@ class PostEditAPIView(generics.GenericAPIView):
                 'message': _('Post ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        post = self.get_object(post_id)
-        serializer = self.get_serializer(post, data=request.data, partial=True)
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Post not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
 
+        serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
-            # Handle media files (images and videos)
-            if 'media' in request.FILES:
-                media_files = request.FILES.getlist('media')
-                for media in media_files:
-                    unique_suffix = get_random_string(8)
-                    file_extension = media.name.split('.')[-1]
-                    file_name = f"post_media/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
-                    media_path = default_storage.save(file_name, media)
-
-                    PostMedia.objects.create(
-                        post=post,
-                        media_type=request.data.get('media_type', PostMedia.IMAGE_TYPE),  # Default to image type
-                        file=media_path
-                    )
-
             # Save the post with updated data
             serializer.save()
+
+            # Handle media files (images and videos)
+            media_files = request.FILES.getlist('media')  # Get list of uploaded media files
+            if media_files:
+                self.handle_media_files(post, media_files, created_by_id)
 
             return Response({
                 'status': 1,
