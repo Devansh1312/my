@@ -688,12 +688,14 @@ class TeamJoiningRequest(APIView):
         if language in ['en', 'ar']:
             activate(language)
         user = request.user
+        print(user)
         if request.user.role_id in [6, 3]:  # Managers (6) or Coaches (3)
         # Determine joinning_type based on role
             joinning_type = (
                 JoinBranch.MANAGERIAL_STAFF_TYPE if request.user.role_id == 6
                 else JoinBranch.COACH_STAFF_TYPE
             )
+          
             try:
                 user_branch = JoinBranch.objects.filter(
                     user_id=request.user,
@@ -734,9 +736,8 @@ class TeamJoiningRequest(APIView):
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Initialize classification dictionaries
-        coach_teams = []
-        manager_teams = []
-        founder_teams = []
+       
+        teams_data=[]
 
         # Retrieve tournament (assuming tournament_id is provided in the request)
         tournament_id = request.query_params.get('tournament_id')
@@ -760,9 +761,10 @@ class TeamJoiningRequest(APIView):
         # Retrieve founder teams
         if TeamBranch.objects.filter(team_id__team_founder=user).exists():
             founder_team_branches = TeamBranch.objects.filter(team_id__team_founder=user, age_group_id=tournament_age_group)
-            founder_teams.extend(founder_team_branches)
+            teams_data.extend(founder_team_branches)
 
         # Retrieve manager teams
+      
         if user.role_id == 6:  # Assuming role_id == 6 indicates a manager
             manager_branches = TeamBranch.objects.filter(
                 id__in=JoinBranch.objects.filter(
@@ -771,7 +773,8 @@ class TeamJoiningRequest(APIView):
                 ).values_list('branch_id', flat=True),
                 age_group_id=tournament_age_group  # Filter by tournament age group
             )
-            manager_teams.extend(manager_branches)
+         
+            teams_data.extend(manager_branches)
 
         # Retrieve coach teams
         if user.role_id == 3:  # Assuming role_id == 3 indicates a coach
@@ -782,26 +785,29 @@ class TeamJoiningRequest(APIView):
                 ).values_list('branch_id', flat=True),
                 age_group_id=tournament_age_group  # Filter by tournament age group
             )
-            coach_teams.extend(coach_branches)
+            teams_data.extend(coach_branches)
 
         # Remove duplicates within each list and serialize results
-        founder_teams = list(founder_teams)
-        manager_teams = list(manager_teams)
-        coach_teams = list(coach_teams)
+
+        unique_teams = list((teams_data))
+        print(unique_teams)
+
+    
+
 
         # Serialize each category
-        founder_serializer = TeamBranchSerializer(founder_teams, many=True, context={'request': request})
-        manager_serializer = TeamBranchSerializer(manager_teams, many=True, context={'request': request})
-        coach_serializer = TeamBranchSerializer(coach_teams, many=True, context={'request': request})
+    
+        serialized_data = TeamBranchSerializer(unique_teams, many=True, context={'request': request}).data
+        print(serialized_data)
+
+       
 
         return Response({
             'status': 1,
             'message': _('Team branches retrieved successfully.'),
-            'data': {
-                'founder_teams': founder_serializer.data,
-                'manager_teams': manager_serializer.data,
-                'coach_teams': coach_serializer.data,
-            }
+            'data': serialized_data
+               
+            
         }, status=status.HTTP_200_OK)
         
     def post(self, request, *args, **kwargs):
