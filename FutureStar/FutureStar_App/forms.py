@@ -349,18 +349,6 @@ class GroundMaterialForm(forms.ModelForm):
         }
 
 
-# Tournament Style Form
-class TournamentStyleForm(forms.ModelForm):
-    class Meta:
-        model = TournamentStyle
-        fields = ["name_en","name_ar"]
-        widgets = {
-            "name_en": forms.TextInput(attrs={"placeholder": "Enter Tournament Style"}),
-            "name_ar": forms.TextInput(attrs={"placeholder": "أدخل نمط البطولة"}),
-
-        }
-
-
 # Event Type Style Form
 class EventTypeForm(forms.ModelForm):
     class Meta:

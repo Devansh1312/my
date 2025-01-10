@@ -326,19 +326,6 @@ class GroundMaterial(models.Model):
     class Meta:
         db_table = 'futurestar_app_groundmaterial'
 
-
-# Tournamebt Style Model
-class TournamentStyle(models.Model):
-    name_en = models.CharField(max_length=100)
-    name_ar = models.CharField(max_length=100,null=True,blank=True)
-
-
-    def __str__(self):
-        return self.name_en
-
-    class Meta:
-        db_table = 'futurestar_app_tournamentstyle'
-
 # Event Types Model
 class EventType(models.Model):
     name_en = models.CharField(max_length=100)
