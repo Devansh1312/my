@@ -1503,7 +1503,6 @@ class PostCreateAPIView(APIView):
         # Get created_by_id, creator_type, and media_type from request data
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
-        media_type = request.data.get('media_type')
 
         if not created_by_id or not creator_type:
             return Response({
@@ -1515,23 +1514,27 @@ class PostCreateAPIView(APIView):
         if serializer.is_valid():
             post = serializer.save(created_by_id=created_by_id, creator_type=creator_type)
 
-            if "image" in request.FILES:
-                image = request.FILES["image"]
+            # Handle media files (images/videos)
+            media_data = request.data.getlist('media')
+            print(media_data)
+            for media_item in media_data:
+                media_type = media_item.get('media_type')
+                media_file = media_item.get('file')
 
-                # Determine file extension based on media_type
-                file_extension = image.name.split('.')[-1]  # Always use the extension from the uploaded file
+                if media_file:
+                    # Save the media file
+                    unique_suffix = get_random_string(8)
+                    file_extension = media_file.name.split('.')[-1]
+                    file_name = f"post_media/{post.id}_{created_by_id}_{unique_suffix}.{file_extension}"
+                    media_path = default_storage.save(file_name, media_file)
 
-
-                # Generate unique file name
-                unique_suffix = get_random_string(8)
-                file_name = f"post_images/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
-
-                # Save the file and assign path to post.image
-                image_path = default_storage.save(file_name, image)
-                post.image = image_path
-                post.save()
-
-            # Notify followers
+                    # Save the media file in the PostMedia model
+                    PostMedia.objects.create(
+                        post=post,
+                        media_type=media_type,  # media_type from the input
+                        file=media_path
+                    )
+                    
             self.notify_followers(created_by_id, creator_type, post)
 
             post.refresh_from_db()
@@ -1718,18 +1721,24 @@ class PostEditAPIView(generics.GenericAPIView):
         serializer = self.get_serializer(post, data=request.data, partial=True)
 
         if serializer.is_valid():
-            if 'image' in request.FILES:
-                if post.image and default_storage.exists(post.image.name):
-                    default_storage.delete(post.image.name)
+            # Handle media files (images and videos)
+            if 'media' in request.FILES:
+                media_files = request.FILES.getlist('media')
+                for media in media_files:
+                    unique_suffix = get_random_string(8)
+                    file_extension = media.name.split('.')[-1]
+                    file_name = f"post_media/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
+                    media_path = default_storage.save(file_name, media)
 
-                image = request.FILES['image']
-                file_extension = image.name.split('.')[-1]
-                unique_suffix = get_random_string(8)
-                file_name = f"post_images/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
-                image_path = default_storage.save(file_name, image)
-                post.image = image_path
+                    PostMedia.objects.create(
+                        post=post,
+                        media_type=request.data.get('media_type', PostMedia.IMAGE_TYPE),  # Default to image type
+                        file=media_path
+                    )
 
+            # Save the post with updated data
             serializer.save()
+
             return Response({
                 'status': 1,
                 'message': _('Post updated successfully.'),
@@ -3895,6 +3904,10 @@ class EventLikeAPIView(APIView):
             # Set notification language
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
+            
+            # Default values
+            title = _('Event Liked!')
+            body = _(f'{notifier_name} liked your event.')
 
             # Send push notification
             if device_type in [1, 2, "1", "2"]:

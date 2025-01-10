@@ -146,7 +146,7 @@ class TrainingGroups(models.Model):
     class Meta:
         db_table = 'futurestar_app_traininggroups'
 
-# post  Model
+# models.py
 class Post(models.Model):
     USER_TYPE = 1
     TEAM_TYPE = 2
@@ -157,15 +157,11 @@ class Post(models.Model):
         (GROUP_TYPE, 'Group'),
     )
 
-    created_by_id = models.IntegerField(default=0)  # Stores ID of User, Team, or Group
-    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES,default=1)  # Stores 1, 2, or 3 based on the type
-
+    created_by_id = models.IntegerField(default=0)
+    creator_type = models.IntegerField(choices=CREATOR_TYPE_CHOICES, default=USER_TYPE)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
-    media_type = models.IntegerField(default=1)
     date_created = models.DateTimeField(default=timezone.now)
-
     latitude = models.FloatField(default=0.0)
     longitude = models.FloatField(default=0.0)
     address = models.CharField(max_length=255, blank=True, null=True)
@@ -178,13 +174,32 @@ class Post(models.Model):
     postalCode = models.CharField(max_length=20, blank=True, null=True)
     country_code = models.CharField(max_length=10, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) 
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
         db_table = 'futurestar_app_post'
+
+
+class PostMedia(models.Model):
+    IMAGE_TYPE = 1
+    VIDEO_TYPE = 2
+    MEDIA_TYPE_CHOICES = (
+        (IMAGE_TYPE, 'Image'),
+        (VIDEO_TYPE, 'Video'),
+    )
+
+    post = models.ForeignKey(Post, related_name='media', on_delete=models.CASCADE)
+    media_type = models.IntegerField(choices=MEDIA_TYPE_CHOICES, default=IMAGE_TYPE)
+    file = models.FileField(upload_to='post_media/')
+
+    def __str__(self):
+        return f"{self.post.title} - {self.get_media_type_display()}"
+
+    class Meta:
+        db_table = 'futurestar_app_post_media'
 
 class Post_comment(models.Model):
     USER_TYPE = 1

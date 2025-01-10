@@ -164,16 +164,29 @@ class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField()
     is_reported = serializers.SerializerMethodField()
+    media = serializers.SerializerMethodField()  # Add a new field to represent the media files
+
 
     class Meta:
         model = Post
         fields = [
-            'id', 'entity', 'title', 'description', 'image', 'media_type',
+            'id', 'entity', 'title', 'description','media',
             'date_created', 'comments', 'view_count', 'like_count', 'is_like', 'is_reported',
             'latitude', 'longitude', 'address', 'house_no',
             'premises', 'street', 'city', 'state', 'country_name',
             'postalCode', 'country_code'
         ]
+    
+    def get_media(self, obj):
+        media_files = PostMedia.objects.filter(post=obj)
+        media_data = []
+        for media in media_files:
+            media_data.append({
+                'id': media.id,
+                'media_type': media.media_type,
+                'file': media.file.url if media.file else None
+            })
+        return media_data
 
     def get_entity(self, obj):
         if obj.creator_type == Post.USER_TYPE:
@@ -202,10 +215,6 @@ class PostSerializer(serializers.ModelSerializer):
             }
         return None
 
-    image = serializers.SerializerMethodField()
-
-    def get_image(self, obj):
-        return obj.image.url if obj.image else None
 
     def get_view_count(self, obj):
         return PostView.objects.filter(post=obj).count()
@@ -280,8 +289,6 @@ class PostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
-        instance.image = validated_data.get('image', instance.image)
-        instance.media_type = validated_data.get('media_type', instance.media_type)
         instance.latitude = validated_data.get('latitude', instance.latitude)
         instance.longitude = validated_data.get('longitude', instance.longitude)
         instance.address = validated_data.get('address', instance.address)
@@ -324,9 +331,13 @@ class GroundMaterialSerializer(serializers.ModelSerializer):
 class FieldSerializer(serializers.ModelSerializer):
     city_id_name= serializers.SerializerMethodField()
     country_id_name = serializers.SerializerMethodField()
+    ground_type_name = serializers.SerializerMethodField()
+    field_capacity_name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Field
-        fields = ['id','field_name', 'image', 'field_capacity', 'ground_type', 'country_id','country_id_name', 'city_id','city_id_name', 'latitude', 'longitude', 'address', 'house_no', 
+        fields = ['id','field_name', 'image', 'field_capacity','field_capacity_name', 'ground_type', 'ground_type_name' , 'country_id','country_id_name', 'city_id','city_id_name', 'latitude', 'longitude', 'address', 'house_no', 
             'premises', 'street', 'city', 'state', 'country_name', 
             'postalCode', 'country_code', 'additional_information']  # Exclude user_id
     def get_country_id_name(self, obj):
@@ -335,6 +346,21 @@ class FieldSerializer(serializers.ModelSerializer):
     # Method to retrieve city name for city_id_name field
     def get_city_id_name(self, obj):
         return obj.city_id.name if obj.city_id else None # Return None if no city
+    
+    def get_ground_type_name(self,obj):
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en') if request else 'en'
+        if language == 'en':
+            return obj.ground_type.name_en
+        return obj.ground_type.name_ar
+    
+    def get_field_capacity_name(self,obj):
+        return obj.field_capacity.name
+    
+    def get_image(self,obj):
+        return obj.image.url if obj.image else None  # Return None if no image is uploaded
+
+
     
     def create(self, validated_data):
         # Automatically associate the field with the currently logged-in user
