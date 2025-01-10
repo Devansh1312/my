@@ -691,7 +691,7 @@ class LoginAPIView(APIView):
                 else:
                     return Response({
                         'status': 0,
-                        'message': _("Email does not exist. Please register first."),
+                        'message': _('Email does not exist. Please register first.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
         # Custom error handling
@@ -1610,7 +1610,7 @@ class PostCreateAPIView(APIView):
         # Notify followers
         for follower in followers:
             title = _('New Post Alert!')
-            body = _(f'{creator_name} just added a new post.')
+            body = _('{} just added a new post.').format(creator_name)
 
             # Set notification target details
             targeted_id = follower.created_by_id  # Follower ID
@@ -2019,11 +2019,11 @@ class CommentCreateAPIView(APIView):
         # Create notification content
         if parent_comment:
             title = _('Someone replied to your comment')
-            body = _(f'{notifier_name} replied to your comment.')
+            body = _('{} replied to your comment.').format(notifier_name)
             push_data = {'type': 'post', 'notifier_id': post_id}
         else:
             title = _('Someone commented on your post')
-            body = _(f'{notifier_name} commented on your post.')
+            body = _('{} commented on your Post.').format(notifier_name)
             push_data = {'type': 'post', 'notifier_id': post_id}
 
         # **Create Notification Record with Targeted ID and Type**
@@ -2295,7 +2295,7 @@ class DetailAlbumListAPIView(generics.ListAPIView):
         if not queryset.exists():
             return Response({
                 'status': 0,
-                'message': _("Album Id is required or Album not found."),
+                'message': _('Album Id is required or Album not found.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         album = queryset.first()
@@ -2682,7 +2682,7 @@ class GallaryCreateAPIView(APIView):
             if creator_type not in [Gallary.USER_TYPE, Gallary.TEAM_TYPE, Gallary.GROUP_TYPE]:
                 return Response({
                     'status': 0,
-                    'message': _("Invalid creator type."),
+                    'message': _('Invalid creator type.'),
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Check permissions based on creator type
@@ -2690,14 +2690,14 @@ class GallaryCreateAPIView(APIView):
                 if not Team.objects.filter(id=created_by_id).exists():
                     return Response({
                         'status': 0,
-                        'message': _("Invalid team ID."),
+                        'message': _('Invalid team ID.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             elif creator_type == Gallary.GROUP_TYPE:
                 if not TrainingGroups.objects.filter(id=created_by_id).exists():
                     return Response({
                         'status': 0,
-                        'message': _("Invalid group ID."),
+                        'message': _('Invalid group ID.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             # Fetch album instance if album_id is provided
@@ -2708,7 +2708,7 @@ class GallaryCreateAPIView(APIView):
                 except Album.DoesNotExist:
                     return Response({
                         'status': 0,
-                        'message': _("Album not found."),
+                        'message': _('Album not found.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
             # Handle the media_file if it is provided
@@ -3578,7 +3578,7 @@ class FollowUnfollowAPI(APIView):
             # **Send Push Notification**
             if device_type in [1, 2, "1", "2"]:
                 title = _('New Follower!')
-                body = _(f'{notifier_name} started following you.')
+                body = _('{} started following you.').format(notifier_name)
                 push_data = {'type': 'follow', 'notifier_id': created_by_id, 'target_type': creator_type}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
@@ -3591,7 +3591,7 @@ class FollowUnfollowAPI(APIView):
                 targeted_type=target_type,       # Target Type
 
                 title=_('New Follower!'),
-                content=_(f'{notifier_name} started following you.')
+                content = _('{} started following you.').format(notifier_name)
             )
             notification.save()
 
@@ -3945,12 +3945,12 @@ class EventLikeAPIView(APIView):
             
             # Default values
             title = _('Event Liked!')
-            body = _(f'{notifier_name} liked your event.')
+            body = _('{} liked your event.').format(notifier_name)
 
             # Send push notification
             if device_type in [1, 2, "1", "2"]:
                 title = _('Event Liked!')
-                body = _(f'{notifier_name} liked your event.')
+                body = _('{} liked your event.').format(notifier_name)
                 push_data = {'type': 'event_list', 'notifier_id': event_id}
                 send_push_notification(device_token, title, body, device_type, data=push_data)
 
@@ -4148,11 +4148,11 @@ class EventCommentCreateAPIView(APIView):
         # Notification Title and Body
         if parent_comment:
             title = _('New Reply on Your Comment!')
-            body = _(f'{notifier_name} replied to your comment.')
+            body = _('{} replied to your comment.').format(notifier_name)
             push_data = {'type': 'event_comment_reply', 'event_id': event_id}
         else:
             title = _('New Comment on Your Event!')
-            body = _(f'{notifier_name} commented on your event.')
+            body = _('{} commented on your event.').format(notifier_name)
             push_data = {'type': 'event_comment', 'event_id': event_id}
 
         # Send push notification

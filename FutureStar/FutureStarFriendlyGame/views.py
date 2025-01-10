@@ -330,11 +330,6 @@ class CreateFriendlyGame(APIView):
                         content=body
                     )
                     notification.save()
-                    
-
-
-
-
         else:       
             user_datas = User.objects.filter(Q(role__id=3) | Q(role__id=6))
             for user_data in user_datas:
@@ -342,9 +337,6 @@ class CreateFriendlyGame(APIView):
                     user_id=user_data.id,  # Filter users by role (Coach or Manager)
                     joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]  # Staff types only
                 ).exclude(user_id=creator_user.id)  # Optimize query by prefetching related user data
-
-
-            
 
             # Iterate through the filtered users and send notifications
                 for member in team_members:
@@ -367,8 +359,7 @@ class CreateFriendlyGame(APIView):
                             "game_type": "friendly",
                             "type":"friendly_game"  # Specify that this is a friendly game
                             
-                    }
-
+                        }
                     if device_token:
                         send_push_notification(
                             device_token=device_token,
@@ -387,9 +378,6 @@ class CreateFriendlyGame(APIView):
                         )
                         notification.save()
 
-
-
-    
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -631,11 +619,6 @@ class OfficialListView(APIView):
                 'id': user.id,
                 'name': user.username,
                 'fees':None,
-                # 'phone': user.phone,
-                # 'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                # 'country_id': user.country.id if user.country else None,
-                # 'country_name': user.country.name if user.country else None,
-                # 'country_flag': user.country.flag.url if user.country else None,
             }
             for user in users
         ]
