@@ -1,44 +1,48 @@
+# Django and Python Standard Library Imports
+from datetime import date, timedelta
+import os
+import random
+import re
+import string
+import logging
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
+from django.db import transaction
+from django.db.models import Case, When, F, Q, Sum
+from django.utils.crypto import get_random_string
+from django.utils.timezone import now
+from django.core.files.storage import default_storage
+from django.core.paginator import EmptyPage
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
-from FutureStarTrainingGroupApp.serializers import *
+from django.utils import timezone
+
+# Django REST Framework Imports
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from FutureStarAPI.serializers import *
-from FutureStarTeamApp.serializers import *
+from rest_framework import status, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.exceptions import ValidationError
+
+# App-Specific Imports
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarFriendlyGame.models import *
 from FutureStarGameSystem.models import *
 from FutureStarTrainingApp.models import *
-from datetime import date
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-import random
-from django.utils import timezone
-import os
-from django.conf import settings
-from django.core.files.storage import default_storage
-from rest_framework import generics
-from rest_framework.pagination import PageNumberPagination
-from django.core.paginator import Paginator, EmptyPage
-from django.db.models import Q
-from django.utils.translation import gettext as _
-from django.db import transaction
-import string
-from rest_framework.exceptions import ValidationError
-import re
-import logging
-from django.utils.crypto import get_random_string
-from django.utils.timezone import now
-from django.db.models import Case, When, F, Q, Sum
-from django.forms.models import model_to_dict
 from FutureStarTournamentApp.serializers import TournamentGameSerializer
+from FutureStarTeamApp.serializers import *
+from FutureStarTrainingGroupApp.serializers import *
+from FutureStarAPI.serializers import *
 from FutureStar.firebase_config import send_push_notification
-from datetime import timedelta
+
+# JWT Token Imports
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 logger = logging.getLogger(__name__)
@@ -1538,9 +1542,7 @@ class PostCreateAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        print(request.data)
-
-        # Get created_by_id, creator_type, and media_type from request data
+        # Get created_by_id, creator_type from request data
         created_by_id = request.data.get('created_by_id')
         creator_type = request.data.get('creator_type')
 
@@ -1554,29 +1556,23 @@ class PostCreateAPIView(APIView):
         if serializer.is_valid():
             post = serializer.save(created_by_id=created_by_id, creator_type=creator_type)
 
-            # Handle media files (images/videos)
-            media_data = request.data.get('media')  # Fixed this line
-            print(media_data)
-            if media_data:
-                for media_item in media_data:
-                    media_type = media_item.get('media_type')
-                    media_file = media_item.get('file')
+            # Handle multiple media files
+            media_files = request.FILES.getlist('media_files')  # Expecting multiple files under 'media_files' key
 
-                    if media_file:
-                        # Save the media file
-                        unique_suffix = get_random_string(8)
-                        file_extension = os.path.splitext(media_file)[-1]
-                        file_name = f"post_media/{post.id}_{created_by_id}_{unique_suffix}{file_extension}"
-                        with open(media_file, 'rb') as file:
-                            media_path = default_storage.save(file_name, file)
+            for media_file in media_files:
+                # Determine file extension and media type
+                file_extension = media_file.name.split('.')[-1].lower()
+                media_type = PostMedia.IMAGE_TYPE if file_extension in ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "svg", "webp", "ico", "heic"] else PostMedia.VIDEO_TYPE
 
-                        # Save the media file in the PostMedia model
-                        PostMedia.objects.create(
-                            post=post,
-                            media_type=media_type,  # media_type from the input
-                            file=media_path
-                        )
+                # Generate unique file name
+                unique_suffix = get_random_string(8)
+                file_name = f"post_media/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
 
+                # Save the file and create a PostMedia instance
+                media_path = default_storage.save(file_name, media_file)
+                PostMedia.objects.create(post=post, media_type=media_type, file=media_path)
+
+            # Notify followers
             self.notify_followers(created_by_id, creator_type, post)
 
             post.refresh_from_db()
@@ -1708,22 +1704,6 @@ class PostEditAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def handle_media_files(self, post, media_files, created_by_id):
-        """
-        Save media files and associate them with the given post.
-        """
-        for media in media_files:
-            unique_suffix = get_random_string(8)
-            file_extension = os.path.splitext(media.name)[-1]
-            file_name = f"post_media/{post.id}_{created_by_id}_{unique_suffix}{file_extension}"
-            media_path = default_storage.save(file_name, media)
-
-            PostMedia.objects.create(
-                post=post,
-                media_type=media.content_type.split('/')[0],  # Infer type (e.g., 'image' or 'video')
-                file=media_path
-            )
-
     def get_queryset(self):
         # Get created_by_id and creator_type from request data
         created_by_id = self.request.data.get('created_by_id')
@@ -1764,38 +1744,50 @@ class PostEditAPIView(generics.GenericAPIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        created_by_id = self.request.data.get('created_by_id')
-        creator_type = self.request.data.get('creator_type')
-
+        created_by_id = request.data.get('created_by_id')
+        creator_type = request.data.get('creator_type')
         post_id = request.data.get('post_id')
+
         if not post_id:
             return Response({
                 'status': 0,
                 'message': _('Post ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return Response({
-                'status': 0,
-                'message': _('Post not found.')
-            }, status=status.HTTP_404_NOT_FOUND)
+        post = self.get_object(post_id)
+        serializer = self.get_serializer(post, data=request.data, partial=True)
 
-        serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
-            # Save the post with updated data
-            serializer.save()
+            # Update the post details
+            post = serializer.save()
 
-            # Handle media files (images and videos)
-            media_files = request.FILES.getlist('media')  # Get list of uploaded media files
+            # Handle media file updates
+            media_files = request.FILES.getlist('media_files')  # Accept multiple media files
             if media_files:
-                self.handle_media_files(post, media_files, created_by_id)
+                for media_file in media_files:
+                    # Determine file extension and media type
+                    file_extension = media_file.name.split('.')[-1].lower()
+                    media_type = (
+                        PostMedia.IMAGE_TYPE 
+                        if file_extension in ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "svg", "webp", "ico", "heic"]
+                        else PostMedia.VIDEO_TYPE
+                    )
+
+                    # Generate unique file name
+                    unique_suffix = get_random_string(8)
+                    file_name = f"post_media/{post.id}_{created_by_id}_{creator_type}_{unique_suffix}.{file_extension}"
+
+                    # Save the file and create a PostMedia instance
+                    media_path = default_storage.save(file_name, media_file)
+                    PostMedia.objects.create(post=post, media_type=media_type, file=media_path)
+
+            # Refresh the post object with updated related data
+            post.refresh_from_db()
 
             return Response({
                 'status': 1,
                 'message': _('Post updated successfully.'),
-                'data': serializer.data
+                'data': PostSerializer(post).data
             }, status=status.HTTP_200_OK)
 
         return Response({
@@ -1803,6 +1795,7 @@ class PostEditAPIView(generics.GenericAPIView):
             'message': _('Failed to update the post.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 ####################### POST DETAIL API ############################
 class PostDetailAPIView(APIView):
@@ -4829,7 +4822,6 @@ class FAQListAPIView(generics.ListAPIView):
     
 ############################################################ General Settings API ####################################################################################
 class GeneralSettingsList(APIView):
-    permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
