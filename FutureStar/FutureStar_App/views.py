@@ -7312,17 +7312,18 @@ class AssignUserToGameView(LoginRequiredMixin, View):
             if notification_language in ["en", "ar"]:
                 activate(notification_language)
 
-            # Prepare notification details
+                # Prepare notification details
             title = _("Match Assignment")
             body = _(
-                "You have been assigned to handle the match between %(team_a)s and %(team_b)s on %(date)s at %(time)s at %(field)s."
-            ) % {
-                "team_a": game.team_a.team_name,
-                "team_b": game.team_b.team_name,
-                "date": game.game_date.strftime("%Y-%m-%d"),
-                "time": game.game_start_time.strftime("%H:%M"),
-                "field": game.game_field_id.field_name,
-            }
+                "You have been assigned to handle the match between {} and {} on {} at {} at {}.".format(
+                    game.team_a.team_name,
+                    game.team_b.team_name,
+                    game.game_date.strftime("%Y-%m-%d"),
+                    game.game_start_time.strftime("%H:%M"),
+                    game.game_field_id.field_name
+                )
+            )
+
 
             # Create notification record with targeted_id and targeted_type
             notification = Notifictions.objects.create(
@@ -7356,10 +7357,11 @@ class AssignUserToGameView(LoginRequiredMixin, View):
             )
 
         except Exception as e:
-            return JsonResponse(
-                {"error": _("An error occurred: %(error)s") % {"error": str(e)}},
+           return JsonResponse(
+                {"error": _("An error occurred: {}".format(str(e)))},
                 status=400,
             )
+
 
 def fetch_users(request):
     role_id = request.GET.get("role_id")
