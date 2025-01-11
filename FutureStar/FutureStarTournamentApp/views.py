@@ -887,7 +887,7 @@ class TeamJoiningRequest(APIView):
         if team_branch.age_group_id != tournament.age_group:
             return Response({
                 'status': 0,
-                'message': _("The team's age group does not match the tournament's age group."),
+                'message': _('The team age group does not match the tournament age group.'),
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check for an existing request (either REQUESTED or ACCEPTED)
