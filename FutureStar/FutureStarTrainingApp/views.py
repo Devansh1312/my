@@ -56,7 +56,7 @@ class CreateTrainingView(APIView):
             # Return the successfully created training data
             return Response({
                 'status': 1,
-                'message': _("Training successfully created"),
+                'message': _('Training successfully created'),
                 'data': serializer.data  # Use the re-serialized data with language context
             }, status=status.HTTP_201_CREATED)
 
@@ -125,7 +125,7 @@ class TrainingDetailAPIView(APIView):
         if not training_id:
             return Response({
                 'status': 0,
-                'message': _("Training ID is required for update"),
+                'message': _('Training ID is required for update'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -135,7 +135,7 @@ class TrainingDetailAPIView(APIView):
         if not training_instance:
             return Response({
                 'status': 0,
-                'message': _("Training not found"),
+                'message': _('Training not found'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -169,7 +169,7 @@ class TrainingDetailAPIView(APIView):
             # Return the successfully updated training data
             return Response({
                 'status': 1,
-                'message': _("Training successfully updated"),
+                'message': _('Training successfully updated'),
                 'data': serializer.data
             }, status=status.HTTP_200_OK)
 
@@ -187,7 +187,7 @@ class TrainingDetailAPIView(APIView):
         if not training_id:
             return Response({
                 'status': 0,
-                'message': _("Training ID is required for deletion"),
+                'message': _('Training ID is required for deletion'),
                 'data': []
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -197,7 +197,7 @@ class TrainingDetailAPIView(APIView):
         if not training_instance:
             return Response({
                 'status': 0,
-                'message': _("Training not found"),
+                'message': _('Training not found'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -207,7 +207,7 @@ class TrainingDetailAPIView(APIView):
         # Return a success response
         return Response({
             'status': 1,
-            'message': _("Training successfully deleted"),
+            'message': _('Training successfully deleted'),
             'data': []
         }, status=status.HTTP_204_NO_CONTENT) 
 

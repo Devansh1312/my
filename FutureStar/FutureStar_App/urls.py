@@ -96,18 +96,11 @@ urlpatterns = [
     path('groundmaterial/update/<int:pk>/', GroundMaterialUpdateView.as_view(), name='groundmaterial_update'),
     path('groundmaterial/delete/<int:pk>/', GroundMaterialDeleteView.as_view(), name='groundmaterial_delete'),
 
-    # Tournament Style URL
-    path('tournamentstyle/', TournamentStyleListView.as_view(), name='tournamentstyle_list'),
-    path('tournamentstyle/create/', TournamentStyleCreateView.as_view(), name='tournamentstyle_create'),
-    path('tournamentstyle/update/<int:pk>/', TournamentStyleUpdateView.as_view(), name='tournamentstyle_update'),
-    path('tournamentstyle/delete/<int:pk>/', TournamentStyleDeleteView.as_view(), name='tournamentstyle_delete'),
-
     # Event Type URL
     path('eventtype/', EventTypeListView.as_view(), name='eventtype_list'),
     path('eventtype/create/', EventTypeCreateView.as_view(), name='eventtype_create'),
     path('eventtype/update/<int:pk>/', EventTypeUpdateView.as_view(), name='eventtype_update'),
     path('eventtype/delete/<int:pk>/', EventTypeDeleteView.as_view(), name='eventtype_delete'),
-
 
     # Events
     path('events/', EventListView.as_view(), name='event_list'),
