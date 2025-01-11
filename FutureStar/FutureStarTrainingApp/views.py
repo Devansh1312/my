@@ -698,74 +698,116 @@ class JoinTrainingAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        # Get the training ID from the request
+
+        # Validate training_id
         training_id = request.data.get('training_id')
         if not training_id:
-            return Response({
-            'status': 0,
-            'message': _('Training ID is required.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Get the user from the request
+            return Response({'status': 0, 'message': _('Training ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate user existence
         user = request.user
         if not user:
-            return Response({
-            'status': 0,
-            'message': _('User not found.')
-            }, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 0, 'message': _('User not found.')}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if gender is provided
-        if not user.gender:  # Assuming gender is a field in the user model
-            return Response({
-                'status': 0,
-                'message': _('Please add your gender first.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+        if not user.gender:
+            return Response({'status': 0, 'message': _('Please add your gender first.')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate the training ID
+        # Validate training existence
         try:
             training = Training.objects.get(id=training_id)
         except Training.DoesNotExist:
-            return Response({
-            'status': 0,
-            'message': _('Training not found.')
-            }, status=status.HTTP_404_NOT_FOUND)
-        
-        # Check training type
-        if training.training_type == Training.CLOSED_TRAINING:  # Closed training
-            if not hasattr(user, 'role') or user.role.id != 2:  # Only Players (role 2) can join
-                return Response({
-                    'status': 0,
-                    'message': _('Only Players can join closed training.')
-                }, status=status.HTTP_403_FORBIDDEN)
-        
-        # Check if the user is already a member of the training
-        try:
-            existing_membership = Training_Joined.objects.get(user=user, training=training)
-        except Training_Joined.DoesNotExist:
-            existing_membership = None
-        
-        # Create a new membership if the user is not a member
-        if not existing_membership:
-            membership = Training_Joined.objects.create(
-                user=user,
-                training=training,
-            )
-        else:
-            return Response({
-            'status': 0,
-            'message': _('User is already a member of the training.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Serialize and return the membership data
+            return Response({'status': 0, 'message': _('Training not found.')}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check closed training restriction
+        if training.training_type == Training.CLOSED_TRAINING:
+            if not hasattr(user, 'role') or user.role.id != 2:
+                return Response({'status': 0, 'message': _('Only Players can join closed training.')}, status=status.HTTP_403_FORBIDDEN)
+
+        # Ensure user is not already a member
+        if Training_Joined.objects.filter(user=user, training=training).exists():
+            return Response({'status': 0, 'message': _('User is already a member of the training.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create training membership
+        membership = Training_Joined.objects.create(user=user, training=training)
+
+        # Notify relevant users
+        notifications_sent = self.notify_relevant_users(training, user)
+
         serializer = TrainingMembershipSerializer(membership)
         return Response({
-        'status': 1,
-        'message': _('User joined the training successfully.'),
-            'data': serializer.data
+            'status': 1,
+            'message': _('User joined the training successfully.'),
+            'data': serializer.data,
+            'notifications_sent': notifications_sent
         }, status=status.HTTP_201_CREATED)
 
-    
+    def notify_relevant_users(self, training, user):
+        """
+        Notify relevant users: creator, branch managers, coaches.
+        """
+        message = _("A new player has joined the training.")
+        comments_message = _("Don't forget to engage with the new player.")
+        push_data = {
+            "training_id": training.id,
+            "training_name": training.training_name,
+            "start_time": str(training.start_time),
+            "cost": training.cost,
+            "description": training.description
+        }
+
+        notifications_sent = 0
+
+        if training.creator_type == Training.USER_TYPE:
+            creator_branches = JoinBranch.objects.filter(
+                user_id=training.created_by_id, joinning_type=4
+            ).values_list('branch_id', flat=True)
+            print(creator_branches)
+          
+
+            if creator_branches.exists():
+                branch_managers_and_coaches = JoinBranch.objects.filter(
+                    branch_id__in=creator_branches, joinning_type__in=[1, 3]
+                ).select_related('user_id')
+
+                for branch in branch_managers_and_coaches:
+                    manager_or_coach = branch.user
+                    self.send_notification(manager_or_coach, message, comments_message, push_data)
+                    notifications_sent += 1
+            else:
+                creator = User.objects.get(id=training.created_by_id)
+                print(creator)
+                self.send_notification(creator, message, comments_message, push_data)
+                notifications_sent += 1
+
+        elif training.creator_type == Training.TEAM_TYPE:
+            team = Team.objects.get(id=training.created_by_id)
+            team_founder = team.team_founder
+            self.send_notification(team_founder, message, comments_message, push_data)
+            notifications_sent += 1
+
+        elif training.creator_type == Training.GROUP_TYPE:
+            training_group = TrainingGroups.objects.get(id=training.created_by_id)
+            group_founder = training_group.group_founder
+            self.send_notification(group_founder, message, comments_message, push_data)
+            notifications_sent += 1
+
+        return notifications_sent
+
+    def send_notification(self, user, message, comments_message, push_data):
+        """
+        Helper method to send notifications to a user.
+        """
+        notification_language = user.current_language
+        if notification_language in ['ar', 'en']:
+            activate(notification_language)
+
+        send_push_notification(user.device_token, message, comments_message, device_type=user.device_type, data=push_data)
+        send_push_notification(user.device_token,  message, comments_message, device_type=user.device_type, data=push_data)
+
+        Notifictions.objects.create(
+            created_by_id=1, creator_type=1, targeted_id=user.id, targeted_type=1,
+            title=_("Training Reminder"), content=message + "\n" + comments_message
+        )
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
@@ -939,7 +981,7 @@ class TrainingFeedbackAPI(APIView):
                 "status": 0,
                 "message": _("user_id and training_id are required")
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             training = Training.objects.get(id=training_id)
         except Training.DoesNotExist:
@@ -947,7 +989,7 @@ class TrainingFeedbackAPI(APIView):
                 'status': 0,
                 'message': _('Training not found.')
             }, status=status.HTTP_404_NOT_FOUND)
-        
+
         user = request.user.id
         if not self._has_access(training, user):
             return Response({
@@ -957,6 +999,8 @@ class TrainingFeedbackAPI(APIView):
 
         # Fetch the Training_Joined object
         training_joined = get_object_or_404(Training_Joined, user=user_id, training=training_id)
+        print(training_joined)
+
 
         # Initialize a flag to track if any changes were made
         updated = False
@@ -978,7 +1022,7 @@ class TrainingFeedbackAPI(APIView):
         if updated:
             training_joined.save()
 
-        # If feedback_id is provided, update the existing feedback
+        # Handle feedback update or creation
         if feedback_id:
             feedback = get_object_or_404(Training_Feedback, id=feedback_id, user_id=user_id, training_id=training_id)
 
@@ -993,55 +1037,12 @@ class TrainingFeedbackAPI(APIView):
                 injuries = InjuryType.objects.filter(id__in=injury_id_list)
                 feedback.injuries.set(injuries)
 
-                # Send notification for injuries
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
-                
-
-                if training.creator_type == Training.USER_TYPE:
-                    user = User.objects.get(id=training.created_by_id)
-                    notification_language = user.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-                    push_data = {
-                        "training_id": training.id,
-                        "user_id": user.id,
-                    
-                        "type": "injury",
-                    
-                    }
-                    send_push_notification(user.device_token, _("Injury Notification"), notification_message, device_type=user.device_type, data=push_data)
-
-                elif training.creator_type == Training.TEAM_TYPE:
-                    team = Team.objects.get(id=training.created_by_id)
-                    notification_language = team.team_founder.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-                    push_data = {
-                        "training_id": training.id,
-                        "team_founder_id": team.team_founder.id,
-                        "type": "injury",
-                    
-                    }
-                    send_push_notification(team.team_founder.device_token, _("Injury Notification"), notification_message, device_type=team.team_founder.device_type, data=push_data)
-
-                elif training.creator_type == Training.GROUP_TYPE:
-                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
-                    notification_language = training_group.group_founder.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-                    push_data = {
-                        "training_id": training.id,
-                        "group_founder_id": training_group.group_founder.id,
-                        "type": "injury",
-                    }
-                    send_push_notification(training_group.group_founder.device_token, _("Injury Notification"), notification_message, device_type=training_group.group_founder.device_type, data=push_data)
-
+                self.notify_users(training, notification_message, {"type": "injury", "training_id": training_id})
                 update_messages.append(_("Injury details updated and notification sent"))
 
-            # Save the updated feedback record
             feedback.save()
 
-        # If no feedback_id is provided, create a new feedback entry
         elif feedback_text:
             feedback = Training_Feedback.objects.create(
                 training_id=training_id,
@@ -1049,47 +1050,17 @@ class TrainingFeedbackAPI(APIView):
                 feedback=feedback_text
             )
 
-            # Add injuries to the new feedback if provided
             if injury_ids:
                 injury_id_list = [int(id) for id in injury_ids.split(',')]
                 injuries = InjuryType.objects.filter(id__in=injury_id_list)
                 feedback.injuries.set(injuries)
 
-                # Send notification for injuries
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
-                push_data = {
-                    "training_id": training.id,
-                    "type": "injury",
-                   
-                }
-
-                if training.creator_type == Training.USER_TYPE:
-                    user = User.objects.get(id=training.created_by_id)
-                    notification_language = user.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-                    send_push_notification(user.device_token, _("Injury Notification"), notification_message, device_type=user.device_type, data=push_data)
-
-                elif training.creator_type == Training.TEAM_TYPE:
-                    team = Team.objects.get(id=training.created_by_id)
-                    notification_language = team.team_founder.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-                    send_push_notification(team.team_founder.device_token, _("Injury Notification"), notification_message, device_type=team.team_founder.device_type, data=push_data)
-
-                elif training.creator_type == Training.GROUP_TYPE:
-                    training_group = TrainingGroups.objects.get(id=training.created_by_id)
-                    notification_language = training_group.group_founder.current_language
-                    if notification_language in ['ar', 'en']:
-                        activate(notification_language)
-                    send_push_notification(training_group.group_founder.device_token, _("Injury Notification"), notification_message, device_type=training_group.group_founder.device_type, data=push_data)
-
+                self.notify_users(training, notification_message, {"type": "injury", "training_id": training_id})
                 update_messages.append(_("New feedback added and injury notification sent"))
 
-        # Fetch all feedbacks for the user and training
+        # Serialize data
         feedbacks = Training_Feedback.objects.filter(training_id=training_id, user_id=user_id).order_by("-created_at")
-
-        # Serialize feedbacks
         feedback_data = [
             {
                 "id": feedback.id,
@@ -1104,14 +1075,13 @@ class TrainingFeedbackAPI(APIView):
             for feedback in feedbacks
         ]
 
-        # Serialize the Training_Joined data
         joined_data = {
             "id": training_joined.id,
             "training": training_joined.training.id,
             "user": {
                 "id": training_joined.user.id,
                 "username": training_joined.user.username,
-                "phone": training_joined.user.phone,  # Assuming a profile relationship
+                "phone": training_joined.user.phone,
                 "profile_picture": training_joined.user.profile_picture.url if training_joined.user.profile_picture else None,
                 "country_id": training_joined.user.country.id if training_joined.user.country else None,
                 "country_name": training_joined.user.country.name if training_joined.user.country else None,
@@ -1121,13 +1091,80 @@ class TrainingFeedbackAPI(APIView):
             "feedbacks": feedback_data
         }
 
-
-        # Compile the message based on what was updated
         update_message = ", ".join(update_messages) if update_messages else _("No changes made")
-
         return Response({
             "status": 1,
             "message": update_message,
             "data": joined_data
         }, status=status.HTTP_200_OK)
 
+    def notify_users(self, training, message, push_data):
+        """
+        Notify users based on the creator type of the training.
+        """
+        notifications_sent = 0
+
+        if training.creator_type == Training.USER_TYPE:
+            creator_branches = JoinBranch.objects.filter(
+                user_id=training.created_by_id,
+                joinning_type=4  # Assuming 4 means team member/player
+            ).values_list('branch_id', flat=True)
+
+            if creator_branches.exists():
+                branch_managers_and_coaches = JoinBranch.objects.filter(
+                    branch_id__in=creator_branches,
+                    joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
+                ).select_related('user')
+
+                for branch in branch_managers_and_coaches:
+                    manager_or_coach = branch.user
+                    self.send_notification(manager_or_coach, message, "", push_data)
+                    notifications_sent += 1
+            else:
+                user = User.objects.get(id=training.created_by_id)
+                self.send_notification(user, message, "", push_data)
+                notifications_sent += 1
+
+        elif training.creator_type == Training.TEAM_TYPE:
+            team = Team.objects.get(id=training.created_by_id)
+            self.send_notification(team.team_founder, message, "", push_data)
+            notifications_sent += 1
+
+        elif training.creator_type == Training.GROUP_TYPE:
+            group = TrainingGroups.objects.get(id=training.created_by_id)
+            self.send_notification(group.group_founder, message, "", push_data)
+            notifications_sent += 1
+
+    def send_notification(self, user, message, comments_message, push_data):
+        """
+        Helper method to send notifications to a user.
+        """
+        notification_language = user.current_language
+        if notification_language in ['ar', 'en']:
+            activate(notification_language)
+
+        send_push_notification(
+            user.device_token,
+            _("Training Notification"),
+            message,
+            device_type=user.device_type,
+            data=push_data
+        )
+
+        if comments_message:
+            send_push_notification(
+                user.device_token,
+                _("Training Notification"),
+                comments_message,
+                device_type=user.device_type,
+                data=push_data
+            )
+
+        Notifictions.objects.create(
+            created_by_id=1,  # Replace with the actual creator ID
+            creator_type=1,
+            targeted_id=user.id,
+            targeted_type=1,
+            title=_("Training Notification"),
+            content=message + "\n" + comments_message
+        )

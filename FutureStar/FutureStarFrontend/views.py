@@ -1557,7 +1557,8 @@ class RegisterPage(View):
         request.session['phone'] = phone
         request.session['username'] = username
         request.session['password'] = password  # Store password in the session temporarily
-        messages.success(request, f"Your OTP is {otp}")
+        messages.success(request, "Your OTP is {}".format(otp))
+
         
         # Instead of passing context, include language as GET parameter
         return redirect(f"{reverse('verify_otp')}?Language={language_from_url}")

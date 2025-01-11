@@ -1016,7 +1016,8 @@ class AddPlayerJerseyAPIView(APIView):
                         'player_id': player_id,
                         'status': 0,
                         'message': _('An error occurred while adding the player to the lineup.'),
-                        'message1': f'An error occurred: {str(e)}'
+                        'message1': 'An error occurred: {}'.format(str(e))
+
                     })
             else:
                 # Handle case where jersey_number is 0 by setting it to null
@@ -2155,7 +2156,10 @@ class PlayerGameStatsAPIView(APIView):
                         self._update_team_goals(game_instance)  # Update team goals after deletion
                         return self._get_game_stats_response(game_instance, team_id, player_id, tournament_id, game_id)
                     else:
-                        return Response({'status': 0, 'message': _(f'Cannot decrement {stat.capitalize()} as it cannot go below zero.')}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response(
+                            {'status': 0, 'message': _('Cannot decrement {} as it cannot go below zero.'.format(stat.capitalize()))},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2187,8 +2191,7 @@ class PlayerGameStatsAPIView(APIView):
         translated_game_number = _(f"Game Number {game_instance.game_number}")
 
         # Construct the notification body
-        notification_body = f"{translated_message} in {translated_tournament_name} - {translated_game_number}"
-
+        notification_body = "{} in {} - {}".format(translated_message, translated_tournament_name, translated_game_number)
         
 
 
@@ -2349,7 +2352,8 @@ class PlayerGameStatsAPIView(APIView):
             if not value:
                 return Response({
                     'status': 0,
-                    'message': _(f'{key} is required.')
+                    'message': _('{} is required.'.format(key))
+
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check access rights

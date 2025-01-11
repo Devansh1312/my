@@ -5426,9 +5426,10 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     notifications_sent += 1
 
         return Response(
-            {"message": f"Notifications sent to {notifications_sent} users."},
+            {"message": "Notifications sent to {} users.".format(notifications_sent)},
             status=status.HTTP_200_OK
         )
+
 
     def send_notification(self, user, attendance_message, comments_message, push_data):
         """
@@ -5523,9 +5524,10 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     notifications_sent += 1
 
         return Response(
-            {"message": f"Notifications sent to {notifications_sent} users."},
+            {"message": "Notifications sent to {} users.".format(notifications_sent)},
             status=status.HTTP_200_OK
         )
+
 
     def send_notification(self, user, message, comments_message, push_data):
         """
@@ -5753,8 +5755,9 @@ class LineupNotificationAPIView(APIView):
 
         # Append details to notifications_sent
         notifications_sent.append(
-           f"Notification sent to {user.username} ({role}) for {game_type} game of {team_name}"
+            "Notification sent to {} ({}) for {} game of {}".format(user.username, role, game_type, team_name)
         )
+
 
 class UniformConfirmationNotificationView(APIView):
     def get(self, request, *args, **kwargs):
@@ -5810,9 +5813,11 @@ class UniformConfirmationNotificationView(APIView):
                     activate(notification_language)
                 title = _("Uniform Confirmation Required")
                 body = _(
-                        f"Please confirm the uniform colors for the {game_type_label} game (Game #{game_number}) "
-                        f"between {game.team_a} and {game.team_b}."
+                    "Please confirm the uniform colors for the {} game (Game #{}) between {} and {}.".format(
+                        game_type_label, game_number, game.team_a, game.team_b
                     )
+                )
+
                 data = {'type': "assign_handler"}
                 
                 send_push_notification(
@@ -5845,9 +5850,11 @@ class UniformConfirmationNotificationView(APIView):
                     activate(notification_language)
                 title = "Uniform Confirmation Required"
                 body = (
-                    f"Please confirm the uniforms colors for the {game_type_label} game (Game #{game_number}) "
-                    f"between {game.team_a} and {game.team_b}."
+                    "Please confirm the uniforms colors for the {} game (Game #{}) between {} and {}.".format(
+                        game_type_label, game_number, game.team_a, game.team_b
+                    )
                 )
+
                 data = {'type': "assign_handler"}
                 send_push_notification(
                     device_token=handler.device_token,
@@ -6011,9 +6018,11 @@ class UniformAddNotificationAPIView(APIView):
 
         # Set the dynamic message
         body = _(
-            f"Please add your uniform colors to your {game_type.capitalize()} match "
-            f"against {opponent_team_name}."
+            "Please add your uniform colors to your {} match against {}.".format(
+                game_type.capitalize(), opponent_team_name
+            )
         )
+
         title = _("Missing Uniform Colors!!")
 
         push_data = {'type': "assign_handler"}
@@ -6039,7 +6048,12 @@ class UniformAddNotificationAPIView(APIView):
     
 
         # Log notification sent
-        notifications_sent.append(f"Notification sent to {user.username} ({role}) for {game_type} game against {opponent_team_name}")
+        notifications_sent.append(
+            "Notification sent to {} ({}) for {} game against {}".format(
+                user.username, role, game_type, opponent_team_name
+            )
+        )
+
 class PlayerReadyNotificationAPIView(APIView):
  
     def send_notifications_to_team_staff(self, team_branch, message_title, message_body):
@@ -6120,9 +6134,10 @@ class PlayerReadyNotificationAPIView(APIView):
                 message_body=_("One or more of your players are not ready for the match! Make sure that they are ready ASAP.")
             )
             notifications.extend([
-                f"Notification sent to {n['role']} ({n['username']}) for Team A"
+                "Notification sent to {} ({}) for Team A".format(n['role'], n['username'])
                 for n in team_a_notifications
             ])
+
 
         # If a player is not ready in Team B, send notification
         if team_b_not_ready:
@@ -6132,9 +6147,10 @@ class PlayerReadyNotificationAPIView(APIView):
                 message_body=_("One or more of your players are not ready for the match! Make sure that they are ready ASAP.")
             )
             notifications.extend([
-                f"Notification sent to {n['role']} ({n['username']}) for Team B"
+                "Notification sent to {} ({}) for Team B".format(n['role'], n['username'])
                 for n in team_b_notifications
             ])
+
 
         return notifications
 
@@ -6189,8 +6205,10 @@ class PlayerReadyNotificationAPIView(APIView):
                 team_b_id=game.team_b_id
             )
             notifications_sent.extend([
-                f"Tournament Game {game.id}: {n}" for n in notifications
+                "Tournament Game {}: {}".format(game.id, n)
+                for n in notifications
             ])
+
 
         # Process Friendly Games
         for game in upcoming_friendly_games:
@@ -6212,8 +6230,10 @@ class PlayerReadyNotificationAPIView(APIView):
                 team_b_id=game.team_b_id
             )
             notifications_sent.extend([
-                f"Friendly Game {game.id}: {n}" for n in notifications
+                "Friendly Game {}: {}".format(game.id, n)
+                for n in notifications
             ])
+
 
         return Response({
             "status": "success",

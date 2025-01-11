@@ -3085,7 +3085,10 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         self._update_team_goals(game_instance)
                         return self._get_game_stats_response(game_instance, team_id, player_id)
                     else:
-                        return Response({'status': 0, 'message': _(f'Cannot decrement {stat.capitalize()} as it cannot go below zero.')}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response(
+                            {'status': 0, 'message': _('Cannot decrement {} as it cannot go below zero.'.format(stat.capitalize()))},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -3116,7 +3119,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
         translated_game_number = _(f"Game Number {game_instance.game_number}")
 
         # Construct the notification body
-        notification_body = f"{translated_message} in Friendly Game - {translated_game_number}"
+        notification_body = "{} in Friendly Game - {}".format(translated_message, translated_game_number)
 
         # Send the notification to the player
         if player_instance.device_token:
@@ -3174,7 +3177,8 @@ class FriendlyPlayerGameStatsAPIView(APIView):
             if not value:
                 return Response({
                     'status': 0,
-                    'message': _(f'{key} is required.')
+                    'message': _('{} is required.'.format(key))
+
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Check access rights

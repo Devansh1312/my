@@ -2847,7 +2847,7 @@ class UpcomingGameView(APIView):
 
             response_data = {
                 "status": 1,
-                "message": f"Upcoming {game_type} game fetched successfully.",
+                "message": "Upcoming {} game fetched successfully.".format(game_type),
                 "data": {
                     "game_type": game_type,
                     "game_start_time": first_game.game_start_time,

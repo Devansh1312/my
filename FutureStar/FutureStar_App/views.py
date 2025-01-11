@@ -520,7 +520,8 @@ class System_Settings(LoginRequiredMixin, View):
                 messages.success(request, "System settings updated successfully.")
 
         except Exception as e:
-            messages.error(request, f"An error occurred: {e}")
+            messages.error(request, "An error occurred: {}".format(e))
+
 
         # Handle the response based on errors or success
         if errors:
@@ -570,10 +571,12 @@ class ToggleUserStatusView(View):
         # Update the user's status
         if new_status == "activate":
             user.is_active = True
-            messages.success(request, f"{user.username} has been activated.")
+            messages.success(request, "{} has been activated.".format(user.username))
+
         elif new_status == "deactivate":
             user.is_active = False
-            messages.success(request, f"{user.username} has been deactivated.")
+            messages.success(request, "{} has been activated.".format(user.username))
+
 
         user.save()
 
@@ -1087,7 +1090,8 @@ class UserDetailView(LoginRequiredMixin, View):
         except Exception as e:
             return {
                 "status": 0,
-                "message": f"An error occurred while fetching manager stats: {str(e)}",
+                "message": "An error occurred while fetching manager stats: {}".format(str(e))
+
             }
 
     def get_player_stats(self, user, time_filter):
@@ -1392,12 +1396,14 @@ class UpdatePlayerStatsView(View):
         for field_name, new_value in changes.items():
             field_name = field_name.replace("player_", "")  # Adjust frontend naming convention
             if field_name not in valid_stats_fields:
-                return JsonResponse({"success": False, "error": f"Invalid field name: {field_name}"})
+               return JsonResponse({"success": False, "error": "Invalid field name: {}".format(field_name)})
+
 
             try:
                 new_value = float(new_value)  # Convert value to float
             except ValueError:
-                return JsonResponse({"success": False, "error": f"Invalid value for {field_name}"})
+              return JsonResponse({"success": False, "error": "Invalid value for {}".format(field_name)})
+
 
             # Set the new value for the field
             setattr(user, field_name, new_value)
@@ -7243,7 +7249,7 @@ class UpdateGameStatsView(View):
         for field_name, new_value in changes.items():
             if field_name not in valid_fields:
                 return JsonResponse(
-                    {"success": False, "error": f"Invalid field name: {field_name}"}
+                    {"success": False, "error": "Invalid field name: {}".format(field_name)}
                 )
 
             # Update the game object with the new value
@@ -7573,9 +7579,11 @@ class FriendlyGameEditStatsView(LoginRequiredMixin, View):
         # Process the changes
         for field_name, new_value in changes.items():
             if field_name not in valid_fields:
+                
                 return JsonResponse(
-                    {"success": False, "error": f"Invalid field name: {field_name}"}
+                    {"success": False, "error": "Invalid field name: {}".format(field_name)}
                 )
+
 
             # Update the game object with the new value
             setattr(game, field_name, new_value)
@@ -7678,8 +7686,9 @@ class UserRoleActionView(LoginRequiredMixin, View):
                     user.role_id = 3  # Change role to coach
                     user.is_coach = True
                 messages.success(
-                    request, f"Role for {user.username} has been approved."
+                    request, "Role for {} has been approved.".format(user.username)
                 )
+
             elif action == "reject":
                 # Delete all certificates associated with the user
                 UserCertificate.objects.filter(user=user).delete()
@@ -7687,7 +7696,7 @@ class UserRoleActionView(LoginRequiredMixin, View):
                 user.is_referee = False
                 user.role_id = 5  # Set to default role
                 messages.success(
-                    request, f"Role for {user.username} has been rejected."
+                    request, "Role for {} has been rejected.".format(user.username)
                 )
 
             user.save()
@@ -7860,14 +7869,15 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 creator_type=booking.creator_type,
                 event=booking.event
             )
-            messages.success(request, f"Booking #{booking_id} approved successfully.")
+            messages.success(request, "Booking #{} approved successfully.".format(booking_id))
+
         else:
             self.notify_user_about_booking_status(
                 created_by_id=booking.created_by_id,
                 event=booking.event,
                 status="rejected"
             )
-            messages.warning(request, f"Booking #{booking_id} rejected successfully.")
+            messages.warning(request, "Booking #{} rejected successfully.".format(booking_id))
 
         # Redirect back to the pending bookings list
         return redirect("PendingEventBookingListView")
@@ -7886,10 +7896,11 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
             # Title and body based on booking status
             if status == "approved":
                 title = _('Booking Approved')
-                body = _(f'Your booking for the event "{event.event_name}" has been approved!')
+                body = _('Your booking for the event "{}" has been approved!'.format(event.event_name))
+
             else:
                 title = _('Booking Rejected')
-                body = _(f'Your booking for the event "{event.event_name}" has been rejected.')
+                body = _('Your booking for the event "{}" has been rejected.'.format(event.event_name))
 
             # Send notification to the user who made the booking
             push_data = {
@@ -7941,8 +7952,12 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
         for follower in followers:
             follower_user = None
             title = _('Event Notification!')
-            body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
-            
+            body = _(
+                '{} whom you are following, is attending an {} of {}'.format(
+                    creator_name, event.event_type.name_en, event.event_name
+                )
+            )
+
             # If the follower is a user
             if follower.target_type == 1:
                 follower_user = User.objects.filter(id=follower.created_by_id).first()
@@ -7972,7 +7987,11 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 team = Team.objects.get(id=follower.target_id)
                 # Notify team founder
                 title = _('Event Notification!')
-                body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+                body = _(
+                    '{} whom you are following, is attending an {} of {}'.format(
+                        creator_name, event.event_type.name_en, event.event_name
+                    )
+                )
                 push_data = {
                     'type': 'event',
                     'notifier_id': event.id
@@ -7992,7 +8011,11 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 group = TrainingGroups.objects.get(id=follower.target_id)
                 # Notify group founder
                 title = _('Event Notification!')
-                body = _(f'{creator_name}, whom you are following, is attending an {event.event_type.name_en} of {event.event_name}.')
+                body = _(
+                    '{} whom you are following, is attending an {} of {}'.format(
+                        creator_name, event.event_type.name_en, event.event_name
+                    )
+                )
                 push_data = {
                     'type': 'event',
                     'notifier_id': event.id
