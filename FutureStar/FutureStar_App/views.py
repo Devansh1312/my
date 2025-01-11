@@ -7988,7 +7988,7 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 # Notify team founder
                 title = _('Event Notification!')
                 body = _(
-                    '{} whom you are following, is attending an {} of {}'.format(
+                    '{} whom you are following, is attending {} of {}'.format(
                         creator_name, event.event_type.name_en, event.event_name
                     )
                 )
@@ -8012,7 +8012,7 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 # Notify group founder
                 title = _('Event Notification!')
                 body = _(
-                    '{} whom you are following, is attending an {} of {}'.format(
+                    '{} whom you are following, is attending {} of {}'.format(
                         creator_name, event.event_type.name_en, event.event_name
                     )
                 )
