@@ -6242,3 +6242,104 @@ class PlayerReadyNotificationAPIView(APIView):
             "message": _("Notifications processed"),
             "details": notifications_sent
         }, status=status.HTTP_200_OK)
+
+
+
+#################### Read Notifiction API #########################
+class ClearNotificationView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request):
+        try:
+            # Set the language for the response based on request header
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Extract the notification_id from query parameters
+            notification_id = request.query_params.get('notification_id')
+
+            if not notification_id:
+                return Response({
+                    'status': 0,
+                    'message': _('Notification ID is required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Get the notification by ID
+            notification = Notifictions.objects.filter(id=notification_id).first()
+
+            if not notification:
+                return Response({
+                    'status': 0,
+                    'message': _('Notification not found.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Mark the notification as read
+            notification.read = True
+            notification.save()
+
+            return Response({
+                'status': 1,
+                'message': _('Notification marked as read successfully.'),
+                'data': {
+                    'id': notification.id,
+                    'read': notification.read
+                }
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+################ Mark All Notifications Read ###################
+class MarkAllNotificationsReadView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request):
+        try:
+            # Set the language for the response based on request header
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Extract created_by_id and creator_type from query parameters
+            created_by_id = request.query_params.get('created_by_id')
+            creator_type = request.query_params.get('creator_type')
+
+            if not created_by_id or not creator_type:
+                return Response({
+                    'status': 0,
+                    'message': _('Both created_by_id and creator_type are required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Convert created_by_id and creator_type to integers
+            created_by_id = int(created_by_id)
+            creator_type = int(creator_type)
+
+            # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
+            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type)
+
+            if not notifications.exists():
+                return Response({
+                    'status': 0,
+                    'message': _('No notifications found for the given targeted_id and targeted_type.')
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Mark all notifications as read
+            notifications.update(read=True)
+
+            return Response({
+                'status': 1,
+                'message': _('All notifications marked as read successfully.')
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

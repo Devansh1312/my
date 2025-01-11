@@ -168,4 +168,8 @@ urlpatterns = [
         path('api/upcoming/player_ready_noti/',PlayerReadyNotificationAPIView.as_view()),
 
 
+        ########## Notifiction Read ##########
+        path('api/mark-all-notifications-read/', MarkAllNotificationsReadView.as_view()),
+        path('api/clear-notification/', ClearNotificationView.as_view()),
+
     ]
