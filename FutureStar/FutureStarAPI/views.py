@@ -5462,7 +5462,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=attendance_message + "\n" + comments_message
+            content=attendance_message + comments_message
         )
 
 ##############################
@@ -5560,7 +5560,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=message + "\n" + comments_message
+            content=message + comments_message
         )
 
 #################### tournament #######################
@@ -6342,4 +6342,109 @@ class MarkAllNotificationsReadView(APIView):
             return Response({
                 'status': 0,
                 'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class NotificationsListView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request):
+        try:
+            # Set the language for the response based on request header
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
+
+            # Extract created_by_id and creator_type from query parameters
+            created_by_id = request.query_params.get('created_by_id')
+            creator_type = request.query_params.get('creator_type')
+
+            if not created_by_id or not creator_type:
+                return Response({
+                    'status': 0,
+                    'message': _('Both created_by_id and creator_type are required.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Convert created_by_id and creator_type to integers
+            created_by_id = int(created_by_id)
+            creator_type = int(creator_type)
+
+            # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
+            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type)
+
+            # Build the response
+            response_data = []
+            entity = None
+            for notification in notifications:
+                # Fetch user details (replace User model with your user model if different)
+                if creator_type == 1:  # User
+                    try:
+                        user = User.objects.get(id=created_by_id)
+                        entity = {
+                            "username": user.username,
+                            "fullname": user.fullname,
+                            "profilepicture": user.profile_picture.url if user.profile_picture else None,
+                            "target_id": notification.created_by_id,
+                            "target_type": notification.creator_type,
+                        }
+                    except User.DoesNotExist:
+                        entity = {
+                         
+                        }
+
+                elif creator_type == 2:  # Team
+                    try:
+                        team = Team.objects.get(id=created_by_id)
+                        entity = {
+                            "username":team.team_username,
+                            "team_name": team.team_name,
+                            "team_logo": team.team_logo.url if team.team_logo else None,
+                            "target_id": notification.created_by_id,
+                            "target_type": notification.creator_type,
+                        }
+                    except Team.DoesNotExist:
+                        entity = {
+                           
+                        }
+
+                elif creator_type == 3:  # Group
+                    try:
+                        group = TrainingGroups.objects.get(id=created_by_id)
+                        entity = {
+                            "username":group.group_username,
+                            "group_name": group.group_name,
+                            "group_logo": group.group_logo.url if group.group_logo else None,
+                            "target_id": notification.created_by_id,
+                            "target_type": notification.creator_type,
+                        }
+                    except TrainingGroups.DoesNotExist:
+                        entity = {
+                           
+                        }
+                response_data.append({
+                    "id": notification.id,
+                    "entity": entity,
+                    "title": notification.title,
+                    "content": notification.content,
+                    "date_created": notification.date_created,
+                })
+
+
+            return Response({
+                "status": 1,
+                "message": _("Notifications fetched successfully."),
+                "data": response_data
+            }, status=status.HTTP_200_OK)
+
+        except ValueError:
+            return Response({
+                "status": 0,
+                "message": _("Invalid created_by_id or creator_type."),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                "status": 0,
+                "message": _("An error occurred: "),
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -171,5 +171,6 @@ urlpatterns = [
         ########## Notifiction Read ##########
         path('api/mark-all-notifications-read/', MarkAllNotificationsReadView.as_view()),
         path('api/clear-notification/', ClearNotificationView.as_view()),
+        path('api/notification_list/', NotificationsListView.as_view()),
 
     ]
