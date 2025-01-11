@@ -11,1259 +11,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-msgid "Player A id is required."
-msgstr "يجب إدخال معرف اللاعب أ."
+msgid "%(user_name)s wants to attend your event!"
+msgstr "%(user_name)s يريد حضور فعاليتك!"
 
-msgid "Player B id is required."
-msgstr "معرف اللاعب B مطلوب."
-
-msgid "Player A not found or not in the correct lineup status."
-msgstr "لم يتم العثور على اللاعب أ أو لم يكن في حالة التشكيلة الصحيحة."
-
-msgid "Player B not found or not in the correct lineup status."
-msgstr "لم يتم العثور على اللاعب B أو لم يكن في حالة التشكيلة الصحيحة."
-
-msgid "Failed to log player substitution."
-msgstr "فشل في تسجيل استبدال اللاعب."
-
-msgid "Top players fetched successfully."
-msgstr "تم جلب اللاعبين المتميزين بنجاح."
-
-msgid "An error occurred while fetching player stats."
-msgstr "حدث خطأ أثناء جلب إحصائيات اللاعب."
-
-msgid "Team data retrieved successfully."
-msgstr "تم استرجاع بيانات الفريق بنجاح."
-
-msgid "Categories retrieved successfully."
-msgstr "تم استرجاع الفئات بنجاح."
-
-msgid "You do not have permission to create a team."
-msgstr "ليس لديك الإذن لإنشاء فريق."
-
-msgid "You can only create one team."
-msgstr "يمكنك إنشاء فريق واحد فقط."
-
-msgid "Invalid team type provided."
-msgstr "تم توفير نوع فريق غير صالح."
-
-msgid "The username is already in use either as a team username or a user username."
-msgstr "اسم المستخدم قيد الاستخدام بالفعل إما كاسم مستخدم للفريق أو اسم مستخدم للمستخدم."
-
-msgid "Team created successfully."
-msgstr "تم إنشاء الفريق بنجاح."
-
-msgid "Invalid country ID provided."
-msgstr "تم إدخال معرف بلد غير صالح."
-
-msgid "Invalid city ID provided."
-msgstr "تم إدخال معرف مدينة غير صالح."
-
-msgid "Team updated successfully."
-msgstr "تم تحديث الفريق بنجاح."
-
-msgid "Team logo updated successfully."
-msgstr "تم تحديث شعار الفريق بنجاح."
-
-msgid "Team deleted successfully."
-msgstr "تم حذف الفريق بنجاح."
-
-msgid "Uniform ID is required."
-msgstr "يجب إظهار هوية موحدة."
-
-msgid "Uniform not found."
-msgstr "لم يتم العثور على الزي الرسمي."
-
-msgid "Uniform deleted successfully."
-msgstr "تم حذف الزي بنجاح."
-
-msgid "Team Branch created successfully."
-msgstr "تم إنشاء فرع الفريق بنجاح."
-
-msgid "Team Branch creation failed."
-msgstr "فشل إنشاء فرع الفريق."
-
-msgid "Team Branch ID is required."
-msgstr "معرف فرع الفريق مطلوب."
-
-msgid "No TeamBranch found for the given ID."
-msgstr "لم يتم العثور على TeamBranch للمعرف المحدد."
-
-msgid "Team Branch retrieved successfully."
-msgstr "تم استرجاع فرع الفريق بنجاح."
-
-msgid "Team Branch updated successfully."
-msgstr "تم تحديث فرع الفريق بنجاح."
-
-msgid "Team Branch update failed."
-msgstr "فشل تحديث فرع الفريق."
-
-msgid "Team Branch deleted successfully."
-msgstr "تم حذف فرع الفريق بنجاح."
-
-msgid "branch_id is required"
-msgstr "مطلوب معرف الفرع"
-
-msgid "Data retrieved successfully."
-msgstr "تم استرجاع البيانات بنجاح."
-
-msgid "branch_id, user_id, and joinning_type are required"
-msgstr "مطلوب معرف الفرع ومعرف المستخدم ونوع الانضمام"
-
-msgid "Please provide a valid joining type"
-msgstr "يرجى تقديم نوع الانضمام صالحًا"
-
-msgid "Please provide a valid joining type."
-msgstr "يرجى تقديم نوع الانضمام صالحًا."
-
-msgid "Branch not found."
-msgstr "لم يتم العثور على الفرع."
-
-msgid "Manager added successfully, and user role updated to manager."
-msgstr "تمت إضافة المدير بنجاح، وتم تحديث دور المستخدم إلى مدير."
-
-msgid "Player added successfully, and user role updated to player."
-msgstr "تمت إضافة اللاعب بنجاح، وتم تحديث دور المستخدم إلى لاعب."
-
-msgid "Staff added successfully."
-msgstr "تمت إضافة الموظفين بنجاح."
-
-msgid "Welcome to {team_name}"
-msgstr "مرحباً بكم في {team_name}"
-
-msgid "H2H Fetch Successfully"
-msgstr "تم جلب H2H بنجاح"
-
-msgid "Game not found with the given criteria."
-msgstr "لم يتم العثور على اللعبة بالمعايير المحددة."
-
-msgid "Access denied. You do not have the necessary role for this action."
-msgstr "تم رفض الوصول. ليس لديك الدور اللازم لهذا الإجراء."
-
-msgid "The specified team_id does not match any team in this game."
-msgstr "معرف الفريق المحدد لا يتطابق مع أي فريق في هذه اللعبة."
-
-msgid "Colors retrieved successfully."
-msgstr "تم استرجاع الألوان بنجاح."
-
-msgid "Access denied. You do not have permission for this team."
-msgstr "تم رفض الوصول. ليس لديك إذن لهذا الفريق."
-
-msgid "Uniform Added Successfully"
-msgstr "تمت إضافة الزي بنجاح"
+msgid "A game with these details already exists."
+msgstr "لعبة بهذه التفاصيل موجودة بالفعل."
 
 msgid "Access denied. You do not have permission for this game."
 msgstr "تم رفض الوصول. ليس لديك إذن لهذه اللعبة."
 
-msgid "Uniform information fetched successfully."
-msgstr "تم جلب المعلومات الموحدة بنجاح."
-
-msgid "game_id and tournament_id are required."
-msgstr "game_id و tournament_id مطلوبان."
-
-msgid "Invalid is_confirm value. It must be 1, 0, true, or false."
-msgstr "قيمة is_confirm غير صالحة. يجب أن تكون 1 أو 0 أو true أو false."
+msgid "Access denied. You do not have permission for this team."
+msgstr "تم رفض الوصول. ليس لديك إذن لهذا الفريق."
 
 msgid "Access denied. You do not have permission to update this game."
-msgstr "تم رفض الوصول. ليس لديك الإذن لتحديث هذه اللعبة."
-
-msgid "Uniform confirmed successfully."
-msgstr "تم تأكيد الزي بنجاح."
-
-msgid "Uniform rejected successfully."
-msgstr "تم رفض الزي بنجاح."
-
-msgid "Team id is required."
-msgstr "معرف الفريق مطلوب."
-
-msgid "Game id is required."
-msgstr "معرف اللعبة مطلوب."
-
-msgid "Tournament id is required."
-msgstr "معرف البطولة مطلوب."
-
-msgid "The specified tournament does not exist."
-msgstr "البطولة المحددة غير موجودة."
-
-msgid "The specified game does not exist in this tournament."
-msgstr "اللعبة المحددة غير موجودة في هذه البطولة."
-
-msgid "The player has not been assigned a jersey number yet."
-msgstr "لم يتم تخصيص رقم قميص للاعب حتى الآن."
-
-msgid "Player id is required."
-msgstr "معرف اللاعب مطلوب."
-
-msgid "No matching active lineup entries found."
-msgstr "لم يتم العثور على إدخالات التشكيلة النشطة المطابقة."
-
-msgid "Lineup entries removed successfully."
-msgstr "تمت إزالة إدخالات التشكيلة بنجاح."
-
-msgid "Tournament ID is required."
-msgstr "معرف البطولة مطلوب."
-
-msgid "Playing 11 Updated Sucessfully"
-msgstr "تم تحديث اللعب 11 بنجاح"
-
-msgid "Lineup reset successfully."
-msgstr "تم إعادة تعيين التشكيلة بنجاح."
-
-msgid "Lineup not found."
-msgstr "لم يتم العثور على التشكيلة."
-
-msgid "Players Details Must Required."
-msgstr "تفاصيل اللاعبين يجب أن تكون مطلوبة."
-
-msgid "Jersey number Deleted"
-msgstr "تم حذف رقم القميص"
-
-msgid "Game not found for the given tournament."
-msgstr "لم يتم العثور على اللعبة للبطولة المحددة."
-
-msgid "No players found for the specified criteria."
-msgstr "لم يتم العثور على لاعبين للمعايير المحددة."
-
-msgid "Lineup entry not found with the specified criteria."
-msgstr "لم يتم العثور على إدخال التشكيلة بالمعايير المحددة."
-
-msgid "Player ready status updated successfully."
-msgstr "تم تحديث حالة جاهزية اللاعب بنجاح."
-
-msgid "No data available."
-msgstr "لا توجد بيانات متاحة."
-
-msgid "official_id is required."
-msgstr "مطلوب official_id."
-
-msgid "officials_type_id is required."
-msgstr "مطلوب officials_type_id."
-
-msgid "You have been appointed to officiate a game."
-msgstr "لقد تم تعيينك لتحكيم مباراة."
-
-msgid "Official is required."
-msgstr "يجب أن يكون هناك مسؤول رسمي."
-
-msgid "No Official Found."
-msgstr "لم يتم العثور على مسؤول."
-
-msgid "Player stats fetched successfully, but no data found. Default values returned."
-msgstr "تم جلب إحصائيات اللاعب بنجاح، ولكن لم يتم العثور على أي بيانات. تم إرجاع القيم الافتراضية."
-
-msgid "Lineup entry not found."
-msgstr "لم يتم العثور على إدخال التشكيلة."
-
-msgid "Player status updated successfully."
-msgstr "تم تحديث حالة اللاعب بنجاح."
-
-msgid "Invalid search type."
-msgstr "نوع البحث غير صالح."
-
-msgid "official types retrieved successfully."
-msgstr "تم استرجاع الأنواع الرسمية بنجاح."
-
-msgid "Officials retrieved successfully."
-msgstr "تم استرجاع المسؤولين بنجاح."
-
-msgid "game_id, official_id, and officials_type_id are required."
-msgstr "game_id، وofficial_id، وofficials_type_id مطلوبة."
-
-msgid "This official is already assigned to this game."
-msgstr "تم تعيين هذا المسؤول بالفعل لهذه اللعبة."
-
-msgid "You have been appointed to officiate a friendly game."
-msgstr "لقد تم تعيينك لإدارة مباراة ودية."
-
-msgid "Official added successfully."
-msgstr "تمت الإضافة الرسمية بنجاح."
-
-msgid "Both game_id and official_id are required."
-msgstr "يجب أن يكون كل من game_id وofficial_id مطلوبين."
-
-msgid "Official removed successfully from the game."
-msgstr "تمت الإزالة الرسمية بنجاح من اللعبة."
-
-msgid "No official found for the given game."
-msgstr "لم يتم العثور على أي إعلان رسمي للعبة المذكورة."
-
-msgid "Stats updated and lineup fetched successfully."
-msgstr "تم تحديث الإحصائيات وتم جلب التشكيلة بنجاح."
-
-msgid "Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59)."
-msgstr "يجب أن يكون وقت اللعبة بالصيغة hh:mm:ss (00:00:00 إلى 23:59:59)."
-
-msgid "All fields are required."
-msgstr "جميع الحقول مطلوبة."
-
-msgid "Cannot modify stats for a finished game."
-msgstr "لا يمكن تعديل الإحصائيات للعبة المنتهية."
-
-msgid "Invalid request data."
-msgstr "بيانات الطلب غير صالحة."
-
-msgid "You just scored a goal!"
-msgstr "لقد سجلت للتو هدفا!"
-
-msgid "You just made an assist!"
-msgstr "لقد قدمت للتو مساعدة!"
-
-msgid "You just scored an own goal!"
-msgstr "لقد سجلت للتو هدفا ذاتيا!"
-
-msgid "You just received a yellow card!"
-msgstr "لقد حصلت للتو على بطاقة صفراء!"
-
-msgid "You just received a red card!"
-msgstr "لقد حصلت للتو على بطاقة حمراء!"
-
-msgid "Your statistics have been updated!"
-msgstr "لقد تم تحديث الإحصائيات الخاصة بك!"
-
-msgid "Statistics Updated!"
-msgstr "تم تحديث الإحصائيات!"
-
-msgid "Player stats fetched successfully."
-msgstr "تم جلب إحصائيات اللاعب بنجاح."
-
-msgid "Team stats timeline fetched successfully."
-msgstr "تم جلب الجدول الزمني لإحصائيات الفريق بنجاح."
-
-msgid "All fields (team_id, game_id, player_a_id, player_b_id) are required."
-msgstr "جميع الحقول (team_id، game_id، player_a_id، player_b_id) مطلوبة."
-
-msgid "Player not found or not in correct lineup status."
-msgstr "لم يتم العثور على اللاعب أو لم يكن في التشكيلة الصحيحة."
-
-msgid "Failed to log substitution."
-msgstr "فشل في تسجيل الاستبدال."
-
-msgid "Player substitution successful."
-msgstr "تم استبدال اللاعب بنجاح."
-
-msgid "team_id, game_id are required."
-msgstr "team_id وgame_id مطلوبان."
-
-msgid "Lineup players fetched successfully with status \"ADDED\"."
-msgstr "تم جلب اللاعبين في التشكيلة بنجاح مع الحالة \"تمت الإضافة\"."
-
-msgid "Player ID, target position, team ID, and game ID are required."
-msgstr "يجب إدخال معرف اللاعب، وموقع الهدف، ومعرف الفريق، ومعرف اللعبة."
-
-msgid "The player in the target position must also be in the starting 11 lineup to swap positions."
-msgstr "يجب على اللاعب الموجود في المركز المستهدف أن يكون أيضًا في التشكيلة الأساسية حتى يتمكن من تبديل المراكز."
-
-msgid "Positions swapped successfully."
-msgstr "تم تبديل المواقع بنجاح."
-
-msgid "Player position updated successfully."
-msgstr "تم تحديث موقع اللاعب بنجاح."
-
-msgid "Team ID and Game ID are required."
-msgstr "يجب إدخال معرف الفريق ومعرف اللعبة."
-
-msgid "No lineups found for the provided team and game."
-msgstr "لم يتم العثور على تشكيلات للفريق واللعبة المقدمة."
-
-msgid "Lineups retrieved successfully."
-msgstr "تم استرجاع التشكيلات بنجاح."
-
-msgid "Both Team A and Team B IDs are required"
-msgstr "مطلوب معرفات الفريق أ والفريق ب"
-
-msgid "team_id is required."
-msgstr "team_id مطلوب."
-
-msgid "game_id is required."
-msgstr "game_id مطلوب."
-
-msgid "No players found for the provided team."
-msgstr "لم يتم العثور على لاعبين للفريق المقدم."
-
-msgid "Players fetched successfully."
-msgstr "تم جلب اللاعبين بنجاح."
-
-msgid "Invalid team_id."
-msgstr "معرف الفريق غير صالح."
-
-msgid "You do not have permission to access this team."
-msgstr "ليس لديك الإذن بالوصول إلى هذا الفريق."
-
-msgid "The specified team does not exist."
-msgstr "الفريق المحدد غير موجود."
-
-msgid "The specified player is not part of this team."
-msgstr "اللاعب المحدد ليس جزءًا من هذا الفريق."
-
-msgid "The specified game does not exist."
-msgstr "اللعبة المحددة غير موجودة."
-
-msgid "The specified team is not part of this game."
-msgstr "الفريق المحدد ليس جزءًا من هذه اللعبة."
-
-msgid "Lineup updated successfully."
-msgstr "تم تحديث التشكيلة بنجاح."
-
-msgid "Player Substituted."
-msgstr "تم استبدال اللاعب."
-
-msgid "Player Added"
-msgstr "تمت إضافة اللاعب"
-
-msgid "player_id is required."
-msgstr "يجب إدخال معرف اللاعب."
-
-msgid "No entries found."
-msgstr "لم يتم العثور على أي إدخالات."
-
-msgid "Lineup Player Removed successfully."
-msgstr "تمت إزالة لاعب التشكيلة بنجاح."
-
-msgid "You do not have the required permissions to perform this action."
-msgstr "ليس لديك الأذونات المطلوبة لأداء هذا الإجراء."
-
-msgid "team_id, game_id, are required."
-msgstr "team_id، game_id، مطلوبان."
-
-msgid "Lineup players fetched successfully."
-msgstr "تم جلب اللاعبين من التشكيلة بنجاح."
-
-msgid "Team ID is required."
-msgstr "معرف الفريق مطلوب."
-
-msgid "Positions data must be a list of player details."
-msgstr "يجب أن تكون بيانات المراكز عبارة عن قائمة بتفاصيل اللاعب."
-
-msgid "Both player_id and position_1 are required."
-msgstr "يجب أن يكون كل من player_id وposition_1 مطلوبين."
-
-msgid "Lineup not found for this player."
-msgstr "لم يتم العثور على تشكيلة لهذا اللاعب."
-
-msgid "Playing 11 Updated Successfully"
-msgstr "تم تحديث اللعب 11 بنجاح"
-
-msgid "Some players could not be updated."
-msgstr "لم يتمكن بعض اللاعبين من التحديث."
-
-msgid "player_id, team_id, and game_id are required."
-msgstr "معرف اللاعب، ومعرف الفريق، ومعرف اللعبة مطلوبة."
-
-msgid "Player Removed From Playing 11."
-msgstr "تم إزالة اللاعب من اللعب 11."
-
-msgid "Lineup not found"
-msgstr "لم يتم العثور على التشكيلة"
-
-msgid "Players details are required."
-msgstr "تفاصيل اللاعبين مطلوبة."
-
-msgid "Validation errors occurred."
-msgstr "حدثت أخطاء التحقق."
-
-msgid "The specified friendly game does not exist."
-msgstr "اللعبة الودية المحددة غير موجودة."
-
-msgid "The specified team is not part of this friendly game."
-msgstr "الفريق المحدد ليس جزءًا من هذه المباراة الودية."
-
-msgid "Jersey Number added Successfully"
-msgstr "تمت إضافة رقم القميص بنجاح"
-
-msgid "An error occurred while adding the player to the lineup."
-msgstr "حدث خطأ أثناء إضافة اللاعب إلى التشكيلة."
-
-msgid "Jersey number deleted."
-msgstr "تم حذف رقم القميص."
-
-msgid "Jersey Numbers Updated Successfully"
-msgstr "تم تحديث أرقام القميص بنجاح"
-
-msgid "You do not have access to this resource."
-msgstr "ليس لديك إمكانية الوصول إلى هذا المورد."
-
-msgid "Lineup players and manager fetched successfully for both teams."
-msgstr "تم اختيار اللاعبين والمدرب بنجاح لكلا الفريقين."
+msgstr "تم رفض الوصول. ليس لديك إذن لتحديث هذه اللعبة."
 
 msgid "Access denied. You do not have permission to view this game."
 msgstr "تم رفض الوصول. ليس لديك إذن لعرض هذه اللعبة."
 
-msgid "No players found."
-msgstr "لم يتم العثور على لاعبين."
+msgid "Access denied. You do not have the necessary role for this action."
+msgstr "تم رفض الوصول. ليس لديك الدور اللازم لهذا الإجراء."
 
-msgid "General Settings retrieved successfully."
-msgstr "تم استرجاع الإعدادات العامة بنجاح."
+msgid "Account is inactive"
+msgstr "الحساب غير نشط"
 
 msgid "Age Groups fetched successfully."
-msgstr "تم جلب الفئات العمرية بنجاح."
+msgstr "تم جلب مجموعات الأعمار بنجاح."
 
-msgid "Error occurred while fetching Age Groups list."
-msgstr "حدث خطأ أثناء جلب قائمة الفئات العمرية."
+msgid "Album Details fetched successfully."
+msgstr "تم جلب تفاصيل الألبوم بنجاح."
 
-msgid "Injury fetched successfully."
-msgstr "تمت الإصابة بنجاح."
-
-msgid "Invalid or missing current_language. It must be either \"en\" or \"ar\"."
-msgstr "اللغة الحالية غير صالحة أو مفقودة. يجب أن تكون \"en\" أو \"ar\"."
-
-msgid "Current language updated successfully."
-msgstr "تم تحديث اللغة الحالية بنجاح."
-
-msgid "User Dose Not Found"
-msgstr "لم يتم العثور على جرعة المستخدم"
-
-msgid "You do not have the required role to access this resource"
-msgstr "ليس لديك الدور المطلوب للوصول إلى هذا المورد"
-
-msgid "Teams fetched successfully."
-msgstr "تم جلب الفرق بنجاح."
-
-msgid "You are not a manager of any team."
-msgstr "أنت لست مديرًا لأي فريق."
-
-msgid "Team not found."
-msgstr "لم يتم العثور على الفريق."
-
-msgid "User does not have the required role."
-msgstr "المستخدم ليس لديه الدور المطلوب."
-
-msgid "Game field id is required."
-msgstr "معرف حقل اللعبة مطلوب."
-
-msgid "Game field not found."
-msgstr "لم يتم العثور على حقل اللعبة."
-
-msgid "Team A is required."
-msgstr "الفريق أ مطلوب."
-
-msgid "Team B cannot be the same as Team A."
-msgstr "لا يمكن للفريق ب أن يكون هو نفسه الفريق أ."
-
-msgid "Friendly game created successfully."
-msgstr "تم إنشاء اللعبة الودية بنجاح."
-
-msgid "A game with these details already exists."
-msgstr "توجد بالفعل لعبة بهذه التفاصيل."
-
-msgid "Game ID is required."
-msgstr "معرف اللعبة مطلوب."
-
-msgid "Friendly game not found."
-msgstr "لم يتم العثور على لعبة ودية."
-
-msgid "Friendly game fetched successfully."
-msgstr "تمت جلب اللعبة الودية بنجاح."
-
-msgid "Game ID and officials are required."
-msgstr "يجب أن يكون لديك معرف اللعبة والمسؤولين."
-
-msgid "Game not exists"
-msgstr "اللعبة غير موجودة"
-
-msgid "Referees requested successfully."
-msgstr "تم طلب الحكام بنجاح."
-
-msgid "game_id, user_id, and status are required"
-msgstr "game_id و user_id و status مطلوبة"
-
-msgid "Invalid status value. Only APPROVED or REJECT are allowed"
-msgstr "قيمة الحالة غير صالحة. يُسمح فقط بـ APPROVED أو REJECT"
-
-msgid "Requested Referee not found for the provided game_id and user_id"
-msgstr "لم يتم العثور على الحكم المطلوب لـ game_id و user_id المقدمين"
-
-msgid "Referee must have a fee assigned to be approved"
-msgstr "يجب أن يكون لدى المحكم رسوم محددة ليتم الموافقة عليها"
-
-msgid "Failed to send notification:"
-msgstr "فشل في إرسال الإشعار:"
-
-msgid "Referee status updated successfully"
-msgstr "تم تحديث حالة الحكم بنجاح"
-
-msgid "Referee list fetched successfully"
-msgstr "تم جلب قائمة الحكام بنجاح"
-
-msgid "Invalid id of Team B."
-msgstr "معرف غير صالح للفريق ب."
-
-msgid "Game not found."
-msgstr "لم يتم العثور على اللعبة."
-
-msgid "Game is already started."
-msgstr "لقد بدأت اللعبة بالفعل."
-
-msgid "Game updated successfully."
-msgstr "تم تحديث اللعبة بنجاح."
-
-msgid "Team B is already assigned."
-msgstr "تم تعيين الفريق B بالفعل."
-
-msgid "Game Deleted successfully."
-msgstr "تم حذف اللعبة بنجاح."
-
-msgid "Cannot delete a game that has already Started."
-msgstr "لا يمكن حذف اللعبة التي تم بدءها بالفعل."
-
-msgid "Game not found or not created by you."
-msgstr "لم يتم العثور على اللعبة أو لم يتم إنشاؤها بواسطةك."
-
-msgid "Data fetched successfully."
-msgstr "تم جلب البيانات بنجاح."
-
-msgid "Cities fetched successfully."
-msgstr "تم جلب المدن بنجاح."
-
-msgid "Unfollowed successfully."
-msgstr "تم إلغاء المتابعة بنجاح."
-
-msgid "Invalid target type."
-msgstr "نوع الهدف غير صالح."
-
-msgid "New Follower!"
-msgstr "متابع جديد!"
-
-msgid "Followed successfully."
-msgstr "تمت المتابعة بنجاح."
-
-msgid "Page not found."
-msgstr "لم يتم العثور على الصفحة."
-
-msgid "Event ID is required."
-msgstr "معرف الحدث مطلوب."
-
-msgid "Event not found."
-msgstr "لم يتم العثور على الحدث."
-
-msgid "Event unliked successfully."
-msgstr "تم إلغاء الإعجاب بالحدث بنجاح."
-
-msgid "Event liked successfully."
-msgstr "تم الإعجاب بالحدث بنجاح."
-
-msgid "Event Liked!"
-msgstr "الحدث أعجبني!"
-
-msgid "No comments found for this Event."
-msgstr "لم يتم العثور على تعليقات لهذا الحدث."
-
-msgid "event_id and comment are required."
-msgstr "event_id والتعليق مطلوبان."
-
-msgid "Invalid recipient type."
-msgstr "نوع المستلم غير صالح."
-
-msgid "New Comment on Your Event!"
-msgstr "تعليق جديد على الحدث الخاص بك!"
-
-msgid "Invalid events_section value. It must be an integer."
-msgstr "قيمة قسم الأحداث غير صالحة. يجب أن تكون عددًا صحيحًا."
-
-msgid "Invalid events_section value. Allowed values are 1 or 2."
-msgstr "قيمة قسم الأحداث غير صالحة. القيم المسموح بها هي 1 أو 2."
-
-msgid "Events fetched successfully."
-msgstr "تم جلب الأحداث بنجاح."
-
-msgid "Events retrieved successfully."
-msgstr "تم استرجاع الأحداث بنجاح."
-
-msgid "creator_type must be provided."
-msgstr "يجب توفير create_type."
-
-msgid "creator_type must be a valid integer."
-msgstr "يجب أن يكون Creator_type عددًا صحيحًا صالحًا."
-
-msgid "created_by_id must be provided for TEAM_TYPE."
-msgstr "يجب توفير created_by_id لـ TEAM_TYPE."
-
-msgid "created_by_id must be a valid integer."
-msgstr "يجب أن يكون created_by_id عددًا صحيحًا صالحًا."
-
-msgid "Events Fetched successfully."
-msgstr "تم جلب الأحداث بنجاح."
-
-msgid "Event not found or you are not authorized to update this event."
-msgstr "لم يتم العثور على الحدث أو ليس لديك الحق في تحديث هذا الحدث."
-
-msgid "Event updated successfully."
-msgstr "تم تحديث الحدث بنجاح."
-
-msgid "Failed to update the event."
-msgstr "فشل في تحديث الحدث."
-
-msgid "Event Booking Detail Fetched successfully."
-msgstr "تم جلب تفاصيل حجز الحدث بنجاح."
-
-msgid "No matching team found for this event."
-msgstr "لم يتم العثور على فريق مطابق لهذا الحدث."
-
-msgid "%(user_name)s wants to attend your event!"
-msgstr "يريد %(user_name)s حضور الحدث الخاص بك!"
-
-msgid "%(user_name)s has Requested to booked a ticket for your event \"%(event_name)s\"."
-msgstr "لقد طلب %(user_name)s حجز تذكرة لحدثك \"%(event_name)s\"."
-
-msgid "Event Booking Requested successfully."
-msgstr "تم طلب حجز الحدث بنجاح."
-
-msgid "Booking creation failed."
-msgstr "فشل إنشاء الحجز."
-
-msgid "Event Notification"
-msgstr "إشعار الحدث"
-
-msgid "Your team is attending an event!"
-msgstr "فريقك يحضر حدثًا!"
-
-msgid "Your group is attending an event!"
-msgstr "مجموعتك ستحضر حدثًا!"
-
-msgid "Event not found or you are not authorized to delete this event."
-msgstr "لم يتم العثور على الحدث أو ليس لديك الحق في حذف هذا الحدث."
-
-msgid "Event deleted successfully."
-msgstr "تم حذف الحدث بنجاح."
-
-msgid "FAQ retrieved successfully."
-msgstr "تم استرجاع الأسئلة الشائعة بنجاح."
-
-msgid "No general settings found."
-msgstr "لم يتم العثور على إعدادات عامة."
-
-msgid "New Comment on Your Post!"
-msgstr "تعليق جديد على مشاركتك!"
-
-msgid "Comment created successfully."
-msgstr "تم إنشاء التعليق بنجاح."
-
-msgid "post_id, created_by_id, and creator_type are required."
-msgstr "post_id، created_by_id، وcreator_type مطلوبة."
-
-msgid "Post deleted successfully."
-msgstr "تم حذف المنشور بنجاح."
-
-msgid "You are already registered as a coach and cannot create a new coach profile."
-msgstr "لقد قمت بالتسجيل كمدرب بالفعل ولا يمكنك إنشاء ملف تعريف مدرب جديد."
-
-msgid "You are already registered as a referee and cannot create a new referee profile."
-msgstr "لقد قمت بالفعل بالتسجيل كحكم ولا يمكنك إنشاء ملف تعريف حكم جديد."
-
-msgid "User Profiles retrieved successfully."
-msgstr "تم استرجاع ملفات تعريف المستخدم بنجاح."
-
-msgid "You do not have permission to perform this action."
-msgstr "ليس لديك الإذن للقيام بهذا الإجراء."
-
-msgid "Invalid profile type."
-msgstr "نوع الملف الشخصي غير صالح."
-
-msgid "Profile type and certificates uploaded successfully."
-msgstr "تم تحميل نوع الملف الشخصي والشهادات بنجاح."
-
-msgid "Detail Albums fetched successfully."
-msgstr "تم جلب الألبومات التفصيلية بنجاح."
-
-msgid "creator_type is required."
-msgstr "يجب أن يكون create_type مطلوبًا."
-
-msgid "creator_type and created_by_id must be valid integers."
-msgstr "يجب أن يكون create_type و created_by_id عددًا صحيحًا صالحًا."
-
-msgid "For TEAM_TYPE, created_by_id must correspond to an existing Team."
-msgstr "بالنسبة لـ TEAM_TYPE، يجب أن يتوافق created_by_id مع فريق موجود."
-
-msgid "For GROUP_TYPE, created_by_id must correspond to an existing Group."
-msgstr "بالنسبة لـ GROUP_TYPE، يجب أن يتوافق created_by_id مع مجموعة موجودة."
-
-msgid "Gallery entry creation failed."
-msgstr "فشل إنشاء إدخال المعرض."
-
-msgid "Detailed Albums added successfully."
-msgstr "تمت إضافة الألبومات التفصيلية بنجاح."
+msgid "Album Id is required or Album not found."
+msgstr "معرّف الألبوم مطلوب أو لم يتم العثور على الألبوم."
 
 msgid "Album creation failed."
 msgstr "فشل إنشاء الألبوم."
 
-msgid "Albums fetched successfully."
-msgstr "تم جلب الألبومات بنجاح."
+msgid "Album deleted successfully."
+msgstr "تم حذف الألبوم بنجاح."
 
 msgid "Album entries fetched successfully."
 msgstr "تم جلب إدخالات الألبوم بنجاح."
 
-msgid "Image gallary entries fetched successfully."
-msgstr "تم جلب مدخلات معرض الصور بنجاح."
-
-msgid "Video gallary entries fetched successfully."
-msgstr "تم جلب إدخالات معرض الفيديو بنجاح."
-
-msgid "Gallery entry created successfully."
-msgstr "تم إنشاء مدخل المعرض بنجاح."
-
-msgid "Failed to create gallery entry."
-msgstr "فشل في إنشاء إدخال المعرض."
-
-msgid "gallary entries and latest albums fetched successfully."
-msgstr "تم جلب إدخالات المعرض والألبومات الأخيرة بنجاح."
-
-msgid "gallary entry deleted successfully."
-msgstr "تم حذف مدخل المعرض بنجاح."
-
-msgid "gallary entry not found."
-msgstr "لم يتم العثور على مدخل المعرض."
-
-msgid "Album deleted successfully."
-msgstr "تم حذف الألبوم بنجاح."
-
 msgid "Album not found."
 msgstr "لم يتم العثور على الألبوم."
 
-msgid "Reports retrieved successfully."
-msgstr "تم استرجاع التقارير بنجاح."
+msgid "Albums fetched successfully."
+msgstr "تم جلب الألبومات بنجاح."
 
-msgid "Post Report Submitted Successfully."
-msgstr "تم إرسال التقرير بنجاح."
-
-msgid "Fields retrieved successfully."
-msgstr "تم استرجاع الحقول بنجاح."
-
-msgid "Field created successfully."
-msgstr "تم إنشاء الحقل بنجاح."
-
-msgid "Field creation failed."
-msgstr "فشل إنشاء الحقل."
-
-msgid "Gender retrieved successfully."
-msgstr "تم استرجاع الجنس بنجاح."
-
-msgid "Playing positions retrieved successfully."
-msgstr "تم استرجاع مواقع اللعب بنجاح."
-
-msgid "Playing foot retrieved successfully."
-msgstr "تم استرجاع القدم التي لعبت بنجاح."
-
-msgid "user role retrieved successfully."
-msgstr "تم استرجاع دور المستخدم بنجاح."
-
-msgid "Countries fetched successfully."
-msgstr "تم جلب البلدان بنجاح."
-
-msgid "Country not found or inactive."
-msgstr "لم يتم العثور على البلد أو غير نشط."
-
-msgid "Old password is incorrect."
-msgstr "كلمة المرور القديمة غير صحيحة."
-
-msgid "New password must be at least 8 characters long."
-msgstr "يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل."
-
-msgid "No profile picture provided."
-msgstr "لم يتم توفير صورة شخصية."
-
-msgid "Profile Image updated successfully."
-msgstr "تم تحديث صورة الملف الشخصي بنجاح."
-
-msgid "created_by_id parameter is required."
-msgstr "المعلمة created_by_id مطلوبة."
-
-msgid "Player Details."
-msgstr "تفاصيل اللاعب."
-
-msgid "Invalid playing foot specified."
-msgstr "قدم اللعب المحددة غير صالحة."
-
-msgid "The specified playing foot does not exist."
-msgstr "القدم المحددة للعب غير موجودة."
-
-msgid "Invalid date format for date_of_birth."
-msgstr "تنسيق التاريخ غير صالح لتاريخ الميلاد."
-
-msgid "Invalid main playing position specified."
-msgstr "تم تحديد موضع لعب رئيسي غير صالح."
-
-msgid "Invalid secondary playing position specified."
-msgstr "تم تحديد موضع لعب ثانوي غير صالح."
-
-msgid "Invalid gender specified."
-msgstr "تم تحديد جنس غير صالح."
-
-msgid "Invalid country specified."
-msgstr "تم تحديد بلد غير صالح."
-
-msgid "City cannot be set without a valid country."
-msgstr "لا يمكن تعيين المدينة بدون بلد صالح."
-
-msgid "Invalid city specified."
-msgstr "تم تحديد مدينة غير صالحة."
-
-msgid "Profile updated successfully."
-msgstr "تم تحديث الملف الشخصي بنجاح."
-
-msgid "Page Not Found"
-msgstr "لم يتم العثور على الصفحة"
-
-msgid "Post ID is required."
-msgstr "معرف البريد مطلوب."
-
-msgid "Post not found."
-msgstr "لم يتم العثور على المنشور."
-
-msgid "Invalid creator type."
-msgstr "نوع المنشئ غير صالح."
-
-msgid "Post unliked successfully."
-msgstr "تم إلغاء إعجابك بالمنشور بنجاح."
-
-msgid "Post liked successfully."
-msgstr "تم الإعجاب بالمنشور بنجاح."
-
-msgid "Invalid creator type for post."
-msgstr "نوع المنشئ غير صالح للنشر."
-
-msgid "Post Liked!"
-msgstr "تم الإعجاب بالمنشور!"
+msgid "All fields are required."
+msgstr "جميع الحقول مطلوبة."
 
 msgid "All posts fetched successfully."
-msgstr "تم جلب كافة المشاركات بنجاح."
+msgstr "تم جلب جميع المنشورات بنجاح."
 
-msgid "Posts fetched successfully."
-msgstr "تم جلب المشاركات بنجاح."
+msgid "All team slots in this tournament are filled."
+msgstr "تم شغل جميع أماكن الفرق في هذه البطولة."
 
-msgid "created_by_id and creator_type are required."
-msgstr "يجب أن يكون created_by_id و Creator_type مطلوبين."
+msgid "All tournament_id, team_a, and team_b are required."
+msgstr "معرّف البطولة والفريق أ والفريق ب مطلوبة."
 
-msgid "Post created successfully"
-msgstr "تم إنشاء المنشور بنجاح"
-
-msgid "Invalid data"
-msgstr "بيانات غير صالحة"
-
-msgid "New Post Alert!"
-msgstr "تنبيه بمنشور جديد!"
-
-msgid "Post fetched successfully."
-msgstr "تم جلب المنشور بنجاح."
-
-msgid "Post updated successfully."
-msgstr "تم تحديث المنشور بنجاح."
-
-msgid "Failed to update the post."
-msgstr "فشل في تحديث المنشور."
-
-msgid "Post details fetched successfully."
-msgstr "تم جلب تفاصيل المشاركة بنجاح."
-
-msgid "No comments found for this post."
-msgstr "لم يتم العثور على تعليقات لهذه التدوينة."
-
-msgid "Comments fetched successfully."
-msgstr "تم جلب التعليقات بنجاح."
-
-msgid "post_id and comment are required."
-msgstr "post_id والتعليق مطلوبان."
-
-msgid "Parent comment not found."
-msgstr "لم يتم العثور على تعليق الوالدين."
-
-msgid "Invalid creator type for recipient."
-msgstr "نوع المنشئ غير صالح للمستلم."
-
-msgid "New Reply on Your Comment!"
-msgstr "رد جديد على تعليقك!"
-
-msgid "Group not found."
-msgstr "لم يتم العثور على المجموعة."
-
-msgid "You can only create one Training Group."
-msgstr "يمكنك إنشاء مجموعة تدريب واحدة فقط."
+msgid "An error occurred while adding the player to the lineup."
+msgstr "حدث خطأ أثناء إضافة اللاعب إلى التشكيلة."
 
 msgid "An error occurred while checking your existing Training Groups."
 msgstr "حدث خطأ أثناء التحقق من مجموعات التدريب الموجودة لديك."
 
-msgid "The username is already Taken."
-msgstr "اسم المستخدم تم أخذه بالفعل."
+msgid "An error occurred while fetching player stats."
+msgstr "حدث خطأ أثناء جلب إحصائيات اللاعب."
 
-msgid "Group created successfully."
-msgstr "تم إنشاء المجموعة بنجاح."
+msgid "An error occurred while registering the user."
+msgstr "حدث خطأ أثناء تسجيل المستخدم."
 
-msgid "Failed to create group."
-msgstr "فشل في إنشاء المجموعة."
-
-msgid "Group updated successfully."
-msgstr "تم تحديث المجموعة بنجاح."
-
-msgid "Group not found or you are not the founder."
-msgstr "لم يتم العثور على المجموعة أو أنت لست المؤسس."
-
-msgid "Invalid page number."
-msgstr "رقم الصفحة غير صالح."
-
-msgid "Group members fetched successfully."
-msgstr "تم جلب أعضاء المجموعة بنجاح."
-
-msgid "User ID and Group ID are required."
-msgstr "معرف المستخدم ومعرف المجموعة مطلوبان."
-
-msgid "User is already an organizer and cannot be changed to a member."
-msgstr "المستخدم هو بالفعل منظم ولا يمكن تغييره إلى عضو."
-
-msgid "User upgraded to organizer in the group."
-msgstr "تمت ترقية المستخدم إلى المنظم في المجموعة."
-
-msgid "User is already a member of this group."
-msgstr "المستخدم هو بالفعل عضو في هذه المجموعة."
-
-msgid "User added as {role} to the group."
-msgstr "تمت إضافة المستخدم كـ {role} إلى المجموعة."
-
-msgid "Membership not found."
-msgstr "لم يتم العثور على العضوية."
-
-msgid "Cannot delete an organizer from the group."
-msgstr "لا يمكن حذف المنظم من المجموعة."
-
-msgid "Member deleted successfully."
-msgstr "تم حذف العضو بنجاح."
-
-msgid "Team joining request updated successfully."
-msgstr "تم تحديث طلب الانضمام للفريق بنجاح."
-
-msgid "All team slots in this tournament are filled."
-msgstr "تم ملء جميع أماكن الفرق في هذه البطولة."
-
-msgid "Tournament Group Team status updated to accepted."
-msgstr "تم تحديث حالة فريق مجموعة البطولة إلى مقبول."
-
-msgid "The team does not exist in the tournament. Please ensure the team is already added."
-msgstr "الفريق غير موجود في البطولة. يرجى التأكد من إضافة الفريق بالفعل."
-
-msgid "Team Fetched successfully."
-msgstr "تم جلب الفريق بنجاح."
-
-msgid "Team is not part of the tournament or the request does not exist."
-msgstr "الفريق ليس جزءًا من البطولة أو الطلب غير موجود."
-
-msgid "Team rejected successfully."
-msgstr "تم رفض الفريق بنجاح."
-
-msgid "Options Fetched Successfully"
-msgstr "تم جلب الخيارات بنجاح"
-
-msgid "Games fetched successfully."
-msgstr "تم جلب الألعاب بنجاح."
-
-msgid "Both tournament_id, game_number, team_a, and team_b are required."
-msgstr "يجب أن يكون لديك كل من tournament_id وgame_number وteam_a وteam_b."
-
-msgid "This game number already exists for the specified tournament. Please choose a different game number."
-msgstr "رقم اللعبة هذا موجود بالفعل للبطولة المحددة. يرجى اختيار رقم لعبة آخر."
-
-msgid "Game created successfully."
-msgstr "تم إنشاء اللعبة بنجاح."
-
-msgid "Failed to create game."
-msgstr "فشل في إنشاء اللعبة."
+msgid "An error occurred while sending OTP."
+msgstr "حدث خطأ أثناء إرسال رمز التحقق."
 
 msgid "An unexpected error occurred."
 msgstr "حدث خطأ غير متوقع."
-
-msgid "Tournament game not found."
-msgstr "لم يتم العثور على لعبة البطولة."
-
-msgid "Stats fetched successfully"
-msgstr "تم جلب الإحصائيات بنجاح"
-
-msgid "Tournament ID is required"
-msgstr "معرف البطولة مطلوب"
-
-msgid "No games found for this tournament"
-msgstr "لم يتم العثور على ألعاب لهذه البطولة"
-
-msgid "Tournament Group Points Table fetched successfully."
-msgstr "تم جلب جدول نقاط مجموعة البطولة بنجاح."
-
-msgid "Tournament Group Team added successfully."
-msgstr "تمت إضافة فريق مجموعة البطولة بنجاح."
-
-msgid "No team found to add."
-msgstr "لم يتم العثور على فريق لإضافته."
-
-msgid "No upcoming games found for the user."
-msgstr "لم يتم العثور على ألعاب قادمة للمستخدم."
-
-msgid "tournament_id is required."
-msgstr "يجب أن يكون tournament_id مطلوبًا."
-
-msgid "Training ID is required."
-msgstr "معرف التدريب مطلوب."
-
-msgid "Training details fetched successfully."
-msgstr "تم جلب تفاصيل التدريب بنجاح."
-
-msgid "Training not found."
-msgstr "لم يتم العثور على التدريب."
-
-msgid "Training unliked successfully."
-msgstr "تم التدريب بنجاح."
-
-msgid "Training liked successfully."
-msgstr "تم التدريب بنجاح."
-
-msgid "No comments found for this Training."
-msgstr "لم يتم العثور على تعليقات لهذا التدريب."
-
-msgid "training_id, comment, created_by_id and creator_type are required."
-msgstr "كل من training_id و comment و created_by_id و Creator_type مطلوبة."
-
-msgid "Please add your gender first."
-msgstr "يرجى إضافة جنسك أولاً."
-
-msgid "Only Players can Join training."
-msgstr "يمكن للاعبين فقط الانضمام إلى التدريب."
-
-msgid "User is already a member of the training."
-msgstr "المستخدم هو بالفعل عضو في التدريب."
-
-msgid "User joined the training successfully."
-msgstr "انضم المستخدم إلى التدريب بنجاح."
-
-msgid "User membership retrieved successfully."
-msgstr "تم استرجاع عضوية المستخدم بنجاح."
-
-msgid "User is not a member of the training."
-msgstr "المستخدم ليس عضوا في التدريب."
-
-msgid "User does not have access to delete this training."
-msgstr "ليس لدى المستخدم القدرة على حذف هذا التدريب."
-
-msgid "User membership deleted successfully."
-msgstr "تم حذف عضوية المستخدم بنجاح."
-
-msgid "Group ID is required."
-msgstr "معرف المجموعة مطلوب."
-
-msgid "Group details retrieved successfully."
-msgstr "تم استرجاع تفاصيل المجموعة بنجاح."
-
-msgid "{team_name} added you as {joinning_type_name}"
-msgstr "لقد أضافك {team_name} كـ {joinning_type_name}"
-
-msgid "Failed to add staff/player."
-msgstr "فشل في إضافة الموظفين/اللاعبين."
-
-msgid "User has already joined this branch."
-msgstr "لقد انضم المستخدم بالفعل إلى هذا الفرع."
-
-msgid "branch_id and user_id are required"
-msgstr "مطلوب معرف الفرع ومعرف المستخدم"
-
-msgid "Player removed from the branch successfully."
-msgstr "تمت إزالة اللاعب من الفرع بنجاح."
-
-msgid "No player found with the given user_id in the specified branch."
-msgstr "لم يتم العثور على لاعب يحمل معرف المستخدم المحدد في الفرع المحدد."
-
-msgid "Error occurred while removing the player."
-msgstr "حدث خطأ أثناء إزالة المشغل."
-
-msgid "No data found."
-msgstr "لم يتم العثور على أي بيانات."
-
-msgid "Invalid search type. Must be 1, 2, 3, or 4."
-msgstr "نوع البحث غير صالح. يجب أن يكون 1، 2، 3، أو 4."
-
-msgid "team_id is required"
-msgstr "team_id مطلوب"
-
-msgid "No branches found for the given team ID."
-msgstr "لم يتم العثور على فروع لمعرف الفريق المحدد."
-
-msgid "Tournament not found."
-msgstr "لم يتم العثور على البطولة."
-
-msgid "Tournament unliked successfully."
-msgstr "تم إلغاء إعجابك بالبطولة بنجاح."
-
-msgid "Tournament liked successfully."
-msgstr "تمت البطولة بنجاح."
-
-msgid "No comments found for this tournament."
-msgstr "لم يتم العثور على تعليقات لهذه البطولة."
-
-msgid "tournament_id, comment, created_by_id and creator_type are required."
-msgstr "يجب أن تكون tournament_id و comment و created_by_id و Creator_type."
-
-msgid "Tournaments fetched successfully."
-msgstr "تم جلب البطولات بنجاح."
-
-msgid "Invalid team ID. Team not found."
-msgstr "معرف الفريق غير صالح. لم يتم العثور على الفريق."
-
-msgid "Tournament created successfully."
-msgstr "تم إنشاء البطولة بنجاح."
-
-msgid "Tournament creation failed."
-msgstr "فشل إنشاء البطولة."
-
-msgid "Tournament updated successfully."
-msgstr "تم تحديث البطولة بنجاح."
-
-msgid "Tournament update failed."
-msgstr "فشل تحديث البطولة."
-
-msgid "Tournament deleted successfully."
-msgstr "تم حذف البطولة بنجاح."
-
-msgid "You do not have access."
-msgstr "ليس لديك إمكانية الوصول."
-
-msgid "Invalid creator details."
-msgstr "تفاصيل المنشئ غير صالحة."
-
-msgid "You have not created any tournament yet..."
-msgstr "لم تقم بإنشاء أي بطولة بعد..."
-
-msgid "Tournament details fetched successfully."
-msgstr "تم جلب تفاصيل البطولة بنجاح."
-
-msgid "Group table retrieved successfully."
-msgstr "تم استرجاع جدول المجموعة بنجاح."
-
-msgid "No groups found for the specified tournament."
-msgstr "لم يتم العثور على مجموعات للبطولة المحددة."
-
-msgid "Tournament Group Teams fetched successfully."
-msgstr "تم جلب فرق مجموعة البطولة بنجاح."
-
-msgid "team_id, group_id, and tournament_id are required."
-msgstr "team_id، group_id، و tournament_id مطلوبة."
-
-msgid "Tournament does not exist."
-msgstr "البطولة غير موجودة."
-
-msgid "The provided group does not belong to the specified tournament."
-msgstr "المجموعة المقدمة لا تنتمي إلى البطولة المحددة."
-
-msgid "The team is already assigned to another group in this tournament."
-msgstr "لقد تم تعيين الفريق بالفعل في مجموعة أخرى في هذه البطولة."
-
-msgid "Tournament Group Team updated successfully."
-msgstr "تم تحديث فريق مجموعة البطولة بنجاح."
-
-msgid "No existing assignment found to update."
-msgstr "لم يتم العثور على أي مهمة موجودة للتحديث."
-
-msgid "You are not assigned as a manager to any branch."
-msgstr "لم يتم تعيينك كمدير لأي فرع."
-
-msgid "Only managers can perform this action."
-msgstr "يمكن للمديرين فقط تنفيذ هذا الإجراء."
-
-msgid "Team does not exist."
-msgstr "الفريق غير موجود."
-
-msgid "This team has already requested or is already accepted into the tournament."
-msgstr "لقد طلب هذا الفريق بالفعل المشاركة في البطولة أو تم قبوله بالفعل."
 
 msgid "Booking Approved"
 msgstr "تمت الموافقة على الحجز"
@@ -1271,116 +95,1379 @@ msgstr "تمت الموافقة على الحجز"
 msgid "Booking Rejected"
 msgstr "تم رفض الحجز"
 
-msgid "Event Notification!"
-msgstr "إشعار الحدث!"
+msgid "Booking creation failed."
+msgstr "فشل إنشاء الحجز."
+
+msgid "Both Team A and Team B IDs are required"
+msgstr "يجب إدخال معرفات الفريق أ والفريق ب معاً."
+
+msgid "Both game_id and official_id are required."
+msgstr "يجب إدخال معرف اللعبة ومعرف المسؤول معاً."
+
+msgid "Both player_id and position_1 are required."
+msgstr "يجب إدخال معرف اللاعب والموقع الأول معاً."
+
+msgid "Branch not found."
+msgstr "لم يتم العثور على الفرع."
+
+msgid "Cannot delete a game that has already Started."
+msgstr "لا يمكن حذف لعبة بدأت بالفعل."
+
+msgid "Cannot delete an organizer from the group."
+msgstr "لا يمكن حذف المنظم من المجموعة."
+
+msgid "Cannot modify stats for a finished game."
+msgstr "لا يمكن تعديل إحصائيات لعبة منتهية."
+
+msgid "Categories retrieved successfully."
+msgstr "تم استرجاع الفئات بنجاح."
+
+msgid "Cities fetched successfully."
+msgstr "تم جلب المدن بنجاح."
+
+msgid "City cannot be set without a valid country."
+msgstr "لا يمكن تعيين المدينة بدون بلد صالح."
+
+msgid "Colors retrieved successfully."
+msgstr "تم استرجاع الألوان بنجاح."
+
+msgid "Comment created successfully."
+msgstr "تم إنشاء التعليق بنجاح."
+
+msgid "Comments fetched successfully."
+msgstr "تم جلب التعليقات بنجاح."
+
+msgid "Countries fetched successfully."
+msgstr "تم جلب البلدان بنجاح."
+
+msgid "Country not found or inactive."
+msgstr "البلد غير موجود أو غير نشط."
+
+msgid "Current language updated successfully."
+msgstr "تم تحديث اللغة الحالية بنجاح."
 
 msgid "Current type updated successfully."
 msgstr "تم تحديث النوع الحالي بنجاح."
 
+msgid "Data fetched successfully."
+msgstr "تم جلب البيانات بنجاح."
+
+msgid "Data retrieved successfully."
+msgstr "تم استرجاع البيانات بنجاح."
+
+msgid "Detailed Albums added successfully."
+msgstr "تمت إضافة الألبومات التفصيلية بنجاح."
+
+msgid "Email already in use."
+msgstr "البريد الإلكتروني قيد الاستخدام بالفعل."
+
+msgid "Email does not exist. Please register first."
+msgstr "البريد الإلكتروني غير موجود. يرجى التسجيل أولاً."
+
+msgid "Error occurred while fetching Age Groups list."
+msgstr "حدث خطأ أثناء جلب قائمة مجموعات الأعمار."
+
+msgid "Error occurred while removing the player."
+msgstr "حدث خطأ أثناء إزالة اللاعب."
+
+msgid "Event Booking Detail Fetched successfully."
+msgstr "تم جلب تفاصيل حجز الفعالية بنجاح."
+
+msgid "Event ID is required."
+msgstr "معرّف الفعالية مطلوب."
+
+msgid "Event Liked!"
+msgstr "تم الإعجاب بالفعالية!"
+
+msgid "Event Notification"
+msgstr "إشعار الفعالية"
+
+msgid "Event Notification!"
+msgstr "إشعار الفعالية!"
+
+msgid "Event created successfully."
+msgstr "تم إنشاء الفعالية بنجاح."
+
+msgid "Event deleted successfully."
+msgstr "تم حذف الفعالية بنجاح."
+
+msgid "Event liked successfully."
+msgstr "تم الإعجاب بالفعالية بنجاح."
+
+msgid "Event not found or you are not authorized to delete this event."
+msgstr "لم يتم العثور على الفعالية أو أنك غير مخول لحذف هذه الفعالية."
+
+msgid "Event not found or you are not authorized to update this event."
+msgstr "لم يتم العثور على الفعالية أو أنك غير مخول لتحديث هذه الفعالية."
+
+msgid "Event not found."
+msgstr "لم يتم العثور على الفعالية."
+
+msgid "Event unliked successfully."
+msgstr "تم إزالة الإعجاب بالفعالية بنجاح."
+
+msgid "Event updated successfully."
+msgstr "تم تحديث الفعالية بنجاح."
+
+msgid "Events fetched successfully."
+msgstr "تم جلب الفعاليات بنجاح."
+
+msgid "Events retrieved successfully."
+msgstr "تم استرجاع الفعاليات بنجاح."
+
+msgid "FAQ retrieved successfully."
+msgstr "تم استرجاع الأسئلة الشائعة بنجاح."
+
+msgid "Failed to add staff/player."
+msgstr "فشل في إضافة الموظف/اللاعب."
+
+msgid "Failed to create gallery entry."
+msgstr "فشل في إنشاء إدخال المعرض."
+
+msgid "Failed to create game."
+msgstr "فشل في إنشاء اللعبة."
+
+msgid "Failed to create group."
+msgstr "فشل في إنشاء المجموعة."
+
+msgid "Failed to log player substitution."
+msgstr "فشل في تسجيل استبدال اللاعب."
+
+msgid "Failed to log substitution."
+msgstr "فشل في تسجيل الاستبدال."
+
+msgid "Failed to send notification: "
+msgstr "فشل في إرسال الإشعار: "
+
 msgid "Failed to update current type."
 msgstr "فشل في تحديث النوع الحالي."
 
-msgid "Username already exists."
-msgstr "اسم المستخدم موجود بالفعل."
+msgid "Failed to update the event."
+msgstr "فشل في تحديث الفعالية."
 
-msgid "OTP sent successfully."
-msgstr "تم إرسال OTP بنجاح."
+msgid "Failed to update the post."
+msgstr "فشل في تحديث المنشور."
 
-msgid "Phone number already exists."
-msgstr "رقم الهاتف موجود بالفعل."
+msgid "Field created successfully."
+msgstr "تم إنشاء الحقل بنجاح."
 
-msgid "Email is required."
-msgstr "البريد الإلكتروني مطلوب."
+msgid "Field creation failed."
+msgstr "فشل إنشاء الحقل."
 
-msgid "Invalid email format."
-msgstr "تنسيق البريد الإلكتروني غير صالح."
+msgid "Fields fetched successfully."
+msgstr "تم جلب الحقول بنجاح."
 
-msgid "Email already exists."
-msgstr "البريد الإلكتروني موجود بالفعل."
+msgid "Fields retrieved successfully."
+msgstr "تم استرجاع الحقول بنجاح."
 
-msgid "User can proceed with registration."
-msgstr "يمكن للمستخدم المضي قدما في التسجيل."
+msgid "Followed successfully."
+msgstr "تمت المتابعة بنجاح."
 
-msgid "Invalid registration type."
-msgstr "نوع التسجيل غير صالح."
+msgid "For GROUP_TYPE, created_by_id must correspond to an existing Group."
+msgstr "بالنسبة لنوع المجموعة (GROUP_TYPE)، يجب أن يتطابق created_by_id مع مجموعة موجودة."
 
-msgid "An error occurred while sending OTP."
-msgstr "حدث خطأ أثناء إرسال OTP."
+msgid "For TEAM_TYPE, created_by_id must correspond to an existing Team."
+msgstr "بالنسبة لنوع الفريق (TEAM_TYPE)، يجب أن يتطابق created_by_id مع فريق موجود."
 
-msgid "Phone is a required field."
-msgstr "الهاتف هو حقل مطلوب."
+msgid "Friendly game created successfully."
+msgstr "تم إنشاء اللعبة الودية بنجاح."
 
-msgid "OTP is a required field."
-msgstr "OTP هو حقل مطلوب."
+msgid "Friendly game fetched successfully."
+msgstr "تم جلب اللعبة الودية بنجاح."
 
-msgid "Username is a required field."
-msgstr "اسم المستخدم هو حقل مطلوب."
+msgid "Friendly game not found."
+msgstr "لم يتم العثور على اللعبة الودية."
+
+msgid "Gallery entry created successfully."
+msgstr "تم إنشاء إدخال المعرض بنجاح."
+
+msgid "Gallery entry creation failed."
+msgstr "فشل في إنشاء إدخال المعرض."
+
+msgid "Game Deleted successfully."
+msgstr "تم حذف اللعبة بنجاح."
+
+msgid "Game ID and officials are required."
+msgstr "معرّف اللعبة والمسؤولون مطلوبون."
+
+msgid "Game ID is required."
+msgstr "معرّف اللعبة مطلوب."
+
+msgid "Game created successfully."
+msgstr "تم إنشاء اللعبة بنجاح."
+
+msgid "Game field id is required."
+msgstr "معرّف حقل اللعبة مطلوب."
+
+msgid "Game field not found."
+msgstr "لم يتم العثور على حقل اللعبة."
+
+msgid "Game id is required."
+msgstr "معرّف اللعبة مطلوب."
+
+msgid "Game is already started."
+msgstr "اللعبة قد بدأت بالفعل."
+
+msgid "Game not exists"
+msgstr "اللعبة غير موجودة."
+
+msgid "Game not found for the given tournament."
+msgstr "لم يتم العثور على اللعبة للبطولة المحددة."
+
+msgid "Game not found or not created by you."
+msgstr "لم يتم العثور على اللعبة أو أنها ليست من إنشائك."
+
+msgid "Game not found with the given criteria."
+msgstr "لم يتم العثور على اللعبة مع المعايير المحددة."
+
+msgid "Game not found."
+msgstr "لم يتم العثور على اللعبة."
+
+msgid "Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59)."
+msgstr "وقت اللعبة مطلوب ويجب أن يكون بتنسيق hh:mm:ss (00:00:00 إلى 23:59:59)."
+
+msgid "Game updated successfully."
+msgstr "تم تحديث اللعبة بنجاح."
+
+msgid "Games fetched successfully."
+msgstr "تم جلب الألعاب بنجاح."
+
+msgid "Gender retrieved successfully."
+msgstr "تم استرجاع الجنس بنجاح."
+
+msgid "General Settings retrieved successfully."
+msgstr "تم استرجاع الإعدادات العامة بنجاح."
+
+msgid "Group ID is required."
+msgstr "معرّف المجموعة مطلوب."
+
+msgid "Group created successfully."
+msgstr "تم إنشاء المجموعة بنجاح."
+
+msgid "Group details retrieved successfully."
+msgstr "تم استرجاع تفاصيل المجموعة بنجاح."
+
+msgid "Group members fetched successfully."
+msgstr "تم جلب أعضاء المجموعة بنجاح."
+
+msgid "Group not found or you are not the founder."
+msgstr "لم يتم العثور على المجموعة أو أنك لست المؤسس."
+
+msgid "Group not found."
+msgstr "لم يتم العثور على المجموعة."
+
+msgid "Group table retrieved successfully."
+msgstr "تم استرجاع جدول المجموعة بنجاح."
+
+msgid "Group updated successfully."
+msgstr "تم تحديث المجموعة بنجاح."
+
+msgid "H2H Fetch Successfully"
+msgstr "تم جلب H2H بنجاح."
+
+msgid "Image gallery entries fetched successfully."
+msgstr "تم جلب إدخالات معرض الصور بنجاح."
+
+msgid "Injury fetched successfully."
+msgstr "تم جلب الإصابة بنجاح."
 
 msgid "Invalid OTP or phone number."
-msgstr "OTP أو رقم الهاتف غير صالح."
-
-msgid "User registered successfully"
-msgstr "تم تسجيل المستخدم بنجاح"
-
-msgid "An error occurred while registering the user."
-msgstr "حدث خطأ أثناء تسجيل المستخدم."
-
-msgid "This phone number is linked to a deleted account. Please register again."
-msgstr "هذا رقم الهاتف مرتبط بحساب محذوف. يرجى التسجيل مرة أخرى."
-
-msgid "You Cannot Login Here"
-msgstr "لا يمكنك تسجيل الدخول هنا"
-
-msgid "Login successful"
-msgstr "تم تسجيل الدخول بنجاح"
-
-msgid "Invalid credentials"
-msgstr "بيانات اعتماد غير صالحة"
-
-msgid "User does not exist with this username or phone."
-msgstr "لا يوجد مستخدم موجود بهذا الاسم أو الهاتف."
-
-msgid "Your account has been deleted. Please contact support."
-msgstr "لقد تم حذف حسابك. يرجى الاتصال بالدعم."
-
-msgid "Account is inactive"
-msgstr "الحساب غير نشط"
-
-msgid "Logout successful"
-msgstr "تم تسجيل الخروج بنجاح"
-
-msgid "Logout failed"
-msgstr "فشل تسجيل الخروج"
-
-msgid "Reasons fetched successfully."
-msgstr "تم جلب الأسباب بنجاح."
-
-msgid "Invalid deletion reason ID. It must be an integer."
-msgstr "معرف سبب الحذف غير صالح. يجب أن يكون عددًا صحيحًا."
-
-msgid "Invalid deletion reason ID."
-msgstr "معرف سبب الحذف غير صالح."
-
-msgid "Your account has been deleted successfully."
-msgstr "لقد تم حذف حسابك بنجاح."
-
-msgid "OTP sent to your phone."
-msgstr "تم إرسال OTP إلى هاتفك."
-
-msgid "User with this phone number does not exist."
-msgstr "المستخدم بهذا رقم الهاتف غير موجود."
-
-msgid "Invalid data."
-msgstr "بيانات غير صالحة."
-
-msgid "OTP verified successfully."
-msgstr "تم التحقق من OTP بنجاح."
+msgstr "رمز التحقق أو رقم الهاتف غير صحيح."
 
 msgid "Invalid OTP."
-msgstr "OTP غير صالح."
+msgstr "رمز التحقق غير صحيح."
+
+msgid "Invalid city ID provided."
+msgstr "تم توفير معرّف مدينة غير صحيح."
+
+msgid "Invalid city specified."
+msgstr "تم تحديد مدينة غير صحيحة."
+
+msgid "Invalid country ID provided."
+msgstr "تم توفير معرّف بلد غير صحيح."
+
+msgid "Invalid country specified."
+msgstr "تم تحديد بلد غير صحيح."
+
+msgid "Invalid creator details."
+msgstr "تفاصيل المنشئ غير صحيحة."
+
+msgid "Invalid creator type for post."
+msgstr "نوع المنشئ غير صحيح للمنشور."
+
+msgid "Invalid creator type for recipient."
+msgstr "نوع المنشئ غير صحيح للمستلم."
+
+msgid "Invalid creator type."
+msgstr "نوع المنشئ غير صحيح."
+
+msgid "Invalid credentials"
+msgstr "بيانات الاعتماد غير صحيحة."
+
+msgid "Invalid data"
+msgstr "بيانات غير صحيحة."
+
+msgid "Invalid data."
+msgstr "بيانات غير صحيحة."
+
+msgid "Invalid date format."
+msgstr "تنسيق التاريخ غير صحيح."
+
+msgid "Invalid deletion reason ID."
+msgstr "معرّف سبب الحذف غير صحيح."
+
+msgid "Invalid deletion reason ID. It must be an integer."
+msgstr "معرّف سبب الحذف غير صحيح. يجب أن يكون عدد صحيح."
+
+msgid "Invalid email format."
+msgstr "تنسيق البريد الإلكتروني غير صحيح."
+
+msgid "Invalid events_section value. Allowed values are 1 or 2."
+msgstr "قيمة events_section غير صحيحة. القيم المسموح بها هي 1 أو 2."
+
+msgid "Invalid events_section value. It must be an integer."
+msgstr "قيمة events_section غير صحيحة. يجب أن تكون عدد صحيح."
+
+msgid "Invalid gender specified."
+msgstr "الجنس المحدد غير صحيح."
+
+msgid "Invalid group ID."
+msgstr "معرّف المجموعة غير صحيح."
+
+msgid "Invalid id of Team B."
+msgstr "معرّف الفريق ب غير صحيح."
+
+msgid "Invalid is_confirm value. It must be 1, 0, true, or false."
+msgstr "قيمة is_confirm غير صحيحة. يجب أن تكون 1 أو 0 أو true أو false."
+
+msgid "Invalid main playing position specified."
+msgstr "المركز الرئيسي المحدد للعب غير صحيح."
+
+msgid "Invalid or missing current_language. It must be either 'en' or 'ar'."
+msgstr "اللغة الحالية غير صحيحة أو مفقودة. يجب أن تكون 'en' أو 'ar'."
+
+msgid "Invalid page number."
+msgstr "رقم الصفحة غير صحيح."
+
+msgid "Invalid playing foot specified."
+msgstr "القدم المحددة للعب غير صحيحة."
+
+msgid "Invalid profile type."
+msgstr "نوع الملف الشخصي غير صحيح."
+
+msgid "Invalid recipient type."
+msgstr "نوع المستلم غير صحيح."
+
+msgid "Invalid registration type."
+msgstr "نوع التسجيل غير صحيح."
+
+msgid "Invalid request data."
+msgstr "بيانات الطلب غير صحيحة."
+
+msgid "Invalid search type."
+msgstr "نوع البحث غير صحيح."
+
+msgid "Invalid search type. Must be 1, 2, 3, or 4."
+msgstr "نوع البحث غير صحيح. يجب أن يكون 1 أو 2 أو 3 أو 4."
+
+msgid "Invalid secondary playing position specified."
+msgstr "المركز الثانوي المحدد للعب غير صحيح."
+
+msgid "Invalid status value. Only APPROVED or REJECT are allowed."
+msgstr "قيمة الحالة غير صحيحة. القيم المسموح بها هي APPROVED أو REJECT."
+
+msgid "Invalid target type."
+msgstr "نوع الهدف غير صحيح."
+
+msgid "Invalid team ID."
+msgstr "معرّف الفريق غير صحيح."
+
+msgid "Invalid team ID. Team not found."
+msgstr "معرّف الفريق غير صحيح. لم يتم العثور على الفريق."
+
+msgid "Invalid team type provided."
+msgstr "نوع الفريق المقدم غير صحيح."
+
+msgid "Invalid team_id."
+msgstr "معرّف الفريق غير صحيح."
+
+msgid "Jersey Number added Successfully"
+msgstr "تم إضافة رقم القميص بنجاح."
+
+msgid "Jersey Numbers Updated Successfully"
+msgstr "تم تحديث أرقام القمصان بنجاح."
+
+msgid "Jersey number Deleted"
+msgstr "تم حذف رقم القميص."
+
+msgid "Jersey number deleted."
+msgstr "تم حذف رقم القميص."
+
+msgid "Lineup Player Removed successfully."
+msgstr "تم إزالة اللاعب من التشكيلة بنجاح."
+
+msgid "Lineup entries removed successfully."
+msgstr "تم إزالة إدخالات التشكيلة بنجاح."
+
+msgid "Lineup entry not found with the specified criteria."
+msgstr "لم يتم العثور على إدخال التشكيلة مع المعايير المحددة."
+
+msgid "Lineup entry not found."
+msgstr "لم يتم العثور على إدخال التشكيلة."
+
+msgid "Lineup not found"
+msgstr "لم يتم العثور على التشكيلة."
+
+msgid "Lineup not found for this player."
+msgstr "لم يتم العثور على التشكيلة لهذا اللاعب."
+
+msgid "Lineup not found."
+msgstr "لم يتم العثور على التشكيلة."
+
+msgid "Lineup players and manager fetched successfully for both teams."
+msgstr "تم جلب اللاعبين والمدير للتشكيلة بنجاح لكلا الفريقين."
+
+msgid "Lineup players fetched successfully with status 'ADDED'."
+msgstr "تم جلب اللاعبين للتشكيلة بنجاح مع حالة 'ADDED'."
+
+msgid "Lineup players fetched successfully."
+msgstr "تم جلب اللاعبين للتشكيلة بنجاح."
+
+msgid "Lineup reset successfully."
+msgstr "تم إعادة تعيين التشكيلة بنجاح."
+
+msgid "Lineup updated successfully."
+msgstr "تم تحديث التشكيلة بنجاح."
+
+msgid "Lineups retrieved successfully."
+msgstr "تم استرجاع التشكيلات بنجاح."
+
+msgid "Login successful"
+msgstr "تم تسجيل الدخول بنجاح."
+
+msgid "Logout failed"
+msgstr "فشل تسجيل الخروج."
+
+msgid "Logout successful"
+msgstr "تم تسجيل الخروج بنجاح."
+
+msgid "Manager added successfully, and user role updated to manager."
+msgstr "تم إضافة المدير بنجاح، وتم تحديث دور المستخدم إلى مدير."
+
+msgid "Media ID is required."
+msgstr "معرّف الوسائط مطلوب."
+
+msgid "Member deleted successfully."
+msgstr "تم حذف العضو بنجاح."
+
+msgid "Membership not found."
+msgstr "لم يتم العثور على العضوية."
+
+msgid "New Comment on Your Event!"
+msgstr "تعليق جديد على حدثك!"
+
+msgid "New Follower!"
+msgstr "متابع جديد!"
+
+msgid "New Post Alert!"
+msgstr "تنبيه منشور جديد!"
+
+msgid "New Reply on Your Comment!"
+msgstr "رد جديد على تعليقك!"
+
+msgid "New password must be at least 8 characters long."
+msgstr "يجب أن تكون كلمة المرور الجديدة على الأقل 8 أحرف."
+
+msgid "No Official Found."
+msgstr "لم يتم العثور على مسؤول."
+
+msgid "No Team Exists"
+msgstr "لا يوجد فريق."
+
+msgid "No TeamBranch found for the given ID."
+msgstr "لم يتم العثور على فرع الفريق للمعرّف المحدد."
+
+msgid "No branches found for the given team ID."
+msgstr "لم يتم العثور على فروع للفريق باستخدام معرّف الفريق المحدد."
+
+msgid "No comments found for this Event."
+msgstr "لم يتم العثور على تعليقات لهذا الحدث."
+
+msgid "No comments found for this Training."
+msgstr "لم يتم العثور على تعليقات لهذا التدريب."
+
+msgid "No comments found for this post."
+msgstr "لم يتم العثور على تعليقات لهذا المنشور."
+
+msgid "No comments found for this tournament."
+msgstr "لم يتم العثور على تعليقات لهذا الدوري."
+
+msgid "No data available."
+msgstr "لا توجد بيانات متوفرة."
+
+msgid "No data found."
+msgstr "لم يتم العثور على بيانات."
+
+msgid "No entries found."
+msgstr "لم يتم العثور على إدخالات."
+
+msgid "No existing assignment found to update."
+msgstr "لم يتم العثور على مهمة موجودة لتحديثها."
+
+msgid "No games found for this tournament"
+msgstr "لم يتم العثور على مباريات لهذا الدوري."
+
+msgid "No general settings found."
+msgstr "لم يتم العثور على الإعدادات العامة."
+
+msgid "No groups found for the specified tournament."
+msgstr "لم يتم العثور على مجموعات للدوري المحدد."
+
+msgid "No lineups found for the provided team and game."
+msgstr "لم يتم العثور على تشكيلات للفريق والمباراة المقدمة."
+
+msgid "No matching active lineup entries found."
+msgstr "لم يتم العثور على إدخالات تشكيل نشطة مطابقة."
+
+msgid "No matching team found for this event."
+msgstr "لم يتم العثور على فريق مطابق لهذا الحدث."
+
+msgid "No official found for the given game."
+msgstr "لم يتم العثور على مسؤول للمباراة المعطاة."
+
+msgid "No player found with the given user_id in the specified branch."
+msgstr "لم يتم العثور على لاعب مع المعرف المستخدم المحدد في الفرع المعطى."
+
+msgid "No players found for the provided team."
+msgstr "لم يتم العثور على لاعبين للفريق المقدم."
+
+msgid "No players found for the specified criteria."
+msgstr "لم يتم العثور على لاعبين للمعايير المحددة."
+
+msgid "No players found."
+msgstr "لم يتم العثور على لاعبين."
+
+msgid "No profile picture provided."
+msgstr "لم يتم توفير صورة للملف الشخصي."
+
+msgid "No such friendly game exists."
+msgstr "لا توجد مباراة ودية من هذا النوع."
+
+msgid "No team found to add."
+msgstr "لم يتم العثور على فريق للإضافة."
+
+msgid "No upcoming games found for the user."
+msgstr "لم يتم العثور على مباريات قادمة للمستخدم."
+
+msgid "OTP is required."
+msgstr "الرمز لمرة واحدة (OTP) مطلوب."
+
+msgid "OTP sent successfully."
+msgstr "تم إرسال الرمز لمرة واحدة بنجاح."
+
+msgid "OTP sent to your phone number."
+msgstr "تم إرسال الرمز لمرة واحدة إلى رقم هاتفك."
+
+msgid "OTP verified successfully."
+msgstr "تم التحقق من الرمز لمرة واحدة بنجاح."
+
+msgid "Official added successfully."
+msgstr "تم إضافة المسؤول بنجاح."
+
+msgid "Official is required."
+msgstr "المسؤول مطلوب."
+
+msgid "Official removed successfully from the game."
+msgstr "تم إزالة المسؤول بنجاح من المباراة."
+
+msgid "Officials retrieved successfully."
+msgstr "تم استرجاع المسؤولين بنجاح."
+
+msgid "Old password is incorrect."
+msgstr "كلمة المرور القديمة غير صحيحة."
+
+msgid "Only Players can join closed training."
+msgstr "يمكن فقط للاعبين الانضمام إلى التدريب المغلق."
+
+msgid "Only managers, coaches, or team founders can perform this action."
+msgstr "يمكن فقط للمديرين والمدربين أو مؤسسي الفريق إجراء هذا الإجراء."
+
+msgid "Options Fetched Successfully"
+msgstr "تم جلب الخيارات بنجاح."
+
+msgid "Page Not Found"
+msgstr "الصفحة غير موجودة."
+
+msgid "Page not found."
+msgstr "الصفحة غير موجودة."
+
+msgid "Parent comment not found."
+msgstr "لم يتم العثور على التعليق الرئيسي."
 
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
 
+msgid "Phone is required."
+msgstr "رقم الهاتف مطلوب."
+
+msgid "Phone number already in use."
+msgstr "رقم الهاتف قيد الاستخدام بالفعل."
+
+msgid "Player A id is required."
+msgstr "معرف اللاعب A مطلوب."
+
+msgid "Player A not found or not in the correct lineup status."
+msgstr "لم يتم العثور على اللاعب A أو ليس في حالة التشكيل الصحيحة."
+
+msgid "Player Added"
+msgstr "تم إضافة اللاعب."
+
+msgid "Player B id is required."
+msgstr "معرف اللاعب B مطلوب."
+
+msgid "Player B not found or not in the correct lineup status."
+msgstr "لم يتم العثور على اللاعب B أو ليس في حالة التشكيل الصحيحة."
+
+msgid "Player Details."
+msgstr "تفاصيل اللاعب."
+
+msgid "Player ID, target position, team ID, and game ID are required."
+msgstr "معرف اللاعب، المركز المستهدف، معرف الفريق، ومعرف المباراة مطلوبين."
+
+msgid "Player Removed From Playing 11."
+msgstr "تم إزالة اللاعب من التشكيلة الأساسية."
+
+msgid "Player Substituted."
+msgstr "تم تبديل اللاعب."
+
+msgid "Player added successfully, and user role updated to player."
+msgstr "تم إضافة اللاعب بنجاح، وتم تحديث دور المستخدم إلى لاعب."
+
+msgid "Player id is required."
+msgstr "معرف اللاعب مطلوب."
+
+msgid "Player not found or not in correct lineup status."
+msgstr "لم يتم العثور على اللاعب أو ليس في حالة التشكيل الصحيحة."
+
+msgid "Player position updated successfully."
+msgstr "تم تحديث مركز اللاعب بنجاح."
+
+msgid "Player ready status updated successfully."
+msgstr "تم تحديث حالة جاهزية اللاعب بنجاح."
+
+msgid "Player removed from the branch successfully."
+msgstr "تم إزالة اللاعب من الفرع بنجاح."
+
+msgid "Player stats fetched successfully, but no data found. Default values returned."
+msgstr "تم جلب إحصائيات اللاعب بنجاح، ولكن لم يتم العثور على بيانات. تم إرجاع القيم الافتراضية."
+
+msgid "Player stats fetched successfully."
+msgstr "تم جلب إحصائيات اللاعب بنجاح."
+
+msgid "Player status updated successfully."
+msgstr "تم تحديث حالة اللاعب بنجاح."
+
+msgid "Player substitution successful."
+msgstr "تم التبديل بنجاح."
+
+msgid "Players Details Must Required."
+msgstr "يجب توفير تفاصيل اللاعبين."
+
+msgid "Players details are required."
+msgstr "تفاصيل اللاعبين مطلوبة."
+
+msgid "Players fetched successfully."
+msgstr "تم جلب اللاعبين بنجاح."
+
+msgid "Playing 11 Updated Successfully"
+msgstr "تم تحديث التشكيلة الأساسية بنجاح."
+
+msgid "Playing 11 Updated Successfully."
+msgstr "تم تحديث التشكيلة الأساسية بنجاح."
+
+msgid "Playing foot retrieved successfully."
+msgstr "تم استرجاع قدم اللعب بنجاح."
+
+msgid "Playing positions retrieved successfully."
+msgstr "تم استرجاع المراكز التي يلعب بها اللاعبون بنجاح."
+
+msgid "Please add your gender first."
+msgstr "يرجى إضافة جنسيتك أولاً."
+
+msgid "Please provide a valid joining type"
+msgstr "يرجى توفير نوع الانضمام الصحيح."
+
+msgid "Please provide a valid joining type."
+msgstr "يرجى توفير نوع الانضمام الصحيح."
+
+msgid "Positions data must be a list of player details."
+msgstr "يجب أن تكون بيانات المراكز عبارة عن قائمة من تفاصيل اللاعبين."
+
+msgid "Positions swapped successfully."
+msgstr "تم تبديل المراكز بنجاح."
+
+msgid "Post ID is required."
+msgstr "معرف المنشور مطلوب."
+
+msgid "Post Liked!"
+msgstr "تم الإعجاب بالمنشور!"
+
+msgid "Post Media deleted successfully."
+msgstr "تم حذف وسائط المنشور بنجاح."
+
+msgid "Post Media not found."
+msgstr "لم يتم العثور على وسائط المنشور."
+
+msgid "Post Report Submitted Successfully."
+msgstr "تم تقديم تقرير المنشور بنجاح."
+
+msgid "Post created successfully"
+msgstr "تم إنشاء المنشور بنجاح."
+
+msgid "Post deleted successfully."
+msgstr "تم حذف المنشور بنجاح."
+
+msgid "Post details fetched successfully."
+msgstr "تم جلب تفاصيل المنشور بنجاح."
+
+msgid "Post fetched successfully."
+msgstr "تم جلب المنشور بنجاح."
+
+msgid "Post liked successfully."
+msgstr "تم الإعجاب بالمنشور بنجاح."
+
+msgid "Post not found."
+msgstr "لم يتم العثور على المنشور."
+
+msgid "Post unliked successfully."
+msgstr "تم إلغاء الإعجاب بالمنشور بنجاح."
+
+msgid "Post updated successfully."
+msgstr "تم تحديث المنشور بنجاح."
+
+msgid "Posts fetched successfully."
+msgstr "تم جلب المنشورات بنجاح."
+
+msgid "Profile Picture updated successfully."
+msgstr "تم تحديث صورة الملف الشخصي بنجاح."
+
+msgid "Profile type and certificates uploaded successfully."
+msgstr "تم تحميل نوع الملف الشخصي والشهادات بنجاح."
+
+msgid "Profile updated successfully."
+msgstr "تم تحديث الملف الشخصي بنجاح."
+
+msgid "Reasons fetched successfully."
+msgstr "تم جلب الأسباب بنجاح."
+
+msgid "Referee list fetched successfully"
+msgstr "تم جلب قائمة الحكام بنجاح."
+
+msgid "Referee must have a fee assigned to be approved"
+msgstr "يجب تعيين أجر للحكم ليتم الموافقة عليه."
+
+msgid "Referee status updated successfully"
+msgstr "تم تحديث حالة الحكم بنجاح."
+
+msgid "Referees requested successfully."
+msgstr "تم طلب الحكام بنجاح."
+
+msgid "Reports retrieved successfully."
+msgstr "تم استرجاع التقارير بنجاح."
+
+msgid "Requested Referee not found for the provided game_id and user_id"
+msgstr "لم يتم العثور على الحكم المطلوب للمباراة ومعرف المستخدم المحددين."
+
+msgid "Some players could not be updated."
+msgstr "لم يتم تحديث بعض اللاعبين."
+
+msgid "Someone commented on your post"
+msgstr "علق شخص ما على منشورك."
+
+msgid "Someone replied to your comment"
+msgstr "رد شخص ما على تعليقك."
+
+msgid "Staff added successfully."
+msgstr "تم إضافة الموظف بنجاح."
+
+msgid "Statistics Updated!"
+msgstr "تم تحديث الإحصائيات!"
+
+msgid "Stats fetched successfully"
+msgstr "تم جلب الإحصائيات بنجاح."
+
+msgid "Stats updated and lineup fetched successfully."
+msgstr "تم تحديث الإحصائيات وجلب التشكيلة بنجاح."
+
+msgid "Team A is required."
+msgstr "الفريق A مطلوب."
+
+msgid "Team B cannot be the same as Team A."
+msgstr "لا يمكن أن يكون الفريق B هو نفس الفريق A."
+
+msgid "Team B is already assigned."
+msgstr "تم تعيين الفريق B بالفعل."
+
+msgid "Team Branch ID is required."
+msgstr "معرف فرع الفريق مطلوب."
+
+msgid "Team Branch created successfully."
+msgstr "تم إنشاء فرع الفريق بنجاح."
+
+msgid "Team Branch creation failed."
+msgstr "فشل إنشاء فرع الفريق."
+
+msgid "Team Branch deleted successfully."
+msgstr "تم حذف فرع الفريق بنجاح."
+
+msgid "Team Branch retrieved successfully."
+msgstr "تم استرجاع فرع الفريق بنجاح."
+
+msgid "Team Branch update failed."
+msgstr "فشل تحديث فرع الفريق."
+
+msgid "Team Branch updated successfully."
+msgstr "تم تحديث فرع الفريق بنجاح."
+
+msgid "Team Fetched successfully."
+msgstr "تم جلب الفريق بنجاح."
+
+msgid "Team ID and Game ID are required."
+msgstr "معرف الفريق ومعرف اللعبة مطلوبان."
+
+msgid "Team ID is required when creator_type is 2."
+msgstr "معرف الفريق مطلوب عندما يكون نوع المنشئ هو 2."
+
+msgid "Team ID is required."
+msgstr "معرف الفريق مطلوب."
+
+msgid "Team branches retrieved successfully."
+msgstr "تم استرجاع فروع الفريق بنجاح."
+
+msgid "Team created successfully."
+msgstr "تم إنشاء الفريق بنجاح."
+
+msgid "Team data retrieved successfully."
+msgstr "تم استرجاع بيانات الفريق بنجاح."
+
+msgid "Team deleted successfully."
+msgstr "تم حذف الفريق بنجاح."
+
+msgid "Team does not exist."
+msgstr "الفريق غير موجود."
+
+msgid "Team id is required."
+msgstr "معرف الفريق مطلوب."
+
+msgid "Team is not part of the tournament or the request does not exist."
+msgstr "الفريق ليس جزءًا من البطولة أو أن الطلب غير موجود."
+
+msgid "Team joining request updated successfully."
+msgstr "تم تحديث طلب انضمام الفريق بنجاح."
+
+msgid "Team logo updated successfully."
+msgstr "تم تحديث شعار الفريق بنجاح."
+
+msgid "Team not found."
+msgstr "الفريق غير موجود."
+
+msgid "Team rejected successfully."
+msgstr "تم رفض الفريق بنجاح."
+
+msgid "Team stats timeline fetched successfully."
+msgstr "تم جلب خط الزمن لإحصائيات الفريق بنجاح."
+
+msgid "Team updated successfully."
+msgstr "تم تحديث الفريق بنجاح."
+
+msgid "Teams fetched successfully."
+msgstr "تم جلب الفرق بنجاح."
+
+msgid "The player has not been assigned a jersey number yet."
+msgstr "لم يتم تعيين رقم قميص للاعب بعد."
+
+msgid "The player in the target position must also be in the starting 11 lineup to swap positions."
+msgstr "يجب أن يكون اللاعب في المركز المستهدف أيضًا في التشكيلة الأساسية الـ11 لتبديل المراكز."
+
+msgid "The provided group does not belong to the specified tournament."
+msgstr "المجموعة المقدمة لا تنتمي إلى البطولة المحددة."
+
+msgid "The specified friendly game does not exist."
+msgstr "المباراة الودية المحددة غير موجودة."
+
+msgid "The specified game does not exist in this tournament."
+msgstr "المباراة المحددة غير موجودة في هذه البطولة."
+
+msgid "The specified game does not exist."
+msgstr "المباراة المحددة غير موجودة."
+
+msgid "The specified player is not part of this team."
+msgstr "اللاعب المحدد ليس جزءًا من هذا الفريق."
+
+msgid "The specified playing foot does not exist."
+msgstr "القدم المحددة غير موجودة."
+
+msgid "The specified team does not exist."
+msgstr "الفريق المحدد غير موجود."
+
+msgid "The specified team is not part of this friendly game."
+msgstr "الفريق المحدد ليس جزءًا من هذه المباراة الودية."
+
+msgid "The specified team is not part of this game."
+msgstr "الفريق المحدد ليس جزءًا من هذه المباراة."
+
+msgid "The specified team_id does not match any team in this game."
+msgstr "معرف الفريق المحدد لا يتطابق مع أي فريق في هذه المباراة."
+
+msgid "The specified tournament does not exist."
+msgstr "البطولة المحددة غير موجودة."
+
+msgid "The team age group does not match the tournament age group."
+msgstr "مجموعة أعمار الفريق لا تتطابق مع مجموعة الأعمار في البطولة."
+
+msgid "The team does not exist in the tournament. Please ensure the team is already added."
+msgstr "الفريق غير موجود في البطولة. يرجى التأكد من أن الفريق قد تم إضافته بالفعل."
+
+msgid "The team is already assigned to another group in this tournament."
+msgstr "الفريق مخصص بالفعل إلى مجموعة أخرى في هذه البطولة."
+
+msgid "The username is already Taken."
+msgstr "اسم المستخدم محجوز بالفعل."
+
+msgid "The username is already in use either as a team username or a user username."
+msgstr "اسم المستخدم مستخدم بالفعل إما كاسم فريق أو كاسم مستخدم."
+
+msgid "This game number already exists for the specified tournament. Please choose a different game number."
+msgstr "رقم اللعبة هذا موجود بالفعل للبطولة المحددة. يرجى اختيار رقم لعبة مختلف."
+
+msgid "This official is already assigned to this game."
+msgstr "هذا المسؤول مخصص بالفعل لهذه المباراة."
+
+msgid "This phone number is associated with a deleted account, you have to register again."
+msgstr "هذا الرقم المرتبط بحساب محذوف، يجب عليك التسجيل مرة أخرى."
+
+msgid "This team has already requested or is already accepted into the tournament."
+msgstr "الفريق قد طلب الانضمام أو تم قبوله بالفعل في البطولة."
+
+msgid "Top players fetched successfully."
+msgstr "تم جلب أفضل اللاعبين بنجاح."
+
+msgid "Tournament Group Points Table fetched successfully."
+msgstr "تم جلب جدول نقاط مجموعة البطولة بنجاح."
+
+msgid "Tournament Group Team added successfully."
+msgstr "تم إضافة فريق مجموعة البطولة بنجاح."
+
+msgid "Tournament Group Team status updated to accepted."
+msgstr "تم تحديث حالة فريق مجموعة البطولة إلى مقبول."
+
+msgid "Tournament Group Team updated successfully."
+msgstr "تم تحديث فريق مجموعة البطولة بنجاح."
+
+msgid "Tournament Group Teams fetched successfully."
+msgstr "تم جلب فرق مجموعة البطولة بنجاح."
+
+msgid "Tournament ID is required"
+msgstr "معرف البطولة مطلوب."
+
+msgid "Tournament ID is required."
+msgstr "معرف البطولة مطلوب."
+
+msgid "Tournament created successfully."
+msgstr "تم إنشاء البطولة بنجاح."
+
+msgid "Tournament creation failed."
+msgstr "فشل إنشاء البطولة."
+
+msgid "Tournament deleted successfully."
+msgstr "تم حذف البطولة بنجاح."
+
+msgid "Tournament details fetched successfully."
+msgstr "تم جلب تفاصيل البطولة بنجاح."
+
+msgid "Tournament does not exist."
+msgstr "البطولة غير موجودة."
+
+msgid "Tournament game not found."
+msgstr "لم يتم العثور على مباراة البطولة."
+
+msgid "Tournament id is required."
+msgstr "معرف البطولة مطلوب."
+
+msgid "Tournament liked successfully."
+msgstr "تم الإعجاب بالبطولة بنجاح."
+
+msgid "Tournament not found."
+msgstr "البطولة غير موجودة."
+
+msgid "Tournament unliked successfully."
+msgstr "تم إلغاء الإعجاب بالبطولة بنجاح."
+
+msgid "Tournament update failed."
+msgstr "فشل تحديث البطولة."
+
+msgid "Tournament updated successfully."
+msgstr "تم تحديث البطولة بنجاح."
+
+msgid "Tournaments fetched successfully."
+msgstr "تم جلب البطولات بنجاح."
+
+msgid "Training ID is required for deletion"
+msgstr "معرف التدريب مطلوب للحذف"
+
+msgid "Training ID is required for update"
+msgstr "معرف التدريب مطلوب للتحديث"
+
+msgid "Training ID is required."
+msgstr "معرف التدريب مطلوب."
+
+msgid "Training details fetched successfully."
+msgstr "تم جلب تفاصيل التدريب بنجاح."
+
+msgid "Training liked successfully."
+msgstr "تم الإعجاب بالتدريب بنجاح."
+
+msgid "Training not found"
+msgstr "لم يتم العثور على التدريب"
+
+msgid "Training not found."
+msgstr "لم يتم العثور على التدريب."
+
+msgid "Training successfully created"
+msgstr "تم إنشاء التدريب بنجاح"
+
+msgid "Training successfully deleted"
+msgstr "تم حذف التدريب بنجاح"
+
+msgid "Training successfully updated"
+msgstr "تم تحديث التدريب بنجاح"
+
+msgid "Training unliked successfully."
+msgstr "تم إلغاء الإعجاب بالتدريب بنجاح."
+
+msgid "Unfollowed successfully."
+msgstr "تم إلغاء المتابعة بنجاح."
+
+msgid "Uniform Added Successfully"
+msgstr "تم إضافة الزي بنجاح"
+
+msgid "Uniform ID is required."
+msgstr "معرف الزي مطلوب."
+
+msgid "Uniform confirmed successfully."
+msgstr "تم تأكيد الزي بنجاح."
+
+msgid "Uniform deleted successfully."
+msgstr "تم حذف الزي بنجاح."
+
+msgid "Uniform information fetched successfully."
+msgstr "تم جلب معلومات الزي بنجاح."
+
+msgid "Uniform not found."
+msgstr "لم يتم العثور على الزي."
+
+msgid "Uniform rejected successfully."
+msgstr "تم رفض الزي بنجاح."
+
+msgid "Uniform rejected successfully. Please add new uniform ASAP."
+msgstr "تم رفض الزي بنجاح. يرجى إضافة زي جديد في أقرب وقت ممكن."
+
+msgid "User Dose Not Found"
+msgstr "لم يتم العثور على المستخدم"
+
+msgid "User ID and Group ID are required."
+msgstr "معرف المستخدم ومعرف المجموعة مطلوبان."
+
+msgid "User Profiles retrieved successfully."
+msgstr "تم جلب ملفات تعريف المستخدمين بنجاح."
+
+msgid "User added as {} to the group."
+msgstr "تم إضافة المستخدم كـ {} إلى المجموعة."
+
+msgid "User can proceed with registration."
+msgstr "يمكن للمستخدم متابعة التسجيل."
+
+msgid "User does not exist for the given username or phone."
+msgstr "المستخدم غير موجود للاسم المستخدم أو الهاتف المعطى."
+
+msgid "User does not have access to delete this training."
+msgstr "المستخدم ليس لديه صلاحية لحذف هذا التدريب."
+
+msgid "User does not have the required role."
+msgstr "المستخدم ليس لديه الدور المطلوب."
+
+msgid "User has already joined this branch."
+msgstr "المستخدم قد انضم بالفعل إلى هذه الفرع."
+
+msgid "User is already a member of the training."
+msgstr "المستخدم هو بالفعل عضو في التدريب."
+
+msgid "User is already a member of this group."
+msgstr "المستخدم هو بالفعل عضو في هذه المجموعة."
+
+msgid "User is already an organizer and cannot be changed to a member."
+msgstr "المستخدم هو بالفعل منظم ولا يمكن تغييره إلى عضو."
+
+msgid "User is not a member of the training."
+msgstr "المستخدم ليس عضوًا في التدريب."
+
+msgid "User joined the training successfully."
+msgstr "انضم المستخدم إلى التدريب بنجاح."
+
+msgid "User membership deleted successfully."
+msgstr "تم حذف عضوية المستخدم بنجاح."
+
+msgid "User membership retrieved successfully."
+msgstr "تم استرجاع عضوية المستخدم بنجاح."
+
 msgid "User not found."
 msgstr "لم يتم العثور على المستخدم."
+
+msgid "User registered successfully"
+msgstr "تم تسجيل المستخدم بنجاح."
+
+msgid "User upgraded to organizer in the group."
+msgstr "تم ترقية المستخدم إلى منظم في المجموعة."
+
+msgid "User with this phone number does not exist."
+msgstr "المستخدم الذي يحمل هذا الرقم غير موجود."
+
+msgid "Username already taken."
+msgstr "اسم المستخدم مأخوذ بالفعل."
+
+msgid "Username is required."
+msgstr "اسم المستخدم مطلوب."
+
+msgid "Validation errors occurred."
+msgstr "حدثت أخطاء في التحقق."
+
+msgid "Video gallary entries fetched successfully."
+msgstr "تم جلب مدخلات معرض الفيديو بنجاح."
+
+msgid "Welcome to {team_name}"
+msgstr "مرحبًا بك في {team_name}"
+
+msgid "You Cannot Login Here"
+msgstr "لا يمكنك تسجيل الدخول هنا"
+
+msgid "You are already registered as a coach and cannot create a new coach profile."
+msgstr "أنت مسجل بالفعل كمدرب ولا يمكنك إنشاء ملف مدرب جديد."
+
+msgid "You are already registered as a referee and cannot create a new referee profile."
+msgstr "أنت مسجل بالفعل كحكم ولا يمكنك إنشاء ملف حكم جديد."
+
+msgid "You are not a manager of any team."
+msgstr "أنت لست مديرًا لأي فريق."
+
+msgid "You are not assigned as a coach to any branch."
+msgstr "أنت لم يتم تعيينك كمدرب لأي فرع."
+
+msgid "You are not assigned as a manager to any branch."
+msgstr "أنت لم يتم تعيينك كمدير لأي فرع."
+
+msgid "You are not associated with any team branch as a founder."
+msgstr "أنت لست مرتبطًا بأي فرع فريق كمؤسس."
+
+msgid "You can only create one Training Group."
+msgstr "يمكنك إنشاء مجموعة تدريب واحدة فقط."
+
+msgid "You can only create one team."
+msgstr "يمكنك إنشاء فريق واحد فقط."
+
+msgid "You do not have access to this resource."
+msgstr "ليس لديك حق الوصول إلى هذه الموارد."
+
+msgid "You do not have access."
+msgstr "ليس لديك حق الوصول."
+
+msgid "You do not have permission to access this team."
+msgstr "ليس لديك إذن للوصول إلى هذا الفريق."
+
+msgid "You do not have permission to create a team."
+msgstr "ليس لديك إذن لإنشاء فريق."
+
+msgid "You do not have permission to perform this action."
+msgstr "ليس لديك إذن لتنفيذ هذا الإجراء."
+
+msgid "You do not have the required permissions to perform this action."
+msgstr "ليس لديك الأذونات المطلوبة لتنفيذ هذا الإجراء."
+
+msgid "You do not have the required role to access this resource"
+msgstr "ليس لديك الدور المطلوب للوصول إلى هذه الموارد"
+
+msgid "You have been appointed to officiate a friendly game."
+msgstr "تم تعيينك لتحكيم مباراة ودية."
+
+msgid "You have been appointed to officiate a game."
+msgstr "تم تعيينك لتحكيم مباراة."
+
+msgid "You have not created any tournament yet..."
+msgstr "لم تقم بإنشاء أي بطولة بعد..."
+
+msgid "You just made an assist!"
+msgstr "لقد قمت بصناعة هدف للتو!"
+
+msgid "You just received a red card!"
+msgstr "لقد تلقيت بطاقة حمراء للتو!"
+
+msgid "You just received a yellow card!"
+msgstr "لقد تلقيت بطاقة صفراء للتو!"
+
+msgid "You just scored a goal!"
+msgstr "لقد سجلت هدفًا للتو!"
+
+msgid "You just scored an own goal!"
+msgstr "لقد سجلت هدفًا في مرماك للتو!"
+
+msgid "Your account has been deleted successfully."
+msgstr "تم حذف حسابك بنجاح."
+
+msgid "Your account has been deleted. Please contact support."
+msgstr "تم حذف حسابك. يرجى الاتصال بالدعم."
+
+msgid "Your event booking request has been submitted successfully. The admin will connect with you for further steps."
+msgstr "تم تقديم طلب حجز الحدث بنجاح. سيتواصل معك المسؤول للخطوات التالية."
+
+msgid "Your group is attending an event!"
+msgstr "مجموعةك تحضر حدثًا!"
+
+msgid "Your statistics have been updated!"
+msgstr "تم تحديث إحصائياتك!"
+
+msgid "Your team is attending an event!"
+msgstr "فريقك يحضر حدثًا!"
+
+msgid "branch_id and user_id are required"
+msgstr "معرف الفرع ومعرف المستخدم مطلوبان."
+
+msgid "branch_id is required"
+msgstr "معرف الفرع مطلوب."
+
+msgid "branch_id, user_id, and joinning_type are required"
+msgstr "معرف الفرع، معرف المستخدم، ونوع الانضمام مطلوبان."
+
+msgid "created_by_id and creator_type are required."
+msgstr "معرف المنشئ ونوع المنشئ مطلوبان."
+
+msgid "created_by_id is required when creator_type is 2."
+msgstr "معرف المنشئ مطلوب عندما يكون نوع المنشئ 2."
+
+msgid "created_by_id must be provided for TEAM_TYPE."
+msgstr "يجب توفير معرف المنشئ لنوع الفريق."
+
+msgid "creator_type and created_by_id must be valid integers."
+msgstr "يجب أن يكون نوع المنشئ ومعرف المنشئ أرقامًا صحيحة."
+
+msgid "creator_type is required when creator_type is 2."
+msgstr "نوع المنشئ مطلوب عندما يكون نوع المنشئ 2."
+
+msgid "creator_type is required."
+msgstr "نوع المنشئ مطلوب."
+
+msgid "creator_type must be a valid integer."
+msgstr "يجب أن يكون نوع المنشئ رقمًا صحيحًا."
+
+msgid "creator_type must be provided."
+msgstr "يجب توفير نوع المنشئ."
+
+msgid "event_id and comment are required."
+msgstr "معرف الحدث والتعليق مطلوبان."
+
+msgid "gallery entries and latest albums fetched successfully."
+msgstr "تم جلب مدخلات المعرض وآخر الألبومات بنجاح."
+
+msgid "gallery entry deleted successfully."
+msgstr "تم حذف مدخل المعرض بنجاح."
+
+msgid "gallery entry not found."
+msgstr "لم يتم العثور على مدخل المعرض."
+
+msgid "game_id and tournament_id are required."
+msgstr "معرف اللعبة ومعرف البطولة مطلوبان."
+
+msgid "game_id is required."
+msgstr "معرف اللعبة مطلوب."
+
+msgid "game_id, official_id, and officials_type_id are required."
+msgstr "معرف اللعبة، معرف المسؤول، ومعرف نوع المسؤولين مطلوبون."
+
+msgid "game_id, user_id, and status are required"
+msgstr "معرف اللعبة، معرف المستخدم، والحالة مطلوبون."
+
+msgid "official types retrieved successfully."
+msgstr "تم جلب أنواع المسؤولين بنجاح."
+
+msgid "official_id is required."
+msgstr "معرف المسؤول مطلوب."
+
+msgid "officials_type_id is required."
+msgstr "معرف نوع المسؤولين مطلوب."
+
+msgid "player_id is required."
+msgstr "معرف اللاعب مطلوب."
+
+msgid "player_id, team_id, and game_id are required."
+msgstr "معرف اللاعب، معرف الفريق، ومعرف اللعبة مطلوبون."
+
+msgid "post_id and comment are required."
+msgstr "معرف المنشور والتعليق مطلوبان."
+
+msgid "post_id, created_by_id, and creator_type are required."
+msgstr "معرف المنشور، معرف المنشئ، ونوع المنشئ مطلوبون."
+
+msgid "team_id is required"
+msgstr "معرف الفريق مطلوب."
+
+msgid "team_id is required."
+msgstr "معرف الفريق مطلوب."
+
+msgid "team_id, game_id are required."
+msgstr "معرف الفريق، معرف اللعبة مطلوبان."
+
+msgid "team_id, game_id, are required."
+msgstr "معرف الفريق، معرف اللعبة، مطلوبان."
+
+msgid "team_id, group_id, and tournament_id are required."
+msgstr "معرف الفريق، معرف المجموعة، ومعرف البطولة مطلوبون."
+
+msgid "tournament_id is required."
+msgstr "معرف البطولة مطلوب."
+
+msgid "tournament_id, comment, created_by_id and creator_type are required."
+msgstr "معرف البطولة، التعليق، معرف المنشئ ونوع المنشئ مطلوبون."
+
+msgid "training_id, comment, created_by_id and creator_type are required."
+msgstr "معرف التدريب، التعليق، معرف المنشئ ونوع المنشئ مطلوبون."
+
+msgid "user role retrieved successfully."
+msgstr "تم استرجاع دور المستخدم بنجاح."
+
+msgid "user_id is required."
+msgstr "معرف المستخدم مطلوب."
+
+msgid "{team_name} added you as {joinning_type_name}"
+msgstr "أضافك {team_name} كـ {joinning_type_name}."
+
+msgid "{} commented on your Post."
+msgstr "{} علق على منشورك."
+
+msgid "{} commented on your event."
+msgstr "{} علق على حدثك."
+
+msgid "{} has requested to book a ticket for your event \"{}\"."
+msgstr "{} طلب حجز تذكرة لحدثك \"{}\"."
+
+msgid "{} just added a new post."
+msgstr "{} أضاف منشورًا جديدًا للتو."
+
+msgid "{} liked your event."
+msgstr "{} أعجب بحدثك."
+
+msgid "{} liked your post."
+msgstr "{} أعجب بمنشورك."
+
+msgid "{} replied to your comment."
+msgstr "{} رد على تعليقك."
+
+msgid "{} started following you."
+msgstr "{} بدأ يتابعك."
