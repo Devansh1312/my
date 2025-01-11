@@ -383,7 +383,7 @@ class GroupMembersAddView(APIView):
         role = _("Organizer") if join_type == JoinTrainingGroup.ORGANIZER else _("Member")
         return Response({
             'status': 1,
-            'message': _('User added as {role} to the group.').format(role=role)
+            'message': _('User added as {} to the group.').format(role)
         }, status=status.HTTP_201_CREATED)
 
     def delete(self, request):

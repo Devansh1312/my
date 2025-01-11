@@ -691,7 +691,7 @@ class LineupPlayers(APIView):
         # Prepare final response
         return Response({
             'status': 1 if not errors else 0,
-            'message': _('Playing 11 Updated Sucessfully ') if not errors else _('Some players could not be updated.'),
+            'message': _('Playing 11 Updated Successfully.') if not errors else _('Some players could not be updated.'),
             'data': {
                 'added': added_data,
                 'substitute': substitute_data,

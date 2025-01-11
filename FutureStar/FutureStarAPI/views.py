@@ -2317,7 +2317,7 @@ class DetailAlbumListAPIView(generics.ListAPIView):
 
             return Response({
                 'status': 1,
-                'message': _('Detail Albums fetched successfully.'),
+                'message': _('Album Details fetched successfully.'),
                 'data': gallary_items_serializer.data,
                 'total_records': total_records,
                 'total_pages': total_pages,
@@ -2328,7 +2328,7 @@ class DetailAlbumListAPIView(generics.ListAPIView):
         gallary_items_serializer = GallarySerializer(gallary_items_queryset, many=True)
         return Response({
             'status': 1,
-            'message': _('Detail Albums fetched successfully.'),
+            'message': _('Album Details fetched successfully.'),
             'data': gallary_items_serializer.data,
             'total_records': gallary_items_queryset.count()
         }, status=status.HTTP_200_OK)
@@ -4645,10 +4645,12 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 title = _('%(user_name)s wants to attend your event!') % {
                     'user_name': request.user.username
                 }
-                body = _('%(user_name)s has requested to book a ticket for your event "%(event_name)s".') % {
-                    'user_name': request.user.username,
-                    'event_name': event_instance.event_name,
-                }
+                body = _('{} has requested to book a ticket for your event "{}".').format(
+                            request.user.username,
+                            event_instance.event_name,
+                        )
+
+
 
                 # Create notification record with targeted_id and targeted_type
                 notification = Notifictions.objects.create(

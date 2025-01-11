@@ -1533,7 +1533,7 @@ class TournamentGamesAPIView(APIView):
         if not tournament_id or not team_a or not team_b:
             return Response({
                 'status': 0,
-                'message': _('Both tournament_id, team_a, and team_b are required.')
+                'message': _('All tournament_id, team_a, and team_b are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         if TournamentGames.objects.filter(Q(tournament_id=tournament_id) & Q(game_number=game_number)).exists():

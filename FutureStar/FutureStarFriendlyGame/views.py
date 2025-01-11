@@ -3431,7 +3431,7 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
         
         # Validate inputs
         if not team_id or not game_id or not player_a_id or not player_b_id:
-            return Response({'status': 0, 'message': _('All fields (team_id, game_id, player_a_id, player_b_id) are required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('All fields are required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Access check
         if not self._has_access(request.user, game_id=game_id):
