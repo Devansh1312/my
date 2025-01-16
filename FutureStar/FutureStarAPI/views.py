@@ -4273,7 +4273,7 @@ class EventsAPIView(APIView):
                 if joined_events.exists():
                     # Get event IDs from joined bookings
                     joined_event_ids = joined_events.values_list('event_id', flat=True)
-                    events = Event.objects.filter(id__in=joined_event_ids)
+                    events = Event.objects.filter(id__in=joined_event_ids).order_by('-event_date')
 
         else:
             return Response({
@@ -4436,7 +4436,7 @@ class EventCreateAPIView(generics.CreateAPIView):
 
                 # Create notification record with targeted_id and targeted_type
                 Notifictions.objects.create(
-                    created_by_id=request.user.id,  # Event creator ID
+                    created_by_id=created_by_id,  # Event creator ID
                     creator_type=creator_type,      # Event creator type
                     targeted_id=user.id,            # Notification recipient ID
                     targeted_type=1,                # Assuming recipient is always a user
@@ -6428,7 +6428,8 @@ class NotificationsListView(APIView):
                     "entity": entity,
                     "title": notification.title,
                     "content": notification.content,
-                    "date_created": notification.date_created,
+                    "status": notification.read,
+                    "date_created": notification.date_created.strftime('%d %B %Y %H:%M'),
                 })
 
 

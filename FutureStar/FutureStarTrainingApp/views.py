@@ -21,46 +21,69 @@ class CreateTrainingView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
-        language = request.headers.get('Language', 'en') 
+        language = request.headers.get('Language', 'en')
+
         if language in ['en', 'ar']:
             activate(language)
 
-        # Pass the full 'request' object in the context
-        context = {'request': request}
+        creator_type = self.request.query_params.get('creator_type', None)
+        created_by_id = self.request.query_params.get('created_by_id', None)
 
-        # Initialize the serializer with the context
+        # Convert creator_type and created_by_id to integers safely
+        try:
+            creator_type = int(creator_type)
+            created_by_id = int(created_by_id)
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Invalid creator_type or created_by_id format. Both must be integers.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        context = {'request': request}
         serializer = TrainingSerializer(data=request.data, context=context)
 
+
         if serializer.is_valid():
+
             # Handle image saving logic if training photo is uploaded
             if "training_photo" in request.FILES:
                 image = request.FILES["training_photo"]
                 file_extension = image.name.split('.')[-1]
                 unique_suffix = get_random_string(8)
-
                 file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
-
-                # Save the image using the default storage
                 image_path = default_storage.save(file_name, image)
                 serializer.validated_data['training_photo'] = image_path
-
-            # Save the new training instance
             training_instance = serializer.save()
 
-            # Re-fetch the training instance with the correct context for language handling
+            if creator_type == 1:  # User
+                Training_Joined.objects.create(
+                    training=training_instance,
+                    user=request.user,
+                    attendance_status=False  # Default attendance status
+                )
+            elif creator_type == 2:  # Team
+                try:
+                    team = Team.objects.get(id=created_by_id)
+                    team_founder = team.team_founder
+                    if team_founder:
+                        Training_Joined.objects.create(
+                            training=training_instance,
+                            user=team_founder,
+                            attendance_status=False
+                        )
+                except Team.DoesNotExist:
+                    return Response({
+                        'status': 0,
+                        'message': _('No team found with the provided ID.')
+                    }, status=status.HTTP_404_NOT_FOUND)
+
             training_instance = Training.objects.get(id=training_instance.id)
-
-            # Re-serialize the training instance to apply language-specific fields
             serializer = TrainingSerializer(training_instance, context={'request': request})
-
-            # Return the successfully created training data
             return Response({
                 'status': 1,
                 'message': _('Training successfully created'),
                 'data': serializer.data  # Use the re-serialized data with language context
             }, status=status.HTTP_201_CREATED)
-
-        # If validation fails, return the errors
         return Response({
             'status': 0,
             'errors': serializer.errors
@@ -444,7 +467,7 @@ class OpenTrainingListView(APIView):
         open_trainings = Training.objects.filter(
             training_type=Training.OPEN_TRAINING,
             training_date__gte=today  # Only future or today
-        )
+        ).order_by('-training_date')
 
         # Initialize custom pagination
         paginator = CustomTrainingPagination()
@@ -494,7 +517,7 @@ class MyTrainingsView(APIView):
         user = request.user.id
 
         # Get all trainings initially
-        trainings = Training.objects.all()
+        trainings = Training.objects.all().order_by('-training_date')
 
         # Filter trainings based on access logic
         accessible_trainings = []
@@ -589,7 +612,7 @@ class MyJoinedTrainingsView(APIView):
         user = request.user
 
         # Fetch all the trainings the user has joined and order by training_date (newest first)
-        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')
+        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training').order_by('-training__training_date')
         
         # If the user has not joined any training, return a message
         if not joined_trainings.exists():
@@ -658,7 +681,6 @@ class JoinTrainingAPIView(APIView):
                 return True
 
             # Check if the request user is in the same branch as the creator
-            # Debugging creator branches
             creator_branches = JoinBranch.objects.filter(
                 user_id=training.created_by_id,
                 joinning_type=4
@@ -672,7 +694,6 @@ class JoinTrainingAPIView(APIView):
             if not creator_branches:
                 return False
 
-            # Debugging request user branches
             request_user_branches = JoinBranch.objects.filter(
                 user_id=user,
                 branch_id__in=creator_branches,
@@ -760,9 +781,7 @@ class JoinTrainingAPIView(APIView):
         if training.creator_type == Training.USER_TYPE:
             creator_branches = JoinBranch.objects.filter(
                 user_id=training.created_by_id, joinning_type=4
-            ).values_list('branch_id', flat=True)
-            print(creator_branches)
-          
+            ).values_list('branch_id', flat=True)          
 
             if creator_branches.exists():
                 branch_managers_and_coaches = JoinBranch.objects.filter(
@@ -775,7 +794,6 @@ class JoinTrainingAPIView(APIView):
                     notifications_sent += 1
             else:
                 creator = User.objects.get(id=training.created_by_id)
-                print(creator)
                 self.send_notification(creator, message, comments_message, push_data)
                 notifications_sent += 1
 
@@ -921,7 +939,6 @@ class TrainingFeedbackAPI(APIView):
                 return True
 
             # Check if the request user is in the same branch as the creator
-            # Debugging creator branches
             creator_branches = JoinBranch.objects.filter(
                 user_id=training.created_by_id,
                 joinning_type=4
@@ -935,7 +952,6 @@ class TrainingFeedbackAPI(APIView):
             if not creator_branches:
                 return False
 
-            # Debugging request user branches
             request_user_branches = JoinBranch.objects.filter(
                 user_id=user,
                 branch_id__in=creator_branches,
@@ -999,8 +1015,6 @@ class TrainingFeedbackAPI(APIView):
 
         # Fetch the Training_Joined object
         training_joined = get_object_or_404(Training_Joined, user=user_id, training=training_id)
-        print(training_joined)
-
 
         # Initialize a flag to track if any changes were made
         updated = False
