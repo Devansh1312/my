@@ -6379,9 +6379,9 @@ class NotificationsListView(APIView):
             entity = None
             for notification in notifications:
                 # Fetch user details (replace User model with your user model if different)
-                if creator_type == 1:  # User
+                if notification.creator_type == 1:  # User
                     try:
-                        user = User.objects.get(id=created_by_id)
+                        user = User.objects.get(id=notification.created_by_id)
                         entity = {
                             "username": user.username,
                             "fullname": user.fullname,
@@ -6394,9 +6394,9 @@ class NotificationsListView(APIView):
                          
                         }
 
-                elif creator_type == 2:  # Team
+                elif notification.creator_type == 2:  # Team
                     try:
-                        team = Team.objects.get(id=created_by_id)
+                        team = Team.objects.get(id=notification.created_by_id)
                         entity = {
                             "username":team.team_username,
                             "team_name": team.team_name,
@@ -6409,9 +6409,9 @@ class NotificationsListView(APIView):
                            
                         }
 
-                elif creator_type == 3:  # Group
+                elif notification.creator_type == 3:  # Group
                     try:
-                        group = TrainingGroups.objects.get(id=created_by_id)
+                        group = TrainingGroups.objects.get(id=notification.created_by_id)
                         entity = {
                             "username":group.group_username,
                             "group_name": group.group_name,
