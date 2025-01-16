@@ -6372,7 +6372,7 @@ class NotificationsListView(APIView):
             creator_type = int(creator_type)
 
             # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
-            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type)
+            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type).exclude(read=True)
 
             # Build the response
             response_data = []
