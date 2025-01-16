@@ -11,101 +11,1490 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-msgid "User registered and logged in successfully"
+msgid "%(user_name)s wants to attend your event!"
 msgstr ""
 
-msgid "User registration failed due to duplicate data"
+msgid "A game with these details already exists."
 msgstr ""
 
-msgid "User registration failed"
+msgid "Access denied. You do not have permission for this game."
 msgstr ""
 
-msgid "Email is required for registration"
+msgid "Access denied. You do not have permission for this team."
 msgstr ""
 
-msgid "User logged in successfully"
+msgid "Access denied. You do not have permission to update this game."
+msgstr ""
+
+msgid "Access denied. You do not have permission to view this game."
+msgstr ""
+
+msgid "Access denied. You do not have the necessary role for this action."
 msgstr ""
 
 msgid "Account is inactive"
 msgstr ""
 
-msgid "User created and logged in successfully"
+msgid "Age Groups fetched successfully."
 msgstr ""
 
-msgid "Invalid registration type"
+msgid "Album Details fetched successfully."
 msgstr ""
 
-msgid "Login successful"
+msgid "Album Id is required or Album not found."
 msgstr ""
 
-msgid "Invalid credentials"
+msgid "Album creation failed."
 msgstr ""
 
-msgid "User created and login successful"
+msgid "Album deleted successfully."
 msgstr ""
 
-msgid "Invalid data"
+msgid "Album entries fetched successfully."
 msgstr ""
 
-msgid "Logout successful"
+msgid "Album not found."
 msgstr ""
 
-msgid "Logout failed"
+msgid "Albums fetched successfully."
 msgstr ""
 
-msgid "OTP sent to your phone."
+msgid "All fields are required."
 msgstr ""
 
-msgid "User with this phone number does not exist."
+msgid "All posts fetched successfully."
 msgstr ""
 
-msgid "Invalid data."
+msgid "All team slots in this tournament are filled."
 msgstr ""
 
-msgid "OTP verified successfully."
+msgid "All tournament_id, team_a, and team_b are required."
 msgstr ""
 
-msgid "Invalid OTP."
+msgid "An error occurred while adding the player to the lineup."
 msgstr ""
 
-msgid "Password changed successfully."
+msgid "An error occurred while checking your existing Training Groups."
 msgstr ""
 
-msgid "User not found."
+msgid "An error occurred while fetching player stats."
 msgstr ""
 
-msgid "Old password is incorrect."
+msgid "An error occurred while registering the user."
 msgstr ""
 
-msgid "New password must be at least 8 characters long."
+msgid "An error occurred while sending OTP."
 msgstr ""
 
-msgid "Player Details."
+msgid "An unexpected error occurred."
 msgstr ""
 
-msgid "Profile updated successfully."
+msgid "Booking Approved"
 msgstr ""
 
-msgid "Posts fetched successfully."
+msgid "Booking Rejected"
 msgstr ""
 
-msgid "Post created successfully"
+msgid "Booking creation failed."
 msgstr ""
 
-msgid "post_id is required."
+msgid "Both Team A and Team B IDs are required"
 msgstr ""
 
-msgid "Post not found."
+msgid "Both game_id and official_id are required."
 msgstr ""
 
-msgid "Post details fetched successfully."
+msgid "Both player_id and position_1 are required."
 msgstr ""
 
-msgid "post_id and comment are required."
+msgid "Branch not found."
+msgstr ""
+
+msgid "Cannot delete a game that has already Started."
+msgstr ""
+
+msgid "Cannot delete an organizer from the group."
+msgstr ""
+
+msgid "Cannot modify stats for a finished game."
+msgstr ""
+
+msgid "Categories retrieved successfully."
+msgstr ""
+
+msgid "Cities fetched successfully."
+msgstr ""
+
+msgid "City cannot be set without a valid country."
+msgstr ""
+
+msgid "Colors retrieved successfully."
 msgstr ""
 
 msgid "Comment created successfully."
 msgstr ""
 
+msgid "Comments fetched successfully."
+msgstr ""
+
+msgid "Countries fetched successfully."
+msgstr ""
+
+msgid "Country not found or inactive."
+msgstr ""
+
+msgid "Current language updated successfully."
+msgstr ""
+
+msgid "Current type updated successfully."
+msgstr ""
+
+msgid "Data fetched successfully."
+msgstr ""
+
+msgid "Data retrieved successfully."
+msgstr ""
+
+msgid "Detailed Albums added successfully."
+msgstr ""
+
+msgid "Email already in use."
+msgstr ""
+
+msgid "Email does not exist. Please register first."
+msgstr ""
+
+msgid "Error occurred while fetching Age Groups list."
+msgstr ""
+
+msgid "Error occurred while removing the player."
+msgstr ""
+
+msgid "Event Booking Detail Fetched successfully."
+msgstr ""
+
+msgid "Event ID is required."
+msgstr ""
+
+msgid "Event Liked!"
+msgstr ""
+
+msgid "Event Notification"
+msgstr ""
+
+msgid "Event Notification!"
+msgstr ""
+
+msgid "Event created successfully."
+msgstr ""
+
+msgid "Event deleted successfully."
+msgstr ""
+
+msgid "Event liked successfully."
+msgstr ""
+
+msgid "Event not found or you are not authorized to delete this event."
+msgstr ""
+
+msgid "Event not found or you are not authorized to update this event."
+msgstr ""
+
+msgid "Event not found."
+msgstr ""
+
+msgid "Event unliked successfully."
+msgstr ""
+
+msgid "Event updated successfully."
+msgstr ""
+
+msgid "Events fetched successfully."
+msgstr ""
+
+msgid "Events retrieved successfully."
+msgstr ""
+
+msgid "FAQ retrieved successfully."
+msgstr ""
+
+msgid "Failed to add staff/player."
+msgstr ""
+
+msgid "Failed to create gallery entry."
+msgstr ""
+
+msgid "Failed to create game."
+msgstr ""
+
+msgid "Failed to create group."
+msgstr ""
+
+msgid "Failed to log player substitution."
+msgstr ""
+
+msgid "Failed to log substitution."
+msgstr ""
+
+msgid "Failed to send notification: "
+msgstr ""
+
+msgid "Failed to update current type."
+msgstr ""
+
+msgid "Failed to update the event."
+msgstr ""
+
+msgid "Failed to update the post."
+msgstr ""
+
+msgid "Field created successfully."
+msgstr ""
+
+msgid "Field creation failed."
+msgstr ""
+
+msgid "Fields fetched successfully."
+msgstr ""
+
+msgid "Fields retrieved successfully."
+msgstr ""
+
+msgid "Followed successfully."
+msgstr ""
+
+msgid "For GROUP_TYPE, created_by_id must correspond to an existing Group."
+msgstr ""
+
+msgid "For TEAM_TYPE, created_by_id must correspond to an existing Team."
+msgstr ""
+
+msgid "Friendly game created successfully."
+msgstr ""
+
+msgid "Friendly game fetched successfully."
+msgstr ""
+
+msgid "Friendly game not found."
+msgstr ""
+
+msgid "Gallery entry created successfully."
+msgstr ""
+
+msgid "Gallery entry creation failed."
+msgstr ""
+
+msgid "Game Deleted successfully."
+msgstr ""
+
+msgid "Game ID and officials are required."
+msgstr ""
+
+msgid "Game ID is required."
+msgstr ""
+
+msgid "Game created successfully."
+msgstr ""
+
+msgid "Game field id is required."
+msgstr ""
+
+msgid "Game field not found."
+msgstr ""
+
+msgid "Game id is required."
+msgstr ""
+
+msgid "Game is already started."
+msgstr ""
+
+msgid "Game not exists"
+msgstr ""
+
+msgid "Game not found for the given tournament."
+msgstr ""
+
+msgid "Game not found or not created by you."
+msgstr ""
+
+msgid "Game not found with the given criteria."
+msgstr ""
+
+msgid "Game not found."
+msgstr ""
+
+msgid "Game time is required and must be in hh:mm:ss format (00:00:00 to 23:59:59)."
+msgstr ""
+
+msgid "Game updated successfully."
+msgstr ""
+
+msgid "Games fetched successfully."
+msgstr ""
+
+msgid "Gender retrieved successfully."
+msgstr ""
+
+msgid "General Settings retrieved successfully."
+msgstr ""
+
+msgid "Group ID is required."
+msgstr ""
+
+msgid "Group created successfully."
+msgstr ""
+
+msgid "Group details retrieved successfully."
+msgstr ""
+
+msgid "Group members fetched successfully."
+msgstr ""
+
+msgid "Group not found or you are not the founder."
+msgstr ""
+
+msgid "Group not found."
+msgstr ""
+
+msgid "Group table retrieved successfully."
+msgstr ""
+
+msgid "Group updated successfully."
+msgstr ""
+
+msgid "H2H Fetch Successfully"
+msgstr ""
+
+msgid "Image gallery entries fetched successfully."
+msgstr ""
+
+msgid "Injury fetched successfully."
+msgstr ""
+
+msgid "Invalid OTP or phone number."
+msgstr ""
+
+msgid "Invalid OTP."
+msgstr ""
+
+msgid "Invalid city ID provided."
+msgstr ""
+
+msgid "Invalid city specified."
+msgstr ""
+
+msgid "Invalid country ID provided."
+msgstr ""
+
+msgid "Invalid country specified."
+msgstr ""
+
+msgid "Invalid creator details."
+msgstr ""
+
+msgid "Invalid creator type for post."
+msgstr ""
+
+msgid "Invalid creator type for recipient."
+msgstr ""
+
+msgid "Invalid creator type."
+msgstr ""
+
+msgid "Invalid credentials"
+msgstr ""
+
+msgid "Invalid data"
+msgstr ""
+
+msgid "Invalid data."
+msgstr ""
+
+msgid "Invalid date format."
+msgstr ""
+
+msgid "Invalid deletion reason ID."
+msgstr ""
+
+msgid "Invalid deletion reason ID. It must be an integer."
+msgstr ""
+
+msgid "Invalid email format."
+msgstr ""
+
+msgid "Invalid events_section value. Allowed values are 1 or 2."
+msgstr ""
+
+msgid "Invalid events_section value. It must be an integer."
+msgstr ""
+
+msgid "Invalid gender specified."
+msgstr ""
+
+msgid "Invalid group ID."
+msgstr ""
+
+msgid "Invalid id of Team B."
+msgstr ""
+
+msgid "Invalid is_confirm value. It must be 1, 0, true, or false."
+msgstr ""
+
+msgid "Invalid main playing position specified."
+msgstr ""
+
+msgid "Invalid or missing current_language. It must be either 'en' or 'ar'."
+msgstr ""
+
+msgid "Invalid page number."
+msgstr ""
+
+msgid "Invalid playing foot specified."
+msgstr ""
+
+msgid "Invalid profile type."
+msgstr ""
+
+msgid "Invalid recipient type."
+msgstr ""
+
+msgid "Invalid registration type."
+msgstr ""
+
+msgid "Invalid request data."
+msgstr ""
+
+msgid "Invalid search type."
+msgstr ""
+
+msgid "Invalid search type. Must be 1, 2, 3, or 4."
+msgstr ""
+
+msgid "Invalid secondary playing position specified."
+msgstr ""
+
+msgid "Invalid status value. Only APPROVED or REJECT are allowed."
+msgstr ""
+
+msgid "Invalid target type."
+msgstr ""
+
+msgid "Invalid team ID."
+msgstr ""
+
+msgid "Invalid team ID. Team not found."
+msgstr ""
+
+msgid "Invalid team type provided."
+msgstr ""
+
+msgid "Invalid team_id."
+msgstr ""
+
+msgid "Jersey Number added Successfully"
+msgstr ""
+
+msgid "Jersey Numbers Updated Successfully"
+msgstr ""
+
+msgid "Jersey number Deleted"
+msgstr ""
+
+msgid "Jersey number deleted."
+msgstr ""
+
+msgid "Lineup Player Removed successfully."
+msgstr ""
+
+msgid "Lineup entries removed successfully."
+msgstr ""
+
+msgid "Lineup entry not found with the specified criteria."
+msgstr ""
+
+msgid "Lineup entry not found."
+msgstr ""
+
+msgid "Lineup not found"
+msgstr ""
+
+msgid "Lineup not found for this player."
+msgstr ""
+
+msgid "Lineup not found."
+msgstr ""
+
+msgid "Lineup players and manager fetched successfully for both teams."
+msgstr ""
+
+msgid "Lineup players fetched successfully with status 'ADDED'."
+msgstr ""
+
+msgid "Lineup players fetched successfully."
+msgstr ""
+
+msgid "Lineup reset successfully."
+msgstr ""
+
+msgid "Lineup updated successfully."
+msgstr ""
+
+msgid "Lineups retrieved successfully."
+msgstr ""
+
+msgid "Login successful"
+msgstr ""
+
+msgid "Logout failed"
+msgstr ""
+
+msgid "Logout successful"
+msgstr ""
+
+msgid "Manager added successfully, and user role updated to manager."
+msgstr ""
+
+msgid "Media ID is required."
+msgstr ""
+
+msgid "Member deleted successfully."
+msgstr ""
+
+msgid "Membership not found."
+msgstr ""
+
+msgid "New Comment on Your Event!"
+msgstr ""
+
+msgid "New Follower!"
+msgstr ""
+
+msgid "New Post Alert!"
+msgstr ""
+
+msgid "New Reply on Your Comment!"
+msgstr ""
+
+msgid "New password must be at least 8 characters long."
+msgstr ""
+
+msgid "No Official Found."
+msgstr ""
+
+msgid "No Team Exists"
+msgstr ""
+
+msgid "No TeamBranch found for the given ID."
+msgstr ""
+
+msgid "No branches found for the given team ID."
+msgstr ""
+
+msgid "No comments found for this Event."
+msgstr ""
+
+msgid "No comments found for this Training."
+msgstr ""
+
+msgid "No comments found for this post."
+msgstr ""
+
+msgid "No comments found for this tournament."
+msgstr ""
+
+msgid "No data available."
+msgstr ""
+
+msgid "No data found."
+msgstr ""
+
+msgid "No entries found."
+msgstr ""
+
+msgid "No existing assignment found to update."
+msgstr ""
+
+msgid "No games found for this tournament"
+msgstr ""
+
+msgid "No general settings found."
+msgstr ""
+
+msgid "No groups found for the specified tournament."
+msgstr ""
+
+msgid "No lineups found for the provided team and game."
+msgstr ""
+
+msgid "No matching active lineup entries found."
+msgstr ""
+
+msgid "No matching team found for this event."
+msgstr ""
+
+msgid "No official found for the given game."
+msgstr ""
+
+msgid "No player found with the given user_id in the specified branch."
+msgstr ""
+
+msgid "No players found for the provided team."
+msgstr ""
+
+msgid "No players found for the specified criteria."
+msgstr ""
+
+msgid "No players found."
+msgstr ""
+
+msgid "No profile picture provided."
+msgstr ""
+
+msgid "No such friendly game exists."
+msgstr ""
+
+msgid "No team found to add."
+msgstr ""
+
+msgid "No upcoming games found for the user."
+msgstr ""
+
+msgid "OTP is required."
+msgstr ""
+
+msgid "OTP sent successfully."
+msgstr ""
+
+msgid "OTP sent to your phone number."
+msgstr ""
+
+msgid "OTP verified successfully."
+msgstr ""
+
+msgid "Official added successfully."
+msgstr ""
+
+msgid "Official is required."
+msgstr ""
+
+msgid "Official removed successfully from the game."
+msgstr ""
+
+msgid "Officials retrieved successfully."
+msgstr ""
+
+msgid "Old password is incorrect."
+msgstr ""
+
+msgid "Only Players can join closed training."
+msgstr ""
+
+msgid "Only managers, coaches, or team founders can perform this action."
+msgstr ""
+
+msgid "Options Fetched Successfully"
+msgstr ""
+
+msgid "Page Not Found"
+msgstr ""
+
+msgid "Page not found."
+msgstr ""
+
+msgid "Parent comment not found."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr ""
+
+msgid "Phone is required."
+msgstr ""
+
+msgid "Phone number already in use."
+msgstr ""
+
+msgid "Player A id is required."
+msgstr ""
+
+msgid "Player A not found or not in the correct lineup status."
+msgstr ""
+
+msgid "Player Added"
+msgstr ""
+
+msgid "Player B id is required."
+msgstr ""
+
+msgid "Player B not found or not in the correct lineup status."
+msgstr ""
+
+msgid "Player Details."
+msgstr ""
+
+msgid "Player ID, target position, team ID, and game ID are required."
+msgstr ""
+
+msgid "Player Removed From Playing 11."
+msgstr ""
+
+msgid "Player Substituted."
+msgstr ""
+
+msgid "Player added successfully, and user role updated to player."
+msgstr ""
+
+msgid "Player id is required."
+msgstr ""
+
+msgid "Player not found or not in correct lineup status."
+msgstr ""
+
+msgid "Player position updated successfully."
+msgstr ""
+
+msgid "Player ready status updated successfully."
+msgstr ""
+
+msgid "Player removed from the branch successfully."
+msgstr ""
+
+msgid "Player stats fetched successfully, but no data found. Default values returned."
+msgstr ""
+
+msgid "Player stats fetched successfully."
+msgstr ""
+
+msgid "Player status updated successfully."
+msgstr ""
+
+msgid "Player substitution successful."
+msgstr ""
+
+msgid "Players Details Must Required."
+msgstr ""
+
+msgid "Players details are required."
+msgstr ""
+
+msgid "Players fetched successfully."
+msgstr ""
+
+msgid "Playing 11 Updated Successfully"
+msgstr ""
+
+msgid "Playing 11 Updated Successfully."
+msgstr ""
+
+msgid "Playing foot retrieved successfully."
+msgstr ""
+
+msgid "Playing positions retrieved successfully."
+msgstr ""
+
+msgid "Please add your gender first."
+msgstr ""
+
+msgid "Please provide a valid joining type"
+msgstr ""
+
+msgid "Please provide a valid joining type."
+msgstr ""
+
+msgid "Positions data must be a list of player details."
+msgstr ""
+
+msgid "Positions swapped successfully."
+msgstr ""
+
+msgid "Post ID is required."
+msgstr ""
+
+msgid "Post Liked!"
+msgstr ""
+
+msgid "Post Media deleted successfully."
+msgstr ""
+
+msgid "Post Media not found."
+msgstr ""
+
+msgid "Post Report Submitted Successfully."
+msgstr ""
+
+msgid "Post created successfully"
+msgstr ""
+
 msgid "Post deleted successfully."
+msgstr ""
+
+msgid "Post details fetched successfully."
+msgstr ""
+
+msgid "Post fetched successfully."
+msgstr ""
+
+msgid "Post liked successfully."
+msgstr ""
+
+msgid "Post not found."
+msgstr ""
+
+msgid "Post unliked successfully."
+msgstr ""
+
+msgid "Post updated successfully."
+msgstr ""
+
+msgid "Posts fetched successfully."
+msgstr ""
+
+msgid "Profile Picture updated successfully."
+msgstr ""
+
+msgid "Profile type and certificates uploaded successfully."
+msgstr ""
+
+msgid "Profile updated successfully."
+msgstr ""
+
+msgid "Reasons fetched successfully."
+msgstr ""
+
+msgid "Referee list fetched successfully"
+msgstr ""
+
+msgid "Referee must have a fee assigned to be approved"
+msgstr ""
+
+msgid "Referee status updated successfully"
+msgstr ""
+
+msgid "Referees requested successfully."
+msgstr ""
+
+msgid "Reports retrieved successfully."
+msgstr ""
+
+msgid "Requested Referee not found for the provided game_id and user_id"
+msgstr ""
+
+msgid "Some players could not be updated."
+msgstr ""
+
+msgid "Someone commented on your post"
+msgstr ""
+
+msgid "Someone replied to your comment"
+msgstr ""
+
+msgid "Staff added successfully."
+msgstr ""
+
+msgid "Statistics Updated!"
+msgstr ""
+
+msgid "Stats fetched successfully"
+msgstr ""
+
+msgid "Stats updated and lineup fetched successfully."
+msgstr ""
+
+msgid "Team A is required."
+msgstr ""
+
+msgid "Team B cannot be the same as Team A."
+msgstr ""
+
+msgid "Team B is already assigned."
+msgstr ""
+
+msgid "Team Branch ID is required."
+msgstr ""
+
+msgid "Team Branch created successfully."
+msgstr ""
+
+msgid "Team Branch creation failed."
+msgstr ""
+
+msgid "Team Branch deleted successfully."
+msgstr ""
+
+msgid "Team Branch retrieved successfully."
+msgstr ""
+
+msgid "Team Branch update failed."
+msgstr ""
+
+msgid "Team Branch updated successfully."
+msgstr ""
+
+msgid "Team Fetched successfully."
+msgstr ""
+
+msgid "Team ID and Game ID are required."
+msgstr ""
+
+msgid "Team ID is required when creator_type is 2."
+msgstr ""
+
+msgid "Team ID is required."
+msgstr ""
+
+msgid "Team branches retrieved successfully."
+msgstr ""
+
+msgid "Team created successfully."
+msgstr ""
+
+msgid "Team data retrieved successfully."
+msgstr ""
+
+msgid "Team deleted successfully."
+msgstr ""
+
+msgid "Team does not exist."
+msgstr ""
+
+msgid "Team id is required."
+msgstr ""
+
+msgid "Team is not part of the tournament or the request does not exist."
+msgstr ""
+
+msgid "Team joining request updated successfully."
+msgstr ""
+
+msgid "Team logo updated successfully."
+msgstr ""
+
+msgid "Team not found."
+msgstr ""
+
+msgid "Team rejected successfully."
+msgstr ""
+
+msgid "Team stats timeline fetched successfully."
+msgstr ""
+
+msgid "Team updated successfully."
+msgstr ""
+
+msgid "Teams fetched successfully."
+msgstr ""
+
+msgid "The player has not been assigned a jersey number yet."
+msgstr ""
+
+msgid "The player in the target position must also be in the starting 11 lineup to swap positions."
+msgstr ""
+
+msgid "The provided group does not belong to the specified tournament."
+msgstr ""
+
+msgid "The specified friendly game does not exist."
+msgstr ""
+
+msgid "The specified game does not exist in this tournament."
+msgstr ""
+
+msgid "The specified game does not exist."
+msgstr ""
+
+msgid "The specified player is not part of this team."
+msgstr ""
+
+msgid "The specified playing foot does not exist."
+msgstr ""
+
+msgid "The specified team does not exist."
+msgstr ""
+
+msgid "The specified team is not part of this friendly game."
+msgstr ""
+
+msgid "The specified team is not part of this game."
+msgstr ""
+
+msgid "The specified team_id does not match any team in this game."
+msgstr ""
+
+msgid "The specified tournament does not exist."
+msgstr ""
+
+msgid "The team age group does not match the tournament age group."
+msgstr ""
+
+msgid "The team does not exist in the tournament. Please ensure the team is already added."
+msgstr ""
+
+msgid "The team is already assigned to another group in this tournament."
+msgstr ""
+
+msgid "The username is already Taken."
+msgstr ""
+
+msgid "The username is already in use either as a team username or a user username."
+msgstr ""
+
+msgid "This game number already exists for the specified tournament. Please choose a different game number."
+msgstr ""
+
+msgid "This official is already assigned to this game."
+msgstr ""
+
+msgid "This phone number is associated with a deleted account, you have to register again."
+msgstr ""
+
+msgid "This team has already requested or is already accepted into the tournament."
+msgstr ""
+
+msgid "Top players fetched successfully."
+msgstr ""
+
+msgid "Tournament Group Points Table fetched successfully."
+msgstr ""
+
+msgid "Tournament Group Team added successfully."
+msgstr ""
+
+msgid "Tournament Group Team status updated to accepted."
+msgstr ""
+
+msgid "Tournament Group Team updated successfully."
+msgstr ""
+
+msgid "Tournament Group Teams fetched successfully."
+msgstr ""
+
+msgid "Tournament ID is required"
+msgstr ""
+
+msgid "Tournament ID is required."
+msgstr ""
+
+msgid "Tournament created successfully."
+msgstr ""
+
+msgid "Tournament creation failed."
+msgstr ""
+
+msgid "Tournament deleted successfully."
+msgstr ""
+
+msgid "Tournament details fetched successfully."
+msgstr ""
+
+msgid "Tournament does not exist."
+msgstr ""
+
+msgid "Tournament game not found."
+msgstr ""
+
+msgid "Tournament id is required."
+msgstr ""
+
+msgid "Tournament liked successfully."
+msgstr ""
+
+msgid "Tournament not found."
+msgstr ""
+
+msgid "Tournament unliked successfully."
+msgstr ""
+
+msgid "Tournament update failed."
+msgstr ""
+
+msgid "Tournament updated successfully."
+msgstr ""
+
+msgid "Tournaments fetched successfully."
+msgstr ""
+
+msgid "Training ID is required for deletion"
+msgstr ""
+
+msgid "Training ID is required for update"
+msgstr ""
+
+msgid "Training ID is required."
+msgstr ""
+
+msgid "Training details fetched successfully."
+msgstr ""
+
+msgid "Training liked successfully."
+msgstr ""
+
+msgid "Training not found"
+msgstr ""
+
+msgid "Training not found."
+msgstr ""
+
+msgid "Training successfully created"
+msgstr ""
+
+msgid "Training successfully deleted"
+msgstr ""
+
+msgid "Training successfully updated"
+msgstr ""
+
+msgid "Training unliked successfully."
+msgstr ""
+
+msgid "Unfollowed successfully."
+msgstr ""
+
+msgid "Uniform Added Successfully"
+msgstr ""
+
+msgid "Uniform ID is required."
+msgstr ""
+
+msgid "Uniform confirmed successfully."
+msgstr ""
+
+msgid "Uniform deleted successfully."
+msgstr ""
+
+msgid "Uniform information fetched successfully."
+msgstr ""
+
+msgid "Uniform not found."
+msgstr ""
+
+msgid "Uniform rejected successfully."
+msgstr ""
+
+msgid "Uniform rejected successfully. Please add new uniform ASAP."
+msgstr ""
+
+msgid "User Dose Not Found"
+msgstr ""
+
+msgid "User ID and Group ID are required."
+msgstr ""
+
+msgid "User Profiles retrieved successfully."
+msgstr ""
+
+msgid "User added as {} to the group."
+msgstr ""
+
+msgid "User can proceed with registration."
+msgstr ""
+
+msgid "User does not exist for the given username or phone."
+msgstr ""
+
+msgid "User does not have access to delete this training."
+msgstr ""
+
+msgid "User does not have the required role."
+msgstr ""
+
+msgid "User has already joined this branch."
+msgstr ""
+
+msgid "User is already a member of the training."
+msgstr ""
+
+msgid "User is already a member of this group."
+msgstr ""
+
+msgid "User is already an organizer and cannot be changed to a member."
+msgstr ""
+
+msgid "User is not a member of the training."
+msgstr ""
+
+msgid "User joined the training successfully."
+msgstr ""
+
+msgid "User membership deleted successfully."
+msgstr ""
+
+msgid "User membership retrieved successfully."
+msgstr ""
+
+msgid "User not found."
+msgstr ""
+
+msgid "User registered successfully"
+msgstr ""
+
+msgid "User upgraded to organizer in the group."
+msgstr ""
+
+msgid "User with this phone number does not exist."
+msgstr ""
+
+msgid "Username already taken."
+msgstr ""
+
+msgid "Username is required."
+msgstr ""
+
+msgid "Validation errors occurred."
+msgstr ""
+
+msgid "Video gallary entries fetched successfully."
+msgstr ""
+
+msgid "Welcome to {team_name}"
+msgstr ""
+
+msgid "You Cannot Login Here"
+msgstr ""
+
+msgid "You are already registered as a coach and cannot create a new coach profile."
+msgstr ""
+
+msgid "You are already registered as a referee and cannot create a new referee profile."
+msgstr ""
+
+msgid "You are not a manager of any team."
+msgstr ""
+
+msgid "You are not assigned as a coach to any branch."
+msgstr ""
+
+msgid "You are not assigned as a manager to any branch."
+msgstr ""
+
+msgid "You are not associated with any team branch as a founder."
+msgstr ""
+
+msgid "You can only create one Training Group."
+msgstr ""
+
+msgid "You can only create one team."
+msgstr ""
+
+msgid "You do not have access to this resource."
+msgstr ""
+
+msgid "You do not have access."
+msgstr ""
+
+msgid "You do not have permission to access this team."
+msgstr ""
+
+msgid "You do not have permission to create a team."
+msgstr ""
+
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+msgid "You do not have the required permissions to perform this action."
+msgstr ""
+
+msgid "You do not have the required role to access this resource"
+msgstr ""
+
+msgid "You have been appointed to officiate a friendly game."
+msgstr ""
+
+msgid "You have been appointed to officiate a game."
+msgstr ""
+
+msgid "You have not created any tournament yet..."
+msgstr ""
+
+msgid "You just made an assist!"
+msgstr ""
+
+msgid "You just received a red card!"
+msgstr ""
+
+msgid "You just received a yellow card!"
+msgstr ""
+
+msgid "You just scored a goal!"
+msgstr ""
+
+msgid "You just scored an own goal!"
+msgstr ""
+
+msgid "Your account has been deleted successfully."
+msgstr ""
+
+msgid "Your account has been deleted. Please contact support."
+msgstr ""
+
+msgid "Your event booking request has been submitted successfully. The admin will connect with you for further steps."
+msgstr ""
+
+msgid "Your group is attending an event!"
+msgstr ""
+
+msgid "Your statistics have been updated!"
+msgstr ""
+
+msgid "Your team is attending an event!"
+msgstr ""
+
+msgid "branch_id and user_id are required"
+msgstr ""
+
+msgid "branch_id is required"
+msgstr ""
+
+msgid "branch_id, user_id, and joinning_type are required"
+msgstr ""
+
+msgid "created_by_id and creator_type are required."
+msgstr ""
+
+msgid "created_by_id is required when creator_type is 2."
+msgstr ""
+
+msgid "created_by_id must be provided for TEAM_TYPE."
+msgstr ""
+
+msgid "creator_type and created_by_id must be valid integers."
+msgstr ""
+
+msgid "creator_type is required when creator_type is 2."
+msgstr ""
+
+msgid "creator_type is required."
+msgstr ""
+
+msgid "creator_type must be a valid integer."
+msgstr ""
+
+msgid "creator_type must be provided."
+msgstr ""
+
+msgid "event_id and comment are required."
+msgstr ""
+
+msgid "gallery entries and latest albums fetched successfully."
+msgstr ""
+
+msgid "gallery entry deleted successfully."
+msgstr ""
+
+msgid "gallery entry not found."
+msgstr ""
+
+msgid "game_id and tournament_id are required."
+msgstr ""
+
+msgid "game_id is required."
+msgstr ""
+
+msgid "game_id, official_id, and officials_type_id are required."
+msgstr ""
+
+msgid "game_id, user_id, and status are required"
+msgstr ""
+
+msgid "official types retrieved successfully."
+msgstr ""
+
+msgid "official_id is required."
+msgstr ""
+
+msgid "officials_type_id is required."
+msgstr ""
+
+msgid "player_id is required."
+msgstr ""
+
+msgid "player_id, team_id, and game_id are required."
+msgstr ""
+
+msgid "post_id and comment are required."
+msgstr ""
+
+msgid "post_id, created_by_id, and creator_type are required."
+msgstr ""
+
+msgid "team_id is required"
+msgstr ""
+
+msgid "team_id is required."
+msgstr ""
+
+msgid "team_id, game_id are required."
+msgstr ""
+
+msgid "team_id, game_id, are required."
+msgstr ""
+
+msgid "team_id, group_id, and tournament_id are required."
+msgstr ""
+
+msgid "tournament_id is required."
+msgstr ""
+
+msgid "tournament_id, comment, created_by_id and creator_type are required."
+msgstr ""
+
+msgid "training_id, comment, created_by_id and creator_type are required."
+msgstr ""
+
+msgid "user role retrieved successfully."
+msgstr ""
+
+msgid "user_id is required."
+msgstr ""
+
+msgid "{team_name} added you as {joinning_type_name}"
+msgstr ""
+
+msgid "{} commented on your Post."
+msgstr ""
+
+msgid "{} commented on your event."
+msgstr ""
+
+msgid "{} has requested to book a ticket for your event \"{}\"."
+msgstr ""
+
+msgid "{} just added a new post."
+msgstr ""
+
+msgid "{} liked your event."
+msgstr ""
+
+msgid "{} liked your post."
+msgstr ""
+
+msgid "{} replied to your comment."
+msgstr ""
+
+msgid "{} started following you."
+msgstr ""
+
+msgid "Notification ID is required."
+msgstr ""
+
+msgid "Notification not found."
+msgstr ""
+
+msgid "Notification marked as read."
+msgstr ""
+
+msgid "Both created_by_id and creator_type are required."
+msgstr ""
+
+msgid "No notifications found."
+msgstr ""
+
+msgid "All notifications marked as read."
+msgstr ""
+
+msgid "Notifications fetched successfully."
+msgstr ""
+
+msgid "Invalid created_by_id or creator_type."
+msgstr ""
+
+msgid "An error occurred: "
 msgstr ""

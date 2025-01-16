@@ -1472,20 +1472,29 @@ msgstr "{} رد على تعليقك."
 msgid "{} started following you."
 msgstr "{} بدأ يتابعك."
 
-msgid "All notifications marked as read successfully."
-msgstr "تم تعليم جميع الإشعارات كمقروءة بنجاح."
-
-msgid "Both created_by_id and creator_type are required."
-msgstr "كل من معرف المنشئ ونوع المنشئ مطلوبان."
-
-msgid "No notifications found for the given targeted_id and targeted_type."
-msgstr "لم يتم العثور على إشعارات للمعرف المستهدف والنوع المستهدف المحددين."
-
 msgid "Notification ID is required."
 msgstr "معرف الإشعار مطلوب."
 
-msgid "Notification marked as read successfully."
-msgstr "تم تعليم الإشعار كمقروء بنجاح."
-
 msgid "Notification not found."
-msgstr "لم يتم العثور على الإشعار."
+msgstr "الإشعار غير موجود."
+
+msgid "Notification marked as read."
+msgstr "تم وضع علامة القراءة على الإشعار."
+
+msgid "Both created_by_id and creator_type are required."
+msgstr "مطلوب كل من معرف المنشئ ونوع المنشئ."
+
+msgid "No notifications found."
+msgstr "لم يتم العثور على إشعارات."
+
+msgid "All notifications marked as read."
+msgstr "تم وضع علامة القراءة على جميع الإشعارات."
+
+msgid "Notifications fetched successfully."
+msgstr "تم جلب الإشعارات بنجاح."
+
+msgid "Invalid created_by_id or creator_type."
+msgstr "معرف المنشئ أو نوع المنشئ غير صالح."
+
+msgid "An error occurred: "
+msgstr "حدث خطأ: "

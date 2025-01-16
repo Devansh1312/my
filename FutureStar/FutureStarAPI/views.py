@@ -6281,7 +6281,7 @@ class ClearNotificationView(APIView):
 
             return Response({
                 'status': 1,
-                'message': _('Notification marked as read successfully.'),
+                'message': _('Notification marked as read.'),
                 'data': {
                     'id': notification.id,
                     'read': notification.read
@@ -6327,7 +6327,7 @@ class MarkAllNotificationsReadView(APIView):
             if not notifications.exists():
                 return Response({
                     'status': 0,
-                    'message': _('No notifications found for the given targeted_id and targeted_type.')
+                    'message': _('No notifications found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
             # Mark all notifications as read
@@ -6335,7 +6335,7 @@ class MarkAllNotificationsReadView(APIView):
 
             return Response({
                 'status': 1,
-                'message': _('All notifications marked as read successfully.')
+                'message': _('All notifications marked as read.')
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
