@@ -3843,6 +3843,23 @@ class DashboardAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
+        # Extract created_by_id and creator_type from query parameters
+        created_by_id = request.query_params.get('created_by_id')
+        creator_type = request.query_params.get('creator_type')
+
+        if not created_by_id or not creator_type:
+            return Response({
+                'status': 0,
+                'message': _('Both created_by_id and creator_type are required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Convert created_by_id and creator_type to integers
+        created_by_id = int(created_by_id)
+        creator_type = int(creator_type)
+
+        # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
+
         # Fetch banners
         banners = MobileDashboardBanner.objects.all().order_by('-created_at')
         banner_serializer = MobileDashboardBannerSerializer(banners, many=True)
@@ -3866,7 +3883,8 @@ class DashboardAPI(APIView):
                 "banners": banner_serializer.data,
                 "latest_post": latest_post_serializer.data if latest_post_serializer else None,
                 "latest_event": latest_event_serializer.data if latest_event_serializer else None,
-                "latest_game": latest_game_serializer.data if latest_game_serializer else None
+                "latest_game": latest_game_serializer.data if latest_game_serializer else None,
+                "notification_count": notification_count if notification_count else 0,
             }
         }, status=status.HTTP_200_OK)
      
