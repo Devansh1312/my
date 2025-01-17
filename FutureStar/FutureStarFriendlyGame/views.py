@@ -120,6 +120,9 @@ class CreateFriendlyGame(APIView):
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Generate the game number for the friendly game
+        game_number = self.generate_game_number()
+
         # Validate and create FriendlyGame
         serializer = FriendlyGameSerializer(data=request.data)
         if serializer.is_valid():
@@ -141,9 +144,8 @@ class CreateFriendlyGame(APIView):
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Generate the game number for the friendly game
-            game_number = self.generate_game_number()
-
+            # Add the generated game number manually to the validated data
+            serializer.validated_data['game_number'] = game_number
             try:
                 # Save the friendly game instance
                 friendly_game = serializer.save(
@@ -183,11 +185,11 @@ class CreateFriendlyGame(APIView):
                                 time=friendly_game.game_start_time.strftime('%H:%M'),
                                 field=friendly_game.game_field_id.field_name
                             )
-                            friendly_data= {"id": friendly_game.id,  # Include the game ID
-                                "game_type": "friendly",}
+                            friendly_data = {"id": friendly_game.id,  # Include the game ID
+                                             "game_type": "friendly",}
                             push_data = {
                                 "game_data": friendly_data,  # Include the game data,
-                                "type":"friendly_game_scheduled"
+                                "type": "friendly_game_scheduled"
                             }
 
                             # Check device type and token
@@ -203,28 +205,27 @@ class CreateFriendlyGame(APIView):
                                     data=push_data
                                 )
                                 notification = Notifictions.objects.create(
-                                        created_by_id=request.user.id,  # Requestor ID
-                                        creator_type=1,  # Assuming 1 represents the requestor type
-                                        targeted_id=referee.id,  # Referee ID
-                                        targeted_type=1,  # Assuming 1 represents a user
-                                        title=title,
-                                        content=body
-                                    )
+                                    created_by_id=request.user.id,  # Requestor ID
+                                    creator_type=1,  # Assuming 1 represents the requestor type
+                                    targeted_id=referee.id,  # Referee ID
+                                    targeted_type=1,  # Assuming 1 represents a user
+                                    title=title,
+                                    content=body
+                                )
                                 notification.save()
 
                         except Exception as e:
                             # Log error for debugging purposes and continue
-                            print(f"Error sending notification to referee {user_id}: {str(e)}")
                             continue
 
                 # Notify eligible team members (coaches and managers)
                 team_a_name = friendly_game.team_a.team_name
                 team_b_name = friendly_game.team_b.team_name if team_b_id else None
-                game_field_name=friendly_game.game_field_id.field_name
+                game_field_name = friendly_game.game_field_id.field_name
                 start_time = friendly_game.game_start_time.strftime('%H:%M')
-                date=friendly_game.game_date.strftime('%d-%m')
+                date = friendly_game.game_date.strftime('%d-%m')
                 game_id = friendly_game.id
-                created_by_id=friendly_game.created_by_id
+                created_by_id = friendly_game.created_by_id
 
                 # Notify eligible team members (coaches and managers)
                 self.notify_team_members(team_a_id, request.user, team_b_id, team_a_name, team_b_name, game_field_name, date, start_time, game_id, created_by_id)
@@ -234,7 +235,7 @@ class CreateFriendlyGame(APIView):
                     'message': _('Friendly game created successfully.'),
                     'data': FriendlyGameSerializer(friendly_game).data
                 }, status=status.HTTP_201_CREATED)
-            except IntegrityError:
+            except IntegrityError as e:
                 return Response({
                     'status': 0,
                     'message': _('A game with these details already exists.'),
@@ -254,12 +255,12 @@ class CreateFriendlyGame(APIView):
         
         # Find the last game number for the current year
         last_game = FriendlyGame.objects.filter(game_date__year=timezone.now().year).order_by('-game_number').first()
-        
+
         # If no games exist for this year, start with game number 1
         if last_game:
-            last_game_number = last_game.game_number
-            # Increment the last game number by 1
-            game_number = last_game_number + 1
+            # Extract the numeric part of the last game number (ignoring the "#FSYY")
+            last_game_number = int(last_game.game_number[5:])  # Remove the "#FSyy" part
+            game_number = last_game_number + 1  # Increment the last game number by 1
         else:
             game_number = 1  # Start from 1 if no games exist
 
@@ -270,6 +271,7 @@ class CreateFriendlyGame(APIView):
         game_number_final = f"#FS{current_year:02d}{game_number_str}"
         
         return game_number_final
+
 
 
 
@@ -285,8 +287,6 @@ class CreateFriendlyGame(APIView):
             )
             for member in team_b_members:
                 user = member.user_id
-                print(user.id)
-                print(type(game_id))
 
                 notification_language = user.current_language
                 if notification_language in ['ar', 'en']:
@@ -352,7 +352,6 @@ class CreateFriendlyGame(APIView):
                     title = _("Friendly Game Reminder")
                     body = _("A new friendly game has been created! Make sure to check it out.")
 
-                    print(game_id)
 
                     push_data = {
                             "game_id": game_id,  # Include the game ID
@@ -2074,7 +2073,6 @@ class FriendlyGameStatsLineupPlayers(APIView):
                 'jersey_number': FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).first().jersey_number if FriendlyGamePlayerJersey.objects.filter(lineup_players=lineup).exists() else None,
                 'lastupdate': self.get_last_update(lineup.player_id.id, game_id)  # Use self to call the method
             } for lineup in already_added_lineups]
-            print(already_added_data)
 
             managerial_staff = JoinBranch.objects.filter(
                 branch_id=team_id,
@@ -2466,8 +2464,6 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             lineup_status=3,
             player_ready=True
         ).count()
-        print(team_a_ready_count)
-        print(team_b_ready_count)
 
         # Send notifications based on ready counts
         is_team_a = team_id == game.team_a.id
@@ -2807,7 +2803,6 @@ class FriendlyGameOfficialsAPIView(APIView):
                     location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
                     officials_type=type_serializer.data['name']
                 )
-                print(type(game_id))
                 friendly_data= {"id": game_id,  # Include the game ID
                     "game_type": "friendly",}
                 push_data = {
@@ -3055,7 +3050,6 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         created_by_id=request.user.id
                     )
                     created_by_id_role = request.user.role.id
-                    print(f'Created by role: {created_by_id_role}')
 
 
                     # Send push notification

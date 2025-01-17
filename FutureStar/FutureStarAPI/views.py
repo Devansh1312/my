@@ -6361,19 +6361,19 @@ class CustomNotificationsPagination(PageNumberPagination):
             }, status=400)
 
         # Get the paginated results as a list (instead of the Page object)
-        paginated_results = list(paginator.page(self.page))  # Convert to list
+        return list(paginator.page(self.page))
 
-        return paginated_results
-
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data, notification_count):
         return Response({
             "status": 1,
             "message": _("Notifications fetched successfully."),
             "total_records": self.total_records,
             "total_pages": self.total_pages,
             "current_page": self.page,
-            "data": data
+            "data": data,  # Directly include data array
+            "notification_count": notification_count  # Include notification count here
         })
+
 
 class NotificationsListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -6401,7 +6401,7 @@ class NotificationsListView(APIView):
             created_by_id = int(created_by_id)
             creator_type = int(creator_type)
 
-            # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
+            # Filter notifications
             notifications = Notifictions.objects.filter(
                 targeted_id=created_by_id, targeted_type=creator_type
             ).order_by('-date_created')
@@ -6417,15 +6417,6 @@ class NotificationsListView(APIView):
             # Apply pagination
             paginator = self.pagination_class()
             paginated_notifications = paginator.paginate_queryset(notifications, request, self)
-
-            # Check if paginated notifications exist
-            if not paginated_notifications:
-                return Response({
-                    'status': 1,
-                    'message': _('No notifications found.'),
-                    'data': [],
-                    'notification_count': notification_count,
-                }, status=status.HTTP_200_OK)
 
             # Build the response data
             response_data = []
@@ -6477,11 +6468,8 @@ class NotificationsListView(APIView):
                     "date_created": notification.date_created.strftime('%d %B %Y %H:%M'),
                 })
 
-            # Return paginated response
-            return paginator.get_paginated_response({
-                "data": response_data,
-                "notification_count": notification_count,  # Include the unread count
-            })
+            # Return the response
+            return paginator.get_paginated_response(response_data, notification_count)
 
         except ValueError:
             return Response({

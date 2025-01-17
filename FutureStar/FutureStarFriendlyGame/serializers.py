@@ -13,12 +13,13 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
     team_a = serializers.SerializerMethodField()
     team_b = serializers.SerializerMethodField()
     game_field_id = serializers.SerializerMethodField()
+    game_number = serializers.CharField(read_only=True)  # Make game_number read-only
 
     class Meta:
         model = FriendlyGame
         fields = [
             'id', 'team_a', 'team_b', 'game_name', 'game_number', 'game_date', 'game_start_time', 
-            'game_end_time', 'game_field_id', 'game_status','created_by'
+            'game_end_time', 'game_field_id', 'game_status', 'created_by'
         ]
 
     def get_team_a(self, obj):
@@ -37,24 +38,22 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
     
     def get_game_field_id(self, obj):
         return {
-                'id': obj.game_field_id.id,
-                'game_field_name': obj.game_field_id.field_name,
-                'location':{
-                    'latitude': obj.game_field_id.latitude,
-                    'longitude': obj.game_field_id.longitude,
-                    'address': obj.game_field_id.address,
-                    'house_no': obj.game_field_id.house_no,
-                    'premises': obj.game_field_id.premises,
-                    'street': obj.game_field_id.street,
-                    'city': obj.game_field_id.city,
-                    'state': obj.game_field_id.state,
-                    'country_name': obj.game_field_id.country_name,
-                    'postalCode': obj.game_field_id.postalCode,
-                    'country_code': obj.game_field_id.country_code
-                    }
-                } if obj.game_field_id else None
-
-
+            'id': obj.game_field_id.id,
+            'game_field_name': obj.game_field_id.field_name,
+            'location': {
+                'latitude': obj.game_field_id.latitude,
+                'longitude': obj.game_field_id.longitude,
+                'address': obj.game_field_id.address,
+                'house_no': obj.game_field_id.house_no,
+                'premises': obj.game_field_id.premises,
+                'street': obj.game_field_id.street,
+                'city': obj.game_field_id.city,
+                'state': obj.game_field_id.state,
+                'country_name': obj.game_field_id.country_name,
+                'postalCode': obj.game_field_id.postalCode,
+                'country_code': obj.game_field_id.country_code
+            }
+        } if obj.game_field_id else None
 
 class MyFriendlyGameSerializer(serializers.ModelSerializer):
     team_a_name = serializers.CharField(source='team_a.name', read_only=True)

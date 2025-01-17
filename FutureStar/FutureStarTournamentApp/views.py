@@ -1491,7 +1491,7 @@ class TournamentGamesAPIView(APIView):
 
     def generate_game_number(self, tournament_id):
         """Generate the game number in the format #TSYYNNNGGG."""
-        # Get the last two digits of the current year (e.g., 2025 → 25)
+        # Get the last two digits of the current year (e.g., 2025 -> 25)
         current_year = timezone.now().year % 100  # Extract last 2 digits
         
         # Pad tournament_id to 3 digits (e.g., 001 for ID 1)
