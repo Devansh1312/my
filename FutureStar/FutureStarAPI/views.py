@@ -4439,39 +4439,6 @@ class EventCreateAPIView(generics.CreateAPIView):
                 event.event_image = image_path
                 event.save()
 
-            # Send notifications to all active users
-            team_name = Team.objects.get(id=created_by_id).team_name
-            all_users = User.objects.filter(is_active=True)
-
-            for user in all_users:
-                notification_language = user.current_language
-                if notification_language in ['ar', 'en']:
-                    activate(notification_language)
-
-                event_type_name = event.event_type.name_ar if notification_language == 'ar' else event.event_type.name_en
-                title = _("New Event Added")
-                body = _("%s has added a %s event.") % (team_name, event_type_name)
-
-                # Create notification record with targeted_id and targeted_type
-                Notifictions.objects.create(
-                    created_by_id=created_by_id,  # Event creator ID
-                    creator_type=creator_type,      # Event creator type
-                    targeted_id=user.id,            # Notification recipient ID
-                    targeted_type=1,                # Assuming recipient is always a user
-                    title=title,
-                    content=body
-                )
-
-                # Send push notification
-                if user.device_token:
-                    send_push_notification(
-                        device_token=user.device_token,
-                        title=title,
-                        body=body,
-                        device_type=user.device_type,
-                        data={"notifier_id": event.id, "type": "event"}
-                    )
-
             return Response({
                 'status': 1,
                 'message': _('Event created successfully.'),
@@ -6261,7 +6228,6 @@ class PlayerReadyNotificationAPIView(APIView):
 
 
 
-#################### Read Notifiction API #########################
 class ClearNotificationView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -6291,17 +6257,12 @@ class ClearNotificationView(APIView):
                     'message': _('Notification not found.')
                 }, status=status.HTTP_404_NOT_FOUND)
 
-            # Mark the notification as read
-            notification.read = True
-            notification.save()
+            # Delete the notification
+            notification.delete()
 
             return Response({
                 'status': 1,
-                'message': _('Notification marked as read.'),
-                'data': {
-                    'id': notification.id,
-                    'read': notification.read
-                }
+                'message': _('Notification Clear successfully.')
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -6309,7 +6270,6 @@ class ClearNotificationView(APIView):
                 'status': 0,
                 'message': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 ################ Mark All Notifications Read ###################
 class MarkAllNotificationsReadView(APIView):
@@ -6342,16 +6302,16 @@ class MarkAllNotificationsReadView(APIView):
 
             if not notifications.exists():
                 return Response({
-                    'status': 0,
-                    'message': _('No notifications found.')
-                }, status=status.HTTP_404_NOT_FOUND)
+                    'status': 1,
+                    'message': _('All notifications Clear successfully.')
+                }, status=status.HTTP_200_OK)
 
-            # Mark all notifications as read
-            notifications.update(read=True)
+            # Delete all notifications
+            notifications.delete()
 
             return Response({
                 'status': 1,
-                'message': _('All notifications marked as read.')
+                'message': _('All notifications Clear successfully.')
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -6362,9 +6322,63 @@ class MarkAllNotificationsReadView(APIView):
 
 
 
+
+
+
+
+class CustomNotificationsPagination(PageNumberPagination):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    page_size = 10
+    page_query_param = 'page'
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def paginate_queryset(self, queryset, request, view=None):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+        try:
+            page_number = request.query_params.get(self.page_query_param, 1)
+            self.page = int(page_number)
+            if self.page < 1:
+                raise ValidationError(_("Page number must be a positive integer."))
+        except (ValueError, TypeError):
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        paginator = self.django_paginator_class(queryset, self.get_page_size(request))
+        self.total_pages = paginator.num_pages
+        self.total_records = paginator.count
+
+        if self.page > self.total_pages or self.page < 1:
+            return Response({
+                'status': 0,
+                'message': _('Page not found.'),
+                'data': []
+            }, status=400)
+
+        # Get the paginated results as a list (instead of the Page object)
+        paginated_results = list(paginator.page(self.page))  # Convert to list
+
+        return paginated_results
+
+    def get_paginated_response(self, data):
+        return Response({
+            "status": 1,
+            "message": _("Notifications fetched successfully."),
+            "total_records": self.total_records,
+            "total_pages": self.total_pages,
+            "current_page": self.page,
+            "data": data
+        })
+
 class NotificationsListView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+    pagination_class = CustomNotificationsPagination
 
     def get(self, request):
         try:
@@ -6388,13 +6402,27 @@ class NotificationsListView(APIView):
             creator_type = int(creator_type)
 
             # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
-            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type).exclude(read=True)
+            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type).order_by('-date_created')
 
-            # Build the response
+            # Mark notifications as read
+            notifications.update(read=True)
+
+            # Apply pagination
+            paginator = self.pagination_class()
+            paginated_notifications = paginator.paginate_queryset(notifications, request, self)
+
+            # Check if paginated notifications exist
+            if not paginated_notifications:
+                return Response({
+                    'status': 1,
+                    'message': _('No notifications found.'),
+                    'data': []
+                }, status=status.HTTP_200_OK)
+
+            # Build the response data
             response_data = []
-            entity = None
-            for notification in notifications:
-                # Fetch user details (replace User model with your user model if different)
+            for notification in paginated_notifications:
+                entity = None
                 if notification.creator_type == 1:  # User
                     try:
                         user = User.objects.get(id=notification.created_by_id)
@@ -6406,39 +6434,32 @@ class NotificationsListView(APIView):
                             "target_type": notification.creator_type,
                         }
                     except User.DoesNotExist:
-                        entity = {
-                         
-                        }
-
+                        entity = {}
                 elif notification.creator_type == 2:  # Team
                     try:
                         team = Team.objects.get(id=notification.created_by_id)
                         entity = {
-                            "username":team.team_username,
+                            "username": team.team_username,
                             "team_name": team.team_name,
                             "team_logo": team.team_logo.url if team.team_logo else None,
                             "target_id": notification.created_by_id,
                             "target_type": notification.creator_type,
                         }
                     except Team.DoesNotExist:
-                        entity = {
-                           
-                        }
-
+                        entity = {}
                 elif notification.creator_type == 3:  # Group
                     try:
                         group = TrainingGroups.objects.get(id=notification.created_by_id)
                         entity = {
-                            "username":group.group_username,
+                            "username": group.group_username,
                             "group_name": group.group_name,
                             "group_logo": group.group_logo.url if group.group_logo else None,
                             "target_id": notification.created_by_id,
                             "target_type": notification.creator_type,
                         }
                     except TrainingGroups.DoesNotExist:
-                        entity = {
-                           
-                        }
+                        entity = {}
+
                 response_data.append({
                     "id": notification.id,
                     "entity": entity,
@@ -6448,12 +6469,8 @@ class NotificationsListView(APIView):
                     "date_created": notification.date_created.strftime('%d %B %Y %H:%M'),
                 })
 
-
-            return Response({
-                "status": 1,
-                "message": _("Notifications fetched successfully."),
-                "data": response_data
-            }, status=status.HTTP_200_OK)
+            # Return paginated response
+            return paginator.get_paginated_response(response_data)
 
         except ValueError:
             return Response({
@@ -6463,5 +6480,5 @@ class NotificationsListView(APIView):
         except Exception as e:
             return Response({
                 "status": 0,
-                "message": _("An error occurred: "),
+                "message": _("An error occurred: ") + str(e),
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

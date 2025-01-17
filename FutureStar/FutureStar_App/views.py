@@ -1986,18 +1986,53 @@ class EventApprovalView(LoginRequiredMixin, View):
     def post(self, request, pk):
         # Fetch the event object
         event = get_object_or_404(Event, pk=pk)
-        
+
         # Retrieve the action from the form
         action = request.POST.get('action')  # Values: 'approve' or 'reject'
 
         # Update the event status based on the action
         if action == "approve" and event.event_status != Event.STATUS_APPROVED:
             event.event_status = Event.STATUS_APPROVED
+            event.save()
+
+            # Send notifications to all active users upon approval
+            created_by_id = event.created_by_id
+            creator_type = event.creator_type
+            team_name = Team.objects.get(id=created_by_id).team_name
+            all_users = User.objects.filter(is_active=True)
+
+            for user in all_users:
+                notification_language = user.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                event_type_name = event.event_type.name_ar if notification_language == 'ar' else event.event_type.name_en
+                title = _("New Event Added")
+                body = _("%s has added a %s event.") % (team_name, event_type_name)
+
+                # Create notification record
+                Notifictions.objects.create(
+                    created_by_id=created_by_id,  # Event creator ID
+                    creator_type=creator_type,   # Event creator type
+                    targeted_id=user.id,         # Notification recipient ID
+                    targeted_type=1,             # Assuming recipient is always a user
+                    title=title,
+                    content=body
+                )
+
+                # Send push notification
+                if user.device_token:
+                    send_push_notification(
+                        device_token=user.device_token,
+                        title=title,
+                        body=body,
+                        device_type=user.device_type,
+                        data={"notifier_id": event.id, "type": "event"}
+                    )
+
         elif action == "reject" and event.event_status != Event.STATUS_REJECTED:
             event.event_status = Event.STATUS_REJECTED
-        
-        # Save the updated status
-        event.save()
+            event.save()
 
         # Redirect back to the Event Detail page
         return redirect('event_detail', pk=pk)
