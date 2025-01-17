@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-msgid "%(user_name)s wants to attend your event!"
+msgid "{} wants to attend your event!"
 msgstr ""
 
 msgid "A game with these details already exists."
@@ -107,7 +107,7 @@ msgstr ""
 msgid "Both player_id and position_1 are required."
 msgstr ""
 
-msgid "Branch not found."
+msgid "Team not found."
 msgstr ""
 
 msgid "Cannot delete a game that has already Started."
@@ -584,10 +584,10 @@ msgstr ""
 msgid "No Team Exists"
 msgstr ""
 
-msgid "No TeamBranch found for the given ID."
+msgid "No Team found for the given ID."
 msgstr ""
 
-msgid "No branches found for the given team ID."
+msgid "No Team found for the given team ID."
 msgstr ""
 
 msgid "No comments found for this Event."
@@ -635,7 +635,7 @@ msgstr ""
 msgid "No official found for the given game."
 msgstr ""
 
-msgid "No player found with the given user_id in the specified branch."
+msgid "No player found with the given user_id in the Specific Team."
 msgstr ""
 
 msgid "No players found for the provided team."
@@ -713,19 +713,19 @@ msgstr ""
 msgid "Phone number already in use."
 msgstr ""
 
-msgid "Player A id is required."
+msgid "Lineup player ID is required."
 msgstr ""
 
-msgid "Player A not found or not in the correct lineup status."
+msgid "Lineup player not found or not in the correct lineup status."
 msgstr ""
 
 msgid "Player Added"
 msgstr ""
 
-msgid "Player B id is required."
+msgid "Substitute player ID is required."
 msgstr ""
 
-msgid "Player B not found or not in the correct lineup status."
+msgid "Substitute player not found or not in the correct lineup status."
 msgstr ""
 
 msgid "Player Details."
@@ -755,7 +755,7 @@ msgstr ""
 msgid "Player ready status updated successfully."
 msgstr ""
 
-msgid "Player removed from the branch successfully."
+msgid "Player removed from the Team successfully."
 msgstr ""
 
 msgid "Player stats fetched successfully, but no data found. Default values returned."
@@ -908,25 +908,22 @@ msgstr ""
 msgid "Team B is already assigned."
 msgstr ""
 
-msgid "Team Branch ID is required."
+msgid "Team ID is required."
 msgstr ""
 
-msgid "Team Branch created successfully."
+msgid "Team created successfully."
 msgstr ""
 
-msgid "Team Branch creation failed."
+msgid "Team creation failed."
 msgstr ""
 
-msgid "Team Branch deleted successfully."
+msgid "Team retrieved successfully."
 msgstr ""
 
-msgid "Team Branch retrieved successfully."
+msgid "Team Detail update failed."
 msgstr ""
 
-msgid "Team Branch update failed."
-msgstr ""
-
-msgid "Team Branch updated successfully."
+msgid "Team Details updated successfully."
 msgstr ""
 
 msgid "Team Fetched successfully."
@@ -938,13 +935,7 @@ msgstr ""
 msgid "Team ID is required when creator_type is 2."
 msgstr ""
 
-msgid "Team ID is required."
-msgstr ""
-
-msgid "Team branches retrieved successfully."
-msgstr ""
-
-msgid "Team created successfully."
+msgid "Teams retrieved successfully."
 msgstr ""
 
 msgid "Team data retrieved successfully."
@@ -966,9 +957,6 @@ msgid "Team joining request updated successfully."
 msgstr ""
 
 msgid "Team logo updated successfully."
-msgstr ""
-
-msgid "Team not found."
 msgstr ""
 
 msgid "Team rejected successfully."
@@ -1196,7 +1184,7 @@ msgstr ""
 msgid "User does not have the required role."
 msgstr ""
 
-msgid "User has already joined this branch."
+msgid "User has already joined this Team."
 msgstr ""
 
 msgid "User is already a member of the training."
@@ -1259,13 +1247,13 @@ msgstr ""
 msgid "You are not a manager of any team."
 msgstr ""
 
-msgid "You are not assigned as a coach to any branch."
+msgid "You are not assigned as a coach to any Team."
 msgstr ""
 
-msgid "You are not assigned as a manager to any branch."
+msgid "You are not assigned as a manager to any Team."
 msgstr ""
 
-msgid "You are not associated with any team branch as a founder."
+msgid "You are not associated with any team as a founder."
 msgstr ""
 
 msgid "You can only create one Training Group."
@@ -1337,13 +1325,13 @@ msgstr ""
 msgid "Your team is attending an event!"
 msgstr ""
 
-msgid "branch_id and user_id are required"
+msgid "team_id and User_id are required."
 msgstr ""
 
-msgid "branch_id is required"
+msgid "Team_Id is required."
 msgstr ""
 
-msgid "branch_id, user_id, and joinning_type are required"
+msgid "Team_id, user_id, and joining_type are required."
 msgstr ""
 
 msgid "created_by_id and creator_type are required."

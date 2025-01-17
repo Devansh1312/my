@@ -2632,9 +2632,9 @@ class PlayerSubstitutionAPIView(APIView):
         if not game_id:
             return Response({'status': 0, 'message': _('Game id is required.')}, status=status.HTTP_400_BAD_REQUEST)
         if not player_a_id:
-            return Response({'status': 0, 'message': _('Player A id is required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Lineup player ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
         if not player_b_id:
-            return Response({'status': 0, 'message': _('Player B id is required.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Substitute player ID is required.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check user access
         if not self._has_access(request.user, game_id=game_id, tournament_id=tournament_id):
@@ -2650,7 +2650,7 @@ class PlayerSubstitutionAPIView(APIView):
                 lineup_status=Lineup.ALREADY_IN_LINEUP
             )
         except Lineup.DoesNotExist:
-            return Response({'status': 0, 'message': _('Player A not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Lineup player not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             player_b = Lineup.objects.get(
@@ -2661,7 +2661,7 @@ class PlayerSubstitutionAPIView(APIView):
                 lineup_status=Lineup.SUBSTITUTE
             )
         except Lineup.DoesNotExist:
-            return Response({'status': 0, 'message': _('Player B not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Substitute player not found or not in the correct lineup status.')}, status=status.HTTP_400_BAD_REQUEST)
 
         # Swap positions and update statuses
         player_b.position_1 = player_a.position_1

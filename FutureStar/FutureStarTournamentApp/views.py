@@ -704,9 +704,9 @@ class TeamJoiningRequest(APIView):
                
             except JoinBranch.DoesNotExist:
                 role_message = (
-                    _('You are not assigned as a manager to any branch.')
+                    _('You are not assigned as a manager to any Team.')
                     if request.user.role_id == 6
-                    else _('You are not assigned as a coach to any branch.')
+                    else _('You are not assigned as a coach to any Team.')
                 )
                 return Response({
                     'status': 0,
@@ -727,7 +727,7 @@ class TeamJoiningRequest(APIView):
             except TeamBranch.DoesNotExist:
                 return Response({
                     'status': 0,
-                    'message': _('You are not associated with any team branch as a founder.'),
+                    'message': _('You are not associated with any team as a founder.'),
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
@@ -804,7 +804,7 @@ class TeamJoiningRequest(APIView):
 
         return Response({
             'status': 1,
-            'message': _('Team branches retrieved successfully.'),
+            'message': _('Teams retrieved successfully.'),
             'data': serialized_data
                
             

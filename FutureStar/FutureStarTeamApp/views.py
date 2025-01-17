@@ -447,14 +447,14 @@ class TeamBranchAPIView(APIView):
             # Return a success response with the created data
             return Response({
                 'status': 1,
-                'message': _('Team Branch created successfully.'),
+                'message': _('Team created successfully.'),
                 'data': TeamBranchSerializer(team_branch_instance, context={'request': request}).data  # Include context here as well
             }, status=status.HTTP_201_CREATED)
         
         # Return an error response if validation fails
         return Response({
             'status': 0,
-            'message': _('Team Branch creation failed.'),
+            'message': _('Team creation failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -469,7 +469,7 @@ class TeamBranchAPIView(APIView):
         if not team_branch_id:
             return Response({
                 'status': 0,
-                'message': _('Team Branch ID is required.')
+                'message': _('Team ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve the TeamBranch instance associated with the team_id
@@ -478,14 +478,14 @@ class TeamBranchAPIView(APIView):
         except TeamBranch.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('No TeamBranch found for the given ID.')
+                'message': _('No Team found for the given ID.')
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Serialize and return the TeamBranch data
         serializer = TeamBranchSerializer(team_branch_instance, context={'request': request})
         return Response({
             'status': 1,
-            'message': _('Team Branch retrieved successfully.'),
+            'message': _('Team retrieved successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
     
@@ -500,7 +500,7 @@ class TeamBranchAPIView(APIView):
         if not team_branch_id:
             return Response({
                 'status': 0,
-                'message': _('Team Branch ID is required.')
+                'message': _('Team ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve the TeamBranch instance associated with the team_id
@@ -509,7 +509,7 @@ class TeamBranchAPIView(APIView):
         except TeamBranch.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('No TeamBranch found for the given ID.')
+                'message': _('No Team found for the given ID.')
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Initialize the serializer with the existing instance and the updated data
@@ -539,14 +539,14 @@ class TeamBranchAPIView(APIView):
             # Return a success response with the updated data
             return Response({
                 'status': 1,
-                'message': _('Team Branch updated successfully.'),
+                'message': _('Team Details updated successfully.'),
                 'data': TeamBranchSerializer(team_branch_instance, context={'request': request}).data
             }, status=status.HTTP_200_OK)
 
         # Return an error response if validation fails
         return Response({
             'status': 0,
-            'message': _('Team Branch update failed.'),
+            'message': _('Team Detail update failed.'),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -561,7 +561,7 @@ class TeamBranchAPIView(APIView):
         if not team_branch_id:
             return Response({
                 'status': 0,
-                'message': _('Team Branch ID is required.')
+                'message': _('Team ID is required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Retrieve the TeamBranch instance associated with the team_id
@@ -570,7 +570,7 @@ class TeamBranchAPIView(APIView):
         except TeamBranch.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('No TeamBranch found for the given ID.')
+                'message': _('No Team found for the given ID.')
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Delete the TeamBranch instance
@@ -578,7 +578,7 @@ class TeamBranchAPIView(APIView):
 
         return Response({
             'status': 1,
-            'message': _('Team Branch deleted successfully.')
+            'message': _('Team deleted successfully.')
         }, status=status.HTTP_204_NO_CONTENT)
         
 
@@ -596,7 +596,7 @@ class StaffManagementView(APIView):
         if not branch_id:
             return Response({
                 'status': 0, 
-                'message': _('branch_id is required')
+                'message': _('Team_Id is required.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Filter staff by type
@@ -638,7 +638,7 @@ class StaffManagementView(APIView):
         if not branch_id or not user_id or joinning_type is None:
             return Response({
                 'status': 0, 
-                'message': _('branch_id, user_id, and joinning_type are required')
+                'message': _('Team_id, user_id, and joining_type are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Convert joinning_type to an integer and validate it
@@ -673,7 +673,7 @@ class StaffManagementView(APIView):
                 except TeamBranch.DoesNotExist:
                     return Response({
                         'status': 0,
-                        'message': _('Branch not found.')
+                        'message': _('Team not found.')
                     }, status=status.HTTP_404_NOT_FOUND)
 
                 # Check if joining as MANAGERIAL_STAFF and update the role if current role is 5
@@ -753,7 +753,7 @@ class StaffManagementView(APIView):
         except IntegrityError:
             return Response({
                 'status': 0,
-                'message': _('User has already joined this branch.')
+                'message': _('User has already joined this Team.')
             }, status=status.HTTP_400_BAD_REQUEST)
         
 
@@ -774,7 +774,7 @@ class StaffManagementView(APIView):
         if not branch_id or not user_id:
             return Response({
                 'status': 0,
-                'message': _('branch_id and user_id are required')
+                'message': _('team_id and User_id are required.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -786,13 +786,13 @@ class StaffManagementView(APIView):
 
             return Response({
                 'status': 1,
-                'message': _('Player removed from the branch successfully.')
+                'message': _('Player removed from the Team successfully.')
             }, status=status.HTTP_200_OK)
 
         except JoinBranch.DoesNotExist:
             return Response({
                 'status': 0,
-                'message': _('No player found with the given user_id in the specified branch.')
+                'message': _('No player found with the given user_id in the Specific Team.')
             }, status=status.HTTP_404_NOT_FOUND)
 
         except IntegrityError:
@@ -984,7 +984,7 @@ class TeamStatsView(APIView):
         if not all_team_branches.exists():
             return Response({
                 'status': 1,
-                'message': _('No branches found for the given team ID.'),
+                'message': _('No Team found for the given team ID.'),
                 'data': []
             }, status=status.HTTP_200_OK)
 
