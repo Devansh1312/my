@@ -26,24 +26,18 @@ class CreateTrainingView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        creator_type = self.request.query_params.get('creator_type', None)
-        created_by_id = self.request.query_params.get('created_by_id', None)
+        creator_type = request.data.get('creator_type', None)
+        created_by_id = request.data.get('created_by_id', None)
 
-        # Convert creator_type and created_by_id to integers safely
-        try:
-            creator_type = int(creator_type)
-            created_by_id = int(created_by_id)
-        except (ValueError, TypeError):
-            return Response({
-                'status': 0,
-                'message': _('Invalid creator_type or created_by_id format. Both must be integers.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+        creator_type = int(creator_type)
+        created_by_id = int(created_by_id)
 
         context = {'request': request}
         serializer = TrainingSerializer(data=request.data, context=context)
 
 
         if serializer.is_valid():
+
 
             # Handle image saving logic if training photo is uploaded
             if "training_photo" in request.FILES:

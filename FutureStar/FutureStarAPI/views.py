@@ -4660,9 +4660,7 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                     activate(notification_language)
 
                 # Prepare notification title and body
-                title = _('%(user_name)s wants to attend your event!') % {
-                    'user_name': request.user.username
-                }
+                title = _('{} wants to attend your event!').format(request.user.username)
                 body = _('{} has requested to book a ticket for your event "{}".').format(
                             request.user.username,
                             event_instance.event_name,
