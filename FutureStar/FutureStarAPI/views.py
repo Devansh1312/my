@@ -6262,7 +6262,7 @@ class ClearNotificationView(APIView):
 
             return Response({
                 'status': 1,
-                'message': _('Notification Clear successfully.')
+                'message': _('Notification Clear successfully.'),
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -6303,7 +6303,7 @@ class MarkAllNotificationsReadView(APIView):
             if not notifications.exists():
                 return Response({
                     'status': 1,
-                    'message': _('All notifications Clear successfully.')
+                    'message': _('All notifications Clear successfully.'),
                 }, status=status.HTTP_200_OK)
 
             # Delete all notifications
@@ -6311,7 +6311,7 @@ class MarkAllNotificationsReadView(APIView):
 
             return Response({
                 'status': 1,
-                'message': _('All notifications Clear successfully.')
+                'message': _('All notifications Clear successfully.'),
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
