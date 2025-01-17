@@ -6402,7 +6402,14 @@ class NotificationsListView(APIView):
             creator_type = int(creator_type)
 
             # Filter notifications where targeted_id matches created_by_id and targeted_type matches creator_type
-            notifications = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type).order_by('-date_created')
+            notifications = Notifictions.objects.filter(
+                targeted_id=created_by_id, targeted_type=creator_type
+            ).order_by('-date_created')
+
+            # Count unread notifications
+            notification_count = Notifictions.objects.filter(
+                targeted_id=created_by_id, targeted_type=creator_type, read=False
+            ).count()
 
             # Mark notifications as read
             notifications.update(read=True)
@@ -6416,7 +6423,8 @@ class NotificationsListView(APIView):
                 return Response({
                     'status': 1,
                     'message': _('No notifications found.'),
-                    'data': []
+                    'data': [],
+                    'notification_count': notification_count,
                 }, status=status.HTTP_200_OK)
 
             # Build the response data
@@ -6470,7 +6478,10 @@ class NotificationsListView(APIView):
                 })
 
             # Return paginated response
-            return paginator.get_paginated_response(response_data)
+            return paginator.get_paginated_response({
+                "data": response_data,
+                "notification_count": notification_count,  # Include the unread count
+            })
 
         except ValueError:
             return Response({
