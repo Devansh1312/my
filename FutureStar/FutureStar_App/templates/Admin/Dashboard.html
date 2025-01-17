@@ -136,8 +136,8 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <h4>{{ model_counts.events }}</h4>
-                                            <span class="f-event">Events</span>
+                                            <h4>{{ model_counts.pending_events_count }}</h4>
+                                            <span class="f-event">Pending Event</span>
                                         </div>
                                     </div>
                                 </div>
@@ -192,12 +192,12 @@
                                 <div class="widget-content">
                                     <div class="widget-round warning">
                                         <div class="bg-round">
-                                            <img src="{% static 'assets/images/dashboard/goal/online.png' %}" width="70%">
+                                            <img src="{% static 'assets/images/dashboard/goal/event-management.png' %}" width="70%">
                                         </div>
                                     </div>
                                     <div>
-                                        <h4>{{ model_counts.posts }}</h4>
-                                        <span class="f-light">Posts</span>
+                                        <h4>{{ model_counts.approve_events_count }}</h4>
+                                        <span class="f-light">Approved Events</span>
                                     </div>
                                 </div>
                             </div>
@@ -307,7 +307,6 @@
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 </div>
