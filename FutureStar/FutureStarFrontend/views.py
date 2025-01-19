@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+import jwt
+
+import time
+from django.conf import settings
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarTournamentApp.models import *
@@ -18,7 +22,15 @@ from datetime import datetime
 from FutureStarTrainingApp.models import *
 from itertools import chain
 from django.urls import reverse
+from django.views.generic.edit import UpdateView
+from .forms import *
+from django.urls import reverse_lazy
+import requests
+from django.http import HttpResponseRedirect, JsonResponse
+from dotenv import load_dotenv
+import os
 
+load_dotenv()  
 
 ##############################################   HomePage   ########################################################
 
@@ -1670,7 +1682,265 @@ def custom_404_view(request, exception=None):
 
         return render(request, 'templates/404.html')
     
+class UserInfoUpdateView(UpdateView):
+    model = User
+    form_class = UserInfoForm
+    template_name = 'user_info.html'
+    success_url = reverse_lazy('verify_otp')
+    login_url = reverse_lazy('google_auth')  # Redirect to Google Auth if not logged in
 
+    def get_object(self):
+        # Directly use the logged-in user without needing pk in the URL
+        if self.request.user.is_authenticated:
+            return self.request.user
+        return None  # If user is not authenticated, redirect them to login
+
+    def get_initial(self):
+        initial = super().get_initial()
+        email = self.request.session.get('email')  # Retrieve email from session
+        if email:
+            initial['email'] = email
+        return initial
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        role = Role.objects.get(id=5)  # Fetch Role instance with ID 5
+        user.role = role
+        # user.save()
+
+        phone = form.cleaned_data.get('phone')
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+
+        otp = generate_otp()
+        OTPSave.objects.create(phone=phone, OTP=otp)
+
+        print(f"Generated OTP: {otp}")
+        self.request.session['phone'] = phone
+        self.request.session['username'] = username
+        self.request.session['password'] = password
+        self.request.session['email'] = form.cleaned_data.get('email')  # Save email as well
+
+        messages.success(self.request, f"Your OTP is {otp}")
+        return redirect(f"{reverse('google_verify_otp')}?Language={self.request.GET.get('Language', 'en')}")
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'There was an error updating your profile.')
+        return super().form_invalid(form)
+class googleOTPVerificationView(View):
+    def get(self, request, *args, **kwargs):
+        language_from_url = request.GET.get('Language')
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        
+        context = {
+            "current_language": language_from_url,
+        }
+
+        return render(request, "otp_verification.html", context)
+
+    def post(self, request, *args, **kwargs):
+        language_from_url = request.GET.get('Language', None)
+        
+        if language_from_url:
+            # If 'Language' parameter is in the URL, save it to the session
+            request.session['language'] = language_from_url
+        
+        context = {
+            "current_language": language_from_url,
+        }
+        
+        otp_input = request.POST.get("otp")
+
+        # Retrieve the saved username, phone, password, and email from the session
+        username = request.session.get('username')
+        phone = request.session.get('phone')
+        password = request.session.get('password')  # Retrieve password from session
+        email = request.session.get('email')  # Retrieve email from session
+
+        if not all([username, phone, password, email]):
+            messages.error(request, "Missing session data, please try again.")
+            return redirect("user_info_update")  # Redirect to update form if session data is missing
+
+        try:
+            otp_record = OTPSave.objects.get(OTP=otp_input, phone=phone)
+        except OTPSave.DoesNotExist:
+            messages.error(request, "Invalid OTP. Please try again.")
+            return redirect("google_verify_otp")
+
+        # If OTP is valid, create a new user in the User table
+        user = User.objects.create(
+            username=username,
+            phone=phone,
+            email=email,  # Use the email from the session
+            role_id=5,  # Default role ID (adjust if needed)
+        )
+        user.set_password(password)  # Use the password stored in the session
+        user.save()
+
+        # Delete the OTP record now that the user is registered
+        otp_record.delete()
+
+        # Clear session data after registration to ensure security
+        request.session.pop('username', None)
+        request.session.pop('password', None)
+        request.session.pop('phone', None)
+        request.session.pop('email', None)
+        request.session.pop('language', None)  # Remove language session if used
+
+        messages.success(request, "Registration successful! Please log in.")
+        return redirect("login")
+
+        
+class GoogleAuthView(View):
+    def get(self, request):
+        # Google OAuth 2.0 URL
+        client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
+        redirect_uri = "http://127.0.0.1:8000/auth/google/callback/"
+        scope = "email"
+        auth_url = (
+            "https://accounts.google.com/o/oauth2/auth"
+            f"?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}"
+        )
+        return redirect(auth_url)
+
+class GoogleCallbackView(View):
+    def get(self, request):
+        code = request.GET.get('code')
+        if not code:
+            return JsonResponse({"error": "Authorization code not provided"}, status=400)
+
+        # Exchange the authorization code for an access token
+        token_url = "https://oauth2.googleapis.com/token"
+        client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
+        client_secret = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
+        
+        redirect_uri = "http://127.0.0.1:8000/auth/google/callback/"
+
+        data = {
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        }
+
+        token_response = requests.post(token_url, data=data)
+        token_json = token_response.json()
+
+        if "access_token" not in token_json:
+            return JsonResponse({"error": "Failed to retrieve access token", "details": token_json}, status=400)
+
+        access_token = token_json["access_token"]
+
+        # Use the access token to retrieve the user's email
+        user_info_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+        user_info_response = requests.get(user_info_url, headers={"Authorization": f"Bearer {access_token}"})
+        user_info_json = user_info_response.json()
+
+        email = user_info_json.get("email")
+        if not email:
+            return JsonResponse({"error": "Failed to retrieve email"}, status=400)
+
+        # Save the email in the session
+        request.session['email'] = email
+        request.session.save()  # Explicitly save the session
+        print("Email saved")
+
+        # Return a success response or redirect
+        return HttpResponseRedirect(reverse('user_info_update'))
+
+############# Apple #############
+class AppleAuthView(View):
+    def get(self, request):
+        # Apple OAuth 2.0 URL
+        client_id = "com.yourapp.serviceid"  # Your Apple service ID (Client ID)
+        redirect_uri = "http://127.0.0.1:8000/auth/apple/callback/"
+        scope = "email"  # You can include other scopes like name if needed
+        response_type = "code"
+        state = "some_random_state"  # Use a secure random string to prevent CSRF attacks
+
+        auth_url = (
+            "https://appleid.apple.com/auth/authorize?"
+            f"response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}"
+            f"&scope={scope}&state={state}"
+        )
+        
+        return redirect(auth_url)
+
+
+class AppleCallbackView(View):
+    def get(self, request):
+        # Retrieve authorization code and state from the URL
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        
+        if not code:
+            return JsonResponse({"error": "Authorization code not provided"}, status=400)
+
+        # Validate state to prevent CSRF attacks (compare with the state value you generated earlier)
+
+        # Apple Token Exchange URL
+        token_url = "https://appleid.apple.com/auth/token"
+        
+        # JWT Client Secret generation
+        team_id = "your_team_id"
+        client_id = "com.yourapp.serviceid"
+        client_secret = self.generate_client_secret(team_id, client_id)
+        
+        data = {
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "grant_type": "authorization_code",
+            "redirect_uri": "http://127.0.0.1:8000/auth/apple/callback/",
+        }
+        
+        # Exchange the authorization code for an access token
+        token_response = requests.post(token_url, data=data)
+        token_json = token_response.json()
+
+        if "access_token" not in token_json:
+            return JsonResponse({"error": "Failed to retrieve access token", "details": token_json}, status=400)
+
+        access_token = token_json["access_token"]
+
+        # Use the access token to retrieve the user's email (Apple returns it as part of the response)
+        user_info_url = "https://api.apple.com/v1/userinfo"
+        user_info_response = requests.get(user_info_url, headers={"Authorization": f"Bearer {access_token}"})
+        user_info_json = user_info_response.json()
+
+        email = user_info_json.get("email")
+        if not email:
+            return JsonResponse({"error": "Failed to retrieve email"}, status=400)
+
+        # Save the email in the session or handle as needed
+        request.session['email'] = email
+        request.session.save()  # Explicitly save the session
+        print("Email saved")
+
+        # Return a success response or redirect
+        return HttpResponseRedirect(reverse('user_info_update'))
+
+    def generate_client_secret(self, team_id, client_id):
+        # Generate the client secret JWT token required by Apple
+        private_key = settings.APPLE_PRIVATE_KEY  # This is your private key used to sign the JWT
+
+        # Prepare JWT payload
+        jwt_payload = {
+            "iss": team_id,  # Your Apple Developer team ID
+            "iat": int(time.time()),  # Issued at time
+            "exp": int(time.time()) + 3600,  # Expiration time (1 hour)
+            "aud": "apple.com",
+            "sub": client_id  # The service ID (your app's client ID)
+        }
+
+        # Generate JWT token with RS256 algorithm
+        client_secret = jwt.encode(jwt_payload, private_key, algorithm="RS256")
+
+        return client_secret
 ############################### google ###########################
 # class GoogleLoginView(View):
 #     def get(self, request):

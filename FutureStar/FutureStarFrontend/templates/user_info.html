@@ -1,0 +1,139 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load lang_filter %}
+{% block title %} Future Star || Google login {% endblock %}
+{% block content %}
+
+<section class="services-area-six pt-150 pb-60 rel">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-12">
+                <div class="section-title mb-50 text-center wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "heading_title" as heading_title %}
+                    <h2>
+                        {{heading_title}}
+                    </h2>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-4">
+                <form id="teamForm" name="teamForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" method="post">
+                    {% csrf_token %}
+                    <input name="login_type" id="login_type" type="hidden" value="2">
+                    
+                    <!-- Email (Readonly) -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" value="{{ form.email.value }}" readonly>
+                                <div class="error-message text-danger" id="emailError" style="display:none;">This field is required</div>
+                            </div>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" class="form-control" value="{{ form.username.value }}" placeholder="Enter your username" required>
+                                <div class="error-message text-danger" id="usernameError" style="display:none;">This field is required</div>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="text" id="phone" name="phone" class="form-control" value="{{ form.phone.value }}" placeholder="Enter your phone" required>
+                                <div class="error-message text-danger" id="phoneError" style="display:none;">This field is required</div>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-md-12">
+                            <div class="form-group position-relative">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" value="{{ form.password.value }}" required placeholder="Enter your password">
+                                <span class="eye-icon" id="togglePassword">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </span>
+                                <div class="error-message text-danger" id="passwordError" style="display:none;">This field is required</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group pt-5 mb-60">
+                                <button type="submit" class="theme-btn style-two w-100">Login <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                            <div class="text-center">
+                                You don't have an account? <a href="{% url 'register' %}">Sign up</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('#teamForm').on('submit', function (e) {
+            let isValid = true;
+
+            if ($('#username').val().trim() === '') {
+                $('#usernameError').show();
+                isValid = false;
+            } else {
+                $('#usernameError').hide();
+            }
+
+            if ($('#phone').val().trim() === '') {
+                $('#phoneError').show();
+                isValid = false;
+            } else {
+                $('#phoneError').hide();
+            }
+
+            if ($('#password').val().trim() === '') {
+                $('#passwordError').show();
+                isValid = false;
+            } else {
+                $('#passwordError').hide();
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert("Please fill in all required fields.");
+            }
+        });
+
+        $('#togglePassword').on('click', function() {
+            const passwordField = $('#password');
+            const passwordFieldType = passwordField.attr('type');
+            passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
+            $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+        });
+    });
+</script>
+
+<style>
+/* Default position for left-to-right (LTR) direction */
+.form-group.position-relative .eye-icon {
+    position: absolute;
+    top: 70%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: black;
+}
+
+/* Adjust position for right-to-left (RTL) direction */
+html[dir="rtl"] .form-group.position-relative .eye-icon {
+    right: auto;
+    left: 15px;
+}
+</style>
+{% endblock %}

@@ -47,6 +47,13 @@ urlpatterns = [
     path('player-page/', PlayerInfoPage.as_view(), name='player_info'),
     path('team/', TeamDetailsView.as_view(), name='TeamBranchPageSearchResults'),
 
+    path('auth/google/', GoogleAuthView.as_view(), name='google_auth'),
+    path('auth/google/callback/', GoogleCallbackView.as_view(), name='google_auth_callback'),
+    path('user_info/update/', UserInfoUpdateView.as_view(), name='user_info_update'),
+    path('google_verify_otp/', googleOTPVerificationView.as_view(), name='google_verify_otp'),
+
+    path('auth/apple/', AppleAuthView.as_view(), name='apple_auth'),
+    path('auth/apple/callback/', AppleCallbackView.as_view(), name='apple_callback'),
 
 
     # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
