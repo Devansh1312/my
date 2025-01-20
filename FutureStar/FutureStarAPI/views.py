@@ -5373,10 +5373,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                 comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
-                    "training_name": training.training_name,
-                    "start_time": str(training.start_time),
-                    "cost": training.cost,
-                    "description": training.description
+                    "type":"training"
                 }
 
                 # Check the creator type
@@ -5473,10 +5470,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                 comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
-                    "training_name": training.training_name,
-                    "end_time": str(training.end_time),
-                    "cost": training.cost,
-                    "description": training.description
+                    "type":"training"
                 }
 
                 if training.creator_type == 1:  # Created by a User

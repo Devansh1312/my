@@ -764,10 +764,8 @@ class JoinTrainingAPIView(APIView):
         comments_message = _("Don't forget to engage with the new player.")
         push_data = {
             "training_id": training.id,
-            "training_name": training.training_name,
-            "start_time": str(training.start_time),
-            "cost": training.cost,
-            "description": training.description
+          
+            "type":"training"
         }
 
         notifications_sent = 0
