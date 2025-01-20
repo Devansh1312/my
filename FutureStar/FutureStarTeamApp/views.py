@@ -39,12 +39,17 @@ class TeamViewAPI(APIView):
 
         # Check if 'team_id' is provided in the request
         team_id = request.query_params.get('team_id', None)
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
+        
 
         if team_id:
             # Fetch and return the team data if 'team_id' is provided
             try:
                 team = Team.objects.get(id=team_id)
                 serializer = TeamSerializer(team, context={'request': request})  # Pass request in context
+                notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
+
                 user = request.user
                 # Fetch user data
                 user_data = get_user_data(user, request)
@@ -58,7 +63,8 @@ class TeamViewAPI(APIView):
                         'team': serializer.data,
                         'group': group_data,
                         'current_type':user.current_type,
-                    }
+                    },
+                    "notification_count": notification_count  # Include notification count here
                 }, status=status.HTTP_200_OK)
             except Team.DoesNotExist:
                 return Response({

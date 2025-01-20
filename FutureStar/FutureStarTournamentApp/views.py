@@ -3036,6 +3036,10 @@ class FetchAllGamesAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         user = request.user
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
+
 
         if not user.is_authenticated:
             return Response({"status": 0, "message": "User is not authenticated."})
@@ -3167,6 +3171,8 @@ class FetchAllGamesAPIView(APIView):
                 "total_pages": total_pages,
                 "current_page": page,
                 "data": response_data[start:end],
+                "notification_count": notification_count  # Include notification count here
+
             })
 
 ############################ Tournaments Game Stats  API ########################################

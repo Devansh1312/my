@@ -1020,6 +1020,8 @@ class EditProfileAPIView(APIView):
 
         # Get 'created_by_id' from query parameters
         user_id = request.query_params.get('user_id')
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_parms.get('created_by_id')
 
         if not user_id:
             return Response({
@@ -1036,6 +1038,9 @@ class EditProfileAPIView(APIView):
                 'message': _('User not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
+
+
         # Return user details if found
         return Response({
             'status': 1,
@@ -1045,7 +1050,8 @@ class EditProfileAPIView(APIView):
                 'team': get_team_data(user, request),
                 'group': get_group_data(user, request),
                 'current_type': user.current_type,
-            }
+            },
+            "notification_count": notification_count  # Include notification count here
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -3999,9 +4005,9 @@ class DashboardAPI(APIView):
                 "latest_post": latest_post_serializer.data if latest_post_serializer else None,
                 "latest_event": latest_event_serializer.data if latest_event_serializer else None,
                 "latest_game": latest_game_serializer.data if latest_game_serializer else None,
-                "notification_count": notification_count if notification_count else 0,
                 "latest_by_date" : response_data,
-            }
+            },
+            "notification_count": notification_count if notification_count else 0,
         }, status=status.HTTP_200_OK)
      
     
@@ -4418,11 +4424,14 @@ class EventsAPIView(APIView):
         # Paginate the queryset
         paginated_events = paginator.paginate_queryset(events, request, view=self)
         serializer = EventSerializer(paginated_events, many=True, context={'request': request, 'creator_type': creator_type, 'created_by_id': created_by_id})
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
+
 
         return Response({
             'status': 1,
             'message': _('Events fetched successfully.'),
             'data': serializer.data,
+            'notification_count': notification_count,
             'total_records': paginator.page.paginator.count,
             'total_pages': paginator.total_pages,
             'current_page': paginator.page.number

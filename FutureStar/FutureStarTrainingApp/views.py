@@ -463,6 +463,12 @@ class OpenTrainingListView(APIView):
             training_date__gte=today  # Only future or today
         ).order_by('-training_date')
 
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
+
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
+
+
         # Initialize custom pagination
         paginator = CustomTrainingPagination()
 
@@ -486,7 +492,8 @@ class OpenTrainingListView(APIView):
                 'data': {
                     **pagination_data,
                     'trainings': serializer.data  # Put serialized data directly here
-                }
+                },
+                'notification_count': notification_count  # Include the notification count in the response
             }, status=status.HTTP_200_OK)
 
         # If pagination is not applied, just return the serialized data
@@ -499,7 +506,8 @@ class OpenTrainingListView(APIView):
                 'total_pages': 1,
                 'current_page': 1,
                 'trainings': serializer.data  # Put serialized data directly here
-            }
+            },
+            'notification_count': notification_count  # Include the notification count in the response
         }, status=status.HTTP_200_OK)
     
 
