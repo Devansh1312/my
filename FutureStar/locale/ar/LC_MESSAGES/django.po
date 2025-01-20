@@ -1464,25 +1464,28 @@ msgid "Notification ID is required."
 msgstr "معرف الإشعار مطلوب."
 
 msgid "Notification not found."
-msgstr "الإشعار غير موجود."
+msgstr "لم يتم العثور على الإشعار."
 
-msgid "Notification marked as read."
-msgstr "تم وضع علامة القراءة على الإشعار."
+msgid "Notification Clear successfully."
+msgstr "تم مسح الإشعار بنجاح."
 
 msgid "Both created_by_id and creator_type are required."
-msgstr "مطلوب كل من معرف المنشئ ونوع المنشئ."
+msgstr "كلا من created_by_id و creator_type مطلوبان."
 
-msgid "No notifications found."
-msgstr "لم يتم العثور على إشعارات."
+msgid "All notifications Clear successfully."
+msgstr "تم مسح جميع الإشعارات بنجاح."
 
-msgid "All notifications marked as read."
-msgstr "تم وضع علامة القراءة على جميع الإشعارات."
+msgid "Page number must be a positive integer."
+msgstr "يجب أن يكون رقم الصفحة عددًا صحيحًا موجبًا."
+
+msgid "Page not found."
+msgstr "الصفحة غير موجودة."
 
 msgid "Notifications fetched successfully."
 msgstr "تم جلب الإشعارات بنجاح."
 
 msgid "Invalid created_by_id or creator_type."
-msgstr "معرف المنشئ أو نوع المنشئ غير صالح."
+msgstr "created_by_id أو creator_type غير صالح."
 
 msgid "An error occurred: "
 msgstr "حدث خطأ: "

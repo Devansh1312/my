@@ -3876,6 +3876,121 @@ class DashboardAPI(APIView):
         latest_game = TournamentGames.objects.order_by('-game_date', '-game_start_time').first()
         latest_game_serializer = TournamentGameSerializer(latest_game, context={'request': request}) if latest_game else None
 
+        tournament_games = TournamentGames.objects.all()
+        friendly_games = FriendlyGame.objects.all()
+
+        games_by_date = {}
+
+        # Process tournament games
+        for game in tournament_games:
+            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
+            if date_str not in games_by_date:
+                games_by_date[date_str] = {"tournament": []}
+
+            tournament_name = game.tournament_id.tournament_name if game.tournament_id else "Unknown Tournament"
+            
+            tournament_entry = next(
+                (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == tournament_name),
+                None
+            )
+            if not tournament_entry:
+                tournament_entry = {
+                    "tournament_name": tournament_name,
+                    "games": []
+                }
+                games_by_date[date_str]["tournament"].append(tournament_entry)
+
+            tournament_entry["games"].append({
+                "id": game.id,
+                "tournament_id": game.tournament_id.id if game.tournament_id else None,
+                "game_number": game.game_number,
+                "game_date": str(game.game_date),
+                "game_start_time": str(game.game_start_time),
+                "game_end_time": str(game.game_end_time),
+                "group_id": game.group_id.id if game.group_id else None,
+                "group_id_name": game.group_id.group_name if game.group_id else None,
+                "team_a": game.team_a.id if game.team_a else None,
+                "team_a_name": game.team_a.team_name if game.team_a else None,
+                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
+                "team_a_goal": game.team_a_goal,
+                "team_b": game.team_b.id if game.team_b else None,
+                "team_b_name": game.team_b.team_name if game.team_b else None,
+                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
+                "team_b_goal": game.team_b_goal,
+                "game_field_id": game.game_field_id.id if game.game_field_id else None,
+                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
+                "finish": game.finish,
+                "winner": game.winner_id,
+                "loser_id": game.loser_id,
+                "is_draw": game.is_draw,
+                "created_at": game.created_at,
+                "updated_at": game.updated_at,
+                "game_type": "Tournament",
+            })
+
+        # Process friendly games as a pseudo-tournament
+        for game in friendly_games:
+            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
+            if date_str not in games_by_date:
+                games_by_date[date_str] = {"tournament": []}
+            
+            friendly_tournament_entry = next(
+                (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == "Friendly Games"),
+                None
+            )
+            if not friendly_tournament_entry:
+                friendly_tournament_entry = {
+                    "tournament_name": "Friendly Games",
+                    "games": []
+                }
+                games_by_date[date_str]["tournament"].append(friendly_tournament_entry)
+
+            friendly_tournament_entry["games"].append({
+                "id": game.id,
+                "game_number": game.game_number,
+                "game_date": str(game.game_date),
+                "game_start_time": str(game.game_start_time),
+                "game_end_time": str(game.game_end_time),
+                "group_id": None,
+                "group_id_name": None,
+                "team_a": game.team_a.id if game.team_a else None,
+                "team_a_name": game.team_a.team_name if game.team_a else None,
+                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
+                "team_a_goal": game.team_a_goal,
+                "team_b": game.team_b.id if game.team_b else None,
+                "team_b_name": game.team_b.team_name if game.team_b else None,
+                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
+                "team_b_goal": game.team_b_goal,
+                "game_field_id": game.game_field_id.id if game.game_field_id else None,
+                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
+                "finish": game.finish,
+                "winner": game.winner_id,
+                "loser_id": game.loser_id,
+                "is_draw": game.is_draw,
+                "created_at": game.created_at,
+                "updated_at": game.updated_at,
+                "game_type": "Friendly",
+            })
+
+            # Sort the games by date (latest first)
+            sorted_games_by_date = dict(sorted(
+                games_by_date.items(),
+                key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
+                reverse=True
+            ))
+
+            # Get the first (most recent) date
+            latest_date = next(iter(sorted_games_by_date))
+
+            # Format the response for only the latest date
+            response_data = [
+                {
+                    "date": latest_date,
+                    "tournament": games["tournament"],
+                }
+                for date, games in sorted_games_by_date.items() if date == latest_date
+            ]
+
         return Response({
             "status": 1,
             "message": _("Dashboard banner list fetched successfully."),
@@ -3885,6 +4000,7 @@ class DashboardAPI(APIView):
                 "latest_event": latest_event_serializer.data if latest_event_serializer else None,
                 "latest_game": latest_game_serializer.data if latest_game_serializer else None,
                 "notification_count": notification_count if notification_count else 0,
+                "latest_by_date" : response_data,
             }
         }, status=status.HTTP_200_OK)
      
