@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'corsheaders',
     'whitenoise' ,
-    'social_django',
+    # 'social_django',
 
 ]
 
@@ -213,12 +213,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AUTHENTICATION_BACKENDS = [
-    # 'FutureStar_App.backends.EmailBackend',  # Add this line
-    'social_core.backends.google.GoogleOAuth2',
-    'social_core.backends.apple.AppleIdAuth',
-    'django.contrib.auth.backends.ModelBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     # 'FutureStar_App.backends.EmailBackend',  # Add this line
+#     'social_core.backends.google.GoogleOAuth2',
+#     'social_core.backends.apple.AppleIdAuth',
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
