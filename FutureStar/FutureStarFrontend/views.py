@@ -1858,7 +1858,7 @@ class GoogleAuthView(View):
 
         # Google OAuth 2.0 URL
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
-        redirect_uri = "http://127.0.0.1:8000/auth/google/callback/"
+        redirect_uri = "https://redsparkinfo.in/auth/google/callback/"
         scope = "email"
         auth_url = (
             "https://accounts.google.com/o/oauth2/auth"
@@ -1885,7 +1885,7 @@ class GoogleCallbackView(View):
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
         client_secret = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
         
-        redirect_uri = "http://127.0.0.1:8000/auth/google/callback/"
+        redirect_uri = "https://redsparkinfo.in/auth/google/callback/"
 
         data = {
             "code": code,
