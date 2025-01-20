@@ -49,6 +49,17 @@
                         </div>
                     </div>
                 </form>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="or"><span>OR</span></div>
+                        </div>
+                        <div class="continue-with-social text-center">
+                           <button onclick="window.location.href='{% url 'google_auth' %}'" class="btn-social"><span>{% load static %}<img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" /></span> Signin With Google</button>
+                           <button class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" /></span> Signin With Apple</button>
+                       </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

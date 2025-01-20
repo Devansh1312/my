@@ -1681,8 +1681,19 @@ def custom_404_view(request, exception=None):
     
 
         return render(request, 'templates/404.html')
-    
 
+def get_language(request):
+    """
+    Retrieves the language from the URL or session and updates the session values.
+    """
+    language = request.GET.get('Language', None)
+    if language:
+        request.session['language'] = language
+    else:
+        language = request.session.get('language', 'en')  # Default to 'en' if not set
+    request.session['current_language'] = language  # Keep 'current_language' consistent
+    return language
+    
 class UserInfoUpdateView(View):
     template_name = 'user_info.html'
     success_url = reverse_lazy('verify_otp')
@@ -1702,14 +1713,22 @@ class UserInfoUpdateView(View):
     def get(self, request, *args, **kwargs):
         form = UserInfoForm()  # Instantiate the form
         email = request.session.get('email', '')
-        if email:
-            form.initial['email'] = email  # Set the initial value for the email field
-
-        return render(request, 'user_info.html', {'form': form})
-    def post(self, request, *args, **kwargs):
-        # if not request.user.is_authenticated:
-        #     return redirect(self.login_url)  # Redirect to Google Auth if not logged in
         
+        # Use the get_language function to retrieve and update language
+        language_from_url = get_language(request)
+
+        # Setting the language context for the template
+        context = {
+            "current_language": language_from_url,
+        }
+
+        # If email exists in the session, set it as the initial value in the form
+        if email:
+            form.initial['email'] = email
+
+        return render(request, self.template_name, {'form': form, **context})
+    
+    def post(self, request, *args, **kwargs):
         form = UserInfoForm(request.POST)
         
         if form.is_valid():
@@ -1717,62 +1736,49 @@ class UserInfoUpdateView(View):
             role = Role.objects.get(id=5)  # Fetch Role instance with ID 5
             user.role = role
 
-            # Retrieve the form data
+            # Retrieve form data
             phone = form.cleaned_data.get('phone')
             username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
             email = form.cleaned_data.get('email')
 
-            # Get language from URL or session
-            language_from_url = request.GET.get('Language', None)
-            if language_from_url:
-                request.session['language'] = language_from_url
-            else:
-                language_from_url = request.session.get('language', 'en')
+            # Use the get_language function to retrieve and update language
+            language_from_url = get_language(request)
 
             # Validate if the username is already taken
             if User.objects.filter(username=username).exists():
-                print(f"Username '{username}' is already taken.")  # Print to console for debugging
                 form.add_error('username', "This username is already taken. Please try a different username.")
-                return render(request, self.template_name, {'form': form})  # Return to the template with errors
+                return render(request, self.template_name, {'form': form})
 
             if User.objects.filter(phone=phone).exists():
                 messages.error(request, "This phone number is already registered. Please try a different number.")
                 return redirect("user_info_update")
 
-            # If all validations pass, proceed with OTP generation and other logic
+            # Generate OTP and save it
             otp = generate_otp()
             OTPSave.objects.update_or_create(
-                phone=phone,  # Lookup field
-                defaults={'OTP': otp}  # Fields to update or set if the object is created
+                phone=phone,
+                defaults={'OTP': otp}
             )
 
-            print(f"Generated OTP: {otp}")
             request.session['phone'] = phone
             request.session['username'] = username
-            request.session['password'] = password
             request.session['email'] = email
 
             messages.success(request, f"Your OTP is {otp}")
             return redirect(f"{reverse_lazy('google_verify_otp')}?Language={language_from_url}")
         else:
-            # Display field-specific errors
+            # Display form-specific errors
             for field, errors in form.errors.items():
                 for error in errors:
-                    print(f"{field}: {error}")
-                    messages.error(request, f"{error}")  # This shows the specific error message
+                    messages.error(request, f"{error}")
 
             return render(request, self.template_name, {'form': form})
 
 class googleOTPVerificationView(View):
     def get(self, request, *args, **kwargs):
-        # Get language from URL or session
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            request.session['language'] = language_from_url
-        else:
-            language_from_url = request.session.get('language', 'en')
-        
+        # Use the get_language function to retrieve and update language
+        language_from_url = get_language(request)
+
         context = {
             "current_language": language_from_url,
         }
@@ -1780,22 +1786,17 @@ class googleOTPVerificationView(View):
         return render(request, "otp_verification.html", context)
 
     def post(self, request, *args, **kwargs):
-        # Get language from URL or session
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            request.session['language'] = language_from_url
-        else:
-            language_from_url = request.session.get('language', 'en')
+        # Use the get_language function to retrieve and update language
+        language_from_url = get_language(request)
 
         otp_input = request.POST.get("otp")
 
         # Retrieve session data
         username = request.session.get('username')
         phone = request.session.get('phone')
-        # password = request.session.get('password')
         email = request.session.get('email')
 
-        if not all([username, phone, password, email]):
+        if not all([username, phone, email]):
             messages.error(request, "Missing session data, please try again.")
             return redirect("user_info_update")
 
@@ -1837,7 +1838,6 @@ class googleOTPVerificationView(View):
         user.set_password(password)  # Set the password securely
         user.save()
 
-
         # Delete OTP record
         otp_record.delete()
 
@@ -1853,12 +1853,8 @@ class googleOTPVerificationView(View):
 
 class GoogleAuthView(View):
     def get(self, request):
-        # Get language from URL or session
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            request.session['language'] = language_from_url
-        else:
-            language_from_url = request.session.get('language', 'en')
+        # Use the get_language function to retrieve and update language
+        language_from_url = get_language(request)
 
         # Google OAuth 2.0 URL
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
@@ -1876,17 +1872,13 @@ class GoogleCallbackView(View):
         code = request.GET.get('code')
         if not code:
             return JsonResponse({"error": "Authorization code not provided"}, status=400)
-        
-        # Get language from URL or session
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            request.session['language'] = language_from_url  # Save language in session
-        else:
-            language_from_url = request.session.get('language', 'en')  # Use default 'en' if not set
 
-        # Ensure language is saved
-        request.session['language'] = language_from_url  # Save language to session explicitly
-        request.session.save()  # Explicitly save the session to persist the language setting
+        # Use the get_language function to retrieve and update language
+        language_from_url = get_language(request)
+
+        # Print to verify session data
+        print("Language in session:", request.session.get('language'))
+        print("Current language in session:", request.session.get('current_language'))
 
         # Exchange the authorization code for an access token
         token_url = "https://oauth2.googleapis.com/token"
@@ -1921,24 +1913,19 @@ class GoogleCallbackView(View):
             return JsonResponse({"error": "Failed to retrieve email"}, status=400)
 
         # Check if the email is already registered
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "This email is already in use. Please try a different email.")
-            return redirect('register')  # Redirect to your registration page
+        user = User.objects.filter(email=email).first()
+        if user:
+            # If user exists, log them in
+            login(request, user)  # Assuming you have Django's authentication set up
+            messages.success(request, "Welcome back!")
+            return redirect("player-dashboard")  # Or wherever you want to redirect after login
 
         # Save the email in the session
         request.session['email'] = email
         request.session.save()  # Explicitly save the session to persist email
 
-        # Get language from URL or session
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            request.session['language'] = language_from_url  # Save language in session
-        else:
-            language_from_url = request.session.get('language', 'en')  # Use default 'en' if not set
-
-        # Ensure language is saved
-        request.session['current_language'] = language_from_url  # Save language to session explicitly
-        request.session.save()  # Explicitly save the session to persist the language setting
+        # Verify that language and current_language are set in session
+        print("Final session data:", dict(request.session))
 
         # Redirect after saving email
         return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
