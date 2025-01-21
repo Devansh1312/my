@@ -44,66 +44,160 @@
                     <ul>
                         <li>
                             <a href="{% url 'player-dashboard' %}" class="sidebar-link">
-                                <span><i class="fas fa-th-large"></i></span> Dashboard
+                                <span><i class="fas fa-th-large"></i></span> 
+                                {% if current_language == 'en' %}
+                                    Dashboard
+                                {% elif current_language == 'ar' %}
+                                    لوحة القيادة
+                                {% endif %}
                             </a>
                         </li>
                         <li>
                             <a href="#" class="sidebar-link dropbtn" onclick="myFunction()">
                                 <span><i class="fas fa-users"></i></span>
-                                Team
+                                {% if current_language == 'en' %}
+                                    Team
+                                {% elif current_language == 'ar' %}
+                                    الفريق
+                                {% endif %}
                             </a>
                             <!-- Submenu for "Team" -->
                             <div id="myDropdown" class="dropdown-content">
                                 {% if is_founder %}
-                                    <a href="{% url 'player-dashboard-team-page' %}">Team Page</a>
+                                    <a href="{% url 'player-dashboard-team-page' %}">
+                                        {% if current_language == 'en' %}
+                                            Team Page
+                                        {% elif current_language == 'ar' %}
+                                            صفحة الفريق
+                                        {% endif %}
+                                    </a>
                                 {% endif %}
-                                <a href="{% url 'player-dashboard-joined-teams' %}">Teams</a>
+                                <a href="{% url 'player-dashboard-joined-teams' %}">
+                                    {% if current_language == 'en' %}
+                                        Teams
+                                    {% elif current_language == 'ar' %}
+                                        الفرق
+                                    {% endif %}
+                                </a>
                             </div>
                         </li>
                         {% if user.role.id != 4 %}
                         <li>
                             <a href="{% url 'player-dashboard-trainings' %}" class="sidebar-link">
-                                <span><i class="fas fa-futbol"></i></span> Training
+                                <span><i class="fas fa-futbol"></i></span>
+                                {% if current_language == 'en' %}
+                                    Training
+                                {% elif current_language == 'ar' %}
+                                    تدريب
+                                {% endif %}
                             </a>
                         </li>
                         {% endif %}
                         <li>
                             <a href="{% url 'player-dashboard-games' %}" class="sidebar-link">
-                                <span><i class="fas fa-trophy"></i></span> Games
+                                <span><i class="fas fa-trophy"></i></span>
+                                {% if current_language == 'en' %}
+                                    Games
+                                {% elif current_language == 'ar' %}
+                                    المباريات
+                                {% endif %}
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'player-dashboard-fileds' %}" class="sidebar-link active">
-                                <span><i class="fas fa-shield-alt"></i></span> Fields
+                                <span><i class="fas fa-shield-alt"></i></span>
+                                {% if current_language == 'en' %}
+                                    Fields
+                                {% elif current_language == 'ar' %}
+                                    الحقول
+                                {% endif %}
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'player-dashboard-events' %}" class="sidebar-link">
-                                <span><i class="fas fa-calendar-check"></i></span> Events
+                                <span><i class="fas fa-calendar-check"></i></span>
+                                {% if current_language == 'en' %}
+                                    Events
+                                {% elif current_language == 'ar' %}
+                                    الأحداث
+                                {% endif %}
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'logout' %}" class="sidebar-link">
-                                <span><i class="fas fa-sign-out-alt"></i></span> Logout
+                                <span><i class="fas fa-sign-out-alt"></i></span>
+                                {% if current_language == 'en' %}
+                                    Logout
+                                {% elif current_language == 'ar' %}
+                                    تسجيل الخروج
+                                {% endif %}
                             </a>
                         </li>
-                    </ul>
+                    </ul>                    
                 </div>
             </div>
             <div class="col-lg-9">
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Fields Created By {{ user.username }}</h5>
+                    <h5>
+                        {% if current_language == 'en' %}
+                            Fields Created By {{ user.username }}
+                        {% elif current_language == 'ar' %}
+                            الحقول التي تم إنشاؤها بواسطة {{ user.username }}
+                        {% endif %}
+                    </h5>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
-                                    <th>Field Name</th>
-                                    <th>Image</th>
-                                    <th>Field Capacity</th>
-                                    <th>Ground Type</th>
-                                    <th>Country</th>
-                                    <th>City</th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            No.
+                                        {% elif current_language == 'ar' %}
+                                            الرقم
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Field Name
+                                        {% elif current_language == 'ar' %}
+                                            اسم الحقل
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Image
+                                        {% elif current_language == 'ar' %}
+                                            الصورة
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Field Capacity
+                                        {% elif current_language == 'ar' %}
+                                            سعة الحقل
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Ground Type
+                                        {% elif current_language == 'ar' %}
+                                            نوع الأرض
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Country
+                                        {% elif current_language == 'ar' %}
+                                            البلد
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            City
+                                        {% elif current_language == 'ar' %}
+                                            المدينة
+                                        {% endif %}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -114,9 +208,13 @@
                                             <td>{{ field.field_name }}</td>
                                             <td>
                                                 {% if field.image %}
-                                                <img src="{{ field.image }}" alt="Field Image" width="100">
+                                                    <img src="{{ field.image }}" alt="Field Image" width="100">
                                                 {% else %}
-                                                No Image
+                                                    {% if current_language == 'en' %}
+                                                        No Image
+                                                    {% elif current_language == 'ar' %}
+                                                        لا توجد صورة
+                                                    {% endif %}
                                                 {% endif %}
                                             </td>
                                             <td>{{ field.field_capacity }}</td>
@@ -127,14 +225,20 @@
                                     {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="7">No fields found.</td>
+                                    <td colspan="7">
+                                        {% if current_language == 'en' %}
+                                            No fields found.
+                                        {% elif current_language == 'ar' %}
+                                            لا توجد حقول.
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>   
-            </div>
+            </div>            
         </div>
     </div>
 </section>
