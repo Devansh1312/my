@@ -100,94 +100,94 @@ def LoginFormView(request):
 
 
 # Forgot Password Module
-class ForgotPasswordView(View):
-    template_name = "Admin/Auth/forgot_password.html"
-    User = get_user_model()
+# class ForgotPasswordView(View):
+#     template_name = "Admin/Auth/forgot_password.html"
+#     User = get_user_model()
 
-    def get(self, request):
-        return render(request, self.template_name)
+#     def get(self, request):
+#         return render(request, self.template_name)
 
-    def post(self, request):
-        email = request.POST.get("email")
-        user = self.User.objects.filter(email=email).first()
+#     def post(self, request):
+#         email = request.POST.get("email")
+#         user = self.User.objects.filter(email=email).first()
 
-        if user:
-            user.remember_token = get_random_string(40)
-            user.token_created_at = timezone.now()
-            user.save()
-            reset_url = request.build_absolute_uri(
-                reverse("reset_password", args=[user.remember_token])
-            )
+#         if user:
+#             user.remember_token = get_random_string(40)
+#             user.token_created_at = timezone.now()
+#             user.save()
+#             reset_url = request.build_absolute_uri(
+#                 reverse("reset_password", args=[user.remember_token])
+#             )
 
-            context = {"user": user, "reset_url": reset_url}
+#             context = {"user": user, "reset_url": reset_url}
 
-            subject = "Reset Your Password"
-            from_email = settings.DEFAULT_FROM_EMAIL
-            to_email = [user.email]
-            html_content = render_to_string("Admin/Email/reset_password.html", context)
+#             subject = "Reset Your Password"
+#             from_email = settings.DEFAULT_FROM_EMAIL
+#             to_email = [user.email]
+#             html_content = render_to_string("Admin/Email/reset_password.html", context)
 
-            msg = EmailMultiAlternatives(subject, "", from_email, to_email)
-            msg.attach_alternative(html_content, "text/html")
+#             msg = EmailMultiAlternatives(subject, "", from_email, to_email)
+#             msg.attach_alternative(html_content, "text/html")
 
-            try:
-                msg.send()
-                messages.success(request, "Please check your email for the reset link.")
-            except Exception as e:
-                messages.error(
-                    request,
-                    "There was an error sending the email. Please try again later.",
-                )
+#             try:
+#                 msg.send()
+#                 messages.success(request, "Please check your email for the reset link.")
+#             except Exception as e:
+#                 messages.error(
+#                     request,
+#                     "There was an error sending the email. Please try again later.",
+#                 )
 
-            return redirect("adminlogin")
-        else:
-            messages.error(request, "Email not found.")
+#             return redirect("adminlogin")
+#         else:
+#             messages.error(request, "Email not found.")
 
-        return redirect("forgot_password")
+#         return redirect("forgot_password")
 
 
-# Reset Password Module
-class ResetPasswordView(View):
-    template_name = "Admin/Auth/reset_password.html"
-    User = get_user_model()
+# # Reset Password Module
+# class ResetPasswordView(View):
+#     template_name = "Admin/Auth/reset_password.html"
+#     User = get_user_model()
 
-    def get(self, request, token):
-        user = get_object_or_404(User, remember_token=token)
+#     def get(self, request, token):
+#         user = get_object_or_404(User, remember_token=token)
 
-        # Check if the token has expired (1 hour expiration)
-        expiration_time = timezone.now() - timedelta(hours=1)
-        if user.token_created_at and user.token_created_at < expiration_time:
-            messages.error(request, "This reset link has expired.")
-            return redirect("forgot_password")
+#         # Check if the token has expired (1 hour expiration)
+#         expiration_time = timezone.now() - timedelta(hours=1)
+#         if user.token_created_at and user.token_created_at < expiration_time:
+#             messages.error(request, "This reset link has expired.")
+#             return redirect("forgot_password")
 
-        return render(request, self.template_name, {"token": token})
+#         return render(request, self.template_name, {"token": token})
 
-    def post(self, request, token):
-        user = get_object_or_404(User, remember_token=token)
+#     def post(self, request, token):
+#         user = get_object_or_404(User, remember_token=token)
 
-        # Check if the token has expired (1 hour expiration)
-        expiration_time = timezone.now() - timedelta(hours=1)
-        if user.token_created_at and user.token_created_at < expiration_time:
-            messages.error(request, "This reset link has expired.")
-            return redirect("forgot_password")
+#         # Check if the token has expired (1 hour expiration)
+#         expiration_time = timezone.now() - timedelta(hours=1)
+#         if user.token_created_at and user.token_created_at < expiration_time:
+#             messages.error(request, "This reset link has expired.")
+#             return redirect("forgot_password")
 
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
+#         password = request.POST.get("password")
+#         confirm_password = request.POST.get("confirm_password")
 
-        if password == confirm_password:
-            user.set_password(password)
-            if not user.email_verified_at:
-                user.email_verified_at = timezone.now()
-            user.remember_token = get_random_string(40)  # Invalidate the token
-            user.token_created_at = None  # Clear the token creation time
-            user.save()
-            messages.success(
-                request, "Your password has been reset. You can now log in."
-            )
-            return redirect("adminlogin")
-        else:
-            messages.error(request, "Passwords do not match.")
+#         if password == confirm_password:
+#             user.set_password(password)
+#             if not user.email_verified_at:
+#                 user.email_verified_at = timezone.now()
+#             user.remember_token = get_random_string(40)  # Invalidate the token
+#             user.token_created_at = None  # Clear the token creation time
+#             user.save()
+#             messages.success(
+#                 request, "Your password has been reset. You can now log in."
+#             )
+#             return redirect("adminlogin")
+#         else:
+#             messages.error(request, "Passwords do not match.")
 
-        return render(request, self.template_name, {"token": token})
+#         return render(request, self.template_name, {"token": token})
 
 
 @method_decorator(user_role_check, name="dispatch")

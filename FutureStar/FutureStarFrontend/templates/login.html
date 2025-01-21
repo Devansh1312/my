@@ -1,7 +1,7 @@
 {% extends 'base1.html' %}
 {% load static %}
 {% load lang_filter %}
-{% block title %} Future Star || Login {% endblock %}
+{% block title %} Goalactico || Login {% endblock %}
 {% block content %}
 
 <section class="services-area-six pt-150 pb-60 rel">
@@ -51,6 +51,25 @@
                                 <div class="error-message text-danger" id="passwordError" style="display:none;">This field is required</div>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="d-flex mb-30 justify-content-between">
+                                <label>
+                                    <input type="checkbox" />
+                                    {% if current_language == 'en' %}
+                                        Remember Me
+                                    {% elif current_language == 'ar' %}
+                                        تذكرني
+                                    {% endif %}
+                                </label>
+                                <a href="{% url 'forgot_password' %}">
+                                    {% if current_language == 'en' %}
+                                        Forgot Password?
+                                    {% elif current_language == 'ar' %}
+                                        هل نسيت كلمة السر؟
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>                        
                         <div class="col-md-12">
                             <div class="form-group pt-5 mb-60">
                                 <button type="submit" class="theme-btn style-two w-100">

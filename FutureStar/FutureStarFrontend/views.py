@@ -36,16 +36,24 @@ load_dotenv()
 
 
 def get_language(request):
-    language = request.GET.get('Language', None)
-    
-    # Validate the language and ensure it's 'en' or 'ar'
-    if language not in ['en', 'ar']:
-        language = 'en'  # Default to 'en' if invalid or not provided
-    
-    # Store the language in the session
-    request.session['language'] = language
-    request.session['current_language'] = language  # Keep 'current_language' consistent  
+    """
+    Retrieves the language from the URL or session and updates the session values.
+    Ensures the language is either 'en' or 'ar', defaulting to 'en'.
+    """
+    allowed_languages = {'en', 'ar'}
+    language = request.GET.get('Language', '').lower()
+
+    if language in allowed_languages:
+        request.session['language'] = language
+    else:
+        language = request.session.get('language', 'en')
+        if language not in allowed_languages:
+            language = 'en'
+        request.session['language'] = language
+
+    request.session['current_language'] = language  # Keep 'current_language' consistent
     return language
+
 
 ##############################################   HomePage   ########################################################
 
@@ -1268,6 +1276,144 @@ class LoginPage(View):
                 messages.error(request, "Invalid credentials.")
 
         return redirect('login')
+
+######################################### Forgot Password ########################################################
+
+class ForgotPasswordPage(View):
+    def get(self, request, *args, **kwargs):
+        language_from_url = get_language(request)
+        context = {
+            "current_language": language_from_url,
+        }
+        return render(request, "forgot_password.html", context)
+
+    def post(self, request, *args, **kwargs):
+        phone = request.POST.get("phone").strip()
+        language_from_url = get_language(request)
+
+        if not phone:
+            messages.error(request, "Please enter a phone number.")
+            return render(request, "forgot_password.html", {"current_language": language_from_url})
+
+        user = User.objects.filter(phone=phone).first()
+        if not user:
+            messages.error(request, "Phone number not found.")
+            return render(request, "forgot_password.html", {"current_language": language_from_url})
+
+        # Generate and save OTP
+        otp = generate_otp()
+        user.otp = otp
+        user.save()
+
+        # Store phone number in session instead of URL
+        request.session["reset_phone"] = phone
+        request.session['language'] = language_from_url
+        request.session['current_language'] = language_from_url 
+
+        messages.success(request, f"OTP {otp} sent to your phone number.")
+        return redirect("verify_forgot_password_otp")
+
+
+class verify_forgot_password_otp(View):
+    def get(self, request, *args, **kwargs):
+        phone = request.session.get("reset_phone")
+        language_from_url = get_language(request)
+
+        # Store language in session
+        request.session["language"] = language_from_url
+        request.session["current_language"] = language_from_url
+        request.session.save()
+
+        if not phone:
+            messages.error(request, "Session expired. Please try again.")
+            return redirect("forgot_password")
+        
+        context = {
+            "phone": phone,
+            "reset_phone": phone,
+            "current_language": language_from_url,
+        }
+        return render(request, "verify_forgot_password_otp.html", context)
+
+    def post(self, request, *args, **kwargs):
+        phone = request.session.get("reset_phone")
+        print(phone)
+        otp = request.POST.get("otp")
+        language_from_url = get_language(request)
+
+        # Store language in session
+        request.session["language"] = language_from_url
+        request.session["current_language"] = language_from_url
+        request.session.save()
+
+        user = User.objects.filter(phone=phone, otp=otp).first()
+        print("user",user)
+        if not user:
+            messages.error(request, "Invalid OTP. Please try again.")
+            context = {
+                "phone": phone,
+                "current_language": language_from_url,
+            }
+            return render(request, "verify_forgot_password_otp.html", context)
+
+        return redirect("reset_password")
+
+
+class ResetPasswordPage(View):
+    def get(self, request, *args, **kwargs):
+        phone = request.session.get("reset_phone")
+        language_from_url = get_language(request)
+
+        # Store language in session
+        request.session["language"] = language_from_url
+        request.session["current_language"] = language_from_url
+        request.session.save()
+
+        if not phone:
+            messages.error(request, "Session expired. Please try again.")
+            return redirect("forgot_password")
+
+        context = {
+            "phone": phone,
+            "current_language": language_from_url,
+        }
+        return render(request, "reset_password.html", context)
+
+    def post(self, request, *args, **kwargs):
+        language_from_url = get_language(request)
+
+        # Store language in session
+        request.session["language"] = language_from_url
+        request.session["current_language"] = language_from_url
+        request.session.save()
+
+        phone = request.session.get("reset_phone")
+        password = request.POST.get("password").strip()
+        confirm_password = request.POST.get("confirm_password").strip()
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            context = {
+                "phone": phone,
+                "current_language": language_from_url,
+            }
+            return render(request, "reset_password.html", context)
+
+        user = User.objects.filter(phone=phone).first()
+        if not user:
+            messages.error(request, "Invalid phone number.")
+            return redirect("forgot_password")
+
+        # Save new password securely
+        user.password = make_password(password)
+        user.otp = None  # Clear OTP after successful reset
+        user.save()
+
+        # Clear session after password reset
+        del request.session["reset_phone"]
+
+        messages.success(request, "Password reset successful. Please log in.")
+        return redirect("login")
 
 ########################################## Generate a random 6-digit OTP######################################################
 def generate_otp():

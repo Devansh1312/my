@@ -33,7 +33,9 @@ urlpatterns = [
     path('user-dashboard-team-page/', TeamPageDashboard.as_view(),name="player-dashboard-team-page"),
     path('user-dashboard-joined-teams/', UserJoinedTeamInfo.as_view(), name='player-dashboard-joined-teams'),
 
-
+    path('forgot-password/', ForgotPasswordPage.as_view(), name='forgot_password'),
+    path('verify_forgot_password_otp/', verify_forgot_password_otp.as_view(), name='verify_forgot_password_otp'),
+    path('reset-password/', ResetPasswordPage.as_view(), name='reset_password'),
 
 
 

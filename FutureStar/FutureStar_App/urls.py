@@ -24,9 +24,9 @@ urlpatterns = [
     #Logout URL
     path('logout/', logout_view, name='logout'),  # Add the logout path here
 
-    # Forgot Password 
-    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
-    path('reset-password/<str:token>/', ResetPasswordView.as_view(), name='reset_password'),
+    # # Forgot Password 
+    # path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    # path('reset-password/<str:token>/', ResetPasswordView.as_view(), name='reset_password'),
 
     #System Settings Page
     path('System-Settings/', System_Settings.as_view(),name="System_Settings"),
