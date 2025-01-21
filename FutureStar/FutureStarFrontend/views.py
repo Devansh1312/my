@@ -1871,7 +1871,7 @@ class GoogleAuthView(View):
 
         # Google OAuth 2.0 URL
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
-        redirect_uri = "https://redsparkinfo.in/auth/google/callback/"
+        redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
         scope = "email"
         auth_url = (
             "https://accounts.google.com/o/oauth2/auth"
@@ -1897,8 +1897,7 @@ class GoogleCallbackView(View):
         token_url = "https://oauth2.googleapis.com/token"
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
         client_secret = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
-        
-        redirect_uri = "https://redsparkinfo.in/auth/google/callback/"
+        redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
 
         data = {
             "code": code,
@@ -1958,8 +1957,8 @@ class AppleAuthView(View):
             language_from_url = request.session.get('language', 'en')
 
         # Generate the Apple Sign-In URL
-        client_id = "com.redsportx.goalactico"  # Your Apple service ID
-        redirect_uri = "https://futurestar.redspark.redspark.a2hosted.com/auth/apple/callback/"
+        client_id = os.getenv("APPLE_CLIENT_ID")
+        redirect_uri = os.getenv("APPLE_REDIRECT_URI")
         scope = "name email"
         response_mode = "form_post" 
 
@@ -1984,16 +1983,11 @@ class AppleCallbackView(View):
         language_from_url = get_language(request)
 
         # Generate client secret
-        private_key = """-----BEGIN PRIVATE KEY-----
-MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgxqqbPLn+RCk1wsjt
-pA6vWQITR5eocjoT172GoFM02ligCgYIKoZIzj0DAQehRANCAASDXa3+Zwl2tD/z
-sZYqrnAvATbASz6DRlRnziJPUgyhbOthDnxtxSPRkqH+BYew2a6UDLDrdZ25rNKl
-yvAXW05y
------END PRIVATE KEY-----"""
-        client_id = "com.redsportx.goalactico"
-        team_id = "98LQ9LKUQJ"
-        key_id = "NPZH69HWP3"  # Replace with your Apple Key ID
-        redirect_uri = "https://futurestar.redspark.redspark.a2hosted.com/auth/apple/callback/"
+        private_key = os.getenv("APPLE_PRIVATE_KEY")
+        client_id = os.getenv("APPLE_CLIENT_ID")
+        team_id = os.getenv("APPLE_TEAM_ID")
+        key_id = os.getenv("APPLE_KEY_ID")
+        redirect_uri = os.getenv("APPLE_REDIRECT_URI")
 
         current_time = int(time.time())
         claims = {
