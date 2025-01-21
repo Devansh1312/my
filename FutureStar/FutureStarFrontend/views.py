@@ -33,18 +33,28 @@ from FutureStarTrainingApp.models import *
 from .forms import *
 load_dotenv()  
 
+
+
+def get_language(request):
+    language = request.GET.get('Language', None)
+    
+    # Validate the language and ensure it's 'en' or 'ar'
+    if language not in ['en', 'ar']:
+        language = 'en'  # Default to 'en' if invalid or not provided
+    
+    # Store the language in the session
+    request.session['language'] = language
+    request.session['current_language'] = language  # Keep 'current_language' consistent  
+    return language
+
 ##############################################   HomePage   ########################################################
 
 class HomePage(View):
     def get(self, request, *args, **kwargs):
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        # Use get_language to handle language logic
+        language_from_url = get_language(request)
+
+        # Retrieve other data as usual
         marquee = Slider_Content.objects.all()
         app_features = App_Feature.objects.all()
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
@@ -53,14 +63,14 @@ class HomePage(View):
         team_members = Team_Members.objects.all().order_by('id')
         cmsfeatures = cms_home_dynamic_field.objects.all() or None
         cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all() or None
-        number_of_users=User.objects.all().count()
-
+        number_of_users = User.objects.all().count()
 
         try:
             cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
 
+        # Prepare context for rendering
         context = {
             "marquee": marquee,
             "app_features": app_features,
@@ -69,35 +79,21 @@ class HomePage(View):
             "partner": partner,
             "team_members": team_members,
             "cmsdata": cmsdata,
-            "current_language":language_from_url,
-            "cmsfeatures":cmsfeatures,
-            "cms_home_dynamic_achivements":cms_home_dynamic_achivements,
-            "number_of_users":number_of_users,
-
-
+            "current_language": language_from_url,
+            "cmsfeatures": cmsfeatures,
+            "cms_home_dynamic_achivements": cms_home_dynamic_achivements,
+            "number_of_users": number_of_users,
         }
+        
+        # Render the home page with context
         return render(request, "home.html", context)
     
-    # def post(self, request, *args, **kwargs):
-    #     selected_language = request.POST.get('language', 'en')
-    #     request.session['language'] = selected_language
-    #     return redirect('index')
-
-
-
 ##############################################   DiscoverPage   ########################################################
 
 class DiscoverPage(View):
     
     def get(self, request, *args, **kwargs):
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         dynamic = cms_dicovery_dynamic_image.objects.all()
         whyus = cms_dicovery_dynamic_view.objects.all()
         try:
@@ -112,28 +108,11 @@ class DiscoverPage(View):
         }
         return render(request, "discover.html",context)
     
-    # def post(self, request, *args, **kwargs):
-    #     selected_language = request.POST.get('language', 'en')
-    #     request.session['language'] = selected_language
-    #     return redirect('discover')  
-
-
-
 ##############################################   SuccessStoriesPage   ########################################################
-
-
-
 class SuccessStoriesPage(View):
     def get(self, request, *args, **kwargs):
         # tryout_clubs = Tryout_Club.objects.all()
-        language_from_url = request.GET.get('Language', None)
-
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         try:
             cmsdata = cms_pages.objects.get(id=3)  # Use get() to fetch a single object
             latest_users = User.objects.all().order_by('-id')[:4]
@@ -200,15 +179,7 @@ class SuccessStoriesPage(View):
 class NewsPage(View):
     
     def get(self, request, *args, **kwargs):
-        # Get the selected language from the session, default to 'en'
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         try:
             cmsdata = cms_pages.objects.get(id=4)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
@@ -241,15 +212,7 @@ class NewsPage(View):
 
 class NewsDetailPage(View):
     def get(self, request, pk):
-        # Get the selected language from the session, default to 'en'
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         # Get the news item based on the provided pk in the URL
         news = get_object_or_404(News, id=pk)
 
@@ -267,31 +230,13 @@ class NewsDetailPage(View):
         }
         return render(request, "news-details.html", context)
     
-    # def post(self, request, pk):
-    #     # Handle language change
-    #     selected_language = request.POST.get('language', 'en')
-
-    #     # Store the selected language in the session
-    #     request.session['language'] = selected_language
-
-    #     # Redirect to the same news detail page with the correct pk
-    #     return redirect('news-detail', pk=pk)
-
-
 
 ##############################################   AdvertisePage   ########################################################
 
 class AdvertisePage(View):
     
     def get(self, request, *args, **kwargs):
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         dynamic_field = cms_advertise_section_2_dynamic_field.objects.all()
         partnership_dynamic_field = cms_advertise_Partnership_dynamic_field.objects.all()
         ads_dynamic_field = cms_advertise_ads_dynamic_field.objects.all()
@@ -329,12 +274,7 @@ class AboutPage(View):
         games_played=TournamentGames.objects.all().count()
         language_from_url = request.GET.get('Language', None)
         
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         try:
             cmsdata = cms_pages.objects.get(id=7)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
@@ -369,12 +309,7 @@ class ContactPage(View):
 
         language_from_url = request.GET.get('Language', None)
         
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         context = {
             "current_language": language_from_url,
@@ -390,12 +325,7 @@ class ContactPage(View):
         message = request.POST.get("message", "").strip()
         language_from_url = request.GET.get('Language', None)
         
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         try:
             cmsdata = cms_pages.objects.get(id=8)  # Fetch CMS data again for context
         except cms_pages.DoesNotExist:
@@ -433,14 +363,7 @@ class PrivacyPolicyPage(View):
     
     def get(self, request, *args, **kwargs):
 
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         try:
             cmsdata = cms_pages.objects.get(id=10)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
@@ -452,12 +375,6 @@ class PrivacyPolicyPage(View):
             "cmsdata": cmsdata,
         } 
         return render(request, "privacy-policy.html",context)
-    
-    def post(self, request, *args, **kwargs):
-        selected_language = request.POST.get('language', 'en')
-        request.session['language'] = selected_language
-        return redirect('privacy-policy')
-    
 
 ##############################################   TermsofServicesPage   ########################################################
 
@@ -465,14 +382,7 @@ class TermsofServicesPage(View):
     
     def get(self, request, *args, **kwargs):
 
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         
         try:
             cmsdata = cms_pages.objects.get(id=9)  # Use get() to fetch a single object
@@ -487,26 +397,13 @@ class TermsofServicesPage(View):
 
         return render(request, "terms-of-services.html",context)
     
-    def post(self, request, *args, **kwargs):
-        selected_language = request.POST.get('language', 'en')
-        request.session['language'] = selected_language
-        return redirect('terms-of-services')  
-
-
 ######################### terms-of-conditions #####################
 
 class TermsAndConditionsPage(View):
     
     def get(self, request, *args, **kwargs):
         # Check if the 'Language' parameter is in the URL
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         # Fetch the CMS data
         try:
@@ -521,12 +418,6 @@ class TermsAndConditionsPage(View):
 
         return render(request, "terms-and-conditions.html", context)
     
-    def post(self, request, *args, **kwargs):
-        selected_language = request.POST.get('language', 'en')
-        request.session['language'] = selected_language
-        return redirect('terms-and-conditions')
-
-
 ##############################################   PlayerDashboardPage   ########################################################
 
 class PlayerDashboardPage(LoginRequiredMixin, View):
@@ -1279,14 +1170,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         if user.role.id == 1:
             return redirect('Dashboard')
@@ -1303,7 +1187,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
         return render(request, "PlayerDashboard.html", context)
 
-  
 
 ##############################################   LoginPage   ########################################################
 
@@ -1334,14 +1217,7 @@ class LoginPage(View):
                 return redirect('player-dashboard')  # Redirect to home for any other role
 
         # Proceed if user is not authenticated
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         try:
             cmsdata = cms_pages.objects.get(id=12)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
@@ -1350,25 +1226,13 @@ class LoginPage(View):
         context = {
             "current_language": language_from_url,
             "cmsdata": cmsdata,
-            # Uncomment these lines if needed
-            # "google_client_id": settings.GOOGLE_CLIENT_ID,
-            # "apple_client_id": settings.APPLE_CLIENT_ID,
-            # "apple_redirect_uri": settings.APPLE_REDIRECT_URI,
-            # "social_auth_state_string": settings.SOCIAL_AUTH_STATE_STRING,
         }
 
         return render(request, "login.html", context)
 
     def post(self, request, *args, **kwargs):
         # Handle language change
-        language_from_url = request.GET.get('Language', None)
-
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         # Fetch login type
         login_type = int(request.POST.get('login_type', 1))
@@ -1405,102 +1269,13 @@ class LoginPage(View):
 
         return redirect('login')
 
-
-    #     elif login_type == 2:
-    #         google_token = request.POST.get('google_token')
-    #         if google_token:
-    #             google_user_info = self.verify_google_token(google_token)
-    #             if google_user_info:
-    #                 return self.handle_social_login(request, google_user_info, login_type='google')
-
-    #         messages.error(request, "Failed to authenticate with Google.")
-    #         return redirect('login')
-
-    #     elif login_type == 3:
-    #         apple_token = request.POST.get('apple_token')
-    #         if apple_token:
-    #             apple_user_info = self.verify_apple_token(apple_token)
-    #             if apple_user_info:
-    #                 return self.handle_social_login(request, apple_user_info, login_type='apple')
-
-    #         messages.error(request, "Failed to authenticate with Apple.")
-    #         return redirect('login')
-
-    #     messages.error(request, "Invalid login type.")
-    #     return redirect('login')
-
-    # def verify_google_token(self, token):
-    #     try:
-    #         response = requests.get(f'https://oauth2.googleapis.com/tokeninfo?id_token={token}')
-    #         if response.status_code == 200:
-    #             return response.json()
-    #     except Exception as e:
-    #         print(f"Error verifying Google token: {e}")
-    #     return None
-
-    # def verify_apple_token(self, token):
-    #     try:
-    #         apple_public_keys = requests.get('https://appleid.apple.com/auth/keys').json()
-    #         key = apple_public_keys['keys'][0]
-    #         decoded_token = decode(token, key, algorithms=['RS256'], audience=settings.APPLE_CLIENT_ID)
-    #         return decoded_token
-    #     except exceptions.InvalidTokenError as e:
-    #         print(f"Error verifying Apple token: {e}")
-    #     return None
-
-    # def handle_social_login(self, request, user_info, login_type):
-    #     email = user_info.get('email')
-    #     if not email:
-    #         messages.error(request, f"Unable to retrieve email for {login_type} login.")
-    #         return redirect('login')
-
-    #     user = User.objects.filter(email=email).first()
-
-    #     if user:
-    #         if user.is_active:
-    #             login(request, user)
-    #             user.device_type = "Website"
-    #             user.last_login = timezone.now()
-    #             user.save()
-    #             messages.success(request, f"Login successful via {login_type.capitalize()}!")
-    #             return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
-    #         else:
-    #             messages.error(request, "Account is inactive.")
-    #             return redirect('login')
-    #     else:
-    #         username = email.split('@')[0]
-    #         user = User.objects.create_user(
-    #             username=username,
-    #             email=email,
-    #             password=None,
-    #             role_id=2,
-    #             is_active=True,
-    #         )
-    #         login(request, user)
-    #         user.device_type = "Website"
-    #         user.last_login = timezone.now()
-    #         user.save()
-    #         messages.success(request, f"User created and login successful via {login_type.capitalize()}!")
-    #         return redirect('player-dashboard')
-
-
-
-
-# Generate a random 6-digit OTP
+########################################## Generate a random 6-digit OTP######################################################
 def generate_otp():
     return str(random.randint(100000, 999999))
-
 #################################### Register Page ##########################################
 class RegisterPage(View):
     def get(self, request, *args, **kwargs):
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         # Fetching specific CMS data
         try:
             cmsdata = cms_pages.objects.get(id=13)
@@ -1515,21 +1290,14 @@ class RegisterPage(View):
 
     def post(self, request, *args, **kwargs):
         register_type = request.POST.get("register_type")
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
         
         if register_type == "1":  # Normal registration
             return self.handle_normal_registration(request)
         
         else:  # Google or Apple sign-up
-            email = request.POST.get("email")  # Get email from OAuth
-            return self.handle_social_signup(email, register_type)
+            messages.error(request, "Username or phone number already exists.")
+            return redirect("register")
 
     def handle_normal_registration(self, request):
         language_from_url = request.GET.get('Language', None)
@@ -1575,55 +1343,10 @@ class RegisterPage(View):
         
         # Instead of passing context, include language as GET parameter
         return redirect(f"{reverse('verify_otp')}?Language={language_from_url}")
-
-    def handle_social_signup(self, email, register_type):
-        # Redirect to the username and phone entry page
-        return redirect('social_signup', email=email, register_type=register_type)
-
-class SocialSignupView(View):
-    def get(self, request, *args, **kwargs):
-        email = request.GET.get('email')
-        register_type = request.GET.get('register_type')
-
-        context = {
-            'email': email,
-            'register_type': register_type,
-        }
-        return render(request, "social_signup.html", context)
-
-    def post(self, request, *args, **kwargs):
-        username = request.POST.get("username")
-        phone = request.POST.get("phone")
-        email = request.POST.get("email")
-        register_type = request.POST.get("register_type")
-
-        # Validate username and phone number
-        if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
-            messages.error(request, "Username or phone number already exists.")
-            return redirect("social_signup", email=email, register_type=register_type)
-
-        # Generate OTP and save user details in OTPSave table
-        otp = generate_otp()
-        OTPSave.objects.create(username=username, phone=phone, email=email, OTP=otp)
-
-        # Log the OTP for development purposes
-
-        # Store necessary data in the session
-        request.session['username'] = username
-        request.session['phone'] = phone
-        request.session['email'] = email
-
-        return redirect("verify_otp")
-
 #################################### OTP Verification #######################################
 class OTPVerificationView(View):
     def get(self, request, *args, **kwargs):
-        language_from_url = request.GET.get('Language')
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        
+        language_from_url = get_language(request)
         context = {
             "current_language":language_from_url,
         }
@@ -1631,12 +1354,7 @@ class OTPVerificationView(View):
         return render(request, "otp_verification.html",context)
 
     def post(self, request, *args, **kwargs):
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        
+        language_from_url = get_language(request)
         context = {
             "current_language":language_from_url,
         }
@@ -1675,7 +1393,6 @@ class OTPVerificationView(View):
         messages.success(request, "Registration successful! Please log in.")
         return redirect("login")
 
-    
 
 def custom_404_view(request, exception=None):
         # template_name = "Admin/User/Referee_List.html"
@@ -1683,18 +1400,6 @@ def custom_404_view(request, exception=None):
 
         return render(request, 'templates/404.html')
 
-def get_language(request):
-    """
-    Retrieves the language from the URL or session and updates the session values.
-    """
-    language = request.GET.get('Language', None)
-    if language:
-        request.session['language'] = language
-    else:
-        language = request.session.get('language', 'en')  # Default to 'en' if not set
-    request.session['current_language'] = language  # Keep 'current_language' consistent
-    return language
-    
 class UserInfoUpdateView(View):
     template_name = 'user_info.html'
     success_url = reverse_lazy('verify_otp')

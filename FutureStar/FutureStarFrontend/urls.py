@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,re_path
 from FutureStarFrontend.views import *
 from django.conf.urls.static import static
 from django.conf.urls import handler404
@@ -19,8 +19,8 @@ urlpatterns = [
     path('news-detail/<int:pk>/', NewsDetailPage.as_view(), name='news-detail'),
     path('advertise/', AdvertisePage.as_view(),name="advertise"),
     path('about/', AboutPage.as_view(),name="about"),
-    path('login/', LoginPage.as_view(),name="login"),
-    path('register/', RegisterPage.as_view(),name="register"),
+    path('login/', LoginPage.as_view(), name="login"),
+    re_path(r'^login/?$', LoginPage.as_view(), name="login_redirect"),
     path('privacy-policy/', PrivacyPolicyPage.as_view(),name="privacy-policy"),
     path('terms-of-services/', TermsofServicesPage.as_view(),name="terms-of-services"),
     path('terms-and-conditions/', TermsAndConditionsPage.as_view(),name="terms-and-conditions"),
@@ -39,7 +39,6 @@ urlpatterns = [
 
     path('register/', RegisterPage.as_view(), name='register'),
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
-    path('social_signup/', SocialSignupView.as_view(), name='social_signup'),
     path('test-404/', custom_404_view),
 
     path('search/', SearchView.as_view(), name='search'),
@@ -54,16 +53,6 @@ urlpatterns = [
 
     path('auth/apple/', AppleAuthView.as_view(), name='apple_auth'),
     path('auth/apple/callback/', AppleCallbackView.as_view(), name='apple_callback'),
-
-
-    # path('google/login/', GoogleLoginView.as_view(), name='google_login'),
-    # path('google/callback/', GoogleCallbackView.as_view(), name='GoogleCallbackView'),
-    # path('apple/login/', AppleLoginView.as_view(), name='apple_login'),
-    # path('apple/callback/', AppleCallbackView.as_view(), name='apple_callback'),
-        
-        # Add your Google login view
-    # path('apple/login/', YourAppleLoginView.as_view(), name='apple_login'),  # Add your Apple login view
-
     ]
 
 handler404 = 'FutureStarFrontend.views.custom_404_view'
