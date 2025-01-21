@@ -598,7 +598,7 @@ class LoginAPIView(APIView):
 
                 if user:
                     if user.check_password(password):
-                        if user.role == 1:
+                        if user.role.id == 1:
                             return Response({
                                 'status': 0,
                                 'message': _('You Cannot Login Here'),
@@ -649,7 +649,7 @@ class LoginAPIView(APIView):
                             'message': _('Your account has been deleted. Please contact support.'),
                         }, status=status.HTTP_400_BAD_REQUEST)
 
-                    if user.role == 1:
+                    if user.role.id == 1:
                         return Response({
                             'status': 0,
                             'message': _('You Cannot Login Here'),
@@ -5663,8 +5663,6 @@ class LineupNotificationAPIView(APIView):
 
             # Calculate the time one hour from now
             one_hour_later = current_time + timedelta(hours=1)
-            print(one_hour_later)
-
             # Get upcoming tournament games within the next 1 hour for today
             upcoming_tournament_games = TournamentGames.objects.filter(
                 game_date=current_date,
@@ -5855,9 +5853,6 @@ class UniformConfirmationNotificationView(APIView):
         current_time = timezone.now()
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
-        print(current_time)
-        print(one_hour_later)
-
         # Retrieve upcoming tournament games that are not confirmed
         upcoming_tournament_games = TournamentGames.objects.filter(
             game_date=current_date,
@@ -5995,8 +5990,6 @@ class UniformAddNotificationAPIView(APIView):
 
         # Calculate the time one hour from now
         one_hour_later = current_time + timedelta(hours=1)
-        print(one_hour_later)
-
         # Get upcoming tournament games within the next 1 hour for today
         upcoming_tournament_games = TournamentGames.objects.filter(
             game_date=current_date,  # Ensure it's today's date

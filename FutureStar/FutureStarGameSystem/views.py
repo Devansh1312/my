@@ -1583,9 +1583,6 @@ class LineupPlayerStatusAPIView(APIView):
             lineup_status=3,
             player_ready=True
         ).count()
-        print(team_a_ready_count)
-        print(team_b_ready_count)
-
         # Send notifications based on ready counts
         is_team_a = team_id == game.team_a.id
         is_team_b = team_id == game.team_b.id
@@ -1625,8 +1622,6 @@ class LineupPlayerStatusAPIView(APIView):
             notification_language = user.current_language
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
-            print(type(tournament_id))
-
             game_data = {"id": game.id, 'tournament_id': tournament_id, "game_type": "Tournament", "team_id": team.id}
             data = {'type': "add_lineup_player", 'game_data': game_data}
             body_message = _(message).format(team_name=team_name)
@@ -2125,8 +2120,6 @@ class PlayerGameStatsAPIView(APIView):
                         created_by_id=request.user.id
                     )
                     created_by_id_role = request.user.role.id
-                    print(f'Created by role: {created_by_id_role}')
-
                     # Send push notification
                     self._send_stat_notification(player_instance, stat, tournament_instance, game_instance,created_by_id_role)
 

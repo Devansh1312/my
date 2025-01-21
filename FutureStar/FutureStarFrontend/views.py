@@ -1578,15 +1578,7 @@ class GoogleCallbackView(View):
         code = request.GET.get('code')
         if not code:
             return JsonResponse({"error": "Authorization code not provided"}, status=400)
-
-        # Use the get_language function to retrieve and update language
         language_from_url = get_language(request)
-
-        # Print to verify session data
-        print("Language in session:", request.session.get('language'))
-        print("Current language in session:", request.session.get('current_language'))
-
-        # Exchange the authorization code for an access token
         token_url = "https://oauth2.googleapis.com/token"
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
         client_secret = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
@@ -1617,22 +1609,15 @@ class GoogleCallbackView(View):
         if not email:
             return JsonResponse({"error": "Failed to retrieve email"}, status=400)
 
-        # Check if the email is already registered
         user = User.objects.filter(email=email).first()
         if user:
-            # If user exists, log them in
             login(request, user)  # Assuming you have Django's authentication set up
             messages.success(request, "Welcome back!")
             return redirect("player-dashboard")  # Or wherever you want to redirect after login
 
-        # Save the email in the session
         request.session['email'] = email
         request.session.save()  # Explicitly save the session to persist email
 
-        # Verify that language and current_language are set in session
-        print("Final session data:", dict(request.session))
-
-        # Redirect after saving email
         return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
 
 ###################### Apple Login and Signup #########################################################
@@ -1707,7 +1692,6 @@ class AppleCallbackView(View):
 
         token_response = requests.post(token_url, data=data)
         token_json = token_response.json()
-        print(token_json)
 
         if "id_token" not in token_json:
             return JsonResponse({"error": "Failed to retrieve tokens", "details": token_json}, status=400)

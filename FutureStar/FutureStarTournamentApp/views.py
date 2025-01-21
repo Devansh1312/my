@@ -688,7 +688,6 @@ class TeamJoiningRequest(APIView):
         if language in ['en', 'ar']:
             activate(language)
         user = request.user
-        print(user)
         if request.user.role_id in [6, 3]:  # Managers (6) or Coaches (3)
         # Determine joinning_type based on role
             joinning_type = (
@@ -773,9 +772,7 @@ class TeamJoiningRequest(APIView):
                 ).values_list('branch_id', flat=True),
                 age_group_id=tournament_age_group  # Filter by tournament age group
             )
-         
             teams_data.extend(manager_branches)
-
         # Retrieve coach teams
         if user.role_id == 3:  # Assuming role_id == 3 indicates a coach
             coach_branches = TeamBranch.objects.filter(
@@ -786,22 +783,8 @@ class TeamJoiningRequest(APIView):
                 age_group_id=tournament_age_group  # Filter by tournament age group
             )
             teams_data.extend(coach_branches)
-
-        # Remove duplicates within each list and serialize results
-
         unique_teams = list((teams_data))
-        print(unique_teams)
-
-    
-
-
-        # Serialize each category
-    
         serialized_data = TeamBranchSerializer(unique_teams, many=True, context={'request': request}).data
-        print(serialized_data)
-
-       
-
         return Response({
             'status': 1,
             'message': _('Teams retrieved successfully.'),
@@ -814,57 +797,6 @@ class TeamJoiningRequest(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        # Initialize team_id to None
-        # team_id = None
-        
-        # # Check if the user is a manager and retrieve their assigned branch
-        #  # Check if the user is a manager or coach and retrieve their assigned branch
-        # if request.user.role_id in [6, 3]:  # Managers (6) or Coaches (3)
-        #     try:
-        #         # Determine joinning_type based on role
-        #         joinning_type = (
-        #             JoinBranch.MANAGERIAL_STAFF_TYPE if request.user.role_id == 6
-        #             else JoinBranch.COACH_STAFF_TYPE
-        #         )
-        #         user_branch = JoinBranch.objects.get(
-        #             user_id=request.user,
-        #             joinning_type=joinning_type
-        #         )
-        #         team_id = user_branch.branch_id.id
-        #     except JoinBranch.DoesNotExist:
-        #         role_message = (
-        #             _('You are not assigned as a manager to any branch.')
-        #             if request.user.role_id == 6
-        #             else _('You are not assigned as a coach to any branch.')
-        #         )
-        #         return Response({
-        #             'status': 0,
-        #             'message': role_message,
-        #         }, status=status.HTTP_400_BAD_REQUEST)
-        # elif TeamBranch.objects.filter(team_id__team_founder=request.user).exists():  # Check if user is a team founder
-        #     try:
-        #         # Retrieve the first branch associated with the team where the user is the founder
-        #         team_branch = TeamBranch.objects.filter(team_id__team_founder=request.user).first()
-        #         if not team_branch:
-        #             return Response({
-        #                 'status': 0,
-        #                 'message': _('No Team Exists'),
-        #             }, status=status.HTTP_400_BAD_REQUEST)
-                
-        #         # Use the branch's ID for further processing
-        #         team_id = team_branch.id
-        #     except TeamBranch.DoesNotExist:
-        #         return Response({
-        #             'status': 0,
-        #             'message': _('You are not associated with any team branch as a founder.'),
-        #         }, status=status.HTTP_400_BAD_REQUEST)
-        # else:
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('Only managers, coaches, or team founders can perform this action.'),
-        #     }, status=status.HTTP_403_FORBIDDEN)
-
         # Proceed with the tournament joining request flow
         tournament_id = request.data.get('tournament_id')
         team_id = request.data.get('team_id')
@@ -918,7 +850,6 @@ class TeamJoiningRequest(APIView):
         # Serialize and return the created or updated object
         serializer = TournamentGroupTeamSerializer(tournament_group_team)
         team_founder = tournament.team_id.team_founder
-        print(tournament.team_id.id)
         if team_founder:
             device_token = team_founder.device_token  # Ensure the `device_token` is available
             if device_token:
@@ -938,10 +869,6 @@ class TeamJoiningRequest(APIView):
                     "notifier_id":tournament.team_id.id , # Assuming `team_branch.id` is the correct attribute for the ID
                     "type": "team_joining_request",  # Assuming `type` is the correct attribute for the type of notification
                 }
-                
-
-
-                
                 send_push_notification(device_token, title, body, device_type=team_founder.device_type, data=push_data)
                 notification = Notifictions.objects.create(
                     created_by_id=request.user.id,
@@ -960,9 +887,6 @@ class TeamJoiningRequest(APIView):
         }, status=status.HTTP_200_OK)
 
    
-
-
-
 class TeamRequestApproved(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1033,7 +957,6 @@ class TeamRequestApproved(APIView):
 
                 if device_token and device_type:
                     # Send push notification with translated content
-                    print("done")
                     push_data = {
                         "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
                         "team_branch_id": team_branch_id, 
@@ -1057,9 +980,6 @@ class TeamRequestApproved(APIView):
                         content=_("Your team has been accepted to join the {} tournament.").format(tournament.tournament_name),
                     )
                     notification.save()
-
-
-
             return Response({
                 'status': 1,
                 'message': _('Tournament Group Team status updated to accepted.'),
@@ -1070,7 +990,6 @@ class TeamRequestApproved(APIView):
                     'status': existing_team.status,
                 }
             }, status=status.HTTP_200_OK)
-
         # Handle cases where the team does not already exist in the tournament
         return Response({
             'status': 0,
@@ -1082,7 +1001,6 @@ class TeamRequestApproved(APIView):
 ############################# FETCH TEAM LISTS APPROVED,REQUESTED AND REJECTED ###########################
 
 class TournamentGroupTeamListView(APIView):
-
     def get(self, request):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -1169,8 +1087,6 @@ class TeamRejectRequest(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-        
-
 ############### Custom Pagination ###############
 class CustomBranchSearchPagination(PageNumberPagination): 
     permission_classes = [IsAuthenticated]
@@ -1221,7 +1137,6 @@ class CustomBranchSearchPagination(PageNumberPagination):
             'current_page': self.page,
             'data': data
         })
-
 
 ################################# Branch Search API ####################################################
 
@@ -1278,9 +1193,6 @@ class TeamBranchSearchView(APIView):
 
         # Create response with formatted paginated data
         return paginator.get_paginated_response(formatted_data)
-
-
-
 
 
 class TournamentGamesOptionsAPIView(APIView):
@@ -1350,8 +1262,6 @@ class TournamentGamesOptionsAPIView(APIView):
             }
         })
 
-
-
 ############### Custom Pagination ###############
 class CustomGameListPagination(PageNumberPagination): 
     permission_classes = [IsAuthenticated]
@@ -1402,7 +1312,6 @@ class CustomGameListPagination(PageNumberPagination):
             'current_page': self.page,
             'data': data
         })
-
 
 ######### Single game Detail API ##################
 class GameDetailsAPIView(APIView):
@@ -1609,9 +1518,6 @@ class TournamentGamesAPIView(APIView):
                     "team_branch_id": team_branch_id,  # The team branch ID
                     "type": "game_scheduled",  # The notification type
                 }
-
-
-
             # Send notification to each team member
             for member in team_members:
                 user = member.user_id  # Assuming JoinBranch.user_id is a ForeignKey to User
@@ -1828,8 +1734,6 @@ class TournamentGamesAPIView(APIView):
                 }
             }, status=status.HTTP_200_OK)
 
-
-
 ################## Tournament Games Detail API for Lineup Of Both Team ################################
 class TournamentGamesDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2008,9 +1912,7 @@ class GameUniformColorAPIView(APIView):
             'data': data
         }, status=status.HTTP_200_OK)
 
-
 ############################### Uniform Color APIS #########################################
-
 ####### Uniform Color Set Post APi ##############
 
 class TeamUniformColorAPIView(APIView):
@@ -2356,62 +2258,6 @@ class FetchTeamUniformColorAPIView(APIView):
                 )
                 notification.save()
 
-
-
-################################
-# class TournamentGameStatsAPIView(APIView):
-#     def get(self, request, *args, **kwargs):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
-#         # Retrieve the query parameters: tournament_id, team_a_id, and team_b_id
-#         tournament_id = request.query_params.get('tournament_id')
-#         team_a_id = request.query_params.get('team_a_id')
-#         team_b_id = request.query_params.get('team_b_id')
-
-#         # Initialize the dictionary to hold statistics for each team
-#         team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
-
-#         # Query games based on tournament_id, team_a_id, and team_b_id
-#         games = TournamentGames.objects.all()
-
-#         # Apply filters based on provided query parameters
-#         if tournament_id:
-#             games = games.filter(tournament_id=tournament_id)
-#         if team_a_id:
-#             games = games.filter(team_a__id=team_a_id)
-#         if team_b_id:
-#             games = games.filter(team_b__id=team_b_id)
-
-#         # Iterate through all the games and calculate statistics
-#         for game in games:
-#             if game.is_draw:
-#                 # Both teams have a draw
-#                 team_stats[game.team_a.id]['draws'] += 1
-#                 team_stats[game.team_b.id]['draws'] += 1
-#             elif game.winner_id == game.team_a.id:
-#                 # Team A wins
-#                 team_stats[game.team_a.id]['wins'] += 1
-#                 team_stats[game.team_b.id]['losses'] += 1
-#             elif game.winner_id == game.team_b.id:
-#                 # Team B wins
-#                 team_stats[game.team_b.id]['wins'] += 1
-#                 team_stats[game.team_a.id]['losses'] += 1
-
-#         # Format the response in the required structure
-#         response_data = {
-#             "status": 1,
-#             "message": _('Stats fetched successfully'),
-#             "data": {
-#                 "Team_A": team_stats.get(int(team_a_id), {"wins": 0, "losses": 0, "draws": 0}),
-#                 "Team_B": team_stats.get(int(team_b_id), {"wins": 0, "losses": 0, "draws": 0}),
-#             }
-#         }
-
-#         return Response(response_data, status=status.HTTP_200_OK)
-
-
-
 ############### Tournament Games h2h  API View ####################
 class TournamentGamesh2hCompleteAPIView(APIView):
     def get(self, request, *args, **kwargs):
@@ -2522,11 +2368,7 @@ class TournamentGamesh2hCompleteAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-
-
-
-
-############################# FETCH AND CREATE GROUP TEAM WITH ADDING OR UPDATING TEAM ###########################
+############################ FETCH AND CREATE GROUP TEAM WITH ADDING OR UPDATING TEAM ###########################
 
 class TournamentGroupTeamListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2573,7 +2415,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                     tournament_id=tournament_id,
                     finish=True
                 )
-
                 match_played = games.count()
 
                 # Calculate total goals for the team (sum of goals scored in games where the team is involved)
@@ -2584,7 +2425,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 total_goals_scored = total_goals['total_goals_a'] or 0
                 total_goals_conceded = total_goals['total_goals_b'] or 0
                 total_goals = total_goals_scored 
-
                 # Calculate conceded goals (goals scored by the opponent)
                 conceded_goals = games.aggregate(
                     total_conceded=Sum(
@@ -2604,7 +2444,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 total_wins = games.filter(winner_id=team_id).count()
                 total_losses = games.filter(loser_id=team_id).count()
                 total_draws = games.filter(is_draw=True).count()
-
                 # Points calculation: 1 point per win
                 points = total_wins  # 1 point per win, 0 for draw and loss
 
@@ -2702,8 +2541,6 @@ class TournamentGroupTeamListCreateAPIView(APIView):
                 'status': 0,
                 'message': _('No team found to add.'),
             }, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class UpcomingGameView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2890,13 +2727,7 @@ class FetchMyGamesAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-
-        # user = request.user
-
-        # # Ensure the user is authenticated
-        # if not user.is_authenticated:
-        #     return Response({"status": 0, "message": "User is not authenticated."})
-
+        
         created_by_id = request.GET.get('created_by_id', None)
         creator_type = str(request.GET.get('creator_type', 0))
 
