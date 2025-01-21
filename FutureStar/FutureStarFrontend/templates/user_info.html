@@ -22,14 +22,7 @@
                     
                     <!-- Email (Readonly) -->
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" class="form-control" value="{{ form.email.value }}" readonly>
-                                <div class="error-message text-danger" id="emailError" style="display:none;">This field is required</div>
-                            </div>
-                        </div>
-
+                        <input hidden type="email" id="email" name="email" class="form-control" value="{{ form.email.value }}" readonly>
                         <!-- Username -->
                         <div class="col-md-12">
                             <div class="form-group">
@@ -48,24 +41,9 @@
                             </div>
                         </div>
 
-                        <!-- Password -->
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <label for="password">Password</label>
-                                <input type="password" id="password" name="password" class="form-control" value="{{ form.password.value }}" required placeholder="Enter your password">
-                                <span class="eye-icon" id="togglePassword">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                </span>
-                                <div class="error-message text-danger" id="passwordError" style="display:none;">This field is required</div>
-                            </div>
-                        </div>
-
                         <div class="col-md-12">
                             <div class="form-group pt-5 mb-60">
-                                <button type="submit" class="theme-btn style-two w-100">Login <i class="fa-solid fa-arrow-right"></i></button>
-                            </div>
-                            <div class="text-center">
-                                You don't have an account? <a href="{% url 'register' %}">Sign up</a>
+                                <button type="submit" class="theme-btn style-two w-100">Send OTP <i class="fa-solid fa-arrow-right"></i></button>
                             </div>
                         </div>
                     </div>

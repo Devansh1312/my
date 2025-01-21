@@ -1981,7 +1981,7 @@ class AppleCallbackView(View):
 
     def handle_auth_callback(self, request, code):
         # Get language from session
-        language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         # Generate client secret
         private_key = """-----BEGIN PRIVATE KEY-----
@@ -2037,10 +2037,12 @@ yvAXW05y
             return JsonResponse({"error": "Failed to retrieve email from ID token"}, status=400)
 
         # Check if the email is already registered
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "This email is already in use. Please try a different email.")
-            return redirect("register")  # Redirect to your registration page
-
+        user = User.objects.filter(email=email).first()
+        if user:
+            # If user exists, log them in
+            login(request, user)
+            messages.success(request, "Welcome back!")
+            return redirect("player-dashboard")
         # Save the email in the session
         request.session['email'] = email
         request.session['language'] = language_from_url
