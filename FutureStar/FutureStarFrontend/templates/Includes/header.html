@@ -165,7 +165,13 @@
     <div class="inner-box text-center">
         <div class="cross-icon"><span class="fa fa-times"></span></div>
         <div class="title">
-            <h4>Contact Details</h4>
+            <h4>
+                {% if current_language == 'en' %}
+                    Contact Details
+                {% elif current_language == 'ar' %}
+                    تفاصيل الاتصال
+                {% endif %}
+            </h4>
         </div>
 
         <ul class="details-wrapper">
