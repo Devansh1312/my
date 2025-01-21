@@ -4,21 +4,17 @@ import os
 import random
 import re
 import string
-import logging
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Case, When, F, Q, Sum
 from django.utils.crypto import get_random_string
-from django.utils.timezone import now
 from django.core.files.storage import default_storage
 from django.core.paginator import EmptyPage
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
-from django.utils import timezone
 
 # Django REST Framework Imports
 from rest_framework.views import APIView
@@ -30,23 +26,18 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import ValidationError
 
 # App-Specific Imports
-from FutureStar_App.models import *
 from FutureStarAPI.models import *
-from FutureStarFriendlyGame.models import *
-from FutureStarGameSystem.models import *
-from FutureStarTrainingApp.models import *
+from FutureStarFriendlyGame.models import FriendlyGame,FriendlyGameLineup,FriendlyGamesPlayerGameStats,FriendlyGameGameOfficials
+from FutureStarGameSystem.models import PlayerGameStats,TournamentGames,Lineup,GameOfficials,JoinBranch
+from FutureStarTrainingApp.models import Training
 from FutureStarTournamentApp.serializers import TournamentGameSerializer
-from FutureStarTeamApp.serializers import *
-from FutureStarTrainingGroupApp.serializers import *
+from FutureStarTeamApp.serializers import TeamSerializer
+from FutureStarTrainingGroupApp.serializers import TrainingGroupSerializer
 from FutureStarAPI.serializers import *
 from FutureStar.firebase_config import send_push_notification
 
 # JWT Token Imports
 from rest_framework_simplejwt.tokens import RefreshToken
-
-
-logger = logging.getLogger(__name__)
-
 ##################################################### User Current Type Switch API Z###############################################
 class UpdateCurrentTypeAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -203,16 +194,12 @@ class send_otp(APIView):
         characters = string.ascii_letters + string.digits
         return ''.join(random.choice(characters) for i in range(length))
     
-    def post(self, request, *args, **kwargs):
-        logger.debug("Starting send_otp post method")
-        
+    def post(self, request, *args, **kwargs):        
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
         registration_type = request.data.get('type')
-        logger.debug(f"Registration Type: {registration_type}")
-
         try:
             # Handle Registration Type 1 (Normal registration)
             if registration_type == 1:
@@ -344,7 +331,6 @@ class send_otp(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            logger.error(f"Error in send_otp: {str(e)}")
             return Response({
                 'status': 0,
                 'message': _('An error occurred while sending OTP.'),

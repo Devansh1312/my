@@ -1,48 +1,36 @@
+# Standard Library Imports
+import os
+import time
+import random
+from datetime import datetime
+
+# Third-party Imports
+import jwt
+import requests
+from dotenv import load_dotenv
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-import jwt
+from django.http import JsonResponse, HttpResponseRedirect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q, Sum, When, Case, F
+from django.utils import timezone
+from django.utils.translation import activate
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.crypto import get_random_string
-import time
-from django.conf import settings
+from django.utils.decorators import method_decorator
+from itertools import chain
+
+# Application-Specific Imports
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
-from django.views import View
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
-from django.contrib import messages
-from django.utils.translation import activate
-from django.contrib.auth import authenticate, login
-import random
-from django.db.models import Q,Sum,When,Case,F
-from datetime import datetime
 from FutureStarTrainingApp.models import *
-from itertools import chain
-from django.urls import reverse
-from django.views.generic.edit import UpdateView
 from .forms import *
-from django.urls import reverse_lazy
-import requests
-from django.http import HttpResponseRedirect, JsonResponse
-from dotenv import load_dotenv
-import os
-
-
-import jwt
-import time
-import requests
-from django.views import View
-from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.urls import reverse_lazy
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-
 load_dotenv()  
 
 ##############################################   HomePage   ########################################################
@@ -1942,11 +1930,7 @@ class GoogleCallbackView(View):
         # Redirect after saving email
         return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
 
-############# Apple #############
-
-
-
-
+###################### Apple Login and Signup #########################################################
 class AppleAuthView(View):
     def get(self, request):
         # Get language from URL or session
@@ -1968,7 +1952,6 @@ class AppleAuthView(View):
         )
         return redirect(auth_url)
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class AppleCallbackView(View):
     def post(self, request):
@@ -1984,6 +1967,8 @@ class AppleCallbackView(View):
 
         # Generate client secret
         private_key = os.getenv("APPLE_PRIVATE_KEY")
+        # Ensure the key is formatted correctly by stripping unwanted whitespace
+        private_key = private_key.strip()
         client_id = os.getenv("APPLE_CLIENT_ID")
         team_id = os.getenv("APPLE_TEAM_ID")
         key_id = os.getenv("APPLE_KEY_ID")
@@ -2045,122 +2030,7 @@ class AppleCallbackView(View):
         # Redirect after saving email
         return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
 
-############################### google ###########################
-# class GoogleLoginView(View):
-#     def get(self, request):
-#         # Step 1: Redirect user to Google OAuth 2.0 URL
-#         google_auth_url = (
-#             f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}"
-#             f"&redirect_uri={settings.GOOGLE_REDIRECT_URI}&scope=email profile"
-#         )
-#         return redirect(google_auth_url)
-
-# class GoogleCallbackView(View):
-#     def get(self, request):
-#         # Step 2: Handle callback from Google
-#         code = request.GET.get('code')
-#         token_url = 'https://oauth2.googleapis.com/token'
-
-#         # Exchange authorization code for access token
-#         token_data = {
-#             'code': code,
-#             'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-#             'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-#             'redirect_uri': settings.GOOGLE_REDIRECT_URI,
-#             'grant_type': 'authorization_code'
-#         }
-#         token_r = requests.post(token_url, data=token_data)
-#         token_json = token_r.json()
-#         access_token = token_json.get('access_token')
-
-#         # Step 3: Retrieve user info from Google
-#         userinfo_url = 'https://www.googleapis.com/oauth2/v3/userinfo'
-#         headers = {'Authorization': f'Bearer {access_token}'}
-#         userinfo_r = requests.get(userinfo_url, headers=headers)
-#         user_info = userinfo_r.json()
-
-#         email = user_info.get('email')
-#         print(email)
-#         username = user_info.get('name')
-
-#         # Check if user already exists
-#         user= User.objects.get_or_create(
-#             username=username,
-#             defaults={'email': email, 'register_type': '2'}
-#         )
-
-#         return redirect('social_signup',user)  # Redirect to your desired page
-
-
-########################## Apple ###########################
-# class AppleLoginView(View):
-#     def get(self, request):
-#         # Step 1: Redirect to Apple Sign-In page
-#         apple_auth_url = (
-#             f"https://appleid.apple.com/auth/authorize?response_type=code&client_id={settings.SOCIAL_AUTH_APPLE_ID}"
-#             f"&redirect_uri={settings.APPLE_REDIRECT_URI}&scope=email%20name"
-#         )
-#         return redirect(apple_auth_url)
-    
-# class AppleCallbackView(View):
-#     def get(self, request):
-#         # Step 2: Handle the callback from Apple
-#         code = request.GET.get('code')
-#         token_url = 'https://appleid.apple.com/auth/token'
-
-#         # Exchange authorization code for access token
-#         token_data = {
-#             'code': code,
-#             'client_id': settings.SOCIAL_AUTH_APPLE_ID,
-#             'client_secret': settings.SOCIAL_AUTH_APPLE_SECRET,
-#             'redirect_uri': settings.APPLE_REDIRECT_URI,
-#             'grant_type': 'authorization_code'
-#         }
-#         token_r = requests.post(token_url, data=token_data)
-#         token_json = token_r.json()
-#         access_token = token_json.get('access_token')
-
-#         # Step 3: Retrieve user info from Apple
-#         userinfo_url = 'https://appleid.apple.com/auth/userinfo'
-#         headers = {'Authorization': f'Bearer {access_token}'}
-#         userinfo_r = requests.get(userinfo_url, headers=headers)
-#         user_info = userinfo_r.json()
-
-#         email = user_info.get('email')
-#         username = user_info.get('name')
-
-#         # Check if user already exists
-#         user = User.objects.filter(email=email).first()  # Fetch user based on email
-
-#         if user:
-#             # If the user already exists, prompt to log in
-#             messages.error(request, "This Apple ID is already registered. Please log in.")
-#             return redirect("login")  # Redirect to your login view
-
-#         # If not registered, proceed with OTP flow
-#         otp = generate_otp()  # Generate OTP as per your existing logic
-
-#         # Save user details in OTPSave table
-#         OTPSave.objects.create(username=username, phone=None, email=email, OTP=otp)
-
-#         # Log the OTP for development purposes
-
-       ## # # Store necessary data in the session
-       ## # request.session['username'] = username
-       ## # request.session['email'] = email
-
-       ## # messages.success(request, f"An OTP has been sent to your registered email: {email}")
-       ## # return redirect("verify_otp")  # Redirect to the OTP verification page
-       ## # Check if user already exists
-#         user= User.objects.get_or_create(
-#             username=username,
-#             defaults={'email': email, 'register_type': '2'}
-#         )
-
-#         return redirect('social_signup',user)  # Redirect to your desired page
-
-
-
+######################## User Dashboard For Games #########################################################
 class UserDashboardGames(LoginRequiredMixin,View):
 
     def get(self, request, *args, **kwargs):
