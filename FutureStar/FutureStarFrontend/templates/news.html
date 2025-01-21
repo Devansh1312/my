@@ -80,7 +80,12 @@
                           
                     </a>
                     <a class="read-more" href="{% url 'news-detail' news.id %}">
-                        Read More <i class="fa fa-arrow-right"></i>
+                        {% if current_language == 'en' %}
+                            Read More
+                        {% elif current_language == 'ar' %}
+                            اقرأ المزيد
+                        {% endif %}
+                        <i class="fa fa-arrow-right"></i>
                     </a>
                     
                 </div>

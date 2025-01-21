@@ -24,15 +24,27 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="username_or_phone">Username or Phone</label>
-                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control" placeholder="Enter your username or phone" required>
+                                <label for="username_or_phone">
+                                    {% if current_language == 'en' %}
+                                        Username or Phone
+                                    {% elif current_language == 'ar' %}
+                                        اسم المستخدم أو الهاتف
+                                    {% endif %}
+                                </label>
+                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control" placeholder="{% if current_language == 'en' %}Enter your username or phone{% elif current_language == 'ar' %}أدخل اسم المستخدم أو الهاتف{% endif %}" required>
                                 <div class="error-message text-danger" id="usernameError" style="display:none;">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group position-relative">
-                                <label for="password">Password</label>
-                                <input type="password" id="password" name="password" class="form-control" required placeholder="Enter your password">
+                                <label for="password">
+                                    {% if current_language == 'en' %}
+                                        Password
+                                    {% elif current_language == 'ar' %}
+                                        كلمة المرور
+                                    {% endif %}
+                                </label>
+                                <input type="password" id="password" name="password" class="form-control" required placeholder="{% if current_language == 'en' %}Enter your password{% elif current_language == 'ar' %}أدخل كلمة المرور{% endif %}">
                                 <span class="eye-icon" id="togglePassword">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </span>
@@ -41,25 +53,56 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group pt-5 mb-60">
-                                <button type="submit" class="theme-btn style-two w-100">Login <i class="fa-solid fa-arrow-right"></i></button>
+                                <button type="submit" class="theme-btn style-two w-100">
+                                    {% if current_language == 'en' %}
+                                        Login
+                                    {% elif current_language == 'ar' %}
+                                        تسجيل الدخول
+                                    {% endif %}
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
                             </div>
                             <div class="text-center">
-                                You don't have an account? <a href="{% url 'register' %}">Sign up</a>
+                                {% if current_language == 'en' %}
+                                    You don't have an account? <a href="{% url 'register' %}">Sign up</a>
+                                {% elif current_language == 'ar' %}
+                                    ليس لديك حساب؟ <a href="{% url 'register' %}">سجل الآن</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                </form>
+                </form>                
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <div class="or"><span>OR</span></div>
+                            <div class="or"><span>
+                                {% if current_language == 'en' %}
+                                    OR
+                                {% elif current_language == 'ar' %}
+                                    أو
+                                {% endif %}
+                            </span></div>
                         </div>
                         <div class="continue-with-social text-center">
-                           <button onclick="window.location.href='{% url 'google_auth' %}'" class="btn-social"><span<img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" /></span> SignIn With Google</button>
-                           <button onclick="window.location.href='{% url 'apple_auth' %}'" class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" /></span> SignIn With Apple</button>
-                       </div>
+                            <button onclick="window.location.href='{% url 'google_auth' %}'" class="btn-social">
+                                <span>{% load static %}<img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" /></span>
+                                {% if current_language == 'en' %}
+                                    Login With Google
+                                {% elif current_language == 'ar' %}
+                                    التسجيل باستخدام جوجل
+                                {% endif %}
+                            </button>
+                            <button onclick="window.location.href='{% url 'apple_auth' %}'" class="btn-social">
+                                <span><img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" /></span>
+                                {% if current_language == 'en' %}
+                                    Login With Apple
+                                {% elif current_language == 'ar' %}
+                                    التسجيل باستخدام أبل
+                                {% endif %}
+                            </button>                            
+                        </div>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
     </div>

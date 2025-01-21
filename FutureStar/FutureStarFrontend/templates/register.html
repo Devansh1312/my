@@ -64,23 +64,40 @@
                         <input name="register_type" id="register_type" type="hidden" value="1">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="username">Username</label>
+                                <label for="username">
+                                    {% if current_language == 'en' %}
+                                        Username
+                                    {% elif current_language == 'ar' %}
+                                        اسم المستخدم
+                                    {% endif %}
+                                </label>
                                 <input type="text" id="username" name="username" class="form-control" required placeholder="">
                                 <div class="error-message" id="usernameError">This field is required</div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="phone">Phone Number</label>
+                                <label for="phone">
+                                    {% if current_language == 'en' %}
+                                        Phone Number
+                                    {% elif current_language == 'ar' %}
+                                        رقم الهاتف
+                                    {% endif %}
+                                </label>
                                 <input type="text" id="phone" name="phone" class="form-control" required placeholder="" pattern="[0-9]*" inputmode="numeric">
                                 <div class="error-message" id="phoneError">This field is required</div>
                             </div>
                         </div>
                         <!-- Password Field -->
-                        <!-- Password Field -->
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="password">Password</label>
+                                <label for="password">
+                                    {% if current_language == 'en' %}
+                                        Password
+                                    {% elif current_language == 'ar' %}
+                                        كلمة السر
+                                    {% endif %}
+                                </label>
                                 <input type="password" id="password" name="password" class="form-control" required placeholder="">
                                 <span class="eye-icon" id="togglePassword">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
@@ -88,11 +105,17 @@
                                 <div class="error-message" id="passwordError">This field is required</div>
                             </div>
                         </div>
-
+                
                         <!-- Confirm Password Field -->
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="confirmPassword">Confirm Password</label>
+                                <label for="confirmPassword">
+                                    {% if current_language == 'en' %}
+                                        Confirm Password
+                                    {% elif current_language == 'ar' %}
+                                        تأكيد كلمة السر
+                                    {% endif %}
+                                </label>
                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required placeholder="">
                                 <span class="eye-icon" id="toggleConfirmPassword">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
@@ -100,8 +123,7 @@
                                 <div class="error-message" id="confirmPasswordError">This field is required</div>
                             </div>
                         </div>
-
-
+                
                         <div class="col-md-12">
                             <div class="d-flex mb-30 justify-content-between">
                                 <label>
@@ -111,28 +133,62 @@
                                     {% elif current_language == 'ar' %}
                                         أوافق على <a href="{% url 'terms-and-conditions' %}">الشروط والأحكام</a> وأقر بأنني قرأت <a href="{% url 'privacy-policy' %}">سياسة الخصوصية</a>.
                                     {% endif %}
-                                </label>                                                               
+                                </label>
                             </div>
                         </div>
+                
                         <div class="col-md-12">
                             <div class="form-group pt-5 mb-60">
-                                <button type="submit" class="theme-btn style-two w-100" id="submitBtn">Sign Up <i class="fa-solid fa-arrow-right"></i></button>
+                                <button type="submit" class="theme-btn style-two w-100" id="submitBtn">
+                                    {% if current_language == 'en' %}
+                                        Sign Up
+                                    {% elif current_language == 'ar' %}
+                                        تسجيل
+                                    {% endif %}
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
                             </div>
-                            <div class="text-center"> Already have an account? <a href="{% url 'login' %}">Sign In</a></div>
+                            <div class="text-center">
+                                {% if current_language == 'en' %}
+                                    Already have an account? <a href="{% url 'login' %}">Sign In</a>
+                                {% elif current_language == 'ar' %}
+                                    لديك حساب بالفعل؟ <a href="{% url 'login' %}">تسجيل الدخول</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </form>
+                </form>                
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <div class="or"><span>OR</span></div>
+                            <div class="or"><span>
+                                {% if current_language == 'en' %}
+                                    OR
+                                {% elif current_language == 'ar' %}
+                                    أو
+                                {% endif %}
+                            </span></div>
                         </div>
                         <div class="continue-with-social text-center">
-                           <button onclick="window.location.href='{% url 'google_auth' %}'" class="btn-social"><span>{% load static %}<img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" /></span> Signup With Google</button>
-                           <button onclick="window.location.href='{% url 'apple_auth' %}'" class="btn-social"><span><img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" /></span> Signup With Apple</button>
-                       </div>
+                            <button onclick="window.location.href='{% url 'google_auth' %}'" class="btn-social">
+                                <span>{% load static %}<img src="{% static 'frontend/assets/images/icon-google.png' %}" class="img-fluid" alt="" /></span> 
+                                {% if current_language == 'en' %}
+                                    Signup With Google
+                                {% elif current_language == 'ar' %}
+                                    التسجيل باستخدام جوجل
+                                {% endif %}
+                            </button>
+                            <button onclick="window.location.href='{% url 'apple_auth' %}'" class="btn-social">
+                                <span><img src="{% static 'frontend/assets/images/icon-apple.png' %}" class="img-fluid" alt="" /></span> 
+                                {% if current_language == 'en' %}
+                                    Signup With Apple
+                                {% elif current_language == 'ar' %}
+                                    التسجيل باستخدام آبل
+                                {% endif %}
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </div>                
             </div>
         </div>
     </div>

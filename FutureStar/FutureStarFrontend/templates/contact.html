@@ -85,44 +85,76 @@
 							{{section_3_title}}
 						</h4>
 					</div>
-					<form id="contactForm" class="contactForm" action="{% url 'contact' %}" name="contactForm" method="post"> {% csrf_token %} <div class="row gap-60 pt-15">
+					<form id="contactForm" class="contactForm" action="{% url 'contact' %}" name="contactForm" method="post"> 
+						{% csrf_token %}
+						<div class="row gap-60 pt-15">
 							<div class="col-md-12">
 								<div class="form-group">
-									<label for="fullname">Full Name</label>
-									<input type="text" id="fullname" name="fullname" class="form-control" placeholder="" required data-error="Please enter your name">
+									<label for="fullname">
+										{% if current_language == 'en' %}
+											Full Name
+										{% elif current_language == 'ar' %}
+											الاسم الكامل
+										{% endif %}
+									</label>
+									<input type="text" id="fullname" name="fullname" class="form-control" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your name{% elif current_language == 'ar' %}يرجى إدخال اسمك{% endif %}">
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
 							<div class="col-md-12">
 								<div class="form-group">
-									<label for="phone">Phone Number</label>
-									<input type="text" id="phone" name="phone" class="form-control" placeholder="" required data-error="Please enter your Number">
+									<label for="phone">
+										{% if current_language == 'en' %}
+											Phone Number
+										{% elif current_language == 'ar' %}
+											رقم الهاتف
+										{% endif %}
+									</label>
+									<input type="text" id="phone" name="phone" class="form-control" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your Number{% elif current_language == 'ar' %}يرجى إدخال رقمك{% endif %}">
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
 							<div class="col-md-12">
 								<div class="form-group">
-									<label for="email">Email Address</label>
-									<input type="email" id="email" name="email" class="form-control" placeholder="" required data-error="Please enter your Email Address">
+									<label for="email">
+										{% if current_language == 'en' %}
+											Email Address
+										{% elif current_language == 'ar' %}
+											عنوان البريد الإلكتروني
+										{% endif %}
+									</label>
+									<input type="email" id="email" name="email" class="form-control" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your Email Address{% elif current_language == 'ar' %}يرجى إدخال بريدك الإلكتروني{% endif %}">
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
 							<div class="col-md-12">
 								<div class="form-group">
-									<label for="message">Message</label>
-									<textarea name="message" id="message" class="form-control" rows="2" placeholder="" required data-error="Please enter your Message"></textarea>
+									<label for="message">
+										{% if current_language == 'en' %}
+											Message
+										{% elif current_language == 'ar' %}
+											رسالة
+										{% endif %}
+									</label>
+									<textarea name="message" id="message" class="form-control" rows="2" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your Message{% elif current_language == 'ar' %}يرجى إدخال رسالتك{% endif %}"></textarea>
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
 							<div class="col-md-12">
 								<div class="form-group pt-5 mb-0">
-									<button type="submit" class="theme-btn style-two w-100">Send Message us <i class="fa-solid fa-arrow-right"></i>
+									<button type="submit" class="theme-btn style-two w-100">
+										{% if current_language == 'en' %}
+											Send Message us
+										{% elif current_language == 'ar' %}
+											أرسل لنا رسالة
+										{% endif %}
+										<i class="fa-solid fa-arrow-right"></i>
 									</button>
 									<div id="msgSubmit" class="hidden"></div>
 								</div>
 							</div>
 						</div>
-					</form>
+					</form>					
 				</div>
 			</div>
 		</div>

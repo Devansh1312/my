@@ -36,8 +36,14 @@
                         <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
                         {% lang cmsdata current_language "heading_content" as heading_content %}
                         <p>{{ heading_content }}</p>
-                        <a href="{% url 'discover' %}" class="theme-btn style-two">{% trans "Read More" %}<i class="fa-solid fa-arrow-right"></i>
-                        </a>
+                        <a href="{% url 'discover' %}" class="theme-btn style-two">
+                            {% if current_language == 'en' %}
+                                Read More
+                            {% elif current_language == 'ar' %}
+                                اقرأ المزيد
+                            {% endif %}
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>                        
                     </div>
                 </div>
                 <div class="col-xl-3 align-self-end">
@@ -517,28 +523,52 @@
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-2s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ number_of_users }}">{{ number_of_users }}</span>
-                    <span class="counter-title">Happy User</span>
+                    <span class="counter-title">
+                        {% if current_language == 'en' %}
+                            Happy User
+                        {% elif current_language == 'ar' %}
+                            مستخدم سعيد
+                        {% endif %}
+                    </span>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text k" data-speed="3000" data-stop="{{ system_settings.line_of_code }}">0</span>
-                    <span class="counter-title">Line of Code</span>
+                    <span class="counter-title">
+                        {% if current_language == 'en' %}
+                            Line of Code
+                        {% elif current_language == 'ar' %}
+                            سطر من الشيفرة
+                        {% endif %}
+                    </span>                    
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ system_settings.downloads }}">0</span>
-                    <span class="counter-title">Downloads</span>
+                    <span class="counter-title">
+                        {% if current_language == 'en' %}
+                            Downloads
+                        {% elif current_language == 'ar' %}
+                            التنزيلات
+                        {% endif %}
+                    </span>                    
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ system_settings.app_rate }}">0</span>
-                    <span class="counter-title">App Rates</span>
+                    <span class="counter-title">
+                        {% if current_language == 'en' %}
+                            App Rates
+                        {% elif current_language == 'ar' %}
+                            تقييمات التطبيق
+                        {% endif %}
+                    </span>                    
                 </div>
             </div>
         </div>
