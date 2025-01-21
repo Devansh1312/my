@@ -43,18 +43,6 @@
         </div>
     </div>
 </section>
-<!-- Page Banner End -->
-
-<!-- Language Switcher -->
-<!-- <form id="language-form" method="POST" action="">
-    {% csrf_token %}
-    <select id="language-selector" name="language">
-        <option style="color: black;" value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
-        <option style="color: black;" value="ar" {% if current_language == 'ar' %}selected{% endif %}>Arabic</option>
-    </select>
-    <button type="submit" id="change-language-btn">Change Language</button>
-</form> -->
-
 <!-- Blog Page Area start -->
 <section class="blog-page-area py-100 rel">
     <div class="container">
@@ -64,7 +52,7 @@
                 <div class="blog-item wow fadeInUp delay-0-2s">
                     <div class="image">
                         <a href="{% url 'news-detail' news.id %}">
-                            <img src="{{ news.image.url }}" alt="Blog">
+                            <img src="{{ news.image.url }}" alt="Blog" style="width: 336px; height: 246px; object-fit: cover;">
                         </a>
                     </div>
                     <ul class="blog-meta">
@@ -74,10 +62,8 @@
                         </li>
                     </ul>
                     {% lang news current_language "title" as title %}
-                           
-                    <a class="blog-head" href="{% url 'news-detail' news.id %}">
+                    <a class="blog-head" href="{% url 'news-detail' news.id %}" style="min-height: 60px; display: flex;">       
                         {{title}}
-                          
                     </a>
                     <a class="read-more" href="{% url 'news-detail' news.id %}">
                         {% if current_language == 'en' %}

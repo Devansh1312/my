@@ -4,8 +4,52 @@
 {% load lang_filter %} <!-- Loading your custom filter -->
 
 {% block css %}
-<!-- Add your CSS if needed -->
-{% endblock %}
+<style>
+    .popup-container {
+     position: absolute;
+     background-color: rgba(254, 212, 97, 0.8);  /* rgba format with 80% opacity */
+     color: rgb(0, 0, 0);
+     padding: 10px;
+     border-radius: 5px;
+     width: 80%;
+     display: none;
+ 
+     top: 150px;
+     transform: translateX(0%) !important;  /* Ensure centering */
+     z-index: 9999;
+     justify-items: center;
+     justify-content: center;
+     font-weight: bold; /* Make the text stand out */
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Optional: add shadow for better visibility */
+ }
+ 
+     .popup-message {
+         font-size: 14px;
+         text-align: center;
+     }
+     .team-popup-container {
+         position: absolute;
+         background-color: rgba(254, 212, 97, 0.8);  /* rgba format with 80% opacity */
+         color: rgb(0, 0, 0);
+         /* padding: 10px; */
+         border-radius: 5px;
+         width: 90%;
+         display: none;
+         margin-left: 10px;
+         top: 50px;
+         left: 0;
+         transform: translate(0%) !important;  /* Position the popup above the image */
+         z-index: 9999;
+         font-weight: bold;
+         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Optional: add shadow for better visibility */
+         text-align: center;
+     }
+ 
+     .team-popup-message {
+         font-size: 14px;
+     }
+ </style>
+ {% endblock %}
 
 {% block title %} Goalactico || Success-Stories {% endblock %}
 
@@ -48,14 +92,12 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
 <section class="success-players">
     <div class="container">
         <div class="row">
-            <!-- Example of static player cards -->
             {% for item in user_data %}
                 <div class="col-lg-3 col-sm-6 custome-alignment">
                     <div class="item-wrapper wow fadeInUp delay-0-3s animated">
                         <div class="img-wrapper">
                             {% if item.user.profile_picture %}
                                 <img src="{{ item.user.profile_picture.url }}" class="img-fluid" alt="">
-
                             {% else %}  
                                 <img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="">
                             {% endif %}
@@ -71,31 +113,63 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
                         <div class="social-info-wrapper">
                             <div class="social-info-item">
                                 <p class="number">{{ item.post_count }}</p>
-                                <p class="des">Post</p>
+                                <p class="des">
+                                    {% if current_language == 'en' %} Post
+                                    {% elif current_language == 'ar' %} ما بعد
+                                    {% endif %}
+                                </p>
                             </div>
                             <div class="social-info-item">
                                 <p class="number">{{ item.following_count }}</p>
-                                <p class="des">Following</p>
+                                <p class="des">
+                                    {% if current_language == 'en' %} Following
+                                    {% elif current_language == 'ar' %} الآتي                                    
+                                    {% endif %}
+                                </p>
                             </div>
                             <div class="social-info-item">
                                 <p class="number">{{ item.followers_count }}</p>
-                                <p class="des">Followers</p>
+                                <p class="des">
+                                    {% if current_language == 'en' %} Followers
+                                    {% elif current_language == 'ar' %} المتابعين
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>                        
+                        {% if user.is_authenticated %}
+                            <div>
+                                <form action="{% url 'player_info' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" value="{{ item.user.id }}">
+                                    <button type="submit" class="theme-btn style-two w-100">
+                                        View Info <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div>
+                                <button type="button" class="theme-btn style-two w-100 not-authenticated">
+                                    {% if current_language == 'en' %}
+                                        View Info <i class="fa-solid fa-arrow-right"></i>
+                                    {% elif current_language == 'ar' %}
+                                        عرض المعلومات <i class="fa-solid fa-arrow-right"></i>
+                                    {% endif %}
+                                </button>                                
+                            </div>
+                        {% endif %}
+                        <!-- Popup message -->
+                        <div class="popup-container" style="display: none;">
+                            <div class="popup-message">
+                                {% if current_language == 'en' %}
+                                    <p>Please log in first to view the information.</p>
+                                {% elif current_language == 'ar' %}
+                                    <p>يرجى تسجيل الدخول أولاً لعرض المعلومات.</p>
+                                {% endif %}
                             </div>
                         </div>
-                        {% if user.is_authenticated %}
-                        <div>
-                            <form action="{% url 'player_info' %}" method="post">
-								{% csrf_token %}
-								<input type="hidden" name="user_id" value="{{ item.user.id }}">
-								<button type="submit" class="theme-btn style-two w-100">
-									View Info <i class="fa-solid fa-arrow-right"></i>
-								</button>
-							</form>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
-                {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -110,9 +184,23 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
         <div class="tryouts-slider">
             {% for tryout_club in top_6_teams %}
             <div class="wow fadeInUp delay-{{ forloop.counter|add:0.1 }}s animated">
-                <div class="img-wrapper">
-                    <img src="{{ tryout_club.team_branch.team_id.team_logo.url }}" class="img-fluid" alt="">
-                </div>
+                <!-- Form to submit the team_id when the image is clicked -->
+                <form action="{% url 'TeamPageSearchResults' %}" method="get" class="team-form" id="team-form-{{ tryout_club.id }}">
+                    <input type="hidden" name="team_id" value="{{ tryout_club.team_branch.team_id.id }}">
+                    <div class="img-wrapper">
+                        <img src="{{ tryout_club.team_branch.team_id.team_logo.url }}" class="img-fluid team-image" alt="">
+                        <!-- New popup for team image -->
+                        <div class="team-popup-container" style="display: none;">
+                            <div class="team-popup-message">
+                                {% if current_language == 'en' %}
+                                    <p>Please log in first to view the team details.</p>
+                                {% elif current_language == 'ar' %}
+                                    <p>يرجى تسجيل الدخول أولاً لعرض تفاصيل الفريق.</p>
+                                {% endif %}
+                            </div>
+                        </div>                        
+                    </div>
+                </form>
                 <span>{{ tryout_club.team_branch.team_name }}</span>
             </div>
             {% endfor %}
@@ -141,6 +229,19 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
         document.getElementById('change-language-btn').addEventListener('click', function() {
             const selectedLanguage = document.getElementById('language-selector').value;
             localStorage.setItem('language', selectedLanguage);
+        });
+    });
+    $(document).ready(function(){
+        // Click event for team image
+        $(".team-image").on("click", function(){
+            var popup = $(this).closest('.img-wrapper').find('.team-popup-container');
+            popup.fadeIn().delay(2000).fadeOut(); // Show the popup for 2 seconds and then hide it
+        });
+    });
+    $(document).ready(function(){
+        $(".not-authenticated").on("click", function(){
+            var popup = $(this).closest('.item-wrapper').find('.popup-container');
+            popup.fadeIn().delay(2000).fadeOut(); // Show popup for 2 seconds and then hide it
         });
     });
 </script>

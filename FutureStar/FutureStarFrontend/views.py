@@ -63,11 +63,11 @@ class HomePage(View):
         language_from_url = get_language(request)
 
         # Retrieve other data as usual
-        marquee = Slider_Content.objects.all()
-        app_features = App_Feature.objects.all()
+        marquee = Slider_Content.objects.all().order_by('-id')
+        app_features = App_Feature.objects.all().order_by('-id')
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         news = News.objects.all().order_by('-id')[:4]
-        partner = Partners.objects.all()
+        partner = Partners.objects.all().order_by('-id')
         team_members = Team_Members.objects.all().order_by('id')
         cmsfeatures = cms_home_dynamic_field.objects.all() or None
         cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all() or None
