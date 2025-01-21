@@ -138,7 +138,13 @@
             </div>
             <div class="col-lg-9">
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Booked Events</h5>
+                    <h5>
+                        {% if current_language == 'en' %}
+                            Booked Events
+                        {% elif current_language == 'ar' %}
+                            الفعاليات المحجوزة
+                        {% endif %}
+                    </h5>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
