@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 import jwt
-
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.crypto import get_random_string
 import time
 from django.conf import settings
 from FutureStar_App.models import *
@@ -29,6 +30,18 @@ import requests
 from django.http import HttpResponseRedirect, JsonResponse
 from dotenv import load_dotenv
 import os
+
+
+import jwt
+import time
+import requests
+from django.views import View
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 load_dotenv()  
 
@@ -1931,94 +1944,111 @@ class GoogleCallbackView(View):
         return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
 
 ############# Apple #############
+
+
+
+
 class AppleAuthView(View):
     def get(self, request):
-        # Apple OAuth 2.0 URL
-        client_id = "com.yourapp.serviceid"  # Your Apple service ID (Client ID)
-        redirect_uri = "http://127.0.0.1:8000/auth/apple/callback/"
-        scope = "email"  # You can include other scopes like name if needed
-        response_type = "code"
-        state = "some_random_state"  # Use a secure random string to prevent CSRF attacks
+        # Get language from URL or session
+        language_from_url = request.GET.get('Language', None)
+        if language_from_url:
+            request.session['language'] = language_from_url
+        else:
+            language_from_url = request.session.get('language', 'en')
+
+        # Generate the Apple Sign-In URL
+        client_id = "com.redsportx.goalactico"  # Your Apple service ID
+        redirect_uri = "https://futurestar.redspark.redspark.a2hosted.com/auth/apple/callback/"
+        scope = "name email"
+        response_mode = "form_post" 
 
         auth_url = (
-            "https://appleid.apple.com/auth/authorize?"
-            f"response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}"
-            f"&scope={scope}&state={state}"
+            f"https://appleid.apple.com/auth/authorize?"
+            f"response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&response_mode={response_mode}"
         )
-        
         return redirect(auth_url)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AppleCallbackView(View):
-    def get(self, request):
-        # Retrieve authorization code and state from the URL
-        code = request.GET.get('code')
-        state = request.GET.get('state')
-        
+    def post(self, request):
+        code = request.POST.get('code')
         if not code:
             return JsonResponse({"error": "Authorization code not provided"}, status=400)
 
-        # Validate state to prevent CSRF attacks (compare with the state value you generated earlier)
+        return self.handle_auth_callback(request, code)
 
-        # Apple Token Exchange URL
+    def handle_auth_callback(self, request, code):
+        # Get language from session
+        language_from_url = request.session.get('language', 'en')
+
+        # Generate client secret
+        private_key = """-----BEGIN PRIVATE KEY-----
+MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgxqqbPLn+RCk1wsjt
+pA6vWQITR5eocjoT172GoFM02ligCgYIKoZIzj0DAQehRANCAASDXa3+Zwl2tD/z
+sZYqrnAvATbASz6DRlRnziJPUgyhbOthDnxtxSPRkqH+BYew2a6UDLDrdZ25rNKl
+yvAXW05y
+-----END PRIVATE KEY-----"""
+        client_id = "com.redsportx.goalactico"
+        team_id = "98LQ9LKUQJ"
+        key_id = "NPZH69HWP3"  # Replace with your Apple Key ID
+        redirect_uri = "https://futurestar.redspark.redspark.a2hosted.com/auth/apple/callback/"
+
+        current_time = int(time.time())
+        claims = {
+            "iss": team_id,
+            "iat": current_time,
+            "exp": current_time + 3600,  # Token valid for 1 hour
+            "aud": "https://appleid.apple.com",
+            "sub": client_id,
+        }
+
+        client_secret = jwt.encode(
+            claims,
+            private_key,
+            algorithm="ES256",
+            headers={"kid": key_id},
+        )
+
+        # Exchange the authorization code for tokens
         token_url = "https://appleid.apple.com/auth/token"
-        
-        # JWT Client Secret generation
-        team_id = "your_team_id"
-        client_id = "com.yourapp.serviceid"
-        client_secret = self.generate_client_secret(team_id, client_id)
-        
         data = {
+            "grant_type": "authorization_code",
             "code": code,
+            "redirect_uri": redirect_uri,
             "client_id": client_id,
             "client_secret": client_secret,
-            "grant_type": "authorization_code",
-            "redirect_uri": "http://127.0.0.1:8000/auth/apple/callback/",
         }
-        
-        # Exchange the authorization code for an access token
+
         token_response = requests.post(token_url, data=data)
         token_json = token_response.json()
+        print(token_json)
 
-        if "access_token" not in token_json:
-            return JsonResponse({"error": "Failed to retrieve access token", "details": token_json}, status=400)
+        if "id_token" not in token_json:
+            return JsonResponse({"error": "Failed to retrieve tokens", "details": token_json}, status=400)
 
-        access_token = token_json["access_token"]
+        # Decode the ID token to get the user's information
+        id_token = token_json["id_token"]
+        decoded_token = jwt.decode(id_token, options={"verify_signature": False})
+        email = decoded_token.get("email")
 
-        # Use the access token to retrieve the user's email (Apple returns it as part of the response)
-        user_info_url = "https://api.apple.com/v1/userinfo"
-        user_info_response = requests.get(user_info_url, headers={"Authorization": f"Bearer {access_token}"})
-        user_info_json = user_info_response.json()
-
-        email = user_info_json.get("email")
         if not email:
-            return JsonResponse({"error": "Failed to retrieve email"}, status=400)
+            return JsonResponse({"error": "Failed to retrieve email from ID token"}, status=400)
 
-        # Save the email in the session or handle as needed
+        # Check if the email is already registered
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "This email is already in use. Please try a different email.")
+            return redirect("register")  # Redirect to your registration page
+
+        # Save the email in the session
         request.session['email'] = email
-        request.session.save()  # Explicitly save the session
-        print("Email saved")
+        request.session['language'] = language_from_url
+        request.session.save()  # Explicitly save the session to persist email and language
 
-        # Return a success response or redirect
-        return HttpResponseRedirect(reverse('user_info_update'))
+        # Redirect after saving email
+        return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
 
-    def generate_client_secret(self, team_id, client_id):
-        # Generate the client secret JWT token required by Apple
-        private_key = settings.APPLE_PRIVATE_KEY  # This is your private key used to sign the JWT
-
-        # Prepare JWT payload
-        jwt_payload = {
-            "iss": team_id,  # Your Apple Developer team ID
-            "iat": int(time.time()),  # Issued at time
-            "exp": int(time.time()) + 3600,  # Expiration time (1 hour)
-            "aud": "apple.com",
-            "sub": client_id  # The service ID (your app's client ID)
-        }
-
-        # Generate JWT token with RS256 algorithm
-        client_secret = jwt.encode(jwt_payload, private_key, algorithm="RS256")
-
-        return client_secret
 ############################### google ###########################
 # class GoogleLoginView(View):
 #     def get(self, request):
