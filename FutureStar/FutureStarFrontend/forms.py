@@ -22,11 +22,9 @@ class OTPForm(forms.Form):
     otp = forms.CharField(max_length=6, required=True)
 
 class UserInfoForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=True)  # For password input
-
     class Meta:
         model = User
-        fields = ['email', 'username', 'phone', 'password']
+        fields = ['email', 'username', 'phone']
         widgets = {
             'email': forms.EmailInput(attrs={'readonly': 'readonly'}),  # Make email readonly
         }

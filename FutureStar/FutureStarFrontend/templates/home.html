@@ -68,7 +68,7 @@
         <div class="row align-items-center">
             <div class="col-xl-4 col-md-6">
                 <div class="about-content-six mb-40 wow fadeInUp delay-0-2s">
-                    <div class="about-logo mb-50">
+                    <div class="about mb-50">
                         <a href="{{cmsdata.section_3_sub_title_en}}" class="mfp-iframe video-play mt-45" id="video-link">
                             <img src="media/{{ cmsdata.sub_heading_logo }}" alt="Play">
                             <iframe id="video-iframe" title="YouTube video player" frameborder="0" 
@@ -671,7 +671,8 @@
                             <img src="{{ news.image.url }}" alt="Blog" style="width: 336px; height: 246px; object-fit: cover;">
                         </a>
                     </div>
-                    <a class="blog-head" href="{% url 'news-detail' news.id %}" style="min-height: 60px; display: flex;">
+                    <a class="blog-head" href="{% url 'news-detail' news.id %}" 
+                        style="min-height: 60px; display: -webkit-box; display: box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
                         {% if current_language == "ar" %}
                             {{ news.title_ar }}
                         {% else %}

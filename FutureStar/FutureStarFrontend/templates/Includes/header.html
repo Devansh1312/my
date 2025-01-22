@@ -135,7 +135,7 @@
                     </a>
                     {% else %}
                         <a href="{% url 'player-dashboard' %}" class="profile-wrapper">
-                            <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'frontend/assets/images/profile-pic.jpg' %}{% endif %}" alt="">
+                            <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'frontend/assets/images/success-stories/player-1.png' %}{% endif %}" alt="">
                             <span>{{ user.username }}</span>
                         </a>                        
                     {% endif %}
