@@ -32,6 +32,8 @@ class CreateTrainingView(APIView):
         days = request.data.get('Days', '[]')
         if isinstance(days, str):
             days = json.loads(days)  # Expected to be a list of integers [1,2,...7]
+        start_times = request.data.get('start_time', '[]')
+        end_times = request.data.get('end_time', '[]')
         end_date = request.data.get('end_date', None)
 
         creator_type = int(creator_type)
@@ -57,10 +59,10 @@ class CreateTrainingView(APIView):
                 training_instances.append(training_instance)
 
             elif repeat_type == 1:  # Multiple training
-                if not end_date or not days:
+                if not end_date or not days or not start_times or not end_times:
                     return Response({
                         'status': 0,
-                        'message': _('End date and Days are required for repeat_type 1.')
+                        'message': _('End date, Days, Start time, and End time are required for repeat_type 1.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 try:
@@ -68,10 +70,25 @@ class CreateTrainingView(APIView):
                     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
                     current_date = start_date
 
+                    # Custom weekday mapping
+                    weekday_mapping = {
+                        0: 2,  # Monday -> 2
+                        1: 3,  # Tuesday -> 3
+                        2: 4,  # Wednesday -> 4
+                        3: 5,  # Thursday -> 5
+                        4: 6,  # Friday -> 6
+                        5: 7,  # Saturday -> 7
+                        6: 1   # Sunday -> 1
+                    }
+
                     while current_date <= end_date:
-                        if current_date.weekday() + 1 in map(int, days):  # Check if the day matches
+                        if weekday_mapping.get(current_date.weekday()) in map(int, days):  # Adjust weekday mapping
+                            # Get index for the day to assign corresponding start_time and end_time
+                            day_index = days.index(weekday_mapping.get(current_date.weekday()))
                             training_data = serializer.validated_data.copy()
                             training_data['training_date'] = current_date
+                            training_data['start_time'] = start_times[day_index]
+                            training_data['end_time'] = end_times[day_index]
                             training_instance = Training.objects.create(**training_data)
                             training_instances.append(training_instance)
 
@@ -120,6 +137,7 @@ class CreateTrainingView(APIView):
             'status': 0,
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 # class CreateTrainingView(APIView):
 #     permission_classes = [IsAuthenticated]
