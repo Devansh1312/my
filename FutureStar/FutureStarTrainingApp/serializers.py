@@ -177,6 +177,23 @@ class TrainingListSerializer(serializers.ModelSerializer):
                 'country_code': obj.field.country_code,
             }
         return None
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        
+        # Modify training_date format when retrieving data
+        training_date = data.get('training_date')
+        if training_date:
+            try:
+                # Convert string date to a datetime object
+                date_obj = datetime.strptime(training_date, '%Y-%m-%d')
+                # Format with day name
+                formatted_date = date_obj.strftime('%Y-%m-%d %A')
+                data['training_date'] = formatted_date
+            except ValueError:
+                pass  # In case of any unexpected format issues
+        
+        return data
 
 
 

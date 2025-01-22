@@ -94,7 +94,9 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <button onclick="history.back()" class="btn btn-secondary" style="float: right;"><i class="fa fa-arrow-left"></i> Back</button>
+                        <a href="{% url 'field_list' %}" class="btn btn-secondary" style="float: right;">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>                        
                         <h3>{{ breadcrumb.child }}</h3>
                         <hr>
 

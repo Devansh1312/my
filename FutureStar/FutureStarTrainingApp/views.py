@@ -34,6 +34,7 @@ class CreateTrainingView(APIView):
             days = json.loads(days)  # Expected to be a list of integers [1,2,...7]
         start_times = request.data.get('start_time', '[]')
         end_times = request.data.get('end_time', '[]')
+        training_durations = request.data.get('training_duration', '[]')  # New array for training durations
         end_date = request.data.get('end_date', None)
 
         creator_type = int(creator_type)
@@ -59,10 +60,10 @@ class CreateTrainingView(APIView):
                 training_instances.append(training_instance)
 
             elif repeat_type == 1:  # Multiple training
-                if not end_date or not days or not start_times or not end_times:
+                if not end_date or not days or not start_times or not end_times or not training_durations:
                     return Response({
                         'status': 0,
-                        'message': _('End date, Days, Start time, and End time are required for repeat_type 1.')
+                        'message': _('End date, Days, Start time, End time, and Training duration are required for repeat_type 1.')
                     }, status=status.HTTP_400_BAD_REQUEST)
 
                 try:
@@ -83,12 +84,13 @@ class CreateTrainingView(APIView):
 
                     while current_date <= end_date:
                         if weekday_mapping.get(current_date.weekday()) in map(int, days):  # Adjust weekday mapping
-                            # Get index for the day to assign corresponding start_time and end_time
+                            # Get index for the day to assign corresponding start_time, end_time, and training_duration
                             day_index = days.index(weekday_mapping.get(current_date.weekday()))
                             training_data = serializer.validated_data.copy()
                             training_data['training_date'] = current_date
                             training_data['start_time'] = start_times[day_index]
                             training_data['end_time'] = end_times[day_index]
+                            training_data['training_duration'] = training_durations[day_index]  # Add duration
                             training_instance = Training.objects.create(**training_data)
                             training_instances.append(training_instance)
 
