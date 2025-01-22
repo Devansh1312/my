@@ -12,7 +12,11 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <button onclick="history.back()" class="btn btn-secondary" style="float: right;"><i class="fa fa-arrow-left"></i> Back</button>
+                        
+                        <a class="btn btn-secondary btn-sm" href="{% url 'team_list' %}">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+                        
                         <h3>Team Details</h3>
                         <div class="container mt-5">
                             <div class="row">

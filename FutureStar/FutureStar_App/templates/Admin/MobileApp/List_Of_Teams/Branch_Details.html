@@ -34,7 +34,17 @@ Branch Details
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <button onclick="history.back()" class="btn btn-secondary mb-3" style="float: right;">	<i class="fa fa-arrow-left"></i> Back</button>
+                     
+                     <form method="POST" action="{% url 'team_detail' %}" style="float: right;">
+                        {% csrf_token %}
+                        <input type="hidden" name="team_id" value="{{ branch.team_id.id }}">
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </button>
+                    </form>
+                    
+                    
+                    
                         <h3 class="text-center text-md-start fs-4">Team Details</h3>
                         <div class="row">
                            <div class="col-12 col-md-6 col-lg-4 mb-3">
