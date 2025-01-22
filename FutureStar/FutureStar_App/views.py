@@ -1915,34 +1915,18 @@ class FieldDetailView(LoginRequiredMixin, View):
     template_name = "Admin/FieldsData/field_detail.html"
 
    
-
     def get(self, request, pk):
         field = get_object_or_404(Field, pk=pk)
         tournament_games = TournamentGames.objects.filter(game_field_id=field)
-        friendly_games=FriendlyGame.objects.filter(game_field_id=field)
+        friendly_games = FriendlyGame.objects.filter(game_field_id=field)
 
-       
+        # Filter Open and Closed Training sessions using training_type
+        open_training = Training.objects.filter(field=field, training_type=1)  # OPEN_TRAINING
         
+        print(open_training)
         
-        return render(
-            request,
-            self.template_name, 
-            {
-                "field": field,
-                "tournament_games": tournament_games,
-                "friendly_games": friendly_games,
-             
-              
-                "breadcrumb": {"child": f"Field Details - {field.field_name}"},
-            },
-        )
+        closed_training = Training.objects.filter(field=field, training_type=2)  # CLOSED_TRAINING
 
-    def post(self, request, pk):
-        field = get_object_or_404(Field, pk=pk)
-        tournament_games = TournamentGames.objects.filter(game_field_id=field)
-        friendly_games=FriendlyGame.objects.filter(game_field_id=field)
-
-       
         return render(
             request,
             self.template_name,
@@ -1950,12 +1934,36 @@ class FieldDetailView(LoginRequiredMixin, View):
                 "field": field,
                 "tournament_games": tournament_games,
                 "friendly_games": friendly_games,
-             
-              
+                "open_training": open_training,
+                "closed_training": closed_training,
                 "breadcrumb": {"child": f"Field Details - {field.field_name}"},
             },
         )
 
+    def post(self, request, pk):
+        field = get_object_or_404(Field, pk=pk)
+        tournament_games = TournamentGames.objects.filter(game_field_id=field)
+        friendly_games = FriendlyGame.objects.filter(game_field_id=field)
+
+        # Retrieve trainings associated with this field
+       # Filter Open and Closed Training sessions using training_type
+        open_training = Training.objects.filter(field=field, training_type=1)  # OPEN_TRAINING
+        
+        print("dfgdf",open_training)
+        closed_training = Training.objects.filter(field=field, training_type=2)  # CLOSED_TRAINING
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "field": field,
+                "tournament_games": tournament_games,
+                "friendly_games": friendly_games,
+                "open_training": open_training,
+                "closed_training": closed_training,
+                "breadcrumb": {"child": f"Field Details - {field.field_name}"},
+            },
+        )
 
    
 
