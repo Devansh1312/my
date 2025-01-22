@@ -109,7 +109,9 @@
                     
                             <!-- Back Button (Right) -->
                             <div>
-                                <button onclick="window.history.back();" class="btn btn-secondary">Back</button>
+                                <a href="{% url 'user_apply_list' %}" class="btn btn-secondary" style="float: right;">
+                                    <i class="fa fa-arrow-left"></i> Back
+                                </a>                                
                             </div>
                         </div>
                     </form>                    
