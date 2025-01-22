@@ -1072,27 +1072,30 @@ class UserDetailView(LoginRequiredMixin, View):
 
     def get_manager_stats(self, user, time_filter):
         """
-        Fetch manager-specific stats, including branch details.
+        Fetch manager-specific stats, including branch details for all teams they manage.
         """
         try:
-            # Fetch the team branch associated with this manager
-            team_branch = (
+            # Fetch all team branches associated with this manager
+            team_branches = (
                 JoinBranch.objects.filter(
                     user_id=user.id, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
                 )
                 .select_related("branch_id")
-                .first()
             )
 
-            # Extract branch details or return None
-            branch = team_branch.branch_id if team_branch else None
+            # If no branches found, return an empty list
+            if not team_branches.exists():
+                return {"branches": []}
 
-            return {"branch": branch}
+            # Extract branch details from all the matching JoinBranch records
+            branches = [team_branch.branch_id for team_branch in team_branches]
+
+            print(branches)
+            return {"branches": branches}
         except Exception as e:
             return {
                 "status": 0,
                 "message": "An error occurred while fetching manager stats: {}".format(str(e))
-
             }
 
     def get_player_stats(self, user, time_filter):
