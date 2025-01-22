@@ -1100,90 +1100,81 @@ class UserDetailView(LoginRequiredMixin, View):
         Fetch player-specific stats, including total wins, losses, draws, games played, goals, assists, and cards.
         """
         try:
-            # Fetch the team the user is associated with
-            team = JoinBranch.objects.filter(user_id=user.id).first()
-            if not team:
-                return {
-                    "status": 0,
-                    "message": "User is not associated with any team.",
-                }
-
-            team_id = team.branch_id
-
             # Ensure time_filter is a valid dictionary
             time_filter = time_filter or {}
 
-            # Fetch the games the player's team participated in
-            games = TournamentGames.objects.filter(
-                (Q(team_a=team_id) | Q(team_b=team_id)), finish=True, **time_filter
-            )
-            # Total matches played
-            total_games_played = games.count()
-
-            # Total goals scored and conceded by the team
-            total_goals = games.aggregate(
-                total_goals_a=Sum("team_a_goal"), total_goals_b=Sum("team_b_goal")
-            )
-            total_goals_scored = total_goals["total_goals_a"] or 0
-            total_goals_conceded = total_goals["total_goals_b"] or 0
-            total_goals = total_goals_scored + total_goals_conceded
-
-            # Total assists (assuming "team_a_assists" and "team_b_assists" fields exist)
-            total_assists = PlayerGameStats.objects.filter(
-                game_id__in=games.values_list("id", flat=True)
-            ).aggregate(
-                total_assists=Sum("assists")  # Adjust based on actual field name
-            )
-            total_assists_scored = total_assists["total_assists"] or 0
-
-            # Total wins, losses, and draws
-            total_wins = games.filter(winner_id=int(team_id.id)).count()
-            total_losses = games.filter(loser_id=int(team_id.id)).count()
-            total_draws = games.filter(is_draw=True).count()
-
-            # Total yellow and red cards
-            cards_stats = PlayerGameStats.objects.filter(
-                game_id__in=games.values_list("id", flat=True)
-            ).aggregate(
-                total_yellow_cards=Sum("yellow_cards"), total_red_cards=Sum("red_cards")
-            )
-            total_yellow_cards = cards_stats["total_yellow_cards"] or 0
-            total_red_cards = cards_stats["total_red_cards"] or 0
+            # Fetch user's individual performance stats
             player = User.objects.get(id=user.id)
-            
+
             performance_stats = {
-                "passing": player.passing,
-                "shooting": player.shooting,
-                "interception": player.interception,
-                "dribbling": player.dribbling,
-                "tackling": player.tackling,
-                "aerial_duals": player.aerial_duals,
-                "stamina": player.stamina,
-                "speed": player.speed,
-                "strength": player.strength,
-                "jump": player.jump,
-                "balance": player.balance,
-                "agility": player.agility,
+                "passing": player.passing or 0,
+                "shooting": player.shooting or 0,
+                "interception": player.interception or 0,
+                "dribbling": player.dribbling or 0,
+                "tackling": player.tackling or 0,
+                "aerial_duals": player.aerial_duals or 0,
+                "stamina": player.stamina or 0,
+                "speed": player.speed or 0,
+                "strength": player.strength or 0,
+                "jump": player.jump or 0,
+                "balance": player.balance or 0,
+                "agility": player.agility or 0,
             }
 
+            # Check if the user is associated with any team
+            team = JoinBranch.objects.filter(user_id=user.id).first()
+            if team:
+                team_id = team.branch_id
+                # Fetch games where the user's team participated
+                games = TournamentGames.objects.filter(
+                    (Q(team_a=team_id) | Q(team_b=team_id)), finish=True, **time_filter
+                )
+            else:
+                games = TournamentGames.objects.filter(finish=True, **time_filter)
+
+            # Fetch user's stats from PlayerGameStats
+            player_stats = PlayerGameStats.objects.filter(player_id=user.id, game_id__in=games.values_list("id", flat=True))
+
+            total_games_played = player_stats.count()
+            total_goals = player_stats.aggregate(total_goals=Sum("goals"))["total_goals"] or 0
+            total_assists = player_stats.aggregate(total_assists=Sum("assists"))["total_assists"] or 0
+            total_yellow_cards = player_stats.aggregate(total_yellow_cards=Sum("yellow_cards"))["total_yellow_cards"] or 0
+            total_red_cards = player_stats.aggregate(total_red_cards=Sum("red_cards"))["total_red_cards"] or 0
+
+            # If user is in a team, calculate team-based stats
+            if team:
+                total_wins = games.filter(winner_id=int(team_id.id)).count()
+                total_losses = games.filter(loser_id=int(team_id.id)).count()
+                total_draws = games.filter(is_draw=True).count()
+            else:
+                # If not in a team, set to 0
+                total_wins = 0
+                total_losses = 0
+                total_draws = 0
+
             return {
-                "matchplayed": total_games_played,
-                "win": total_wins,
-                "loss": total_losses,
-                "draw": total_draws,
-                "goals": total_goals,
-                "assists": total_assists_scored,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
+                "status": 1,
+                "matchplayed": total_games_played or 0,
+                "win": total_wins or 0,
+                "loss": total_losses or 0,
+                "draw": total_draws or 0,
+                "goals": total_goals or 0,
+                "assists": total_assists or 0,
+                "yellow_card": total_yellow_cards or 0,
+                "red": total_red_cards or 0,
                 "player_stats": performance_stats,
+                "message": "Stats calculated successfully."
             }
 
         except Exception as e:
             return {
                 "status": 0,
                 "message": "Failed to fetch player stats.",
+                "player_stats": {},
                 "error": str(e),
             }
+
+
 
     def get_coach_stats(self, user, time_filter):
         """
