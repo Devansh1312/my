@@ -14,7 +14,7 @@ from django.core.files.storage import default_storage
 from datetime import date
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
-
+import json
 
 class CreateTrainingView(APIView):
     permission_classes = [IsAuthenticated]
@@ -28,6 +28,11 @@ class CreateTrainingView(APIView):
 
         creator_type = request.data.get('creator_type', None)
         created_by_id = request.data.get('created_by_id', None)
+        repeat_type = int(request.data.get('repeat_type', 2))  # Default to single if not provided
+        days = request.data.get('Days', '[]')
+        if isinstance(days, str):
+            days = json.loads(days)  # Expected to be a list of integers [1,2,...7]
+        end_date = request.data.get('end_date', None)
 
         creator_type = int(creator_type)
         created_by_id = int(created_by_id)
@@ -35,10 +40,7 @@ class CreateTrainingView(APIView):
         context = {'request': request}
         serializer = TrainingSerializer(data=request.data, context=context)
 
-
         if serializer.is_valid():
-
-
             # Handle image saving logic if training photo is uploaded
             if "training_photo" in request.FILES:
                 image = request.FILES["training_photo"]
@@ -47,41 +49,144 @@ class CreateTrainingView(APIView):
                 file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
                 image_path = default_storage.save(file_name, image)
                 serializer.validated_data['training_photo'] = image_path
-            training_instance = serializer.save()
 
-            if creator_type == 1:  # User
-                Training_Joined.objects.create(
-                    training=training_instance,
-                    user=request.user,
-                    attendance_status=False  # Default attendance status
-                )
-            elif creator_type == 2:  # Team
-                try:
-                    team = Team.objects.get(id=created_by_id)
-                    team_founder = team.team_founder
-                    if team_founder:
-                        Training_Joined.objects.create(
-                            training=training_instance,
-                            user=team_founder,
-                            attendance_status=False
-                        )
-                except Team.DoesNotExist:
+            training_instances = []
+
+            if repeat_type == 2:  # Single training
+                training_instance = serializer.save()
+                training_instances.append(training_instance)
+
+            elif repeat_type == 1:  # Multiple training
+                if not end_date or not days:
                     return Response({
                         'status': 0,
-                        'message': _('No team found with the provided ID.')
-                    }, status=status.HTTP_404_NOT_FOUND)
+                        'message': _('End date and Days are required for repeat_type 1.')
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-            training_instance = Training.objects.get(id=training_instance.id)
-            serializer = TrainingSerializer(training_instance, context={'request': request})
+                try:
+                    start_date = serializer.validated_data['training_date']
+                    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+                    current_date = start_date
+
+                    while current_date <= end_date:
+                        if current_date.weekday() + 1 in map(int, days):  # Check if the day matches
+                            training_data = serializer.validated_data.copy()
+                            training_data['training_date'] = current_date
+                            training_instance = Training.objects.create(**training_data)
+                            training_instances.append(training_instance)
+
+                        current_date += timedelta(days=1)
+
+                except Exception as e:
+                    return Response({
+                        'status': 0,
+                        'message': _('Invalid data for creating multiple trainings.'),
+                        'error': str(e)
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            for training_instance in training_instances:
+                if creator_type == 1:  # User
+                    Training_Joined.objects.create(
+                        training=training_instance,
+                        user=request.user,
+                        attendance_status=False  # Default attendance status
+                    )
+                elif creator_type == 2:  # Team
+                    try:
+                        team = Team.objects.get(id=created_by_id)
+                        team_founder = team.team_founder
+                        if team_founder:
+                            Training_Joined.objects.create(
+                                training=training_instance,
+                                user=team_founder,
+                                attendance_status=False
+                            )
+                    except Team.DoesNotExist:
+                        return Response({
+                            'status': 0,
+                            'message': _('No team found with the provided ID.')
+                        }, status=status.HTTP_404_NOT_FOUND)
+
+            training_serializer = TrainingSerializer(
+                training_instances, many=True, context={'request': request}
+            )
             return Response({
                 'status': 1,
-                'message': _('Training successfully created'),
-                'data': serializer.data  # Use the re-serialized data with language context
+                'message': _('Trainings successfully created'),
+                'data': training_serializer.data
             }, status=status.HTTP_201_CREATED)
+
         return Response({
             'status': 0,
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+# class CreateTrainingView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser]
+
+#     def post(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+
+#         if language in ['en', 'ar']:
+#             activate(language)
+
+#         creator_type = request.data.get('creator_type', None)
+#         created_by_id = request.data.get('created_by_id', None)
+
+#         creator_type = int(creator_type)
+#         created_by_id = int(created_by_id)
+
+#         context = {'request': request}
+#         serializer = TrainingSerializer(data=request.data, context=context)
+
+
+#         if serializer.is_valid():
+
+
+#             # Handle image saving logic if training photo is uploaded
+#             if "training_photo" in request.FILES:
+#                 image = request.FILES["training_photo"]
+#                 file_extension = image.name.split('.')[-1]
+#                 unique_suffix = get_random_string(8)
+#                 file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
+#                 image_path = default_storage.save(file_name, image)
+#                 serializer.validated_data['training_photo'] = image_path
+#             training_instance = serializer.save()
+
+#             if creator_type == 1:  # User
+#                 Training_Joined.objects.create(
+#                     training=training_instance,
+#                     user=request.user,
+#                     attendance_status=False  # Default attendance status
+#                 )
+#             elif creator_type == 2:  # Team
+#                 try:
+#                     team = Team.objects.get(id=created_by_id)
+#                     team_founder = team.team_founder
+#                     if team_founder:
+#                         Training_Joined.objects.create(
+#                             training=training_instance,
+#                             user=team_founder,
+#                             attendance_status=False
+#                         )
+#                 except Team.DoesNotExist:
+#                     return Response({
+#                         'status': 0,
+#                         'message': _('No team found with the provided ID.')
+#                     }, status=status.HTTP_404_NOT_FOUND)
+
+#             training_instance = Training.objects.get(id=training_instance.id)
+#             serializer = TrainingSerializer(training_instance, context={'request': request})
+#             return Response({
+#                 'status': 1,
+#                 'message': _('Training successfully created'),
+#                 'data': serializer.data  # Use the re-serialized data with language context
+#             }, status=status.HTTP_201_CREATED)
+#         return Response({
+#             'status': 0,
+#             'errors': serializer.errors
+#         }, status=status.HTTP_400_BAD_REQUEST)
 
 
 ##################### Get trainings Details ##################################
