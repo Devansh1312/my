@@ -72,6 +72,9 @@ class HomePage(View):
         cmsfeatures = cms_home_dynamic_field.objects.all() or None
         cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all() or None
         number_of_users = User.objects.all().count()
+        tournament_organized = Tournament.objects.all().count()
+        team_created=Team.objects.all().count()
+        games_played=TournamentGames.objects.all().count()
 
         try:
             cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
@@ -91,6 +94,9 @@ class HomePage(View):
             "cmsfeatures": cmsfeatures,
             "cms_home_dynamic_achivements": cms_home_dynamic_achivements,
             "number_of_users": number_of_users,
+            "tournament_organized": tournament_organized,
+            "team_created": team_created,
+            "games_played": games_played,
         }
         
         # Render the home page with context
@@ -2900,9 +2906,9 @@ class PlayerInfoPage(View):
                 "loss": total_losses,
                 "draw": total_draws,
                 "goals": total_goals_scored,
-                "assists": total_assists,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
+                "assists": total_assists if total_assists is not None else 0,
+                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
+                "red": total_red_cards if total_red_cards is not None else 0,
                 "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
             }
@@ -3087,8 +3093,8 @@ class PlayerInfoPage(View):
                 "win": games_won,
                 "loss": games_lost,
                 "draw": games_drawn,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
+                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
+                "red": total_red_cards if total_red_cards is not None else 0,
                 "goals_conceded": goals_conceded,
                 "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
@@ -3271,8 +3277,8 @@ class PlayerInfoPage(View):
                 "win": games_won,
                 "loss": games_lost,
                 "draw": games_drawn,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
+                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
+                "red": total_red_cards if total_red_cards is not None else 0,
                 "goals_conceded": goals_conceded,
                 "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
@@ -3420,8 +3426,8 @@ class PlayerInfoPage(View):
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
+                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
+                "red": total_red_cards if total_red_cards is not None else 0,
                 "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games,
             }

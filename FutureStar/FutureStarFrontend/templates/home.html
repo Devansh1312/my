@@ -535,12 +535,12 @@
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
                     <i class="fa-regular fa-circle-check"></i>
-                    <span class="count-text k" data-speed="3000" data-stop="{{ system_settings.line_of_code }}">0</span>
+                    <span class="count-text" data-speed="3000" data-stop="{{ team_created }}">0</span>
                     <span class="counter-title">
                         {% if current_language == 'en' %}
-                            Line of Code
+                            Teams Created
                         {% elif current_language == 'ar' %}
-                            سطر من الشيفرة
+                            الفرق التي تم إنشاؤها
                         {% endif %}
                     </span>                    
                 </div>
@@ -548,27 +548,27 @@
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
                     <i class="fa-regular fa-circle-check"></i>
-                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.downloads }}">0</span>
+                    <span class="count-text" data-speed="3000" data-stop="{{ tournament_organized }}">0</span>
                     <span class="counter-title">
                         {% if current_language == 'en' %}
-                            Downloads
+                            Tournaments Organized
                         {% elif current_language == 'ar' %}
-                            التنزيلات
-                        {% endif %}
-                    </span>                    
+                            البطولات المنظمة
+                        {% endif %} 
+                    </span>                   
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
                     <i class="fa-regular fa-circle-check"></i>
-                    <span class="count-text" data-speed="3000" data-stop="{{ system_settings.app_rate }}">0</span>
+                    <span class="count-text" data-speed="3000" data-stop="{{ games_played }}">0</span>
                     <span class="counter-title">
                         {% if current_language == 'en' %}
-                            App Rates
+                            Games Played
                         {% elif current_language == 'ar' %}
-                            تقييمات التطبيق
+                            المباريات played
                         {% endif %}
-                    </span>                    
+                    </span>                   
                 </div>
             </div>
         </div>
