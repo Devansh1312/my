@@ -25,7 +25,6 @@ class CreateTrainingView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Extracting and validating basic fields
         try:
             creator_type = int(request.data.get('creator_type'))
             created_by_id = int(request.data.get('created_by_id'))
@@ -39,24 +38,21 @@ class CreateTrainingView(APIView):
         training_date = request.data.get('training_date')
         end_date = request.data.get('end_date', None)
         repeat_type = int(request.data.get('repeat_type', 2))  # Default: Single training
-        
-        # Handling days, start and end times for multiple training sessions
         days_str = request.data.get('days', '[]')  # Expected format: '[1, 3, 5]'
         start_times_str = request.data.get('start_time', '[]')  # Expected format: '["18:00", "19:00"]'
         end_times_str = request.data.get('end_time', '[]')  # Expected format: '["19:00", "20:00"]'
-
-        # Convert string representation of lists to actual lists
-        try:
-            days = ast.literal_eval(days_str)
-            start_times = ast.literal_eval(start_times_str)
-            end_times = ast.literal_eval(end_times_str)
-        except (ValueError, SyntaxError) as e:
-            return Response({
-                'status': 0,
-                'message': _('Invalid format for days, start_time, or end_time.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-    
-        # Handle image upload
+        if repeat_type == 1:  # Only parse days, start_times, end_times for multiple sessions
+            try:
+                days = ast.literal_eval(days_str)
+                start_times = ast.literal_eval(start_times_str)
+                end_times = ast.literal_eval(end_times_str)
+            except (ValueError, SyntaxError) as e:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid format for days, start_time, or end_time.')
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            days, start_times, end_times = [], [], []  # For single training, these can be empty or not required
         training_photo = None
         if "training_photo" in request.FILES:
             image = request.FILES["training_photo"]
@@ -64,29 +60,24 @@ class CreateTrainingView(APIView):
             unique_suffix = get_random_string(8)
             file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
             training_photo = default_storage.save(file_name, image)
-
         training_instances = []
-
-        # Weekday mapping to custom days
         weekday_mapping = {
-            0: 2, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 1  # Map weekdays to custom days
+            0: 2, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 1
         }
-
-        # Single training logic
         if repeat_type == 2:  # Single training session
             try:
-                start_time_obj = datetime.strptime(request.data.get('start_time'), "%H:%M:%S").time()
-                end_time_obj = datetime.strptime(request.data.get('end_time'), "%H:%M:%S").time()
+                start_time_str = request.data.get('start_time')  # Assume 'start_time' is in H:M format
+                end_time_str = request.data.get('end_time')      # Assume 'end_time' is in H:M format
+                start_time_obj = datetime.strptime(start_time_str, "%H:%M:%S").time()
+                end_time_obj = datetime.strptime(end_time_str, "%H:%M:%S").time()
                 duration = (datetime.combine(datetime.today(), end_time_obj) - 
                             datetime.combine(datetime.today(), start_time_obj)).seconds // 60
             except ValueError:
                 return Response({'status': 0, 'message': _('Invalid time format.')}, status=status.HTTP_400_BAD_REQUEST)
-
             try:
                 training_date_obj = datetime.strptime(training_date, "%Y-%m-%d").date()
             except ValueError:
                 return Response({'status': 0, 'message': _('Invalid training_date format.')}, status=status.HTTP_400_BAD_REQUEST)
-
             training_instance = Training.objects.create(
                 training_name=training_name,
                 training_photo=training_photo,
@@ -98,39 +89,30 @@ class CreateTrainingView(APIView):
                 created_by_id=created_by_id,
             )
             training_instances.append(training_instance)
-
-        # Multiple training logic
         elif repeat_type == 1 and end_date and days:
             try:
-                start_time_objs = [datetime.strptime(st, "%H:%M").time() for st in start_times]
-                end_time_objs = [datetime.strptime(et, "%H:%M").time() for et in end_times]
-                durations = [(datetime.combine(datetime.today(), et) - datetime.combine(datetime.today(), st)).seconds // 60 
-                             for st, et in zip(start_time_objs, end_time_objs)]
+                start_time_objs = [datetime.strptime(st, "%H:%M:%S").time() for st in start_times]
+                end_time_objs = [datetime.strptime(et, "%H:%M:%S").time() for et in end_times]
+                durations = [
+                    (datetime.combine(datetime.today(), et) - datetime.combine(datetime.today(), st)).seconds // 60
+                    for st, et in zip(start_time_objs, end_time_objs)
+                ]
             except ValueError:
                 return Response({
                     'status': 0,
-                    'message': _('Invalid date format or time arrays mismatch.')
+                    'message': _('Invalid time format or time arrays mismatch.'),
                 }, status=status.HTTP_400_BAD_REQUEST)
-
             try:
                 training_date_obj = datetime.strptime(training_date, "%Y-%m-%d").date()
                 end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
             except ValueError:
                 return Response({'status': 0, 'message': _('Invalid date format.')}, status=status.HTTP_400_BAD_REQUEST)
-
             current_date = training_date_obj
-
             while current_date <= end_date_obj:
-                weekday = current_date.weekday()  # Python's weekday() returns 0 for Monday, 6 for Sunday
-
-                # Map the weekday to your custom day using weekday_mapping
+                weekday = current_date.weekday()
                 custom_weekday = weekday_mapping.get(weekday)
-
                 if custom_weekday in days:
-                    # Find the index of the custom weekday in the days array
                     day_index = days.index(custom_weekday)
-
-                    # Create the training instance for the specific day
                     training_instance = Training.objects.create(
                         training_name=training_name,
                         training_photo=training_photo,
@@ -142,16 +124,13 @@ class CreateTrainingView(APIView):
                         created_by_id=created_by_id,
                     )
                     training_instances.append(training_instance)
-
                 current_date += timedelta(days=1)
-
-        # Handle automatic joining logic
         for training_instance in training_instances:
-            if creator_type == Training.USER_TYPE:  # User creator type
+            if creator_type == Training.USER_TYPE:  
                 Training_Joined.objects.create(
                     training=training_instance,
                     user=request.user,
-                    attendance_status=False  # Default attendance status
+                    attendance_status=False 
                 )
             elif creator_type == Training.TEAM_TYPE:  # Team creator type
                 try:
@@ -168,7 +147,6 @@ class CreateTrainingView(APIView):
                         'status': 0,
                         'message': _('No team found with the provided ID.')
                     }, status=status.HTTP_404_NOT_FOUND)
-
         if len(training_instances) > 0:
             return Response({
                 'status': 1,
@@ -180,9 +158,6 @@ class CreateTrainingView(APIView):
                 'status': 0,
                 'message': _('No training instances were created.')
             }, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 
 # class CreateTrainingView(APIView):
 #     permission_classes = [IsAuthenticated]
