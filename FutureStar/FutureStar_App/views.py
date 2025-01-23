@@ -36,7 +36,7 @@ from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Count
 from django.utils.translation import gettext as _
-
+from django.core.files.storage import default_storage
 from django.utils.translation import activate
 from FutureStar.firebase_config import send_push_notification
 
@@ -461,16 +461,19 @@ class System_Settings(LoginRequiredMixin, View):
                         if os.path.isfile(old_file_path):
                             os.remove(old_file_path)
 
-                    # Save the new file
+                    # Generate a unique filename and store the file
                     file_extension = field_file.name.split(".")[-1]
                     unique_suffix = get_random_string(8)
-                    file_filename = f"{field_label}_{unique_suffix}.{file_extension}"
-                    fs.save(file_filename, field_file)
-                    setattr(
-                        system_settings,
-                        field_label,
-                        os.path.join("System_Settings", file_filename),
-                    )
+                    file_filename = f"system_settings/{field_label}_{unique_suffix}.{file_extension}"
+                    
+                    # Save the file using default storage
+                    image_path = default_storage.save(file_filename, field_file)
+                    
+                    # Update the system_settings with the new file path
+                    setattr(system_settings, field_label, image_path)
+
+            # Save changes to the system_settings model
+            system_settings.save()
 
             # Handle text fields: intro1_text, intro2_text, intro3_text
             text_fields = ["intro1_text", "intro2_text", "intro3_text"]

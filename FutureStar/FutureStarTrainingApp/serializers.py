@@ -211,8 +211,8 @@ class TrainingSerializer(serializers.ModelSerializer):
     joined_players = serializers.SerializerMethodField()
     joined_players_count = serializers.SerializerMethodField()
     is_joined = serializers.SerializerMethodField()  # New field for is_joined flag
-
-
+    start_time = serializers.TimeField(format="%H:%M:%S", input_formats=["%H:%M:%S", "%H:%M"])
+    end_time = serializers.TimeField(format="%H:%M:%S", input_formats=["%H:%M:%S", "%H:%M"])
     class Meta:
         model = Training
         fields = ['id', 'training_name', 'training_photo', 'country', 'country_name', 'city', 'city_name', 
