@@ -1007,7 +1007,8 @@ class EditProfileAPIView(APIView):
         # Get 'created_by_id' from query parameters
         user_id = request.query_params.get('user_id')
         creator_type = request.query_params.get('creator_type')
-        created_by_id = request.query_parms.get('created_by_id')
+        created_by_id = request.query_params.get('created_by_id')
+
 
         if not user_id:
             return Response({
