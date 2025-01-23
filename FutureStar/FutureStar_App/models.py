@@ -245,6 +245,8 @@ class UserCertificate(models.Model):
     certificate_type = models.CharField(max_length=20, choices=CertificateType.choices)
     certificate_file = models.FileField(upload_to='certificates/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.certificate_type}'
@@ -289,9 +291,8 @@ class SystemSettings(models.Model):
     intro1_text = models.CharField(max_length=255, null=True, blank=True)
     intro2_text = models.CharField(max_length=255, null=True, blank=True)
     intro3_text = models.CharField(max_length=255, null=True, blank=True)
-
-
-
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.website_name_english
@@ -300,13 +301,11 @@ class SystemSettings(models.Model):
         db_table = 'futurestar_app_systemsettings'
 
 
-
-
-
-
 # Field Capacity  Model
 class FieldCapacity(models.Model):
     name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -318,7 +317,8 @@ class FieldCapacity(models.Model):
 class GroundMaterial(models.Model):
     name_en = models.CharField(max_length=100)
     name_ar = models.CharField(max_length=100,null=True,blank=True)
-
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.name_en
@@ -349,6 +349,8 @@ class News(models.Model):
     description_ar = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='news/', blank=True, null=True)
     news_date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.title_en
@@ -360,7 +362,8 @@ class News(models.Model):
 class Partners(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='partners/', blank=True, null=True)
-
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
     def __str__(self):
         return self.title 
     
@@ -371,6 +374,8 @@ class Partners(models.Model):
 class Global_Clients(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='global_clients/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -382,6 +387,8 @@ class Global_Clients(models.Model):
 class Tryout_Club(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='tryout_club/')
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -400,6 +407,8 @@ class Testimonial(models.Model):
     content_en = models.TextField()
     content_ar = models.TextField(blank=True, null=True)
     rattings = models.CharField(max_length=5)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.name_en
@@ -415,6 +424,8 @@ class Team_Members(models.Model):
     name_ar = models.CharField(max_length=255, blank=True, null=True)
     designations_ar = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='team_members/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.name_en
@@ -430,6 +441,8 @@ class App_Feature(models.Model):
     title_ar = models.CharField(max_length=255, blank=True, null=True)
     sub_title_ar = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='app_feature/')
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
     
     def __str__(self):
         return self.title_en
@@ -441,6 +454,8 @@ class App_Feature(models.Model):
 class Slider_Content(models.Model):
     content_en = models.CharField(max_length=100,null=True,blank=True)
     content_ar = models.CharField(max_length=100,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
     def __str__(self):
         return self.content_en
     
@@ -450,7 +465,6 @@ class Slider_Content(models.Model):
 
 #cmspages
 class cms_pages(models.Model):
-    
     
     #name 
     name_en = models.CharField(max_length=100,null=True,blank=True)
@@ -673,6 +687,9 @@ class cms_pages(models.Model):
     meta_content_en = models.TextField(blank = True,null =True)
     meta_content_ar = models.TextField(blank = True,null =True)
 
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
+
     
     
     def __str__(self):
@@ -690,6 +707,8 @@ class cms_dicovery_dynamic_view(models.Model):
     content_en = models.TextField(blank=True,null=True)
     content_ar = models.TextField(blank=True,null=True)
     field_id = models.CharField(max_length=255,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
 
     def __str__(self):
@@ -705,21 +724,13 @@ class cms_dicovery_dynamic_image(models.Model):
     field_id = models.CharField(max_length=255,blank=True,null=True)
 
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     class Meta:
         db_table = "futurestar_app_cms_dicovery_dynamic_image"
         
-        
 
-'''class cms_advertise_dynamic_field(models.Model):
-    
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255,blank=True,null=True)
-    content = models.TextField(blank=True,null=True)
-    images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
-
-    class Meta():
-        db_table = "futurestar_app_cms_advertise_dynamic_field"    '''
 class cms_advertise_section_2_dynamic_field(models.Model):
     
     id = models.AutoField(primary_key=True)
@@ -731,6 +742,8 @@ class cms_advertise_section_2_dynamic_field(models.Model):
 
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     field_id = models.CharField(max_length=255,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     class Meta():
         db_table = "futurestar_app_cms_advertise_section_2_dynamic_field"
@@ -746,6 +759,8 @@ class cms_advertise_Partnership_dynamic_field(models.Model):
 
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     field_id = models.CharField(max_length=255,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     class Meta():
         db_table = "futurestar_app_cms_advertise_partnership_dynamic_field"      
@@ -756,6 +771,8 @@ class cms_advertise_ads_dynamic_field(models.Model):
 
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     field_id = models.CharField(max_length=255,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     class Meta():
         db_table = "futurestar_app_cms_advertise_ads_dynamic_field" 
@@ -768,6 +785,8 @@ class cms_advertise_premium_dynamic_field(models.Model):
 
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
     field_id = models.CharField(max_length=255,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     class Meta():
         db_table = "futurestar_app_cms_advertise_premium_dynamic_field"                
@@ -784,6 +803,8 @@ class cms_home_dynamic_field(models.Model):
     content_ar = models.TextField(blank=True,null=True)
 
     images = models.ImageField(upload_to='cmspages/',blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     class Meta():
         db_table = "futurestar_app_cms_home_dynamic_field"      
@@ -798,6 +819,8 @@ class cms_home_dynamic_achivements_field(models.Model):
     
     title_en = models.CharField(max_length=255,blank=True,null=True)
     title_ar = models.CharField(max_length=255,blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
     def __str__(self):
         return self.heading_en

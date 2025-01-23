@@ -770,7 +770,7 @@ class TournamentListView(LoginRequiredMixin, View):
 
     def get(self, request):
         # Fetch all tournaments from the Tournament model
-        tournaments = Tournament.objects.all()
+        tournaments = Tournament.objects.all().order_by('-tournament_starting_date')
         tournament_data = []
         for tournament in tournaments:
             # Fetch unique city names for the tournament's games
@@ -1488,7 +1488,7 @@ class CategoryListView(LoginRequiredMixin, View):
     template_name = "Admin/Category_List.html"
 
     def get(self, request):
-        categories = Category.objects.all()
+        categories = Category.objects.all().order_by('name_en')
         return render(
             request,
             self.template_name,
@@ -1785,7 +1785,7 @@ class GroundMaterialListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/GroundMaterial.html"
 
     def get(self, request):
-        groundmaterials = GroundMaterial.objects.all()
+        groundmaterials = GroundMaterial.objects.all().order_by('name_en')
         return render(
             request,
             self.template_name,
