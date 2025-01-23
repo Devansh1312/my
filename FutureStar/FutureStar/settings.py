@@ -242,6 +242,8 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
     )
 }
+# settings.py
+REMEMBER_ME_EXPIRY = 1209600  # 2 weeks in seconds
 
 # JWT Configuration
 SIMPLE_JWT = {

@@ -30,6 +30,7 @@ from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
 from FutureStarTrainingApp.models import *
+from FutureStar import settings
 from .forms import *
 load_dotenv()  
 
@@ -1232,6 +1233,8 @@ class LoginPage(View):
 
         # Proceed if user is not authenticated
         language_from_url = get_language(request)
+        username_or_phone = request.COOKIES.get('username_or_phone', '')
+        password = request.COOKIES.get('password', '')
         try:
             cmsdata = cms_pages.objects.get(id=12)  # Use get() to fetch a single object
         except cms_pages.DoesNotExist:
@@ -1239,11 +1242,14 @@ class LoginPage(View):
 
         context = {
             "current_language": language_from_url,
-            "cmsdata": cmsdata,
+            "cmsdata": cmsdata,   
+            "username_or_phone": username_or_phone,
+            "password": password,
         }
 
         return render(request, "login.html", context)
 
+   
     def post(self, request, *args, **kwargs):
         # Handle language change
         language_from_url = get_language(request)
@@ -1252,10 +1258,10 @@ class LoginPage(View):
         login_type = int(request.POST.get('login_type', 1))
         username_or_phone = request.POST.get('username_or_phone', '').strip()
         password = request.POST.get('password', '').strip()
+        remember_me = request.POST.get('remember_me', 'off') == 'on'
 
         # If only language is changed (no login fields are filled)
         if not username_or_phone and not password:
-            # Reload the login page with the updated language context
             cmsdata = cms_pages.objects.filter(id=12).first()
             context = {
                 "current_language": language_from_url,
@@ -1266,12 +1272,25 @@ class LoginPage(View):
 
         # Proceed with the login process
         if login_type == 1:
-            # Custom login logic for username or phone number
             user = self.authenticate_username_or_phone(username_or_phone, password)
 
             if user:
                 if user.is_active:
                     login(request, user)
+
+                    # If "Remember Me" is checked, set session expiration accordingly
+                    if remember_me:
+                        response = redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
+                        response.set_cookie('username_or_phone', username_or_phone, max_age=1209600)  # 2 weeks
+                        response.set_cookie('password', password, max_age=1209600)  # 2 weeks (you might want to hash this instead)
+                        return response
+                    else:
+                        # Clear cookies if "Remember Me" is unchecked
+                        response = redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
+                        response.delete_cookie('username_or_phone')
+                        response.delete_cookie('password')
+                        return response
+
                     user.last_login = timezone.now()
                     user.save()
                     messages.success(request, "Login successful!")
