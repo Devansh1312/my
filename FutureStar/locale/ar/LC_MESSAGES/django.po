@@ -410,9 +410,6 @@ msgstr "بيانات غير صحيحة."
 msgid "Invalid data."
 msgstr "بيانات غير صحيحة."
 
-msgid "Invalid date format."
-msgstr "تنسيق التاريخ غير صحيح."
-
 msgid "Invalid deletion reason ID."
 msgstr "معرّف سبب الحذف غير صحيح."
 
@@ -696,10 +693,10 @@ msgid "Options Fetched Successfully"
 msgstr "تم جلب الخيارات بنجاح."
 
 msgid "Page Not Found"
-msgstr "الصفحة غير موجودة."
+msgstr "لم يتم العثور على الصفحة"
 
 msgid "Page not found."
-msgstr "الصفحة غير موجودة."
+msgstr "لم يتم العثور على الصفحة"
 
 msgid "Parent comment not found."
 msgstr "لم يتم العثور على التعليق الرئيسي."
@@ -1478,9 +1475,6 @@ msgstr "تم مسح جميع الإشعارات بنجاح."
 msgid "Page number must be a positive integer."
 msgstr "يجب أن يكون رقم الصفحة عددًا صحيحًا موجبًا."
 
-msgid "Page not found."
-msgstr "الصفحة غير موجودة."
-
 msgid "Notifications fetched successfully."
 msgstr "تم جلب الإشعارات بنجاح."
 
@@ -1489,3 +1483,30 @@ msgstr "created_by_id أو creator_type غير صالح."
 
 msgid "An error occurred: "
 msgstr "حدث خطأ: "
+
+msgid "Invalid creator_type or created_by_id."
+msgstr "creator_type أو created_by_id غير صالح."
+
+msgid "Invalid country, city, gender, or field ID provided."
+msgstr "تم توفير معرف غير صالح للدولة أو المدينة أو الجنس أو المجال."
+
+msgid "Invalid country, city, gender, or field provided."
+msgstr "تم توفير دولة أو مدينة أو جنس أو مجال غير صالح."
+
+msgid "Invalid format for days, start_time, or end_time."
+msgstr "تنسيق غير صالح للأيام أو start_time أو end_time."
+
+msgid "Invalid time format."
+msgstr "تنسيق التاريخ غير صالح."
+
+msgid "Invalid time format or time arrays mismatch."
+msgstr "تنسيق الوقت غير صالح أو صفائف الوقت غير متطابقة."
+
+msgid "Invalid date format."
+msgstr "تنسيق التاريخ غير صالح."
+
+msgid "No team found with the provided ID."
+msgstr "لم يتم العثور على فريق بالمعرف المقدم."
+
+msgid "No training instances were created."
+msgstr "لم يتم إنشاء أي حالات تدريب."

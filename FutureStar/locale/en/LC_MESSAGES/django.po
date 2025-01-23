@@ -1486,3 +1486,27 @@ msgstr ""
 
 msgid "An error occurred: "
 msgstr ""
+
+msgid "Invalid creator_type or created_by_id."
+msgstr ""
+
+msgid "Invalid country, city, gender, or field ID provided."
+msgstr ""
+
+msgid "Invalid country, city, gender, or field provided."
+msgstr ""
+
+msgid "Invalid format for days, start_time, or end_time."
+msgstr ""
+
+msgid "Invalid time format."
+msgstr ""
+
+msgid "Invalid time format or time arrays mismatch."
+msgstr ""
+
+msgid "No team found with the provided ID."
+msgstr ""
+
+msgid "No training instances were created."
+msgstr ""
