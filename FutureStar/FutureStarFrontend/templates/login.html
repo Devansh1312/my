@@ -31,7 +31,10 @@
                                         اسم المستخدم أو الهاتف
                                     {% endif %}
                                 </label>
-                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control" placeholder="{% if current_language == 'en' %}Enter your username or phone{% elif current_language == 'ar' %}أدخل اسم المستخدم أو الهاتف{% endif %}" required>
+                                <input type="text" id="username_or_phone" name="username_or_phone" class="form-control"
+                                value="{{ username_or_phone }}" 
+                                placeholder="{% if current_language == 'en' %}Enter your username or phone{% elif current_language == 'ar' %}أدخل اسم المستخدم أو الهاتف{% endif %}" 
+                                required>
                                 <div class="error-message text-danger" id="usernameError" style="display:none;">This field is required</div>
                             </div>
                         </div>
@@ -53,14 +56,16 @@
                         </div>
                         <div class="col-md-12">
                             <div class="d-flex mb-30 justify-content-between">
-                                <label>
-                                    <input type="checkbox" />
-                                    {% if current_language == 'en' %}
-                                        Remember Me
-                                    {% elif current_language == 'ar' %}
-                                        تذكرني
-                                    {% endif %}
-                                </label>
+                                <div>
+                                    <label>
+                                        <input type="checkbox" name="remember_me" id="remember_me">
+                                        {% if current_language == 'en' %}
+                                            Remember Me
+                                        {% elif current_language == 'ar' %}
+                                            تذكرني
+                                        {% endif %}
+                                    </label>
+                                </div>
                                 <a href="{% url 'forgot_password' %}">
                                     {% if current_language == 'en' %}
                                         Forgot Password?
