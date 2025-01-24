@@ -1,7 +1,39 @@
-{% extends 'base1.html' %} {% load static %} {% load lang_filter %} {% block css %}
-<!-- Plugins css start-->
-<!-- Plugins css Ends--> {% endblock %} {% block title %}Goalactico || Otp - Verify{% endblock %} {% block content %}
-<!-- Page Banner Start -->
+{% extends 'base1.html' %} 
+{% load static %} 
+{% load lang_filter %} 
+
+{% block css %}
+<style>
+  @media (max-width: 768px) {
+    .otp-input {
+      font-size: 1.2rem;
+      padding: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .section-title h2 {
+      font-size: 1.5rem;
+    }
+
+    .section-title p {
+      font-size: 1rem;
+    }
+  }
+
+  .otp-input {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block title %}Goalactico || Otp - Verify{% endblock %}
+
+{% block content %}
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
         <div class="row justify-content-center">
@@ -11,45 +43,26 @@
                     <p>Enter your One Time Password</p>
                 </div>
             </div>
-            <div class="col-xl-6 col-lg-4">
+            <div class="col-lg-6 col-md-8 col-sm-10">
                 <form id="otpForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" action="{% url 'verify_otp' %}" method="post">
                     {% csrf_token %}
                     <div class="row justify-content-center">
                         <!-- Six OTP input fields -->
-                        <div class="col-md-2">
+                        {% for i in "123456" %}
+                        <div class="col-2 px-1">
                             <div class="form-group">
-                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp2')" id="otp1" required>
+                                <input type="text" class="otp-input form-control" maxlength="1" 
+                                    oninput="moveToNext(this, 'otp{{ forloop.counter0|add:1 }}')" 
+                                    id="otp{{ forloop.counter }}" required>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp3')" id="otp2" required>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp4')" id="otp3" required>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp5')" id="otp4" required>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp6')" id="otp5" required>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <input type="text" class="otp-input form-control text-center" maxlength="1" id="otp6" oninput="combineOTP()" required>
-                            </div>
-                        </div>
+                        {% endfor %}
                         <input type="hidden" id="otp" name="otp">
-                        <div class="col-md-12">
-                            <div class="form-group pt-5 mb-60">
-                                <button type="submit" class="theme-btn style-two w-100">Submit <i class="fa-solid fa-arrow-right"></i></button>
+                        <div class="col-12">
+                            <div class="form-group pt-4">
+                                <button type="submit" class="theme-btn style-two w-100">
+                                    Submit <i class="fa-solid fa-arrow-right"></i>
+                                </button>
                             </div>
                             <div class="text-center">
                                 <a href="#">Haven't received the code?</a>
@@ -61,37 +74,34 @@
         </div>
     </div>
 </section>
-
-
 {% endblock %}
 
 {% block scriptcontent %}
 <script>
-    // Function to move to the next input field automatically
+    // Move to the next field and combine OTP
     function moveToNext(current, nextFieldId) {
         if (current.value.length == 1 && /^[0-9]$/.test(current.value)) {
-            document.getElementById(nextFieldId).focus();
+            const nextInput = document.getElementById(nextFieldId);
+            if (nextInput) nextInput.focus();
         }
         combineOTP();
     }
 
-    // Combine the values of all six fields and set it to the hidden input
     function combineOTP() {
         let otp = '';
         for (let i = 1; i <= 6; i++) {
-            otp += document.getElementById('otp' + i).value;
+            const value = document.getElementById('otp' + i).value;
+            otp += value ? value : '';
         }
         document.getElementById('otp').value = otp;
     }
 
     // Restrict input to only numbers
-    document.querySelectorAll('.otp-input').forEach(function(input) {
-        input.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');  // Remove non-numeric characters
+    document.querySelectorAll('.otp-input').forEach(input => {
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');  // Allow numbers only
         });
     });
 </script>
-
 {% endblock %}
-{% block script %} 
-{% endblock %}
+{% block script %}{% endblock %}

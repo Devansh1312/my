@@ -7,27 +7,27 @@
 {% block content %}
 <script>
   function saveDetails() {
-    var email = document.getElementById('email').value;
+    var phone = document.getElementById('phone').value;
     var saveDetailsCheckbox = document.getElementById('rememberMe');
 
     if (saveDetailsCheckbox.checked) {
-        // Save email to localStorage
-        localStorage.setItem('savedEmail', email);
+        // Save phone to localStorage
+        localStorage.setItem('savedPhone', phone);
         // Do not save password for security reasons
         localStorage.setItem('saveDetailsChecked', 'true'); // Store checkbox state
     } else {
         // Clear saved details if checkbox is not checked
-        localStorage.removeItem('savedEmail');
+        localStorage.removeItem('savedPhone');
         localStorage.removeItem('saveDetailsChecked'); // Remove checkbox state
     }
   }
 
   function loadSavedDetails() {
-    var savedEmail = localStorage.getItem('savedEmail');
+    var savedPhone = localStorage.getItem('savedPhone');
     var saveDetailsChecked = localStorage.getItem('saveDetailsChecked');
     
-    if (savedEmail) {
-        document.getElementById('email').value = savedEmail;
+    if (savedPhone) {
+        document.getElementById('phone').value = savedPhone;
     }
     if (saveDetailsChecked === 'true') {
         document.getElementById('rememberMe').checked = true;
@@ -47,20 +47,26 @@
         <div>
           <div>
             <a class="logo" href="{% url 'adminlogin' %}">
-              <img class="img-fluid for-light" style="width: 240px; height: 70px;" src="{{ header_logo }}" alt="loginpage">
-              <img class="img-fluid for-dark" src="{{ header_logo }}" alt="loginpage">
+              <img class="img-fluid for-light" style="width: 240px; height: 70px;" src="{{ footer_logo }}" alt="loginpage">
+              <img class="img-fluid for-dark" src="{{ footer_logo }}" alt="loginpage">
             </a>
           </div>
           <div class="login-main"> 
             <form class="theme-form" method='post' novalidate>
                 {% csrf_token %}
               <h4>Sign in to account</h4>
-              <p>Enter your email & password to login</p>
+              <p>Enter your phone & password to login</p>
               
               <div class="form-group">
-                <label class="col-form-label">Email</label>
-                {{ form.email }}
+                <label class="col-form-label">Phone</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div class="text-danger">
+                        {{ form.phone.errors }}
+                    </div>
+                {% endif %}
               </div>
+            
               <div class="form-group">
                 <label class="col-form-label">Password</label>
                 <div class="form-input position-relative">
@@ -71,9 +77,9 @@
                 <div class="checkbox p-0">
                   <input id="rememberMe" type="checkbox" name="rememberMe">
                   <label class="text-muted" for="rememberMe">Remember password</label>
-                </div><a class="link" href="{% url 'forgot_password' %}">Forgot password?</a>
+                </div>
                 <div class="text-end mt-3">
-                  <button class="btn btn-primary btn-block w-100" type="submit">Sign in</button>
+                  <button class="btn btn-primary btn-block w-100" type="submit">Login</button>
                 </div>
               </div>
               </div>

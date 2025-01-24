@@ -60,16 +60,20 @@ def user_role_check(view_func):
 def LoginFormView(request):
     # If the user is already logged in, redirect to the dashboard
     if request.user.is_authenticated:
-        return redirect("Dashboard")
+            # Redirect based on user role
+            if request.user.role.id == 1:
+                return redirect('Dashboard')  # Redirect to the dashboard if role is 1
+            else:
+                return redirect('player-dashboard')  # Redirect to home for any other role
 
     form = LoginForm(request.POST or None)
 
     if request.method == "POST":
         remember_me = request.POST.get("rememberMe") == "on"
         if form.is_valid():
-            email = form.cleaned_data.get("email")
+            phone = form.cleaned_data.get("phone")
             password = form.cleaned_data.get("password")
-            user = authenticate(request, email=email, password=password)
+            user = authenticate_username_or_phone(phone, password)
 
             if user is not None:
                 if user.is_active:  # Check if the user is active
@@ -98,6 +102,19 @@ def LoginFormView(request):
 
     return render(request, "AdminLogin.html", {"form": form})
 
+def authenticate_username_or_phone(username_or_phone, password):
+        # Check if input is username or phone and retrieve user accordingly
+        try:
+            if username_or_phone.isdigit():
+                user = User.objects.get(phone=username_or_phone)
+            else:
+                user = User.objects.get(username=username_or_phone)
+        except User.DoesNotExist:
+            return None
+
+        # Use Django's built-in authenticate to verify the password
+        user = authenticate(username=user.username, password=password)
+        return user
 
 # Forgot Password Module
 # class ForgotPasswordView(View):

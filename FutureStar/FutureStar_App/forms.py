@@ -12,9 +12,9 @@ from FutureStarFriendlyGame.models import FriendlyGame
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(
+    phone = forms.CharField(
         widget=forms.TextInput(
-            attrs={"placeholder": "Email", "class": "form-control"}
+            attrs={"placeholder": "Phone", "class": "form-control"}
         )
     )
     password = forms.CharField(
@@ -22,6 +22,15 @@ class LoginForm(forms.Form):
             attrs={"placeholder": "Password", "class": "form-control"}
         )
     )
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        
+        # Check if the phone number is numeric
+        if not phone.isdigit():
+            raise ValidationError("Phone number must contain only digits.")
+        
+        return phone
 
 
 class SignUpForm(UserCreationForm):
