@@ -68,13 +68,11 @@ def get_user_data(user, request):
     creator_type = request.query_params.get('creator_type') or request.data.get('creator_type', FollowRequest.USER_TYPE)
     
 
-    # Calculate follower and following counts for the user
     # Counting followers for a user, team, or group
     followers_count = FollowRequest.objects.filter(target_id=user.id, target_type=FollowRequest.USER_TYPE).count()
     # Counting following for a user, team, or group
     following_count = FollowRequest.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
 
-    
     post_count = Post.objects.filter(created_by_id=user.id, creator_type=FollowRequest.USER_TYPE).count()
     
     # Check if the current user is following this user
@@ -337,8 +335,7 @@ class send_otp(APIView):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
+##################################################### Verify and Register API #############################################################################################################
 class verify_and_register(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
@@ -557,6 +554,7 @@ class verify_and_register(APIView):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+##################################################### Login API ######################################################################
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -582,9 +580,6 @@ class LoginAPIView(APIView):
                 deleted_user = User.objects.filter(phone=username_or_phone, is_deleted=True).first()
 
                 if deleted_user:
-                    # Phone number is associated with a deleted account, we need to allow new registration
-                    # Allow login for the newly registered user associated with the same phone number
-                    # First, check if the phone number belongs to a normal user (non-deleted)
                     user = User.objects.filter(phone=username_or_phone, is_deleted=False).first()
                     if not user:
                         return Response({
@@ -697,6 +692,7 @@ class LoginAPIView(APIView):
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
+##################################################### Logout API ###############################################################
 class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -705,21 +701,13 @@ class LogoutAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-
         try:
             # Fetch the user who is logging out
             user = request.user
-            
             # Clear device_type and device_token
             user.device_type = None
             user.device_token = None
             user.save()
-
-            # Blacklist the token or any other token management action if required
-            # token = request.auth
-            # if token:
-            #     token.blacklist()  # If using token blacklisting
-            
             return Response({
                 'status': 1,
                 'message': _('Logout successful'),
@@ -731,7 +719,6 @@ class LogoutAPIView(APIView):
                 'message': _('Logout failed'),
                 'error': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
 ####################### User Acount Delete Reason LIST API ##############
 class DeleteAccountReasonsListView(APIView):
@@ -792,10 +779,7 @@ class DeleteAccountView(APIView):
             'message': _('Your account has been deleted successfully.')
         }, status=status.HTTP_200_OK)
 
-
-
-
-
+##################################################### Forgot Password API #############################################################################################################
 class ForgotPasswordAPIView(APIView):
     permission_classes = [AllowAny]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -832,7 +816,7 @@ class ForgotPasswordAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
+##################################################### Verify OTP API #############################################################################################################
 class VerifyOTPAPIView(APIView):
     permission_classes = [AllowAny]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -866,7 +850,7 @@ class VerifyOTPAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
+##################################################### Change Password API #############################################################################################################
 class ChangePasswordOtpAPIView(APIView):
     permission_classes = [AllowAny]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -905,8 +889,7 @@ class ChangePasswordOtpAPIView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
+##################################################### Change Password API #############################################################################################################
 class ChangePasswordAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -993,7 +976,7 @@ class UpdateProfilePictureAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-
+############################################### Edit Profile API ###################################
 class EditProfileAPIView(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
@@ -1123,8 +1106,6 @@ class EditProfileAPIView(APIView):
                     'message': _('Invalid secondary playing position specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
         # Handle gender - retain old value if None or blank
         gender_id = request.data.get('gender')
         if gender_id not in [None, '','0', 'null']:  # Ensure 'null' is also checked
@@ -1163,7 +1144,6 @@ class EditProfileAPIView(APIView):
                     'status': 2,
                     'message': _('Invalid city specified.')
                 }, status=status.HTTP_400_BAD_REQUEST)
-
 
         # Handle profile picture update
         if "profile_picture" in request.FILES:
@@ -1206,7 +1186,6 @@ class EditProfileAPIView(APIView):
                 'current_type':user.current_type,
             }
         }, status=status.HTTP_200_OK)
-
 
 ####################### POST API ###############################################################################
 class CustomPostPagination(PageNumberPagination):
@@ -1253,7 +1232,6 @@ class CustomPostPagination(PageNumberPagination):
         return super().paginate_queryset(queryset, request, view)
 
 ###################################################################################### POST MODULE ################################################################################
-
 
 ###################### POST LIKE ##################################
 class PostLikeAPIView(APIView):
@@ -4785,115 +4763,6 @@ class EventBookingCreateAPIView(generics.CreateAPIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
-    # def notify_followers_event(self, created_by_id, creator_type, event):
-    #     # Fetch followers based on FollowRequest
-    #     followers = FollowRequest.objects.filter(
-    #         Q(target_id=created_by_id, target_type=creator_type)
-    #     )
-
-    #     # Retrieve creator name and user data based on creator_type
-    #     creator_name = None
-    #     notification_language = None
-
-    #     if creator_type in [1, "1"]:  # For individual users
-    #         creator_name = User.objects.filter(id=created_by_id).values_list('username', flat=True).first()
-    #     elif creator_type in [2, "2"]:  # For teams
-    #         team = Team.objects.get(id=created_by_id)
-    #         creator_name = team.team_username
-    #         notification_language = team.team_founder.current_language  # Get the team founder's language
-    #     elif creator_type in [3, "3"]:  # For groups
-    #         group = TrainingGroups.objects.get(id=created_by_id)
-    #         creator_name = group.group_name
-    #         notification_language = group.group_founder.current_language  # Get the group founder's language
-
-    #     # Notify followers based on their type
-    #     for follower in followers:
-    #         follower_user = User.objects.filter(id=follower.created_by_id).first()
-    #         if follower_user and follower_user.device_type in [1, 2, "1", "2"]:
-
-    #             # Set notification language based on the follower's preference
-    #             notification_language = follower_user.current_language
-    #             if notification_language in ['ar', 'en']:
-    #                 activate(notification_language)
-
-    #             # Send notification to the follower
-    #             title = _('Event Notification')
-    #             body = _(f'{creator_name}, whom you are following, is attending an event.')
-    #             push_data = {
-    #                 'type': 'event',
-    #                 'event_id': event.id
-    #             }
-    #             send_push_notification(follower_user.device_token, title, body, follower_user.device_type, data=push_data)
-
-    #             # If the follower is a team, send notification to the team founder
-    #             if creator_type == 2:
-    #                 title = _('Your team is attending an event!')
-    #                 body = _(f'Team {creator_name} is attending an event.')
-    #                 push_data = {
-    #                     'type': 'team_event',
-    #                     'event_id': event.id,
-    #                     'team_id': team.id
-    #                 }
-    #                 send_push_notification(team.team_founder.device_token, title, body, team.team_founder.device_type, data=push_data)
-
-    #             # If the follower is a group, send notification to the group founder
-    #             elif creator_type == 3:
-    #                 title = _('Your group is attending an event!')
-    #                 body = _(f'Group {creator_name} is attending an event.')
-    #                 push_data = {
-    #                     'type': 'group_event',
-    #                     'event_id': event.id,
-    #                     'group_id': group.id
-    #                 }
-    #                 send_push_notification(group.group_founder.device_token, title, body, group.group_founder.device_type, data=push_data)
-
-
-
-
-
-# class DeleteEventAPIView(APIView):
-
-#     def get_object(self, event_id):
-#         try:
-#             return Event.objects.get(id=event_id, event_organizer=self.request.user)
-#         except Event.DoesNotExist:
-#             return None
-
-#     def delete(self, request, *args, **kwargs):
-#         language = request.headers.get('Language', 'en')
-#         if language in ['en', 'ar']:
-#             activate(language)
-
-#         event_id = request.data.get('event_id')
-#         if not event_id:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('Event ID is required.')
-#             }, status=status.HTTP_400_BAD_REQUEST)
-
-#         event = self.get_object(event_id)
-#         if not event:
-#             return Response({
-#                 'status': 0,
-#                 'message': _('Event not found or you are not authorized to delete this event.')
-#             }, status=status.HTTP_404_NOT_FOUND)
-
-#         # Optionally delete the associated event image
-#         if event.event_image and default_storage.exists(event.event_image.name):
-#             default_storage.delete(event.event_image.name)
-
-#         event.delete()
-#         return Response({
-#             'status': 1,
-#             'message': _('Event deleted successfully.')
-#         }, status=status.HTTP_200_OK)
-
-
-
-
-
-
 ############################################################### FAQ API #####################################################################################################
 class FAQListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -4944,12 +4813,7 @@ class GeneralSettingsList(APIView):
             'data': serializer.data
         }, status=status.HTTP_200_OK)
 
-
-
-
-
-
-
+############################################################### User Profile API #####################################################################################################
 class AgeGroupListAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -4979,7 +4843,7 @@ class AgeGroupListAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+############################################################### Injury API #####################################################################################################
 class InjuryListAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -4998,7 +4862,7 @@ class InjuryListAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-
+############################################################### User Role State API #####################################################################################################
 class UserRoleStatsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -5456,10 +5320,7 @@ class UpdateCurrentLanguageView(APIView):
         }, status=status.HTTP_200_OK)
     
 
-
-
-    ########################## timing notification #####################
-
+########################## timing notification #####################
 
 ############### Training #####################
 class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
@@ -5523,7 +5384,6 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
-
     def send_notification(self, user, attendance_message, comments_message, push_data):
         """
         Helper method to send notifications to a user.
@@ -5556,8 +5416,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             content=attendance_message + comments_message
         )
 
-##############################
-
+#################### Training End Time Notification API ######################
 class CheckEndTimeAndSendNotificationsAPIView(APIView):
     def get(self, request, *args, **kwargs):
         # Get the current datetime
@@ -5651,9 +5510,8 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             content=message + comments_message
         )
 
-#################### tournament #######################
 
-
+#################### Tournament Game LineUp Notification API ######################
 class LineupNotificationAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
