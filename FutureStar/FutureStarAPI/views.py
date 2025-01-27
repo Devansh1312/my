@@ -1094,7 +1094,7 @@ class EditProfileAPIView(APIView):
 
         # Handle age - retain old value if None or blank
         age = request.data.get('age')
-        if age not in [None,'0', '', 'null']:
+        if age not in [None,'', 'null']:
             user.age = age
         
         # Handle main_playing_position - set to NULL if blank, zero, or 'null' is provided
