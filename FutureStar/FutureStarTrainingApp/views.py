@@ -1216,7 +1216,18 @@ class TrainingFeedbackAPI(APIView):
 
         # Update attendance status if provided
         if attendance_status is not None:
-            training_joined.attendance_status = attendance_status
+            # Normalize attendance status to handle different input formats
+            if str(attendance_status).lower() == "true":
+                training_joined.attendance_status = True
+            elif str(attendance_status).lower() == "false":
+                training_joined.attendance_status = False
+            else:
+                # Handle invalid input or if you want to set a default value
+                return Response({
+                    "status": 0,
+                    "message": _("Invalid attendance status value.")
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             updated = True
             update_messages.append(_("Attendance updated"))
 
@@ -1293,7 +1304,7 @@ class TrainingFeedbackAPI(APIView):
                 "profile_picture": training_joined.user.profile_picture.url if training_joined.user.profile_picture else None,
                 "country_id": training_joined.user.country.id if training_joined.user.country else None,
                 "country_name": training_joined.user.country.name if training_joined.user.country else None,
-                "attendance_status": training_joined.attendance_status,
+                "attendance_status": bool(training_joined.attendance_status),
             },
             "rating": training_joined.rating,
             "feedbacks": feedback_data
