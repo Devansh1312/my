@@ -1216,8 +1216,6 @@ class TrainingFeedbackAPI(APIView):
 
         # Update attendance status if provided
         if attendance_status is not None:
-            # Make sure to treat the status as a boolean (True/False)
-            attendance_status = bool(attendance_status)  # Ensure it's a boolean
             training_joined.attendance_status = attendance_status
             updated = True
             update_messages.append(_("Attendance updated"))
@@ -1296,7 +1294,6 @@ class TrainingFeedbackAPI(APIView):
                 "country_id": training_joined.user.country.id if training_joined.user.country else None,
                 "country_name": training_joined.user.country.name if training_joined.user.country else None,
                 "attendance_status": training_joined.attendance_status,
-
             },
             "rating": training_joined.rating,
             "feedbacks": feedback_data
