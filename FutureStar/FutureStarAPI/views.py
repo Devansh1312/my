@@ -3976,13 +3976,12 @@ class DashboardAPI(APIView):
             latest_date = next(iter(sorted_games_by_date))
 
             # Format the response for only the latest date
-            response_data = [
-                {
+            response_data = {}
+            if latest_date:
+                response_data = {
                     "date": latest_date,
-                    "tournament": games["tournament"],
+                    "tournament": sorted_games_by_date[latest_date]["tournament"]
                 }
-                for date, games in sorted_games_by_date.items() if date == latest_date
-            ]
 
         return Response({
             "status": 1,

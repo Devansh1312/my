@@ -40,6 +40,7 @@ class CreateTrainingView(APIView):
         gender_id = request.data.get('gender')
         field_id = request.data.get('field')
         description = request.data.get('description', '')
+        cost = request.data.get('cost', '')
 
         try:
             country_id = int(country_id) if country_id else None
@@ -126,6 +127,7 @@ class CreateTrainingView(APIView):
                 field=field,
                 no_of_participants=no_of_participants,
                 description=description,
+                cost=cost,
             )
             training_instances.append(training_instance)
 
@@ -170,6 +172,7 @@ class CreateTrainingView(APIView):
                         field=field,
                         no_of_participants=no_of_participants,
                         description=description,
+                        cost=cost,
                     )
                     training_instances.append(training_instance)
                 current_date += timedelta(days=1)

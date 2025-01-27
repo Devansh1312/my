@@ -25,7 +25,7 @@ class TrainingCommentSerializer(serializers.ModelSerializer):
             team = Team.objects.get(id=obj.created_by_id)
             return {
                 'id': team.id,
-                'name': team.team_name,
+                'username': team.team_usernameeam,
                 'profile_image': team.team_logo.url if team.team_logo else None,
                 'type': 'team'
             }
@@ -33,7 +33,7 @@ class TrainingCommentSerializer(serializers.ModelSerializer):
             group = TrainingGroups.objects.get(id=obj.created_by_id)
             return {
                 'id': group.id,
-                'name': group.group_name,
+                'username': group.group_username,
                 'profile_image': group.group_logo.url if group.group_logo else None,
                 'type': 'group'
             }
