@@ -686,21 +686,16 @@ class OpenTrainingListView(APIView):
             # Serialize the paginated data
             serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
-            # Prepare the pagination data
-            pagination_data = {
-                'total_records': open_trainings.count(),
-                'total_pages': paginator.page.paginator.num_pages,
-                'current_page': paginator.page.number
-            }
+        
 
             # Return paginated data in the response, with the serialized data directly under 'data'
             return Response({
                 'status': 1,
                 'message': "Open trainings retrieved successfully",
-                'data': {
-                    **pagination_data,
-                    'trainings': serializer.data  # Put serialized data directly here
-                },
+                'total_records': open_trainings.count(),
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'data': serializer.data,
                 'notification_count': notification_count  # Include the notification count in the response
             }, status=status.HTTP_200_OK)
 
@@ -709,12 +704,10 @@ class OpenTrainingListView(APIView):
         return Response({
             'status': 1,
             'message': "Open trainings retrieved successfully",
-            'data': {
-                'total_records': open_trainings.count(),
-                'total_pages': 1,
-                'current_page': 1,
-                'trainings': serializer.data  # Put serialized data directly here
-            },
+            'total_records': open_trainings.count(),
+            'total_pages': 1,
+            'current_page': 1,
+            'data':  serializer.data,
             'notification_count': notification_count  # Include the notification count in the response
         }, status=status.HTTP_200_OK)
     
@@ -759,7 +752,10 @@ class MyTrainingsView(APIView):
             return Response({
                 'status': 1,
                 'message': 'Trainings retrieved successfully',
-                'data': pagination_data
+                'total_records': len(accessible_trainings),
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'data': serializer.data,
             }, status=status.HTTP_200_OK)
 
         # If pagination is not applied, return all serialized data
@@ -767,12 +763,10 @@ class MyTrainingsView(APIView):
         return Response({
             'status': 1,
             'message': 'Trainings retrieved successfully',
-            'data': {
-                'total_records': len(accessible_trainings),
-                'total_pages': 1,
-                'current_page': 1,
-                'data': serializer.data
-            }
+            'total_records': len(accessible_trainings),
+            'total_pages': 1,
+            'current_page': 1,
+            'data': serializer.data,
         }, status=status.HTTP_200_OK)
     
     def _has_access(self, training, user):
@@ -847,19 +841,14 @@ class MyJoinedTrainingsView(APIView):
             # Serialize the paginated data
             serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
-            # Prepare the pagination data
-            pagination_data = {
-                'total_records': len(trainings),
-                'total_pages': paginator.page.paginator.num_pages,
-                'current_page': paginator.page.number,
-                'data': serializer.data  # Directly place the data in 'data'
-            }
-
             # Return paginated data in the response
             return Response({
                 'status': 1,
                 'message': 'Joined trainings retrieved successfully',
-                'data': pagination_data
+                'total_records': len(trainings),
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'data': serializer.data  
             }, status=status.HTTP_200_OK)
 
         # If pagination is not applied, just return the serialized data
@@ -867,14 +856,11 @@ class MyJoinedTrainingsView(APIView):
         return Response({
             'status': 1,
             'message': 'Joined trainings retrieved successfully',
-            'data': {
-                'total_records': len(trainings),
-                'total_pages': 1,
-                'current_page': 1,
-                'data': serializer.data  # Directly place the data in 'data'
-            }
+            'total_records': len(trainings),
+            'total_pages': 1,
+            'current_page': 1,
+            'data': serializer.data  # Directly place the data in 'data'
         }, status=status.HTTP_200_OK)
-
 
 ############################## Join Training API ##############################
 
@@ -1230,6 +1216,8 @@ class TrainingFeedbackAPI(APIView):
 
         # Update attendance status if provided
         if attendance_status is not None:
+            # Make sure to treat the status as a boolean (True/False)
+            attendance_status = bool(attendance_status)  # Ensure it's a boolean
             training_joined.attendance_status = attendance_status
             updated = True
             update_messages.append(_("Attendance updated"))
@@ -1307,8 +1295,9 @@ class TrainingFeedbackAPI(APIView):
                 "profile_picture": training_joined.user.profile_picture.url if training_joined.user.profile_picture else None,
                 "country_id": training_joined.user.country.id if training_joined.user.country else None,
                 "country_name": training_joined.user.country.name if training_joined.user.country else None,
+                "attendance_status": training_joined.attendance_status,
+
             },
-            "attendance_status": training_joined.attendance_status,
             "rating": training_joined.rating,
             "feedbacks": feedback_data
         }

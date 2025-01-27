@@ -373,16 +373,19 @@ class TrainingMembershipSerializer(serializers.ModelSerializer):
         fields = ['id', 'training', 'user', 'attendance_status', 'rating', 'feedbacks']
 
     def get_user(self, obj):
-        """Retrieve user data as a dictionary."""
+        """Retrieve user data along with attendance status in the training session."""
         user = obj.user  # Get the related User object via foreign key
+        # Retrieve the attendance status of the user for this particular training session
+        attendance_status = obj.attendance_status  # Use the attendance status from the current `Training_Joined` instance
         return {
             'id': user.id,
             'username': user.username,
             'phone': user.phone,
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
-            'gender':user.gender.id if user.gender else None,
+            'gender': user.gender.id if user.gender else None,
             'country_id': user.country.id if user.country else None,
             'country_name': user.country.name if user.country else None,
+            'attendance_status': attendance_status  # Add attendance status here
         }
 
     def get_feedbacks(self, obj):
