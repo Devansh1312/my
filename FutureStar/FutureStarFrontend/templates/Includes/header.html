@@ -36,7 +36,7 @@
                                 {% if user.is_authenticated %}
                                 <!-- Profile Wrapper -->
                                 <a href="{% url 'player-dashboard' %}" class="profile-wrapper">
-                                    <img src="assets/images/profile-pic.jpg" alt=""><span>{{ user.username }}</span>
+                                    <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'frontend/assets/images/success-stories/player-1.png' %}{% endif %}" alt=""><span>{{ user.username }}</span>
                                 </a>
                                 {% endif %}
                             </div>
