@@ -44,10 +44,16 @@
          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Optional: add shadow for better visibility */
          text-align: center;
      }
- 
-     .team-popup-message {
+
+    .team-popup-message {
          font-size: 14px;
      }
+    .team-image, .team-image-1 {
+         cursor: pointer;  /* Hand cursor */
+     }
+     .not-authenticated {
+    cursor: pointer;  /* Hand cursor */
+}
  </style>
  {% endblock %}
 
@@ -57,30 +63,15 @@
 
 <!-- Page Banner Start -->
 
-
-<section class="success-stories-page-banner common-banner text-center" 
-style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37,67,0,1) 100%), url('/media/{{ cmsdata.heading_banner }}');">
-
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="banner-inner">
-                    <!-- <h1 class="page-title wow fadeInUp delay-0-2s"> -->
-                        {% lang cmsdata current_language "heading_title" as heading_title %}
-                        <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
-
-                       
-
-                    <!-- </h1> -->
-                    <!-- <p> -->
-                        {% lang cmsdata current_language "heading_content" as heading_content %}
-                        <p>{{ heading_content }}</p>
-                       
-                    
-                        
-
-                       
-                    <!-- </p> -->
+<section class="success-stories-page-banner common-banner text-center" style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37,67,0,1) 100%), url('/media/{{ cmsdata.heading_banner }}');">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="banner-inner">
+                            {% lang cmsdata current_language "heading_title" as heading_title %}
+                            <h1 class="page-title wow fadeInUp delay-0-2s">{{ heading_title }}</h1>
+                            {% lang cmsdata current_language "heading_content" as heading_content %}
+                            <p>{{ heading_content }}</p>
                 </div>
             </div>
         </div>
@@ -109,7 +100,14 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
                             @{{ item.user.username }}
                             {% endif %}
                         </h5>
-                        <p class="player-designation">{{ item.user.role.name_en |default:"None" }}</p>
+                        <p class="player-designation">
+
+                            {% if current_language == 'en' %}
+                                {{ item.user.role.name_en |default:"None" }}
+                            {% elif current_language == 'ar' %}
+                                {{ item.user.role.name_ar |default:"None" }}
+                            {% endif %}                        
+                        </p>
                         <div class="social-info-wrapper">
                             <div class="social-info-item">
                                 <p class="number">{{ item.post_count }}</p>
@@ -187,9 +185,18 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
                 <!-- Form to submit the team_id when the image is clicked -->
                 <form action="{% url 'TeamPageSearchResults' %}" method="get" class="team-form" id="team-form-{{ tryout_club.id }}">
                     <input type="hidden" name="team_id" value="{{ tryout_club.team_branch.team_id.id }}">
+                    
                     <div class="img-wrapper">
-                        <img src="{{ tryout_club.team_branch.team_id.team_logo.url }}" class="img-fluid team-image" alt="">
-                        <!-- New popup for team image -->
+                        <!-- Check if the user is authenticated -->
+                        {% if user.is_authenticated %}
+                            <!-- If authenticated, the image is clickable -->
+                            <img src="{{ tryout_club.team_branch.team_id.team_logo.url }}" class="img-fluid team-image-1" alt="">
+                        {% else %}
+                            <!-- If not authenticated, show a popup message when clicked -->
+                            <img src="{{ tryout_club.team_branch.team_id.team_logo.url }}" class="img-fluid team-image not-authenticated" alt="">
+                        {% endif %}
+                        
+                        <!-- New popup for team image (only visible when user is not authenticated) -->
                         <div class="team-popup-container" style="display: none;">
                             <div class="team-popup-message">
                                 {% if current_language == 'en' %}
@@ -198,7 +205,7 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
                                     <p>يرجى تسجيل الدخول أولاً لعرض تفاصيل الفريق.</p>
                                 {% endif %}
                             </div>
-                        </div>                        
+                        </div> 
                     </div>
                 </form>
                 <span>{{ tryout_club.team_branch.team_name }}</span>
@@ -207,10 +214,7 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
         </div>
     </div>
 </section>
-
 <!-- Tryouts Clubs Area End -->
-
-
 {% endblock %}
 
 {% block scriptcontent %}
@@ -232,16 +236,23 @@ style=" background-image:linear-gradient(180deg, rgba(157,164,148,0) 0%, rgba(37
         });
     });
     $(document).ready(function(){
-        // Click event for team image
-        $(".team-image").on("click", function(){
-            var popup = $(this).closest('.img-wrapper').find('.team-popup-container');
-            popup.fadeIn().delay(2000).fadeOut(); // Show the popup for 2 seconds and then hide it
+        // Click event for authenticated user (no popup)
+        $(".team-image-1").on("click", function(){
+            var form = $(this).closest('form');
+            form.submit(); // Submit the form to go to the TeamPageSearchResults
         });
     });
     $(document).ready(function(){
         $(".not-authenticated").on("click", function(){
             var popup = $(this).closest('.item-wrapper').find('.popup-container');
             popup.fadeIn().delay(2000).fadeOut(); // Show popup for 2 seconds and then hide it
+        });
+    });
+    $(document).ready(function(){
+        // Click event for team image
+        $(".team-image").on("click", function(){
+            var popup = $(this).closest('.img-wrapper').find('.team-popup-container');
+            popup.fadeIn().delay(2000).fadeOut(); // Show the popup for 2 seconds and then hide it
         });
     });
 </script>

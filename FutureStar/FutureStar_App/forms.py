@@ -304,26 +304,6 @@ class FriendlyGameForm(forms.ModelForm):
             self.fields['discipline_team_b_offside'].label = f"{team_b_name} Discipline Offsides"
             self.fields['discipline_team_b_corner'].label = f"{team_b_name} Discipline Corners"
 
-# # Gender Form
-# class GenderForm(forms.ModelForm):
-#     class Meta:
-#         model = Gender
-#         fields = ["name_en"]
-#         widgets = {
-#             "name": forms.TextInput(attrs={"placeholder": "Enter Gender"}),
-#         }
-
-
-# # GameType Form
-# class GameTypeForm(forms.ModelForm):
-#     class Meta:
-#         model = GameType
-#         fields = ["name"]
-#         widgets = {
-#             "name": forms.TextInput(attrs={"placeholder": "Enter GameType"}),
-#         }
-
-
 # Field Capacity Form
 class FieldCapacityForm(forms.ModelForm):
     class Meta:

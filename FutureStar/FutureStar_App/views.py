@@ -40,7 +40,7 @@ from django.core.files.storage import default_storage
 from django.utils.translation import activate
 from FutureStar.firebase_config import send_push_notification
 
-
+# User Role Check
 def user_role_check(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
@@ -102,6 +102,7 @@ def LoginFormView(request):
 
     return render(request, "AdminLogin.html", {"form": form})
 
+# Authenticate username or phone
 def authenticate_username_or_phone(username_or_phone, password):
         # Check if input is username or phone and retrieve user accordingly
         try:
@@ -116,97 +117,7 @@ def authenticate_username_or_phone(username_or_phone, password):
         user = authenticate(username=user.username, password=password)
         return user
 
-# Forgot Password Module
-# class ForgotPasswordView(View):
-#     template_name = "Admin/Auth/forgot_password.html"
-#     User = get_user_model()
-
-#     def get(self, request):
-#         return render(request, self.template_name)
-
-#     def post(self, request):
-#         email = request.POST.get("email")
-#         user = self.User.objects.filter(email=email).first()
-
-#         if user:
-#             user.remember_token = get_random_string(40)
-#             user.token_created_at = timezone.now()
-#             user.save()
-#             reset_url = request.build_absolute_uri(
-#                 reverse("reset_password", args=[user.remember_token])
-#             )
-
-#             context = {"user": user, "reset_url": reset_url}
-
-#             subject = "Reset Your Password"
-#             from_email = settings.DEFAULT_FROM_EMAIL
-#             to_email = [user.email]
-#             html_content = render_to_string("Admin/Email/reset_password.html", context)
-
-#             msg = EmailMultiAlternatives(subject, "", from_email, to_email)
-#             msg.attach_alternative(html_content, "text/html")
-
-#             try:
-#                 msg.send()
-#                 messages.success(request, "Please check your email for the reset link.")
-#             except Exception as e:
-#                 messages.error(
-#                     request,
-#                     "There was an error sending the email. Please try again later.",
-#                 )
-
-#             return redirect("adminlogin")
-#         else:
-#             messages.error(request, "Email not found.")
-
-#         return redirect("forgot_password")
-
-
-# # Reset Password Module
-# class ResetPasswordView(View):
-#     template_name = "Admin/Auth/reset_password.html"
-#     User = get_user_model()
-
-#     def get(self, request, token):
-#         user = get_object_or_404(User, remember_token=token)
-
-#         # Check if the token has expired (1 hour expiration)
-#         expiration_time = timezone.now() - timedelta(hours=1)
-#         if user.token_created_at and user.token_created_at < expiration_time:
-#             messages.error(request, "This reset link has expired.")
-#             return redirect("forgot_password")
-
-#         return render(request, self.template_name, {"token": token})
-
-#     def post(self, request, token):
-#         user = get_object_or_404(User, remember_token=token)
-
-#         # Check if the token has expired (1 hour expiration)
-#         expiration_time = timezone.now() - timedelta(hours=1)
-#         if user.token_created_at and user.token_created_at < expiration_time:
-#             messages.error(request, "This reset link has expired.")
-#             return redirect("forgot_password")
-
-#         password = request.POST.get("password")
-#         confirm_password = request.POST.get("confirm_password")
-
-#         if password == confirm_password:
-#             user.set_password(password)
-#             if not user.email_verified_at:
-#                 user.email_verified_at = timezone.now()
-#             user.remember_token = get_random_string(40)  # Invalidate the token
-#             user.token_created_at = None  # Clear the token creation time
-#             user.save()
-#             messages.success(
-#                 request, "Your password has been reset. You can now log in."
-#             )
-#             return redirect("adminlogin")
-#         else:
-#             messages.error(request, "Passwords do not match.")
-
-#         return render(request, self.template_name, {"token": token})
-
-
+# Dashboard Module
 @method_decorator(user_role_check, name="dispatch")
 class Dashboard(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -264,7 +175,7 @@ class UserProfileView(LoginRequiredMixin, View):
 
         return render(request, "Admin/User/user_profile.html", {"user": user})
 
-
+##################################################### User Update Profile View ###############################################################
 @method_decorator(user_role_check, name="dispatch")
 class UserUpdateProfileView(View):
     def get(self, request, *args, **kwargs):
@@ -279,7 +190,7 @@ class UserUpdateProfileView(View):
                 "breadcrumb": {"parent": "Acccount", "child": "Edit Profile"},
             },
         )
-
+# Handle POST request for updating profile
     def post(self, request, *args, **kwargs):
         if "change_password" in request.POST:
             # Handle password change
@@ -307,18 +218,6 @@ class UserUpdateProfileView(View):
 
                             # Return redirect to the referrer URL
                             return redirect(referer_url)
-              
-               
-                # form = UserUpdateProfileForm(instance=request.user)
-                # return render(
-                #     request,
-                #     referer_url,  # Pass the referer URL as a template to render the same page
-                #     {
-                #         "form": form,
-                #         "password_change_form": password_change_form,
-                #         "show_change_password_modal": True,
-                #     }
-                # )
                 else:
                     # If no referer, fallback to a default page (or you can just render the form on a specific template)
                     return render(
@@ -424,7 +323,6 @@ class UserUpdateProfileView(View):
                     {"form": form, "password_change_form": password_change_form},
                 )
 
-
 ################################## SytemSettings view #######################################################
 @method_decorator(user_role_check, name="dispatch")
 class System_Settings(LoginRequiredMixin, View):
@@ -442,7 +340,7 @@ class System_Settings(LoginRequiredMixin, View):
                 },  # Pass MEDIA_URL to the template
             },
         )
-
+# Handle POST request for updating system settings
     def post(self, request, *args, **kwargs):
         system_settings = SystemSettings.objects.first()
         if not system_settings:
@@ -561,8 +459,6 @@ class System_Settings(LoginRequiredMixin, View):
         else:
             return redirect("System_Settings")
 
-
-
 #######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
 
 # User Active & Deactive Function
@@ -597,7 +493,6 @@ class ToggleUserStatusView(View):
         elif new_status == "deactivate":
             user.is_active = False
             messages.success(request, "{} has been activated.".format(user.username))
-
 
         user.save()
 
@@ -682,7 +577,7 @@ class RefereeListView(LoginRequiredMixin, View):
         )
 
 
-######### manager list ##################
+############################################## Manager List View ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class ManagerListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Manager_List.html"
@@ -718,69 +613,7 @@ class ManagerListView(LoginRequiredMixin, View):
             },
         )
 
-
-# #### manager detail view ###########
-# @method_decorator(user_role_check, name='dispatch')
-# class ManagerDetailView(View):
-#     template_name = "Admin/User/Manager_Detail.html"
-
-#     def get(self, request, pk, *args, **kwargs):
-#         User = get_user_model()
-
-#         # Fetch the manager using the primary key
-#         manager = get_object_or_404(User, pk=pk, role_id=6)
-
-#         # Fetch the team branch associated with this manager
-#         team_branch = JoinBranch.objects.filter(
-#             user_id=manager, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
-#         ).select_related("branch_id").first()
-
-#         # Check if manager is associated with a team branch
-#         team_branch_info = (
-#             team_branch if team_branch else "Manager not associated with any team."
-#         )
-
-#         context = {
-#             "user": manager,
-#             "team_branch_info": team_branch_info,
-#         }
-
-#         return render(request, self.template_name, context)
-
-#     def post(self, request, pk, *args, **kwargs):
-#         User = get_user_model()
-
-#         # Fetch the manager using the primary key
-#         manager = get_object_or_404(User, pk=pk, role_id=6)
-
-#         # Handle form data or any actions you want to take on POST request
-#         # Example: Updating manager information based on POST data
-#         manager_data = request.POST.get("manager_data")  # Assuming you have some data to process
-#         if manager_data:
-#             # Process the data (for example, update the manager's profile)
-#             manager.some_field = manager_data
-#             manager.save()
-
-#         # Fetch the team branch associated with this manager again after any updates
-#         team_branch = JoinBranch.objects.filter(
-#             user_id=manager, joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
-#         ).select_related("branch_id").first()
-
-#         # Check if manager is associated with a team branch
-#         team_branch_info = (
-#             team_branch.branch_id.team_name if team_branch else "Manager not associated with any team."
-#         )
-
-#         context = {
-#             "user": manager,
-#             "team_branch_info": team_branch_info,
-#              # Example feedback
-#         }
-
-#         return render(request, self.template_name, context)
-
-
-###### Tournament List #####
+############################################## List of Tournament ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class TournamentListView(LoginRequiredMixin, View):
     template_name = "Admin/Tournament_List.html"  # Specify the template to render
@@ -815,10 +648,7 @@ class TournamentListView(LoginRequiredMixin, View):
             },
         )
 
-
-###### Tournament Detail #####
-
-
+##################################################### Tournament Detail View ###############################################################
 @method_decorator(user_role_check, name="dispatch")
 class TournamentDetailView(View):
     template_name = "Admin/Tournament_detail.html"
@@ -1040,8 +870,7 @@ class TournamentDetailView(View):
 
         return render(request, self.template_name, context)
 
-
-# Default User List View
+############################################## List of Default User ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class DefaultUserList(LoginRequiredMixin, View):
     template_name = "Admin/User/Default_User_List.html"
@@ -1060,7 +889,7 @@ class DefaultUserList(LoginRequiredMixin, View):
             },
         )
 
-
+############################################## User Detail View ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class UserDetailView(LoginRequiredMixin, View):
     template_name = "Admin/User/User_Detail.html"
@@ -1385,7 +1214,7 @@ class UserDetailView(LoginRequiredMixin, View):
             return redirect("Dashboard")
 
 
-
+##############################################  Update Player Stats View ##############################################################
 class UpdatePlayerStatsView(View):
        def post(self, request, *args, **kwargs):
         user_id = kwargs.get("user_id")  # Now you can get user_id from kwargs
@@ -1460,7 +1289,7 @@ class CategoryCreateView(LoginRequiredMixin, View):
             )
         return redirect("category_list")
 
-
+##############################################  User Category Type Module  ################################################
 @method_decorator(user_role_check, name="dispatch")
 class CategoryUpdateView(LoginRequiredMixin, View):
     template_name = "forms/category_form.html"
@@ -1484,7 +1313,7 @@ class CategoryUpdateView(LoginRequiredMixin, View):
             )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  User Category Type Delete Module  ################################################
 @method_decorator(user_role_check, name="dispatch")
 class CategoryDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -1499,7 +1328,7 @@ class CategoryDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Category Type Deleted Successfully.")
         return redirect("category_list")
 
-
+##############################################  User Category Type List Module  ################################################
 @method_decorator(user_role_check, name="dispatch")
 class CategoryListView(LoginRequiredMixin, View):
     template_name = "Admin/Category_List.html"
@@ -1537,7 +1366,7 @@ class RoleCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  User Role Update Module  ################################################
 @method_decorator(user_role_check, name="dispatch")
 class RoleUpdateView(LoginRequiredMixin, View):
     template_name = "Admin/User_Role.html"  # Fixed template name
@@ -1560,7 +1389,7 @@ class RoleUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  User Role Delete Module  ################################################
 @method_decorator(user_role_check, name="dispatch")
 class RoleDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -1575,7 +1404,7 @@ class RoleDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Role Deleted Successfully.")
         return redirect("role_list")
 
-
+##############################################  User Role List Module  ################################################
 @method_decorator(user_role_check, name="dispatch")
 class RoleListView(LoginRequiredMixin, View):
     template_name = "Admin/User_Role.html"
@@ -1587,79 +1416,6 @@ class RoleListView(LoginRequiredMixin, View):
             self.template_name,
             {"roles": roles, "breadcrumb": {"parent": "User", "child": "Role"}},
         )
-
-
-##########################################  Gender CRUD Views  ###########################################
-# class GenderCreateView(LoginRequiredMixin, View):
-#     template_name = "forms/gender_form.html"
-
-#     def get(self, request):
-#         form = GenderForm()
-#         return render(request, self.template_name, {"form": form})
-
-#     def post(self, request):
-#         form = GenderForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Gender created successfully.")
-#             return redirect("gender_list")
-#         messages.error(
-#             request,
-#             "There was an error creating the gender. Please ensure all fields are filled out correctly.",
-#         )
-#         return render(request, self.template_name, {"form": form})
-
-
-# class GenderUpdateView(LoginRequiredMixin, View):
-#     template_name = "forms/gender_form.html"
-
-#     def get(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
-#         form = GenderForm(instance=gender)
-#         return render(request, self.template_name, {"form": form})
-
-#     def post(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
-#         form = GenderForm(request.POST, instance=gender)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Gender was successfully updated.")
-#             return redirect("gender_list")
-#         messages.error(
-#             request,
-#             "There was an error updating the gender. Please ensure all fields are filled out correctly.",
-#         )
-#         return render(request, self.template_name, {"form": form})
-
-
-# class GenderDeleteView(LoginRequiredMixin, View):
-#     def get(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
-#         gender.delete()
-#         messages.success(request, "Gender was successfully deleted.")
-#         return redirect("gender_list")
-
-#     def post(self, request, pk):
-#         gender = get_object_or_404(UserGender, pk=pk)
-#         gender.delete()
-#         messages.success(request, "Gender was successfully deleted.")
-#         return redirect("gender_list")
-
-
-# class GenderListView(LoginRequiredMixin, View):
-#     template_name = "Admin/General_Settings/Gender.html"
-
-#     def get(self, request):
-#         genders = UserGender.objects.all()
-#         return render(
-#             request,
-#             self.template_name,
-#             {
-#                 "genders": genders,
-#                 "breadcrumb": {"parent": "General Settings", "child": "Gender"},
-#             },
-#         )
-
 
 ####################################### fieldcapacity CRUD Views  ########################################################
 @method_decorator(user_role_check, name="dispatch")
@@ -1682,7 +1438,7 @@ class FieldCapacityCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  Filed Capacity Update ################################################
 @method_decorator(user_role_check, name="dispatch")
 class FieldCapacityUpdateView(LoginRequiredMixin, View):
     template_name = "forms/fieldcapacity_form.html"
@@ -1705,7 +1461,7 @@ class FieldCapacityUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  Filed Capacity Delete ################################################
 @method_decorator(user_role_check, name="dispatch")
 class FieldCapacityDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -1720,7 +1476,7 @@ class FieldCapacityDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Field Capacity Successfully Deleted.")
         return redirect("fieldcapacity_list")
 
-
+##############################################  Filed Capacity List ################################################
 @method_decorator(user_role_check, name="dispatch")
 class FieldCapacityListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/FieldCapacity.html"
@@ -1758,7 +1514,7 @@ class GroundMaterialCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  Ground Material Update ################################################
 @method_decorator(user_role_check, name="dispatch")
 class GroundMaterialUpdateView(LoginRequiredMixin, View):
     template_name = "forms/groundmaterial_form.html"
@@ -1781,7 +1537,7 @@ class GroundMaterialUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  Ground Material Delete ################################################
 @method_decorator(user_role_check, name="dispatch")
 class GroundMaterialDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -1796,7 +1552,7 @@ class GroundMaterialDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Ground Material successfully deleted.")
         return redirect("groundmaterial_list")
 
-
+##############################################  Ground Material List ################################################
 @method_decorator(user_role_check, name="dispatch")
 class GroundMaterialListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/GroundMaterial.html"
@@ -1836,7 +1592,7 @@ class EventTypeCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  Event Type Update ################################################
 @method_decorator(user_role_check, name="dispatch")
 class EventTypeUpdateView(LoginRequiredMixin, View):
     template_name = "forms/eventtype_form.html"
@@ -1859,7 +1615,7 @@ class EventTypeUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+##############################################  Event Type Delete ################################################
 @method_decorator(user_role_check, name="dispatch")
 class EventTypeDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -1874,7 +1630,7 @@ class EventTypeDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Event Type successfully deleted.")
         return redirect("eventtype_list")
 
-
+##############################################  Event Type List ################################################
 @method_decorator(user_role_check, name="dispatch")
 class EventTypeListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/EventType.html"
@@ -1922,8 +1678,7 @@ class FieldListView(LoginRequiredMixin, View):
             },
         )
 
-
-############ Event Detail ###################
+########### Field Create #################
 @method_decorator(user_role_check, name="dispatch")
 class FieldDetailView(LoginRequiredMixin, View):
     template_name = "Admin/FieldsData/field_detail.html"
@@ -2003,7 +1758,7 @@ class EventListView(LoginRequiredMixin, View):
             },
         )
 
-
+########### Event Approval #################
 @method_decorator(user_role_check, name="dispatch")
 class EventApprovalView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2147,7 +1902,7 @@ class NewsListView(LoginRequiredMixin, View):
             },
         )
 
-
+####################################### News Creation View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class NewsCreateView(View):
     def post(self, request):
@@ -2187,7 +1942,7 @@ class NewsCreateView(View):
         messages.success(request, "News created successfully.")
         return redirect("news_list")
 
-
+####################################### News Edit View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class NewsEditView(View):
     template_name = "Admin/News_List.html"
@@ -2237,7 +1992,7 @@ class NewsEditView(View):
         messages.success(request, "News updated successfully.")
         return redirect("news_list")
 
-
+####################################### News Delete View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class NewsDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2339,7 +2094,7 @@ class PartnersEditView(View):
         messages.success(request, "Partner updated successfully.")
         return redirect("partners_list")
 
-
+####################################### Partner Delete View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class PartnersDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2442,7 +2197,7 @@ class Global_ClientsEditView(View):
         messages.success(request, "Global Client updated successfully.")
         return redirect("global_clients_list")
 
-
+####################################### Global Clients Delete View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class Global_ClientsDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2682,7 +2437,7 @@ class TestimonialEditView(View):
         messages.success(request, "Testimonial updated successfully.")
         return redirect("testimonial_list")
 
-
+####################################### Testimonial Delete View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class TestimonialDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2765,31 +2520,22 @@ class Team_MembersEditView(View):
 
         image_file = request.FILES.get("image")
         if image_file:
-            # Generate a random string of 8 characters for the file name
             unique_suffix = get_random_string(8)
-            # Extract the file extension from the uploaded image
             file_extension = os.path.splitext(image_file.name)[1]
-            # Create a new unique image name
             image_name = f"team_members/{unique_suffix}{file_extension}"
-
-            # Save the new image to the file system
             fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             if team_members_item.image and team_members_item.image.path:
                 old_image_path = team_members_item.image.path
                 if os.path.exists(old_image_path):
-                    os.remove(old_image_path)  # Delete the old image
+                    os.remove(old_image_path)
 
-            # Save the new image file and update the team member entry
             fs.save(image_name, image_file)
-            team_members_item.image = image_name  # Save the relative image path in the database
-
-        # Save the updated team member entry
+            team_members_item.image = image_name 
         team_members_item.save()
-
         messages.success(request, "Team Member updated successfully.")
         return redirect("team_members_list")
 
-
+####################################### Team Member Delete View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class Team_MembersDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2897,7 +2643,7 @@ class App_FeatureEditView(View):
         messages.success(request, "App Feature updated successfully.")
         return redirect("app_feature_list")
 
-
+####################################### App Feature Delete View ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class App_FeatureDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -2928,7 +2674,7 @@ class Slider_ContentCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+#################################################   Slider Content Update Views  #######################################################
 @method_decorator(user_role_check, name="dispatch")
 class Slider_ContentUpdateView(LoginRequiredMixin, View):
     template_name = "forms/slider_content_form.html"
@@ -2951,7 +2697,7 @@ class Slider_ContentUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+#################################################   Slider Content Delete Views  #######################################################
 @method_decorator(user_role_check, name="dispatch")
 class Slider_ContentDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -2966,7 +2712,7 @@ class Slider_ContentDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Slider Content Successfully Deleted.")
         return redirect("slider_content_list")
 
-
+#################################################   Slider Content List Views  #######################################################
 @method_decorator(user_role_check, name="dispatch")
 class Slider_ContentListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/Slider_Content.html"
@@ -2981,7 +2727,6 @@ class Slider_ContentListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Slider Content"},
             },
         )
-
 
 ########################## CMS PAGES #################################
 @method_decorator(user_role_check, name="dispatch")
@@ -3015,7 +2760,7 @@ class cms_contactpage(LoginRequiredMixin, View):
 
         return render(request, self.template_name, context)
 
-
+######################################## cms_contact_page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def savecontactpage(request):
@@ -3120,7 +2865,6 @@ def savecontactpage(request):
                 contactussave.heading_title_ar = heading_title_ar
                 contactussave.heading_content_en = heading_content_en
                 contactussave.heading_content_ar = heading_content_ar
-                # contactussave.heading_banner = heading_banner
 
                 # section 2
                 contactussave.section_2_heading_en = sub_heading_title_en
@@ -3130,10 +2874,6 @@ def savecontactpage(request):
                 # section 2 country_name
                 contactussave.section_2_country_name_en = country_name_en
                 contactussave.section_2_country_name_ar = country_name_ar
-
-                # section 2 mailicon and phoneicon
-                # contactussave.sub_section_2_1_icon = mailicon
-                # contactussave.sub_section_2_2_icon = phoneicon
 
                 # section 3
                 contactussave.section_3_heading_en = sub_heading_name_en
@@ -3151,7 +2891,6 @@ def savecontactpage(request):
                 dom = "True"
 
                 messages.success(request, "Contact Page Updated Successfully")
-                # return redirect("cms_contactpage")
 
             except Exception as e:
                 messages.error(request, "Error Saving!")
@@ -3174,7 +2913,7 @@ def savecontactpage(request):
         return JsonResponse(response_data)
 
 
-# cms_about_page
+######################################## cms about page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_aboutpage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/aboutus.html"
@@ -3185,7 +2924,7 @@ class cms_aboutpage(LoginRequiredMixin, View):
         context = {"data": dataFilter}
         return render(request, self.template_name, context)
 
-
+######################################## cms about page Save  ##############################################################
 @user_role_check
 @csrf_exempt
 def saveAboutUspage(request):
@@ -3287,7 +3026,7 @@ def saveAboutUspage(request):
         return JsonResponse(response_data)
 
 
-# cms_about_page
+######################################## cms news page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_newsPage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/news.html"
@@ -3300,7 +3039,7 @@ class cms_newsPage(LoginRequiredMixin, View):
 
         return render(request, self.template_name, context)
 
-
+######################################## cms news page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def savenewspage(request):
@@ -3316,15 +3055,11 @@ def savenewspage(request):
             seo_title_ar = request.POST.get("meta-title-ar")
             seo_content_en = request.POST.get("meta-content-en")
             seo_content_ar = request.POST.get("meta-content-ar")
-
             dom = "Done"
             imageName = []
-
             try:
                 savenews = cms_pages.objects.get(id="4")
-
                 if "heading_banner" in request.FILES:
-
                     heading_banner = request.FILES.get("heading_banner", None)
                     if heading_banner:
                         try:
@@ -3339,12 +3074,10 @@ def savenewspage(request):
                                     destination.write(chunk)
                                     imageName.append(heading_banner.name)
                                     savenews.heading_banner = heading_banner
-
                         except Exception as e:
                             dom = str(e)
                 else:
                     pass
-
                 savenews.heading_title_en = heading_title_en
                 savenews.heading_title_ar = heading_title_ar
                 savenews.heading_content_en = heading_content_en
@@ -3353,13 +3086,9 @@ def savenewspage(request):
                 savenews.meta_title_ar = seo_title_ar
                 savenews.meta_content_en = seo_content_en
                 savenews.meta_content_ar = seo_content_ar
-
                 savenews.save()
-
                 dom = "True"
-
                 messages.success(request, "News Page Updated Successfully")
-
             except Exception as e:
                 messages.error(request, str(e))
             response_data = {
@@ -3367,20 +3096,16 @@ def savenewspage(request):
                 "message": "Data uploaded successfully",
                 "heading_title_en": dom,
             }
-
             return JsonResponse(response_data)
-
         else:
             response_data = {"status": "error", "message": "Missing data or image file"}
-
             return JsonResponse(response_data)
     except Exception as e:
         response_data = {"status": "error", "message": str(e)}
-
         return JsonResponse(response_data)
 
 
-# cms_about_page
+######################################## cms success story page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_successStory(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/successtory.html"
@@ -3393,7 +3118,7 @@ class cms_successStory(LoginRequiredMixin, View):
 
         return render(request, self.template_name, context)
 
-
+######################################## cms success story page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def saveSucessStorypage(request):
@@ -3411,15 +3136,11 @@ def saveSucessStorypage(request):
             seo_title_ar = request.POST.get("meta-title-ar")
             seo_content_en = request.POST.get("meta-content-en")
             seo_content_ar = request.POST.get("meta-content-ar")
-
             dom = "Done"
             imageName = []
-
             try:
                 successstorysave = cms_pages.objects.get(id="3")
-
                 if "heading_banner" in request.FILES:
-
                     heading_banner = request.FILES.get("heading_banner", None)
                     if heading_banner:
                         try:
@@ -3427,19 +3148,16 @@ def saveSucessStorypage(request):
                                 settings.MEDIA_ROOT, "cmspages", heading_banner.name
                             )
                             os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
                             # Save the file
                             with open(save_path, "wb+") as destination:
                                 for chunk in heading_banner.chunks():
                                     destination.write(chunk)
                                     imageName.append(heading_banner.name)
                                     successstorysave.heading_banner = heading_banner
-
                         except Exception as e:
                             dom = str(e)
                 else:
                     pass
-
                 successstorysave.heading_title_en = heading_title_en
                 successstorysave.heading_title_ar = heading_title_ar
                 successstorysave.heading_content_en = heading_content_en
@@ -3450,35 +3168,27 @@ def saveSucessStorypage(request):
                 successstorysave.meta_title_ar = seo_title_ar
                 successstorysave.meta_content_en = seo_content_en
                 successstorysave.meta_content_ar = seo_content_ar
-
                 successstorysave.save()
-
                 dom = "True"
 
                 messages.success(request, "Success Story Page Updated Successfully")
-
             except Exception as e:
                 messages.error(request, str(e))
-
             response_data = {
                 "status": "success",
                 "message": "Data uploaded successfully",
                 "heading_title_en": dom,
             }
-
             return JsonResponse(response_data)
-
         else:
             response_data = {"status": "error", "message": "Missing data or image file"}
 
             return JsonResponse(response_data)
     except Exception as e:
         response_data = {"status": "error", "message": str(e)}
-
         return JsonResponse(response_data)
 
-
-# cms_about_page
+######################################## cms term and condition page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_termcondition(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/term&condition.html"
@@ -3486,15 +3196,11 @@ class cms_termcondition(LoginRequiredMixin, View):
     def get(self, request):
 
         dataFilter = cms_pages.objects.get(name_en="Terms & Condition")
-
         context = {"data": dataFilter}
-
         return render(request, self.template_name, context)
-
     def post(self, request):
         return savetermconditionpage(request)  # Reuse the existing function
-
-
+######################################## cms term and condition page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def savetermconditionpage(request):
@@ -3520,15 +3226,11 @@ def savetermconditionpage(request):
                 termcondition.meta_title_ar = seo_title_ar
                 termcondition.meta_content_en = seo_content_en
                 termcondition.meta_content_ar = seo_content_ar
-
                 termcondition.save()
-
                 messages.success(
                     request, "Term and Condition Page Updated Successfully"
                 )
                 return redirect("termcondition")
-
-
             except Exception as e:
                 messages.error(request, str(e))
 
@@ -3538,20 +3240,15 @@ def savetermconditionpage(request):
                     "status": "success",
                     "message": saving_error,
                 }
-
             return JsonResponse(response_data)
-
         else:
             response_data = {"status": "error", "message": "Missing data or image file"}
-
             return JsonResponse(response_data)
     except Exception as e:
         response_data = {"status": "error", "message": str(e)}
-
         return JsonResponse(response_data)
 
-
-# cms privacy policy page
+######################################## cms privacy policy page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_privacypolicy(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/privacypolicy.html"
@@ -3566,7 +3263,7 @@ class cms_privacypolicy(LoginRequiredMixin, View):
     def post(self, request):
         return saveprivacypolicypage(request)  # Reuse the existing function
 
-
+######################################## cms privacy policy page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def saveprivacypolicypage(request):
@@ -3605,20 +3302,15 @@ def saveprivacypolicypage(request):
                     "status": "success",
                     "message": saving_error,
                 }
-
             return JsonResponse(response_data)
-
         else:
             response_data = {"status": "error", "message": "Missing data or image file"}
-
             return JsonResponse(response_data)
     except Exception as e:
         response_data = {"status": "error", "message": str(e)}
-
         return JsonResponse(response_data)
 
-
-# cms term and service
+######################################## cms term and service page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_termandserice(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/term&service.html"
@@ -3637,7 +3329,7 @@ class cms_termandserice(LoginRequiredMixin, View):
         return savetermservicepage(request)  # Reuse the existing function
 
 
-# save term and condition
+######################################## cms term and service page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def savetermservicepage(request):
@@ -3646,8 +3338,6 @@ def savetermservicepage(request):
         if request.method == "POST":
             saving_error = "None"
             dom = "Done"
-
-            # text
             ts_title_en = request.POST.get("ts-title-en")
             ts_title_ar = request.POST.get("ts-title-ar")
             ts_content_en = request.POST.get("ts-content-en")
@@ -3666,36 +3356,26 @@ def savetermservicepage(request):
                 termservice.meta_title_ar = seo_title_ar
                 termservice.meta_content_en = seo_content_en
                 termservice.meta_content_ar = seo_content_ar
-
                 termservice.save()
-
                 dom = "True"
-
                 messages.success(request, "Term and service Page Updated Successfully")
                 return redirect("cms_termandservicepage")
-
             except Exception as e:
                 messages.error(request, str(e))
                 saving_error = str(e)
-
                 response_data = {
                     "status": "success",
                     "message": saving_error,
                 }
-
             return JsonResponse(response_data)
-
         else:
             response_data = {"status": "error", "message": "Missing data or image file"}
-
             return JsonResponse(response_data)
     except Exception as e:
         response_data = {"status": "error", "message": str(e)}
-
         return JsonResponse(response_data)
 
-
-# cms news detail
+######################################## cms news detail page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_newsdetail(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/newsdetail.html"
@@ -3706,8 +3386,7 @@ class cms_newsdetail(LoginRequiredMixin, View):
         context = {"data": dataFilter}
         return render(request, self.template_name, context)
 
-
-# cms news detail
+######################################## cms news detail page Save  ##############################################################
 @csrf_exempt
 @user_role_check
 def savenewsdetail(request):
@@ -3716,17 +3395,14 @@ def savenewsdetail(request):
             # text
             heading_title_en = request.POST.get("nd_title_en")
             heading_title_ar = request.POST.get("nd_title_ar")
-            # heading_section_video  = request.FILES['heading_section_video']
             heading_content_en = request.POST.get("nd_content_en")
             heading_content_ar = request.POST.get("nd_content_ar")
             seo_title_en = request.POST.get("seo_title_en")
             seo_title_ar = request.POST.get("seo_title_ar")
             seo_content_en = request.POST.get("seo_content_en")
             seo_content_ar = request.POST.get("seo_content_ar")
-
             dom = "Done"
             imageName = []
-
             try:
                 savenewsdetail = cms_pages.objects.get(id="5")
 
@@ -3746,12 +3422,10 @@ def savenewsdetail(request):
                                     destination.write(chunk)
                                     imageName.append(heading_banner.name)
                                     savenewsdetail.heading_banner = heading_banner
-
                         except Exception as e:
                             dom = str(e)
                 else:
                     pass
-
                 savenewsdetail.section_2_title_en = heading_title_en
                 savenewsdetail.section_2_title_ar = heading_title_ar
                 savenewsdetail.section_2_content_en = heading_content_en
@@ -3760,35 +3434,25 @@ def savenewsdetail(request):
                 savenewsdetail.meta_title_ar = seo_title_ar
                 savenewsdetail.meta_content_en = seo_content_en
                 savenewsdetail.meta_content_ar = seo_content_ar
-
                 savenewsdetail.save()
-
                 dom = "True"
-
                 messages.success(request, "News Detail Page Updated Successfully")
-
             except Exception as e:
                 messages.error(request, str(e))
-
             response_data = {
                 "status": "success",
                 "message": "Data uploaded successfully",
                 "heading_title_en": dom,
             }
-
             return JsonResponse(response_data)
-
         else:
             response_data = {"status": "error", "message": "Missing data or image file"}
-
             return JsonResponse(response_data)
     except Exception as e:
         response_data = {"status": "error", "message": str(e)}
-
         return JsonResponse(response_data)
 
-
-# cms descovery page
+######################################## cms Discovery Page ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_discoverypage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/discovery.html"
@@ -3809,12 +3473,7 @@ class cms_discoverypage(LoginRequiredMixin, View):
         }
         return render(request, self.template_name, context)
 
-
-# cms discover
-
-
-# discover page
-# cms discover
+######################################## cms Discovery Page Save ##############################################################
 @csrf_exempt
 @user_role_check
 def saveDiscoverdetail(request):
@@ -3950,7 +3609,6 @@ def saveDiscoverdetail(request):
                     who_count = request.POST.get("who_passed")
                     if who_count:
                         who_deleted_field = request.POST.get("deleted_who_field")
-
                         if "deleted_who_field" in request.POST:
                             if "," in who_deleted_field:
                                 deleted_who_list = who_deleted_field.split(",")
@@ -3961,7 +3619,6 @@ def saveDiscoverdetail(request):
                                 deleted_who_list = [
                                     int(item) for item in deleted_who_list
                                 ]
-
                         else:
                             deleted_who_list = []
                         # Convert strings to integers
@@ -3971,8 +3628,6 @@ def saveDiscoverdetail(request):
                             if str(i) in deleted_who_list:
                                 pass
                             else:
-                               
-
                                 unique_id = request.POST.get("uwid_{}".format(i))
                                 if unique_id != "":
 
@@ -3999,13 +3654,10 @@ def saveDiscoverdetail(request):
                                     )
 
                                     if existing_who_record:
-                                        # Update the existing record
-
                                         existing_who_record.title_en = who_title_en
                                         existing_who_record.title_ar = who_title_ar
                                         existing_who_record.content_en = who_content_en
                                         existing_who_record.content_ar = who_content_ar
-
                                         existing_who_record.save()
                                     else:
                                         savediscoveryview = cms_dicovery_dynamic_view(
@@ -4016,9 +3668,7 @@ def saveDiscoverdetail(request):
                                             content_ar=who_content_ar,
                                         )
                                         savediscoveryview.save()
-
                     game_image = request.POST.get("header_image")
-
                     if game_image:
                         image_deleted_field = request.POST.get("deleted_image_field")
 
@@ -4032,11 +3682,9 @@ def saveDiscoverdetail(request):
                                 deleted_image_list = [
                                     int(item) for item in deleted_image_list
                                 ]
-
                         else:
                             deleted_image_list = []
                         # Convert strings to integers
-
                         if game_image != None:
                             for i in range(2, int(game_image) + 1):
 
@@ -4054,7 +3702,6 @@ def saveDiscoverdetail(request):
                                                 field_id=unique_id
                                             ).first()
                                         )
-
                                         image = request.FILES.get(
                                             "image_{}".format(str(i)), None
                                         )
@@ -4077,21 +3724,15 @@ def saveDiscoverdetail(request):
                                                 ) as destination:
                                                     for chunk in image.chunks():
                                                         destination.write(chunk)
-                                                        # imageName.append(heading_banner.name)
-                                                        # savenewsdetail.heading_banner = heading_banner
-
                                             except Exception as e:
                                                 dom = str(e)
-
                                         if existing_record:
-                                            # Update the existing record
-
                                             if (
                                                 image
-                                            ):  # Update the image if a new one is uploaded
+                                            ):
                                                 existing_record.images = image
 
-                                            existing_record.save()  # Save the updated record
+                                            existing_record.save()
                                         else:
                                             savediscoveryimage_view = (
                                                 cms_dicovery_dynamic_image(
@@ -4101,29 +3742,23 @@ def saveDiscoverdetail(request):
                                             savediscoveryimage_view.save()
 
                     if "discovery_game_image" in request.FILES:
-
                         game_image = request.FILES.get("discovery_game_image", None)
-
                         if game_image:
                             try:
                                 save_path = os.path.join(
                                     settings.MEDIA_ROOT, "cmspages", game_image.name
                                 )
                                 os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
                                 # Save the file
                                 with open(save_path, "wb+") as destination:
                                     for chunk in game_image.chunks():
                                         destination.write(chunk)
                                         # imageName.append(heading_banner.name)
                                         discover_page.section_2_images = game_image
-
                             except Exception as e:
                                 messages.error(request, str(e))
-
                     else:
                         pass
-
                     if "discover_heading_image" in request.FILES:
 
                         heading_image = request.FILES.get(
@@ -4135,26 +3770,19 @@ def saveDiscoverdetail(request):
                                     settings.MEDIA_ROOT, "cmspages", heading_image.name
                                 )
                                 os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-                                # Save the file
                                 with open(save_path, "wb+") as destination:
                                     for chunk in heading_image.chunks():
                                         destination.write(chunk)
-                                        # imageName.append(heading_banner.name)
                                         discover_page.heading_banner = heading_image
-
                             except Exception as e:
                                 messages.error(request, str(e))
-
                     else:
                         pass
-
                     if "discover_training_sec_1_image_field" in request.FILES:
 
                         training_1_image = request.FILES.get(
                             "discover_training_sec_1_image_field", None
                         )
-
                         if training_1_image:
                             try:
                                 save_path = os.path.join(
@@ -4164,27 +3792,22 @@ def saveDiscoverdetail(request):
                                 )
                                 os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
-                                # Save the file
                                 with open(save_path, "wb+") as destination:
                                     for chunk in training_1_image.chunks():
                                         destination.write(chunk)
-                                        # imageName.append(heading_banner.name)
                                         discover_page.sub_section_2_1_icon = (
                                             training_1_image
                                         )
 
                             except Exception as e:
                                 messages.error(request, str(e))
-
                     else:
                         pass
 
                     if "discover_training_sec_2_image_field" in request.FILES:
-
                         training_2_image = request.FILES.get(
                             "discover_training_sec_2_image_field", None
                         )
-
                         if training_2_image:
                             try:
                                 save_path = os.path.join(
@@ -4198,43 +3821,33 @@ def saveDiscoverdetail(request):
                                 with open(save_path, "wb+") as destination:
                                     for chunk in training_2_image.chunks():
                                         destination.write(chunk)
-                                        # imageName.append(heading_banner.name)
                                         discover_page.sub_section_2_2_icon = (
                                             training_2_image
                                         )
-
                             except Exception as e:
                                 messages.error(request, str(e))
-
                     else:
                         pass
-
                     if "why_Choose_us_image_field" in request.FILES:
-
                         who_image = request.FILES.get("why_Choose_us_image_field", None)
-
                         if who_image:
                             try:
                                 save_path = os.path.join(
                                     settings.MEDIA_ROOT, "cmspages", who_image.name
                                 )
                                 os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
                                 # Save the file
                                 with open(save_path, "wb+") as destination:
                                     for chunk in who_image.chunks():
                                         destination.write(chunk)
                                         # imageName.append(heading_banner.name)
                                         discover_page.section_3_image = who_image
-
                             except Exception as e:
                                 messages.error(request, str(e))
-
                     else:
                         pass
 
                     discover_page.save()
-
                     if "dyanmic_deleted_field" in request.POST:
 
                         try:
@@ -4296,7 +3909,7 @@ def saveDiscoverdetail(request):
         return JsonResponse(response_data)
 
 
-# cms Advertise page
+######################################## cms advertise page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_advertisepage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/advertise.html"
@@ -4317,7 +3930,7 @@ class cms_advertisepage(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-# cms advertise
+######################################## cms advertise page Save  ##############################################################
 @user_role_check
 @csrf_exempt
 def saveadvertisedetail(request):
@@ -5185,7 +4798,7 @@ def saveadvertisedetail(request):
         messages.error(request, str(e))
 
 
-# home page
+######################################## cms Home page  ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_homepage(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/home.html"
@@ -5203,7 +4816,7 @@ class cms_homepage(LoginRequiredMixin, View):
         )
 
 
-# cms home
+######################################## cms Home page Save  ##############################################################
 @user_role_check
 @csrf_exempt
 def savehomedetail(request):
@@ -5339,11 +4952,8 @@ def savehomedetail(request):
                     i += 1
                 else:
                     break
-            # dom = "Done"
-            # imageName = []
-
+        
             try:
-                # savenewsdetail = cms_pages.objects.get(id = "5")
 
                 savehomedetail = cms_pages.objects.get(id="1")
 
@@ -5440,8 +5050,6 @@ def savehomedetail(request):
                 savehomedetail.meta_content_ar = seo_content_ar
 
                 feature_count = request.POST.get("features_passed")
-
-            
                 if feature_count:
                     for i in range(int(feature_count) + 1):
 
@@ -5998,7 +5606,7 @@ def savehomedetail(request):
 
         return JsonResponse(response_data)
 
-
+######################################## cms Login Page ######################################## 
 @method_decorator(user_role_check, name="dispatch")
 class cms_Login(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/login.html"
@@ -6014,7 +5622,7 @@ class cms_Login(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-# cms Login
+####################################### CMS Login Page Save ########################################
 @csrf_exempt
 @user_role_check
 def savelogindetail(request):
@@ -6066,7 +5674,7 @@ def savelogindetail(request):
 
         return JsonResponse(response_data)
 
-
+######################################## CMS Registration Page ########################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_registration(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/registration.html"
@@ -6081,7 +5689,7 @@ class cms_registration(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-# cms Login
+######################################## CMS Registration Page Save ########################################
 @user_role_check
 @csrf_exempt
 def saveregdetail(request):
@@ -6133,7 +5741,7 @@ def saveregdetail(request):
 
         return JsonResponse(response_data)
 
-
+######################################## CMS Dashboard Page ########################################
 @method_decorator(user_role_check, name="dispatch")
 class cms_dashboard(LoginRequiredMixin, View):
     template_name = "Admin/cmspages/dashboard.html"
@@ -6148,7 +5756,7 @@ class cms_dashboard(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-# cms Login
+######################################## CMS Dashboard Page Save ########################################
 @user_role_check
 @csrf_exempt
 def savedashdetail(request):
@@ -6280,7 +5888,7 @@ class MobileDashboardBannerEditView(View):
         messages.success(request, "Banner updated successfully.")
         return redirect("dashboard_banner_list")
 
-
+# Mobile Dashboard Banner Delete View
 @method_decorator(user_role_check, name='dispatch')
 class MobileDashboardBannerDeleteView(View):
     def post(self, request, pk):
@@ -6310,7 +5918,7 @@ class ReportListView(LoginRequiredMixin, View):
             },
         )
 
-
+######################################################### Report Create Module ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class ReportCreateView(View):
     def post(self, request):
@@ -6323,10 +5931,6 @@ class ReportCreateView(View):
             messages.error(request, "Title and Description are required.")
             return redirect("report_list")
 
-        # if not title_en or  content_en or  title_ar or  content_ar:
-        #     messages.error(request, "Title and Content are required.")
-        #     return redirect("report_list")
-
         report = Report.objects.create(
             title_en=title_en,
             title_ar=title_ar,
@@ -6337,7 +5941,7 @@ class ReportCreateView(View):
         messages.success(request, "Report created successfully.")
         return redirect("report_list")
 
-
+######################################################### Report Edit Module ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class ReportEditView(View):
     template_name = "Admin/MobileApp/Report/report.html"
@@ -6374,7 +5978,7 @@ class ReportEditView(View):
         messages.success(request, "Report updated successfully.")
         return redirect("report_list")
 
-
+######################################################### Report Delete Module ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class ReportDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -6385,7 +5989,6 @@ class ReportDeleteView(LoginRequiredMixin, View):
 
 
 ######################################################### Post  Report's List Module ###############################################
-
 
 @method_decorator(user_role_check, name="dispatch")
 class PostReportListView(LoginRequiredMixin, View):
@@ -6422,7 +6025,7 @@ class PostReportListView(LoginRequiredMixin, View):
             },
         )
 
-
+######################################################### Post Report Detail Module ###############################################
 @method_decorator(user_role_check, name="dispatch")
 class PostReportDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
@@ -6793,7 +6396,7 @@ class PlayingPositionListView(LoginRequiredMixin, View):
             },
         )
 
-
+################################################################# Playing Position Create Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class PlayingPositionCreateView(LoginRequiredMixin, View):
     def post(self, request):
@@ -6814,7 +6417,7 @@ class PlayingPositionCreateView(LoginRequiredMixin, View):
         messages.success(request, "Playing Position Added successfully.")
         return redirect("playing_position_list")
 
-
+################################################################# Playing Position Edit Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class PlayingPositionEditView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/playing_position.html"
@@ -6851,7 +6454,7 @@ class PlayingPositionEditView(LoginRequiredMixin, View):
         return redirect("playing_position_list")
 
 
-################################################################# AgeGroup CRUD Views ###################################################
+################################################################# Age Group create Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class AgeGroupCreateView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/AgeGroup.html"
@@ -6872,7 +6475,7 @@ class AgeGroupCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+################################################################# Age Group uPDATE Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class AgeGroupUpdateView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/AgeGroup.html"  # Fixed template name
@@ -6895,7 +6498,7 @@ class AgeGroupUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+################################################################# Age Group Delete Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class AgeGroupDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -6910,7 +6513,7 @@ class AgeGroupDeleteView(LoginRequiredMixin, View):
         messages.success(request, "AgeGroup Deleted Successfully.")
         return redirect("agegroup_list")
 
-
+################################################################# Age Group List Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class AgeGroupListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/AgeGroup.html"
@@ -6927,7 +6530,7 @@ class AgeGroupListView(LoginRequiredMixin, View):
         )
 
 
-################################################################# Injury Type CRUD Views ###################################################
+################################################################# Injury Type Create Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class InjuryTypeCreateView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/InjuryType.html"
@@ -6948,7 +6551,7 @@ class InjuryTypeCreateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+################################################################# Injury Type Update Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class InjuryTypeUpdateView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/InjuryType.html"  # Fixed template name
@@ -6971,7 +6574,7 @@ class InjuryTypeUpdateView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
-
+################################################################# Injury Type Delete Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class InjuryTypeDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -6986,7 +6589,7 @@ class InjuryTypeDeleteView(LoginRequiredMixin, View):
         messages.success(request, "Injury Type Deleted Successfully.")
         return redirect("injurytype_list")
 
-
+################################################################# Injury Type List Views ###################################################
 @method_decorator(user_role_check, name="dispatch")
 class InjuryTypeListView(LoginRequiredMixin, View):
     template_name = "Admin/General_Settings/InjuryType.html"
