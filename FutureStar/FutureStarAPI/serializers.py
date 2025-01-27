@@ -1,16 +1,13 @@
-import mimetypes
 from rest_framework import serializers
 from FutureStar_App.models import User
 from urllib.parse import urlparse
 from FutureStarAPI.models import *
-from django.core.files.images import get_image_dimensions
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext as _
-
 from django.utils.crypto import get_random_string
 
-
-
+# Define the serializers here
+############################# User Registration Serializer #####################################
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
@@ -45,7 +42,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-
+############################# User Login Serializer #####################################
 class LoginSerializer(serializers.Serializer):
     type = serializers.IntegerField(required=True)  # Add type field to distinguish login types
     username = serializers.CharField(required=False)
@@ -87,23 +84,23 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError(_(" ".join(errors)))
         return data
 
-
-##### Delete User Seralizer #####
-# class UserDeleteSerializer(serializers.Serializer):
-#     deleted_reason_id = serializers.IntegerField(required=True)
-#     deleted_reason = serializers.CharField(max_length=255)
-
+############################# User Profile Update Serializer #####################################
 class ForgotPasswordSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Adjust max_length based on your phone number format
 
+############################# User Profile Update Serializer #####################################
 class OTPVerificationSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Same as above
     otp = serializers.CharField(max_length=6)      # Assuming OTP is a 6-digit code
+
+
+############################# User Profile Update Serializer #####################################
 
 class ChangePasswordOtpSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20)  # Same as above
     new_password = serializers.CharField(min_length=8)  # Ensure a minimum length for security
 
+############################# User Profile Update Serializer #####################################
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -111,7 +108,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_profile_picture(self, obj):
         return obj.profile_picture.url if obj.profile_picture else None  
+    
 
+############################# User Post Comment Update Serializer #####################################
 class PostCommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
     entity = serializers.SerializerMethodField()
@@ -154,9 +153,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
             }
         return None
 
-
-
-
+############################# Post   Serializer #####################################
 class PostSerializer(serializers.ModelSerializer):
     entity = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
@@ -304,12 +301,13 @@ class PostSerializer(serializers.ModelSerializer):
         return instance
 
 
-
+############################# Filed Capacity Serializer #####################################
 class FieldCapacitySerializer(serializers.ModelSerializer):
     class Meta:
         model = FieldCapacity
         fields = '__all__'
 
+############################# Ground Material Type Serializer #####################################
 class GroundMaterialSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
 
@@ -327,7 +325,7 @@ class GroundMaterialSerializer(serializers.ModelSerializer):
             return obj.name_ar
         return obj.name_en
     
-
+############################# Field Type Serializer #####################################
 class FieldSerializer(serializers.ModelSerializer):
     city_id_name= serializers.SerializerMethodField()
     country_id_name = serializers.SerializerMethodField()
@@ -476,18 +474,6 @@ class GallarySerializer(serializers.ModelSerializer):
         logo = default_storage.save(file_name, media_file)
         data['media_file'] = logo  # Update data with the saved file path
 
-        # Check MIME type to determine content type
-        # mime_type, _ = mimetypes.guess_type(logo)
-        # if mime_type:
-        #     if mime_type.startswith('image/'):
-        #         data['content_type'] = 1  # Image type
-        #     elif mime_type.startswith('video/'):
-        #         data['content_type'] = 2  # Video type
-        #     else:
-        #         raise serializers.ValidationError(_("The file must be an image or video."))
-        # else:
-        #     raise serializers.ValidationError(_("The file type could not be determined."))
-
         return data
 
     def to_representation(self, instance):
@@ -524,17 +510,6 @@ class GetGallarySerializer(serializers.ModelSerializer):
         media_file = data.get('media_file')
         if not media_file:
             raise serializers.ValidationError(_("A media file (image or video) must be provided."))
-        
-    #     mime_type, _ = mimetypes.guess_type(media_file.name)
-    #     if mime_type:
-    #         if mime_type.startswith('image/'):
-    #             data['content_type'] = 1
-    #         elif mime_type.startswith('video/'):
-    #             data['content_type'] = 2
-    #         else:
-    #             raise serializers.ValidationError(_("The file must be an image or video."))
-    #     else:
-    #         raise serializers.ValidationError(_("The file type could not be determined."))
         return data
 class DetailAlbumSerializer(serializers.ModelSerializer):
     gallary_items = GallarySerializer(many=True, source='gallery_set', read_only=True)
@@ -570,6 +545,9 @@ class AlbumSerializer(serializers.ModelSerializer):
         
         # Return the content_type if media exists, otherwise None
         return last_media.content_type if last_media else None
+    
+
+   
 class ReportSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
