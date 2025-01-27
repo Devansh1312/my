@@ -11,7 +11,7 @@
             </div>
             <div class="col-6 col-md-6 text-md-end">
                <ol class="breadcrumb">
-                  <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addFieldCapacityModal">Add FieldCapacity</button>
+                  <button class="btn btn-pill btn-outline-primary-2x" data-bs-toggle="modal" data-bs-target="#addFieldCapacityModal">Add Field Capacity</button>
                </ol>
             </div>
          </div>
@@ -26,7 +26,7 @@
                         <thead>
                            <tr>
                               <th>No.</th>
-                              <th>Approx Field Capacity (Players)</th>
+                              <th>Field Capacity</th>
                               <th>Actions</th>
                            </tr>
                         </thead>
@@ -73,18 +73,18 @@
    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="addFieldCapacityModalLabel">Add FieldCapacity (Players)</h5>
+            <h5 class="modal-title" id="addFieldCapacityModalLabel">Add Field Capacity</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
             <form method="post" action="{% url 'fieldcapacity_create' %}" id="addFieldCapacityForm">
                {% csrf_token %}
                <div class="mb-3">
-                  <label for="name" class="form-label">Approx Field Capacity (Players)</label>
+                  <label for="name" class="form-label">Field Capacity</label>
                   <input type="text" class="form-control" id="name" name="name" placeholder="Enter approx field capacity">
                   <div id="addFieldCapacityError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Add Field Capacity (Players)</button>
+               <button type="submit" class="btn btn-primary">Save</button>
             </form>
          </div>
       </div>
@@ -96,7 +96,7 @@
    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="editFieldCapacityModalLabel">Edit FieldCapacity (Players)</h5>
+            <h5 class="modal-title" id="editFieldCapacityModalLabel">Edit Field Capacity</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body">
@@ -104,11 +104,11 @@
                {% csrf_token %}
                <input type="hidden" id="editFieldCapacityId" name="id">
                <div class="mb-3">
-                  <label for="editName" class="form-label">Approx Field Capacity</label>
+                  <label for="editName" class="form-label">Field Capacity</label>
                   <input type="text" class="form-control" id="editName" name="name" placeholder="Enter fieldcapacity name">
                   <div id="editFieldCapacityError" class="text-danger mt-2"></div>
                </div>
-               <button type="submit" class="btn btn-primary">Update Field Capacity (Players)</button>
+               <button type="submit" class="btn btn-primary">Update</button>
             </form>
          </div>
       </div>
@@ -127,8 +127,8 @@
             <form method="post" action="{% url 'fieldcapacity_delete' pk=0 %}" id="deleteFieldCapacityForm">
                {% csrf_token %}
                <input type="hidden" id="deleteFieldCapacityId" name="id">
-               <p>Are you sure you want to delete this fieldcapacity?</p>
-               <button type="submit" class="btn btn-danger">Delete FieldCapacity</button>
+               <p>Are you sure you want to delete this field capacity?</p>
+               <button type="submit" class="btn btn-danger">Delete Field Capacity</button>
             </form>
          </div>
       </div>
