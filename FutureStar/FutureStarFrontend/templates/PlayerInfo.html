@@ -31,32 +31,51 @@
             <div class="col-lg-3 col-sm-6 custome-alignment success-players" style="padding: 0 10px;">
                 <div class="item-wrapper wow fadeInUp delay-0-3s animated">
                     <div class="img-wrapper">
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" class="img-fluid" alt="User Profile Picture">
+                        {% if infouser.profile_picture %}
+                            <img src="{{ infouser.profile_picture.url }}" class="img-fluid" alt="User Profile Picture">
                         {% else %}
                             <img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="Default Player Image">
                         {% endif %}
                     </div>
                     <h5 class="player-name">@{{ infouser.username }}</h5>
-                    <p class="player-designation">{{ infouser.role.name_en }}</p>
+                    <p class="player-designation">
+                        {% if current_language == 'en' %}
+                            {{ infouser.role.name_en }}
+                        {% elif current_language == 'ar' %}
+                            {{ infouser.role.name_ar }}
+                        {% endif %}
+                    
+                       </p>
 
                         <div class="">
                             <div class="contact-info-item mt-35">
                                 <div class="icon">
                                     <i class="fa fa-phone"></i>
                                 </div>
-                                <div class="content" style="text-align: left;">
-                                    <b class="title">Phone</b>
-                                    <span class="text">{{infouser.phone}}</span>
+                                <div class="content" style="text-align: {% if current_language == 'ar' %}right{% else %}left{% endif %};">
+                                    <b class="title">
+                                        {% if current_language == 'en' %}
+                                            Phone
+                                        {% elif current_language == 'ar' %}
+                                            الهاتف
+                                        {% endif %}
+                                    </b>
+                                    <span class="text">{{ infouser.phone }}</span>
                                 </div>
+                                
 
                             </div>
                             <div class="contact-info-item">
                                 <div class="icon">
                                     <i class="fa fa-envelope"></i>
                                 </div>
-                                <div class="content" style="text-align: left;">
-                                    <b class="title">Email</b>
+                                <div class="content" style="text-align: {% if current_language == 'ar' %}right{% else %}left{% endif %};">
+
+                                    <b class="title">{% if current_language == 'en' %}
+                                        Email
+                                    {% elif current_language == 'ar' %}
+                                         إيميل       
+                                    {% endif %}</b>
                                     <span class="text">{{infouser.email}}</span>
                                 </div>
 
@@ -75,7 +94,11 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Game Played</h6>
+                                <h6 class="info-head">  {% if current_language == 'en' %}
+                                    Game Played
+                                {% elif current_language == 'ar' %}
+                                   لعبة تم لعبها     
+                                {% endif %}</h6>
                                 <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
@@ -87,7 +110,12 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Win</h6>
+                                <h6 class="info-head">
+                                 {% if current_language == 'en' %}
+                                    Win
+                                {% elif current_language == 'ar' %}
+                                   فوز  
+                                {% endif %}</h6>
                                 <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
@@ -99,7 +127,11 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Lost</h6>
+                                <h6 class="info-head">  {% if current_language == 'en' %}
+                                    Lost
+                                {% elif current_language == 'ar' %}
+                                  خسارة  
+                                {% endif %}</h6>
                                 <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                             </div>
                         </div>
@@ -111,7 +143,11 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Draw</h6>
+                                <h6 class="info-head">  {% if current_language == 'en' %}
+                                    Draw
+                                {% elif current_language == 'ar' %}
+                                  تعادل   
+                                {% endif %}</h6>
                                 <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
@@ -123,7 +159,11 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Goal Scored</h6>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Goal Scored
+                                {% elif current_language == 'ar' %}
+                                    الأهداف المسجلة
+                                {% endif %}</h6>
                                 <h5 class="score">{{ stats.goals|default:"0" }}</h5>
                             </div>
                         </div>
@@ -135,8 +175,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Assists</h6>
-                                <h5 class="score">{{ stats.assists }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Assists
+                                {% elif current_language == 'ar' %}
+                                    التمريرات الحاسمة
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.assists|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -147,8 +192,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Yellow Card</h6>
-                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Yellow Card
+                                {% elif current_language == 'ar' %}
+                                    بطاقة صفراء
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.yellow_card|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -159,8 +209,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Red Card</h6>
-                                <h5 class="score">{{ stats.red }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Red Card
+                                {% elif current_language == 'ar' %}
+                                    بطاقة حمراء
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.red|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -175,8 +230,12 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Game Coached</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Game Played
+                                {% elif current_language == 'ar' %}
+                                    لعبة لعبت
+                                {% endif %}</h6>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -187,8 +246,14 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Win</h6>
-                                <h5 class="score">{{ stats.win }}</h5>
+                                
+                                <h6 class="info-head">
+                                    {% if current_language == 'en' %}
+                                       Win
+                                   {% elif current_language == 'ar' %}
+                                      فوز  
+                                   {% endif %}</h6>
+                                   <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -199,8 +264,12 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Lost</h6>
-                                <h5 class="score">{{ stats.loss }}</h5>
+                                <h6 class="info-head">  {% if current_language == 'en' %}
+                                    Lost
+                                {% elif current_language == 'ar' %}
+                                  خسارة  
+                                {% endif %}</h6>
+                                <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -211,8 +280,12 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Draw</h6>
-                                <h5 class="score">{{ stats.draw }}</h5>
+                                <h6 class="info-head">  {% if current_language == 'en' %}
+                                    Draw
+                                {% elif current_language == 'ar' %}
+                                  تعادل   
+                                {% endif %}</h6>
+                                <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -223,8 +296,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head"> Team Goal Conceded</h6>
-                                <h5 class="score">{{ stats.goals_conceded }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Team Goal Conceded
+                                {% elif current_language == 'ar' %}
+                                    فريق هدف استقبل
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.goals_conceded|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -235,8 +313,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Yellow Card</h6>
-                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Yellow Card
+                                {% elif current_language == 'ar' %}
+                                    بطاقة صفراء
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.yellow_card|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -247,8 +330,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Red Card</h6>
-                                <h5 class="score">{{ stats.red }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Red Card
+                                {% elif current_language == 'ar' %}
+                                    بطاقة حمراء
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.red|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -264,8 +352,10 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Game Officiating</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h6 class="info-head">
+                                    {% if current_language == 'en' %}Game Officiating{% elif current_language == 'ar' %}غيم أوفيشياتينغ {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -276,8 +366,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Yellow Card</h6>
-                                <h5 class="score">{{ stats.yellow_card }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Yellow Card
+                                {% elif current_language == 'ar' %}
+                                    بطاقة صفراء
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.yellow_card|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -288,8 +383,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Red Card</h6>
-                                <h5 class="score">{{ stats.red }}</h5>
+                                <h6 class="info-head">{% if current_language == 'en' %}
+                                    Red Card
+                                {% elif current_language == 'ar' %}
+                                    بطاقة حمراء
+                                {% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.red|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -304,8 +404,10 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Game Manage</h6>
-                                <h5 class="score">{{ stats.matchplayed }}</h5>
+                                <h6 class="info-head">
+                                    {% if current_language == 'en' %}Game Manage{% elif current_language == 'ar' %}غيم ماناج{% endif %}
+                                </h6>
+                                <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -316,8 +418,13 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Win</h6>
-                                <h5 class="score">{{ stats.win }}</h5>
+                                <h6 class="info-head">
+                                    {% if current_language == 'en' %}
+                                       Win
+                                   {% elif current_language == 'ar' %}
+                                      فوز  
+                                   {% endif %}</h6>
+                                   <h5 class="score">{{ stats.win|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
@@ -327,10 +434,12 @@
                                 <div class="img-wrapper"><img src="{% static 'frontend/assets/images/dashboard/lost.png' %}" class="img-fluid" alt=""></div>
 
                             </div>
-                            <div>
-                                <h6 class="info-head">Lost</h6>
-                                <h5 class="score">{{ stats.loss }}</h5>
-                            </div>
+                            <h6 class="info-head">  {% if current_language == 'en' %}
+                                Lost
+                            {% elif current_language == 'ar' %}
+                              خسارة  
+                            {% endif %}</h6>
+                            <h5 class="score">{{ stats.loss|default:"0" }}</h5>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
@@ -340,23 +449,56 @@
 
                             </div>
                             <div>
-                                <h6 class="info-head">Draw</h6>
-                                <h5 class="score">{{ stats.draw }}</h5>
+                                <h6 class="info-head">  {% if current_language == 'en' %}
+                                    Draw
+                                {% elif current_language == 'ar' %}
+                                  تعادل   
+                                {% endif %}</h6>
+                                <h5 class="score">{{ stats.draw|default:"0" }}</h5>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% endif %}
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Upcoming Game</h5>
+                    <h5>{% if current_language == 'en' %} Upcoming Games {% elif current_language == 'ar' %} الألعاب القادمة {% endif %}
+
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>id </th>
-                                    <th>Match Type</th>
-                                    <th>Teams</th>
-                                    <th>Game Date</th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            id
+                                        {% elif current_language == 'ar' %}
+                                            معرف
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}Match Type{% elif current_language == 'ar' %}نوع المباراة{% endif %}
+
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Teams
+                                        {% elif current_language == 'ar' %}
+                                            الفرق
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Game Date
+                                        {% elif current_language == 'ar' %}
+                                            تاريخ المباراة
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Score
+                                        {% elif current_language == 'ar' %}
+                                            النتيجة
+                                        {% endif %}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -374,25 +516,68 @@
                                     </tr>
                                 {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="4">No Games Found</td></tr>
+                                    <tr><td colspan="4">  {% if current_language == 'en' %}
+                                        No Games Found
+                                    {% elif current_language == 'ar' %}
+                                        لم يتم العثور على ألعاب
+                                    {% endif %}</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>Latest Finish Game</h5>
+                    <h5>
+                        {% if current_language == 'en' %}
+                            Latest Finish Game
+                        {% elif current_language == 'ar' %}
+                            أحدث مباراة منتهية
+                        {% endif %}
+                    </h5>
+                    
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>id </th>
-                                    <th>Match Type</th>
-                                    <th>Teams</th>
-                                    <th>Game Date</th>
-                                    <th>Score</th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            id
+                                        {% elif current_language == 'ar' %}
+                                            معرف
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Match Type
+                                        {% elif current_language == 'ar' %}
+                                            نوع المباراة
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Teams
+                                        {% elif current_language == 'ar' %}
+                                            الفرق
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Game Date
+                                        {% elif current_language == 'ar' %}
+                                             تاريخ المباراة
+
+                                        {% endif %}
+                                    </th>
+                                    <th>
+                                        {% if current_language == 'en' %}
+                                            Score
+                                        {% elif current_language == 'ar' %}
+                                            سكور
+                                        {% endif %}
+                                    </th>
                                 </tr>
                             </thead>
+                            
                             <tbody>
                                 {% if stats.finished_games %}
                                 {% for game in stats.finished_games %}
@@ -409,7 +594,11 @@
                                     </tr>
                                 {% endfor %}
                                 {% else %}
-                                <tr><td colspan="5">No Games Found</td></tr>
+                                <tr><td colspan="5">  {% if current_language == 'en' %}
+                                    No Games Found
+                                {% elif current_language == 'ar' %}
+                                    لم يتم العثور على ألعاب
+                                {% endif %}</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>

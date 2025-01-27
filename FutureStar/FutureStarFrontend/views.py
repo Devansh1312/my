@@ -2605,6 +2605,7 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
 class SearchView(View):
     def get(self, request, *args, **kwargs):
         language_from_url = request.GET.get('Language', None)
+        print("gsd",language_from_url)
         
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session
@@ -3454,6 +3455,36 @@ class PlayerInfoPage(View):
             return {"status": 0, "message": "Failed to fetch referee stats.", "error": str(e)}
 
 
+    def get(self, request, *args, **kwargs):
+        user_id = request.GET.get('user_id')  # Fetch user_id from query parameters
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return redirect('search')
+
+        # Handle language from URL or session
+        language_from_url = request.GET.get('Language', None)
+        if language_from_url:
+            # Save language to the session if it's provided in the URL
+            request.session['language'] = language_from_url
+        else:
+            # Fallback to the session's language or default to 'en'
+            language_from_url = request.session.get('language', 'en')
+
+        if user.role.id == 1:
+            return redirect('Dashboard')
+
+        # Fetch user-related data
+        teams, stats = self.get_user_related_data(user)
+        context = {
+            "current_language": language_from_url,
+            "cmsdata": cms_pages.objects.filter(id=14).first(),
+            "teams": teams,
+            "stats": stats,
+            "infouser": user,
+        }
+
+        return render(request, "PlayerInfo.html", context)
 
     def post(self, request, *args, **kwargs):
         user_id = request.POST.get('user_id')
@@ -3462,6 +3493,7 @@ class PlayerInfoPage(View):
         except User.DoesNotExist:
             return redirect('search')
         language_from_url = request.GET.get('Language', None)
+        
         
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session

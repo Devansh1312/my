@@ -113,77 +113,146 @@
 				<!-- Team Profile Content -->
 				<div class="col-lg-6">
 					<div class="team-profile-content wow fadeInRight delay-0-2s">
-						<h2>{{ team.team_name }}</h2>
-						<span class="designation">{{ team.team_type.name_en }}</span>
-						<p>{{ team.team_id.bio }}</p>
+						<h2>
+							{% if current_language == 'en' %}
+								{{ team.team_name }}
+							{% elif current_language == 'ar' %}
+								{{ team.team_name }}  <!-- Assuming you have an Arabic translation field -->
+							{% endif %}
+						</h2>
+						<span class="designation">
+							{% if current_language == 'en' %}
+								{{ team.team_id.team_type.name_en }}
+							{% elif current_language == 'ar' %}
+								{{ team.team_id.team_type.name_ar }}  <!-- Assuming you have an Arabic translation field -->
+							{% endif %}
+						</span>
+						<p>
+							{% if current_language == 'en' %}
+								{{ team.team_id.bio }}
+							{% elif current_language == 'ar' %}
+								{{ team.team_id.bio }}  <!-- Assuming you have an Arabic translation field -->
+							{% endif %}
+						</p>
 						<div class="team-sub-title mt-55 mb-30">
-							<h4>Get In Touch</h4>
+							<h4>
+								{% if current_language == 'en' %}
+									Get In Touch
+								{% elif current_language == 'ar' %}
+									تواصل معنا  <!-- Arabic translation -->
+								{% endif %}
+							</h4>
 						</div>
 						<!-- Contact Information -->
 						<div class="row">
 							<div class="col-sm-6 contact-info-item">
-								<div class="icon">
+								<div class="icon" style="margin-left: {% if current_language == 'ar' %}10px{% else %}0{% endif %};">
+
 									<i class="fa fa-map-marker-alt"></i>
 								</div>
 								<div class="content">
-									<b class="title">Location</b>
+									<b class="title">
+										{% if current_language == 'en' %}
+											Location
+										{% elif current_language == 'ar' %}
+											الموقع  <!-- Arabic translation -->
+										{% endif %}
+									</b>
 									<span class="text">{{ team.city }}</span>
 								</div>
 							</div>
 							<div class="col-sm-6 contact-info-item">
-								<div class="icon">
+								<div class="icon" style="margin-left: {% if current_language == 'ar' %}10px{% else %}0{% endif %};">
+
 									<i class="fa fa-user"></i>
 								</div>
 								<div class="content">
-									<b class="title">Team Founder</b>
+									<b class="title">
+										{% if current_language == 'en' %}
+											Team Founder
+										{% elif current_language == 'ar' %}
+											مؤسس الفريق  <!-- Arabic translation -->
+										{% endif %}
+									</b>
 									<span class="text">{{ team.team_id.team_founder.username }}</span>
 								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-sm-6 contact-info-item">
-								<div class="icon">
-									<i class="far fa-envelope"></i>
-								</div>
-								<div class="content">
-									<b class="title">Email Address</b>
-									<span class="text">
-										<a href="mailto:{{ team.email }}">{{ team.email }}</a>
-									</span>
-								</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-sm-6 contact-info-item">
+							<div class="icon" style="margin-left: {% if current_language == 'ar' %}10px{% else %}0{% endif %};">
+								<i class="far fa-envelope"></i>
 							</div>
-							<div class="col-sm-6 contact-info-item">
-								<div class="icon">
-									<i class="far fa-calendar"></i>
-								</div>
-								<div class="content">
-									<b class="title">Establishment Date</b>
-									<span class="text">{{ team.team_id.team_establishment_date|date:"d M Y" }}</span>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-sm-6 contact-info-item">
-								<div class="icon">
-									<i class="fa fa-phone"></i>
-								</div>
-								<div class="content">
-									<b class="title">Phone Us</b>
-									<span class="text">
-										<a href="callto:{{ team.phone }}">{{ team.phone }}</a>
-									</span>
-								</div>
-							</div>
-							<div class="col-sm-6 contact-info-item">
-								<div class="icon">
-									<i class="far fa-user"></i>
-								</div>
-								<div class="content">
-									<b class="title">President</b>
-									<span class="text">{{ team.team_id.team_president }}</span>
-								</div>
+							
+							<div class="content">
+								<b class="title">
+									{% if current_language == 'en' %}
+										Email Address
+									{% elif current_language == 'ar' %}
+										عنوان البريد الإلكتروني  <!-- Arabic translation -->
+									{% endif %}
+								</b>
+								<span class="text">
+									<a href="mailto:{{ team.email }}">{{ team.email }}</a>
+								</span>
 							</div>
 						</div>
+						<div class="col-sm-6 contact-info-item">
+							<div class="icon" style="margin-left: {% if current_language == 'ar' %}10px{% else %}0{% endif %};">
+
+								<i class="far fa-calendar"></i>
+							</div>
+							<div class="content">
+								<b class="title">
+									{% if current_language == 'en' %}
+										Establishment Date
+									{% elif current_language == 'ar' %}
+										تاريخ التأسيس  <!-- Arabic translation -->
+									{% endif %}
+								</b>
+								<span class="text">{{ team.team_id.team_establishment_date|date:"d M Y" }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-6 contact-info-item">
+							<div class="icon" style="margin-left: {% if current_language == 'ar' %}10px{% else %}0{% endif %};">
+
+								<i class="fa fa-phone"></i>
+							</div>
+							<div class="content">
+								<b class="title">
+									{% if current_language == 'en' %}
+										Phone Us
+									{% elif current_language == 'ar' %}
+										اتصل بنا  <!-- Arabic translation -->
+									{% endif %}
+								</b>
+								<span class="text">
+									<a href="callto:{{ team.phone }}">{{ team.phone }}</a>
+								</span>
+							</div>
+						</div>
+						<div class="col-sm-6 contact-info-item">
+							<div class="icon" style="margin-left: {% if current_language == 'ar' %}10px{% else %}0{% endif %};">
+
+								<i class="far fa-user"></i>
+							</div>
+							<div class="content">
+								<b class="title">
+									{% if current_language == 'en' %}
+										President
+									{% elif current_language == 'ar' %}
+										الرئيس  <!-- Arabic translation -->
+									{% endif %}
+								</b>
+								<span class="text">{{ team.team_id.team_president }}</span>
+							</div>
+						</div>
+					</div>
+					
 					</div>
 				</div>
 			</div>
@@ -199,8 +268,12 @@
 							</div>
 						</div>
 						<div>
-							<h6 class="info-head">Game Played</h6>
-							<h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
+							<h6 class="info-head">{% if current_language == 'en' %}
+								Game Played
+							{% elif current_language == 'ar' %}
+								لعبة لعبت
+							{% endif %}</h6>
+							<h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.matchplayed|default:"0" }}</h5>
 						</div>
 					</div>
 				</div>
@@ -212,8 +285,13 @@
 							</div>
 						</div>
 						<div>
-							<h6 class="info-head">Win</h6>
-							<h5 class="score">{{ stats.win|default:"0" }}</h5>
+							<h6 class="info-head">{% if current_language == 'en' %}
+								Win
+							{% elif current_language == 'ar' %}
+							   فوز  
+							{% endif %}</h6>
+							<h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.win|default:"0" }}</h5></h6>
+						
 						</div>
 					</div>
 				</div>
@@ -225,8 +303,13 @@
 							</div>
 						</div>
 						<div>
-							<h6 class="info-head">Lost</h6>
-							<h5 class="score">{{ stats.loss|default:"0" }}</h5>
+						    <h6 class="info-head">  {% if current_language == 'en' %}
+								Lost
+							{% elif current_language == 'ar' %}
+							  خسارة  
+							{% endif %}</h6>
+							<h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.loss|default:"0" }}</h5>
+
 						</div>
 					</div>
 				</div>
@@ -238,8 +321,12 @@
 							</div>
 						</div>
 						<div>
-							<h6 class="info-head">Draw</h6>
-							<h5 class="score">{{ stats.draw|default:"0" }}</h5>
+							<h6 class="info-head">  {% if current_language == 'en' %}
+								Draw
+							{% elif current_language == 'ar' %}
+							  تعادل   
+							{% endif %}</h6>
+							<h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.draw|default:"0" }}</h5>
 						</div>
 					</div>
 				</div>
@@ -251,8 +338,12 @@
 							</div>
 						</div>
 						<div>
-							<h6 class="info-head">Goal Scored</h6>
-							<h5 class="score">{{ stats.goals|default:"0" }}</h5>
+							<h6 class="info-head">{% if current_language == 'en' %}
+								Goal Scored
+							{% elif current_language == 'ar' %}
+								الأهداف المسجلة
+							{% endif %}</h6>
+							<h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.goals|default:"0" }}</h5>
 						</div>
 					</div>
 				</div>
@@ -264,8 +355,13 @@
 							</div>
 						</div>
 						<div>
-							<h6 class="info-head"> Team Goal Conceded</h6>
-							<h5 class="score">{{ stats.goals_conceded|default:"0" }}</h5>
+							<h6 class="info-head">{% if current_language == 'en' %}
+								Team Goal Conceded
+							{% elif current_language == 'ar' %}
+								فريق هدف استقبل
+							{% endif %}
+							</h6>
+							<h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.goals_conceded|default:"0" }}</h5>
 						</div>
 					</div>
 				</div>
@@ -274,17 +370,55 @@
 				<div class="col-lg-12">
 					<!-- Staff Members, Players, Tournaments Joined -->
 					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-						<h5>Staff Members</h5>
+						<h5>
+							{% if current_language == 'en' %}
+								Staff Members
+							{% elif current_language == 'ar' %}
+								أعضاء الفريق
+							{% endif %}
+						</h5>
+						
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
 									<tr>
-										<th>No.</th>
-										<th>Username</th>
-										<th>Full Name</th>
-										<th>Mobile No.</th>
-										<th>Role</th>
+										<th>
+											{% if current_language == 'en' %}
+												No.
+											{% elif current_language == 'ar' %}
+												رقم
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Username
+											{% elif current_language == 'ar' %}
+												اسم المستخدم
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Full Name
+											{% elif current_language == 'ar' %}
+												الاسم الكامل
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Mobile No.
+											{% elif current_language == 'ar' %}
+												رقم الجوال
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Role
+											{% elif current_language == 'ar' %}
+												الدور
+											{% endif %}
+										</th>
 									</tr>
+									
 								</thead>
 								<tbody> {% for staff in staff_members %} <tr>
 										<td>{{ forloop.counter }}</td>
@@ -297,51 +431,141 @@
 										</td>
 										<td>{{ staff.get_joinning_type_display }}</td>
 									</tr> {% empty %} <tr>
-										<td colspan="5">No staff members found.</td>
+										<td colspan="5">
+											{% if current_language == 'en' %}
+												No staff members found.
+											{% elif current_language == 'ar' %}
+												لا توجد أعضاء في الطاقم
+											{% endif %}
+										</td>
+										
 									</tr> {% endfor %} </tbody>
 							</table>
 						</div>
 					</div>
 					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-						<h5>Players</h5>
+						<h5>
+							{% if current_language == 'en' %}
+								Players
+							{% elif current_language == 'ar' %}
+								اللاعبين
+							{% endif %}
+						</h5>
+						
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
 									<tr>
-										<th>No.</th>
-										<th>Username</th>
-										<th>Full Name</th>
-										<th>Mobile No.</th>
+										<th>
+											{% if current_language == 'en' %}
+												No.
+											{% elif current_language == 'ar' %}
+												رقم
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Username
+											{% elif current_language == 'ar' %}
+												اسم المستخدم
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Full Name 
+											{% elif current_language == 'ar' %}
+												الاسم الكامل
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Mobile No.
+											{% elif current_language == 'ar' %}
+												رقم الجوال
+											{% endif %}
+										</th>
+										
 									</tr>
+									
 								</thead>
 								<tbody> {% for player in players %} <tr>
 										<td>{{ forloop.counter }}</td>
-										<td>@{{ player.user_id.username }}</td>
+										<td>@{{ player.user_id.username }} </td>
 										<td>
-											{{ player.user_id.email }}
+											{{ player.user_id.email }} 
 										</td>
 										<td>
-											<a href="tel:{{ player.user_id.phone }}">{{ player.user_id.phone }}</a>
+											<a href="tel:{{ player.user_id.phone }}">{{ player.user_id.phone }} </a>
 										</td>
 									</tr> {% empty %} <tr>
-										<td colspan="4">No Players found.</td>
+										<td colspan="4">
+											{% if current_language == 'en' %}
+												No Players found.
+											{% elif current_language == 'ar' %}
+												لا توجد لاعبين
+											{% endif %}
+										</td>
+										</td>
 									</tr> {% endfor %} </tbody>
 							</table>
 						</div>
 					</div>
 					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-						<h5>Last 5 Tournaments</h5>
+						<h5>
+							{% if current_language == 'en' %}
+								Last 5 Tournaments
+							{% elif current_language == 'ar' %}
+								آخر 5 بطولات
+							{% endif %}
+						</h5>
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
 									<tr>
-										<th>No.</th>
-										<th>Tournament Name</th>
-										<th>Start Date</th>
-										<th>Age Group</th>
-										<th>City</th>
-										<th>Joining Cost</th>
+										<th>
+											{% if current_language == 'en' %}
+												No.
+											{% elif current_language == 'ar' %}
+												رقم
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Tournament Name
+											{% elif current_language == 'ar' %}
+												اسم البطولة
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Start Date
+											{% elif current_language == 'ar' %}
+												تاريخ البدء
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Age Group
+											{% elif current_language == 'ar' %}
+												الفئة العمرية
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												City
+											{% elif current_language == 'ar' %}
+												المدينة
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Joining Cost
+											{% elif current_language == 'ar' %}
+												تكلفة الانضمام
+											{% endif %}
+										</th>
 									</tr>
+									
 								</thead>
 								<tbody> {% for joined_tournament in joined_tournaments %} <tr>
 										<td>{{ forloop.counter }}</td>
@@ -351,23 +575,72 @@
 										<td>{{ joined_tournament.tournament_id.city.name }}</td>
 										<td>{{ system_settings.currency_symbol }} {{ joined_tournament.tournament_id.tournament_joining_cost }}</td>
 									</tr> {% empty %} <tr>
-										<td colspan="6">No Tournaments found.</td>
+										<td colspan="6">
+											{% if current_language == 'en' %}
+												No Tournaments found.
+											{% elif current_language == 'ar' %}
+												لم يتم العثور على بطولات
+											{% endif %}
+										</td>
+										
 									</tr> {% endfor %} </tbody>
 							</table>
 						</div>
 					</div>
 					<div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-						<h5>Last 5 Games</h5>
+						<h5>
+							{% if current_language == 'en' %}Last 5 Games{% elif current_language == 'ar' %}آخر 5 مباريات{% endif %}
+						</h5>
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
 									<tr>
-										<th>No.</th>
-										<th>Game Type</th>
-										<th>Tournament Name</th>
-										<th>Game Date</th>
-										<th>Teams</th>
-										<th>Score</th>
+										
+											<th>
+												{% if current_language == 'en' %}
+													No.
+												{% elif current_language == 'ar' %}
+													رقم
+												{% endif %}
+											</th>
+											<th>
+												{% if current_language == 'en' %}
+													Game Type
+												{% elif current_language == 'ar' %}
+													نوع اللعبة
+												{% endif %}
+											</th>
+											<th>
+												{% if current_language == 'en' %}
+													Tournament Name
+												{% elif current_language == 'ar' %}
+													اسم البطولة
+												{% endif %}
+											</th>
+									
+										
+										<th>
+											{% if current_language == 'en' %}
+												Game Date
+											{% elif current_language == 'ar' %}
+												تاريخ المباراة
+											{% endif %}
+										</th>
+										<th>
+											{% if current_language == 'en' %}
+												Teams
+											{% elif current_language == 'ar' %}
+												الفرق
+											{% endif %}
+										</th>
+										
+										<th>
+											{% if current_language == 'en' %}
+												Score
+											{% elif current_language == 'ar' %}
+												النتيجة
+											{% endif %}
+										</th>
 									</tr>
 								</thead>
 								<tbody> {% for finished_game in finished_games %} <tr>
@@ -382,7 +655,14 @@
 										</td>
 										<td>{{ finished_game.score }}</td>
 									</tr> {% empty %} <tr>
-										<td colspan="8">No games found.</td>
+										<td colspan="8">
+											{% if current_language == 'en' %}
+												No games found.
+											{% elif current_language == 'ar' %}
+												لم يتم العثور على مباريات
+											{% endif %}
+										</td>
+										
 									</tr> {% endfor %} </tbody>
 							</table>
 						</div>

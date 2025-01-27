@@ -315,7 +315,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">
-                                    {% if current_language == 'en' %}Game Officiating{% elif current_language == 'ar' %}تحكيم اللعبة{% endif %}
+                                    {% if current_language == 'en' %}Game Officiating{% elif current_language == 'ar' %}غيم أوفيشياتينغ {% endif %}
                                 </h6>
                                 <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
@@ -359,7 +359,7 @@
                             </div>
                             <div>
                                 <h6 class="info-head">
-                                    {% if current_language == 'en' %}Game Manage{% elif current_language == 'ar' %}إدارة اللعبة{% endif %}
+                                    {% if current_language == 'en' %}Game Manage{% elif current_language == 'ar' %}غيم ماناج{% endif %}
                                 </h6>
                                 <h5 class="score">{{ stats.matchplayed|default:"0" }}</h5>
                             </div>
@@ -424,7 +424,10 @@
                                         {% if current_language == 'en' %}Teams{% elif current_language == 'ar' %}الفرق{% endif %}
                                     </th>
                                     <th>
-                                        {% if current_language == 'en' %}Game Date{% elif current_language == 'ar' %}تاريخ المباراة{% endif %}
+                                        {% if current_language == 'en' %}Game Date{% elif current_language == 'ar' %}      تاريخ المباراة
+                                           
+
+                                        {% endif %}
                                     </th>
                                 </tr>
                             </thead>
@@ -499,7 +502,11 @@
                                 {% else %}
                                 <tr>
                                     <td colspan="5">
-                                        {% if current_language == 'en' %}No Games Found{% elif current_language == 'ar' %}لم يتم العثور على مباريات{% endif %}
+                                        {% if current_language == 'en' %}
+                                            No Games Found
+                                        {% elif current_language == 'ar' %}
+                                            لم يتم العثور على ألعاب
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 
