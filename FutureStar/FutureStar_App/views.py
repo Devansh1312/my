@@ -175,6 +175,31 @@ class UserProfileView(LoginRequiredMixin, View):
 
         return render(request, "Admin/User/user_profile.html", {"user": user})
 
+
+##################################################### User Change Password View ###############################################################
+def change_password_ajax(request):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        
+        if form.is_valid():
+            user = request.user
+            user.set_password(form.cleaned_data['new_password1'])
+            user.save()
+            # Log the user out after password change
+            logout(request)
+            # Add a success message for the user (optional)
+            messages.success(request, "Your password has been successfully updated! Please log in with your new credentials.")
+            
+            # Return the success response with a redirect URL
+            return JsonResponse({'success': 'Your password has been successfully updated!',
+                                  'redirect': '/adminlogin/'})  # Redirect to login page after password change
+        else:
+            errors = {}
+            for field in form.errors:
+                errors[field] = form.errors.get(field)
+            return JsonResponse({'errors': errors})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 ##################################################### User Update Profile View ###############################################################
 @method_decorator(user_role_check, name="dispatch")
 class UserUpdateProfileView(View):
@@ -188,140 +213,103 @@ class UserUpdateProfileView(View):
                 "form": form,
                 "password_change_form": password_change_form,
                 "breadcrumb": {"parent": "Acccount", "child": "Edit Profile"},
+                "show_change_password_modal": False,
             },
         )
 # Handle POST request for updating profile
     def post(self, request, *args, **kwargs):
-        if "change_password" in request.POST:
-            # Handle password change
-            password_change_form = CustomPasswordChangeForm(
-                user=request.user, data=request.POST
+        # Handle profile update
+        user = request.user
+        form = UserUpdateProfileForm(
+            request.POST, instance=user, files=request.FILES
+        )
+        if form.is_valid():
+            # Handle profile picture update
+            # Initialize FileSystemStorage for profile pictures and card headers
+            fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "profile_pics")
             )
-            if password_change_form.is_valid():
-                user = password_change_form.save()
-                logout(request)  # Log out the user after password change
-                messages.success(
-                    request,
-                    "Your password has been changed successfully. Please log in again.",
-                )
-                return redirect("login")
-            else:
-                 # Retrieve the referrer (previous page)
-                referer_url = request.META.get('HTTP_REFERER', None)
-            
-            # If referer_url is available, stay on the same page
-                if referer_url:
-                            # Add form errors to messages framework
-                            for field in password_change_form:
-                                for error in field.errors:
-                                    messages.error(request, error)
+            card_fs = FileSystemStorage(
+                location=os.path.join(settings.MEDIA_ROOT, "card_header")
+            )
 
-                            # Return redirect to the referrer URL
-                            return redirect(referer_url)
-                else:
-                    # If no referer, fallback to a default page (or you can just render the form on a specific template)
-                    return render(
-                        request,
-                        "Admin/User/edit_profile.html",
-                        {
-                            "form": form,
-                            "password_change_form": password_change_form,
-                            "show_change_password_modal": True,
-                        }
+            # Handle profile picture
+            if "profile_picture" in request.FILES:
+                # Remove old profile picture if it exists
+                if user.profile_picture:
+                    old_profile_picture_path = os.path.join(
+                        settings.MEDIA_ROOT,
+                        str(user.profile_picture),  # Convert to string
                     )
+                    if os.path.isfile(old_profile_picture_path):
+                        os.remove(old_profile_picture_path)
+
+                # Save new profile picture
+                profile_picture_file = request.FILES["profile_picture"]
+                file_extension = profile_picture_file.name.split(".")[-1]
+                unique_suffix = get_random_string(8)
+                profile_picture_filename = (
+                    f"{request.user.id}_{unique_suffix}.{file_extension}"
+                )
+                fs.save(profile_picture_filename, profile_picture_file)
+                user.profile_picture = os.path.join(
+                    "profile_pics", profile_picture_filename
+                )
+            elif "profile_picture-clear" in request.POST:
+                # Clear the profile picture field
+                if user.profile_picture:
+                    old_profile_picture_path = os.path.join(
+                        settings.MEDIA_ROOT,
+                        str(user.profile_picture),  # Convert to string
+                    )
+                    if os.path.isfile(old_profile_picture_path):
+                        os.remove(old_profile_picture_path)
+                user.profile_picture = None
+
+            # Handle card_header
+            if "card_header" in request.FILES:
+                # Remove old card header if it exists
+                if user.card_header:
+                    old_card_header_path = os.path.join(
+                        settings.MEDIA_ROOT,
+                        str(user.card_header),  # Convert to string
+                    )
+                    if os.path.isfile(old_card_header_path):
+                        os.remove(old_card_header_path)
+
+                # Save new card header
+                card_header_file = request.FILES["card_header"]
+                file_extension = card_header_file.name.split(".")[-1]
+                unique_suffix = get_random_string(8)
+                card_header_filename = (
+                    f"card_header_{unique_suffix}.{file_extension}"
+                )
+                card_fs.save(card_header_filename, card_header_file)
+                user.card_header = os.path.join("card_header", card_header_filename)
+            elif "card_header-clear" in request.POST:
+                # Clear the card header field
+                if user.card_header:
+                    old_card_header_path = os.path.join(
+                        settings.MEDIA_ROOT,
+                        str(user.card_header),  # Convert to string
+                    )
+                    if os.path.isfile(old_card_header_path):
+                        os.remove(old_card_header_path)
+                user.card_header = None
+
+            user = form.save()
+            messages.success(request, "Your profile has been updated successfully.")
+            return redirect("edit_profile")
         else:
-            # Handle profile update
-            user = request.user
-            form = UserUpdateProfileForm(
-                request.POST, instance=user, files=request.FILES
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, error)
+            password_change_form = CustomPasswordChangeForm(user=request.user)
+            return render(
+                request,
+                "Admin/User/edit_profile.html",
+                {"form": form, "password_change_form": password_change_form},
             )
-            if form.is_valid():
-                # Handle profile picture update
-                # Initialize FileSystemStorage for profile pictures and card headers
-                fs = FileSystemStorage(
-                    location=os.path.join(settings.MEDIA_ROOT, "profile_pics")
-                )
-                card_fs = FileSystemStorage(
-                    location=os.path.join(settings.MEDIA_ROOT, "card_header")
-                )
-
-                # Handle profile picture
-                if "profile_picture" in request.FILES:
-                    # Remove old profile picture if it exists
-                    if user.profile_picture:
-                        old_profile_picture_path = os.path.join(
-                            settings.MEDIA_ROOT,
-                            str(user.profile_picture),  # Convert to string
-                        )
-                        if os.path.isfile(old_profile_picture_path):
-                            os.remove(old_profile_picture_path)
-
-                    # Save new profile picture
-                    profile_picture_file = request.FILES["profile_picture"]
-                    file_extension = profile_picture_file.name.split(".")[-1]
-                    unique_suffix = get_random_string(8)
-                    profile_picture_filename = (
-                        f"{request.user.id}_{unique_suffix}.{file_extension}"
-                    )
-                    fs.save(profile_picture_filename, profile_picture_file)
-                    user.profile_picture = os.path.join(
-                        "profile_pics", profile_picture_filename
-                    )
-                elif "profile_picture-clear" in request.POST:
-                    # Clear the profile picture field
-                    if user.profile_picture:
-                        old_profile_picture_path = os.path.join(
-                            settings.MEDIA_ROOT,
-                            str(user.profile_picture),  # Convert to string
-                        )
-                        if os.path.isfile(old_profile_picture_path):
-                            os.remove(old_profile_picture_path)
-                    user.profile_picture = None
-
-                # Handle card_header
-                if "card_header" in request.FILES:
-                    # Remove old card header if it exists
-                    if user.card_header:
-                        old_card_header_path = os.path.join(
-                            settings.MEDIA_ROOT,
-                            str(user.card_header),  # Convert to string
-                        )
-                        if os.path.isfile(old_card_header_path):
-                            os.remove(old_card_header_path)
-
-                    # Save new card header
-                    card_header_file = request.FILES["card_header"]
-                    file_extension = card_header_file.name.split(".")[-1]
-                    unique_suffix = get_random_string(8)
-                    card_header_filename = (
-                        f"card_header_{unique_suffix}.{file_extension}"
-                    )
-                    card_fs.save(card_header_filename, card_header_file)
-                    user.card_header = os.path.join("card_header", card_header_filename)
-                elif "card_header-clear" in request.POST:
-                    # Clear the card header field
-                    if user.card_header:
-                        old_card_header_path = os.path.join(
-                            settings.MEDIA_ROOT,
-                            str(user.card_header),  # Convert to string
-                        )
-                        if os.path.isfile(old_card_header_path):
-                            os.remove(old_card_header_path)
-                    user.card_header = None
-
-                user = form.save()
-                messages.success(request, "Your profile has been updated successfully.")
-                return redirect("edit_profile")
-            else:
-                for field in form:
-                    for error in field.errors:
-                        messages.error(request, error)
-                password_change_form = CustomPasswordChangeForm(user=request.user)
-                return render(
-                    request,
-                    "Admin/User/edit_profile.html",
-                    {"form": form, "password_change_form": password_change_form},
-                )
 
 ################################## SytemSettings view #######################################################
 @method_decorator(user_role_check, name="dispatch")

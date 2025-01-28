@@ -378,32 +378,12 @@ class UserUpdateProfileForm(forms.ModelForm):
 
 
 class CustomPasswordChangeForm(PasswordChangeForm):
-    old_password = forms.CharField(
-        label=("Old password"),
-        strip=False,
-        widget=forms.PasswordInput(
-            attrs={
-                "autocomplete": "current-password",
-                "autofocus": True,
-                "class": "form-control",
-            }
-        ),
-    )
-    new_password1 = forms.CharField(
-        label=("New password"),
-        widget=forms.PasswordInput(
-            attrs={"autocomplete": "new-password", "class": "form-control"}
-        ),
-        strip=False,
-        help_text=password_validation.password_validators_help_text_html(),  # type: ignore
-    )
-    new_password2 = forms.CharField(
-        label=("New password confirmation"),
-        strip=False,
-        widget=forms.PasswordInput(
-            attrs={"autocomplete": "new-password", "class": "form-control"}
-        ),
-    )
+    def clean_new_password2(self):
+        new_password1 = self.cleaned_data.get('new_password1')
+        new_password2 = self.cleaned_data.get('new_password2')
+        if new_password1 and new_password2 and new_password1 != new_password2:
+            raise forms.ValidationError("The two password fields didn’t match.")
+        return new_password2
 
 
 
