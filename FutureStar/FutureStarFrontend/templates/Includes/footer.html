@@ -10,21 +10,21 @@
                         <a href="{% url 'index' %}"><img src="{{ header_logo }}" alt="Logo"></a>
                     </div>
                     <p class="des">
-                    {% if current_language == 'en' %}
-                    Goalactico is the ultimate platform for football enthusiasts, offering a comprehensive and engaging experience tailored for players, coaches, and fans alike.
-                    {% elif current_language == 'ar' %}
-                    جوالكتيكو هو المنصة المثالية لعشاق كرة القدم، حيث يقدم تجربة شاملة ومميزة مصممة خصيصًا للاعبين والمدربين والمشجعين على حد سواء.
-                    {% endif %}
+                        {% if current_language == 'en' %}
+                        Goalactico is the ultimate platform for football enthusiasts, offering a comprehensive and engaging experience tailored for players, coaches, and fans alike.
+                        {% elif current_language == 'ar' %}
+                        جوالكتيكو هو المنصة المثالية لعشاق كرة القدم، حيث يقدم تجربة شاملة ومميزة مصممة خصيصًا للاعبين والمدربين والمشجعين على حد سواء.
+                        {% endif %}
                     </p>
 
                     <div class="social-style-two">
-                        <a href="{{ system_settings.facebook }}" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>  
+                        <a href="{{ system_settings.facebook }}" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
                         <a href="{{ system_settings.twitter }}" target="_blank"> <i class="fa-brands fa-x-twitter"></i></a>
                         <a href="{{ system_settings.instagram }}" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                         <a href="{{ system_settings.linkedin }}" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
                     </div>
                 </div>
-                
+
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="footer-widget footer-links wow fadeInUp delay-0-3s">
@@ -32,44 +32,44 @@
                         {% if current_language == 'en' %}
                         Explore
                         {% elif current_language == 'ar' %}
-                        استكشاف                                
+                        استكشاف
                         {% endif %}
                     </h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
                             <li><a href="{% url 'discover' %}">
-                                {% if current_language == 'en' %}
-                                Discover
-                                {% elif current_language == 'ar' %}
-                                يكتشف
-                                {% endif %}</a></li>
+                                    {% if current_language == 'en' %}
+                                    Discover
+                                    {% elif current_language == 'ar' %}
+                                    يكتشف
+                                    {% endif %}</a></li>
                             <li><a href="{% url 'success-stories' %}">
-                                {% if current_language == 'en' %}
-                                Success Stories
-                                {% elif current_language == 'ar' %}
-                                قصص النجاح
-                                {% endif %}
-                            </a></li>
+                                    {% if current_language == 'en' %}
+                                    Success Stories
+                                    {% elif current_language == 'ar' %}
+                                    قصص النجاح
+                                    {% endif %}
+                                </a></li>
                             <li><a href="{% url 'news' %}">
-                                {% if current_language == 'en' %}
-                                News
-                                {% elif current_language == 'ar' %}
-                                الأخبار
-                                {% endif %}
-                            </a></li>
-                            <li><a href="{% url 'advertise' %}"> 
-                                {% if current_language == 'en' %}
-                                Advertise
-                                {% elif current_language == 'ar' %}
-                                إعلان
-                                {% endif %}</a></li>
+                                    {% if current_language == 'en' %}
+                                    News
+                                    {% elif current_language == 'ar' %}
+                                    الأخبار
+                                    {% endif %}
+                                </a></li>
+                            <li><a href="{% url 'advertise' %}">
+                                    {% if current_language == 'en' %}
+                                    Advertise
+                                    {% elif current_language == 'ar' %}
+                                    إعلان
+                                    {% endif %}</a></li>
                             <li><a href="{% url 'contact' %}">
-                                {% if current_language == 'en' %}
-                                Contacts
-                                {% elif current_language == 'ar' %}
-                                جهات الاتصال
-                                {% endif %}
-                            </a></li>
+                                    {% if current_language == 'en' %}
+                                    Contacts
+                                    {% elif current_language == 'ar' %}
+                                    جهات الاتصال
+                                    {% endif %}
+                                </a></li>
                         </ul>
                     </div>
                 </div>
@@ -81,32 +81,32 @@
                         {% if current_language == 'en' %}
                         Supports
                         {% elif current_language == 'ar' %}
-                        يدعم                        
+                        يدعم
                         {% endif %}
                     </h5>
                     <div class="footer-widget widget_nav_menu">
                         <ul class="list-style-two">
                             <li><a href="{% url 'terms-of-services' %}">
-                                {% if current_language == 'en' %}
-                                Terms of Services
-                                {% elif current_language == 'ar' %}
-                                شروط الخدمات                                        
-                                {% endif %}
-                            </a></li>
+                                    {% if current_language == 'en' %}
+                                    Terms of Services
+                                    {% elif current_language == 'ar' %}
+                                    شروط الخدمات
+                                    {% endif %}
+                                </a></li>
                             <li><a href="{% url 'privacy-policy' %}">
-                                {% if current_language == 'en' %}
+                                    {% if current_language == 'en' %}
                                     Privacy Policy
-                                {% elif current_language == 'ar' %}
+                                    {% elif current_language == 'ar' %}
                                     سياسة الخصوصية
-                                {% endif %}
-                            </a></li>
+                                    {% endif %}
+                                </a></li>
                             <li><a href="{% url 'terms-and-conditions' %}">
-                                {% if current_language == 'en' %}
-                                Term & Condition
-                                {% elif current_language == 'ar' %}
-                                الشروط والأحكام                                
-                                {% endif %}
-                            </a></li>
+                                    {% if current_language == 'en' %}
+                                    Term & Condition
+                                    {% elif current_language == 'ar' %}
+                                    الشروط والأحكام
+                                    {% endif %}
+                                </a></li>
                         </ul>
                     </div>
                 </div>
@@ -115,9 +115,9 @@
                 <div class="footer-widget footer-info wow fadeInUp delay-0-6s">
                     <h5 class="footer-title">
                         {% if current_language == 'en' %}
-                            Contact
+                        Contact
                         {% elif current_language == 'ar' %}
-                            اتصل بنا
+                        اتصل بنا
                         {% endif %}
                     </h5>
                     <ul class="list-style-two">
@@ -125,31 +125,31 @@
                         <li><i class="fa-solid fa-envelope"></i><a href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a></li>
                         <li><i class="fa-solid fa-phone"></i><a href="callto:{{ system_settings.phone }}">{{ system_settings.phone }}</a></li>
                     </ul>
-                   
+
                 </div>
             </div>
         </div>
         <div class="copyright-area rel">
             <!-- <div class="row"> -->
-                <div class="col-lg-6">
-                    <div class="footer-copyright-text wow fadeInUp delay-0-2s">
-                        <p>
-                            {% if current_language == 'en' %}
-                                Copyright @2024, Goalactico All Rights Reserved
-                            {% elif current_language == 'ar' %}
-                                حقوق الطبع والنشر @2024، Goalactico جميع الحقوق محفوظة                             
-                            {% endif %}
-                        </p>
-                    </div>
+            <div class="col-lg-6">
+                <div class="footer-copyright-text wow fadeInUp delay-0-2s">
+                    <p>
+                        {% if current_language == 'en' %}
+                        Copyright @2024, Goalactico All Rights Reserved
+                        {% elif current_language == 'ar' %}
+                        حقوق الطبع والنشر @2024، Goalactico جميع الحقوق محفوظة
+                        {% endif %}
+                    </p>
                 </div>
-                <div class="col-lg-6">
-                    <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
-                        <p>
-                            {% if current_language == 'en' %}Designed & Developed{% elif current_language == 'ar' %} تصميم وتطوير{% endif %}By
-                            <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
-                        </p>
-                    </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
+                    <p>
+                        {% if current_language == 'en' %}Designed & Developed{% elif current_language == 'ar' %} تصميم وتطوير{% endif %}By
+                        <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
+                    </p>
                 </div>
+            </div>
             <!-- </div> -->
         </div>
     </div>

@@ -1,34 +1,34 @@
 from collections import defaultdict
-import logging
+import re
+from datetime import date
+from itertools import chain
+from operator import attrgetter
+
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.utils.translation import activate
-from FutureStarTrainingGroupApp.serializers import *
+from django.utils import timezone
+from django.core.paginator import EmptyPage
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
+from django.db.models import Q, Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from FutureStarFriendlyGame.serializers import *
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
+
+from FutureStarTrainingGroupApp.serializers import *
+from FutureStarFriendlyGame.serializers import *
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarFriendlyGame.models import *
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from django.utils import timezone
-from rest_framework.pagination import PageNumberPagination
-from django.core.paginator import Paginator, EmptyPage
-from django.utils.translation import gettext as _
-from rest_framework.exceptions import ValidationError
-from django.db import IntegrityError
-from django.db.models import Q ,Sum 
-from itertools import chain
-from operator import attrgetter
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
-import re
-from datetime import date
 from FutureStar.firebase_config import send_push_notification
 
 
+######################### List Of Teamms Of Manager ###############################
 class ManagerBranchDetail(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -84,7 +84,7 @@ class ManagerBranchDetail(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-
+################## Create Friedndly game With Request Refree For Game ###############################
 class CreateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -2825,7 +2825,8 @@ class FriendlyGameOfficialsAPIView(APIView):
                 )
                 notification.save()
         except Exception as e:
-            logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
+            print(f"Error sending push notification: {str(e)}")
+
 
         return Response({
             'status': 1,
@@ -4336,7 +4337,7 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
             self.send_rejection_notification(team_b_managers, notification_message, game)
 
         except Exception as e:
-            logging.error(f"Error notifying team managers: {str(e)}", exc_info=True)
+            print(f"Error notifying team managers: {str(e)}")
 
     def send_rejection_notification(self, team_managers, message, game):
         """
@@ -4371,9 +4372,7 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
                 notification.save()
 
 
-
-
-
+###### Friendly Game Result API for Update Game Result ############################
 class FriendlyGameResult(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)

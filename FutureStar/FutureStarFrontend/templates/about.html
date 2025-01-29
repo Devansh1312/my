@@ -1,7 +1,7 @@
 {% extends 'base1.html' %}
-
 {% load static %}
-{% load lang_filter %} <!-- Loading your custom filter -->
+{% load lang_filter %}
+<!-- Loading your custom filter -->
 {% load i18n %}
 {% block css %}
 <!-- Plugins css start-->
@@ -12,6 +12,7 @@
         color: lightgray;
         position: relative;
     }
+
     .star-rating .filled-stars {
         color: rgb(17, 167, 12);
         position: absolute;
@@ -31,6 +32,7 @@
     .header-upper {
         display: none;
     }
+
     .main-footer {
         display: none;
     }
@@ -38,152 +40,150 @@
 {% endif %}
 
 <!-- Page Banner Section Start -->
-        <section class="page-banner pt-150" style="background-image: url(assets/images/hero/hero-two-bg.png)">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        {% lang cmsdata current_language "heading_title" as heading_title %}
-                        <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
-                            {{ heading_title }}
-                          
-                        </h1>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- Page Banner Section End -->        
-        
-        <!-- Video Area start -->
-        <div class="video-area-two pb-50">
-            <div class="container">
-                <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
-                    
-                    <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
-                    <!-- <a href="{{ cmsdata.achivement_title_en }}" class="mfp-iframe video-play"><i class="fas fa-play"></i></a> -->
-                    <a href="{{cmsdata.heading_url}}" class="mfp-iframe video-play mt-45" id="video-link">
-                        <iframe id="video-iframe" title="YouTube video player" frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-                        </iframe>
-                        <i class="fas fa-play"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 wow fadeInLeft delay-0-2s">
-                       
-                            {% lang cmsdata current_language "heading_content" as heading_content %}
-                            <div class="video-dis mt-40 pb-50">{{ heading_content }}
-                        </div>
-                       
-                    </div>
-                    <div class="col-lg-6 wow fadeInRight delay-0-2s">
-                        {% lang cmsdata current_language "heading_year_title" as heading_year_title %} 
-                        <div class="video-year text-lg-end text-center rel">
-                            {{heading_year_title}}
-                           
-                            <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Video Area end -->
-        
-         <!-- Headline area start -->
-         <div class="headline-area bgc-primary">
-            <div class="container-fluid">
-                <div class="headline-wrap marquee">
-                    <span>
-                        {% for marquee in marquee %}
-                        <span class="marquee-item">
-                            <i class="fas fa-star-of-life"></i>
-                            {% lang marquee current_language "content" as content %}
-                            <b>
-                                {{content}}
-                            </b>
-                        </span>
-                        {% endfor %}
-                    </span>
-                </div>
-            </div>
-        </div>
-        <!-- Headline Area end -->
+<section class="page-banner pt-150" style="background-image: url(assets/images/hero/hero-two-bg.png)">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                {% lang cmsdata current_language "heading_title" as heading_title %}
+                <h1 class="hero-title mb-50 wow fadeInUp delay-0-2s">
+                    {{ heading_title }}
 
-        <!-- Who We Are start -->
-        <section class="who-we-are-area pt-100">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-xl-7 col-lg-9 col-md-11">
-                        <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
-                            {% lang cmsdata current_language "section_2_heading" as section_2_heading %}      
-                            <span class="sub-title">
-                            {{section_2_heading}}   
-                            </span>
-                            
-                            {% lang cmsdata current_language "section_2_title" as section_2_title %}
-                            <h3>
-                                {{section_2_title}}
-                            </h3>
-                        </div>
-                    </div>
-                </div>    
-                <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 justify-content-center">
-                    {% for team_member in team_members %}
-                    <div class="col">
-                        <div class="team-member wow fadeInUp delay-0-2s">
-                            <div class="image">
-                                <img src="{{ team_member.image.url }}" alt="Team Member">
-                            </div>
-                            <div class="content">
-                                
-                                    {% lang team_member current_language "name" as name %}
-                                <h4>
-                                    {{name}}
-                                </h4>
-                                
-                            {% lang team_member current_language "designations" as designations %}
-                                <span>
-                                    {{designations}}
-                                </span>
-                            </div>
-                           
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>            
+                </h1>
             </div>
-        </section>
-        <!-- Who We Are end -->
-        
+        </div>
+    </div>
+</section>
+<!-- Page Banner Section End -->
+
+<!-- Video Area start -->
+<div class="video-area-two pb-50">
+    <div class="container">
+        <div class="video-part style-two mb-40 wow fadeInUp delay-0-2s">
+
+            <img src="{% static 'frontend/assets/images/video-bg.jpg' %}" alt="Video">
+            <!-- <a href="{{ cmsdata.achivement_title_en }}" class="mfp-iframe video-play"><i class="fas fa-play"></i></a> -->
+            <a href="{{cmsdata.heading_url}}" class="mfp-iframe video-play mt-45" id="video-link">
+                <iframe id="video-iframe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                </iframe>
+                <i class="fas fa-play"></i>
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 wow fadeInLeft delay-0-2s">
+
+                {% lang cmsdata current_language "heading_content" as heading_content %}
+                <div class="video-dis mt-40 pb-50">{{ heading_content }}
+                </div>
+
+            </div>
+            <div class="col-lg-6 wow fadeInRight delay-0-2s">
+                {% lang cmsdata current_language "heading_year_title" as heading_year_title %}
+                <div class="video-year text-lg-end text-center rel">
+                    {{heading_year_title}}
+
+                    <img class="leaf-shape" src="{% static 'frontend/assets/images/video/leaf.png' %}" alt="Leaf">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Video Area end -->
+
+<!-- Headline area start -->
+<div class="headline-area bgc-primary">
+    <div class="container-fluid">
+        <div class="headline-wrap marquee">
+            <span>
+                {% for marquee in marquee %}
+                <span class="marquee-item">
+                    <i class="fas fa-star-of-life"></i>
+                    {% lang marquee current_language "content" as content %}
+                    <b>
+                        {{content}}
+                    </b>
+                </span>
+                {% endfor %}
+            </span>
+        </div>
+    </div>
+</div>
+<!-- Headline Area end -->
+
+<!-- Who We Are start -->
+<section class="who-we-are-area pt-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 col-md-11">
+                <div class="section-title text-center mb-60 wow fadeInUp delay-0-2s">
+                    {% lang cmsdata current_language "section_2_heading" as section_2_heading %}
+                    <span class="sub-title">
+                        {{section_2_heading}}
+                    </span>
+
+                    {% lang cmsdata current_language "section_2_title" as section_2_title %}
+                    <h3>
+                        {{section_2_title}}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 justify-content-center">
+            {% for team_member in team_members %}
+            <div class="col">
+                <div class="team-member wow fadeInUp delay-0-2s">
+                    <div class="image">
+                        <img src="{{ team_member.image.url }}" alt="Team Member">
+                    </div>
+                    <div class="content">
+
+                        {% lang team_member current_language "name" as name %}
+                        <h4>
+                            {{name}}
+                        </h4>
+
+                        {% lang team_member current_language "designations" as designations %}
+                        <span>
+                            {{designations}}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<!-- Who We Are end -->
+
 <!-- Statistics Area start -->
 <div class="statistics-area pt-50" style="background-image: url('{% static 'frontend/assets/images/hero/hero-two-bg.png' %}')">
     <div class="container">
         <div class="row justify-content-between">
             <div class="col-xl-2 col-lg-3 col-6">
-                
-                
-                
+
+
+
                 <div class="counter-item counter-text-wrap wow fadeInRight delay-0-2s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ number_of_users }}">0</span>
                     {% if current_language == 'en' %}
-                        Happy Users
+                    Happy Users
                     {% elif current_language == 'ar' %}
-                        المستخدمون السعداء
+                    المستخدمون السعداء
                     {% endif %}
                 </div>
-         
+
             </div>
             <div class="col-xl-2 col-lg-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInRight delay-0-4s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ team_created }}">0</span>
                     {% if current_language == 'en' %}
-                        Teams Created
+                    Teams Created
                     {% elif current_language == 'ar' %}
-                        الفرق التي تم إنشاؤها
+                    الفرق التي تم إنشاؤها
                     {% endif %}
                 </div>
             </div>
@@ -192,21 +192,21 @@
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ tournament_organized }}">0</span>
                     {% if current_language == 'en' %}
-                        Tournaments Organized
+                    Tournaments Organized
                     {% elif current_language == 'ar' %}
-                        البطولات المنظمة
+                    البطولات المنظمة
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="col-xl-2 col-lg-3 col-6">
                 <div class="counter-item counter-text-wrap wow fadeInRight delay-0-5s">
                     <i class="fa-regular fa-circle-check"></i>
                     <span class="count-text" data-speed="3000" data-stop="{{ games_played }}">0</span>
                     {% if current_language == 'en' %}
-                        Games Played
+                    Games Played
                     {% elif current_language == 'ar' %}
-                        المباريات played
+                    المباريات played
                     {% endif %}
                 </div>
             </div>
@@ -214,104 +214,104 @@
     </div>
 </div>
 <!-- Statistics Area end -->
-        
-        <!-- Testimonial Area start -->
-        <section class="testimonial-section pt-80">
-            <div class="container container-1210">
-                <div class="row">
-                   <div class="col-lg-6 col-md-4">
-                       <div class="image-border-shape rmb-20 wow fadeInRight delay-0-2s">
-                        <img src="/media/{{ cmsdata.section_3_feature_icons }}" alt="Testimonial Left Image">
 
-                        <div class="bottom-border"></div>
-                       </div>
-                   </div>
-                    <div class="col-lg-6 col-md-8">
-                        <div class="testimonial-one-right-part wow fadeInLeft delay-0-2s">
-                            <div class="testimonials-active">
-                                {% for testimonial in testimonials %}
-                                <div class="testimonial-item">
-                                    <div class="author-speech">
-                                        <p>
-                                            {% lang testimonial current_language "content" as content %}
-                                                                                   
-                                            <span class="quote">“</span> 
-                                            {{content}}
-                                            <span class="quote right-quote">“</span>
-                                        </p>
+<!-- Testimonial Area start -->
+<section class="testimonial-section pt-80">
+    <div class="container container-1210">
+        <div class="row">
+            <div class="col-lg-6 col-md-4">
+                <div class="image-border-shape rmb-20 wow fadeInRight delay-0-2s">
+                    <img src="/media/{{ cmsdata.section_3_feature_icons }}" alt="Testimonial Left Image">
+
+                    <div class="bottom-border"></div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-8">
+                <div class="testimonial-one-right-part wow fadeInLeft delay-0-2s">
+                    <div class="testimonials-active">
+                        {% for testimonial in testimonials %}
+                        <div class="testimonial-item">
+                            <div class="author-speech">
+                                <p>
+                                    {% lang testimonial current_language "content" as content %}
+
+                                    <span class="quote">“</span>
+                                    {{content}}
+                                    <span class="quote right-quote">“</span>
+                                </p>
+                            </div>
+                            <div class="testimonial-footer">
+                                <div class="testimonial-author">
+                                    <div class="author-image">
+                                        <img src="{{ testimonial.image.url }}" alt="Author Image">
                                     </div>
-                                    <div class="testimonial-footer">
-                                        <div class="testimonial-author">
-                                            <div class="author-image">
-                                                <img src="{{ testimonial.image.url }}" alt="Author Image">
-                                            </div>
-                                            <div class="author-info">
-                                                {% lang testimonial current_language "name" as name %}
-                                                <h4>
-                                                    {{name}}
-                                                </h4>
-                                                {% lang testimonial current_language "designations" as designations %}
-                                                <span class="designation">
-                                                {{designations}}    
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="ratting style-two">
-                                            <div class="star-rating" data-rating="{{ testimonial.rattings }}">
-                                                <div class="filled-stars">★★★★★</div>
-                                                ★★★★★
-                                            </div>
-                                        </div>
+                                    <div class="author-info">
+                                        {% lang testimonial current_language "name" as name %}
+                                        <h4>
+                                            {{name}}
+                                        </h4>
+                                        {% lang testimonial current_language "designations" as designations %}
+                                        <span class="designation">
+                                            {{designations}}
+                                        </span>
                                     </div>
                                 </div>
-                                {% endfor %}
-                            </div>
-                            <div class="testimonial-controls mt-75 rmt-40">
-                                <button class="testimonial-prev">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <div class="testimonial-dots"></div>
-                                <button class="testimonial-next">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
+                                <div class="ratting style-two">
+                                    <div class="star-rating" data-rating="{{ testimonial.rattings }}">
+                                        <div class="filled-stars">★★★★★</div>
+                                        ★★★★★
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        {% endfor %}
+                    </div>
+                    <div class="testimonial-controls mt-75 rmt-40">
+                        <button class="testimonial-prev">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <div class="testimonial-dots"></div>
+                        <button class="testimonial-next">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-        </section>
-        <!-- Testimonial Area end -->
-        
-        <!-- Client Logo Two start -->
-        <section class="client-logo-area py-100">
-            <div class="container">
-                <div class="section-title text-center mb-60">
-                    {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
-                    <h3>
-                       {{section_3_heading}} 
-                    </h3>
-                </div>
-                <div class="clients-logo-slider">
-                    {% for global_client in global_clients %}
+        </div>
+    </div>
+</section>
+<!-- Testimonial Area end -->
 
-                        <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
-                            <img src="{{ global_client.image.url }}" alt="Client Logo">
-                        </a>
-                    {% endfor %}
+<!-- Client Logo Two start -->
+<section class="client-logo-area py-100">
+    <div class="container">
+        <div class="section-title text-center mb-60">
+            {% lang cmsdata current_language "section_3_heading" as section_3_heading %}
+            <h3>
+                {{section_3_heading}}
+            </h3>
+        </div>
+        <div class="clients-logo-slider">
+            {% for global_client in global_clients %}
 
-                </div>
-                <div class="work-gallery-controls">
-                    <button class="clients-logo-slider-prev">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <div class="clients-logo-slider-dots"></div>
-                    <button class="clients-logo-slider-next">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-        {% endblock %}
+            <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
+                <img src="{{ global_client.image.url }}" alt="Client Logo">
+            </a>
+            {% endfor %}
+
+        </div>
+        <div class="work-gallery-controls">
+            <button class="clients-logo-slider-prev">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="clients-logo-slider-dots"></div>
+            <button class="clients-logo-slider-next">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
 
 {% block scriptcontent %}
@@ -320,7 +320,7 @@
         // Set default language from localStorage or 'en' by default
         const currentLanguage = localStorage.getItem('language') || 'en';
         document.getElementById('language-selector').value = currentLanguage;
-
+    
         // On language change, update localStorage
         document.getElementById('change-language-btn').addEventListener('click', function() {
             const selectedLanguage = document.getElementById('language-selector').value;
@@ -338,6 +338,8 @@
         const widthPercentage = (rating / 5) * 100;
         starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
     });
-</script> 
-<script>new WOW().init();</script>
+</script>
+<script>
+    new WOW().init();
+</script>
 {% endblock %}
