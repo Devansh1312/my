@@ -1361,9 +1361,9 @@ class GameDetailsAPIView(APIView):
             "game_duration": game_duration,  # Include game duration
             "group_id": game.group_id.id if game.group_id else None,
             "group_name": game.group_id.group_name if game.group_id else None,
-            "team_a_name": game.team_a.team_id.team_name if game.team_a and game.team_a.team_id else None,
+            "team_a_name": game.team_a.team_name if game.team_a and game.team_a.team_id else None,
             "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
-            "team_b_name": game.team_b.team_id.team_name if game.team_b and game.team_b.team_id else None,
+            "team_b_name": game.team_b.team_name if game.team_b and game.team_b.team_id else None,
             "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None,
             "game_field_id": game.game_field_id.id if game.game_field_id else None,
             "game_field_name": game.game_field_id.field_name if game.game_field_id else None,
