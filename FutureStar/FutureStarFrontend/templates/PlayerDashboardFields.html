@@ -9,7 +9,13 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}Goalactico || Fields{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Fields
+    {% elif current_language == 'ar' %}
+        جولاكتكو || المجالات
+    {% endif %}
+{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 

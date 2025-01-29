@@ -7,7 +7,13 @@
 
 <!-- Plugins css Ends-->
 {% endblock %}
-{% block title %} Goalactico || Discover{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Discover
+    {% elif current_language == 'ar' %}
+        جولأكتكو || اكتشف
+    {% endif %}
+{% endblock %}
 {% block content %}
 <!-- Page Banner Start -->
 <section class="discover-banner text-center">

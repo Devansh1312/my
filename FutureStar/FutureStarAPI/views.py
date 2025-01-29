@@ -3299,8 +3299,14 @@ class ListFieldsAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Fetch all fields ordered by the latest creation date
-        fields_queryset = Field.objects.all().order_by('-created_at')
+        # Get city_id from query parameters and handle 0, blank, or null values
+        city_id = request.query_params.get('city_id')
+
+        # Fetch fields based on city_id if provided and valid
+        if city_id and city_id.strip() != "0":
+            fields_queryset = Field.objects.filter(city_id=city_id).order_by('-created_at')
+        else:
+            fields_queryset = Field.objects.all().order_by('-created_at')
 
         # Serialize the data
         serializer = FieldDetailSerializer(fields_queryset, many=True)
@@ -3311,8 +3317,6 @@ class ListFieldsAPIView(APIView):
             'message': _('Fields fetched successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
-
-
 
 
 ##################################################################### User Gender List API View ##############################################################################

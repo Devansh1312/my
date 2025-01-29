@@ -57,7 +57,13 @@
  </style>
  {% endblock %}
 
-{% block title %} Goalactico || Success-Stories {% endblock %}
+ {% block title %}
+ {% if current_language == 'en' %}
+     Goalactico || Success-Stories
+ {% elif current_language == 'ar' %}
+     جولاكتكو || قصص النجاح
+ {% endif %}
+{% endblock %}
 
 {% block content %}
 

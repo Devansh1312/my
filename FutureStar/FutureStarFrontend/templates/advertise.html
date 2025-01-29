@@ -7,7 +7,13 @@
 
 <!-- Plugins css Ends-->
 {% endblock %}
-{% block title %} Goalactico || Advertise{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Advertise
+    {% elif current_language == 'ar' %}
+        جولأكتكو || إعلانات
+    {% endif %}
+{% endblock %}
 {% block content %}
 
 

@@ -9,7 +9,13 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}Goalactico || Player-Info{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Player-Info
+    {% elif current_language == 'ar' %}
+        جولاكتكو || معلومات اللاعب
+    {% endif %}
+{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 

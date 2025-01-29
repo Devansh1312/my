@@ -165,7 +165,7 @@
                      <span>{{ game.team_a.team_name }}</span>
                   </div>
                   <!-- Center: Game Time or Score -->
-                  <div class="game-time"> {% if game.finish %} <span>{{ game.team_a_goal }} - {{ game.team_b_goal }}</span> {% else %} <span>{{ game.game_start_time|default:"Not Available" }}</span> {% endif %} </div>
+                  <div class="game-time"> {% if game.finish %} <span>{{ game.team_a_goal }} - {{ game.team_b_goal }}</span> {% else %} <span>{{ game.game_date|date:"d M Y" }} {{ game.game_start_time|date:"h:i A" }}</span> {% endif %} </div>
                   <!-- Right Side: Team B Logo and Name -->
                   <div class="team-b">
                      <img src="{{ game.team_b.team_id.team_logo.url|default:'path/to/default-logo.png' }}" alt="Team B Logo">

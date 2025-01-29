@@ -8,7 +8,13 @@
 {% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 
-{% block title %} Goalactico || Terms of Services{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Terms of Services
+    {% elif current_language == 'ar' %}
+        جولاكتكو || شروط الخدمة
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <!-- Conditional styles based on URL parameters -->

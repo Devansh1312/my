@@ -45,7 +45,13 @@
 </style>
 {% endblock %}
 
-{% block title %} Goalactico || Register {% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Register
+    {% elif current_language == 'ar' %}
+        جولاكتكو || التسجيل
+    {% endif %}
+{% endblock %}
 {% block content %}
 <!-- Page Banner Start -->
 <section class="services-area-six pt-150 pb-60 rel">

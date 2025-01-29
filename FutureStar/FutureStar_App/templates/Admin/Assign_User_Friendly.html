@@ -47,7 +47,7 @@
                                         <td>{{ game.game_number }}</td>
                                         <td>{{ game.team_a.team_name }}</td>
                                         <td>{{ game.team_b.team_name }}</td>
-                                        <td>{{ game.game_date }}{{ game.game_start_time }}</td>
+                                        <td>{{ game.game_date|date:"d M Y" }} {{ game.game_start_time|date:"h:i A" }}</td>
                                         <td>{{ game.game_field_id.field_name}}</td>
                                         <td>{{ game.created_by.username }}</td>
 

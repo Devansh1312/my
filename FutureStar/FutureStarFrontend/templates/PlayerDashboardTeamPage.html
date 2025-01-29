@@ -9,7 +9,13 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}Goalactico || Team {% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Team
+    {% elif current_language == 'ar' %}
+        جولاكتكو || الفريق
+    {% endif %}
+{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 

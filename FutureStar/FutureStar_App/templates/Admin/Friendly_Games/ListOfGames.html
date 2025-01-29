@@ -47,8 +47,8 @@ Friendly Game Stats
                                         <td>{{ game.game_number }}</td>
                                         <td>{{ game.team_a.team_name }}</td>
                                         <td>{{ game.team_b.team_name }}</td>
-                                        <td>{{ game.game_date }}</td>
-                                        <td>{{ game.game_start_time }}</td>
+                                        <td>{{ game.game_date|date:"d M Y" }}</td>
+                                        <td>{{ game.game_start_time|date:"h:i A" }}</td>
                                         <td>{{ game.created_by.username }}</td>
                                         <td>
                                             <a href="#" class="btn btn-primary btn-sm edit-stats-btn"

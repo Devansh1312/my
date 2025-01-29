@@ -9,7 +9,13 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %} Goalactico || Privacy Policy{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Privacy Policy
+    {% elif current_language == 'ar' %}
+        جولاكتكو || سياسة الخصوصية
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <!-- Conditional styles based on URL parameters -->

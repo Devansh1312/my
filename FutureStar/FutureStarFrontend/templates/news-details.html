@@ -7,7 +7,13 @@
 
 <!-- Plugins css Ends-->
 {% endblock %}
-{% block title %} Goalactico || News-Detail{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || News-Detail
+    {% elif current_language == 'ar' %}
+        جولأكتكو || تفاصيل الأخبار
+    {% endif %}
+{% endblock %}
 {% block content %}
 
 <section class="page-banner-area overlay pt-250 pb-50 rel z-1 bgs-cover" style="background-image: url('/media/{{ cmsdata.heading_banner }}');">

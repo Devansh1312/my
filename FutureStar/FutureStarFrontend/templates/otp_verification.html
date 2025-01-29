@@ -31,7 +31,13 @@
 </style>
 {% endblock %}
 
-{% block title %}Goalactico || Otp - Verify{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Otp - Verify
+    {% elif current_language == 'ar' %}
+        جولأكتكو || التحقق من OTP
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <section class="services-area-six pt-150 pb-60 rel">

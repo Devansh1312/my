@@ -149,7 +149,13 @@
 	}
 </style> 
 {% endblock %} 
-{% block title %} Goalactico || Search {% endblock %} 
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Search
+    {% elif current_language == 'ar' %}
+        جولاكتكو || البحث
+    {% endif %}
+{% endblock %}
 {% block content %}
 <div class="page-wrapper">
 	<section class="success-players">

@@ -59,7 +59,6 @@ class MiddlewareToken(MiddlewareMixin):
                 "/api/fields/list/",                   # List Fields API
                 "/api/genders/",                       # User Gender List API
                 "/api/age_groups/",                   # Age Groups List API
-                "/api/general/settings/",              # General Settings API
                 "/api/faq/",                           # FAQ API
                 "/api/role/",                          # User Roles API
                 "/api/locations/",                     # Locations API

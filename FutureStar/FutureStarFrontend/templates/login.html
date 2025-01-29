@@ -1,7 +1,13 @@
 {% extends 'base1.html' %}
 {% load static %}
 {% load lang_filter %}
-{% block title %} Goalactico || Login {% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Login
+    {% elif current_language == 'ar' %}
+        جولأكتكو || تسجيل الدخول
+    {% endif %}
+{% endblock %}
 {% block content %}
 
 <section class="services-area-six pt-150 pb-60 rel">

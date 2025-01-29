@@ -9,7 +9,13 @@
 <!-- Plugins css Ends-->
 {% endblock %}
 
-{% block title %}Goalactico || Dashboard{% endblock %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Dashboard
+    {% elif current_language == 'ar' %}
+        جولأكتكو || لوحة القيادة
+    {% endif %}
+{% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
 
