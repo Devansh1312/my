@@ -1066,7 +1066,10 @@ class SendRefereeNotification(APIView):
         game_id = request.query_params.get('game_id')
 
         if not game_id:
-            return Response({"status": "error", "message": "game_id parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'status': 0,
+                'message': _('game id  is required.'),
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             # Retrieve the FriendlyGame instance by game_id
@@ -1082,7 +1085,7 @@ class SendRefereeNotification(APIView):
                     activate(notification_language)
 
                 # Prepare push notification content
-                title = _("New Friendly Game Invitation")
+                title = _("Invitation to Referee a Friendly Game")
                 body = _("A new friendly game '{game_name}' has been scheduled on {game_date} at {game_time} at {field}. "
                          "Would you like to participate as a referee?").format(
                     game_name=friendly_game.game_name,
@@ -1124,10 +1127,22 @@ class SendRefereeNotification(APIView):
                     )
                     notification.save()
 
-            return Response({"status": "success", "message": "Notifications sent successfully."}, status=status.HTTP_200_OK)
+            return Response({
+                'status': 1,
+                'message': _('Notifications sent successfully.'),
+            }, status=status.HTTP_200_OK)
 
         except FriendlyGame.DoesNotExist:
-            return Response({"status": "error", "message": "Game not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 ################## participates players of particular team for particular tournament ###############
