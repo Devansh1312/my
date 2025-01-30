@@ -352,8 +352,6 @@ class TournamentAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
-
     ############################# EDIT AND DELETE###################
 
     def patch(self, request, *args, **kwargs):
@@ -1435,14 +1433,6 @@ class UpdateTournamentGameDetailAPIView(APIView):
                 'message': _('Game not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # # Ensure `game_number` is not in the request data
-        # if "game_number" in request.data:
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('Updating game number is not allowed.')
-        #     }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Update the game details
         serializer = TournamentGamesSerializer(game, data=request.data, partial=True)
         try:
             if serializer.is_valid():
