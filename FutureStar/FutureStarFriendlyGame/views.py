@@ -1073,8 +1073,7 @@ class SendRefereeNotification(APIView):
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game_id is required.'),
-                'data': {}
+                'message': _('game id is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -1137,14 +1136,12 @@ class SendRefereeNotification(APIView):
             return Response({
                 'status': 1,
                 'message': _('Notifications sent successfully.'),
-                'data': {}
             }, status=status.HTTP_200_OK)
 
         except FriendlyGame.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Game not found.'),
-                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
 
 ################## participates players of particular team for particular tournament ###############
@@ -1625,6 +1622,12 @@ class FriendlyGameLineupPlayers(APIView):
                 'status': 0,
                 'message': _('Game ID is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if positions == []:
+            return Response({
+                'status': 1,
+                'message': _('No lineup changes to update.'),
+            }, status=status.HTTP_200_OK)
 
         # Validate positions data
         if not positions or not isinstance(positions, list):

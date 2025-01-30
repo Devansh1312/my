@@ -559,6 +559,12 @@ class LineupPlayers(APIView):
                 'status': 0,
                 'message': _('Game ID is required.'),
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if positions == []:
+            return Response({
+                'status': 1,
+                'message': _('No lineup changes to update.'),
+            }, status=status.HTTP_200_OK)
 
         # Validate positions data
         if not positions or not isinstance(positions, list):
