@@ -1980,15 +1980,19 @@ class GameUniformColorAPIView(APIView):
             data = {
                 "primary_color_player": game.team_a_primary_color_player,
                 "secondary_color_player": game.team_a_secondary_color_player,
+                "third_color_player": game.team_a_third_color_player,
                 "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper
+                "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+                "third_color_goalkeeper": game.team_a_third_color_goalkeeper
             }
         elif game.team_b.id == int(team_id):
             data = {
                 "primary_color_player": game.team_b_primary_color_player,
                 "secondary_color_player": game.team_b_secondary_color_player,
+                "third_color_player": game.team_b_third_color_player,
                 "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
-                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper
+                "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+                "third_color_goalkeeper": game.team_b_third_color_goalkeeper
             }
         else:
             return Response({
@@ -2041,8 +2045,10 @@ class TeamUniformColorAPIView(APIView):
             team_id = validated_data['team_id']
             primary_color_player = validated_data['primary_color_player']
             secondary_color_player = validated_data['secondary_color_player']
+            third_color_player = validated_data['third_color_player']
             primary_color_goalkeeper = validated_data['primary_color_goalkeeper']
             secondary_color_goalkeeper = validated_data['secondary_color_goalkeeper']
+            third_color_goalkeeper = validated_data['third_color_goalkeeper']
 
             if not self._has_access(request.user, team_id):
                 return Response({
@@ -2064,13 +2070,17 @@ class TeamUniformColorAPIView(APIView):
             if team_id == game.team_a.id:
                 game.team_a_primary_color_player = primary_color_player
                 game.team_a_secondary_color_player = secondary_color_player
+                game.team_a_third_color_player = third_color_player
                 game.team_a_primary_color_goalkeeper = primary_color_goalkeeper
                 game.team_a_secondary_color_goalkeeper = secondary_color_goalkeeper
+                game.team_a_third_color_goalkeeper = third_color_goalkeeper
             elif team_id == game.team_b.id:
                 game.team_b_primary_color_player = primary_color_player
                 game.team_b_secondary_color_player = secondary_color_player
+                game.team_b_third_color_player = third_color_player
                 game.team_b_primary_color_goalkeeper = primary_color_goalkeeper
                 game.team_b_secondary_color_goalkeeper = secondary_color_goalkeeper
+                game.team_b_third_color_goalkeeper = third_color_goalkeeper
             else:
                 return Response({
                     'status': 0,
@@ -2164,8 +2174,10 @@ class FetchTeamUniformColorAPIView(APIView):
             "team_name": game.team_a.team_name,  # Assuming the `TeamBranch` model has a `name` field
             "primary_color_player": game.team_a_primary_color_player,
             "secondary_color_player": game.team_a_secondary_color_player,
+            "third_color_player": game.team_a_third_color_player,
             "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
             "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+            "third_color_goalkeeper": game.team_a_third_color_goalkeeper,
         }
 
         team_b_data = {
@@ -2173,8 +2185,10 @@ class FetchTeamUniformColorAPIView(APIView):
             "team_name": game.team_b.team_name,  # Assuming the `TeamBranch` model has a `name` field
             "primary_color_player": game.team_b_primary_color_player,
             "secondary_color_player": game.team_b_secondary_color_player,
+            "third_color_player": game.team_b_third_color_player,
             "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
             "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+            "third_color_goalkeeper": game.team_b_third_color_goalkeeper,
         }
 
         return Response({
@@ -2234,12 +2248,16 @@ class FetchTeamUniformColorAPIView(APIView):
             if not is_confirm:
                 game.team_a_primary_color_player = None
                 game.team_a_secondary_color_player = None
+                game.team_a_third_color_player = None
                 game.team_a_primary_color_goalkeeper = None
                 game.team_a_secondary_color_goalkeeper = None
+                game.team_a_third_color_goalkeeper = None
                 game.team_b_primary_color_player = None
                 game.team_b_secondary_color_player = None
+                game.team_b_third_color_player = None
                 game.team_b_primary_color_goalkeeper = None
                 game.team_b_secondary_color_goalkeeper = None
+                game.team_b_third_color_goalkeeper = None
                 # Send rejection notification to both teams' managers
                 self.notify_team_managers(game)
 
@@ -2254,8 +2272,10 @@ class FetchTeamUniformColorAPIView(APIView):
                 "team_name": game.team_a.team_name,
                 "primary_color_player": game.team_a_primary_color_player,
                 "secondary_color_player": game.team_a_secondary_color_player,
+                "third_color_player": game.team_a_third_color_player,
                 "primary_color_goalkeeper": game.team_a_primary_color_goalkeeper,
                 "secondary_color_goalkeeper": game.team_a_secondary_color_goalkeeper,
+                "third_color_goalkeeper": game.team_a_third_color_goalkeeper,
             }
 
             team_b_data = {
@@ -2263,8 +2283,10 @@ class FetchTeamUniformColorAPIView(APIView):
                 "team_name": game.team_b.team_name,
                 "primary_color_player": game.team_b_primary_color_player,
                 "secondary_color_player": game.team_b_secondary_color_player,
+                "third_color_player": game.team_b_third_color_player,
                 "primary_color_goalkeeper": game.team_b_primary_color_goalkeeper,
                 "secondary_color_goalkeeper": game.team_b_secondary_color_goalkeeper,
+                "third_color_goalkeeper": game.team_b_third_color_goalkeeper,
             }
 
             # Dynamic success message based on is_confirm value

@@ -34,12 +34,22 @@ class FriendlyGame(models.Model):
 
     team_a_primary_color_player = models.CharField(max_length=255,null=True,blank=True)
     team_a_secondary_color_player = models.CharField(max_length=255,null=True,blank=True)
+    team_a_third_color_player = models.CharField(max_length=255,null=True,blank=True)
+
+
     team_a_primary_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
     team_a_secondary_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
+    team_a_third_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
+
+
     team_b_primary_color_player = models.CharField(max_length=255,null=True,blank=True)
     team_b_secondary_color_player = models.CharField(max_length=255,null=True,blank=True)
+    team_b_third_color_player = models.CharField(max_length=255,null=True,blank=True)
+
+
     team_b_primary_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
     team_b_secondary_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
+    team_b_third_color_goalkeeper = models.CharField(max_length=255,null=True,blank=True)
 
     #GAME_STATS
     #General

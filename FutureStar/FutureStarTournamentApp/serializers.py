@@ -292,8 +292,10 @@ class TeamUniformColorSerializer(serializers.Serializer):
     team_id = serializers.IntegerField()  # Can be either team_a or team_b
     primary_color_player = serializers.CharField(max_length=255, required=True)
     secondary_color_player = serializers.CharField(max_length=255, required=True)
+    third_color_player = serializers.CharField(max_length=255, required=True)
     primary_color_goalkeeper = serializers.CharField(max_length=255, required=True)
     secondary_color_goalkeeper = serializers.CharField(max_length=255, required=True)
+    third_color_goalkeeper = serializers.CharField(max_length=255, required=True)
 
     def validate(self, data):
         game_id = data.get('game_id')
