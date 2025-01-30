@@ -14232,15 +14232,30 @@ background: linear-gradient(to bottom,  #344A6C 0%,#284700 100%); /* W3C, IE10+,
 .success-players .item-wrapper .social-info-wrapper .social-info-item {
   position: relative;
 }
-.success-players .item-wrapper .social-info-wrapper .social-info-item::after {
+/* Default LTR styles */
+html[dir="ltr"] .success-players .item-wrapper .social-info-wrapper .social-info-item::after {
   content: '';
   position: absolute;
   top: 8px;
   right: -18px;
   border-right: 2px solid #D9D9D9;
   height: 70%;
-  opacity: .3;
+  opacity: 0.3;
 }
+
+/* RTL styles */
+html[dir="rtl"] .success-players .item-wrapper .social-info-wrapper .social-info-item::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: -18px;
+  right: auto;
+  border-left: 2px solid #D9D9D9;
+  border-right: none;
+  height: 70%;
+  opacity: 0.3;
+}
+
 .success-players .item-wrapper .social-info-wrapper .social-info-item:last-child:after {
   display: none;
 }
