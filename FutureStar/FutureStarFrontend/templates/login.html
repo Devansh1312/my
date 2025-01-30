@@ -1,6 +1,19 @@
 {% extends 'base1.html' %}
 {% load static %}
 {% load lang_filter %}
+
+
+{% block meta_title %}
+{% lang cmsdata current_language "meta_title" as meta_title %}
+{{meta_title}}
+{% endblock %}
+
+{% block meta_description %}
+{% lang cmsdata current_language "meta_content" as meta_content %}
+{{meta_content}}
+{% endblock %}
+
+
 {% block title %}
     {% if current_language == 'en' %}
         Goalactico || Login

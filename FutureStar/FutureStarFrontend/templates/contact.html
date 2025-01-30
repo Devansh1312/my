@@ -2,7 +2,15 @@
 <!-- Loading your custom filter --> {% block css %}
 <!-- Plugins css start-->
 <!-- Plugins css Ends--> {% endblock %}
- 
+{% block meta_title %}
+{% lang cmsdata current_language "meta_title" as meta_title %}
+{{meta_title}}
+{% endblock %}
+
+{% block meta_description %}
+{% lang cmsdata current_language "meta_content" as meta_content %}
+{{meta_content}}
+{% endblock %} 
 {% block title %}
     {% if current_language == 'en' %}
         Goalactico || Contact Us

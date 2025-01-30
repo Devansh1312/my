@@ -3691,6 +3691,7 @@ class TeamPageDashboard(LoginRequiredMixin, View):
                 'team': team,
                 'current_language': language_from_url,  # Add language to context
                 'user': user,
+                "cmsdata": cms_pages.objects.filter(id=14).first(),
             }
             return render(request, self.template_name, context)
 
@@ -3719,6 +3720,7 @@ class UserJoinedTeamInfo(LoginRequiredMixin, View):
         context = {
             "current_language": language_from_url,
             "team_branches": team_branches,
+            "cmsdata": cms_pages.objects.filter(id=14).first(),
         }
 
         return render(request, self.template_name, context)
