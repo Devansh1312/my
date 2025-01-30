@@ -13,6 +13,10 @@ urlpatterns = [
       path('api/friendlygames/team_list_of_manager/', ManagerBranchDetail.as_view()),
       path('api/friendlygames/delete/', DeleteFriendlyGame.as_view()),
       path('api/friendlygames/detail/', FriendlyGameDetailAPIView.as_view()),
+      
+      path('api/send_referee_notification/', SendRefereeNotification.as_view(), name='send_referee_notification'),
+
+
       path('api/friendly-game/list/', ListOfFridlyGamesForJoin.as_view()),
       path('api/friendly-game/branch_list/', TeamBranchListView.as_view()),
       path('api/friendlygames/teamplayers/', FriendlyGameTeamPlayersAPIView.as_view()),

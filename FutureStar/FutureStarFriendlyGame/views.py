@@ -1058,6 +1058,78 @@ class FriendlyGameDetailAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+################## send notification to referee ###############
+class SendRefereeNotification(APIView):
+
+    def get(self, request, *args, **kwargs):
+        # Get game_id from query parameters
+        game_id = request.query_params.get('game_id')
+
+        if not game_id:
+            return Response({"status": "error", "message": "game_id parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Retrieve the FriendlyGame instance by game_id
+            friendly_game = FriendlyGame.objects.get(id=game_id)
+
+            # Fetch users with role ID 4 (referees)
+            referees = User.objects.filter(role_id=4)
+
+            for referee in referees:
+                # Get the referee's current language
+                notification_language = referee.current_language
+                if notification_language in ['ar', 'en']:
+                    activate(notification_language)
+
+                # Prepare push notification content
+                title = _("New Friendly Game Invitation")
+                body = _("A new friendly game '{game_name}' has been scheduled on {game_date} at {game_time} at {field}. "
+                         "Would you like to participate as a referee?").format(
+                    game_name=friendly_game.game_name,
+                    game_date=friendly_game.game_date.strftime('%d-%m'),
+                    game_time=friendly_game.game_start_time.strftime('%H:%M'),
+                    field=friendly_game.game_field_id.field_name
+                )
+
+                friendly_data = {
+                    "id": friendly_game.id,  # Include the game ID
+                    "game_type": "friendly"
+                }
+                push_data = {
+                    "game_data": friendly_data,  # Include the game data
+                    "type": "friendly_game_scheduled"
+                }
+
+                # Check device token for each referee and send push notification if exists
+                device_token = referee.device_token
+                device_type = referee.device_type
+
+                if device_token:
+                    send_push_notification(
+                        device_token=device_token,
+                        title=title,
+                        body=body,
+                        device_type=device_type,
+                        data=push_data
+                    )
+
+                    # Create and save a notification for the referee
+                    notification = Notifictions.objects.create(
+                        created_by_id=friendly_game.created_by.id,  # The user who created the friendly game
+                        creator_type=1,  # Assuming 1 represents the requestor type
+                        targeted_id=referee.id,  # Referee ID
+                        targeted_type=1,  # Assuming 1 represents a user
+                        title=title,
+                        content=body
+                    )
+                    notification.save()
+
+            return Response({"status": "success", "message": "Notifications sent successfully."}, status=status.HTTP_200_OK)
+
+        except FriendlyGame.DoesNotExist:
+            return Response({"status": "error", "message": "Game not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
 ################## participates players of particular team for particular tournament ###############
 
 class FriendlyGameTeamPlayersAPIView(APIView):
