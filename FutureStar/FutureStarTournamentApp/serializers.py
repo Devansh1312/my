@@ -174,6 +174,33 @@ class TournamentSerializer(serializers.ModelSerializer):
             GroupTable.objects.create(tournament_id=tournament, group_name=group_name)
 
         return tournament
+    
+    def update(self, instance, validated_data):
+        # Get the updated number of groups
+        updated_number_of_groups = validated_data.get('number_of_group', instance.number_of_group)
+
+        # Calculate the difference in the number of groups
+        current_number_of_groups = instance.number_of_group
+        group_difference = updated_number_of_groups - current_number_of_groups
+
+        if group_difference > 0:
+            # If increased, create the new groups
+            existing_groups = GroupTable.objects.filter(tournament_id=instance).count()
+            for i in range(existing_groups, existing_groups + group_difference):
+                group_name = f"Group-{chr(65 + i)}"
+                GroupTable.objects.create(tournament_id=instance, group_name=group_name)
+
+        elif group_difference < 0:
+            # If decreased, delete groups from the last
+            groups_to_delete = GroupTable.objects.filter(tournament_id=instance).order_by('-id')[:abs(group_difference)]
+            groups_to_delete.delete()
+
+        # Update the tournament instance
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class GroupTableSerializer(serializers.ModelSerializer):
