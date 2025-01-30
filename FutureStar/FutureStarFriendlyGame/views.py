@@ -88,6 +88,39 @@ class ManagerBranchDetail(APIView):
 class CreateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        # Extract game_id from request
+        game_id = request.query_params.get('game_id')
+        game_id = int(game_id) if game_id else None
+        print(game_id)
+
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the friendly game based on the provided game_id
+            friendly_game = FriendlyGame.objects.get(id=game_id)
+
+            # Serialize the game data
+            serializer = FriendlyGameSerializer(friendly_game)
+
+            return Response({
+                'status': 1,
+                'message': _('Game data retrieved successfully.'),
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.'),
+                'data': {}
+            }, status=status.HTTP_404_NOT_FOUND)
     
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
