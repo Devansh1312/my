@@ -1061,14 +1061,20 @@ class FriendlyGameDetailAPIView(APIView):
 ################## send notification to referee ###############
 class SendRefereeNotification(APIView):
 
-    def get(self, request, *args, **kwargs):
+   def get(self, request, *args, **kwargs):
+        # Get the language from the request headers (default to 'en' if not provided)
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
         # Get game_id from query parameters
         game_id = request.query_params.get('game_id')
 
         if not game_id:
             return Response({
                 'status': 0,
-                'message': _('game id  is required.'),
+                'message': _('game_id is required.'),
+                'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -1086,6 +1092,7 @@ class SendRefereeNotification(APIView):
 
                 # Prepare push notification content
                 title = _("Invitation to Referee a Friendly Game")
+               
                 body = _("A new friendly game '{game_name}' has been scheduled on {game_date} at {game_time} at {field}. "
                          "Would you like to participate as a referee?").format(
                     game_name=friendly_game.game_name,
@@ -1130,20 +1137,15 @@ class SendRefereeNotification(APIView):
             return Response({
                 'status': 1,
                 'message': _('Notifications sent successfully.'),
+                'data': {}
             }, status=status.HTTP_200_OK)
 
         except FriendlyGame.DoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Game not found.'),
+                'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
-
-        except Exception as e:
-            return Response({
-                'status': 0,
-                'message': str(e),
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 ################## participates players of particular team for particular tournament ###############
 
