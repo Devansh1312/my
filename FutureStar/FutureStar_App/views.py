@@ -2984,8 +2984,8 @@ def saveAboutUspage(request):
                 # meta section
                 aboutussave.meta_title_en = seo_title_en
                 aboutussave.meta_title_ar = seo_title_ar
-                aboutussave.meta_content_ar = seo_content_en
-                aboutussave.meta_content_en = seo_content_ar
+                aboutussave.meta_content_ar = seo_content_ar
+                aboutussave.meta_content_en = seo_content_en
                 #youtube URl
                 aboutussave.achivement_title_en = achivement_title_en
 
