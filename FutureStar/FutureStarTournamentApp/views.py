@@ -1421,7 +1421,10 @@ class UpdateTournamentGameDetailAPIView(APIView):
             activate(language)
 
         # Extract the game ID from the URL
-        game_id = kwargs.get("game_id")
+        game_id =request.data.get("game_id")
+        group_id = request.data.get("group_id")
+        if group_id == 0 or group_id == "0":
+            request.data["group_id"] = None
         if not game_id:
             return Response({
                 'status': 0,
