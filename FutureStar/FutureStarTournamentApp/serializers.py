@@ -192,8 +192,9 @@ class TournamentSerializer(serializers.ModelSerializer):
 
         elif group_difference < 0:
             # If decreased, delete groups from the last
-            groups_to_delete = GroupTable.objects.filter(tournament_id=instance).order_by('-id')[:abs(group_difference)]
-            groups_to_delete.delete()
+            groups_to_delete = list(GroupTable.objects.filter(tournament_id=instance).order_by('-id')[:abs(group_difference)])
+            for group in groups_to_delete:
+                group.delete()
 
         # Update the tournament instance
         for attr, value in validated_data.items():
@@ -201,6 +202,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
 
 
 class GroupTableSerializer(serializers.ModelSerializer):

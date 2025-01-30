@@ -13,7 +13,7 @@ urlpatterns = [
         path('api/tournament/my_tournament/', MyTournamentsAPIView.as_view()),
         path('api/tournament/create/', TournamentAPIView.as_view()),
         path('api/tournament/update/', TournamentAPIView.as_view()),
-        path('api/tournament/delete/', TournamentAPIView.as_view()),
+        path('api/tournament/delete/', TournmanetDeleteAPIView.as_view()),
         path('api/tournament/game/detail/', GameDetailsAPIView.as_view()),
         path('api/tournament/team_request/', TeamJoiningRequest.as_view()),
         path('api/tournament/team_reject/', TeamRejectRequest.as_view()),

@@ -421,19 +421,31 @@ class TournamentAPIView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, *args, **kwargs):
+
+
+class TournmanetDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    
+    def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        tournament_id = request.query_params.get('tournament_id')
+        tournament_id = request.data.get('tournament_id')
+        if tournament_id is None:
+            return Response({
+                'status': 0,
+                'message': _('Tournament ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+        tournament_id = int(tournament_id)
         try:
             tournament_instance = Tournament.objects.get(id=tournament_id)
             tournament_instance.delete()
             return Response({
                 'status': 1,
                 'message': _('Tournament deleted successfully.')
-            }, status=status.HTTP_204_NO_CONTENT)
+            }, status=status.HTTP_200_OK)
         except Tournament.DoesNotExist:
             return Response({
                 'status': 0,
