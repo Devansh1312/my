@@ -21,6 +21,9 @@ urlpatterns = [
         path('api/tournament/detail/', TournamentDetailAPIView.as_view()),
         path('api/tournament/team/', TournamentGroupTeamListView.as_view()),
         path('api/tournament/games/create/', TournamentGamesAPIView.as_view()),
+        path('api/tournament/games/edit/', UpdateTournamentGameDetailAPIView.as_view()),
+        path('api/tournament/games/delete/', UpdateTournamentGameDetailAPIView.as_view()),
+
         path('api/tournament/games/', TournamentGamesAPIView.as_view()),
         path('api/tournament/games/update/', TournamentGamesAPIView.as_view()),
         path('api/games/team_uniform/', TeamUniformColorAPIView.as_view()),

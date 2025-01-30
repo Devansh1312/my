@@ -1394,6 +1394,95 @@ class GameDetailsAPIView(APIView):
             "data": game_data
         }, status=status.HTTP_200_OK)
 
+
+######################### Update Tournamnet game API #########################
+class UpdateTournamentGameDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def patch(self, request, *args, **kwargs):
+        # Set language
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Extract the game ID from the URL
+        game_id = kwargs.get("game_id")
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the game object
+            game = TournamentGames.objects.get(id=game_id)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # # Ensure `game_number` is not in the request data
+        # if "game_number" in request.data:
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('Updating game number is not allowed.')
+        #     }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the game details
+        serializer = TournamentGamesSerializer(game, data=request.data, partial=True)
+        try:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'status': 1,
+                    'message': _('Game details updated successfully.'),
+                    'data': serializer.data
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Failed to update game details.'),
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An unexpected error occurred.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def delete(self, request, *args, **kwargs):
+        # Extract the game ID from the URL
+        game_id =request.query_params.get('game_id')
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch and delete the game object
+            game = TournamentGames.objects.get(id=game_id)
+            game.delete()
+            return Response({
+                'status': 1,
+                'message': _('Game deleted successfully.')
+            }, status=status.HTTP_200_OK)
+        except TournamentGames.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An unexpected error occurred.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+######################### Create Tournamnet Game API #######################################################
 class TournamentGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
