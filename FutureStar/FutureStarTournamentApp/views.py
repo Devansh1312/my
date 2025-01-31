@@ -2957,7 +2957,7 @@ class FetchMyGamesAPIView(APIView):
                 })
 
         # Sort all games by game_date and game_start_time
-        all_games.sort(key=lambda x: (x["game_date"], x["game_start_time"]))
+        all_games.sort(key=lambda x: (x["game_date"], x["game_start_time"]), reverse=True)
 
         # Implement Pagination
         page = int(request.GET.get("page", 1))
