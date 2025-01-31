@@ -2990,8 +2990,9 @@ class FetchAllGamesAPIView(APIView):
         user = request.user
         creator_type = request.query_params.get('creator_type')
         created_by_id = request.query_params.get('created_by_id')
-        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
-
+        notification_count = Notifictions.objects.filter(
+            targeted_id=created_by_id, targeted_type=creator_type, read=False
+        ).count()
 
         if not user.is_authenticated:
             return Response({"status": 0, "message": "User is not authenticated."})
@@ -3001,18 +3002,17 @@ class FetchAllGamesAPIView(APIView):
 
         games_by_date = {}
 
-        # Process tournament games
-        for game in tournament_games:
-            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
+        # Helper function to organize games
+        def add_game_to_date(date_str, tournament_name, game_data):
             if date_str not in games_by_date:
                 games_by_date[date_str] = {"tournament": []}
 
-            tournament_name = game.tournament_id.tournament_name if game.tournament_id else "Unknown Tournament"
-            
             tournament_entry = next(
-                (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == tournament_name),
+                (entry for entry in games_by_date[date_str]["tournament"]
+                 if entry["tournament_name"] == tournament_name),
                 None
             )
+
             if not tournament_entry:
                 tournament_entry = {
                     "tournament_name": tournament_name,
@@ -3020,7 +3020,12 @@ class FetchAllGamesAPIView(APIView):
                 }
                 games_by_date[date_str]["tournament"].append(tournament_entry)
 
-            tournament_entry["games"].append({
+            tournament_entry["games"].append(game_data)
+
+        # Process tournament games
+        for game in tournament_games:
+            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
+            game_data = {
                 "id": game.id,
                 "tournament_id": game.tournament_id.id if game.tournament_id else None,
                 "game_number": game.game_number,
@@ -3046,26 +3051,13 @@ class FetchAllGamesAPIView(APIView):
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
                 "game_type": "Tournament",
-            })
+            }
+            add_game_to_date(date_str, game.tournament_id.tournament_name if game.tournament_id else "Unknown Tournament", game_data)
 
-        # Process friendly games as a pseudo-tournament
+        # Process friendly games
         for game in friendly_games:
             date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
-            if date_str not in games_by_date:
-                games_by_date[date_str] = {"tournament": []}
-            
-            friendly_tournament_entry = next(
-                (entry for entry in games_by_date[date_str]["tournament"] if entry["tournament_name"] == "Friendly Games"),
-                None
-            )
-            if not friendly_tournament_entry:
-                friendly_tournament_entry = {
-                    "tournament_name": "Friendly Games",
-                    "games": []
-                }
-                games_by_date[date_str]["tournament"].append(friendly_tournament_entry)
-
-            friendly_tournament_entry["games"].append({
+            game_data = {
                 "id": game.id,
                 "game_number": game.game_number,
                 "game_date": str(game.game_date),
@@ -3090,42 +3082,44 @@ class FetchAllGamesAPIView(APIView):
                 "created_at": game.created_at,
                 "updated_at": game.updated_at,
                 "game_type": "Friendly",
-            })
+            }
+            add_game_to_date(date_str, "Friendly Games", game_data)
 
         # Sort the games by date (latest first)
-            sorted_games_by_date = dict(sorted(
-                games_by_date.items(),
-                key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
-                reverse=True
-            ))
+        sorted_games_by_date = dict(sorted(
+            games_by_date.items(),
+            key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
+            reverse=True
+        ))
 
         # Format the response
-            response_data = [
-                {
-                    "date": date,
-                    "tournament": games["tournament"],
-                }
-                for date, games in sorted_games_by_date.items()
-            ]
+        response_data = [
+            {
+                "date": date,
+                "tournament": games["tournament"],
+            }
+            for date, games in sorted_games_by_date.items()
+        ]
 
-            # Pagination
-            page = int(request.GET.get("page", 1))
-            page_size = 10  # Adjust as needed
-            total_records = len(response_data)
-            total_pages = (total_records + page_size - 1) // page_size
-            start = (page - 1) * page_size
-            end = start + page_size
+        # Pagination
+        page = int(request.GET.get("page", 1))
+        page_size = 10  # Adjust as needed
+        total_records = len(response_data)
+        total_pages = (total_records + page_size - 1) // page_size
+        start = (page - 1) * page_size
+        end = start + page_size
 
-            return Response({
-                "status": 1,
-                "message": "Games fetched successfully.",
-                "total_records": total_records,
-                "total_pages": total_pages,
-                "current_page": page,
-                "data": response_data[start:end],
-                "notification_count": notification_count  # Include notification count here
+        return Response({
+            "status": 1,
+            "message": "Games fetched successfully.",
+            "total_records": total_records,
+            "total_pages": total_pages,
+            "current_page": page,
+            "data": response_data[start:end],
+            "notification_count": notification_count  # Include notification count here
+        })
 
-            })
+
 
 ############################ Tournaments Game Stats  API ########################################
 class TeamGameDetailStatsAPIView(APIView):

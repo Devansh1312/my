@@ -84,6 +84,95 @@ class ManagerBranchDetail(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
+
+
+########## Update Friendly Game Detail API #########
+class UpdateFriendlyGameDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+    def patch(self, request, *args, **kwargs):
+        # Set language
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Check if user has the correct role
+        if request.user.role.id not in [3, 6]:
+            return Response({
+                'status': 0,
+                'message': _('User does not have the required role.'),
+                'data': {}
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Validate game_field_id
+        game_field_id = request.data.get('game_field_id', None)
+        if not game_field_id:
+            return Response({
+                'status': 0,
+                'message': _('Game field ID is required.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            game_field = Field.objects.get(id=game_field_id)
+        except Field.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game field not found.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Extract the game ID from the request
+        game_id = request.data.get("game_id")
+        if not game_id:
+            return Response({
+                'status': 0,
+                'message': _('Game ID is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Fetch the game object
+            game = FriendlyGame.objects.get(id=game_id)
+
+            # Restrict editing if the game has already finished (finish=1)
+            if game.finish == 1:
+                return Response({
+                    'status': 0,
+                    'message': _('Cannot edit a game that has already finished.'),
+                    'data': {}
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        except FriendlyGame.DoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Game not found.')
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Update game details
+        serializer = FriendlyGameSerializer(game, data=request.data, partial=True)
+        try:
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'status': 1,
+                    'message': _('Game details updated successfully.'),
+                    'data': serializer.data
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'status': 0,
+                    'message': _('Failed to update game details.'),
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                'status': 0,
+                'message': _('An unexpected error occurred.'),
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 ################## Create Friedndly game With Request Refree For Game ###############################
 class CreateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
@@ -815,9 +904,11 @@ class UpdateFriendlyGame(APIView):
                 notification.save()
 
 
+################## Delete Friendly Game ################
 class DeleteFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
     def delete(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -845,18 +936,18 @@ class DeleteFriendlyGame(APIView):
             # Retrieve the game instance, ensuring it was created by the current user
             game = FriendlyGame.objects.get(id=game_id, created_by=user_id)
 
-            # Check if the game date is in the future
-            if game.game_date >= timezone.now().date():
+            # Check if the game is not finished (finish should be 0 or False)
+            if not game.finish:  # Assuming 'finish' is a Boolean or 0/1 integer
                 game.delete()
                 return Response({
                     'status': 1,
-                    'message': _('Game Deleted successfully.'),
+                    'message': _('Game deleted successfully.'),
                     'data': {}
-                }, status=status.HTTP_204_NO_CONTENT)
+                }, status=status.HTTP_200_OK)
 
             return Response({
                 'status': 0,
-                'message': _('Cannot delete a game that has already Started.'),
+                'message': _('Cannot delete a game that has already finished.'),
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -866,6 +957,7 @@ class DeleteFriendlyGame(APIView):
                 'message': _('Game not found or not created by you.'),
                 'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
+
         
 
 

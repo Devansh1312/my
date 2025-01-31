@@ -10,6 +10,9 @@ urlpatterns = [
       path('api/friendlygames/requested_referee/list/', OfficialListView.as_view()),
       path('api/friendlygames/edit_detail/', CreateFriendlyGame.as_view()),
       path('api/friendlygames/update/', UpdateFriendlyGame.as_view()),
+
+      path('api/friendlygames/update_detail/', UpdateFriendlyGameDetailAPIView.as_view()),
+
       path('api/friendlygames/team_list_of_manager/', ManagerBranchDetail.as_view()),
       path('api/friendlygames/delete/', DeleteFriendlyGame.as_view()),
       path('api/friendlygames/detail/', FriendlyGameDetailAPIView.as_view()),
