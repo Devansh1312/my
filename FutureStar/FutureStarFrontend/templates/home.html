@@ -750,7 +750,8 @@
         <span></span>
     </div>
 </div>
-<!-- Client Logo Two end --> {% endblock %} {% block scriptcontent %} {% endblock %} {% block script %} <script>
+<!-- Client Logo Two end --> {% endblock %} {% block scriptcontent %} {% endblock %} {% block script %} 
+<script>
     // Initialize star ratings
     const starRatings = document.querySelectorAll('.star-rating');
     starRatings.forEach(function(starRating) {
@@ -758,8 +759,6 @@
         const widthPercentage = (rating / 5) * 100;
         starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
     });
-</script>
-<script>
     document.addEventListener('DOMContentLoaded', function() {
         // Set default language from localStorage or 'en' by default
         const currentLanguage = localStorage.getItem('language') || 'en';
@@ -770,7 +769,22 @@
             localStorage.setItem('language', selectedLanguage);
         });
     });
-</script>
-<script>
+    // Block right-click context menu
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    
+    // Optional: Block common developer tools shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+            (e.ctrlKey && e.key === 'u')) {
+            e.preventDefault();
+            return false;
+        }
+    });
     new WOW().init();
-</script> {% endblock %}
+</script> 
+{% endblock %}

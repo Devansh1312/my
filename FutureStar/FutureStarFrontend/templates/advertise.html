@@ -296,7 +296,24 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
     </div>
 </section>
 <!-- End Training Section -->
-
+<script>
+    // Block right-click context menu
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+    
+// Optional: Block common developer tools shortcuts
+document.addEventListener('keydown', function(e) {
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'u')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
 
 {% endblock %}
 
