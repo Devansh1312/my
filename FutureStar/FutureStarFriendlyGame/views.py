@@ -522,6 +522,15 @@ class CreateFriendlyGame(APIView):
                 'message': _('Friendly game not found.'),
                 'data': {}
             }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Calculate game duration
+        if friendly_game.game_start_time and friendly_game.game_end_time:
+            start_time = datetime.combine(friendly_game.game_date, friendly_game.game_start_time)
+            end_time = datetime.combine(friendly_game.game_date, friendly_game.game_end_time)
+            duration = end_time - start_time
+            game_duration = str(duration)  # Convert timedelta to string
+        else:
+            game_duration = None  # If either time is missing
 
         # Prepare custom response data
         data = {
@@ -537,6 +546,7 @@ class CreateFriendlyGame(APIView):
             "start_date": str(friendly_game.game_date) if friendly_game.game_date else None,
             "game_field_id": friendly_game.game_field_id.id,
             "game_field_name": friendly_game.game_field_id.field_name,
+            "game_duration": game_duration,
         }
 
         return Response({

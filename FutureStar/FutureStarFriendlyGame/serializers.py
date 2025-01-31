@@ -14,11 +14,12 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
     team_b = serializers.SerializerMethodField()
     game_field_id = serializers.SerializerMethodField()
     game_number = serializers.CharField(read_only=True)  # Make game_number read-only
+    game_duration = serializers.SerializerMethodField()
 
     class Meta:
         model = FriendlyGame
         fields = [
-            'id', 'team_a', 'team_b', 'game_name', 'game_number', 'game_date', 'game_start_time', 
+            'id', 'team_a', 'team_b', 'game_name', 'game_number', 'game_date', 'game_start_time','game_duration',
             'game_end_time', 'game_field_id', 'game_status', 'created_by'
         ]
 
@@ -54,6 +55,20 @@ class FriendlyGameSerializer(serializers.ModelSerializer):
                 'country_code': obj.game_field_id.country_code
             }
         } if obj.game_field_id else None
+    
+    def get_game_duration(self, obj):
+        if obj.game_start_time and obj.game_end_time:
+            # Convert to datetime for accurate timedelta calculation
+            start_time = datetime.combine(obj.game_date, obj.game_start_time)
+            end_time = datetime.combine(obj.game_date, obj.game_end_time)
+            
+            # Handle crossing midnight
+            if end_time < start_time:
+                end_time += timedelta(days=1)
+
+            duration = end_time - start_time
+            return str(duration)  # Convert timedelta to string
+        return None  # Return None if start or end time is missing
 
 class MyFriendlyGameSerializer(serializers.ModelSerializer):
     team_a_name = serializers.CharField(source='team_a.name', read_only=True)
