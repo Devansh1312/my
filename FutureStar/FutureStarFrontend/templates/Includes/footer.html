@@ -57,19 +57,32 @@
                                     الأخبار
                                     {% endif %}
                                 </a></li>
-                            <li><a href="{% url 'advertise' %}">
+                            <li>
+                                <a href="{% url 'about' %}">
+                                    {% if current_language == 'en' %} 
+                                    About {% elif current_language == 'ar' %} 
+                                    حول 
+                                    {% endif %}
+                                </a>
+                            </li>    
+                            <li>
+                                <a href="{% url 'advertise' %}">
                                     {% if current_language == 'en' %}
                                     Advertise
                                     {% elif current_language == 'ar' %}
                                     إعلان
-                                    {% endif %}</a></li>
-                            <li><a href="{% url 'contact' %}">
-                                    {% if current_language == 'en' %}
-                                    Contacts
-                                    {% elif current_language == 'ar' %}
-                                    جهات الاتصال
                                     {% endif %}
-                                </a></li>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'contact' %}">
+                                    {% if current_language == 'en' %} 
+                                        Contact Us 
+                                    {% elif current_language == 'ar' %}
+                                        اتصل بنا
+                                    {% endif %}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -135,9 +148,9 @@
                 <div class="footer-copyright-text wow fadeInUp delay-0-2s">
                     <p>
                         {% if current_language == 'en' %}
-                        Copyright @2024, Goalactico All Rights Reserved
+                            Copyright © 2025, Goalactico. All Rights Reserved.
                         {% elif current_language == 'ar' %}
-                        حقوق الطبع والنشر @2024، Goalactico جميع الحقوق محفوظة
+                            حقوق النشر © 2025، جولاكتكو. جميع الحقوق محفوظة.
                         {% endif %}
                     </p>
                 </div>
@@ -145,8 +158,11 @@
             <div class="col-lg-6">
                 <div class="footer-bottom-social text-lg-end wow fadeInRight delay-0-2s">
                     <p>
-                        {% if current_language == 'en' %}Designed & Developed{% elif current_language == 'ar' %} تصميم وتطوير{% endif %}By
-                        <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
+                        {% if current_language == 'en' %}
+                            Designed & Developed By <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
+                        {% elif current_language == 'ar' %}
+                            تم التصميم والتطوير بواسطة <a href="https://redsparkinfo.com/" target="_blank">Redspark Technologies</a>
+                        {% endif %}                         
                     </p>
                 </div>
             </div>
