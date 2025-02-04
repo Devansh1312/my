@@ -6062,11 +6062,11 @@ class TeamDetailView(LoginRequiredMixin, View):
     template_name = "Admin/MobileApp/List_Of_Teams/Team_Details.html"
 
     def get_team_related_data(self, team):
-        branches = TeamBranch.objects.filter(team_id=team)
-        sponsors = Sponsor.objects.filter(created_by_id=team.id, creator_type=2)
-        posts = Post.objects.filter(created_by_id=team.id, creator_type=2)
-        events = Event.objects.filter(created_by_id=team.id, creator_type=2)
-        uniforms = TeamUniform.objects.filter(team_id=team)
+        branches = TeamBranch.objects.filter(team_id=team).order_by("-id")
+        sponsors = Sponsor.objects.filter(created_by_id=team.id, creator_type=2).order_by("-id")
+        posts = Post.objects.filter(created_by_id=team.id, creator_type=2).order_by("-id")
+        events = Event.objects.filter(created_by_id=team.id, creator_type=2).order_by("-id")
+        uniforms = TeamUniform.objects.filter(team_id=team).order_by("-id")
 
         # Get the counts of each related model
         branches_count = branches.count()
@@ -6211,12 +6211,24 @@ class BranchDetailView(LoginRequiredMixin, View):
             players = JoinBranch.objects.filter(branch_id=branch.id, joinning_type=4)
 
             # Get all tournaments related to the branch
-            tournaments = Tournament.objects.filter(team_id=branch.team_id)
-            games = TournamentGames.objects.filter()
+            # tournaments = Tournament.objects.filter(team_id=branch.team_id)
+            tournaments = Tournament.objects.filter(
+                id__in=TournamentGroupTeam.objects.filter(
+                    team_branch_id=branch.id, status=TournamentGroupTeam.ACCEPTED
+                ).values('tournament_id')
+            )
+            
+            game_friendly = FriendlyGame.objects.filter((Q(team_a=branch.id) | Q(team_b=branch.id)) & Q(team_a__isnull=False) & Q(team_b__isnull=False)).order_by('-game_number')            
+            game_friendly_count = game_friendly.count()
 
-            # Friendly game statistics for the branch (both as team_a and team_b)
-            friendly_games_as_team_a = FriendlyGame.objects.filter(team_a=branch)
-            friendly_games_as_team_b = FriendlyGame.objects.filter(team_b=branch)
+            games = TournamentGames.objects.filter(Q(team_a=branch.id) | Q(team_b=branch.id))
+
+            # Filter for friendly games where neither team_a nor team_b is None and the branch is involved
+            friendly_games_as_team_a = FriendlyGame.objects.filter(team_a=branch.id, team_a__isnull=False, team_b__isnull=False)
+
+            # Filter for friendly games where neither team_a nor team_b is None and the branch is involved
+            friendly_games_as_team_b = FriendlyGame.objects.filter(team_b=branch.id, team_a__isnull=False, team_b__isnull=False)
+
 
             # Count total games, wins, losses, draws, goals, and assists
             total_games = (friendly_games_as_team_a | friendly_games_as_team_b).count()
@@ -6266,8 +6278,8 @@ class BranchDetailView(LoginRequiredMixin, View):
             ) or 0
 
             # Now, also calculate for TournamentGames (both as team_a and team_b)
-            tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch)
-            tournament_games_as_team_b = TournamentGames.objects.filter(team_b=branch)
+            tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch.id)
+            tournament_games_as_team_b = TournamentGames.objects.filter(team_b=branch.id)
 
             total_games_tournament = games.count()
 
@@ -6329,6 +6341,8 @@ class BranchDetailView(LoginRequiredMixin, View):
                 "total_draws": total_draws_combined,
                 "total_goals": total_goals_combined,
                 "total_conceded_goals": total_conceded_goals,
+                "game_friendly_count": game_friendly_count,
+                "game_friendly" : game_friendly,
             }
         except TeamBranch.DoesNotExist:
             raise ValueError("Branch not found")
