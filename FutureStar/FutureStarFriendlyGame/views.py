@@ -86,7 +86,6 @@ class ManagerBranchDetail(APIView):
 
 
 
-########## Update Friendly Game Detail API #########
 class UpdateFriendlyGameDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -106,7 +105,8 @@ class UpdateFriendlyGameDetailAPIView(APIView):
             }, status=status.HTTP_403_FORBIDDEN)
 
         # Validate game_field_id
-        game_field_id = request.data.get('game_field_id', None)
+        game_field_id = request.data.get('game_field_id')
+        game_field_id = int(game_field_id) if game_field_id else None
         if not game_field_id:
             return Response({
                 'status': 0,
@@ -125,6 +125,7 @@ class UpdateFriendlyGameDetailAPIView(APIView):
 
         # Extract the game ID from the request
         game_id = request.data.get("game_id")
+        game_id = int(game_id) if game_id else None
         if not game_id:
             return Response({
                 'status': 0,
@@ -149,7 +150,26 @@ class UpdateFriendlyGameDetailAPIView(APIView):
                 'message': _('Game not found.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        # Update game details
+        # Update game_field_id in the game instance
+        game.game_field_id = game_field
+
+        # Handle Team_b validation and update
+        team_b_id = request.data.get('team_b',None)
+        if team_b_id:
+            try:
+                team_b = TeamBranch.objects.get(id=team_b_id)
+                game.team_b = team_b
+            except TeamBranch.DoesNotExist:
+                return Response({
+                    'status': 0,
+                    'message': _('Invalid Team B specified.'),
+                    'data': {}
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save the updated game object
+        game.save()
+
+        # Update other game details using the serializer
         serializer = FriendlyGameSerializer(game, data=request.data, partial=True)
         try:
             if serializer.is_valid():
@@ -171,8 +191,6 @@ class UpdateFriendlyGameDetailAPIView(APIView):
                 'message': _('An unexpected error occurred.'),
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 ################## Create Friedndly game With Request Refree For Game ###############################
 class CreateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
