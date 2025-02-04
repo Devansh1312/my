@@ -4910,7 +4910,7 @@ class UserRoleStatsAPIView(APIView):
                     "status": 1,
                     "message": _("You don't have Any Statstics"),
                     "data":{},
-                }, status=200)
+                }, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
             return Response({
@@ -5015,7 +5015,8 @@ class UserRoleStatsAPIView(APIView):
                         "agility": user.agility,
                     },
                 },
-            }, status=200)
+            },status=status.HTTP_200_OK)
+            
         except Exception as e:
             return Response({
                 "status": 0,
