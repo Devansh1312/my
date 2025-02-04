@@ -1362,7 +1362,6 @@ class verify_forgot_password_otp(View):
 
     def post(self, request, *args, **kwargs):
         phone = request.session.get("reset_phone")
-        print(phone)
         otp = request.POST.get("otp")
         language_from_url = get_language(request)
 
@@ -1372,7 +1371,6 @@ class verify_forgot_password_otp(View):
         request.session.save()
 
         user = User.objects.filter(phone=phone, otp=otp).first()
-        print("user",user)
         if not user:
             messages.error(request, "Invalid OTP. Please try again.")
             context = {
@@ -2605,7 +2603,6 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
 class SearchView(View):
     def get(self, request, *args, **kwargs):
         language_from_url = request.GET.get('Language', None)
-        print("gsd",language_from_url)
         
         if language_from_url:
             # If 'Language' parameter is in the URL, save it to the session

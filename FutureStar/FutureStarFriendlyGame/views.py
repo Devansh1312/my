@@ -200,7 +200,6 @@ class CreateFriendlyGame(APIView):
         # Extract game_id from request
         game_id = request.query_params.get('game_id')
         game_id = int(game_id) if game_id else None
-        print(game_id)
 
         if not game_id:
             return Response({
@@ -3070,8 +3069,14 @@ class FriendlyGameOfficialsAPIView(APIView):
                 )
                 notification.save()
         except Exception as e:
-            print(f"Error sending push notification: {str(e)}")
-
+            return Response(
+                {
+                    'status': 0,
+                    'message': f"Error adding official: {str(e)}",
+                    'data': {}
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response({
             'status': 1,
@@ -3296,7 +3301,6 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         created_by_id=request.user.id
                     )
                     created_by_id_role = request.user.role.id
-
 
                     # Send push notification
                     self._send_stat_notification(player_instance, stat, game_instance,created_by_id_role)
@@ -4604,8 +4608,15 @@ class FetchFriendlyGameUniformColorAPIView(APIView):
             self.send_rejection_notification(team_b_managers, notification_message, game)
 
         except Exception as e:
-            print(f"Error notifying team managers: {str(e)}")
-
+            return Response(
+                {
+                    'status': 0,
+                    'message': f"Error adding official: {str(e)}",
+                    'data': {}
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
     def send_rejection_notification(self, team_managers, message, game):
         """
         Send rejection notification to each manager.

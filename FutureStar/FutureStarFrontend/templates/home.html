@@ -501,7 +501,8 @@
         <div class="work-gallery-active"> {% for app_feature in app_features %} <div class="project-item style-four wow fadeInUp delay-0-2s">
                 <div class="image">
                     <img src="{{ app_feature.image.url }}" alt="Work Gallery">
-                    <a href="{% url 'index' %}" class="project-btn">
+                    <!-- <a href="{% url 'index' %}" class="project-btn"> -->
+                    <a class="project-btn">
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
@@ -770,21 +771,21 @@
         });
     });
     // Block right-click context menu
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
+    // document.addEventListener('contextmenu', function(e) {
+    //     e.preventDefault();
+    //     return false;
+    // });
     
-    // Optional: Block common developer tools shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-            (e.ctrlKey && e.key === 'u')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-    new WOW().init();
+    // // Optional: Block common developer tools shortcuts
+    // document.addEventListener('keydown', function(e) {
+    //     // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+    //     if (e.key === 'F12' || 
+    //         (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+    //         (e.ctrlKey && e.key === 'u')) {
+    //         e.preventDefault();
+    //         return false;
+    //     }
+    // });
+    // new WOW().init();
 </script> 
 {% endblock %}
