@@ -3288,7 +3288,7 @@ class FieldAPIView(APIView):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
+############################################## List Fields API View #################################################
 class ListFieldsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
