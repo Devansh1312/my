@@ -641,6 +641,110 @@ class TournamentListView(LoginRequiredMixin, View):
 class TournamentDetailView(View):
     template_name = "Admin/Tournament_detail.html"
 
+    def post(self, request, pk, *args, **kwargs):
+        tournament = get_object_or_404(Tournament, pk=pk)
+
+        # Fetch additional related information
+        team = tournament.team_id if tournament.team_id else "No team assigned"
+        age_group = tournament.age_group if tournament.age_group else "No age group"
+        country = tournament.country if tournament.country else "No country assigned"
+        city = tournament.city if tournament.city else "No city assigned"
+        field = tournament.tournament_fields if tournament.tournament_fields else "No field assigned"
+
+        # Fetch all games for the tournament
+        games = TournamentGames.objects.filter(tournament_id=tournament.id).order_by('game_date')
+
+        # Fetch all teams for the tournament
+        teams = TournamentGroupTeam.objects.filter(tournament_id=tournament.id)
+
+        # Fetch groups associated with the tournament
+        groups = GroupTable.objects.filter(tournament_id=pk).order_by("group_name")
+
+        grouped_data = []
+        for group in groups:
+            teams_in_group = TournamentGroupTeam.objects.filter(group_id=group.id, tournament_id=tournament.id)
+
+            team_stats = []
+            for team in teams_in_group:
+                team_id = team.team_branch_id.id if team.team_branch_id else None
+                games = TournamentGames.objects.filter(
+                    (Q(team_a=team_id) | Q(team_b=team_id)),
+                    group_id=group.id,
+                    tournament_id=tournament.id,
+                    finish=True,
+                )
+
+                match_played = games.count()
+                total_goals = games.aggregate(
+                    total_goals_a=Sum("team_a_goal"), total_goals_b=Sum("team_b_goal")
+                )
+                total_goals_scored = total_goals["total_goals_a"] or 0
+                total_goals_conceded = total_goals["total_goals_b"] or 0
+                total_goals = total_goals_scored
+                conceded_goals = (
+                    games.aggregate(
+                        total_conceded=Sum(
+                            Case(
+                                When(team_a=team_id, then="team_b_goal"),
+                                When(team_b=team_id, then="team_a_goal"),
+                                default=0,
+                                output_field=IntegerField(),
+                            )
+                        )
+                    )["total_conceded"]
+                    or 0
+                )
+                goal_difference = total_goals_scored - conceded_goals
+
+                total_wins = games.filter(winner_id=team_id).count()
+                total_losses = games.filter(loser_id=team_id).count()
+                total_draws = games.filter(is_draw=True).count()
+
+                points = total_wins  # 1 point per win
+
+                # Create a dictionary with team statistics
+                team_data = {
+                    "team_name": team.team_branch_id.team_name,
+                    "match_played": match_played,
+                    "total_goals": total_goals,
+                    "total_wins": total_wins,
+                    "total_losses": total_losses,
+                    "total_draws": total_draws,
+                    "points": points,
+                    "conceded_goals": conceded_goals,
+                    "goal_difference": goal_difference,
+                }
+
+                team_stats.append(team_data)
+
+            # Sort teams by points (descending) and then by total goals as a tiebreaker
+            sorted_team_stats = sorted(
+                team_stats, key=lambda x: (x["points"], x["total_goals"]), reverse=True
+            )
+
+            grouped_data.append(
+                {
+                    "group_id": group.id,
+                    "group_name": group.group_name,
+                    "teams": sorted_team_stats,
+                }
+            )
+
+        # Pass all necessary data to the template
+        context = {
+            "tournament": tournament,
+            "team": team,
+            "age_group": age_group,
+            "country": country,
+            "city": city,
+            "field": field,
+            "games": games,
+            "teams": teams,
+            "grouped_data": grouped_data,
+        }
+
+        return render(request, self.template_name, context)
+    
     def get(self, request, pk, *args, **kwargs):
         tournament = get_object_or_404(Tournament, pk=pk)
 
@@ -649,23 +753,23 @@ class TournamentDetailView(View):
         age_group = tournament.age_group if tournament.age_group else "No age group"
         country = tournament.country if tournament.country else "No country assigned"
         city = tournament.city if tournament.city else "No city assigned"
-        field = (
-            tournament.tournament_fields
-            if tournament.tournament_fields
-            else "No field assigned"
-        )
+        field = tournament.tournament_fields if tournament.tournament_fields else "No field assigned"
+
+        # Fetch all games for the tournament
+        games = TournamentGames.objects.filter(tournament_id=tournament.id).order_by('game_date')
+
+        # Fetch all teams for the tournament
+        teams = TournamentGroupTeam.objects.filter(tournament_id=tournament.id)
 
         # Fetch groups associated with the tournament
         groups = GroupTable.objects.filter(tournament_id=pk).order_by("group_name")
 
         grouped_data = []
         for group in groups:
-            teams = TournamentGroupTeam.objects.filter(
-                group_id=group.id, tournament_id=tournament.id
-            ).select_related("group_id", "team_branch_id")
+            teams_in_group = TournamentGroupTeam.objects.filter(group_id=group.id, tournament_id=tournament.id)
 
             team_stats = []
-            for team in teams:
+            for team in teams_in_group:
                 team_id = team.team_branch_id.id if team.team_branch_id else None
                 games = TournamentGames.objects.filter(
                     (Q(team_a=team_id) | Q(team_b=team_id)),
@@ -730,6 +834,7 @@ class TournamentDetailView(View):
                 }
             )
 
+        # Pass all necessary data to the template
         context = {
             "tournament": tournament,
             "team": team,
@@ -737,127 +842,12 @@ class TournamentDetailView(View):
             "country": country,
             "city": city,
             "field": field,
-            "grouped_data": grouped_data,  # Add the grouped data to context
+            "games": games,
+            "teams": teams,
+            "grouped_data": grouped_data,
         }
 
         return render(request, self.template_name, context)
-
-    def post(self, request, pk, *args, **kwargs):
-        # Fetch the tournament using the primary key
-        tournament = get_object_or_404(Tournament, pk=pk)
-
-        # Update the tournament based on the POST data (example fields)
-        team = request.POST.get("team", None)
-        age_group = request.POST.get("age_group", None)
-        country = request.POST.get("country", None)
-        city = request.POST.get("city", None)
-        field = request.POST.get("field", None)
-
-        # Optionally, handle null or missing values
-        if team:
-            tournament.team_id = team
-        if age_group:
-            tournament.age_group = age_group
-        if country:
-            tournament.country = country
-        if city:
-            tournament.city = city
-        if field:
-            tournament.tournament_fields = field
-
-        # Save the updated tournament
-        tournament.save()
-
-        # Fetch groups associated with the tournament after update
-        groups = GroupTable.objects.filter(tournament_id=tournament.id).order_by(
-            "group_name"
-        )
-
-        grouped_data = []
-        for group in groups:
-            teams = TournamentGroupTeam.objects.filter(
-                group_id=group.id, tournament_id=tournament.id
-            ).select_related("group_id", "team_branch_id")
-
-            team_stats = []
-            for team in teams:
-                team_id = team.team_branch_id.id if team.team_branch_id else None
-                games = TournamentGames.objects.filter(
-                    (Q(team_a=team_id) | Q(team_b=team_id)),
-                    group_id=group.id,
-                    tournament_id=tournament.id,
-                    finish=True,
-                )
-
-                match_played = games.count()
-                total_goals = games.aggregate(
-                    total_goals_a=Sum("team_a_goal"), total_goals_b=Sum("team_b_goal")
-                )
-                total_goals_scored = total_goals["total_goals_a"] or 0
-                total_goals_conceded = total_goals["total_goals_b"] or 0
-                total_goals = total_goals_scored
-                conceded_goals = (
-                    games.aggregate(
-                        total_conceded=Sum(
-                            Case(
-                                When(team_a=team_id, then="team_b_goal"),
-                                When(team_b=team_id, then="team_a_goal"),
-                                default=0,
-                                output_field=IntegerField(),
-                            )
-                        )
-                    )["total_conceded"]
-                    or 0
-                )
-                goal_difference = total_goals_scored - conceded_goals
-
-                total_wins = games.filter(winner_id=team_id).count()
-                total_losses = games.filter(loser_id=team_id).count()
-                total_draws = games.filter(is_draw=True).count()
-
-                points = total_wins  # 1 point per win
-
-                # Create a dictionary with team statistics
-                team_data = {
-                    "team_name": team.team_branch_id.team_name,
-                    "match_played": match_played,
-                    "total_goals": total_goals,
-                    "total_wins": total_wins,
-                    "total_losses": total_losses,
-                    "total_draws": total_draws,
-                    "points": points,
-                    "conceded_goals": conceded_goals,
-                    "goal_difference": goal_difference,
-                }
-
-                team_stats.append(team_data)
-
-            # Sort teams by points (descending) and then by total goals as a tiebreaker
-            sorted_team_stats = sorted(
-                team_stats, key=lambda x: (x["points"], x["total_goals"]), reverse=True
-            )
-
-            grouped_data.append(
-                {
-                    "group_id": group.id,
-                    "group_name": group.group_name,
-                    "teams": sorted_team_stats,
-                }
-            )
-
-        # Include the grouped data in context
-        context = {
-            "tournament": tournament,
-            "team": team or "No team assigned",
-            "age_group": age_group or "No age group",
-            "country": country or "No country assigned",
-            "city": city or "No city assigned",
-            "field": field or "No field assigned",
-            "grouped_data": grouped_data,  # Include the grouped data in context
-        }
-
-        return render(request, self.template_name, context)
-
 ############################################## List of Default User ##############################################################
 @method_decorator(user_role_check, name="dispatch")
 class DefaultUserList(LoginRequiredMixin, View):
