@@ -308,12 +308,11 @@
         </div>
         <div class="clients-logo-slider">
             {% for global_client in global_clients %}
-
-            <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}">
+            <!-- <a class="client-logo-item wow fadeInUp delay-0-2s" href="{% url 'contact' %}"> -->
+            <a class="client-logo-item wow fadeInUp delay-0-2s">
                 <img src="{{ global_client.image.url }}" alt="Client Logo">
             </a>
             {% endfor %}
-
         </div>
         <div class="work-gallery-controls">
             <button class="clients-logo-slider-prev">
