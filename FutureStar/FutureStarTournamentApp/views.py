@@ -697,20 +697,21 @@ class TeamJoiningRequest(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+        
         user = request.user
+        creator_type = request.query_params.get('creator_type')  # Get the creator_type from query params
+        
         if request.user.role_id in [6, 3]:  # Managers (6) or Coaches (3)
-        # Determine joinning_type based on role
             joinning_type = (
                 JoinBranch.MANAGERIAL_STAFF_TYPE if request.user.role_id == 6
                 else JoinBranch.COACH_STAFF_TYPE
             )
-          
+            
             try:
                 user_branch = JoinBranch.objects.filter(
                     user_id=request.user,
                     joinning_type=joinning_type
                 )
-               
             except JoinBranch.DoesNotExist:
                 role_message = (
                     _('You are not assigned as a manager to any Team.')
@@ -721,18 +722,15 @@ class TeamJoiningRequest(APIView):
                     'status': 0,
                     'message': role_message,
                 }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         elif TeamBranch.objects.filter(team_id__team_founder=request.user).exists():  # Check if user is a team founder
             try:
-                # Retrieve the first branch associated with the team where the user is the founder
                 team_branch = TeamBranch.objects.filter(team_id__team_founder=request.user).first()
                 if not team_branch:
                     return Response({
                         'status': 0,
                         'message': _('No Team Exists'),
                     }, status=status.HTTP_400_BAD_REQUEST)
-                
-               
             except TeamBranch.DoesNotExist:
                 return Response({
                     'status': 0,
@@ -744,11 +742,7 @@ class TeamJoiningRequest(APIView):
                 'message': _('Only managers, coaches, or team founders can perform this action.'),
             }, status=status.HTTP_403_FORBIDDEN)
 
-        # Initialize classification dictionaries
-       
-        teams_data=[]
-
-        # Retrieve tournament (assuming tournament_id is provided in the request)
+        teams_data = []
         tournament_id = request.query_params.get('tournament_id')
         if not tournament_id:
             return Response({
@@ -764,44 +758,52 @@ class TeamJoiningRequest(APIView):
                 'message': _('Tournament does not exist.'),
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filter teams by age group
         tournament_age_group = tournament.age_group
-     
-        # Retrieve founder teams
-        if TeamBranch.objects.filter(team_id__team_founder=user).exists():
-            founder_team_branches = TeamBranch.objects.filter(team_id__team_founder=user, age_group_id=tournament_age_group)
-            teams_data.extend(founder_team_branches)
+        
+        # Handle team founder (creator_type == 2)
+        if creator_type == '2':  # Check if creator_type is 2 (Team Founder)
+            if TeamBranch.objects.filter(team_id__team_founder=user).exists():
+                founder_team_branches = TeamBranch.objects.filter(team_id__team_founder=user, age_group_id=tournament_age_group)
+                teams_data.extend(founder_team_branches)
 
         # Retrieve manager teams
-      
-        if user.role_id == 6:  # Assuming role_id == 6 indicates a manager
+        if user.role_id == 6:  # Manager
             manager_branches = TeamBranch.objects.filter(
                 id__in=JoinBranch.objects.filter(
                     user_id=user,
-                    joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE  # Managerial staff
+                    joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
                 ).values_list('branch_id', flat=True),
-                age_group_id=tournament_age_group  # Filter by tournament age group
+                age_group_id=tournament_age_group
             )
             teams_data.extend(manager_branches)
+
         # Retrieve coach teams
-        if user.role_id == 3:  # Assuming role_id == 3 indicates a coach
+        if user.role_id == 3:  # Coach
             coach_branches = TeamBranch.objects.filter(
                 id__in=JoinBranch.objects.filter(
                     user_id=user,
-                    joinning_type=JoinBranch.COACH_STAFF_TYPE  # Coach staff
+                    joinning_type=JoinBranch.COACH_STAFF_TYPE
                 ).values_list('branch_id', flat=True),
-                age_group_id=tournament_age_group  # Filter by tournament age group
+                age_group_id=tournament_age_group
             )
             teams_data.extend(coach_branches)
-        unique_teams = list((teams_data))
+
+        # Ensure unique teams
+        unique_teams = []
+        seen_teams = set()  # To track already added team branches
+        for branch in teams_data:
+            if branch.id not in seen_teams:
+                unique_teams.append(branch)
+                seen_teams.add(branch.id)
+
         serialized_data = TeamBranchSerializer(unique_teams, many=True, context={'request': request}).data
+
         return Response({
             'status': 1,
             'message': _('Teams retrieved successfully.'),
             'data': serialized_data
-               
-            
         }, status=status.HTTP_200_OK)
+
         
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
