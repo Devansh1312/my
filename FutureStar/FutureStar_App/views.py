@@ -6989,7 +6989,7 @@ class FriendlyGamesListView(LoginRequiredMixin, View):
                 default=0,
                 output_field=IntegerField(),
             ),
-        ).order_by("-game_date", "-game_start_time", "-id")
+        ).order_by("-game_number")
 
         return render(
             request,
