@@ -23,7 +23,7 @@
 </style>
 
 {% block title %}
-Branch Details
+Team Detail Page
 {% endblock %}
 
 {% block content %}
@@ -306,6 +306,7 @@ Branch Details
                                                         <th>Username</th>
                                                         <th>Email</th>
                                                         <th>Mobile</th>
+                                                        <th>Joining Date</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -321,7 +322,8 @@ Branch Details
                                                             {% endif %}
                                                         </td>
                                                         <td>{{ player.user_id.phone }}</td>
-                                                    </tr>
+                                                        <td>{{ player.created_at|date:"M. d, Y" }}</td>
+                                                      </tr>
                                                     {% endfor %}
                                                 </tbody>
                                             </table>

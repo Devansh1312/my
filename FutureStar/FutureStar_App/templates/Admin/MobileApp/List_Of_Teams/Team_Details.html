@@ -244,8 +244,9 @@
                                                         <tr>
                                                             <th>No</th>
                                                             <th>Event Name</th>
-                                                            <th>Event Description</th>
+                                                            <!-- <th>Event Description</th> -->
                                                             <th>Event Type</th>
+                                                            <th>Event Status</th>
                                                             <th>Event Cost</th>
                                                             <th>Event Date</th>
                                                             <th>Tickets Sold</th> <!-- New column for ticket sales -->
@@ -256,8 +257,17 @@
                                                             <tr>
                                                                 <td>{{ forloop.counter }}</td>
                                                                 <td>{{ item.event.event_name }}</td>
-                                                                <td>{{ item.event.event_description }}</td>
+                                                                <!-- <td>{{ item.event.event_description }}</td> -->
                                                                 <td>{{ item.event.event_type }}</td>
+                                                                <td>
+                                                                    {% if item.event.event_status == 0 %}
+                                                                        <span class="badge badge-warning">Pending</span>
+                                                                    {% elif item.event.event_status == 1 %}
+                                                                        <span class="badge badge-success">Approved</span>
+                                                                    {% elif item.event.event_status == 2 %}
+                                                                        <span class="badge badge-danger">Rejected</span>
+                                                                    {% endif %}
+                                                                </td>
                                                                 <td>{{ item.event.event_cost }}</td>
                                                                 <td>{{ item.event.event_date }}</td>
                                                                 <td>{{ item.total_tickets_sold }}</td> <!-- Display ticket sales -->
