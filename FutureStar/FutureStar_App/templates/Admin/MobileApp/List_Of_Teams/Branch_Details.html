@@ -342,6 +342,7 @@ Team Detail Page
                                                         <th>Age Group</th>
                                                         <th>City</th>
                                                         <th>Joining Cost</th>
+                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -353,6 +354,27 @@ Team Detail Page
                                                         <td>{{ tournament.age_group }}</td>
                                                         <td>{{ tournament.city }}</td>
                                                         <td>{{ tournament.tournament_joining_cost }}</td>
+                                                        <td>
+                                                         <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                            <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                               <i data-feather="more-vertical"></i>
+                                                            </a>
+                                                            <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                               <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                   <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                       <a href="#" class="view-details" data-id="{{ tournament.id }}">View</a>
+                                                                       <form id="view-form-{{ tournament.id }}" method="post" action="{% url 'tournament_detail' pk=tournament.id %}" style="display: none;">
+                                                                           {% csrf_token %}
+                                                                           <input type="hidden" name="tournament_id" value="{{ tournament.id }}">
+                                                                           <script>
+                                                                              console.log("{{ tournament.id }}");
+                                                                           </script>
+                                                                       </form>
+                                                                   </li>
+                                                               </ul>
+                                                            </div>
+                                                         </div>
+                                                      </td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -371,6 +393,7 @@ Team Detail Page
                                                         <th>Game Number</th>
                                                         <th>Game Date</th>
                                                         <th>Group Name</th>
+                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -387,6 +410,21 @@ Team Detail Page
                                                             None
                                                          {% endif %}
                                                       </td>
+                                                      <td>
+                                                         <!-- Action buttons -->
+                                                         <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                             <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                                 <i data-feather="more-vertical"></i>
+                                                             </a>
+                                                             <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                                 <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                     <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                         <a href="{% url 'game_detail' game.id %}">View</a>
+                                                                     </li>
+                                                                 </ul>
+                                                             </div>
+                                                         </div>
+                                                     </td>
                                                    </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -405,6 +443,7 @@ Team Detail Page
                                                        <th>Game Number</th>
                                                        <th>Game Date</th>
                                                        <th>Team A Vs Team B</th>
+                                                       <th>Actions</th>
                                                    </tr>
                                                </thead>
                                                <tbody>
@@ -415,6 +454,21 @@ Team Detail Page
                                                        <td>{{ game.game_number }}</td>
                                                        <td>{{ game.game_date }}</td>
                                                        <td>{{ game.team_a }} Vs {{ game.team_b }}</td>
+                                                       <td>
+                                                         <!-- Action buttons -->
+                                                         <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                             <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                                 <i data-feather="more-vertical"></i>
+                                                             </a>
+                                                             <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                                 <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                     <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                         <a href="{% url 'friendly_game_detail' game.id %}">View</a>
+                                                                     </li>
+                                                                 </ul>
+                                                             </div>
+                                                         </div>
+                                                     </td>     
                                                   </tr>
                                                    {% endfor %}
                                                </tbody>
@@ -456,7 +510,14 @@ Team Detail Page
         });
     });
 });
-
+      document.querySelectorAll('.view-details').forEach(function(link) {
+         link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var tournamentId = this.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + tournamentId);
+            form.submit();
+         });
+      });
 $(document).ready(function () {
     $('#staff-member-table').DataTable();
     $('#player-table').DataTable();
@@ -481,7 +542,6 @@ $(document).ready(function () {
 
     });
 });
-
 </script>
 
 
