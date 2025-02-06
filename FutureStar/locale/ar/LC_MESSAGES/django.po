@@ -818,9 +818,6 @@ msgstr "لم يتم العثور على وسائط المنشور."
 msgid "Post Report Submitted Successfully."
 msgstr "تم تقديم تقرير المنشور بنجاح."
 
-msgid "Post created successfully"
-msgstr "تم إنشاء المنشور بنجاح."
-
 msgid "Post deleted successfully."
 msgstr "تم حذف المنشور بنجاح."
 
@@ -1333,6 +1330,9 @@ msgstr "يلزم وجود Team_id وuser_id وjoin_type."
 
 msgid "created_by_id and creator_type are required."
 msgstr "معرف المنشئ ونوع المنشئ مطلوبان."
+
+msgid "post created successfully."
+msgstr "تم إنشاء المنشور بنجاح."
 
 msgid "created_by_id is required when creator_type is 2."
 msgstr "معرف المنشئ مطلوب عندما يكون نوع المنشئ 2."

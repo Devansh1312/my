@@ -821,7 +821,7 @@ msgstr ""
 msgid "Post Report Submitted Successfully."
 msgstr ""
 
-msgid "Post created successfully"
+msgid "post created successfully."
 msgstr ""
 
 msgid "Post deleted successfully."
