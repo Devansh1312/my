@@ -1733,8 +1733,9 @@ class GameOfficialsAPIView(APIView):
         officials_by_type = {}
         for official_type in all_official_types:
             # Serialize the official type
-            type_serializer = GameOficialTypeSerializer(official_type, context={'language': language})
-            type_name = type_serializer.data['name']
+            # type_serializer = GameOficialTypeSerializer(official_type, context={'language': language})
+            # type_name = type_serializer.data['name']
+            type_name = official_type.name_en
 
             # Filter assigned officials for the current official type
             assigned_officials = assigned_game_officials.filter(officials_type_id=official_type)
