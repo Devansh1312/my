@@ -17,16 +17,15 @@ from django.shortcuts import get_object_or_404
 import json
 from django.core.exceptions import ObjectDoesNotExist
 
-
+################# Create Training API #######################
 class CreateTrainingView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
         try:
             creator_type = int(request.data.get('creator_type'))
             created_by_id = int(request.data.get('created_by_id'))
@@ -36,7 +35,6 @@ class CreateTrainingView(APIView):
                 'message': _('Invalid creator_type or created_by_id.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Other fields extraction and validation...
         country_id = request.data.get('country')
         city_id = request.data.get('city')
         gender_id = request.data.get('gender')
@@ -55,11 +53,16 @@ class CreateTrainingView(APIView):
                 'message': _('Invalid country, city, gender, or field ID provided.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Fetch Country, City, Gender, Field...
-        country = Country.objects.get(id=country_id) if country_id else None
-        city = City.objects.get(id=city_id) if city_id else None
-        gender = UserGender.objects.get(id=gender_id) if gender_id else None
-        field = Field.objects.get(id=field_id) if field_id else None
+        try:
+            country = Country.objects.get(id=country_id) if country_id else None
+            city = City.objects.get(id=city_id) if city_id else None
+            gender = UserGender.objects.get(id=gender_id) if gender_id else None
+            field = Field.objects.get(id=field_id) if field_id else None
+        except ObjectDoesNotExist:
+            return Response({
+                'status': 0,
+                'message': _('Invalid country, city, gender, or field provided.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         training_name = request.data.get('training_name', '')
         training_date = request.data.get('training_date')
@@ -85,7 +88,14 @@ class CreateTrainingView(APIView):
         else:
             days, start_times, end_times = [], [], []  # For single training, these can be empty or not required
 
-        # Time conversion and validation
+        training_photo = None
+        if "training_photo" in request.FILES:
+            image = request.FILES["training_photo"]
+            file_extension = image.name.split('.')[-1]
+            unique_suffix = get_random_string(8)
+            file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
+            training_photo = default_storage.save(file_name, image)
+
         weekday_mapping = {
             0: 2, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 1
         }
@@ -104,6 +114,7 @@ class CreateTrainingView(APIView):
 
             training_instance = Training.objects.create(
                 training_name=training_name,
+                training_photo=training_photo,
                 training_date=training_date,
                 start_time=start_time_obj,
                 end_time=end_time_obj,
@@ -122,42 +133,8 @@ class CreateTrainingView(APIView):
 
         elif repeat_type == 1 and end_date and days:
             try:
-                # Check if the arrays are not empty and have matching lengths
-                if not start_times or not end_times or len(start_times) != len(end_times):
-                    return Response({
-                        'status': 0,
-                        'message': _('Invalid or mismatched time arrays for start and end times.')
-                    }, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Handle single time entry case by checking if the arrays have only one element
-                if len(start_times) == 1 and len(end_times) == 1:
-                    start_time_objs = [datetime.strptime(start_times[0], "%H:%M:%S").time()]
-                    end_time_objs = [datetime.strptime(end_times[0], "%H:%M:%S").time()]
-                else:
-                    start_time_objs = []
-                    end_time_objs = []
-                    for st, et in zip(start_times, end_times):
-                        try:
-                            # Ensure time is in correct format
-                            start_time_obj = datetime.strptime(st, "%H:%M:%S").time()
-                            end_time_obj = datetime.strptime(et, "%H:%M:%S").time()
-                            start_time_objs.append(start_time_obj)
-                            end_time_objs.append(end_time_obj)
-                        except ValueError as e:
-                            return Response({
-                                'status': 0,
-                                'message': _('Invalid time format.'),
-                                'data': f"Start time: {st}, End time: {et}"
-                            }, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Ensure that start times are before corresponding end times
-                for st, et in zip(start_time_objs, end_time_objs):
-                    if st >= et:
-                        return Response({
-                            'status': 0,
-                            'message': _('Start time must be before end time.')
-                        }, status=status.HTTP_400_BAD_REQUEST)
-                
+                start_time_objs = [datetime.strptime(st, "%H:%M:%S").time() for st in start_times]
+                end_time_objs = [datetime.strptime(et, "%H:%M:%S").time() for et in end_times]
                 durations = [
                     (datetime.combine(datetime.today(), et) - datetime.combine(datetime.today(), st)).seconds // 60
                     for st, et in zip(start_time_objs, end_time_objs)
@@ -166,9 +143,7 @@ class CreateTrainingView(APIView):
                 return Response({
                     'status': 0,
                     'message': _('Invalid time format or time arrays mismatch.'),
-                    'data': str(e)
                 }, status=status.HTTP_400_BAD_REQUEST)
-
 
             try:
                 training_date_obj = datetime.strptime(training_date, "%Y-%m-%d").date()
@@ -184,6 +159,7 @@ class CreateTrainingView(APIView):
                     day_index = days.index(custom_weekday)
                     training_instance = Training.objects.create(
                         training_name=training_name,
+                        training_photo=training_photo,
                         training_date=current_date,
                         start_time=start_time_objs[day_index],
                         end_time=end_time_objs[day_index],
@@ -201,7 +177,7 @@ class CreateTrainingView(APIView):
                     training_instances.append(training_instance)
                 current_date += timedelta(days=1)
 
-        # Serialize the training instances and return response
+        # Serialize the training instances
         serialized_trainings = TrainingSerializer(training_instances, many=True, context={'request': request})
 
         # Create the corresponding Training_Joined instances for each training
@@ -239,8 +215,6 @@ class CreateTrainingView(APIView):
                 'status': 0,
                 'message': _('No training instances were created.')
             }, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 
