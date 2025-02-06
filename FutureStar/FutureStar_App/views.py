@@ -1664,15 +1664,15 @@ class FieldDetailView(LoginRequiredMixin, View):
    
     def get(self, request, pk):
         field = get_object_or_404(Field, pk=pk)
-        tournament_games = TournamentGames.objects.filter(game_field_id=field)
-        friendly_games = FriendlyGame.objects.filter(game_field_id=field)
+        tournament_games = TournamentGames.objects.filter(game_field_id=field).order_by('-game_number')
+        friendly_games = FriendlyGame.objects.filter(game_field_id=field).order_by('-game_number')
 
         # Filter Open and Closed Training sessions using training_type
-        open_training = Training.objects.filter(field=field, training_type=1)  # OPEN_TRAINING
+        open_training = Training.objects.filter(field=field, training_type=1).order_by('-training_date')  # OPEN_TRAINING
         
         print(open_training)
         
-        closed_training = Training.objects.filter(field=field, training_type=2)  # CLOSED_TRAINING
+        closed_training = Training.objects.filter(field=field, training_type=2).order_by('-training_date')  # CLOSED_TRAINING
 
         return render(
             request,
@@ -1689,15 +1689,14 @@ class FieldDetailView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         field = get_object_or_404(Field, pk=pk)
-        tournament_games = TournamentGames.objects.filter(game_field_id=field)
-        friendly_games = FriendlyGame.objects.filter(game_field_id=field)
+        tournament_games = TournamentGames.objects.filter(game_field_id=field).order_by('-game_number')
+        friendly_games = FriendlyGame.objects.filter(game_field_id=field).order_by('-game_number')
 
         # Retrieve trainings associated with this field
        # Filter Open and Closed Training sessions using training_type
-        open_training = Training.objects.filter(field=field, training_type=1)  # OPEN_TRAINING
+        open_training = Training.objects.filter(field=field, training_type=1).order_by('-training_date')  # OPEN_TRAINING
         
-        print("dfgdf",open_training)
-        closed_training = Training.objects.filter(field=field, training_type=2)  # CLOSED_TRAINING
+        closed_training = Training.objects.filter(field=field, training_type=2).order_by('-training_date')  # CLOSED_TRAINING
 
         return render(
             request,
