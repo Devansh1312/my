@@ -250,6 +250,7 @@
                                                             <th>Event Cost</th>
                                                             <th>Event Date</th>
                                                             <th>Tickets Sold</th> <!-- New column for ticket sales -->
+                                                            <th>Actions</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -271,6 +272,29 @@
                                                                 <td>{{ item.event.event_cost }}</td>
                                                                 <td>{{ item.event.event_date }}</td>
                                                                 <td>{{ item.total_tickets_sold }}</td> <!-- Display ticket sales -->
+                                                                <td>
+                                                                    <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                                       <!-- Three dots menu trigger -->
+                                                                       <a href="#" class="three-dots-menu" onclick="toggleMenu(this)" style="display: flex; align-items: center; justify-content: center;">
+                                                                          <i data-feather="more-vertical"></i> <!-- Icon for three dots -->
+                                                                       </a>
+                                                                 
+                                                                       <!-- Action card for menu items -->
+                                                                        <!-- Action card for menu items -->
+                                                                        <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                                           <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                               <!-- View action -->
+                                                                               <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                                   <a href="#" class="view-details" data-id="{{ item.event.id }}" onclick="submitViewForm(event, '{{ item.event.id }}')">View</a>
+                                                                                   <form id="view-form-{{ item.event.id }}" method="post" action="{% url 'event_detail' item.event.id %}" style="display: none;">
+                                                                                       {% csrf_token %}
+                                                                                       <input type="hidden" name="event_id" value="{{ item.event.id }}">
+                                                                                   </form>
+                                                                               </li>
+                                                                           </ul>
+                                                                       </div>
+                                                                    </div>
+                                                                 </td>
                                                             </tr>
                                                         {% endfor %}
                                                     </tbody>

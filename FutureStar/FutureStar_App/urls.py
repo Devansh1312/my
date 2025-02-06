@@ -241,8 +241,8 @@ urlpatterns = [
     #Team list URL's
     path('team_lists/', TeamListView.as_view(), name='team_list'),
    
-    path('team_details/', TeamDetailView.as_view(), name='team_detail'),
-    path('branch_details/', BranchDetailView.as_view(), name='branch_detail'),
+    path('team_profile_detail/', TeamDetailView.as_view(), name='team_detail'),
+    path('team_detail/', BranchDetailView.as_view(), name='branch_detail'),
     
     #User injury type URL
     path('injurytype/', InjuryTypeListView.as_view(), name='injurytype_list'),
