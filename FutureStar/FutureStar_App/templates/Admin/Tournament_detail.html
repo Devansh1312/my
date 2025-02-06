@@ -248,6 +248,7 @@
                                                 <th>Game Number</th>
                                                 <th>Game Date</th>
                                                 <th>Teams</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -257,6 +258,21 @@
                                                 <td>{{ game.game_number }}</td>
                                                 <td>{{ game.game_date }}</td>
                                                 <td>{{ game.team_a.team_name }} Vs {{ game.team_b.team_name }}</td>
+                                                <td>
+                                                   <!-- Action buttons -->
+                                                   <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                       <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                           <i data-feather="more-vertical"></i>
+                                                       </a>
+                                                       <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                           <ul style="list-style: none; padding: 0; margin: 0;">
+                                                               <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                   <a href="{% url 'game_detail' game.id %}">View</a>
+                                                               </li>
+                                                           </ul>
+                                                       </div>
+                                                   </div>
+                                               </td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -275,6 +291,7 @@
                                                 <th>Joining Status</th>
                                                 <th>Group Name</th>
                                                 <th>Created Date</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -282,9 +299,38 @@
                                             <tr>
                                                 <td>{{ forloop.counter }}</td>
                                                 <td>{{ team.team_branch_id.team_name }}</td>
-                                                <td>{{ team.get_status_display }}</td>
+                                                <td>
+                                                   {% if team.status == 0 %}
+                                                       <span class="badge badge-warning">Requested</span>
+                                                   {% elif team.status == 1 %}
+                                                       <span class="badge badge-success">Accepted</span>
+                                                   {% elif team.status == 2 %}
+                                                       <span class="badge badge-danger">Rejected</span>
+                                                   {% endif %}
+                                               </td>
                                                 <td>{{ team.group_id.group_name }}</td>
                                                 <td>{{ team.created_at }}</td>
+                                                <td>
+                                                   <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                       <!-- Three dots menu trigger -->
+                                                       <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                           <i data-feather="more-vertical"></i>
+                                                       </a>
+                                                       <!-- Action card -->
+                                                       <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                           <ul style="list-style: none; padding: 0; margin: 0;">
+                                                               <!-- View action -->
+                                                               <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                   <a href="#" class="view-details" data-id="{{ team.team_branch_id.id }}" onclick="submitViewForm(event, '{{ team.team_branch_id.id }}')">View</a>
+                                                                   <form id="view-form-{{ team.team_branch_id.id }}" method="post" action="{% url 'branch_detail' %}" style="display: none;">
+                                                                       {% csrf_token %}
+                                                                       <input type="hidden" name="branch_id" value="{{ team.team_branch_id.id }}">
+                                                                   </form>
+                                                               </li>
+                                                           </ul>
+                                                       </div>
+                                                   </div>                                                                                                                         
+                                               </td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -324,7 +370,14 @@
         });
     });
 });
-
+document.querySelectorAll('.view-details').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var branchId = link.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + branchId);
+            form.submit(); // Submits the form programmatically
+        });
+    });
 $(document).ready(function () {
 
     $('#team-table').DataTable();

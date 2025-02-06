@@ -652,7 +652,8 @@ class TournamentDetailView(View):
         field = tournament.tournament_fields if tournament.tournament_fields else "No field assigned"
 
         # Fetch all games for the tournament
-        games = TournamentGames.objects.filter(tournament_id=tournament.id).order_by('game_date')
+        games = TournamentGames.objects.filter(tournament_id=pk).order_by('game_date')
+        tournamnet_games = TournamentGames.objects.filter(tournament_id=pk).order_by('-game_number')
 
         # Fetch all teams for the tournament
         teams = TournamentGroupTeam.objects.filter(tournament_id=tournament.id)
@@ -701,7 +702,6 @@ class TournamentDetailView(View):
                 total_draws = games.filter(is_draw=True).count()
 
                 points = total_wins  # 1 point per win
-
                 # Create a dictionary with team statistics
                 team_data = {
                     "team_name": team.team_branch_id.team_name,
@@ -738,7 +738,7 @@ class TournamentDetailView(View):
             "country": country,
             "city": city,
             "field": field,
-            "games": games,
+            "games":tournamnet_games,
             "teams": teams,
             "grouped_data": grouped_data,
         }
@@ -757,6 +757,7 @@ class TournamentDetailView(View):
 
         # Fetch all games for the tournament
         games = TournamentGames.objects.filter(tournament_id=tournament.id).order_by('game_date')
+        tournamnet_games = TournamentGames.objects.filter(tournament_id=pk).order_by('-game_number')
 
         # Fetch all teams for the tournament
         teams = TournamentGroupTeam.objects.filter(tournament_id=tournament.id)
@@ -842,7 +843,7 @@ class TournamentDetailView(View):
             "country": country,
             "city": city,
             "field": field,
-            "games": games,
+            "games": tournamnet_games,
             "teams": teams,
             "grouped_data": grouped_data,
         }
