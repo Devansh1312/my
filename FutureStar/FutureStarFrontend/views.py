@@ -3,6 +3,7 @@ import os
 import time
 import random
 from datetime import datetime
+from django.utils.cache import add_never_cache_headers
 
 # Third-party Imports
 import jwt
@@ -63,22 +64,22 @@ class HomePage(View):
         # Use get_language to handle language logic
         language_from_url = get_language(request)
 
-        # Retrieve other data as usual
+        # Retrieve data from the database
         marquee = Slider_Content.objects.all().order_by('-id')
         app_features = App_Feature.objects.all().order_by('-id')
         testimonials = Testimonial.objects.all().order_by('-id')[:3]
         news = News.objects.all().order_by('-id')[:4]
         partner = Partners.objects.all().order_by('-id')
-        team_members = Team_Members.objects.all().order_by('id')
+        team_members = Team_Members.objects.all().order_by('-id')
         cmsfeatures = cms_home_dynamic_field.objects.all() or None
         cms_home_dynamic_achivements = cms_home_dynamic_achivements_field.objects.all() or None
         number_of_users = User.objects.all().count()
         tournament_organized = Tournament.objects.all().count()
-        team_created=Team.objects.all().count()
-        games_played=TournamentGames.objects.all().count()
+        team_created = Team.objects.all().count()
+        games_played = TournamentGames.objects.all().count()
 
         try:
-            cmsdata = cms_pages.objects.get(id=1)  # Use get() to fetch a single object
+            cmsdata = cms_pages.objects.get(id=1)  # Fetch a single object
         except cms_pages.DoesNotExist:
             cmsdata = None  # Handle the case where the object does not exist
 
@@ -99,10 +100,15 @@ class HomePage(View):
             "team_created": team_created,
             "games_played": games_played,
         }
-        
+
         # Render the home page with context
-        return render(request, "home.html", context)
-    
+        response = render(request, "home.html", context)
+
+        # Apply cache-control headers to clear browser cache
+        add_never_cache_headers(response)
+
+        return response
+
 ##############################################   DiscoverPage   ########################################################
 
 class DiscoverPage(View):
@@ -2598,8 +2604,6 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
 
 
 ############################### SearchView ########################
-
-
 class SearchView(View):
     def get(self, request, *args, **kwargs):
         language_from_url = request.GET.get('Language', None)

@@ -607,5 +607,18 @@
 	});
 	new WOW().init();
 </script> 
+<script>
+    if ('caches' in window) {
+		caches.keys().then(async function(names) {
+			for (let name of names) {
+				await caches.delete(name);
+			}
+			console.log('Cache cleared');
+		}).catch(() => console.log('Cache not cleared'));
+	} else {
+		console.log('Cache API not supported');
+	}
+
+</script>
 
 {% endblock %}
