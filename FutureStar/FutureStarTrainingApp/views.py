@@ -288,9 +288,9 @@ class CreateTrainingView(APIView):
 #         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-##################### Get trainings Details ##################################
-    
 
+
+##################### Get trainings Details ##################################
 class TrainingDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -329,8 +329,7 @@ class TrainingDetailAPIView(APIView):
                 'message': _('Training not found.'),
             }, status=status.HTTP_404_NOT_FOUND)
 
-###################### Edit Training ############################
-
+###################### Edit Training Detail ############################
     def get_object(self, training_id):
             try:
                 # Retrieve the training instance by ID
@@ -986,7 +985,8 @@ class JoinTrainingAPIView(APIView):
 
         # Default: No access
         return False
-    ######### Create a new training membership for the user ###################
+    
+####################### Create a new training membership for the user ################################
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -1199,7 +1199,7 @@ class JoinTrainingAPIView(APIView):
             }, status=status.HTTP_200_OK)
         
             
-
+################## Training Feedback API ############################
 class TrainingFeedbackAPI(APIView):
     def _has_access(self, training, user):
 
