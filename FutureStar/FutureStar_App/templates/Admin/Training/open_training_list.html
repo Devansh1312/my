@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins CSS Start -->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+   @media (max-width: 576px) {
+    .action-card {
+        width: 120px; /* Adjust the width of the action menu for smaller screens */
+    }
+}
+</style>
+<!-- Plugins CSS End -->
+{% endblock %}
+
+{% block title %}
+Open Training
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+   <div class="container-fluid">
+      <div class="page-title">
+         <div class="row">
+            <div class="col-6">
+               <h3>{{ breadcrumb.child }}</h3>
+            </div>
+            <div class="col-6"></div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <div class="card">
+               <div class="card-body">
+                  <div class="table-responsive">
+                     <table class="table table-bordered" id="basic-1">
+                        <thead>
+                           <tr>
+                              <th>No.</th>
+                              <th>Training Name</th>
+                              <th>City</th>
+                              <th>Field</th>
+                              <th>Training Date</th>
+                              <th>Start Time</th>
+                              <th>End Time</th>
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for training in trainings %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ training.training_name }}</td>
+                              <td>{{ training.city.name|default:"None" }}</td>
+                              <td>{{ training.field.field_name|default:"None" }}</td>
+                              <td>{{ training.training_date|date:"d M Y" }}</td>
+                              <td>{{ training.start_time|time:"H:i A" }}</td>
+                              <td>{{ training.end_time|time:"H:i A" }}</td>
+                              <td>Update Soon...</td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block scriptcontent %}
+<!-- Plugins JS Start -->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<!-- Plugins JS End -->
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+      // View Tournament Details
+      document.querySelectorAll('.view-details').forEach(function(link) {
+         link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var tournamentId = this.getAttribute('data-id');
+            var form = document.getElementById('view-form-' + tournamentId);
+            form.submit();
+         });
+      });
+
+      // Toggle the visibility of the action card
+      document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+         menu.addEventListener('click', function(event) {
+            event.preventDefault();
+            var actionCard = menu.nextElementSibling;
+            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+            // Close other open action cards
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               if (card !== actionCard) {
+                  card.style.display = 'none';
+               }
+            });
+         });
+      });
+
+      // Hide action card if clicking outside
+      document.addEventListener('click', function(event) {
+         var isClickInside = event.target.closest('.action-menu-container');
+         if (!isClickInside) {
+            document.querySelectorAll('.action-card').forEach(function(card) {
+               card.style.display = 'none';
+            });
+         }
+      });
+   });
+</script>
+{% endblock %}

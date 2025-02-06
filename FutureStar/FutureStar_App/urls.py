@@ -311,6 +311,11 @@ urlpatterns = [
     path('approve-reject-booking/', ApproveRejectBookingView.as_view(), name='approve_or_reject_booking'),
 
 
+    ############ Training URL's ##############
+    path('open-trainings/', OpenTrainingListView.as_view(), name='open-trainings'),
+    path('close-trainings/', ClosedTrainingListView.as_view(), name='close-trainings'),
+
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)   

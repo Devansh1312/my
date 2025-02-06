@@ -7607,3 +7607,37 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                     title=title,
                     content=body,
                 )
+
+
+
+################################## Open Training List ##################################
+@method_decorator(user_role_check, name="dispatch")
+class OpenTrainingListView(LoginRequiredMixin, View):
+    template_name = "Admin/Training/open_training_list.html"
+
+    def get(self, request):
+        open_trainings = Training.objects.filter(training_type=1)
+        return render(
+            request,
+            self.template_name,
+            {
+                "trainings": open_trainings,
+                "breadcrumb": {"child": "Open Training List"},
+            },
+        )
+
+################################## Closed Training List ##################################
+@method_decorator(user_role_check, name="dispatch")
+class ClosedTrainingListView(LoginRequiredMixin, View):
+    template_name = "Admin/Training/closed_training_list.html"
+
+    def get(self, request):
+        closed_trainings = Training.objects.filter(training_type=2)
+        return render(
+            request,
+            self.template_name,
+            {
+                "trainings": closed_trainings,
+                "breadcrumb": {"child": "Closed Training List"},
+            },
+        )
