@@ -687,17 +687,45 @@ class OpenTrainingListView(APIView):
         # Get today's date
         today = date.today()
 
-        # Query all open training sessions that have not passed
-        open_trainings = Training.objects.filter(
-            training_type=Training.OPEN_TRAINING,
-            training_date__gte=today  # Only future or today
-        ).order_by('-training_date')
+        # Get the type of training (whether to show past or upcoming)
+        date_type = request.query_params.get('date_type', 0)  # Default to upcoming (0)
 
+        # Validate date_type value
+        try:
+            date_type = int(date_type)
+        except ValueError:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. It must be an integer.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter open training sessions based on the date_type
+        if date_type == 0:  # Upcoming or ongoing open training sessions
+            open_trainings = Training.objects.filter(
+                training_type=Training.OPEN_TRAINING,
+                training_date__gte=today  # Only future or today
+            ).order_by('training_date')
+        elif date_type == 1:  # Past open training sessions
+            open_trainings = Training.objects.filter(
+                training_type=Training.OPEN_TRAINING,
+                training_date__lt=today  # Only past trainings
+            ).order_by('-training_date')
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. Allowed values are 0 or 1.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get creator type and created_by_id from query parameters
         creator_type = request.query_params.get('creator_type')
         created_by_id = request.query_params.get('created_by_id')
 
-        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
-
+        # Get notification count for the user
+        notification_count = Notifictions.objects.filter(
+            targeted_id=created_by_id, 
+            targeted_type=creator_type,
+            read=False
+        ).count()
 
         # Initialize custom pagination
         paginator = CustomTrainingPagination()
@@ -741,8 +769,36 @@ class MyTrainingsView(APIView):
         # Retrieve the logged-in user ID
         user = request.user.id
 
-        # Get all trainings initially
-        trainings = Training.objects.all().order_by('-training_date')
+        # Get today's date
+        today = date.today()
+
+        # Get the date_type from query parameters (0 for upcoming, 1 for past)
+        date_type = request.query_params.get('date_type', 0)  # Default to upcoming (0)
+
+        # Validate date_type value
+        try:
+            date_type = int(date_type)
+        except ValueError:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. It must be an integer.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Retrieve all trainings initially
+        trainings = Training.objects.all()
+
+        # Filter trainings based on the date_type
+        if date_type == 0:  # Upcoming or ongoing trainings
+            # Get upcoming trainings from today onwards, order by training_date
+            trainings = trainings.filter(training_date__gte=today).order_by('training_date')
+        elif date_type == 1:  # Past trainings
+            # Get past trainings, order by training_date in reverse (from recent to past)
+            trainings = trainings.filter(training_date__lt=today).order_by('-training_date')
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. Allowed values are 0 or 1.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # Filter trainings based on access logic
         accessible_trainings = []
@@ -750,8 +806,11 @@ class MyTrainingsView(APIView):
             if self._has_access(training, user):
                 accessible_trainings.append(training)
 
-        # Sort the trainings by `training_date` in descending order
-        accessible_trainings = sorted(accessible_trainings, key=lambda t: t.training_date, reverse=True)
+        # Sort the trainings by `training_date` as per the required order
+        if date_type == 0:
+            accessible_trainings = sorted(accessible_trainings, key=lambda t: t.training_date)
+        else:
+            accessible_trainings = sorted(accessible_trainings, key=lambda t: t.training_date, reverse=True)
 
         # Apply custom pagination
         paginator = CustomTrainingPagination()
@@ -762,15 +821,7 @@ class MyTrainingsView(APIView):
             # Serialize the paginated data
             serializer = TrainingListSerializer(paginated_trainings, many=True, context={'request': request})
 
-            # Prepare pagination metadata
-            pagination_data = {
-                'total_records': len(accessible_trainings),
-                'total_pages': paginator.page.paginator.num_pages,
-                'current_page': paginator.page.number,
-                'data': serializer.data
-            }
-
-            # Return paginated response
+            # Return paginated response with metadata
             return Response({
                 'status': 1,
                 'message': 'Trainings retrieved successfully',
@@ -837,9 +888,35 @@ class MyJoinedTrainingsView(APIView):
         # Get the current authenticated user
         user = request.user
 
+        # Get today's date
+        today = date.today()
+
+        # Get the date_type from query parameters (0 for upcoming, 1 for past)
+        date_type = request.query_params.get('date_type', 0)  # Default to upcoming (0)
+
+        # Validate date_type value
+        try:
+            date_type = int(date_type)
+        except ValueError:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. It must be an integer.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Fetch all the trainings the user has joined and order by training_date (newest first)
-        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training').order_by('-training__training_date')
-        
+        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')
+
+        # Filter the trainings based on the date_type
+        if date_type == 0:  # Upcoming or ongoing trainings
+            joined_trainings = joined_trainings.filter(training__training_date__gte=today)  # Only future or today
+        elif date_type == 1:  # Past trainings
+            joined_trainings = joined_trainings.filter(training__training_date__lt=today)  # Only past trainings
+        else:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. Allowed values are 0 or 1.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # If the user has not joined any training, return a message
         if not joined_trainings.exists():
             return Response({
@@ -851,8 +928,11 @@ class MyJoinedTrainingsView(APIView):
         # Get the training sessions by joining the Training model
         trainings = [entry.training for entry in joined_trainings]
 
-        # Order the trainings by training_date (newest first)
-        trainings = sorted(trainings, key=lambda x: x.training_date, reverse=True)
+        # Sort the trainings by `training_date` as per the required order
+        if date_type == 0:  # Upcoming
+            trainings = sorted(trainings, key=lambda x: x.training_date)  # Sort from earliest to latest
+        else:  # Past
+            trainings = sorted(trainings, key=lambda x: x.training_date, reverse=True)  # Sort from latest to earliest
 
         # Initialize custom pagination
         paginator = CustomTrainingPagination()

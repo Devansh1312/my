@@ -1054,8 +1054,17 @@ class ListOfFridlyGamesForJoin(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
-        # Filter games where game_date is in the future and team_b is None
-        games = FriendlyGame.objects.filter(game_date__gte=date.today(), team_b=None)
+        # Get date_type from query parameters
+        date_type = int(request.query_params.get('date_type', 0))  # Default to upcoming and ongoing games
+        current_date = timezone.now().date()
+
+        # Filter games based on date_type
+        if date_type == 0:  # Upcoming and ongoing games
+            games = FriendlyGame.objects.filter(game_date__gte=current_date, team_b=None)
+        elif date_type == 1:  # Past games
+            games = FriendlyGame.objects.filter(game_date__lt=current_date, team_b=None)
+        else:  # Show all games if invalid date_type
+            games = FriendlyGame.objects.filter(team_b=None)
 
         # Initialize pagination
         paginator = self.pagination_class()
@@ -1073,7 +1082,7 @@ class ListOfFridlyGamesForJoin(APIView):
             'message': _('Data fetched successfully.'),
             'data': serializer.data
         })
-    
+
 ######################### List of all Teams for Team B  ###################
 class TeamBranchListView(APIView):
     permission_classes = [IsAuthenticated]

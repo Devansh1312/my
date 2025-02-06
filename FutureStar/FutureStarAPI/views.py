@@ -1547,10 +1547,13 @@ class PostCreateAPIView(APIView):
             self.notify_followers(created_by_id, creator_type, post)
 
             post.refresh_from_db()
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
 
             return Response({
                 'status': 1,
-                'message': _('Post created successfully'),
+                'message': _('post created successfully.'),
                 'data': PostSerializer(post).data
             }, status=status.HTTP_201_CREATED)
 
@@ -3421,6 +3424,8 @@ class UserRoleListAPIView(generics.ListAPIView):
             'data': serializer.data  # Directly include the serialized data
         }, status=status.HTTP_200_OK)
 
+
+########################## Country City Fetch API #########################################
 class LocationAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -3434,7 +3439,7 @@ class LocationAPIView(APIView):
 
         # If country_id is not provided, return all active countries
         if not country_id:
-            countries = Country.objects.filter(status=True)
+            countries = Country.objects.filter(status=True).order_by('-id')
             country_data = [{'id': country.id, 'name': country.name} for country in countries]
 
             return Response({
@@ -3452,7 +3457,7 @@ class LocationAPIView(APIView):
                 'message': _('Country not found or inactive.')
             }, status=status.HTTP_404_NOT_FOUND)
 
-        cities = City.objects.filter(country=country, status=True)
+        cities = City.objects.filter(country=country, status=True).order_by('name')
         city_data = [{'id': city.id, 'name': city.name} for city in cities]
 
         return Response({
@@ -4350,7 +4355,9 @@ class EventsAPIView(APIView):
         events_section = request.query_params.get('events_section')  # Default to 1 if not provided
         creator_type = request.query_params.get('creator_type')  # Get creator_type from query parameters
         created_by_id = request.query_params.get('created_by_id')  # Get created_by_id from query parameters
+        date_type = request.query_params.get('date_type', 0)  # Default to upcoming and ongoing events
 
+        # Validate events_section
         try:
             events_section = int(events_section)
         except ValueError:
@@ -4359,17 +4366,38 @@ class EventsAPIView(APIView):
                 'message': _('Invalid events_section value. It must be an integer.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if events_section == 1:
-            # Show all events
-            events = Event.objects.filter(event_status=1).order_by('-event_date')
+        # Validate date_type
+        try:
+            date_type = int(date_type)
+        except ValueError:
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. It must be an integer.')
+            }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Get current date for filtering
+        current_date = timezone.now().date()
+
+        # Filter events based on date_type
+        if date_type == 0:  # Upcoming and ongoing events (default)
+            events_filter = Event.objects.filter(event_status=1, event_date__gte=current_date)
+        elif date_type == 1:  # Past events
+            events_filter = Event.objects.filter(event_status=1, event_date__lt=current_date)
+        else:  # Invalid date_type
+            return Response({
+                'status': 0,
+                'message': _('Invalid date_type value. Allowed values are 0 or 1.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filter events based on events_section
+        if events_section == 1:
+            events = events_filter.order_by('event_date')  # For upcoming events, order by event date ascending
         elif events_section == 2:
-            # Show events created by the specified creator_type and created_by_id
-            events = Event.objects.filter(
+            # Filter events created by the specified creator_type and created_by_id
+            events = events_filter.filter(
                 creator_type=creator_type,
                 created_by_id=created_by_id
-            ).order_by('-event_date')
-
+            ).order_by('-event_date')  # For created events, order by date descending
 
             if not events.exists():
                 # If no created events, look up joined events in EventBooking
@@ -4381,8 +4409,7 @@ class EventsAPIView(APIView):
                 if joined_events.exists():
                     # Get event IDs from joined bookings
                     joined_event_ids = joined_events.values_list('event_id', flat=True)
-                    events = Event.objects.filter(id__in=joined_event_ids).order_by('-event_date')
-
+                    events = events_filter.filter(id__in=joined_event_ids).order_by('-event_date')
         else:
             return Response({
                 'status': 0,

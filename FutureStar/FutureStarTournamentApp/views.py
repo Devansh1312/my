@@ -281,8 +281,19 @@ class TournamentAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
         
+        date_type = request.query_params.get('date_type', 0)  # Get the date_type from query params, default to 0
+        current_date = timezone.now().date()  # Get today's date
+        
         paginator = CustomTournamentPagination()
-        tournaments = Tournament.objects.all().order_by('-created_at')
+        
+        # Filter tournaments based on date_type
+        if date_type == 0:
+            tournaments = Tournament.objects.filter(
+                models.Q(tournament_starting_date__gte=current_date) |  # Future tournaments
+                models.Q(tournament_starting_date__lte=current_date, tournament_final_date__gte=current_date)  # Ongoing tournaments
+            ).order_by('tournament_starting_date')
+        else:  # Show past tournaments
+            tournaments = Tournament.objects.filter(tournament_starting_date__lte=current_date).order_by('-tournament_starting_date')
 
         paginated_tournaments = paginator.paginate_queryset(tournaments, request, view=self)
         if paginated_tournaments is None:
@@ -298,6 +309,7 @@ class TournamentAPIView(APIView):
             'total_pages': paginator.total_pages,
             'current_page': paginator.page.number
         }, status=status.HTTP_200_OK)
+    
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -461,6 +473,8 @@ class MyTournamentsAPIView(APIView):
         # Extract parameters from request
         creator_type = request.query_params.get('creator_type', None)
         created_by_id = request.query_params.get('created_by_id', None)
+        date_type = request.query_params.get('date_type', 0)  # Default to '0' (upcoming tournaments)
+        current_date = timezone.now().date()
 
         # Check creator_type and created_by_id validity
         if creator_type is None or int(creator_type) != 2:
@@ -475,8 +489,18 @@ class MyTournamentsAPIView(APIView):
                 'message': _('Invalid creator details.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filter tournaments where team_id matches created_by_id
-        tournaments = Tournament.objects.filter(team_id=created_by_id).order_by('-created_at')
+        # Filter tournaments based on date_type
+        if date_type == 0:  # Show upcoming and ongoing tournaments
+            tournaments = Tournament.objects.filter(
+                models.Q(tournament_starting_date__gte=current_date) |
+                models.Q(tournament_starting_date__lte=current_date, tournament_final_date__gte=current_date),
+                team_id=created_by_id
+            ).order_by('-created_at')
+        else:  # Show past tournaments
+            tournaments = Tournament.objects.filter(
+                team_id=created_by_id,
+                tournament_final_date__lt=current_date
+            ).order_by('-created_at')
 
         if not tournaments.exists():
             return Response({
@@ -501,7 +525,6 @@ class MyTournamentsAPIView(APIView):
             'total_pages': paginator.total_pages,
             'current_page': paginator.page.number
         }, status=status.HTTP_200_OK)
-
 ############################# TOURNAMENT DETAIL WITH ID ###########################
 class TournamentDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2850,9 +2873,11 @@ class FetchMyGamesAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
-        
-        created_by_id = request.GET.get('created_by_id', None)
-        creator_type = str(request.GET.get('creator_type', 0))
+
+        created_by_id = request.query_params.get('created_by_id', None)
+        creator_type = str(request.query_params.get('creator_type', 0))
+        date_type = request.query_params.get('date_type',0)  # Default to upcoming and ongoing games
+        current_date = timezone.now().date()
 
         if creator_type == '2' and not created_by_id:
             return Response({"status": 0, "message": "created_by_id must be provided for creator_type 2."})
@@ -2955,11 +2980,27 @@ class FetchMyGamesAPIView(APIView):
                     "winner": game.winner_id,
                     "loser_id": game.loser_id,
                     "is_draw": game.is_draw,
-                    "created_by":game.created_by.id,
+                    "created_by": game.created_by.id,
                 })
 
-        # Sort all games by game_date and game_start_time
-        all_games.sort(key=lambda x: (x["game_date"], x["game_start_time"]), reverse=True)
+        # Filter games based on date_type
+        if date_type == 0:  # Upcoming and ongoing games
+            all_games = [game for game in all_games if game["game_date"] >= str(current_date)]
+        elif date_type == 1:  # Past games
+            all_games = [game for game in all_games if game["game_date"] < str(current_date)]
+
+        # Sort all games by game_date and game_start_time with the custom sorting logic
+        today = datetime.today().date()
+
+        all_games.sort(
+            key=lambda x: (
+                # Prioritize future dates (today and later) in ascending order
+                (x["game_date"] >= str(today), x["game_date"], x["game_start_time"]),
+                # Past dates in descending order
+                (x["game_date"] < str(today), -int(x["game_date"].replace("-", "")))
+            ),
+            reverse=False
+        )
 
         # Implement Pagination
         page = int(request.GET.get("page", 1))
@@ -2982,6 +3023,7 @@ class FetchMyGamesAPIView(APIView):
             "data": paginated_games,
         })
 
+######################################## Fetch All Games API View ########################################
 class FetchAllGamesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -2989,9 +3031,13 @@ class FetchAllGamesAPIView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         user = request.user
         creator_type = request.query_params.get('creator_type')
         created_by_id = request.query_params.get('created_by_id')
+        date_type = int(request.query_params.get('date_type', 0))  # Default to upcoming and ongoing games
+        current_date = timezone.now().date()
+
         notification_count = Notifictions.objects.filter(
             targeted_id=created_by_id, targeted_type=creator_type, read=False
         ).count()
@@ -3004,7 +3050,6 @@ class FetchAllGamesAPIView(APIView):
 
         games_by_date = {}
 
-        # Helper function to organize games
         def add_game_to_date(date_str, tournament_name, game_data):
             if date_str not in games_by_date:
                 games_by_date[date_str] = {"tournament": []}
@@ -3024,75 +3069,46 @@ class FetchAllGamesAPIView(APIView):
 
             tournament_entry["games"].append(game_data)
 
-        # Process tournament games
-        for game in tournament_games:
-            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
+        # Process tournament and friendly games
+        all_games = []
+
+        for game in list(tournament_games) + list(friendly_games):
+            game_date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
+            game_type = "Tournament" if isinstance(game, TournamentGames) else "Friendly"
             game_data = {
                 "id": game.id,
-                "tournament_id": game.tournament_id.id if game.tournament_id else None,
+                "game_type": game_type,
                 "game_number": game.game_number,
                 "game_date": str(game.game_date),
                 "game_start_time": str(game.game_start_time),
                 "game_end_time": str(game.game_end_time),
-                "group_id": game.group_id.id if game.group_id else None,
-                "group_id_name": game.group_id.group_name if game.group_id else None,
-                "team_a": game.team_a.id if game.team_a else None,
                 "team_a_name": game.team_a.team_name if game.team_a else None,
-                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
-                "team_a_goal": game.team_a_goal,
-                "team_b": game.team_b.id if game.team_b else None,
                 "team_b_name": game.team_b.team_name if game.team_b else None,
-                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
-                "team_b_goal": game.team_b_goal,
-                "game_field_id": game.game_field_id.id if game.game_field_id else None,
-                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
                 "finish": game.finish,
                 "winner": game.winner_id,
                 "loser_id": game.loser_id,
                 "is_draw": game.is_draw,
-                "created_at": game.created_at,
-                "updated_at": game.updated_at,
-                "game_type": "Tournament",
             }
-            add_game_to_date(date_str, game.tournament_id.tournament_name if game.tournament_id else "Unknown Tournament", game_data)
+            all_games.append((game_date_str, game_data, game_type))
 
-        # Process friendly games
-        for game in friendly_games:
-            date_str = game.game_date.strftime('%A,%Y-%m-%d') if game.game_date else "Unknown"
-            game_data = {
-                "id": game.id,
-                "game_number": game.game_number,
-                "game_date": str(game.game_date),
-                "game_start_time": str(game.game_start_time),
-                "game_end_time": str(game.game_end_time),
-                "group_id": None,
-                "group_id_name": None,
-                "team_a": game.team_a.id if game.team_a else None,
-                "team_a_name": game.team_a.team_name if game.team_a else None,
-                "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id.team_logo else None,
-                "team_a_goal": game.team_a_goal,
-                "team_b": game.team_b.id if game.team_b else None,
-                "team_b_name": game.team_b.team_name if game.team_b else None,
-                "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id.team_logo else None,
-                "team_b_goal": game.team_b_goal,
-                "game_field_id": game.game_field_id.id if game.game_field_id else None,
-                "game_field_id_name": game.game_field_id.field_name if game.game_field_id else None,
-                "finish": game.finish,
-                "winner": game.winner_id,
-                "loser_id": game.loser_id,
-                "is_draw": game.is_draw,
-                "created_at": game.created_at,
-                "updated_at": game.updated_at,
-                "game_type": "Friendly",
-            }
-            add_game_to_date(date_str, "Friendly Games", game_data)
+        # Apply the date type filter
+        if date_type == 0:  # Upcoming and ongoing games
+            all_games = [game for game in all_games if game[1]["game_date"] >= str(current_date)]
+        elif date_type == 1:  # Past games
+            all_games = [game for game in all_games if game[1]["game_date"] < str(current_date)]
 
-        # Sort the games by date (latest first)
-        sorted_games_by_date = dict(sorted(
-            games_by_date.items(),
-            key=lambda x: datetime.strptime(x[0], '%A,%Y-%m-%d') if x[0] != "Unknown" else datetime.min,
-            reverse=True
-        ))
+        # Sorting logic for upcoming and past games
+        all_games.sort(
+            key=lambda x: (
+                (x[1]["game_date"] >= str(current_date), x[1]["game_date"], x[1]["game_start_time"]),
+                (x[1]["game_date"] < str(current_date), -int(x[1]["game_date"].replace("-", "")))
+            ),
+            reverse=False
+        )
+
+        # Organize games by date
+        for date_str, game_data, game_type in all_games:
+            add_game_to_date(date_str, game_type, game_data)
 
         # Format the response
         response_data = [
@@ -3100,12 +3116,12 @@ class FetchAllGamesAPIView(APIView):
                 "date": date,
                 "tournament": games["tournament"],
             }
-            for date, games in sorted_games_by_date.items()
+            for date, games in games_by_date.items()
         ]
 
         # Pagination
         page = int(request.GET.get("page", 1))
-        page_size = 10  # Adjust as needed
+        page_size = 10
         total_records = len(response_data)
         total_pages = (total_records + page_size - 1) // page_size
         start = (page - 1) * page_size
@@ -3118,9 +3134,8 @@ class FetchAllGamesAPIView(APIView):
             "total_pages": total_pages,
             "current_page": page,
             "data": response_data[start:end],
-            "notification_count": notification_count  # Include notification count here
+            "notification_count": notification_count
         })
-
 
 
 ############################ Tournaments Game Stats  API ########################################
