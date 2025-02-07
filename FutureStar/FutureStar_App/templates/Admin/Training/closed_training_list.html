@@ -59,7 +59,26 @@ Closed Training
                               <td>{{ training.training_date|date:"d M Y" }}</td>
                               <td>{{ training.start_time|time:"H:i A" }}</td>
                               <td>{{ training.end_time|time:"H:i A" }}</td>
-                              <td>Update Soon...</td>
+                              <td>      <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                 <!-- Three dots menu trigger -->
+                                 <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                     <i data-feather="more-vertical"></i>
+                                 </a>
+                                 <!-- Action card -->
+                                 <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                     <ul style="list-style: none; padding: 0; margin: 0;">
+                                         <!-- View action -->
+                                         <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                             <a href="#" class="view-details" data-id="{{ training.id }}" onclick="submitViewForm(event, '{{ training.id }}')">View</a>
+                                             <form id="view-form-{{ training.id }}" method="post" action="{% url 'close_training_detail'  training.id %}" style="display: none;">
+                                                 {% csrf_token %}
+                                                 <input type="hidden" name="training_id" value="{{ training.id }}">
+                                             </form>
+                                         </li>
+                                     </ul>
+                                 </div>
+                             </div>      
+                           </td>
                            </tr>
                            {% endfor %}
                         </tbody>

@@ -7624,6 +7624,45 @@ class OpenTrainingListView(LoginRequiredMixin, View):
             },
         )
 
+################################## Joined Open Training Detail ##################################
+@method_decorator(user_role_check, name="dispatch")
+class OpenTrainingDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/Training/open_training_detail.html"
+
+    def post(self, request, training_id):
+        # Get the specific training or return 404 if not found
+        training = get_object_or_404(Training, id=training_id, training_type=Training.OPEN_TRAINING)
+
+        # Get users who joined this particular training
+        joined_users = Training_Joined.objects.filter(training=training)
+
+        creator_name = "Unknown"
+        creator_type = "Unknown Type"
+
+        if training.creator_type == Training.USER_TYPE:
+            creator = User.objects.filter(id=training.created_by_id).first()
+            creator_name = creator.username if creator else "Unknown User"
+            creator_type = "User"
+        elif training.creator_type == Training.TEAM_TYPE:
+            creator = Team.objects.filter(id=training.created_by_id).first()
+            creator_name = creator.team_name if creator else "Unknown Team"
+            creator_type = "Team"
+        elif training.creator_type == Training.GROUP_TYPE:
+            creator = TrainingGroups.objects.filter(id=training.created_by_id).first()
+            creator_name = creator.group_name if creator else "Unknown Group"
+            creator_type = "Group"
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "training": training,
+                "joined_users": joined_users,
+                "creator_name": creator_name,  # Pass creator's name
+                "creator_type": creator_type,  # Pass creator's type
+                "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
+            },
+        )
 ################################## Closed Training List ##################################
 @method_decorator(user_role_check, name="dispatch")
 class ClosedTrainingListView(LoginRequiredMixin, View):
@@ -7637,5 +7676,45 @@ class ClosedTrainingListView(LoginRequiredMixin, View):
             {
                 "trainings": closed_trainings,
                 "breadcrumb": {"child": "Closed Training List"},
+            },
+        )
+
+################################## Closed Training Detail ##################################
+@method_decorator(user_role_check, name="dispatch")
+class CloseTrainingDetailView(LoginRequiredMixin, View):
+    template_name = "Admin/Training/close_training_detail.html"
+
+    def post(self, request, training_id):
+        # Get the specific training or return 404 if not found
+        training = get_object_or_404(Training, id=training_id, training_type=Training.CLOSED_TRAINING)
+
+        # Get users who joined this particular training
+        joined_users = Training_Joined.objects.filter(training=training)
+
+        creator_name = "Unknown"
+        creator_type = "Unknown Type"
+
+        if training.creator_type == Training.USER_TYPE:
+            creator = User.objects.filter(id=training.created_by_id).first()
+            creator_name = creator.username if creator else "Unknown User"
+            creator_type = "User"
+        elif training.creator_type == Training.TEAM_TYPE:
+            creator = Team.objects.filter(id=training.created_by_id).first()
+            creator_name = creator.team_name if creator else "Unknown Team"
+            creator_type = "Team"
+        elif training.creator_type == Training.GROUP_TYPE:
+            creator = TrainingGroups.objects.filter(id=training.created_by_id).first()
+            creator_name = creator.group_name if creator else "Unknown Group"
+            creator_type = "Group"
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "training": training,
+                "joined_users": joined_users,
+                "creator_name": creator_name,  # Pass creator's name
+                "creator_type": creator_type,  # Pass creator's type
+                "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
             },
         )

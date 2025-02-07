@@ -302,9 +302,11 @@ urlpatterns = [
     path('approve-reject-booking/', ApproveRejectBookingView.as_view(), name='approve_or_reject_booking'),
 
 
-    ############ Training URL's ##############
+     ############ Training URL's ##############
     path('open-trainings/', OpenTrainingListView.as_view(), name='open-trainings'),
+    path("open-training/<int:training_id>/", OpenTrainingDetailView.as_view(), name="open_training_detail"),
     path('close-trainings/', ClosedTrainingListView.as_view(), name='close-trainings'),
+    path("close-training/<int:training_id>/", CloseTrainingDetailView.as_view(), name="close_training_detail"),
 
 
 
