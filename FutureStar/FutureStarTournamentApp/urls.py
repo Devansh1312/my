@@ -1,11 +1,5 @@
 from django.urls import path
 from FutureStarTournamentApp.views import *
-from django.conf.urls.static import static
-from django.conf.urls import handler404
-from django.shortcuts import redirect
-
-
-handler404 = 'FutureStarFrontend.views.custom_404_view'
 
 urlpatterns = [
     
@@ -53,5 +47,3 @@ urlpatterns = [
         ############ Extra time ############\
         path('api/update_extra_time/', ExtraTimeAPIView.as_view(), name='update_extra_time'),
     ]
-
-handler404 = 'FutureStarFrontend.views.custom_404_view'
