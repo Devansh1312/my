@@ -41,12 +41,14 @@ class CreateTrainingView(APIView):
         field_id = request.data.get('field')
         description = request.data.get('description', '')
         cost = request.data.get('cost', '')
+        training_type = int(request.data.get('training_type', 1))  # Default: Open training
 
         try:
             country_id = int(country_id) if country_id else None
             city_id = int(city_id) if city_id else None
             gender_id = int(gender_id) if gender_id else None
             field_id = int(field_id) if field_id else None
+            training_type = int(training_type)
         except (ValueError, TypeError):
             return Response({
                 'status': 0,
@@ -128,6 +130,7 @@ class CreateTrainingView(APIView):
                 no_of_participants=no_of_participants,
                 description=description,
                 cost=cost,
+                training_type=training_type,
             )
             training_instances.append(training_instance)
 
@@ -173,6 +176,7 @@ class CreateTrainingView(APIView):
                         no_of_participants=no_of_participants,
                         description=description,
                         cost=cost,
+                        training_type=training_type,
                     )
                     training_instances.append(training_instance)
                 current_date += timedelta(days=1)
@@ -675,12 +679,12 @@ class OpenTrainingListView(APIView):
         # Filter open training sessions based on the date_type
         if date_type == 0:  # Upcoming or ongoing open training sessions
             open_trainings = Training.objects.filter(
-                training_type=Training.OPEN_TRAINING,
+                training_type=1,
                 training_date__gte=today  # Only future or today
             ).order_by('training_date')
         elif date_type == 1:  # Past open training sessions
             open_trainings = Training.objects.filter(
-                training_type=Training.OPEN_TRAINING,
+                training_type=1,
                 training_date__lt=today  # Only past trainings
             ).order_by('-training_date')
         else:
