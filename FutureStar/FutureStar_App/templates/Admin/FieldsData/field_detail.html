@@ -195,7 +195,7 @@
                                                                 <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                                                     <i data-feather="more-vertical"></i>
                                                                 </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
                                                                     <ul style="list-style: none; padding: 0; margin: 0;">
                                                                         <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
                                                                             <a href="{% url 'game_detail' tournament_game.id %}">View</a>
@@ -246,7 +246,7 @@
                                                                 <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
                                                                     <i data-feather="more-vertical"></i>
                                                                 </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
                                                                     <ul style="list-style: none; padding: 0; margin: 0;">
                                                                         <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
                                                                             <a href="{% url 'friendly_game_detail' friendly_game.id %}">View</a>
@@ -298,6 +298,7 @@
                                                     <th>Training Date</th>
 
                                                     <th>No. of Participants</th>
+                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -307,10 +308,25 @@
                                                         <td>{{ training.training_name }}</td>
                                                         <td>{{ training.training_date }}</td>
                                                         <td>{{ training.no_of_participants }}</td>
+                                                        <td>
+                                                            <!-- Action buttons -->
+                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                                    <i data-feather="more-vertical"></i>
+                                                                </a>
+                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
+                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                            <a href="{% url 'open_training_detail' training.id %}">View</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 {% empty %}
                                                     <tr>
-                                                        <td colspan="4">No Data available.</td>
+                                                        <td colspan="5">No Data available.</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -327,8 +343,8 @@
                                                     <th>No</th>
                                                     <th>Training Name</th>
                                                     <th>Training Date</th>
-
                                                     <th>No. of Participants</th>
+                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -338,10 +354,25 @@
                                                         <td>{{ training.training_name }}</td>
                                                         <td>{{ training.training_date }}</td>
                                                         <td>{{ training.no_of_participants }}</td>
+                                                        <td>
+                                                            <!-- Action buttons -->
+                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
+                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+                                                                    <i data-feather="more-vertical"></i>
+                                                                </a>
+                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
+                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+                                                                            <a href="{% url 'close_training_detail' training.id %}">View</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 {% empty %}
                                                     <tr>
-                                                        <td colspan="4">No Data available.</td>
+                                                        <td colspan="5">No Data available.</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -407,63 +438,30 @@
             "lengthChange": true,
             "pageLength": 10
         });
+    });
 
-        // Toggle the visibility of the action card
-        document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-            menu.addEventListener('click', function(field) {
-                field.preventDefault();
-                var actionCard = menu.nextElementSibling;
-                actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-                // Close other open action cards
-                document.querySelectorAll('.action-card').forEach(function(card) {
-                    if (card !== actionCard) {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
 
-        // View User Details
-        document.querySelectorAll('.view-details').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var FieldId = this.getAttribute('data-id');
-                var form = document.getElementById('view-form-' + FieldId);
-                form.submit();
-            });
-        });
-
-        // Hide action card if clicking outside
-        document.addEventListener('click', function(field) {
-            var isClickInside = field.target.closest('.action-menu-container');
-            if (!isClickInside) {
-                document.querySelectorAll('.action-card').forEach(function(card) {
-                    card.style.display = 'none';
-                });
+    function toggleMenu(menu) {
+        event.preventDefault();
+        const actionCard = menu.nextElementSibling;
+        // Toggle visibility
+        actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+    
+        // Close other open action cards
+        document.querySelectorAll('.action-card').forEach(card => {
+            if (card !== actionCard) {
+                card.style.display = 'none';
             }
         });
+    }
+    
+    // Close the action card when clicking outside
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.action-menu-container')) {
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.style.display = 'none';
+            });
+        }
     });
-    // Toggle the visibility of the action card
-   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-        menu.addEventListener('click', function(event) {
-            event.preventDefault();
-            var actionCard = menu.nextElementSibling;
-            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-            // Close other open action cards
-            document.querySelectorAll('.action-card').forEach(function(card) {
-                if (card !== actionCard) {
-                    card.style.display = 'none';
-            }
-        });
-    });
-});
-      document.querySelectorAll('.view-details').forEach(function(link) {
-         link.addEventListener('click', function(e) {
-            e.preventDefault();
-            var tournamentId = this.getAttribute('data-id');
-            var form = document.getElementById('view-form-' + tournamentId);
-            form.submit();
-         });
-      });
 </script>
 {% endblock %}

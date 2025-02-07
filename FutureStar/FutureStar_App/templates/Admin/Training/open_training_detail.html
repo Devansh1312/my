@@ -55,6 +55,7 @@
             padding: 1rem;
         }
     }
+
  </style>
 {% endblock %}
 
@@ -64,242 +65,184 @@
 
 {% block content %}
 <div class="page-body">
-   <!-- Big Card -->
-   <div class="card" style="margin-top: 100px;">
-      <div class="card-body">
-         <div class="row">
-            <!-- Tournament Information -->
-            <div class="col-12">
-               <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4 class="card-title mb-0">Training Details</h4>
-                  <!-- Back Button -->
-                  <a href="{% url 'open-trainings' %}" class="btn btn-secondary" style="float: right;">
-                     <i class="fa fa-arrow-left"></i> Back
-                  </a>                 
-               </div>
-               <div class="card-body">
-                  <div class="info">
-                     <div class="row g-3">
-                        <!-- Left Column -->
-                        <div class="col-12 col-md-6 col-xl-4 order-sm-1 order-xl-0">
-                           <div class="row g-3 mb-3">
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-trophy"></i> Training Name
-                                    </h6>
-                                    <span>
-                                       {{ training.training_name|default:"None" }}
-
-                                    </span>
-                                 </div>
-                              </div>
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                       <i class="fa fa-calendar"></i> Training Date
-                                    </h6>
-                                    <span>
-                                        {% if training.training_date %}{{ training.training_date|date:"Y-m-d" }}{% else %}None{% endif %}
-                                        {{ training.training_date|date:"Y-m-d" }}</span>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="row g-3">
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                        <h6><i class="fa fa-calendar-check-o"></i> Training Field</h6>
-                                    </h6>
-                                    <span>{{ training.field.field_name|default:"None"  }}</span>
-                                 </div>
-                              </div>
-                              <div class="col-md-6">
-                                 <div class="ttl-info text-start">
-                                    <h6>
-                                        <h6><i class="fa fa-clock-o"></i> Training Duration</h6>
-                                    </h6>
-                                    <span>{{ training.training_duration|default:"None"  }}</span>
-                                 </div>
-                              </div>
-                          
-
-                              <div class="col-md-6">
-                                <div class="ttl-info text-start">
-                                    <h6><i class="fa fa-hourglass-start"></i> Training Start Time</h6>
-                                   <span>{{ training.start_time|default:"None"  }}</span>
-                                </div>
-
-                             </div>
-                             <div class="col-md-6">
-                                <div class="ttl-info text-start">
-                                    <h6><i class="fa fa-hourglass-end"></i> Training End Time</h6>
-                                   <span>{{ training.end_time|default:"None"  }}</span>
-                                </div>
-
-                             </div>
-                             </div>
-
-                          
-                        </div>
-                        <!-- Middle Column -->
-                        <div class="col-12 col-md-6 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center"> 
-                           {% if training.training_photo %}
-                              <img src="{{ training.training_photo.url }}" alt="Training" class="training-image rounded">
-                           {% else %}
-                              <span>None</span>
-                           {% endif %}
-                            <div class="creator-info">
-                             <strong><i class="fa fa-user"></i>Created By:</strong> <span>{{ creator_name }}</span> ({{ creator_type }})
-                            </div>
-                        
-                        </div>
-                        <!-- Right Column -->
-                        <div class="col-12 col-md-6 col-xl-4 order-sm-2 order-xl-2">
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <div class="ttl-info text-start">
-                                        <h6>
-                                            <i class="fa fa-users"> </i>Participants
-                                        </h6>
-                                        <span>{{ training.no_of_participants|default:"None"  }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="ttl-info text-start">
-                                        <h6>
-                                            <i class="fa fa-money"></i> Cost
-                                        </h6>
-                                        <span> {{ training.cost|default:"None"  }}</span>
-                                    </div>
-                                </div>
-                            
-                          
-                                <div class="col-md-6">
-                                    <div class="ttl-info text-start">
-                                        <h6>
-                                            <i class="fa fa-venus-mars"></i>Gender
-                                        </h6>
-                                        <span> {{ training.gender.name_en|default:"None"  }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="ttl-info text-start">
-                                        <h6>
-                                            <i class="fa fa-graduation-cap"></i> Training
-                                        </h6>
-                                        <span>{{ training.get_training_type_display }}</span>
-                                    </div>
-                                </div>
-                            
-                           
-                        
-
-                                <div class="col-md-6">
-                                    <div class="ttl-info text-start">
-                                        <h6>
-                                        <i class="fa fa-map-marker"></i> City
-                                        </h6>
-                                        <span>{{ training.city.name|default:"None"  }}</span>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="ttl-info text-start">
-                                        <h6>
-                                        <i class="fa fa-globe"></i>  Country
-                                        </h6>
-                                        <span>{{ training.country.name|default:"None"  }}</span>
-                                    </div>
-
-                                </div>
-                        
-                           
-                           
-                           </div>
-
-
-                        
-                               
-
-
-
-                        </div>
-                    </div>
-                    </div>
-                  </div>
-                  <hr>
-               </div>
-
-          
-
-         <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                    
-                <!-- Users Who Joined Training Tab -->
-                <div class="tab-pane fade show active mt-4" id="joined-users" role="tabpanel">
-                    <h4 class="mb-3">Users Joined Training</h4>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover" id="joined-users-table">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Username</th>
-                                    <th>Joined Date</th>
-                                    <th>Attendance Status</th>
-                                    <th>Rating</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in joined_users %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ user.user.username }}</td>
-                                    <td>{{ user.created_at|date:"Y-m-d" }}</td>
-                                    <td>
-                                        {% if user.attendance_status %}
-                                            <span class="badge bg-success">Present</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Absent</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if user.rating %}
-                                            {% for i in "12345"|make_list %}
-                                                {% if forloop.counter <= user.rating %}
-                                                     
-                                                    <i class="fa fa-star text-warning"></i> {# Filled Star #}
-                                                {% else %}
-                                                    <i class="fa fa-star-o text-warning"></i>  {# Empty Star #  {# Empty Star #}
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            <span>Not Rated</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No users have joined this training.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                    </div>
-                </div>
-
-        
-        
-      </div>
-   </div>
-            </div>
-         </div>
-      </div>
-   </div>
+	<!-- Big Card -->
+	<div class="card" style="margin-top: 100px;">
+		<div class="card-body">
+			<div class="row">
+				<!-- Tournament Information -->
+				<div class="col-12">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h4 class="card-title mb-0">Training Details</h4>
+						<!-- Back Button -->
+						<a href="{% url 'open-trainings' %}" class="btn btn-secondary" style="float: right;">
+							<i class="fa fa-arrow-left"></i> Back </a>
+					</div>
+					<div class="card-body">
+						<div class="info">
+							<div class="row g-3">
+								<!-- Left Column -->
+								<div class="col-12 col-md-6 col-xl-4 order-sm-1 order-xl-0">
+									<div class="row g-3 mb-3">
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-trophy"></i> Training Name
+												</h6>
+												<span>
+													{{ training.training_name|default:"None" }}
+												</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-calendar"></i> Training Date
+												</h6>
+												<span> {% if training.training_date %}{{ training.training_date|date:"Y-m-d" }}{% else %}None{% endif %} </span>
+											</div>
+										</div>
+									</div>
+									<div class="row g-3">
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<h6>
+														<i class="fa fa-calendar-check-o"></i> Training Field
+													</h6>
+												</h6>
+												<span>{{ training.field.field_name|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<h6>
+														<i class="fa fa-clock-o"></i> Training Duration
+													</h6>
+												</h6>
+												<span>{{ training.training_duration|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-hourglass-start"></i> Training Start Time
+												</h6>
+												<span>{{ training.start_time|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-hourglass-end"></i> Training End Time
+												</h6>
+												<span>{{ training.end_time|default:"None"  }}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- Middle Column -->
+								<div class="col-12 col-md-6 col-xl-4 order-sm-0 order-xl-1 d-flex flex-column align-items-center"> {% if training.training_photo %} <img src="{{ training.training_photo.url }}" alt="Training" class="training-image rounded"> {% else %} <span>None</span> {% endif %} <div style="margin-top: 10px;" class="creator-info">
+										<strong>
+											<i class="fa fa-user"></i>Created By: </strong>
+										<span>{{ creator_name }}</span> ({{ creator_type }})
+									</div>
+								</div>
+								<!-- Right Column -->
+								<div class="col-12 col-md-6 col-xl-4 order-sm-2 order-xl-2">
+									<div class="row g-3 mb-3">
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-users"></i>Participants
+												</h6>
+												<span>{{ training.no_of_participants|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-money"></i> Cost
+												</h6>
+												<span> {{ training.cost|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-venus-mars"></i>Gender
+												</h6>
+												<span> {{ training.gender.name_en|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-graduation-cap"></i> Training
+												</h6>
+												<span>{{ training.get_training_type_display }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-map-marker"></i> City
+												</h6>
+												<span>{{ training.city.name|default:"None"  }}</span>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="ttl-info text-start">
+												<h6>
+													<i class="fa fa-globe"></i> Country
+												</h6>
+												<span>{{ training.country.name|default:"None"  }}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr>
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-body">
+								<!-- Users Who Joined Training Tab -->
+								<div class="tab-pane fade show active mt-4" id="joined-users" role="tabpanel">
+									<h4 class="mb-3">Users Joined Training</h4>
+									<div class="table-responsive">
+										<table class="table table-striped table-bordered table-hover" id="joined-users-table">
+											<thead>
+												<tr>
+													<th>No</th>
+													<th>Username</th>
+													<th>Joined Date</th>
+													<th>Attendance Status</th>
+													<th>Rating</th>
+												</tr>
+											</thead>
+											<tbody> {% for user in joined_users %} <tr>
+													<td>{{ forloop.counter }}</td>
+													<td>{{ user.user.username }}</td>
+													<td>{{ user.created_at|date:"Y-m-d" }}</td>
+													<td> {% if user.attendance_status %} <span class="badge bg-success">Present</span> {% else %} <span class="badge bg-danger">Absent</span> {% endif %} </td>
+													<td> {% if user.rating %} {% for i in "12345"|make_list %} {% if forloop.counter <= user.rating %} <i class="fa fa-star text-warning"></i> {# Filled Star #} {% else %} <i class="fa fa-star-o text-warning"></i> {# Empty Star #  {# Empty Star #} {% endif %} {% endfor %} {% else %} <span>Not Rated</span> {% endif %} </td>
+												</tr> {% empty %} <tr>
+													<td colspan="5" class="text-center">No users have joined this training.</td>
+												</tr> {% endfor %} </tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock %}
 {% block script %}
