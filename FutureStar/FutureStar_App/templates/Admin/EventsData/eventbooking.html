@@ -55,7 +55,7 @@ Pending Event Bookings
                         <tbody>
                            {% for booking in pending_bookings %}
                            <tr>
-                              <td>{{ forloop.counter }}</td>
+                              <td>{{ booking.id }}</td>
                               <td>{{ booking.event.event_name }}</td>
                               <td>{{ booking.tickets }}</td>
                               <td>{{ booking.total_amount }}</td>
