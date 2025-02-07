@@ -44,7 +44,7 @@ Pending Event Bookings
                      <table class="table table-bordered" id="basic-1">
                         <thead>
                            <tr>
-                              <th>ID</th>
+                              <th>Booking Id</th>
                               <th>Event Name</th>
                               <th>Tickets</th>
                               <th>Amount</th>
@@ -55,7 +55,7 @@ Pending Event Bookings
                         <tbody>
                            {% for booking in pending_bookings %}
                            <tr>
-                              <td>{{ booking.id }}</td>
+                              <td>#{{ booking.id }}</td>
                               <td>{{ booking.event.event_name }}</td>
                               <td>{{ booking.tickets }}</td>
                               <td>{{ booking.total_amount }}</td>

@@ -7629,7 +7629,7 @@ class OpenTrainingListView(LoginRequiredMixin, View):
 class OpenTrainingDetailView(LoginRequiredMixin, View):
     template_name = "Admin/Training/open_training_detail.html"
 
-    def post(self, request, training_id):
+    def _get_training_details(self, training_id):
         # Get the specific training or return 404 if not found
         training = get_object_or_404(Training, id=training_id, training_type=Training.OPEN_TRAINING)
 
@@ -7639,6 +7639,7 @@ class OpenTrainingDetailView(LoginRequiredMixin, View):
         creator_name = "Unknown"
         creator_type = "Unknown Type"
 
+        # Determine creator information based on creator type
         if training.creator_type == Training.USER_TYPE:
             creator = User.objects.filter(id=training.created_by_id).first()
             creator_name = creator.username if creator else "Unknown User"
@@ -7652,14 +7653,36 @@ class OpenTrainingDetailView(LoginRequiredMixin, View):
             creator_name = creator.group_name if creator else "Unknown Group"
             creator_type = "Group"
 
+        return training, joined_users, creator_name, creator_type
+
+    def get(self, request, training_id):
+        # Get training details using the helper method
+        training, joined_users, creator_name, creator_type = self._get_training_details(training_id)
+
         return render(
             request,
             self.template_name,
             {
                 "training": training,
                 "joined_users": joined_users,
-                "creator_name": creator_name,  # Pass creator's name
-                "creator_type": creator_type,  # Pass creator's type
+                "creator_name": creator_name,
+                "creator_type": creator_type,
+                "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
+            },
+        )
+
+    def post(self, request, training_id):
+        # Get training details using the helper method
+        training, joined_users, creator_name, creator_type = self._get_training_details(training_id)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "training": training,
+                "joined_users": joined_users,
+                "creator_name": creator_name,
+                "creator_type": creator_type,
                 "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
             },
         )
@@ -7684,7 +7707,7 @@ class ClosedTrainingListView(LoginRequiredMixin, View):
 class CloseTrainingDetailView(LoginRequiredMixin, View):
     template_name = "Admin/Training/close_training_detail.html"
 
-    def post(self, request, training_id):
+    def _get_training_details(self, training_id):
         # Get the specific training or return 404 if not found
         training = get_object_or_404(Training, id=training_id, training_type=Training.CLOSED_TRAINING)
 
@@ -7694,6 +7717,7 @@ class CloseTrainingDetailView(LoginRequiredMixin, View):
         creator_name = "Unknown"
         creator_type = "Unknown Type"
 
+        # Determine creator information based on creator type
         if training.creator_type == Training.USER_TYPE:
             creator = User.objects.filter(id=training.created_by_id).first()
             creator_name = creator.username if creator else "Unknown User"
@@ -7707,14 +7731,36 @@ class CloseTrainingDetailView(LoginRequiredMixin, View):
             creator_name = creator.group_name if creator else "Unknown Group"
             creator_type = "Group"
 
+        return training, joined_users, creator_name, creator_type
+
+    def get(self, request, training_id):
+        # Get training details using the helper method
+        training, joined_users, creator_name, creator_type = self._get_training_details(training_id)
+
         return render(
             request,
             self.template_name,
             {
                 "training": training,
                 "joined_users": joined_users,
-                "creator_name": creator_name,  # Pass creator's name
-                "creator_type": creator_type,  # Pass creator's type
+                "creator_name": creator_name,
+                "creator_type": creator_type,
+                "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
+            },
+        )
+
+    def post(self, request, training_id):
+        # Get training details using the helper method
+        training, joined_users, creator_name, creator_type = self._get_training_details(training_id)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "training": training,
+                "joined_users": joined_users,
+                "creator_name": creator_name,
+                "creator_type": creator_type,
                 "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
             },
         )
