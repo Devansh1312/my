@@ -1569,11 +1569,6 @@ class OTPVerificationView(View):
         return redirect("login")
 
 
-def custom_404_view(request, exception=None):
-        # template_name = "Admin/User/Referee_List.html"
-    
-
-        return render(request, 'templates/404.html')
 
 class UserInfoUpdateView(View):
     template_name = 'user_info.html'

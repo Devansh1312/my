@@ -3089,6 +3089,8 @@ class FetchAllGamesAPIView(APIView):
                 "loser_id": game.loser_id,
                 "is_draw": game.is_draw,
             }
+            if isinstance(game, TournamentGames):
+                game_data["tournament_id"] = game.tournament_id.id if game.tournament_id else None
             all_games.append((game_date_str, game_data, game_type))
 
         # Apply the date type filter

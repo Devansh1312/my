@@ -1,11 +1,5 @@
 from django.urls import path,re_path
 from FutureStarFrontend.views import *
-from django.conf.urls.static import static
-from django.conf.urls import handler404
-from django.shortcuts import redirect
-
-
-handler404 = 'FutureStarFrontend.views.custom_404_view'
 
 urlpatterns = [
     
@@ -41,7 +35,6 @@ urlpatterns = [
 
     path('register/', RegisterPage.as_view(), name='register'),
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
-    path('test-404/', custom_404_view),
 
     path('search/', SearchView.as_view(), name='search'),
     path('team-page-detail/', TeamPageSearchResults.as_view(), name='TeamPageSearchResults'),
@@ -56,5 +49,3 @@ urlpatterns = [
     path('auth/apple/', AppleAuthView.as_view(), name='apple_auth'),
     path('auth/apple/callback/', AppleCallbackView.as_view(), name='apple_callback'),
     ]
-
-handler404 = 'FutureStarFrontend.views.custom_404_view'

@@ -1,16 +1,7 @@
 from django.urls import path
 from .views import *
 from django.conf.urls.static import static
-from django.conf.urls import handler404
 from django.shortcuts import redirect
-
-
-def custom_404_view(request, exception=None):
-    if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login if the user is not authenticated
-    return render(request, 'error/error.html', status=404)
-
-handler404 = 'FutureStar_App.urls.custom_404_view'
 
 urlpatterns = [
 

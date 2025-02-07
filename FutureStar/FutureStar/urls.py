@@ -21,12 +21,42 @@ from django.conf import settings
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.shortcuts import render
 
+
+def get_language(request):
+    """
+    Retrieves the language from the URL or session and updates the session values.
+    Ensures the language is either 'en' or 'ar', defaulting to 'en'.
+    """
+    allowed_languages = {'en', 'ar'}
+    language = request.GET.get('Language', '').lower()
+
+    if language in allowed_languages:
+        request.session['language'] = language
+    else:
+        language = request.session.get('language', 'en')
+        if language not in allowed_languages:
+            language = 'en'
+        request.session['language'] = language
+
+    request.session['current_language'] = language  # Keep 'current_language' consistent
+    return language
+
 # Custom error handlers
 def custom_404(request, exception):
-    return render(request, '404.html', status=404)
+    language_from_url = get_language(request)
+    # Prepare context for rendering
+    context = {
+        "current_language": language_from_url,         
+    }
+    return render(request, '404.html', status=404,context=context)
 
 def custom_500(request):
-    return render(request, '500.html', status=500)
+    language_from_url = get_language(request)
+    # Prepare context for rendering
+    context = {
+        "current_language": language_from_url,         
+    }
+    return render(request, '500.html', status=500,context=context)
 
 # Set the custom handlers
 handler404 = 'FutureStar.urls.custom_404'
@@ -54,6 +84,14 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ] 
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    from django.views.static import serve
+    from django.urls import re_path
 
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
