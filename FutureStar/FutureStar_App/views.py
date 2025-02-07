@@ -6757,7 +6757,7 @@ class AccountDeleteReasonListView(LoginRequiredMixin, View):
 ############################ Tournamnet Game User Assign ##########################
 @method_decorator(user_role_check, name="dispatch")
 class TournamentGamesListView(LoginRequiredMixin, View):
-    template_name = "Admin/Assign_User_Game.html"
+    template_name = "Admin/Games/Assign_User_Game.html"
 
     def get(self, request):
         # Current time to compare game date and start time
@@ -6953,7 +6953,7 @@ def fetch_users(request):
 ############################ Friendly Game User Assign ##########################
 @method_decorator(user_role_check, name="dispatch")
 class FriendlyGamesListView(LoginRequiredMixin, View):
-    template_name = "Admin/Assign_User_Friendly.html"
+    template_name = "Admin/Friendly_Games/Assign_User_Friendly.html"
 
     def get(self, request):
         # Current time to compare game date and start time
@@ -7043,22 +7043,22 @@ class AssignUserToFriendlyGameView(LoginRequiredMixin, View):
 ############################ Tournamemt Games State Add ####################################
 
 
-@method_decorator(user_role_check, name="dispatch")
-class TournamentGameStatsView(LoginRequiredMixin, View):
-    template_name = "Admin/Games/ListOfGames.html"
+# @method_decorator(user_role_check, name="dispatch")
+# class TournamentGameStatsView(LoginRequiredMixin, View):
+#     template_name = "Admin/Games/ListOfGames.html"
 
-    def get(self, request):
-        games = TournamentGames.objects.all().select_related(
-            "tournament_id", "team_a", "team_b"
-        )
-        return render(
-            request,
-            self.template_name,
-            {
-                "games": games,
-                "breadcrumb": {"parent": "Tournament", "child": "Game Stats"},
-            },
-        )
+#     def get(self, request):
+#         games = TournamentGames.objects.all().select_related(
+#             "tournament_id", "team_a", "team_b"
+#         )
+#         return render(
+#             request,
+#             self.template_name,
+#             {
+#                 "games": games,
+#                 "breadcrumb": {"parent": "Tournament", "child": "Game Stats"},
+#             },
+#         )
 
 
 @method_decorator(user_role_check, name="dispatch")
@@ -7114,26 +7114,24 @@ class TournamentGameEditStatsView(LoginRequiredMixin, View):
 ############################ Friendly Games State Add ####################################
 
 
-@method_decorator(user_role_check, name="dispatch")
-class FriendlyGameStatsView(LoginRequiredMixin, View):
-    template_name = "Admin/Friendly_Games/ListOfGames.html"
+# @method_decorator(user_role_check, name="dispatch")
+# class FriendlyGameStatsView(LoginRequiredMixin, View):
+#     template_name = "Admin/Friendly_Games/ListOfGames.html"
 
-    def get(self, request):
-        # Fetch friendly games, adjust the query based on your model relationships
-        games = FriendlyGame.objects.all().select_related("team_a", "team_b")
-        return render(
-            request,
-            self.template_name,
-            {
-                "games": games,
-                "breadcrumb": {"parent": "Friendly Games", "child": "Game Stats"},
-            },
-        )
-
-
-method_decorator(user_role_check, name="dispatch")  # Custom decorator for role check
+#     def get(self, request):
+#         # Fetch friendly games, adjust the query based on your model relationships
+#         games = FriendlyGame.objects.all().select_related("team_a", "team_b")
+#         return render(
+#             request,
+#             self.template_name,
+#             {
+#                 "games": games,
+#                 "breadcrumb": {"parent": "Friendly Games", "child": "Game Stats"},
+#             },
+#         )
 
 
+@method_decorator(user_role_check, name="dispatch")  # Custom decorator for role check
 class FriendlyGameEditStatsView(LoginRequiredMixin, View):
     template_name = "Admin/Friendly_Games/EditGameStatsModal.html"
 

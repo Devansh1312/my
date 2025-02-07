@@ -281,7 +281,7 @@ urlpatterns = [
 
   
   ################## Tournament Game States Add URLS ############################
-    path('games/', TournamentGameStatsView.as_view(), name='games_list'),
+    # path('games/', TournamentGameStatsView.as_view(), name='games_list'),
     # path('games/edit/<int:game_id>/', TournamentGameEditStatsView.as_view(), name='edit_game_stats'),
     path('tournament-games/<int:pk>/update-stats/', UpdateGameStatsView.as_view(), name='update_game_stats'),
     path('tournament-games/<int:game_id>/details/', TournamentGameDetailView.as_view(), name='game_detail'),
@@ -290,7 +290,7 @@ urlpatterns = [
 
     ################## Friendly Game States Add URLS ############################
   
-    path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
+    # path('friendly-games/', FriendlyGameStatsView.as_view(), name='friendly_games_list_stats'),
     path('friendly-games/<int:pk>/update-stats/', FriendlyGameEditStatsView.as_view(), name='update_game_stats'),
 
 
