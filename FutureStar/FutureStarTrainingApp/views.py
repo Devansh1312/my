@@ -690,7 +690,6 @@ class TrainingDetailAPIView(APIView):
         training_id = request.data.get('training_id')
         created_by_id = int(request.data.get('created_by_id'))
         creator_type = int(request.data.get('creator_type', None))
-        print(request.data)
 
         if not training_id:
             return Response({
@@ -701,8 +700,6 @@ class TrainingDetailAPIView(APIView):
 
         # Get the training instance to update
         training_instance = self.get_object(training_id)
-        print("#############")
-        print(training_instance.created_by_id,training_instance.creator_type)
 
         if not training_instance:
             return Response({
