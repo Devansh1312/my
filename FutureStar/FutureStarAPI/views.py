@@ -1030,7 +1030,8 @@ class EditProfileAPIView(APIView):
             activate(language)
 
         user = request.user
-
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
         # Get old profile picture and card header
         old_profile_picture = user.profile_picture
         old_card_header = user.card_header
@@ -1172,7 +1173,7 @@ class EditProfileAPIView(APIView):
             user.card_header = path
         elif request.data.get("cover_photo") in [None, '']:  # Retain old header if None/blank
             user.card_header = old_card_header
-
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
         # Save user details
         user.save()
 
@@ -1184,7 +1185,8 @@ class EditProfileAPIView(APIView):
                 'team':get_team_data(user, request),
                 'group':get_group_data(user, request),
                 'current_type':user.current_type,
-            }
+            },
+            "notification_count": notification_count  # Include notification count here
         }, status=status.HTTP_200_OK)
 
 ####################### POST API ###############################################################################
@@ -1396,53 +1398,48 @@ class PostListAPIView(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     pagination_class = CustomPostPagination
 
-    def get_queryset(self):
-        # Get created_by_id and creator_type from query_params
-        creator_type = self.request.query_params.get('creator_type')
-        created_by_id = self.request.query_params.get('created_by_id')
-
-        # Set default values if either parameter is missing
-        if not creator_type:
-            return Response({
-                    'status': 0,
-                    'message': _('creator_type is required when creator_type is 2.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-        
-        if not created_by_id:
-            return Response({
-                    'status': 0,
-                    'message': _('created_by_id is required when creator_type is 2.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-
-        # Check creator_type and adjust the created_by_id accordingly
-        if creator_type in [1,"1"]:  # If creator_type is 1, use user_id
-            created_by_id = self.request.query_params.get('user_id', self.request.user.id)
-        elif creator_type in [2,"2"]:  # If creator_type is 2, use team_id
-            created_by_id = self.request.query_params.get('team_id')
-            if not created_by_id:
-                # Return an error if team_id is missing for creator_type 2
-                return Response({
-                    'status': 0,
-                    'message': _('Team ID is required when creator_type is 2.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Filter posts based on created_by_id and creator_type
-        return Post.objects.filter(
-            created_by_id=created_by_id,
-            creator_type=creator_type
-        ).order_by('-date_created')
-
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
 
-        queryset = self.get_queryset()
+        # Get query parameters
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
+
+        # Validate parameters
+        if not creator_type:
+            return Response({
+                'status': 0,
+                'message': _('creator_type is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if creator_type in [1, "1"]:
+            created_by_id = request.query_params.get('user_id', request.user.id)
+        elif creator_type in [2, "2"]:
+            created_by_id = request.query_params.get('created_by_id')
+            if not created_by_id:
+                return Response({
+                    'status': 0,
+                    'message': _('Team ID is required when creator_type is 2.')
+                }, status=status.HTTP_400_BAD_REQUEST)
         
+        if not created_by_id:
+            return Response({
+                'status': 0,
+                'message': _('created_by_id is required.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch posts based on parameters
+        queryset = Post.objects.filter(
+            created_by_id=created_by_id,
+            creator_type=creator_type
+        ).order_by('-date_created')
+
         # Count posts for this created_by_id and creator_type
         post_count = queryset.count()
 
+        # Paginate posts
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True, context={'request': request})
@@ -1453,7 +1450,7 @@ class PostListAPIView(generics.ListAPIView):
                 'status': 1,
                 'message': _('Posts fetched successfully.'),
                 'data': serializer.data,
-                'post_count': post_count,  # Add post_count here
+                'post_count': post_count,
                 'total_records': total_records,
                 'total_pages': total_pages,
                 'current_page': self.paginator.page.number
@@ -1464,7 +1461,7 @@ class PostListAPIView(generics.ListAPIView):
             'status': 1,
             'message': _('Posts fetched successfully.'),
             'data': serializer.data,
-            'post_count': post_count  # Add post_count here
+            'post_count': post_count
         }, status=status.HTTP_200_OK)
 
 ######################## Post Media Delete #######################

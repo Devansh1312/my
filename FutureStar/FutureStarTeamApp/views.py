@@ -99,6 +99,8 @@ class TeamViewAPI(APIView):
         if language in ['en', 'ar']:
             activate(language)
         user = request.user
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
 
         if not user.role_id in [2, 5]:
             return Response({
@@ -161,7 +163,7 @@ class TeamViewAPI(APIView):
         user_data = get_user_data(user, request)
         # Fetch group data
         group_data = get_group_data(user, request)
-
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
 
         return Response({
             'status': 1,
@@ -171,13 +173,16 @@ class TeamViewAPI(APIView):
                 'team': serializer.data,
                 'group': group_data,
                 'current_type':user.current_type,
-            }
+            },
+            "notification_count": notification_count  # Include notification count here
         }, status=status.HTTP_201_CREATED)
 
 
     def put(self, request):
         team_id = request.data.get('created_by_id')
         user = request.user
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
@@ -293,7 +298,8 @@ class TeamViewAPI(APIView):
         user_data = get_user_data(user, request)
         # Fetch group data
         group_data = get_group_data(user, request)
-
+        # Fetch notification count
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
         return Response({
             'status': 1,
             'message': _('Team updated successfully.'),
@@ -302,7 +308,8 @@ class TeamViewAPI(APIView):
                 'team': serializer.data,
                 'group': group_data,
                 'current_type': user.current_type
-            }
+            },
+            "notification_count": notification_count  # Include notification count here
         }, status=status.HTTP_200_OK)
     
     def patch(self, request):
@@ -312,6 +319,8 @@ class TeamViewAPI(APIView):
 
         """API for updating team logo"""
         team_id = request.data.get('created_by_id')
+        creator_type = request.query_params.get('creator_type')
+        created_by_id = request.query_params.get('created_by_id')
         if not team_id:
             return Response({
                 'status': 0, 
@@ -347,6 +356,7 @@ class TeamViewAPI(APIView):
         user_data = get_user_data(user, request)
         # Fetch group data
         group_data = get_group_data(user, request)
+        notification_count = Notifictions.objects.filter(targeted_id=created_by_id, targeted_type=creator_type,read=False).count()
 
         return Response({
             'status': 1,
@@ -356,7 +366,8 @@ class TeamViewAPI(APIView):
                 'team': serializer.data,
                 'group': group_data,
                 'current_type': user.current_type
-            }
+            },
+            "notification_count": notification_count  # Include notification count here
         }, status=status.HTTP_200_OK)
     
     ############### Team Delete API ###################
