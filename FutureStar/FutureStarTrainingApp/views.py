@@ -759,8 +759,8 @@ class TrainingDetailAPIView(APIView):
     def delete(self, request, *args, **kwargs):
         # Retrieve the training ID from the query parameters
         training_id = request.query_params.get('training_id')
-        created_by_id = request.query_params.get('created_by_id')
-        creator_type = request.query_params.get('creator_type', None)
+        created_by_id = int(request.query_params.get('created_by_id'))
+        creator_type = int(request.query_params.get('creator_type', None))
 
         if not training_id:
             return Response({
@@ -777,12 +777,11 @@ class TrainingDetailAPIView(APIView):
                 'status': 0,
                 'message': _('Training not found'),
             }, status=status.HTTP_404_NOT_FOUND)
-
+        
         if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
             return Response({
                 'status': 0,
-                'message': _('Unauthorized to update this training'),
-                'data': []
+                'message': _('Unauthorized to Delete this training'),
             }, status=status.HTTP_404_NOT_FOUND)
 
         # Delete the training instance
@@ -792,7 +791,7 @@ class TrainingDetailAPIView(APIView):
         return Response({
             'status': 1,
             'message': _('Training successfully deleted'),
-        }, status=status.HTTP_204_NO_CONTENT) 
+        }, status=status.HTTP_200_OK) 
 
 ###################### Training LIKE ##################################
 class TrainingLikeAPIView(APIView):
@@ -1656,9 +1655,12 @@ class TrainingFeedbackAPI(APIView):
         # Update attendance status if provided
         if attendance_status is not None:
             # Normalize attendance status to handle different input formats
-            if str(attendance_status).lower() == "true":
+            truthy_values = {"true", "1", "yes", "y",1}
+            falsy_values = {"false", "0", "no", "n",0}
+
+            if str(attendance_status).strip().lower() in truthy_values:
                 training_joined.attendance_status = True
-            elif str(attendance_status).lower() == "false":
+            elif str(attendance_status).strip().lower() in falsy_values:
                 training_joined.attendance_status = False
             else:
                 # Handle invalid input or if you want to set a default value

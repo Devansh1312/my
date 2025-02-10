@@ -1510,3 +1510,12 @@ msgstr "لم يتم العثور على فريق بالمعرف المقدم."
 
 msgid "No training instances were created."
 msgstr "لم يتم إنشاء أي حالات تدريب."
+
+msgid "Unauthorized to update this training"
+msgstr "غير مصرح بتحديث هذا التدريب"
+
+msgid "Unauthorized to Delete this training"
+msgstr "غير مصرح بحذف هذا التدريب"
+
+msgid "Invalid format for days schedule."
+msgstr "تنسيق غير صالح لجدول الأيام."
