@@ -18,6 +18,373 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 
 ################# Create Training API #######################
+# class CreateTrainingView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+#     def post(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
+#         try:
+#             creator_type = int(request.data.get('creator_type'))
+#             created_by_id = int(request.data.get('created_by_id'))
+#         except (ValueError, TypeError):
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Invalid creator_type or created_by_id.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         country_id = request.data.get('country')
+#         city_id = request.data.get('city')
+#         gender_id = request.data.get('gender')
+#         field_id = request.data.get('field')
+#         description = request.data.get('description', '')
+#         cost = request.data.get('cost', '')
+#         training_type = int(request.data.get('training_type', 1))  # Default: Open training
+
+#         try:
+#             country_id = int(country_id) if country_id else None
+#             city_id = int(city_id) if city_id else None
+#             gender_id = int(gender_id) if gender_id else None
+#             field_id = int(field_id) if field_id else None
+#             training_type = int(training_type)
+#         except (ValueError, TypeError):
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Invalid country, city, gender, or field ID provided.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             country = Country.objects.get(id=country_id) if country_id else None
+#             city = City.objects.get(id=city_id) if city_id else None
+#             gender = UserGender.objects.get(id=gender_id) if gender_id else None
+#             field = Field.objects.get(id=field_id) if field_id else None
+#         except ObjectDoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Invalid country, city, gender, or field provided.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         training_name = request.data.get('training_name', '')
+#         training_date = request.data.get('training_date')
+
+#         end_date = request.data.get('end_date', None)
+#         repeat_type = int(request.data.get('repeat_type', 2))  # Default: Single training
+
+#         days_str = request.data.get('days', '[]')  # Expected format: '[1, 3, 5]'
+#         start_times_str = request.data.get('start_time', '[]')  # Expected format: '["18:00", "19:00"]'
+#         end_times_str = request.data.get('end_time', '[]')  # Expected format: '["19:00", "20:00"]'
+#         no_of_participants = int(request.data.get('no_of_participants', 0))
+
+#         if repeat_type == 1:  # Only parse days, start_times, end_times for multiple sessions
+#             try:
+#                 days = ast.literal_eval(days_str)
+#                 start_times = ast.literal_eval(start_times_str)
+#                 end_times = ast.literal_eval(end_times_str)
+#             except (ValueError, SyntaxError) as e:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('Invalid format for days, start_time, or end_time.')
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#         else:
+#             days, start_times, end_times = [], [], []  # For single training, these can be empty or not required
+
+#         training_photo = None
+#         if "training_photo" in request.FILES:
+#             image = request.FILES["training_photo"]
+#             file_extension = image.name.split('.')[-1]
+#             unique_suffix = get_random_string(8)
+#             file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
+#             training_photo = default_storage.save(file_name, image)
+
+#         weekday_mapping = {
+#             0: 2, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 1
+#         }
+
+#         training_instances = []
+#         if repeat_type == 2:  # Single training session
+#             try:
+#                 start_time_str = request.data.get('start_time')  # Assume 'start_time' is in H:M format
+#                 end_time_str = request.data.get('end_time')      # Assume 'end_time' is in H:M format
+#                 start_time_obj = datetime.strptime(start_time_str, "%H:%M:%S").time()
+#                 end_time_obj = datetime.strptime(end_time_str, "%H:%M:%S").time()
+#                 duration = (datetime.combine(datetime.today(), end_time_obj) - 
+#                             datetime.combine(datetime.today(), start_time_obj)).seconds // 60
+#             except ValueError as e:
+#                 return Response({'status': 0, 'message': _('Invalid time format.')}, status=status.HTTP_400_BAD_REQUEST)
+
+#             training_instance = Training.objects.create(
+#                 training_name=training_name,
+#                 training_photo=training_photo,
+#                 training_date=training_date,
+#                 start_time=start_time_obj,
+#                 end_time=end_time_obj,
+#                 training_duration=duration,
+#                 creator_type=creator_type,
+#                 created_by_id=created_by_id,
+#                 country=country,
+#                 city=city,
+#                 gender=gender,
+#                 field=field,
+#                 no_of_participants=no_of_participants,
+#                 description=description,
+#                 cost=cost,
+#                 training_type=training_type,
+#             )
+#             training_instances.append(training_instance)
+
+#         elif repeat_type == 1 and end_date and days:
+#             try:
+#                 start_time_objs = [datetime.strptime(st, "%H:%M:%S").time() for st in start_times]
+#                 end_time_objs = [datetime.strptime(et, "%H:%M:%S").time() for et in end_times]
+#                 durations = [
+#                     (datetime.combine(datetime.today(), et) - datetime.combine(datetime.today(), st)).seconds // 60
+#                     for st, et in zip(start_time_objs, end_time_objs)
+#                 ]
+#             except ValueError as e:
+#                 return Response({
+#                     'status': 0,
+#                     'message': _('Invalid time format or time arrays mismatch.'),
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+
+#             try:
+#                 training_date_obj = datetime.strptime(training_date, "%Y-%m-%d").date()
+#                 end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+#             except ValueError as e:
+#                 return Response({'status': 0, 'message': _('Invalid date format.')}, status=status.HTTP_400_BAD_REQUEST)
+
+#             current_date = training_date_obj
+#             while current_date <= end_date_obj:
+#                 weekday = current_date.weekday()
+#                 custom_weekday = weekday_mapping.get(weekday)
+#                 if custom_weekday in days:
+#                     day_index = days.index(custom_weekday)
+#                     training_instance = Training.objects.create(
+#                         training_name=training_name,
+#                         training_photo=training_photo,
+#                         training_date=current_date,
+#                         start_time=start_time_objs[day_index],
+#                         end_time=end_time_objs[day_index],
+#                         training_duration=durations[day_index],
+#                         creator_type=creator_type,
+#                         created_by_id=created_by_id,
+#                         country=country,
+#                         city=city,
+#                         gender=gender,
+#                         field=field,
+#                         no_of_participants=no_of_participants,
+#                         description=description,
+#                         cost=cost,
+#                         training_type=training_type,
+#                     )
+#                     training_instances.append(training_instance)
+#                 current_date += timedelta(days=1)
+
+#         # Serialize the training instances
+#         serialized_trainings = TrainingSerializer(training_instances, many=True, context={'request': request})
+
+#         # Create the corresponding Training_Joined instances for each training
+#         for training_instance in training_instances:
+#             if creator_type == Training.USER_TYPE:
+#                 Training_Joined.objects.create(
+#                     training=training_instance,
+#                     user=request.user,
+#                     attendance_status=False
+#                 )
+#             elif creator_type == Training.TEAM_TYPE:  # Team creator type
+#                 try:
+#                     team = Team.objects.get(id=created_by_id)
+#                     team_founder = team.team_founder
+#                     if team_founder:
+#                         Training_Joined.objects.create(
+#                             training=training_instance,
+#                             user=team_founder,
+#                             attendance_status=False
+#                         )
+#                 except Team.DoesNotExist:
+#                     return Response({
+#                         'status': 0,
+#                         'message': _('No team found with the provided ID.')
+#                     }, status=status.HTTP_404_NOT_FOUND)
+
+#         if len(training_instances) > 0:
+#             return Response({
+#                 'status': 1,
+#                 'message': _('Training successfully created'),
+#                 'data': serialized_trainings.data  # Return the serialized data
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('No training instances were created.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+####################### Craete Training API VIEW WITH OBJECTS ########################################
+# class CreateTrainingView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = (JSONParser, MultiPartParser, FormParser)
+
+#     def post(self, request, *args, **kwargs):
+#         language = request.headers.get('Language', 'en')
+#         if language in ['en', 'ar']:
+#             activate(language)
+
+#         try:
+#             creator_type = int(request.data.get('creator_type'))
+#             created_by_id = int(request.data.get('created_by_id'))
+#         except (ValueError, TypeError):
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Invalid creator_type or created_by_id.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Validate and fetch related objects
+#         try:
+#             country = Country.objects.get(id=int(request.data.get('country', 0)))
+#             city = City.objects.get(id=int(request.data.get('city', 0)))
+#             gender = UserGender.objects.get(id=int(request.data.get('gender', 0)))
+#             field = Field.objects.get(id=int(request.data.get('field', 0)))
+#         except ObjectDoesNotExist:
+#             return Response({
+#                 'status': 0,
+#                 'message': _('Invalid country, city, gender, or field provided.')
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+#         training_photo = None
+#         if "training_photo" in request.FILES:
+#             image = request.FILES["training_photo"]
+#             unique_suffix = get_random_string(8)
+#             file_name = f"training_photo/{request.user.id}_{unique_suffix}.{image.name.split('.')[-1]}"
+#             training_photo = default_storage.save(file_name, image)
+
+#         try:
+#             training_date = datetime.strptime(request.data.get('training_date'), "%Y-%m-%d").date()
+#             end_date = datetime.strptime(request.data.get('end_date', ""), "%Y-%m-%d").date() if request.data.get('end_date') else None
+#         except ValueError:
+#             return Response({'status': 0, 'message': _('Invalid training_date or end_date format.')}, status=status.HTTP_400_BAD_REQUEST)
+
+#         repeat_type = int(request.data.get('repeat_type', 2))
+#         no_of_participants = int(request.data.get('no_of_participants', 0))
+#         training_name = request.data.get('training_name', '')
+#         description = request.data.get('description', '')
+#         cost = request.data.get('cost', '')
+#         training_type = int(request.data.get('training_type', 1))  # Default: Open training
+
+#         # Parse `days` schedule
+#         day_schedules = request.data.get('days', [])
+#         parsed_days = []
+#         if not isinstance(day_schedules, list):
+#             return Response({'status': 0, 'message': _('Days must be a list of schedules.')}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             for entry in day_schedules:
+#                 day = int(entry.get('day'))
+#                 start_time = datetime.strptime(entry.get('start_time'), "%H:%M:%S").time()
+#                 end_time = datetime.strptime(entry.get('end_time'), "%H:%M:%S").time()
+#                 duration = (datetime.combine(datetime.today(), end_time) -
+#                             datetime.combine(datetime.today(), start_time)).seconds // 60
+#                 parsed_days.append({"day": day, "start_time": start_time, "end_time": end_time, "duration": duration})
+#         except (ValueError, KeyError, TypeError):
+#             return Response({'status': 0, 'message': _('Invalid format for days schedule.')}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Map weekday mapping (Monday = 0 to Sunday = 6)
+#         weekday_mapping = {
+#             0: 2, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 1
+#         }
+
+#         training_instances = []
+
+#         if repeat_type == 2:  # Single training session
+#             try:
+#                 start_time = datetime.strptime(request.data.get('start_time'), "%H:%M:%S").time()
+#                 end_time = datetime.strptime(request.data.get('end_time'), "%H:%M:%S").time()
+#                 duration = (datetime.combine(datetime.today(), end_time) -
+#                             datetime.combine(datetime.today(), start_time)).seconds // 60
+#                 training_instance = Training.objects.create(
+#                     training_name=training_name,
+#                     training_photo=training_photo,
+#                     training_date=training_date,
+#                     start_time=start_time,
+#                     end_time=end_time,
+#                     training_duration=duration,
+#                     creator_type=creator_type,
+#                     created_by_id=created_by_id,
+#                     country=country,
+#                     city=city,
+#                     gender=gender,
+#                     field=field,
+#                     no_of_participants=no_of_participants,
+#                     description=description,
+#                     cost=cost,
+#                     training_type=training_type,
+#                 )
+#                 training_instances.append(training_instance)
+#             except ValueError:
+#                 return Response({'status': 0, 'message': _('Invalid time format.')}, status=status.HTTP_400_BAD_REQUEST)   
+
+#         elif repeat_type == 1 and end_date:
+#             current_date = training_date
+#             while current_date <= end_date:
+#                 weekday = current_date.weekday()
+#                 mapped_weekday = weekday_mapping[weekday]  # Use the mapped weekday
+#                 for entry in parsed_days:
+#                     if mapped_weekday == entry["day"]:
+#                         training_instance = Training.objects.create(
+#                             training_name=training_name,
+#                             training_photo=training_photo,
+#                             training_date=current_date,
+#                             start_time=entry["start_time"],
+#                             end_time=entry["end_time"],
+#                             training_duration=entry["duration"],
+#                             creator_type=creator_type,
+#                             created_by_id=created_by_id,
+#                             country=country,
+#                             city=city,
+#                             gender=gender,
+#                             field=field,
+#                             no_of_participants=no_of_participants,
+#                             description=description,
+#                             cost=cost,
+#                             training_type=training_type,
+#                         )
+#                         training_instances.append(training_instance)
+#                 current_date += timedelta(days=1)
+
+#         serialized_trainings = TrainingSerializer(training_instances, many=True, context={'request': request})
+#         for training_instance in training_instances:
+#             if creator_type == Training.USER_TYPE:
+#                 Training_Joined.objects.create(
+#                     training=training_instance,
+#                     user=request.user,
+#                     attendance_status=False
+#                 )
+#             elif creator_type == Training.TEAM_TYPE:  # Team creator type
+#                 try:
+#                     team = Team.objects.get(id=created_by_id)
+#                     team_founder = team.team_founder
+#                     if team_founder:
+#                         Training_Joined.objects.create(
+#                             training=training_instance,
+#                             user=team_founder,
+#                             attendance_status=False
+#                         )
+#                 except Team.DoesNotExist:
+#                     return Response({
+#                         'status': 0,
+#                         'message': _('No team found with the provided ID.')
+#                     }, status=status.HTTP_404_NOT_FOUND)
+#         return Response({
+#             'status': 1,
+#             'message': _('Training successfully created'),
+#             'data': serialized_trainings.data
+#         }, status=status.HTTP_200_OK) if training_instances else Response({
+#             'status': 0,
+#             'message': _('No training instances were created.')
+#         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+############################ Craete Training Main Working IN IOS With Object ############
 class CreateTrainingView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -26,6 +393,7 @@ class CreateTrainingView(APIView):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
             activate(language)
+
         try:
             creator_type = int(request.data.get('creator_type'))
             created_by_id = int(request.data.get('created_by_id'))
@@ -35,156 +403,123 @@ class CreateTrainingView(APIView):
                 'message': _('Invalid creator_type or created_by_id.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        country_id = request.data.get('country')
-        city_id = request.data.get('city')
-        gender_id = request.data.get('gender')
-        field_id = request.data.get('field')
-        description = request.data.get('description', '')
-        cost = request.data.get('cost', '')
-        training_type = int(request.data.get('training_type', 1))  # Default: Open training
-
+        # Validate and fetch related objects
         try:
-            country_id = int(country_id) if country_id else None
-            city_id = int(city_id) if city_id else None
-            gender_id = int(gender_id) if gender_id else None
-            field_id = int(field_id) if field_id else None
-            training_type = int(training_type)
-        except (ValueError, TypeError):
-            return Response({
-                'status': 0,
-                'message': _('Invalid country, city, gender, or field ID provided.')
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            country = Country.objects.get(id=country_id) if country_id else None
-            city = City.objects.get(id=city_id) if city_id else None
-            gender = UserGender.objects.get(id=gender_id) if gender_id else None
-            field = Field.objects.get(id=field_id) if field_id else None
+            country = Country.objects.get(id=int(request.data.get('country', 0)))
+            city = City.objects.get(id=int(request.data.get('city', 0)))
+            gender = UserGender.objects.get(id=int(request.data.get('gender', 0)))
+            field = Field.objects.get(id=int(request.data.get('field', 0)))
         except ObjectDoesNotExist:
             return Response({
                 'status': 0,
                 'message': _('Invalid country, city, gender, or field provided.')
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        training_name = request.data.get('training_name', '')
-        training_date = request.data.get('training_date')
-
-        end_date = request.data.get('end_date', None)
-        repeat_type = int(request.data.get('repeat_type', 2))  # Default: Single training
-
-        days_str = request.data.get('days', '[]')  # Expected format: '[1, 3, 5]'
-        start_times_str = request.data.get('start_time', '[]')  # Expected format: '["18:00", "19:00"]'
-        end_times_str = request.data.get('end_time', '[]')  # Expected format: '["19:00", "20:00"]'
-        no_of_participants = int(request.data.get('no_of_participants', 0))
-
-        if repeat_type == 1:  # Only parse days, start_times, end_times for multiple sessions
-            try:
-                days = ast.literal_eval(days_str)
-                start_times = ast.literal_eval(start_times_str)
-                end_times = ast.literal_eval(end_times_str)
-            except (ValueError, SyntaxError) as e:
-                return Response({
-                    'status': 0,
-                    'message': _('Invalid format for days, start_time, or end_time.')
-                }, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            days, start_times, end_times = [], [], []  # For single training, these can be empty or not required
-
         training_photo = None
         if "training_photo" in request.FILES:
             image = request.FILES["training_photo"]
-            file_extension = image.name.split('.')[-1]
             unique_suffix = get_random_string(8)
-            file_name = f"training_photo/{request.user.id}_{unique_suffix}.{file_extension}"
+            file_name = f"training_photo/{request.user.id}_{unique_suffix}.{image.name.split('.')[-1]}"
             training_photo = default_storage.save(file_name, image)
 
+        try:
+            training_date = datetime.strptime(request.data.get('training_date'), "%Y-%m-%d").date()
+            end_date = datetime.strptime(request.data.get('end_date', ""), "%Y-%m-%d").date() if request.data.get('end_date') else None
+        except ValueError:
+            return Response({'status': 0, 'message': _('Invalid training_date or end_date format.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        repeat_type = int(request.data.get('repeat_type', 2))
+        no_of_participants = int(request.data.get('no_of_participants', 0))
+        training_name = request.data.get('training_name', '')
+        description = request.data.get('description', '')
+        cost = request.data.get('cost', '')
+        training_type = int(request.data.get('training_type', 1))  # Default: Open training
+
+        # Parse `days` schedule from the string to JSON object (list of dicts)
+        try:
+            day_schedules = json.loads(request.data.get('days', '[]'))
+        except json.JSONDecodeError:
+            return Response({'status': 0, 'message': _('Invalid format for days schedule.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        parsed_days = []
+        if not isinstance(day_schedules, list):
+            return Response({'status': 0, 'message': _('Days must be a list of schedules.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            for entry in day_schedules:
+                day = int(entry.get('day'))
+                start_time = datetime.strptime(entry.get('start_time'), "%H:%M:%S").time()
+                end_time = datetime.strptime(entry.get('end_time'), "%H:%M:%S").time()
+                duration = (datetime.combine(datetime.today(), end_time) - 
+                            datetime.combine(datetime.today(), start_time)).seconds // 60
+                parsed_days.append({"day": day, "start_time": start_time, "end_time": end_time, "duration": duration})
+        except (ValueError, KeyError, TypeError):
+            return Response({'status': 0, 'message': _('Invalid format for days schedule.')}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Map weekday mapping (Monday = 0 to Sunday = 6)
         weekday_mapping = {
             0: 2, 1: 3, 2: 4, 3: 5, 4: 6, 5: 7, 6: 1
         }
 
         training_instances = []
+
         if repeat_type == 2:  # Single training session
             try:
-                start_time_str = request.data.get('start_time')  # Assume 'start_time' is in H:M format
-                end_time_str = request.data.get('end_time')      # Assume 'end_time' is in H:M format
-                start_time_obj = datetime.strptime(start_time_str, "%H:%M:%S").time()
-                end_time_obj = datetime.strptime(end_time_str, "%H:%M:%S").time()
-                duration = (datetime.combine(datetime.today(), end_time_obj) - 
-                            datetime.combine(datetime.today(), start_time_obj)).seconds // 60
-            except ValueError as e:
-                return Response({'status': 0, 'message': _('Invalid time format.')}, status=status.HTTP_400_BAD_REQUEST)
+                start_time = datetime.strptime(request.data.get('start_time'), "%H:%M:%S").time()
+                end_time = datetime.strptime(request.data.get('end_time'), "%H:%M:%S").time()
+                duration = (datetime.combine(datetime.today(), end_time) - 
+                            datetime.combine(datetime.today(), start_time)).seconds // 60
+                training_instance = Training.objects.create(
+                    training_name=training_name,
+                    training_photo=training_photo,
+                    training_date=training_date,
+                    start_time=start_time,
+                    end_time=end_time,
+                    training_duration=duration,
+                    creator_type=creator_type,
+                    created_by_id=created_by_id,
+                    country=country,
+                    city=city,
+                    gender=gender,
+                    field=field,
+                    no_of_participants=no_of_participants,
+                    description=description,
+                    cost=cost,
+                    training_type=training_type,
+                )
+                training_instances.append(training_instance)
+            except ValueError:
+                return Response({'status': 0, 'message': _('Invalid time format.')}, status=status.HTTP_400_BAD_REQUEST)   
 
-            training_instance = Training.objects.create(
-                training_name=training_name,
-                training_photo=training_photo,
-                training_date=training_date,
-                start_time=start_time_obj,
-                end_time=end_time_obj,
-                training_duration=duration,
-                creator_type=creator_type,
-                created_by_id=created_by_id,
-                country=country,
-                city=city,
-                gender=gender,
-                field=field,
-                no_of_participants=no_of_participants,
-                description=description,
-                cost=cost,
-                training_type=training_type,
-            )
-            training_instances.append(training_instance)
-
-        elif repeat_type == 1 and end_date and days:
-            try:
-                start_time_objs = [datetime.strptime(st, "%H:%M:%S").time() for st in start_times]
-                end_time_objs = [datetime.strptime(et, "%H:%M:%S").time() for et in end_times]
-                durations = [
-                    (datetime.combine(datetime.today(), et) - datetime.combine(datetime.today(), st)).seconds // 60
-                    for st, et in zip(start_time_objs, end_time_objs)
-                ]
-            except ValueError as e:
-                return Response({
-                    'status': 0,
-                    'message': _('Invalid time format or time arrays mismatch.'),
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                training_date_obj = datetime.strptime(training_date, "%Y-%m-%d").date()
-                end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
-            except ValueError as e:
-                return Response({'status': 0, 'message': _('Invalid date format.')}, status=status.HTTP_400_BAD_REQUEST)
-
-            current_date = training_date_obj
-            while current_date <= end_date_obj:
+        elif repeat_type == 1 and end_date:
+            current_date = training_date
+            while current_date <= end_date:
                 weekday = current_date.weekday()
-                custom_weekday = weekday_mapping.get(weekday)
-                if custom_weekday in days:
-                    day_index = days.index(custom_weekday)
-                    training_instance = Training.objects.create(
-                        training_name=training_name,
-                        training_photo=training_photo,
-                        training_date=current_date,
-                        start_time=start_time_objs[day_index],
-                        end_time=end_time_objs[day_index],
-                        training_duration=durations[day_index],
-                        creator_type=creator_type,
-                        created_by_id=created_by_id,
-                        country=country,
-                        city=city,
-                        gender=gender,
-                        field=field,
-                        no_of_participants=no_of_participants,
-                        description=description,
-                        cost=cost,
-                        training_type=training_type,
-                    )
-                    training_instances.append(training_instance)
+                mapped_weekday = weekday_mapping[weekday]  # Use the mapped weekday
+                for entry in parsed_days:
+                    if mapped_weekday == entry["day"]:
+                        training_instance = Training.objects.create(
+                            training_name=training_name,
+                            training_photo=training_photo,
+                            training_date=current_date,
+                            start_time=entry["start_time"],
+                            end_time=entry["end_time"],
+                            training_duration=entry["duration"],
+                            creator_type=creator_type,
+                            created_by_id=created_by_id,
+                            country=country,
+                            city=city,
+                            gender=gender,
+                            field=field,
+                            no_of_participants=no_of_participants,
+                            description=description,
+                            cost=cost,
+                            training_type=training_type,
+                        )
+                        training_instances.append(training_instance)
                 current_date += timedelta(days=1)
 
-        # Serialize the training instances
         serialized_trainings = TrainingSerializer(training_instances, many=True, context={'request': request})
-
-        # Create the corresponding Training_Joined instances for each training
         for training_instance in training_instances:
             if creator_type == Training.USER_TYPE:
                 Training_Joined.objects.create(
@@ -208,20 +543,25 @@ class CreateTrainingView(APIView):
                         'message': _('No team found with the provided ID.')
                     }, status=status.HTTP_404_NOT_FOUND)
 
-        if len(training_instances) > 0:
-            return Response({
-                'status': 1,
-                'message': _('Training successfully created'),
-                'data': serialized_trainings.data  # Return the serialized data
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'status': 0,
-                'message': _('No training instances were created.')
-            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'status': 1,
+            'message': _('Training successfully created'),
+            'data': serialized_trainings.data
+        }, status=status.HTTP_200_OK) if training_instances else Response({
+            'status': 0,
+            'message': _('No training instances were created.')
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 
+
+
+
+
+
+
+    ##################
 
 
 # class CreateTrainingView(APIView):
