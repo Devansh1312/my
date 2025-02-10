@@ -154,9 +154,9 @@ class TrainingListSerializer(serializers.ModelSerializer):
         language = request.headers.get('Language', 'en')
         # Ensure language-based name retrieval (example with hardcoded types)
         if obj.training_type == 1:
-            return "تدريب مفتوح" if language == 'ar' else "Open Training"
+            return "يفتح" if language == 'ar' else "Open"
         elif obj.training_type == 2:
-            return "تدريب مغلق" if language == 'ar' else "Closed Training"
+            return "يغلق" if language == 'ar' else "Close"
         return None
     
     def get_field_info(self, obj):
@@ -322,9 +322,9 @@ class TrainingSerializer(serializers.ModelSerializer):
         language = request.headers.get('Language', 'en')
         # Ensure language-based name retrieval (example with hardcoded types)
         if obj.training_type == 1:
-            return "تدريب مفتوح" if language == 'ar' else "Open Training"
+            return "يفتح" if language == 'ar' else "Open"
         elif obj.training_type == 2:
-            return "تدريب مغلق" if language == 'ar' else "Closed Training"
+            return "يغلق" if language == 'ar' else "Close"
         return None
     
     def get_field_info(self, obj):

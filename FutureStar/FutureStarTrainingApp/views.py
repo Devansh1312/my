@@ -683,8 +683,14 @@ class TrainingDetailAPIView(APIView):
             
             
     def patch(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Retrieve the training ID from the request data (in request.data)
         training_id = request.data.get('training_id')
+        created_by_id = int(request.data.get('created_by_id'))
+        creator_type = int(request.data.get('creator_type', None))
+        print(request.data)
 
         if not training_id:
             return Response({
@@ -695,11 +701,20 @@ class TrainingDetailAPIView(APIView):
 
         # Get the training instance to update
         training_instance = self.get_object(training_id)
+        print("#############")
+        print(training_instance.created_by_id,training_instance.creator_type)
 
         if not training_instance:
             return Response({
                 'status': 0,
                 'message': _('Training not found'),
+                'data': []
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
+            return Response({
+                'status': 0,
+                'message': _('Unauthorized to update this training'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -747,6 +762,8 @@ class TrainingDetailAPIView(APIView):
     def delete(self, request, *args, **kwargs):
         # Retrieve the training ID from the query parameters
         training_id = request.query_params.get('training_id')
+        created_by_id = request.query_params.get('created_by_id')
+        creator_type = request.query_params.get('creator_type', None)
 
         if not training_id:
             return Response({
@@ -762,6 +779,12 @@ class TrainingDetailAPIView(APIView):
             return Response({
                 'status': 0,
                 'message': _('Training not found'),
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
+            return Response({
+                'status': 0,
+                'message': _('Unauthorized to update this training'),
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
@@ -772,7 +795,6 @@ class TrainingDetailAPIView(APIView):
         return Response({
             'status': 1,
             'message': _('Training successfully deleted'),
-            'data': []
         }, status=status.HTTP_204_NO_CONTENT) 
 
 ###################### Training LIKE ##################################
