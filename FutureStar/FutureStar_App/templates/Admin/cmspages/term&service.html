@@ -50,7 +50,7 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="ts-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="ts-title-en" name="ts_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+                                <input class="form-control btn-pill " id="ts-title-en" name="ts-title-en" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
                                 <p style="color: red; display: none;" class="error-message" id ="error-ts-title-en"></p>
 
                             </div>
@@ -128,17 +128,19 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
+                                <input class="form-control btn-pill" id="meta-title-en" name="meta-title-en" type="text" 
+                                    value="{{ data.meta_title_en }}" placeholder="SEO Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id="error-meta-title-en"></p>
 
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+                                <label class="form-label" for="meta-title-ar">SEO Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta-title-ar" type="text" 
+                                    value="{{ data.meta_title_ar }}" placeholder="SEO Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id="error-meta-title-ar"></p>
 
                             </div>
                         </div>

@@ -48,48 +48,43 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="policy-title">Title (English)</label>
-                                <input class="form-control btn-pill " id="policy-title-en" name="policy_title" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-policy-title-en"></p>
+                                <label class="form-label" for="tc-title-en">Title (English)</label>
+                                <input class="form-control btn-pill " id="tc-title-en" name="tc-title-en" type="text" value="{{data.heading_title_en}}" placeholder="Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-title-en"></p>
 
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="policy-title-arabic">Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="policy-title-ar" name="policy-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-policy-title-ar"></p>
+                                <label class="form-label" for="tc-title-arabic">Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="tc-title-ar" name="tc-title-ar" type="text" value="{{data.heading_title_ar}}" placeholder="Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-title-ar"></p>
 
                             </div>
                         </div>
                     </div>
-
-                   
-                    
                     <!--heading content-->
                         
                     <div class="row">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="policy-content-en">Content (English)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="policy-content-en" name="policy-content-en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-policy-content-en"></p>
+                                <label class="form-label" for="tc-content-en">Content (English)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="tc-content-en" name="tc-content-en" type="text" placeholder="content (English)">{{data.heading_content_en}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-content-en"></p>
 
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="policy-content-ar">Content (Arabic)</label>
-                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="policy-content-ar" name="policy-content-ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
-                                <p style="color: red; display: none;" class="error-message" id ="error-policy-content-ar"></p>
+                                <label class="form-label" for="tc-content-ar">Content (Arabic)</label>
+                                <textarea style ="height:200px;border-radius:1px;border:1px solid silver;" class="form-control btn-pill " id="tc-content-ar" name="tc-content-ar" type="text"  placeholder="content (Arabic)">{{data.heading_content_ar}}</textarea>
+                                <p style="color: red; display: none;" class="error-message" id ="error-tc-content-ar"></p>
 
                             </div>
                         </div>
                     </div>
-
-
                     <!--section 2-->
                     <br>
                     <div class="row" style="margin-bottom: 10px;">
@@ -100,17 +95,18 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label" for="meta-title-en">SEO Title (English)</label>
-                                <input class="form-control btn-pill " id="meta-title-en" name="meta_title_en" type="text" value="{{data.meta_title_en}}" placeholder="Title (English)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-en"></p>
-
+                                <input class="form-control btn-pill" id="meta-title-en" name="meta-title-en" type="text" 
+                                    value="{{ data.meta_title_en }}" placeholder="SEO Title (English)">
+                                <p style="color: red; display: none;" class="error-message" id="error-meta-title-en"></p>
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label" for="meta-title_ar">SEO Title (Arabic)</label>
-                                <input class="form-control btn-pill" id="meta-title-ar" name="meta_title_ar" type="text" value="{{data.meta_title_ar}}" placeholder="Title (Arabic)">
-                                <p style="color: red; display: none;" class="error-message" id ="error-meta-title-ar"></p>
+                                <label class="form-label" for="meta-title-ar">SEO Title (Arabic)</label>
+                                <input class="form-control btn-pill" id="meta-title-ar" name="meta-title-ar" type="text" 
+                                    value="{{ data.meta_title_ar }}" placeholder="SEO Title (Arabic)">
+                                <p style="color: red; display: none;" class="error-message" id="error-meta-title-ar"></p>
 
                             </div>
                         </div>
@@ -135,11 +131,6 @@
                             </div>
                         </div>
                     </div>
-
-
-
-                    
-                   
                 </div>
                 <div class="card-footer text-end">
                     <button class="btn btn-primary" type="submit" onclick ="return savethedata()">Save</button>
@@ -149,10 +140,6 @@
         </div>
     </div>
 </div>
-
-
-
-
 
 <!--javascript-->
 <!-- <script>
@@ -166,13 +153,13 @@
 
 <script>
     ClassicEditor
-        .create(document.querySelector('#policy-content-en'))
+        .create(document.querySelector('#tc-content-en'))
         .catch(error => {
             console.error(error);
         });
 
     ClassicEditor
-        .create(document.querySelector('#policy-content-ar'))
+        .create(document.querySelector('#tc-content-ar'))
         .catch(error => {
             console.error(error);
         });
@@ -193,12 +180,8 @@
 
         
     }
-    
     function savethedata(){
-        
 
-
-        
             try{
 
                 //text
@@ -211,10 +194,10 @@
                     }
                 });
 
-                var tc_title_en = document.getElementById("policy-title-en")
-                var tc_title_ar = document.getElementById("policy-title-ar")
-                var tc_content_en = document.getElementById("policy-content-en")
-                var tc_content_ar = document.getElementById("policy-content-ar")
+                var tc_title_en = document.getElementById("tc-title-en")
+                var tc_title_ar = document.getElementById("tc-title-ar")
+                var tc_content_en = document.getElementById("tc-content-en")
+                var tc_content_ar = document.getElementById("tc-content-ar")
                 var seo_title_en = document.getElementById("meta-title-en")
                 var seo_title_ar = document.getElementById("meta-title-ar")
                 var seo_content_en = document.getElementById("meta-content-en")
@@ -224,10 +207,10 @@
 
                 const form_data = [
 
-                { id: "policy-title-en", name: "Title (English)" },
-                { id: "policy-title-ar", name: "Title (Arabic)" },
-                { id: "policy-content-en", name: "Content (English)" },
-                { id: "policy-content-ar", name: "Content (Arabic)" },
+                { id: "tc-title-en", name: "Title (English)" },
+                { id: "tc-title-ar", name: "Title (Arabic)" },
+                { id: "tc-content-en", name: "Content (English)" },
+                { id: "tc-content-ar", name: "Content (Arabic)" },
                 { id: "meta-title-en", name: "SEO Title (English)" },
                 { id: "meta-title-ar", name: "SEO Title (Arabic)" },
                 { id: "meta-content-en", name: "SEO Content (English)" },
@@ -311,18 +294,11 @@
                                     }
                                 }
                                 return cookieValue;
-                            
-    
-                        }
                         
-                        //errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
+                        }
+
                     }
-        
-            
-                
-                //console.log(country_name_ar.value)
-                
+
             }
             catch(err){
 
@@ -331,9 +307,6 @@
             }
                 
         }
-       
-
-    
 </script>
 {% endblock %}
 
