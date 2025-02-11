@@ -256,3 +256,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),  # Use Bearer tokens for authorization
 }
 APPEND_SLASH=False
+
+############ For Secure Password And Not Visible in Network ################
+SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent access to cookies via JavaScript
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
