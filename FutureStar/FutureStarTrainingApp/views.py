@@ -558,7 +558,7 @@ class CreateTrainingView(APIView):
     def handle_training_notifications(self, training_instances, training_name):
         for training_instance in training_instances:
             message = f"New training session: {training_name} on {training_instance.training_date}"
-            push_data = {"training_id": training_instance.id, "type": "training"}
+            push_data = {"notifier_id": training_instance.id, "type": "training"}
             self.notify_users(training_instance, message, push_data)
 
     def notify_users(self, training, message, push_data):
@@ -1743,7 +1743,7 @@ class TrainingFeedbackAPI(APIView):
                 feedback.injuries.set(injuries)
 
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
-                self.notify_users(training, notification_message, {"type": "injury", "training_id": training_id})
+                self.notify_users(training, notification_message, {"type": "injury", "notifier_id": training_id})
                 update_messages.append(_("Injury details updated and notification sent"))
 
             feedback.save()
@@ -1761,7 +1761,7 @@ class TrainingFeedbackAPI(APIView):
                 feedback.injuries.set(injuries)
 
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
-                self.notify_users(training, notification_message, {"type": "injury", "training_id": training_id})
+                self.notify_users(training, notification_message, {"type": "injury", "notifier_id": training_id})
                 update_messages.append(_("New feedback added and injury notification sent"))
 
         # Serialize data
