@@ -572,7 +572,7 @@ class CreateTrainingView(APIView):
         relevant_users = JoinBranch.objects.filter(
             branch_id=branch_id,
             joinning_type__in=target_roles
-        ).select_related('user')
+        ).select_related('user_id')
         
         for join_branch in relevant_users:
             user = join_branch.user
