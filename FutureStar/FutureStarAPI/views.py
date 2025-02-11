@@ -5410,11 +5410,14 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                     self.send_notification(team_founder, attendance_message, comments_message, push_data)
                     notifications_sent += 1
 
-        return Response(
-            {"message": "Notifications sent to {} users.".format(notifications_sent)},
-            status=status.HTTP_200_OK
-        )
+        data = {"current_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        response_data = {
+            "message": "Notifications sent to {} users.".format(notifications_sent),
+            "data": data
+        }
 
+        return Response(response_data, status=status.HTTP_200_OK)
+    
     def send_notification(self, user, attendance_message, comments_message, push_data):
         """
         Helper method to send notifications to a user.
