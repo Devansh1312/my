@@ -18,7 +18,6 @@ from django.utils.decorators import method_decorator
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from datetime import timedelta
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 import sys
 from functools import wraps

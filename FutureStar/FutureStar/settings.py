@@ -39,9 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'FutureStar_App',
     'FutureStarFrontend',
-    'rest_framework',  # Add this for DRF
-    'rest_framework_simplejwt',  # Add this for JWT Authentication
-    'FutureStarAPI',  # Add your app where User model is defined
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'FutureStarAPI',
     'FutureStarTeamApp',
     'FutureStarTournamentApp',
     'FutureStarTrainingGroupApp',
@@ -52,15 +52,13 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'corsheaders',
     'whitenoise' ,
-    # 'social_django',
-
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Add this for CORS
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -69,22 +67,13 @@ MIDDLEWARE = [
     'FutureStarAPI.middleware.MiddlewareToken',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', 
-
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True  # Allows all origins (use cautiously in production)
-
-
-# CORS_ALLOWED_ORIGINS  = [
-#     'https://futurestar.redspark.redspark.a2hosted.com',
-#     'https://redsparkinfo.in'
-#     'http://localhost:3000',
-# ]
+CORS_ALLOW_ALL_ORIGINS = True 
 
 ROOT_URLCONF = 'FutureStar.urls'
 
 LOGIN_URL = '/login/' 
-
 
 TEMPLATES = [
     {
@@ -172,7 +161,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-
 #language Settibgs
 LANGUAGE_CODE = 'en'
 
@@ -188,19 +176,16 @@ LOCALE_PATHS = [
 
 ########################################### Social Login ####################################
 
-
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = "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"
 APPLE_CLIENT_ID = os.getenv('APPLE_CLIENT_ID')
 APPLE_REDIRECT_URI = os.getenv('APPLE_REDIRECT_URI')
 SOCIAL_AUTH_STATE_STRING = os.getenv('SOCIAL_AUTH_STATE_STRING')
 
-
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 USE_L10N = True
-
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS=[
@@ -212,22 +197,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# AUTHENTICATION_BACKENDS = [
-#     # 'FutureStar_App.backends.EmailBackend',  # Add this line
-#     'social_core.backends.google.GoogleOAuth2',
-#     'social_core.backends.apple.AppleIdAuth',
-#     'django.contrib.auth.backends.ModelBackend',
-# ]
-
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'sohamghayal02@gmail.com'
-EMAIL_HOST_PASSWORD = 'vhzttjhigjttsufv'
-DEFAULT_FROM_EMAIL = 'sohamghayal02@gmail.com'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
