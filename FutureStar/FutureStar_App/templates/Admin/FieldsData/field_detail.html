@@ -113,15 +113,15 @@
                                     <strong>Field Type:</strong> {{ field.ground_type.name_en }}
                                 </div>
                                 <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field Location:</strong>{% if field.city_id.name and field.country_id.name %}
-                                    {{ field.city_id.name }}, {{ field.country_id.name }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
+                                    <strong>Field Address:</strong> {{ field.address }}
                                 </div>
-                                
                                 <div class="col-12 col-md-4 mb-3">
-                                    <strong>Additional Info:</strong> {{ field.additional_information }}
+                                    <strong>Field City & Country:</strong>
+                                    {% if field.city_id.name and field.country_id.name %}
+                                        {{ field.city_id.name }}, {{ field.country_id.name }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
                                 </div>
                                 <div class="col-12 col-md-4 mb-3">
                                     <strong>Field Creator:</strong>   {% if field.user_id.fullname %}
