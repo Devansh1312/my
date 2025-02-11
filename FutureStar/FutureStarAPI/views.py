@@ -5358,6 +5358,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         current_time = timezone.now()
         current_date = current_time.date()
         one_hour_later = current_time + timedelta(hours=1)
+        print(one_hour_later)
 
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
@@ -5452,6 +5453,8 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
         current_time = timezone.now()
         one_hour_later = current_time + timedelta(hours=1)
         current_date = current_time.date()
+        print(one_hour_later)
+
 
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
@@ -5471,6 +5474,8 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     "training_id": training.id,
                     "type":"training"
                 }
+
+                
 
                 if training.creator_type == 1:  # Created by a User
                     creator_branches = JoinBranch.objects.filter(

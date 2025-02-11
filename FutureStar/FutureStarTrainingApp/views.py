@@ -519,6 +519,8 @@ class CreateTrainingView(APIView):
                 current_date += timedelta(days=1)
 
         serialized_trainings = TrainingSerializer(training_instances, many=True, context={'request': request})
+        self.handle_training_notifications(training_instances, training_name)
+
         for training_instance in training_instances:
             if creator_type == Training.USER_TYPE:
                 Training_Joined.objects.create(
@@ -540,8 +542,7 @@ class CreateTrainingView(APIView):
                     return Response({
                         'status': 0,
                         'message': _('No team found with the provided ID.')
-                    }, status=status.HTTP_404_NOT_FOUND)
-
+                    }, status=status.HTTP_404_NOT_FOUND)       
         return Response({
             'status': 1,
             'message': _('Training successfully created'),
@@ -552,9 +553,54 @@ class CreateTrainingView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
     
 
+      
 
+    def handle_training_notifications(self, training_instances, training_name):
+        for training_instance in training_instances:
+            message = f"New training session: {training_name} on {training_instance.training_date}"
+            push_data = {"training_id": training_instance.id, "type": "training"}
+            self.notify_users(training_instance, message, push_data)
 
+    def notify_users(self, training, message, push_data):
+        # Get the branch_id from the training instance
+        branch_id = training.created_by_id
+        
+        # Define the relevant roles for sending notifications (Player, Coach, Manager)
+        target_roles = [4, 1, 2]  # Player, Coach, Manager roles
+        
+        # Query the users who belong to the branch and have relevant roles
+        relevant_users = JoinBranch.objects.filter(
+            branch_id=branch_id,
+            joinning_type__in=target_roles
+        ).select_related('user')
+        
+        for join_branch in relevant_users:
+            user = join_branch.user
+            self.send_notification(user, message, push_data)
 
+    def send_notification(self, user, message, push_data):
+        notification_language = user.current_language
+        if notification_language in ['ar', 'en']:
+            activate(notification_language)
+
+        send_push_notification(
+            user.device_token,
+            _("Training Notification"),
+            message,
+            device_type=user.device_type,
+            data=push_data
+        )
+        Notifictions.objects.create(
+            created_by_id=1,  # Assumed system admin ID
+            creator_type=1,
+            targeted_id=user.id,
+            targeted_type=1,
+            title=_("Training Notification"),
+            content=message
+        )
+                
+            
+    
 
 
 
