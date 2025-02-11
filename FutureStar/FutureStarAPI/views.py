@@ -5413,7 +5413,8 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         data = {"current_date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         response_data = {
             "message": "Notifications sent to {} users.".format(notifications_sent),
-            "data": data
+            "data": data,
+            "notifiction_sent_to":self.send_notification,
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
