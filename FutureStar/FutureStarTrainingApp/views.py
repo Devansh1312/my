@@ -558,25 +558,57 @@ class CreateTrainingView(APIView):
     def handle_training_notifications(self, training_instances, training_name):
         for training_instance in training_instances:
             message = f"New training session: {training_name} on {training_instance.training_date}"
-            push_data = {"notifier_id": training_instance.id, "type": "training"}
+            push_data = {"training_id": training_instance.id, "type": "training"}
             self.notify_users(training_instance, message, push_data)
 
+
+             
     def notify_users(self, training, message, push_data):
-        # Get the branch_id from the training instance
-        branch_id = training.created_by_id
-        
         # Define the relevant roles for sending notifications (Player, Coach, Manager)
         target_roles = [4, 1, 2]  # Player, Coach, Manager roles
+
+        # Handle notifications when the creator_type is 1 (individual user)
+        if training.creator_type == 1:
+            user = User.objects.get(id=training.created_by_id)
+            
+            # Get all branches associated with the user
+            user_branches = JoinBranch.objects.filter(
+                user_id=user.id
+            ).values_list('branch_id', flat=True)
+
+            # Iterate over each branch and notify relevant users
+            for branch_id in user_branches:
+                # Query the users who belong to the branch and have relevant roles
+                relevant_users = JoinBranch.objects.filter(
+                    branch_id=branch_id,
+                    joinning_type__in=target_roles
+                ).select_related('user_id')
+                print(relevant_users)
+
+                for join_branch in relevant_users:
+                    user = join_branch.user_id
+                    print(user)
+                    self.send_notification(user, message, push_data)
+
+        # Handle notifications when the creator_type is 2 (team or branch)
+        elif training.creator_type == 2:
+            # Get the branch associated with the team or creator
+            team_branch = JoinBranch.objects.filter(branch_id=training.created_by_id).first()
+            
+            if team_branch:
+                # Query the users who belong to the branch and have relevant roles
+                relevant_users = JoinBranch.objects.filter(
+                    branch_id=team_branch.branch_id,
+                    joinning_type__in=target_roles
+                ).select_related('user')
+
+                for join_branch in relevant_users:
+                    user = join_branch.user
+                    self.send_notification(user, message, push_data)
+
+           
         
-        # Query the users who belong to the branch and have relevant roles
-        relevant_users = JoinBranch.objects.filter(
-            branch_id=branch_id,
-            joinning_type__in=target_roles
-        ).select_related('user_id')
-        
-        for join_branch in relevant_users:
-            user = join_branch.user
-            self.send_notification(user, message, push_data)
+
 
     def send_notification(self, user, message, push_data):
         notification_language = user.current_language
@@ -1809,38 +1841,37 @@ class TrainingFeedbackAPI(APIView):
         """
         notifications_sent = 0
 
-        if training.creator_type == Training.USER_TYPE:
-            creator_branches = JoinBranch.objects.filter(
-                user_id=training.created_by_id,
-                joinning_type=4  # Assuming 4 means team member/player
+        if training.creator_type == 1:  # Created by a User
+            user = User.objects.get(id=training.created_by_id)
+            user_branches = JoinBranch.objects.filter(
+                user_id=user.id, joinning_type=4  # 4 = Player/Team Creator
             ).values_list('branch_id', flat=True)
 
-            if creator_branches.exists():
-                branch_managers_and_coaches = JoinBranch.objects.filter(
-                    branch_id__in=creator_branches,
+            if user_branches.exists():
+                # Notify all managers and coaches of the branches
+                coaches_or_managers = JoinBranch.objects.filter(
+                    branch_id__in=user_branches,
                     joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
-                ).select_related('user')
+                ).select_related('user_id')
 
-                for branch in branch_managers_and_coaches:
-                    manager_or_coach = branch.user
-                    self.send_notification(manager_or_coach, message, "", push_data)
+                for branch in coaches_or_managers:
+                    coach_or_manager = branch.user_id
+                    self.send_notification(
+                        coach_or_manager, message, push_data
+                    )
                     notifications_sent += 1
             else:
-                user = User.objects.get(id=training.created_by_id)
-                self.send_notification(user, message, "", push_data)
+                # Notify the user who created the training
+                self.send_notification(user, message, push_data)
                 notifications_sent += 1
 
-        elif training.creator_type == Training.TEAM_TYPE:
+        elif training.creator_type == 2:  # Created by a Team
             team = Team.objects.get(id=training.created_by_id)
-            self.send_notification(team.team_founder, message, "", push_data)
+            team_founder = team.team_founder
+            self.send_notification(team_founder, message, push_data)
             notifications_sent += 1
 
-        elif training.creator_type == Training.GROUP_TYPE:
-            group = TrainingGroups.objects.get(id=training.created_by_id)
-            self.send_notification(group.group_founder, message, "", push_data)
-            notifications_sent += 1
-
-    def send_notification(self, user, message, comments_message, push_data):
+    def send_notification(self, user, message, push_data):
         """
         Helper method to send notifications to a user.
         """
@@ -1856,14 +1887,7 @@ class TrainingFeedbackAPI(APIView):
             data=push_data
         )
 
-        if comments_message:
-            send_push_notification(
-                user.device_token,
-                _("Training Notification"),
-                comments_message,
-                device_type=user.device_type,
-                data=push_data
-            )
+      
 
         Notifictions.objects.create(
             created_by_id=1,  # Replace with the actual creator ID
@@ -1871,5 +1895,5 @@ class TrainingFeedbackAPI(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Notification"),
-            content=message + "\n" + comments_message
+            content=message 
         )
