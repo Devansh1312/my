@@ -5375,8 +5375,8 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                 comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
-                    "training_type":training.training_type,
-                    "type":"training"
+                 
+                    "type":"my_training"
                 }
 
                 # Check the creator type
@@ -5473,8 +5473,8 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                 comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
-                    "training_type":training.training_type,
-                    "type":"training"
+              
+                    "type":"my_training"
                 }
 
 

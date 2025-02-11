@@ -1793,7 +1793,7 @@ class TrainingFeedbackAPI(APIView):
                 feedback.injuries.set(injuries)
 
                 notification_message = _("Someone Injured!!! Don't forget to add their injury to keep track.")
-                self.notify_users(training, notification_message, {"type": "injury", "training_id": training_id})
+                self.notify_users(training, notification_message, {"type": "my_training", "training_id": training_id})
                 update_messages.append(_("New feedback added and injury notification sent"))
 
         # Serialize data
