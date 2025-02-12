@@ -593,10 +593,10 @@ class CreateTrainingView(APIView):
                 relevant_users = JoinBranch.objects.filter(
                     branch_id=team_branch.branch_id,
                     joinning_type__in=target_roles
-                ).select_related('user')
+                ).select_related('user_id')
 
                 for join_branch in relevant_users:
-                    user = join_branch.user
+                    user = join_branch.user_id
                     self.send_notification(user, message, push_data)
 
     def send_notification(self, user, message, push_data):
