@@ -5358,7 +5358,6 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         current_time = timezone.now()
         current_date = current_time.date()
         one_hour_later = current_time + timedelta(hours=1)
-        print(one_hour_later)
 
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
@@ -5449,32 +5448,21 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
         current_time = timezone.now()
         one_hour_later = current_time + timedelta(hours=1)
         current_date = current_time.date()
-        print(one_hour_later)
-
-
         # Query all training sessions for today
         trainings = Training.objects.filter(training_date=current_date)
-
         notifications_sent = 0  # Counter for sent notifications
-
         for training in trainings:
             training_end_time = timezone.make_aware(
                 datetime.combine(training.training_date, training.end_time)
             )
-
             # Check if the training ends within the next hour
             if current_time <= training_end_time <= one_hour_later:
                 message = _("Don't forget to rate your players after the training session.")
                 comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
-              
                     "type":"my_training"
                 }
-
-
-                
-
                 if training.creator_type == 1:  # Created by a User
                     creator_branches = JoinBranch.objects.filter(
                         user_id=training.created_by_id,
@@ -5487,7 +5475,6 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                             branch_id__in=creator_branches,
                             joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
                         ).select_related('user_id')
-
                         for branch in branch_managers_and_coaches:
                             manager_or_coach = branch.user_id
                             self.send_notification(manager_or_coach, message, comments_message, push_data)
@@ -5497,18 +5484,15 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         user = User.objects.get(id=training.created_by_id)
                         self.send_notification(user, message, comments_message, push_data)
                         notifications_sent += 1
-
                 elif training.creator_type == 2:  # Created by Team Founder
                     team = Team.objects.get(id=training.created_by_id)
                     team_founder = team.team_founder
                     self.send_notification(team_founder, message, comments_message, push_data)
                     notifications_sent += 1
-
         return Response(
             {"message": "Notifications sent to {} users.".format(notifications_sent)},
             status=status.HTTP_200_OK
         )
-
 
     def send_notification(self, user, message, comments_message, push_data):
         """
@@ -5550,7 +5534,6 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             title=_("Training Reminder"),
             content=comments_message
         )
-
 
 #################### Tournament Game LineUp Notification API ######################
 class LineupNotificationAPIView(APIView):
@@ -5678,7 +5661,6 @@ class LineupNotificationAPIView(APIView):
                         game_number=game.game_number, game_type=game_type)
                 )
                 notification.save()
-
 
         # Notify team founder (if present)
         team_founder = team.team_id.team_founder

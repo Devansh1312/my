@@ -550,19 +550,14 @@ class CreateTrainingView(APIView):
         }, status=status.HTTP_200_OK) if training_instances else Response({
             'status': 0,
             'message': _('No training instances were created.')
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-
-      
+        }, status=status.HTTP_400_BAD_REQUEST) 
 
     def handle_training_notifications(self, training_instances, training_name):
         for training_instance in training_instances:
             message = f"New training session: {training_name} on {training_instance.training_date}"
             push_data = {"training_id": training_instance.id, "type": "training"}
             self.notify_users(training_instance, message, push_data)
-
-
-             
+    
     def notify_users(self, training, message, push_data):
         # Define the relevant roles for sending notifications (Player, Coach, Manager)
         target_roles = [4, 1, 2]  # Player, Coach, Manager roles
@@ -583,11 +578,9 @@ class CreateTrainingView(APIView):
                     branch_id=branch_id,
                     joinning_type__in=target_roles
                 ).select_related('user_id')
-                print(relevant_users)
 
                 for join_branch in relevant_users:
                     user = join_branch.user_id
-                    print(user)
                     self.send_notification(user, message, push_data)
 
         # Handle notifications when the creator_type is 2 (team or branch)
@@ -605,10 +598,6 @@ class CreateTrainingView(APIView):
                 for join_branch in relevant_users:
                     user = join_branch.user
                     self.send_notification(user, message, push_data)
-
-           
-        
-
 
     def send_notification(self, user, message, push_data):
         notification_language = user.current_language
@@ -631,14 +620,7 @@ class CreateTrainingView(APIView):
             content=message
         )
                 
-            
-    
-
-
-
-
-
-    ##################
+##############################################################################################################################
 
 
 # class CreateTrainingView(APIView):
@@ -707,8 +689,6 @@ class CreateTrainingView(APIView):
 #             'status': 0,
 #             'errors': serializer.errors
 #         }, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 ##################### Get trainings Details ##################################
