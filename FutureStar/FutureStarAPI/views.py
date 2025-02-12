@@ -5372,7 +5372,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             # Check if the training is within the next hour
             if current_time <= training_start_time <= one_hour_later:
                 attendance_message = _("Don't forget to mark your attendance")
-                comments_message = _("Don't forget to add your comments on your players' performance.")
+                # comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
                  
@@ -5396,18 +5396,18 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
                         for branch in coaches_or_managers:
                             coach_or_manager = branch.user_id
                             self.send_notification(
-                                coach_or_manager, attendance_message, comments_message, push_data
+                                coach_or_manager, attendance_message, push_data
                             )
                             notifications_sent += 1
                     else:
                         # Notify the user who created the training
-                        self.send_notification(user, attendance_message, comments_message, push_data)
+                        self.send_notification(user, attendance_message, push_data)
                         notifications_sent += 1
 
                 elif training.creator_type == 2:  # Created by a Team
                     team = Team.objects.get(id=training.created_by_id)
                     team_founder = team.team_founder
-                    self.send_notification(team_founder, attendance_message, comments_message, push_data)
+                    self.send_notification(team_founder, attendance_message, push_data)
                     notifications_sent += 1
 
         response_data = {
@@ -5416,7 +5416,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
         return Response(response_data, status=status.HTTP_200_OK)
     
-    def send_notification(self, user, attendance_message, comments_message, push_data):
+    def send_notification(self, user, attendance_message, push_data):
         """
         Helper method to send notifications to a user.
         """
@@ -5431,13 +5431,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             device_type=user.device_type,
             data=push_data
         )
-        send_push_notification(
-            user.device_token,
-            _("Training Reminder"),
-            comments_message,
-            device_type=user.device_type,
-            data=push_data
-        )
+      
 
         Notifictions.objects.create(
             created_by_id=1,  # Assumed system admin ID
@@ -5445,7 +5439,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=attendance_message + comments_message
+            content=attendance_message 
         )
 
 #################### Training End Time Notification API ######################
@@ -5492,10 +5486,10 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         branch_managers_and_coaches = JoinBranch.objects.filter(
                             branch_id__in=creator_branches,
                             joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
-                        ).select_related('user')
+                        ).select_related('user_id')
 
                         for branch in branch_managers_and_coaches:
-                            manager_or_coach = branch.user
+                            manager_or_coach = branch.user_id
                             self.send_notification(manager_or_coach, message, comments_message, push_data)
                             notifications_sent += 1
                     else:
@@ -5545,7 +5539,16 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=message + comments_message
+            content=message  
+        )
+
+        Notifictions.objects.create(
+            created_by_id=1,
+            creator_type=1,
+            targeted_id=user.id,
+            targeted_type=1,
+            title=_("Training Reminder"),
+            content=comments_message
         )
 
 
