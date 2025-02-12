@@ -603,6 +603,8 @@ class CreateTrainingView(APIView):
         notification_language = user.current_language
         if notification_language in ['ar', 'en']:
             activate(notification_language)
+        
+        message = _(message)
 
         send_push_notification(
             user.device_token,
@@ -1443,78 +1445,78 @@ class JoinTrainingAPIView(APIView):
         membership = Training_Joined.objects.create(user=user, training=training)
 
         # Notify relevant users
-        notifications_sent = self.notify_relevant_users(training, user)
+        # notifications_sent = self.notify_relevant_users(training, user)
 
         serializer = TrainingMembershipSerializer(membership)
         return Response({
             'status': 1,
             'message': _('User joined the training successfully.'),
             'data': serializer.data,
-            'notifications_sent': notifications_sent
+            # 'notifications_sent': notifications_sent
         }, status=status.HTTP_201_CREATED)
 
-    def notify_relevant_users(self, training, user):
-        """
-        Notify relevant users: creator, branch managers, coaches.
-        """
-        message = _("A new player has joined the training.")
-        comments_message = _("Don't forget to engage with the new player.")
-        push_data = {
-            "training_id": training.id,
+    # def notify_relevant_users(self, training, user):
+    #     """
+    #     Notify relevant users: creator, branch managers, coaches.
+    #     """
+    #     message = _("A new player has joined the training.")
+    #     comments_message = _("Don't forget to engage with the new player.")
+    #     push_data = {
+    #         "training_id": training.id,
           
-            "type":"training"
-        }
+    #         "type":"training"
+    #     }
 
-        notifications_sent = 0
+    #     notifications_sent = 0
 
-        if training.creator_type == Training.USER_TYPE:
-            creator_branches = JoinBranch.objects.filter(
-                user_id=training.created_by_id, joinning_type=4
-            ).values_list('branch_id', flat=True)          
+    #     if training.creator_type == Training.USER_TYPE:
+    #         creator_branches = JoinBranch.objects.filter(
+    #             user_id=training.created_by_id, joinning_type=4
+    #         ).values_list('branch_id', flat=True)          
 
-            if creator_branches.exists():
-                branch_managers_and_coaches = JoinBranch.objects.filter(
-                    branch_id__in=creator_branches, joinning_type__in=[1, 3]
-                ).select_related('user_id')
+    #         if creator_branches.exists():
+    #             branch_managers_and_coaches = JoinBranch.objects.filter(
+    #                 branch_id__in=creator_branches, joinning_type__in=[1, 3]
+    #             ).select_related('user_id')
 
-                for branch in branch_managers_and_coaches:
-                    manager_or_coach = branch.user
-                    self.send_notification(manager_or_coach, message, comments_message, push_data)
-                    notifications_sent += 1
-            else:
-                creator = User.objects.get(id=training.created_by_id)
-                self.send_notification(creator, message, comments_message, push_data)
-                notifications_sent += 1
+    #             for branch in branch_managers_and_coaches:
+    #                 manager_or_coach = branch.user
+    #                 self.send_notification(manager_or_coach, message, comments_message, push_data)
+    #                 notifications_sent += 1
+    #         else:
+    #             creator = User.objects.get(id=training.created_by_id)
+    #             self.send_notification(creator, message, comments_message, push_data)
+    #             notifications_sent += 1
 
-        elif training.creator_type == Training.TEAM_TYPE:
-            team = Team.objects.get(id=training.created_by_id)
-            team_founder = team.team_founder
-            self.send_notification(team_founder, message, comments_message, push_data)
-            notifications_sent += 1
+    #     elif training.creator_type == Training.TEAM_TYPE:
+    #         team = Team.objects.get(id=training.created_by_id)
+    #         team_founder = team.team_founder
+    #         self.send_notification(team_founder, message, comments_message, push_data)
+    #         notifications_sent += 1
 
-        elif training.creator_type == Training.GROUP_TYPE:
-            training_group = TrainingGroups.objects.get(id=training.created_by_id)
-            group_founder = training_group.group_founder
-            self.send_notification(group_founder, message, comments_message, push_data)
-            notifications_sent += 1
+    #     elif training.creator_type == Training.GROUP_TYPE:
+    #         training_group = TrainingGroups.objects.get(id=training.created_by_id)
+    #         group_founder = training_group.group_founder
+    #         self.send_notification(group_founder, message, comments_message, push_data)
+    #         notifications_sent += 1
 
-        return notifications_sent
+    #     return notifications_sent
 
-    def send_notification(self, user, message, comments_message, push_data):
-        """
-        Helper method to send notifications to a user.
-        """
-        notification_language = user.current_language
-        if notification_language in ['ar', 'en']:
-            activate(notification_language)
+    # def send_notification(self, user, message, comments_message, push_data):
+    #     """
+    #     Helper method to send notifications to a user.
+    #     """
+    #     notification_language = user.current_language
+    #     if notification_language in ['ar', 'en']:
+    #         activate(notification_language)
 
-        send_push_notification(user.device_token, message, comments_message, device_type=user.device_type, data=push_data)
-        send_push_notification(user.device_token,  message, comments_message, device_type=user.device_type, data=push_data)
+    #     send_push_notification(user.device_token, message, comments_message, device_type=user.device_type, data=push_data)
+    #     send_push_notification(user.device_token,  message, comments_message, device_type=user.device_type, data=push_data)
 
-        Notifictions.objects.create(
-            created_by_id=1, creator_type=1, targeted_id=user.id, targeted_type=1,
-            title=_("Training Reminder"), content=message + "\n" + comments_message
-        )
+    #     Notifictions.objects.create(
+    #         created_by_id=1, creator_type=1, targeted_id=user.id, targeted_type=1,
+    #         title=_("Training Reminder"), content=message + "\n" + comments_message
+    #     )
 
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
