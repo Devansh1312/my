@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-x7$wh)3+(3$)13tn$!pa=x#@1%l*qdmwk%zv!x(vlvsxkwey9-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['futurestar.redspark.redspark.a2hosted.com', 'localhost', '127.0.0.1','75.101.179.30','redsparkinfo.in']
 
@@ -182,7 +182,9 @@ APPLE_CLIENT_ID = os.getenv('APPLE_CLIENT_ID')
 APPLE_REDIRECT_URI = os.getenv('APPLE_REDIRECT_URI')
 SOCIAL_AUTH_STATE_STRING = os.getenv('SOCIAL_AUTH_STATE_STRING')
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Riyadh'
+USE_TZ = True  # Ensure Django uses the specified timezone
 
 USE_I18N = True
 USE_L10N = True

@@ -6,20 +6,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from FutureStarAPI.serializers import *
-from FutureStarAPI.views import get_group_data,get_user_data
 from FutureStarTeamApp.serializers import *
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarTeamApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarGameSystem.serializers import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from django.core.files.storage import default_storage
 from django.utils.translation import gettext as _
-from django.utils.crypto import get_random_string
 from rest_framework.pagination import PageNumberPagination
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import EmptyPage
 from django.db import IntegrityError
 from django.db.models import Sum,Count,Q
 from django.core.exceptions import ObjectDoesNotExist

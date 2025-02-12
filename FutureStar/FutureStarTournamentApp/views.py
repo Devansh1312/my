@@ -28,9 +28,6 @@ from FutureStarFriendlyGame.models import *
 
 
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-import random
-from django.utils import timezone
-import os
 from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework import generics
@@ -38,21 +35,17 @@ from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Q
 from django.utils.translation import gettext as _
-from django.db import IntegrityError, transaction
-import string
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
-import re
 import logging
 from django.utils.crypto import get_random_string
-from django.utils.timezone import now
+from django.utils.timezone import now , localtime
 
 
-
-from datetime import date, timedelta
+from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.utils.timezone import now
 from django.db.models import Q
 
 from FutureStar.firebase_config import send_push_notification
@@ -282,7 +275,7 @@ class TournamentAPIView(APIView):
             activate(language)
         
         date_type = request.query_params.get('date_type', 0)  # Get the date_type from query params, default to 0
-        current_date = timezone.now().date()  # Get today's date
+        current_date = timezone.localtime(now()).date()  # Get today's date
         
         paginator = CustomTournamentPagination()
         
@@ -474,7 +467,7 @@ class MyTournamentsAPIView(APIView):
         creator_type = request.query_params.get('creator_type', None)
         created_by_id = request.query_params.get('created_by_id', None)
         date_type = request.query_params.get('date_type', 0)  # Default to '0' (upcoming tournaments)
-        current_date = timezone.now().date()
+        current_date = timezone.localtime(now()).date()
 
         # Check creator_type and created_by_id validity
         if creator_type is None or int(creator_type) != 2:
@@ -1524,7 +1517,7 @@ class TournamentGamesAPIView(APIView):
     def generate_game_number(self, tournament_id):
         """Generate the game number in the format #TSYYNNNGGG."""
         # Get the last two digits of the current year (e.g., 2025 -> 25)
-        current_year = timezone.now().year % 100  # Extract last 2 digits
+        current_year = timezone.localtime(now()).year % 100  # Extract last 2 digits
         
         # Pad tournament_id to 3 digits (e.g., 001 for ID 1)
         tournament_id_str = str(tournament_id).zfill(3)
@@ -2699,8 +2692,8 @@ class UpcomingGameView(APIView):
         user = request.user
         user_id = user.id
         user_role = user.role.id  # Assuming `role` is a related field
-        one_hour_ago = now() - timedelta(hours=1)
-        current_time = now()
+        one_hour_ago = localtime(now()) - timedelta(hours=1)
+        current_time = localtime(now())
 
         all_games = []
 
@@ -2877,7 +2870,7 @@ class FetchMyGamesAPIView(APIView):
         created_by_id = request.query_params.get('created_by_id', None)
         creator_type = str(request.query_params.get('creator_type', 0))
         date_type = request.query_params.get('date_type',0)  # Default to upcoming and ongoing games
-        current_date = timezone.now().date()
+        current_date = timezone.localtime(now()).date()
 
         if creator_type == '2' and not created_by_id:
             return Response({"status": 0, "message": "created_by_id must be provided for creator_type 2."})
@@ -3036,7 +3029,7 @@ class FetchAllGamesAPIView(APIView):
         creator_type = request.query_params.get('creator_type')
         created_by_id = request.query_params.get('created_by_id')
         date_type = int(request.query_params.get('date_type', 0))  # Default to upcoming and ongoing games
-        current_date = timezone.now().date()
+        current_date = timezone.localtime(now()).date()
 
         notification_count = Notifictions.objects.filter(
             targeted_id=created_by_id, targeted_type=creator_type, read=False

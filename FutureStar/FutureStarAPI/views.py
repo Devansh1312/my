@@ -602,7 +602,7 @@ class LoginAPIView(APIView):
                         elif user.is_active:
                             user.device_type = device_type
                             user.device_token = device_token
-                            user.last_login = timezone.now()
+                            user.last_login = timezone.localtime(timezone.now())
                             user.save()
 
                             refresh = RefreshToken.for_user(user)
@@ -652,7 +652,7 @@ class LoginAPIView(APIView):
                     elif user.is_active:
                         user.device_type = device_type
                         user.device_token = device_token
-                        user.last_login = timezone.now()
+                        user.last_login = timezone.localtime(timezone.now())
                         user.save()
 
                         refresh = RefreshToken.for_user(user)
@@ -1293,7 +1293,7 @@ class PostLikeAPIView(APIView):
             message = _('Post unliked successfully.')
         else:
             # Like the post
-            post_like.date_liked = timezone.now()
+            post_like.date_liked = timezone.localtime(timezone.now())
             post_like.save()
             message = _('Post liked successfully.')
 
@@ -2191,7 +2191,7 @@ class ProfileTypeView(APIView):
 
 
         # Update user's profile and save changes
-        user.updated_at = timezone.now()
+        user.updated_at = timezone.localtime(timezone.now())
         user.save()
 
         # Return success response
@@ -4373,7 +4373,7 @@ class EventsAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Get current date for filtering
-        current_date = timezone.now().date()
+        current_date = timezone.localtime(timezone.now()).date()
 
         # Filter events based on date_type
         if date_type == 0:  # Upcoming and ongoing events (default)
@@ -5355,7 +5355,7 @@ class UpdateCurrentLanguageView(APIView):
 class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
     def get(self, request, *args, **kwargs):
         # Get the current time and date
-        current_time = timezone.now()
+        current_time = timezone.localtime(timezone.now())
         current_date = current_time.date()
         one_hour_later = current_time + timedelta(hours=1)
 
@@ -5411,6 +5411,10 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
         response_data = {
             "message": "Notifications sent to {} users.".format(notifications_sent),
+            "data":timezone.localtime(timezone.localtime(timezone.now())),
+            "current_time":current_time,
+            "current_date": current_date,
+            "one_hour_later": one_hour_later,
             }
 
         return Response(response_data, status=status.HTTP_200_OK)
@@ -5445,7 +5449,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 class CheckEndTimeAndSendNotificationsAPIView(APIView):
     def get(self, request, *args, **kwargs):
         # Get the current datetime
-        current_time = timezone.now()
+        current_time = timezone.localtime(timezone.now())
         one_hour_later = current_time + timedelta(hours=1)
         current_date = current_time.date()
         # Query all training sessions for today
@@ -5540,7 +5544,7 @@ class LineupNotificationAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         # Get current time and today's date
-            current_time = timezone.now()
+            current_time = timezone.localtime(timezone.now())
             current_date = date.today()
 
             # Calculate the time one hour from now
@@ -5731,7 +5735,7 @@ class LineupNotificationAPIView(APIView):
 class UniformConfirmationNotificationView(APIView):
     def get(self, request, *args, **kwargs):
 
-        current_time = timezone.now()
+        current_time = timezone.localtime(timezone.now())
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
         # Retrieve upcoming tournament games that are not confirmed
@@ -5866,7 +5870,7 @@ class UniformAddNotificationAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         # Get current time and today's date
-        current_time = timezone.now()
+        current_time = timezone.localtime(timezone.now())
         current_date = date.today()  # This will give you today's date
 
         # Calculate the time one hour from now
@@ -6119,7 +6123,7 @@ class PlayerReadyNotificationAPIView(APIView):
         return notifications
 
     def get(self, request, *args, **kwargs):
-        current_time = timezone.now()
+        current_time = timezone.localtime(timezone.now())
         current_date = date.today()
         one_hour_later = current_time + timedelta(hours=1)
 

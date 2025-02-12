@@ -4,6 +4,7 @@ import time
 import random
 from datetime import datetime
 from django.utils.cache import add_never_cache_headers
+from django.utils.timezone import localtime, now
 
 # Third-party Imports
 import jwt
@@ -14,7 +15,6 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Sum, When, Case, F
-from django.utils import timezone
 from django.utils.translation import activate
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -566,7 +566,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             total_red_cards = tournament_total_red_cards + friendly_total_red_cards
 
             # Fetch Upcoming Games where the player is in the lineup
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGameLineup.objects.filter(
@@ -612,7 +612,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Fetch Finished Games where the player was in the lineup
-            finished_games_date_filter = datetime.now()
+            finished_games_date_filter = localtime(now())
 
             # Friendly Games - Finished
             friendly_finished_games = FriendlyGameLineup.objects.filter(
@@ -770,7 +770,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
 
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGame.objects.filter(
@@ -958,7 +958,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
 
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGame.objects.filter(
@@ -1091,7 +1091,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             total_yellow_cards = cards_stats['total_yellow_cards'] or 0
             total_red_cards = cards_stats['total_red_cards'] or 0
             # 5. Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
             # 6. Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
@@ -1969,7 +1969,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
 
            
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGame.objects.filter(
@@ -2095,7 +2095,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
             ).values_list('game_id', flat=True)
 
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
@@ -2203,7 +2203,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
             time_filter = time_filter or {}
 
             # Fetch upcoming and finished games where the player is in the lineup
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
             upcoming_games = []
             finished_games = []
             # Friendly Games - Upcoming
@@ -2247,7 +2247,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Fetch finished games where the player was in the lineup
-            finished_games_date_filter = datetime.now()
+            finished_games_date_filter = localtime(now())
 
             # Friendly Games - Finished
             friendly_finished_games = FriendlyGameLineup.objects.filter(
@@ -2335,7 +2335,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
 
            
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGame.objects.filter(
@@ -2819,7 +2819,7 @@ class PlayerInfoPage(View):
             total_red_cards = tournament_total_red_cards + friendly_total_red_cards
 
             # Fetch Upcoming Games where the player is in the lineup
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGameLineup.objects.filter(
@@ -2865,7 +2865,7 @@ class PlayerInfoPage(View):
                 })
 
             # Fetch Finished Games where the player was in the lineup
-            finished_games_date_filter = datetime.now()
+            finished_games_date_filter = localtime(now())
 
             # Friendly Games - Finished
             friendly_finished_games = FriendlyGameLineup.objects.filter(
@@ -3023,7 +3023,7 @@ class PlayerInfoPage(View):
             total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
 
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGame.objects.filter(
@@ -3211,7 +3211,7 @@ class PlayerInfoPage(View):
             total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
 
             # Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
             friendly_upcoming_games = FriendlyGame.objects.filter(
@@ -3349,7 +3349,7 @@ class PlayerInfoPage(View):
             total_red_cards = cards_stats['total_red_cards'] or 0
 
             # 5. Fetch Upcoming Games
-            current_datetime = datetime.now()
+            current_datetime = localtime(now())
 
            
 

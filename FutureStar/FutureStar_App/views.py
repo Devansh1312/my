@@ -16,8 +16,6 @@ from .models import *
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.utils.crypto import get_random_string
-from django.utils import timezone
-from datetime import timedelta
 from django.template.loader import render_to_string
 import sys
 from functools import wraps
@@ -31,7 +29,7 @@ from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
 from FutureStarTrainingApp.models import *
 from django.db.models import F, Case, When, IntegerField, Sum, Q
-from django.utils.timezone import now
+from django.utils.timezone import now,localtime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Count
 from django.utils.translation import gettext as _
@@ -6760,7 +6758,7 @@ class TournamentGamesListView(LoginRequiredMixin, View):
 
     def get(self, request):
         # Current time to compare game date and start time
-        current_time = now()
+        current_time = localtime(now())
 
         # Retrieve tournament games with annotated order for categorizing
         tournament_games = TournamentGames.objects.annotate(
@@ -6866,7 +6864,7 @@ class AssignUserToGameView(LoginRequiredMixin, View):
             game = get_object_or_404(TournamentGames, id=game_id)
             user = get_object_or_404(User, id=user_id)
 
-            current_time = now()
+            current_time = localtime(now())
 
             # Check if the game date and time has passed
             if game.game_date < current_time.date() or (
@@ -6956,7 +6954,7 @@ class FriendlyGamesListView(LoginRequiredMixin, View):
 
     def get(self, request):
         # Current time to compare game date and start time
-        current_time = now()
+        current_time = localtime(now())
 
         # Retrieve friendly games with annotated order for categorizing
         friendly_games = FriendlyGame.objects.annotate(
@@ -7012,7 +7010,7 @@ class AssignUserToFriendlyGameView(LoginRequiredMixin, View):
             game = get_object_or_404(FriendlyGame, id=game_id)
             user = get_object_or_404(User, id=user_id)
 
-            current_time = now()
+            current_time = localtime(now())
 
             # Check if the game date and time has passed
             if game.game_date < current_time.date() or (

@@ -390,10 +390,10 @@ class CreateFriendlyGame(APIView):
     def generate_game_number(self):
         """Generate the game number in the format #FSYYGGGGGG."""
         # Get the last two digits of the current year (e.g., 2025 -> 25)
-        current_year = timezone.now().year % 100  # Get last two digits of the year
+        current_year = timezone.localtime(timezone.localtime(timezone.now())).year % 100  # Get last two digits of the year
         
         # Find the last game number for the current year
-        last_game = FriendlyGame.objects.filter(game_date__year=timezone.now().year).order_by('-game_number').first()
+        last_game = FriendlyGame.objects.filter(game_date__year=timezone.localtime(timezone.localtime(timezone.now())).year).order_by('-game_number').first()
 
         # If no games exist for this year, start with game number 1
         if last_game:
@@ -1056,7 +1056,7 @@ class ListOfFridlyGamesForJoin(APIView):
 
         # Get date_type from query parameters
         date_type = int(request.query_params.get('date_type', 0))  # Default to upcoming and ongoing games
-        current_date = timezone.now().date()
+        current_date = timezone.localtime(timezone.localtime(timezone.now())).date()
 
         # Filter games based on date_type
         if date_type == 0:  # Upcoming and ongoing games
