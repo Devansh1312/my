@@ -1821,7 +1821,7 @@ class TournamentGamesAPIView(APIView):
 
             return Response({
                 "status": 1,
-                "message": _("Game updated successfully."),
+                "message": _("Game Finished."),
                 "data": {
                     "id": game.id,
                     "tournament_id": game.tournament_id.id,

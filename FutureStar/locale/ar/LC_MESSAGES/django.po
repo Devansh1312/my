@@ -1522,3 +1522,6 @@ msgstr "تنسيق غير صالح لجدول الأيام."
 
 msgid "New training session: %(training_name)s on %(training_date)s"
 msgstr "جلسة تدريبية جديدة: %(training_name)s في %(training_date)s"
+
+msgid "Game Finished."
+msgstr "انتهت المباراة."
