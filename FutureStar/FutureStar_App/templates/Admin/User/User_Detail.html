@@ -988,4 +988,36 @@
 			}
 		});
 	});
-</script> {% endblock %}
+</script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const editButton = document.getElementById("edit-player-performence");
+	
+		editButton.addEventListener("click", function () {
+			document.querySelectorAll(".editable").forEach(function (span) {
+				let input = span.nextElementSibling;
+				span.style.display = "none";
+				input.style.display = "block";
+			});
+		});
+	
+		document.querySelectorAll(".form-control").forEach(function (input) {
+			input.addEventListener("input", function () {
+				if (parseInt(this.value) > 100) {
+					this.value = 100;
+				} else if (parseInt(this.value) < 0 || isNaN(this.value)) {
+					this.value = 0;
+				}
+			});
+	
+			input.addEventListener("blur", function () {
+				let span = this.previousElementSibling;
+				span.textContent = this.value;
+				span.style.display = "inline";
+				this.style.display = "none";
+			});
+		});
+	});
+	
+</script>
+{% endblock %}
