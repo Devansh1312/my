@@ -221,7 +221,14 @@
                                  <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.friendlygameplayerjersey_set.first %}
+                                          {{ lineup.friendlygameplayerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                          Not Assigned
+                                       {% endif %}
+                                       <!-- {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %}  -->
+                                    </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                            <br>
@@ -237,7 +244,14 @@
                               <tbody> {% for lineup in team_a_lineup %} {% if lineup.lineup_status == 2 %} <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.friendlygameplayerjersey_set.first %}
+                                          {{ lineup.friendlygameplayerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                          Not Assigned
+                                       {% endif %}
+                                       <!-- {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %}  -->
+                                    </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                         </div>
@@ -256,7 +270,14 @@
                               <tbody> {% for lineup in team_b_lineup %} {% if lineup.lineup_status == 3 %} <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.friendlygameplayerjersey_set.first %}
+                                          {{ lineup.friendlygameplayerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                          Not Assigned
+                                       {% endif %}
+                                       <!-- {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %}  -->
+                                    </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                            <br>
@@ -272,7 +293,14 @@
                               <tbody> {% for lineup in team_b_lineup %} {% if lineup.lineup_status == 2 %} <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ lineup.player_id.username }}</td>
-                                    <td> {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %} </td>
+                                    <td>
+                                       {% if lineup.friendlygameplayerjersey_set.first %}
+                                          {{ lineup.friendlygameplayerjersey_set.first.jersey_number }}
+                                       {% else %}
+                                          Not Assigned
+                                       {% endif %}
+                                       <!-- {% if lineup.player_id.playerjersey_set.first %} {{ lineup.player_id.playerjersey_set.first.jersey_number }} {% else %} Not Assigned {% endif %}  -->
+                                    </td>
                                  </tr> {% endif %} {% endfor %} </tbody>
                            </table>
                         </div>

@@ -3228,9 +3228,24 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                 'lastupdate': self.get_last_update(lineup.player_id.id, game_id)
             } for lineup in already_added_lineups]
 
+            managerial_staff = JoinBranch.objects.filter(
+                branch_id=team_id,
+                joinning_type=JoinBranch.MANAGERIAL_STAFF_TYPE
+            ).select_related('user_id')
+
+            managerial_staff_data = [{
+                'id': staff.id,
+                'staff_id': staff.user_id.id,
+                'staff_username': staff.user_id.username,
+                'profile_picture': staff.user_id.profile_picture.url if staff.user_id.profile_picture else None,
+                'joining_type_id': staff.joinning_type,
+                'joining_type_name': staff.get_joinning_type_display()
+            } for staff in managerial_staff]
+
             lineup_data[team_key] = {
                 'player_added_in_lineup': already_added_data,
-                'substitute': substitute_data
+                'substitute': substitute_data,
+                'managerial_staff': managerial_staff_data
             }
 
         return Response({
