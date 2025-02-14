@@ -1151,10 +1151,10 @@ class FriendlyGameDetailAPIView(APIView):
         game_data = {
             "id": game.id,
             "tournament_name": "Friendly Game",
-            "team_a": game.team_a.id if game.team_a else None,
+            "team_a_id": game.team_a.id if game.team_a else None,
             "team_a_name": game.team_a.team_name if game.team_a else None,
             "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
-            "team_b": game.team_b.id if game.team_b else None,
+            "team_b_id": game.team_b.id if game.team_b else None,
             "team_b_name": game.team_b.team_name if game.team_b else None,
             "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None,
             "game_field_id": game.game_field_id.id if game.game_field_id else None,
