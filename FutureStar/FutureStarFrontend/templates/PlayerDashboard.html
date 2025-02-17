@@ -435,6 +435,13 @@
                                         {% if current_language == 'en' %}Match Type{% elif current_language == 'ar' %}نوع المباراة{% endif %}
                                     </th>
                                     <th>
+                                        {% if current_language == 'en' %}
+                                            Game Number
+                                        {% elif current_language == 'ar' %}
+                                           رقم اللعبة      
+                                        {% endif %}
+                                    </th>
+                                    <th>
                                         {% if current_language == 'en' %}Teams{% elif current_language == 'ar' %}الفرق{% endif %}
                                     </th>
                                     <th>
@@ -452,6 +459,7 @@
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ game.game_type }}</td>
+                                        <td>{{ game.game_number }}</td>
                                         <td>
                                             <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
                                             <span> {{ game.team_a_vs_team_b }} </span>
@@ -487,6 +495,13 @@
                                         {% if current_language == 'en' %}Match Type{% elif current_language == 'ar' %}نوع المباراة{% endif %}
                                     </th>
                                     <th>
+                                        {% if current_language == 'en' %}
+                                            Game Number
+                                        {% elif current_language == 'ar' %}
+                                           رقم اللعبة      
+                                        {% endif %}
+                                    </th>
+                                    <th>
                                         {% if current_language == 'en' %}Teams{% elif current_language == 'ar' %}الفرق{% endif %}
                                     </th>
                                     <th>
@@ -504,6 +519,9 @@
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ game.game_type }}</td>
+                                        <td>
+                                            {{ game.game_number }}
+                                        </td>
                                         <td>
                                             <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
                                             <span> {{ game.team_a_vs_team_b }} </span>

@@ -473,99 +473,62 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
     def get_player_stats(self, user, time_filter):
         """
         Fetch player-specific stats, including total wins, losses, draws, games played, goals, assists, and cards
-        from both tournament and friendly games, and also return the upcoming games where the player is already in the lineup.
+        from both tournament and friendly games, considering all branches the user was or is a part of.
+        Also, return upcoming and finished games where the player is in the lineup.
         """
         try:
-            # Fetch the team the player is associated with
-            team = JoinBranch.objects.filter(user_id=user.id).first()
-            if not team:
-                return {"status": 0, "message": "User is not associated with any team."}
+            if time_filter is None:
+                time_filter = {}
+            branches = JoinBranch.objects.filter(user_id=user.id)
+            
+            branch_ids = branches.values_list("branch_id", flat=True)
 
-            team_id = team.branch_id
-
-            # Ensure time_filter is valid
-            time_filter = time_filter or {}
-
-            # Tournament Games
+            # Fetch tournament and friendly games where the user's teams participated
             tournament_games = TournamentGames.objects.filter(
-                (Q(team_a=team_id) | Q(team_b=team_id)),
-                finish=True,
-                **time_filter
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
             )
-            tournament_total_games_played = tournament_games.count()
 
-            tournament_goals = tournament_games.aggregate(
-                total_goals_a=Sum('team_a_goal'),
-                total_goals_b=Sum('team_b_goal')
-            )
-            tournament_total_goals_scored = tournament_goals['total_goals_a'] or 0
-            tournament_total_goals_conceded = tournament_goals['total_goals_b'] or 0
-
-            tournament_total_assists = PlayerGameStats.objects.filter(
-                game_id__in=tournament_games.values_list('id', flat=True)
-            ).aggregate(
-                total_assists=Sum('assists')
-            )['total_assists'] or 0
-
-            tournament_total_wins = tournament_games.filter(winner_id=team_id).count()
-            tournament_total_losses = tournament_games.filter(loser_id=team_id).count()
-            tournament_total_draws = tournament_games.filter(is_draw=True).count()
-
-            tournament_cards_stats = PlayerGameStats.objects.filter(
-                game_id__in=tournament_games.values_list('id', flat=True)
-            ).aggregate(
-                total_yellow_cards=Sum('yellow_cards'),
-                total_red_cards=Sum('red_cards')
-            )
-            tournament_total_yellow_cards = tournament_cards_stats['total_yellow_cards'] or 0
-            tournament_total_red_cards = tournament_cards_stats['total_red_cards'] or 0
-
-            # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                (Q(team_a=team_id) | Q(team_b=team_id)),
-                finish=True,
-                **time_filter
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
             )
-            friendly_total_games_played = friendly_games.count()
 
-            friendly_goals = friendly_games.aggregate(
-                total_goals_a=Sum('team_a_goal'),
-                total_goals_b=Sum('team_b_goal')
+            # Fetch user's stats from PlayerGameStats (tournament games)
+            tournament_player_stats = PlayerGameStats.objects.filter(
+                player_id=user.id, game_id__in=tournament_games.values_list("id", flat=True)
             )
-            friendly_total_goals_scored = friendly_goals['total_goals_a'] or 0
-            friendly_total_goals_conceded = friendly_goals['total_goals_b'] or 0
 
-            friendly_total_assists = FriendlyGamesPlayerGameStats.objects.filter(
-                game_id__in=friendly_games.values_list('id', flat=True)
-            ).aggregate(
-                total_assists=Sum('assists')
-            )['total_assists'] or 0
-
-            friendly_total_wins = friendly_games.filter(winner_id=team_id).count()
-            friendly_total_losses = friendly_games.filter(loser_id=team_id).count()
-            friendly_total_draws = friendly_games.filter(is_draw=True).count()
-
-            friendly_cards_stats = FriendlyGamesPlayerGameStats.objects.filter(
-                game_id__in=friendly_games.values_list('id', flat=True)
-            ).aggregate(
-                total_yellow_cards=Sum('yellow_cards'),
-                total_red_cards=Sum('red_cards')
+            # Fetch user's stats from FriendlyGamesPlayerGameStats (friendly games)
+            friendly_player_stats = FriendlyGamesPlayerGameStats.objects.filter(
+                player_id=user.id, game_id__in=friendly_games.values_list("id", flat=True)
             )
-            friendly_total_yellow_cards = friendly_cards_stats['total_yellow_cards'] or 0
-            friendly_total_red_cards = friendly_cards_stats['total_red_cards'] or 0
 
-            # Combine Stats
-            total_games_played = tournament_total_games_played + friendly_total_games_played
-            total_goals_scored = tournament_total_goals_scored + friendly_total_goals_scored
-            total_goals_conceded = tournament_total_goals_conceded + friendly_total_goals_conceded
-            total_assists = tournament_total_assists + friendly_total_assists
-            total_wins = tournament_total_wins + friendly_total_wins
-            total_losses = tournament_total_losses + friendly_total_losses
-            total_draws = tournament_total_draws + friendly_total_draws
-            total_yellow_cards = tournament_total_yellow_cards + friendly_total_yellow_cards
-            total_red_cards = tournament_total_red_cards + friendly_total_red_cards
+            # Combine stats from both tournament and friendly games
+            total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
 
-            # Fetch Upcoming Games where the player is in the lineup
+            total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
+                        (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
+
+            total_assists = (tournament_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0)
+
+            total_yellow_cards = (tournament_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0) + \
+                                (friendly_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0)
+
+            total_red_cards = (tournament_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0)
+
+            # Calculate wins, losses, and draws across all teams user played for
+            total_wins = tournament_games.filter(winner_id__in=branch_ids).count() + \
+                        friendly_games.filter(winner_id__in=branch_ids).count()
+
+            total_losses = tournament_games.filter(loser_id__in=branch_ids).count() + \
+                        friendly_games.filter(loser_id__in=branch_ids).count()
+
+            total_draws = tournament_games.filter(is_draw=True).count() + \
+                        friendly_games.filter(is_draw=True).count()
+
+            # Fetch upcoming games where the player is in the lineup
+           # Fetch Upcoming Games where the player is in the lineup
             current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
@@ -592,6 +555,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
@@ -604,6 +568,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
@@ -638,6 +603,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -651,6 +617,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -660,24 +627,24 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
-            # Return stats and upcoming games
+
             return {
                 "matchplayed": total_games_played,
                 "win": total_wins,
                 "loss": total_losses,
                 "draw": total_draws,
-                "goals": total_goals_scored,
+                "goals": total_goals,
                 "assists": total_assists,
                 "yellow_card": total_yellow_cards,
                 "red": total_red_cards,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": upcoming_games,
                 "finished_games": finished_games
             }
 
         except Exception as e:
-            return {"status": 0, "message": "Failed to fetch player stats and upcoming games.", "error": str(e)}
+            return {"status": 0, "message": "Failed to fetch player stats.", "error": str(e)}
 
 
     def get_coach_stats(self, user, time_filter=None):
@@ -704,9 +671,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
-            )
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches))
 
             # Calculate Games Stats
             tournament_total_games = tournament_games.count()
@@ -741,8 +706,8 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 tournament_games.aggregate(
                     total_goals=Sum(
                         Case(
-                            When(team_a__in=coach_branches, then='team_b_goal'),
-                            When(team_b__in=coach_branches, then='team_a_goal'),
+                            When(team_a__in=coach_branches, then=F('team_b_goal')),
+                            When(team_b__in=coach_branches, then=F('team_a_goal')),
                             default=0,
                             output_field=models.IntegerField()
                         )
@@ -752,8 +717,8 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 friendly_games.aggregate(
                     total_goals=Sum(
                         Case(
-                            When(team_a__in=coach_branches, then='team_b_goal'),
-                            When(team_b__in=coach_branches, then='team_a_goal'),
+                            When(team_a__in=coach_branches, then=F('team_b_goal')),
+                            When(team_b__in=coach_branches, then=F('team_a_goal')),
                             default=0,
                             output_field=models.IntegerField()
                         )
@@ -761,13 +726,21 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 )['total_goals'] or 0
             )
 
+
             # Cards Stats
             player_stats = PlayerGameStats.objects.filter(
                 team_id__in=coach_branches,
                 **time_filter
             )
-            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
-            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
+            player_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id__in=coach_branches,
+                **time_filter
+            )
+            total_red_cards = (player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0) + \
+                              (player_stats_friendly.aggregate(Sum('red_cards'))['red_cards__sum'] or 0)
+
+            total_yellow_cards = (player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0) + \
+                                 (player_stats_friendly.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0)
 
             # Fetch Upcoming Games
             current_datetime = localtime(now())
@@ -777,14 +750,14 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             # Tournament Games - Upcoming
             tournament_upcoming_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             upcoming_games = []
 
@@ -792,6 +765,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -803,6 +777,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -814,12 +789,12 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             friendly_finished_games = friendly_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             tournament_finished_games = tournament_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             finished_games = []
 
@@ -827,6 +802,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -839,6 +815,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -848,7 +825,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
@@ -859,7 +836,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "yellow_card": total_yellow_cards,
                 "red": total_red_cards,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -954,9 +931,12 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 team_id__in=coach_branches,
                 **time_filter
             )
-            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
-            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
-
+            player_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id__in=coach_branches,
+                **time_filter
+            )
+            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0 + player_stats_friendly.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
+            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0 + player_stats_friendly.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
             # Fetch Upcoming Games
             current_datetime = localtime(now())
 
@@ -965,14 +945,14 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             # Tournament Games - Upcoming
             tournament_upcoming_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             upcoming_games = []
 
@@ -980,6 +960,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -991,6 +972,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -1002,12 +984,12 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             friendly_finished_games = friendly_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             tournament_finished_games = tournament_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             finished_games = []
 
@@ -1015,6 +997,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -1025,6 +1008,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -1032,7 +1016,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
@@ -1040,14 +1024,18 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "win": games_won,
                 "loss": games_lost,
                 "draw": games_drawn,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
+                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
+                "red": total_red_cards if total_red_cards is not None else 0,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
+        
         except Exception as e:
-            return {"status": 0, "message": "Failed to fetch coach stats.", "error": str(e)}
+            return {
+                "status": 0,
+                "error": str(e)
+            }
 
     
     def get_referee_stats(self, user, time_filter=None):
@@ -1066,8 +1054,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 **time_filter
             ).values_list('game_id', flat=True)
 
-           
-
             # 2. Friendly games officiated
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
@@ -1080,24 +1066,36 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
             # 4. Cards stats (yellow and red cards)
             cards_stats = PlayerGameStats.objects.filter(
-                game_id__in=list(tournament_games_officiated) + list(friendly_games_officiated),
+                game_id__in=list(tournament_games_officiated),
                 **time_filter
             ).aggregate(
                 total_yellow_cards=Sum('yellow_cards'),
                 total_red_cards=Sum('red_cards')
             )
 
+            cards_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                game_id__in=list(friendly_games_officiated),
+                **time_filter
+            ).aggregate(
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
+           
+            total_yellow_cards = (cards_stats['total_yellow_cards'] or 0) + (cards_stats_friendly['total_yellow_cards'] or 0)
+            total_red_cards = (cards_stats['total_red_cards'] or 0) + (cards_stats_friendly['total_red_cards'] or 0)
 
-            total_yellow_cards = cards_stats['total_yellow_cards'] or 0
-            total_red_cards = cards_stats['total_red_cards'] or 0
             # 5. Fetch Upcoming Games
             current_datetime = localtime(now())
+
+           
+
             # 6. Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
                 game_date__gte=current_datetime.date(),
                 finish=False
             ).order_by('game_date')[:5]  # Get the next 5 upcoming games
+
 
             # 7. Upcoming friendly games
             upcoming_friendly_games = FriendlyGame.objects.filter(
@@ -1106,29 +1104,38 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 finish=False
             ).order_by('game_date')[:5]  # Get the next 5 upcoming games
 
+        
             upcoming_games = []
 
             # 8. Format upcoming tournament games
             for game in upcoming_tournament_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                 })
 
             # 9. Format upcoming friendly games
             for game in upcoming_friendly_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_end_time": game.game_end_time,
                 })
 
@@ -1149,39 +1156,47 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
             # 11. Format finished tournament games
             for game in finished_tournament_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
 
             # 12. Format finished friendly games
             for game in finished_friendly_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
 
             # 13. Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
-                "yellow_card": total_yellow_cards,
-                "red": total_red_cards,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
+                "red": total_red_cards if total_red_cards is not None else 0,
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games,
             }
         except Exception as e:
@@ -1991,6 +2006,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -2002,6 +2018,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -2026,6 +2043,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -2038,6 +2056,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -2047,11 +2066,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -2117,6 +2136,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -2128,6 +2148,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -2154,6 +2175,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -2166,6 +2188,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -2175,11 +2198,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games,
             }
 
@@ -2227,6 +2250,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date.strftime("%Y-%m-%d"),
@@ -2239,6 +2263,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date.strftime("%Y-%m-%d"),
@@ -2271,6 +2296,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date.strftime("%Y-%m-%d"),
                     "game_start_time": game.game_start_time,
                     "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -2284,6 +2310,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date.strftime("%Y-%m-%d"),
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -2293,11 +2320,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return stats and upcoming games
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
 
@@ -2357,6 +2384,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -2368,6 +2396,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -2392,6 +2421,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -2404,6 +2434,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -2413,11 +2444,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -2726,99 +2757,62 @@ class PlayerInfoPage(View):
     def get_player_stats(self, user, time_filter):
         """
         Fetch player-specific stats, including total wins, losses, draws, games played, goals, assists, and cards
-        from both tournament and friendly games, and also return the upcoming games where the player is already in the lineup.
+        from both tournament and friendly games, considering all branches the user was or is a part of.
+        Also, return upcoming and finished games where the player is in the lineup.
         """
         try:
-            # Fetch the team the player is associated with
-            team = JoinBranch.objects.filter(user_id=user.id).first()
-            if not team:
-                return {"status": 0, "message": "User is not associated with any team."}
+            if time_filter is None:
+                time_filter = {}
+            branches = JoinBranch.objects.filter(user_id=user.id)
+            
+            branch_ids = branches.values_list("branch_id", flat=True)
 
-            team_id = team.branch_id
-
-            # Ensure time_filter is valid
-            time_filter = time_filter or {}
-
-            # Tournament Games
+            # Fetch tournament and friendly games where the user's teams participated
             tournament_games = TournamentGames.objects.filter(
-                (Q(team_a=team_id) | Q(team_b=team_id)),
-                finish=True,
-                **time_filter
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
             )
-            tournament_total_games_played = tournament_games.count()
 
-            tournament_goals = tournament_games.aggregate(
-                total_goals_a=Sum('team_a_goal'),
-                total_goals_b=Sum('team_b_goal')
-            )
-            tournament_total_goals_scored = tournament_goals['total_goals_a'] or 0
-            tournament_total_goals_conceded = tournament_goals['total_goals_b'] or 0
-
-            tournament_total_assists = PlayerGameStats.objects.filter(
-                game_id__in=tournament_games.values_list('id', flat=True)
-            ).aggregate(
-                total_assists=Sum('assists')
-            )['total_assists'] or 0
-
-            tournament_total_wins = tournament_games.filter(winner_id=team_id).count()
-            tournament_total_losses = tournament_games.filter(loser_id=team_id).count()
-            tournament_total_draws = tournament_games.filter(is_draw=True).count()
-
-            tournament_cards_stats = PlayerGameStats.objects.filter(
-                game_id__in=tournament_games.values_list('id', flat=True)
-            ).aggregate(
-                total_yellow_cards=Sum('yellow_cards'),
-                total_red_cards=Sum('red_cards')
-            )
-            tournament_total_yellow_cards = tournament_cards_stats['total_yellow_cards'] or 0
-            tournament_total_red_cards = tournament_cards_stats['total_red_cards'] or 0
-
-            # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                (Q(team_a=team_id) | Q(team_b=team_id)),
-                finish=True,
-                **time_filter
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
             )
-            friendly_total_games_played = friendly_games.count()
 
-            friendly_goals = friendly_games.aggregate(
-                total_goals_a=Sum('team_a_goal'),
-                total_goals_b=Sum('team_b_goal')
+            # Fetch user's stats from PlayerGameStats (tournament games)
+            tournament_player_stats = PlayerGameStats.objects.filter(
+                player_id=user.id, game_id__in=tournament_games.values_list("id", flat=True)
             )
-            friendly_total_goals_scored = friendly_goals['total_goals_a'] or 0
-            friendly_total_goals_conceded = friendly_goals['total_goals_b'] or 0
 
-            friendly_total_assists = FriendlyGamesPlayerGameStats.objects.filter(
-                game_id__in=friendly_games.values_list('id', flat=True)
-            ).aggregate(
-                total_assists=Sum('assists')
-            )['total_assists'] or 0
-
-            friendly_total_wins = friendly_games.filter(winner_id=team_id).count()
-            friendly_total_losses = friendly_games.filter(loser_id=team_id).count()
-            friendly_total_draws = friendly_games.filter(is_draw=True).count()
-
-            friendly_cards_stats = FriendlyGamesPlayerGameStats.objects.filter(
-                game_id__in=friendly_games.values_list('id', flat=True)
-            ).aggregate(
-                total_yellow_cards=Sum('yellow_cards'),
-                total_red_cards=Sum('red_cards')
+            # Fetch user's stats from FriendlyGamesPlayerGameStats (friendly games)
+            friendly_player_stats = FriendlyGamesPlayerGameStats.objects.filter(
+                player_id=user.id, game_id__in=friendly_games.values_list("id", flat=True)
             )
-            friendly_total_yellow_cards = friendly_cards_stats['total_yellow_cards'] or 0
-            friendly_total_red_cards = friendly_cards_stats['total_red_cards'] or 0
 
-            # Combine Stats
-            total_games_played = tournament_total_games_played + friendly_total_games_played
-            total_goals_scored = tournament_total_goals_scored + friendly_total_goals_scored
-            total_goals_conceded = tournament_total_goals_conceded + friendly_total_goals_conceded
-            total_assists = tournament_total_assists + friendly_total_assists
-            total_wins = tournament_total_wins + friendly_total_wins
-            total_losses = tournament_total_losses + friendly_total_losses
-            total_draws = tournament_total_draws + friendly_total_draws
-            total_yellow_cards = tournament_total_yellow_cards + friendly_total_yellow_cards
-            total_red_cards = tournament_total_red_cards + friendly_total_red_cards
+            # Combine stats from both tournament and friendly games
+            total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
 
-            # Fetch Upcoming Games where the player is in the lineup
+            total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
+                        (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
+
+            total_assists = (tournament_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0)
+
+            total_yellow_cards = (tournament_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0) + \
+                                (friendly_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0)
+
+            total_red_cards = (tournament_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0)
+
+            # Calculate wins, losses, and draws across all teams user played for
+            total_wins = tournament_games.filter(winner_id__in=branch_ids).count() + \
+                        friendly_games.filter(winner_id__in=branch_ids).count()
+
+            total_losses = tournament_games.filter(loser_id__in=branch_ids).count() + \
+                        friendly_games.filter(loser_id__in=branch_ids).count()
+
+            total_draws = tournament_games.filter(is_draw=True).count() + \
+                        friendly_games.filter(is_draw=True).count()
+
+            # Fetch upcoming games where the player is in the lineup
+           # Fetch Upcoming Games where the player is in the lineup
             current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
@@ -2845,6 +2839,7 @@ class PlayerInfoPage(View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
@@ -2857,6 +2852,7 @@ class PlayerInfoPage(View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
@@ -2891,6 +2887,7 @@ class PlayerInfoPage(View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -2904,6 +2901,7 @@ class PlayerInfoPage(View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -2913,24 +2911,25 @@ class PlayerInfoPage(View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
-            # Return stats and upcoming games
+
             return {
                 "matchplayed": total_games_played,
                 "win": total_wins,
                 "loss": total_losses,
                 "draw": total_draws,
-                "goals": total_goals_scored,
-                "assists": total_assists if total_assists is not None else 0,
-                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
-                "red": total_red_cards if total_red_cards is not None else 0,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "goals": total_goals,
+                "assists": total_assists,
+                "yellow_card": total_yellow_cards,
+                "red": total_red_cards,
+                "upcoming_games": upcoming_games,
                 "finished_games": finished_games
             }
 
         except Exception as e:
-            return {"status": 0, "message": "Failed to fetch player stats and upcoming games.", "error": str(e)}
+            return {"status": 0, "message": "Failed to fetch player stats.", "error": str(e)}
+
 
 
     def get_coach_stats(self, user, time_filter=None):
@@ -2957,9 +2956,7 @@ class PlayerInfoPage(View):
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
-            )
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches))
 
             # Calculate Games Stats
             tournament_total_games = tournament_games.count()
@@ -2994,8 +2991,8 @@ class PlayerInfoPage(View):
                 tournament_games.aggregate(
                     total_goals=Sum(
                         Case(
-                            When(team_a__in=coach_branches, then='team_b_goal'),
-                            When(team_b__in=coach_branches, then='team_a_goal'),
+                            When(team_a__in=coach_branches, then=F('team_b_goal')),
+                            When(team_b__in=coach_branches, then=F('team_a_goal')),
                             default=0,
                             output_field=models.IntegerField()
                         )
@@ -3005,8 +3002,8 @@ class PlayerInfoPage(View):
                 friendly_games.aggregate(
                     total_goals=Sum(
                         Case(
-                            When(team_a__in=coach_branches, then='team_b_goal'),
-                            When(team_b__in=coach_branches, then='team_a_goal'),
+                            When(team_a__in=coach_branches, then=F('team_b_goal')),
+                            When(team_b__in=coach_branches, then=F('team_a_goal')),
                             default=0,
                             output_field=models.IntegerField()
                         )
@@ -3014,13 +3011,21 @@ class PlayerInfoPage(View):
                 )['total_goals'] or 0
             )
 
+
             # Cards Stats
             player_stats = PlayerGameStats.objects.filter(
                 team_id__in=coach_branches,
                 **time_filter
             )
-            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
-            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
+            player_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id__in=coach_branches,
+                **time_filter
+            )
+            total_red_cards = (player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0) + \
+                              (player_stats_friendly.aggregate(Sum('red_cards'))['red_cards__sum'] or 0)
+
+            total_yellow_cards = (player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0) + \
+                                 (player_stats_friendly.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0)
 
             # Fetch Upcoming Games
             current_datetime = localtime(now())
@@ -3030,14 +3035,14 @@ class PlayerInfoPage(View):
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             # Tournament Games - Upcoming
             tournament_upcoming_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             upcoming_games = []
 
@@ -3045,6 +3050,7 @@ class PlayerInfoPage(View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -3056,6 +3062,7 @@ class PlayerInfoPage(View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -3067,12 +3074,12 @@ class PlayerInfoPage(View):
             friendly_finished_games = friendly_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             tournament_finished_games = tournament_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('game_number')[:5]
 
             finished_games = []
 
@@ -3080,6 +3087,7 @@ class PlayerInfoPage(View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -3092,6 +3100,7 @@ class PlayerInfoPage(View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
                     "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
@@ -3101,7 +3110,7 @@ class PlayerInfoPage(View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
@@ -3109,10 +3118,10 @@ class PlayerInfoPage(View):
                 "win": games_won,
                 "loss": games_lost,
                 "draw": games_drawn,
-                "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
-                "red": total_red_cards if total_red_cards is not None else 0,
+                "yellow_card": total_yellow_cards,
+                "red": total_red_cards,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -3207,9 +3216,12 @@ class PlayerInfoPage(View):
                 team_id__in=coach_branches,
                 **time_filter
             )
-            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
-            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
-
+            player_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id__in=coach_branches,
+                **time_filter
+            )
+            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0 + player_stats_friendly.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
+            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0 + player_stats_friendly.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
             # Fetch Upcoming Games
             current_datetime = localtime(now())
 
@@ -3218,14 +3230,14 @@ class PlayerInfoPage(View):
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             # Tournament Games - Upcoming
             tournament_upcoming_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 game_date__gte=current_datetime.date(),
                 finish=False
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             upcoming_games = []
 
@@ -3233,6 +3245,7 @@ class PlayerInfoPage(View):
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -3244,6 +3257,7 @@ class PlayerInfoPage(View):
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
@@ -3255,12 +3269,12 @@ class PlayerInfoPage(View):
             friendly_finished_games = friendly_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             tournament_finished_games = tournament_games.filter(
                 game_date__lt=current_datetime.date(),
                 finish=True
-            ).order_by('game_id__game_date')[:5]
+            ).order_by('-game_number')[:5]
 
             finished_games = []
 
@@ -3268,6 +3282,7 @@ class PlayerInfoPage(View):
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -3278,6 +3293,7 @@ class PlayerInfoPage(View):
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number":game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -3285,7 +3301,7 @@ class PlayerInfoPage(View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
@@ -3296,13 +3312,15 @@ class PlayerInfoPage(View):
                 "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
                 "red": total_red_cards if total_red_cards is not None else 0,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games
             }
         
         except Exception as e:
-            return {"status": 0, "message": "Failed to fetch coach stats.", "error": str(e)}
-
+            return {
+                "status": 0,
+                "error": str(e)
+            }
     
     def get_referee_stats(self, user, time_filter=None):
         """
@@ -3326,28 +3344,29 @@ class PlayerInfoPage(View):
                 officials_type_id__in=[2, 3, 4, 5],
                 **time_filter
             ).values_list('game_id', flat=True)
-
         
-
             # 3. Calculate total games officiated
             total_games_officiated = len(tournament_games_officiated) + len(friendly_games_officiated)
 
-           
-
             # 4. Cards stats (yellow and red cards)
             cards_stats = PlayerGameStats.objects.filter(
-                game_id__in=list(tournament_games_officiated) + list(friendly_games_officiated),
+                game_id__in=list(tournament_games_officiated),
                 **time_filter
             ).aggregate(
                 total_yellow_cards=Sum('yellow_cards'),
                 total_red_cards=Sum('red_cards')
             )
 
-           
+            cards_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                game_id__in=list(friendly_games_officiated),
+                **time_filter
+            ).aggregate(
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
 
-            total_yellow_cards = cards_stats['total_yellow_cards'] or 0
-            total_red_cards = cards_stats['total_red_cards'] or 0
-
+            total_yellow_cards = (cards_stats['total_yellow_cards'] or 0) + (cards_stats_friendly['total_yellow_cards'] or 0)
+            total_red_cards = (cards_stats['total_red_cards'] or 0) + (cards_stats_friendly['total_red_cards'] or 0)
             # 5. Fetch Upcoming Games
             current_datetime = localtime(now())
 
@@ -3373,25 +3392,33 @@ class PlayerInfoPage(View):
 
             # 8. Format upcoming tournament games
             for game in upcoming_tournament_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 upcoming_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                 })
 
             # 9. Format upcoming friendly games
             for game in upcoming_friendly_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 upcoming_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_end_time": game.game_end_time,
                 })
 
@@ -3412,39 +3439,47 @@ class PlayerInfoPage(View):
 
             # 11. Format finished tournament games
             for game in finished_tournament_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 finished_games.append({
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
 
             # 12. Format finished friendly games
             for game in finished_friendly_games:
+                team_a_logo = game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None
+                team_b_logo = game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None
+
                 finished_games.append({
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
+                    "game_number": game.game_number,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
-                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
-                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "team_a_logo": team_a_logo,
+                    "team_b_logo": team_b_logo,
                     "game_end_time": game.game_end_time,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
 
             # 13. Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
 
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
                 "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
                 "red": total_red_cards if total_red_cards is not None else 0,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
                 "finished_games": finished_games,
             }
         except Exception as e:
