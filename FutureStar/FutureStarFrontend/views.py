@@ -6,6 +6,10 @@ from datetime import datetime
 from django.utils.cache import add_never_cache_headers
 from django.utils.timezone import localtime, now
 
+#################
+from django.utils.translation import gettext as _
+from django.utils.translation import activate
+
 # Third-party Imports
 import jwt
 import requests
@@ -326,10 +330,7 @@ class ContactPage(View):
         try:
             cmsdata = cms_pages.objects.get(id=8)  # Fetch the CMS data
         except cms_pages.DoesNotExist:
-            cmsdata = None  # Handle case where the CMS data doesn't exist
-
-        language_from_url = request.GET.get('Language', None)
-        
+            cmsdata = None  # Handle case where the CMS data doesn't exist        
         language_from_url = get_language(request)
 
         context = {
@@ -344,9 +345,13 @@ class ContactPage(View):
         phone = request.POST.get("phone", "").strip()
         email = request.POST.get("email", "").strip()
         message = request.POST.get("message", "").strip()
-        language_from_url = request.GET.get('Language', None)
-        
+
         language_from_url = get_language(request)
+        
+        # Activate the selected language
+        if language_from_url in ['en', 'ar']:
+            activate(language_from_url)
+
         try:
             cmsdata = cms_pages.objects.get(id=8)  # Fetch CMS data again for context
         except cms_pages.DoesNotExist:
@@ -354,12 +359,12 @@ class ContactPage(View):
 
         # If no contact form fields are filled, assume the user is only changing the language
         if not fullname and not phone and not email and not message:
-            messages.success(request, "Language changed successfully!")
+            messages.success(request, _("Language changed successfully!"))
             return redirect('contact')  # Redirect after language change
 
         # Validation: Ensure all fields are filled
         if not fullname or not phone or not email or not message:
-            messages.error(request, "All fields are required for submitting an inquiry.")
+            messages.error(request, _("All fields are required for submitting an inquiry."))
             context = {
                 "current_language": language_from_url,
                 "cmsdata": cmsdata,
@@ -375,7 +380,7 @@ class ContactPage(View):
         )
 
         # Success message and redirect after submission
-        messages.success(request, "Inquiry submitted successfully.")
+        messages.success(request, _("Inquiry submitted successfully."))
         return redirect("contact")
 
 ##############################################   PrivacyPolicyPage   ########################################################
@@ -444,11 +449,7 @@ class TermsAndConditionsPage(View):
 class PlayerDashboardPage(LoginRequiredMixin, View):
     
     def get_user_related_data(self, user, time_filter=None):
-        """
-        Fetch user-related data such as event bookings, teams, stats, and upcoming/latest games
-        based on the user's role.
-        """
-        # Fetch event bookings
+        
         # Fetch teams associated with the user
         teams = JoinBranch.objects.filter(user_id=user.id)
 
@@ -471,11 +472,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
     
 
     def get_player_stats(self, user, time_filter):
-        """
-        Fetch player-specific stats, including total wins, losses, draws, games played, goals, assists, and cards
-        from both tournament and friendly games, considering all branches the user was or is a part of.
-        Also, return upcoming and finished games where the player is in the lineup.
-        """
         try:
             if time_filter is None:
                 time_filter = {}
@@ -527,8 +523,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             total_draws = tournament_games.filter(is_draw=True).count() + \
                         friendly_games.filter(is_draw=True).count()
 
-            # Fetch upcoming games where the player is in the lineup
-           # Fetch Upcoming Games where the player is in the lineup
             current_datetime = localtime(now())
 
             # Friendly Games - Upcoming
@@ -644,14 +638,14 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             }
 
         except Exception as e:
-            return {"status": 0, "message": "Failed to fetch player stats.", "error": str(e)}
+            return {
+                "status": 0,
+                "message": _("Failed to fetch player stats."),
+                "error": str(e),
+            }
 
 
     def get_coach_stats(self, user, time_filter=None):
-        """
-        Fetch coach-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the coach's branches.
-        """
         try:
             # Default time_filter to an empty dictionary if None
             if time_filter is None:
@@ -1225,8 +1219,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
 
 ##############################################   LoginPage   ########################################################
-
-
 class LoginPage(View):
 
     def authenticate_username_or_phone(self, username_or_phone, password):
@@ -1254,6 +1246,8 @@ class LoginPage(View):
 
         # Proceed if user is not authenticated
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
         username_or_phone = request.COOKIES.get('username_or_phone', '')
         password = request.COOKIES.get('password', '')
         try:
@@ -1274,6 +1268,8 @@ class LoginPage(View):
     def post(self, request, *args, **kwargs):
         # Handle language change
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
 
         # Fetch login type
         login_type = int(request.POST.get('login_type', 1))
@@ -1288,7 +1284,7 @@ class LoginPage(View):
                 "current_language": language_from_url,
                 "cmsdata": cmsdata,
             }
-            messages.success(request, "Language changed successfully!")
+            messages.success(request, _("Language changed successfully!"))
             return render(request, "login.html", context)
 
         # Proceed with the login process
@@ -1314,17 +1310,16 @@ class LoginPage(View):
 
                     user.last_login = timezone.now()
                     user.save()
-                    messages.success(request, "Login successful!")
+                    messages.success(request, _("Login successful!"))
                     return redirect('Dashboard' if user.role_id == 1 else 'player-dashboard')
                 else:
-                    messages.error(request, "Account is inactive.")
+                    messages.error(request, _("Account is inactive."))
             else:
-                messages.error(request, "Invalid credentials.")
+                messages.error(request, _("Invalid credentials."))
 
         return redirect('login')
 
 ######################################### Forgot Password ########################################################
-
 class ForgotPasswordPage(View):
     def get(self, request, *args, **kwargs):
         language_from_url = get_language(request)
@@ -1336,14 +1331,16 @@ class ForgotPasswordPage(View):
     def post(self, request, *args, **kwargs):
         phone = request.POST.get("phone").strip()
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
 
         if not phone:
-            messages.error(request, "Please enter a phone number.")
+            messages.error(request, _("Please enter a phone number."))
             return render(request, "forgot_password.html", {"current_language": language_from_url})
 
         user = User.objects.filter(phone=phone).first()
         if not user:
-            messages.error(request, "Phone number not found.")
+            messages.error(request, _("Phone number not found."))
             return render(request, "forgot_password.html", {"current_language": language_from_url})
 
         # Generate and save OTP
@@ -1356,14 +1353,17 @@ class ForgotPasswordPage(View):
         request.session['language'] = language_from_url
         request.session['current_language'] = language_from_url 
 
-        messages.success(request, f"OTP {otp} sent to your phone number.")
+        messages.success(request, _("OTP {otp} sent to your phone number.").format(otp=otp))
         return redirect("verify_forgot_password_otp")
 
 
+####################### Verify Forgot Password ##############
 class verify_forgot_password_otp(View):
     def get(self, request, *args, **kwargs):
         phone = request.session.get("reset_phone")
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
 
         # Store language in session
         request.session["language"] = language_from_url
@@ -1371,7 +1371,7 @@ class verify_forgot_password_otp(View):
         request.session.save()
 
         if not phone:
-            messages.error(request, "Session expired. Please try again.")
+            messages.error(request, _("Session expired. Please try again."))
             return redirect("forgot_password")
         
         context = {
@@ -1385,7 +1385,9 @@ class verify_forgot_password_otp(View):
         phone = request.session.get("reset_phone")
         otp = request.POST.get("otp")
         language_from_url = get_language(request)
-
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+        
         # Store language in session
         request.session["language"] = language_from_url
         request.session["current_language"] = language_from_url
@@ -1393,7 +1395,7 @@ class verify_forgot_password_otp(View):
 
         user = User.objects.filter(phone=phone, otp=otp).first()
         if not user:
-            messages.error(request, "Invalid OTP. Please try again.")
+            messages.error(request, _("Invalid OTP. Please try again."))
             context = {
                 "phone": phone,
                 "current_language": language_from_url,
@@ -1403,10 +1405,13 @@ class verify_forgot_password_otp(View):
         return redirect("reset_password")
 
 
+################ Reset Password Page ########################
 class ResetPasswordPage(View):
     def get(self, request, *args, **kwargs):
         phone = request.session.get("reset_phone")
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
 
         # Store language in session
         request.session["language"] = language_from_url
@@ -1414,7 +1419,7 @@ class ResetPasswordPage(View):
         request.session.save()
 
         if not phone:
-            messages.error(request, "Session expired. Please try again.")
+            messages.error(request, _("Session expired. Please try again."))
             return redirect("forgot_password")
 
         context = {
@@ -1425,7 +1430,8 @@ class ResetPasswordPage(View):
 
     def post(self, request, *args, **kwargs):
         language_from_url = get_language(request)
-
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
         # Store language in session
         request.session["language"] = language_from_url
         request.session["current_language"] = language_from_url
@@ -1436,7 +1442,7 @@ class ResetPasswordPage(View):
         confirm_password = request.POST.get("confirm_password").strip()
 
         if password != confirm_password:
-            messages.error(request, "Passwords do not match.")
+            messages.error(request, _("Passwords do not match."))
             context = {
                 "phone": phone,
                 "current_language": language_from_url,
@@ -1445,7 +1451,7 @@ class ResetPasswordPage(View):
 
         user = User.objects.filter(phone=phone).first()
         if not user:
-            messages.error(request, "Invalid phone number.")
+            messages.error(request, _("Invalid phone number."))
             return redirect("forgot_password")
 
         # Save new password securely
@@ -1456,7 +1462,7 @@ class ResetPasswordPage(View):
         # Clear session after password reset
         del request.session["reset_phone"]
 
-        messages.success(request, "Password reset successful. Please log in.")
+        messages.success(request, _("Password reset successful. Please log in."))
         return redirect("login")
 
 ########################################## Generate a random 6-digit OTP######################################################
@@ -1466,6 +1472,9 @@ def generate_otp():
 class RegisterPage(View):
     def get(self, request, *args, **kwargs):
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
         # Fetching specific CMS data
         try:
             cmsdata = cms_pages.objects.get(id=13)
@@ -1481,23 +1490,20 @@ class RegisterPage(View):
     def post(self, request, *args, **kwargs):
         register_type = request.POST.get("register_type")
         language_from_url = get_language(request)
-        
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
         if register_type == "1":  # Normal registration
             return self.handle_normal_registration(request)
         
         else:  # Google or Apple sign-up
-            messages.error(request, "Username or phone number already exists.")
+            messages.error(request, _("Username or phone number already exists."))
             return redirect("register")
 
     def handle_normal_registration(self, request):
-        language_from_url = request.GET.get('Language', None)
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
 
         context = {
             "current_language": language_from_url,
@@ -1510,12 +1516,12 @@ class RegisterPage(View):
 
         # Validate password match
         if password != confirm_password:
-            messages.error(request, "Passwords do not match!")
+            messages.error(request, _("Passwords do not match!"))
             return redirect("register")
 
         # Check if username or phone already exists in the User table
         if User.objects.filter(Q(username=username) | Q(phone=phone)).exists():
-            messages.error(request, "Username or phone number already exists.")
+            messages.error(request, _("Username or phone number already exists."))
             return redirect("register")
 
         # Generate OTP and save user details in OTPSave table
@@ -1528,7 +1534,7 @@ class RegisterPage(View):
         request.session['phone'] = phone
         request.session['username'] = username
         request.session['password'] = password  # Store password in the session temporarily
-        messages.success(request, "Your OTP is {}".format(otp))
+        messages.success(request, _("Your OTP is {}").format(otp))
 
         
         # Instead of passing context, include language as GET parameter
@@ -1536,43 +1542,48 @@ class RegisterPage(View):
 #################################### OTP Verification #######################################
 class OTPVerificationView(View):
     def get(self, request, *args, **kwargs):
+        # Retrieve language from URL and activate it
         language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
+        # Pass the current language to the context
         context = {
-            "current_language":language_from_url,
+            "current_language": language_from_url,
         }
 
-        return render(request, "otp_verification.html",context)
+        return render(request, "otp_verification.html", context)
 
     def post(self, request, *args, **kwargs):
         language_from_url = get_language(request)
-        context = {
-            "current_language":language_from_url,
-        }
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
         otp_input = request.POST.get("otp")
 
-        # Retrieve the saved username and phone from the session
+        # Retrieve session data for username, phone, password, and email
         username = request.session.get('username')
         phone = request.session.get('phone')
         password = request.session.get('password')  # Retrieve password from session
-        email = request.session.get('email')  # Retrieve password from session
+        email = request.session.get('email')  # Retrieve email from session
 
         try:
             otp_record = OTPSave.objects.get(OTP=otp_input, phone=phone)
         except OTPSave.DoesNotExist:
-            messages.error(request, "Invalid OTP. Please try again.")
+            messages.error(request, _("Invalid OTP. Please try again."))
             return redirect("verify_otp")
 
-        # If OTP is valid, create a new user in the User table
+        # If OTP is valid, create the user
         user = User.objects.create(
             username=username,
             phone=phone,
-            email=email,  # Make sure to handle email properly
+            email=email,  # Handle email properly
             role_id=5,
         )
         user.set_password(password)  # Use the password stored in the session
         user.save()
 
-        # Delete the OTP record now that the user is registered
+        # Delete OTP record now that the user is registered
         otp_record.delete()
 
         # Clear session data
@@ -1580,7 +1591,7 @@ class OTPVerificationView(View):
         request.session.pop('password', None)
         request.session.pop('phone', None)
 
-        messages.success(request, "Registration successful! Please log in.")
+        messages.success(request, _("Registration successful! Please log in."))
         return redirect("login")
 
 
@@ -1607,6 +1618,10 @@ class UserInfoUpdateView(View):
         
         # Use the get_language function to retrieve and update language
         language_from_url = get_language(request)
+
+        # Activate the selected language
+        if language_from_url in ['en', 'ar']:
+            activate(language_from_url)
 
         # Setting the language context for the template
         context = {
@@ -1635,13 +1650,17 @@ class UserInfoUpdateView(View):
             # Use the get_language function to retrieve and update language
             language_from_url = get_language(request)
 
+            # Activate the selected language
+            if language_from_url in ['en', 'ar']:
+                activate(language_from_url)
+
             # Validate if the username is already taken
             if User.objects.filter(username=username).exists():
-                form.add_error('username', "This username is already taken. Please try a different username.")
+                form.add_error('username', _("This username is already taken. Please try a different username."))
                 return render(request, self.template_name, {'form': form})
 
             if User.objects.filter(phone=phone).exists():
-                messages.error(request, "This phone number is already registered. Please try a different number.")
+                messages.error(request, _("This phone number is already registered. Please try a different number."))
                 return redirect("user_info_update")
 
             # Generate OTP and save it
@@ -1655,7 +1674,7 @@ class UserInfoUpdateView(View):
             request.session['username'] = username
             request.session['email'] = email
 
-            messages.success(request, f"Your OTP is {otp}")
+            messages.success(request, _("Your OTP is") + f" {otp}")
             return redirect(f"{reverse_lazy('google_verify_otp')}?Language={language_from_url}")
         else:
             # Display form-specific errors
@@ -1665,10 +1684,15 @@ class UserInfoUpdateView(View):
 
             return render(request, self.template_name, {'form': form})
 
+################## OTP Verification ##############################################
 class googleOTPVerificationView(View):
     def get(self, request, *args, **kwargs):
         # Use the get_language function to retrieve and update language
         language_from_url = get_language(request)
+
+        # Activate the selected language
+        if language_from_url in ['en', 'ar']:
+            activate(language_from_url)
 
         context = {
             "current_language": language_from_url,
@@ -1680,6 +1704,10 @@ class googleOTPVerificationView(View):
         # Use the get_language function to retrieve and update language
         language_from_url = get_language(request)
 
+        # Activate the selected language
+        if language_from_url in ['en', 'ar']:
+            activate(language_from_url)
+
         otp_input = request.POST.get("otp")
 
         # Retrieve session data
@@ -1688,34 +1716,34 @@ class googleOTPVerificationView(View):
         email = request.session.get('email')
 
         if not all([username, phone, email]):
-            messages.error(request, "Missing session data, please try again.")
+            messages.error(request, _("Missing session data, please try again."))
             return redirect("user_info_update")
 
         # Validate email, phone, and username
         if User.objects.filter(email=email).exists():
-            messages.error(request, "This email is already registered. Please try a different email.")
+            messages.error(request, _("This email is already registered. Please try a different email."))
             return redirect("user_info_update")
         
         if User.objects.filter(phone=phone).exists():
-            messages.error(request, "This phone number is already registered. Please try a different number.")
+            messages.error(request, _("This phone number is already registered. Please try a different number."))
             return redirect("user_info_update")
         
         if User.objects.filter(username=username).exists():
-            messages.error(request, "This username is already taken. Please try a different username.")
+            messages.error(request, _("This username is already taken. Please try a different username."))
             return redirect("user_info_update")
         
         if Team.objects.filter(team_username=username).exists():
-            messages.error(request, "This username is already taken by a team. Please try a different username.")
+            messages.error(request, _("This username is already taken by a team. Please try a different username."))
             return redirect("user_info_update")
         
         if TrainingGroups.objects.filter(group_username=username).exists():
-            messages.error(request, "This username is already taken by a training group. Please try a different username.")
+            messages.error(request, _("This username is already taken by a training group. Please try a different username."))
             return redirect("user_info_update")
 
         try:
             otp_record = OTPSave.objects.get(OTP=otp_input, phone=phone)
         except OTPSave.DoesNotExist:
-            messages.error(request, "Invalid OTP. Please try again.")
+            messages.error(request, _("Invalid OTP. Please try again."))
             return redirect("google_verify_otp")
 
         # Create user if OTP is valid
@@ -1738,7 +1766,7 @@ class googleOTPVerificationView(View):
         request.session.pop('phone', None)
         request.session.pop('email', None)
 
-        messages.success(request, "Registration successful! Please log in.")
+        messages.success(request, _("Registration successful! Please log in."))
         return redirect("login")
 
 
@@ -1758,12 +1786,18 @@ class GoogleAuthView(View):
         return redirect(auth_url)
 
 
+###################### Google Call Backup ##########################################################
 class GoogleCallbackView(View):
     def get(self, request):
+        language_from_url = get_language(request)
+
+        # Activate the selected language
+        if language_from_url in ['en', 'ar']:
+            activate(language_from_url)
         code = request.GET.get('code')
         if not code:
-            return JsonResponse({"error": "Authorization code not provided"}, status=400)
-        language_from_url = get_language(request)
+            return JsonResponse({"error": _("Authorization code not provided")}, status=400)
+
         token_url = "https://oauth2.googleapis.com/token"
         client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
         client_secret = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
@@ -1781,7 +1815,7 @@ class GoogleCallbackView(View):
         token_json = token_response.json()
 
         if "access_token" not in token_json:
-            return JsonResponse({"error": "Failed to retrieve access token", "details": token_json}, status=400)
+            return JsonResponse({"error": _("Failed to retrieve access token"), "details": token_json}, status=400)
 
         access_token = token_json["access_token"]
 
@@ -1792,17 +1826,19 @@ class GoogleCallbackView(View):
 
         email = user_info_json.get("email")
         if not email:
-            return JsonResponse({"error": "Failed to retrieve email"}, status=400)
+            return JsonResponse({"error": _("Failed to retrieve email")}, status=400)
 
         user = User.objects.filter(email=email).first()
         if user:
             login(request, user)  # Assuming you have Django's authentication set up
-            messages.success(request, "Welcome back!")
+            messages.success(request, _("Welcome back!"))
             return redirect("player-dashboard")  # Or wherever you want to redirect after login
 
+        # Save the email in the session
         request.session['email'] = email
         request.session.save()  # Explicitly save the session to persist email
 
+        # Redirect to user info update page with language query parameter
         return HttpResponseRedirect(f"{reverse_lazy('user_info_update')}?Language={language_from_url}")
 
 ###################### Apple Login and Signup #########################################################
@@ -1827,23 +1863,27 @@ class AppleAuthView(View):
         )
         return redirect(auth_url)
 
+################### APPLE CALL BACK ##########################
 @method_decorator(csrf_exempt, name='dispatch')
 class AppleCallbackView(View):
     def post(self, request):
         code = request.POST.get('code')
         if not code:
-            return JsonResponse({"error": "Authorization code not provided"}, status=400)
+            return JsonResponse({"error": _("Authorization code not provided")}, status=400)
 
         return self.handle_auth_callback(request, code)
 
     def handle_auth_callback(self, request, code):
-        # Get language from session
+        # Get language from session or request
         language_from_url = get_language(request)
+
+        # Activate the selected language
+        if language_from_url in ['en', 'ar']:
+            activate(language_from_url)
 
         # Generate client secret
         private_key = os.getenv("APPLE_PRIVATE_KEY")
-        # Ensure the key is formatted correctly by stripping unwanted whitespace
-        private_key = private_key.strip()
+        private_key = private_key.strip()  # Ensure the key is formatted correctly
         client_id = os.getenv("APPLE_CLIENT_ID")
         team_id = os.getenv("APPLE_TEAM_ID")
         key_id = os.getenv("APPLE_KEY_ID")
@@ -1879,7 +1919,7 @@ class AppleCallbackView(View):
         token_json = token_response.json()
 
         if "id_token" not in token_json:
-            return JsonResponse({"error": "Failed to retrieve tokens", "details": token_json}, status=400)
+            return JsonResponse({"error": _("Failed to retrieve tokens"), "details": token_json}, status=400)
 
         # Decode the ID token to get the user's information
         id_token = token_json["id_token"]
@@ -1887,15 +1927,16 @@ class AppleCallbackView(View):
         email = decoded_token.get("email")
 
         if not email:
-            return JsonResponse({"error": "Failed to retrieve email from ID token"}, status=400)
+            return JsonResponse({"error": _("Failed to retrieve email from ID token")}, status=400)
 
         # Check if the email is already registered
         user = User.objects.filter(email=email).first()
         if user:
             # If user exists, log them in
             login(request, user)
-            messages.success(request, "Welcome back!")
+            messages.success(request, _("Welcome back!"))
             return redirect("player-dashboard")
+
         # Save the email in the session
         request.session['email'] = email
         request.session['language'] = language_from_url
