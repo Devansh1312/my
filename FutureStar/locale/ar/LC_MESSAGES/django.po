@@ -1525,3 +1525,102 @@ msgstr "جلسة تدريبية جديدة: %(training_name)s في %(training_da
 
 msgid "Game Finished."
 msgstr "انتهت المباراة."
+
+msgid "Language changed successfully!"
+msgstr "تم تغيير اللغة بنجاح!"
+
+msgid "All fields are required for submitting an inquiry."
+msgstr "جميع الحقول مطلوبة لتقديم الاستفسار."
+
+msgid "Inquiry submitted successfully."
+msgstr "تم تقديم الاستفسار بنجاح."
+
+msgid "Failed to fetch player stats."
+msgstr "فشل في جلب إحصائيات اللاعب."
+
+msgid "Missing session data, please try again."
+msgstr "بيانات الجلسة مفقودة، يرجى المحاولة مرة أخرى."
+
+msgid "This email is already registered. Please try a different email."
+msgstr "تم تسجيل هذا البريد الإلكتروني بالفعل. يرجى المحاولة ببريد إلكتروني مختلف."
+
+msgid "This phone number is already registered. Please try a different number."
+msgstr "تم تسجيل هذا الرقم الهاتف بالفعل. يرجى المحاولة برقم هاتف مختلف."
+
+msgid "This username is already taken. Please try a different username."
+msgstr "تم أخذ هذا الاسم المستخدم بالفعل. يرجى المحاولة باسم مستخدم مختلف."
+
+msgid "This username is already taken by a team. Please try a different username."
+msgstr "تم أخذ هذا الاسم المستخدم بالفعل من قبل فريق. يرجى المحاولة باسم مستخدم مختلف."
+
+msgid "This username is already taken by a training group. Please try a different username."
+msgstr "تم أخذ هذا الاسم المستخدم بالفعل من قبل مجموعة تدريبية. يرجى المحاولة باسم مستخدم مختلف."
+
+msgid "Invalid OTP. Please try again."
+msgstr "رمز التحقق غير صالح. يرجى المحاولة مرة أخرى."
+
+msgid "Registration successful! Please log in."
+msgstr "تم التسجيل بنجاح! يرجى تسجيل الدخول."
+
+msgid "Authorization code not provided"
+msgstr "رمز التفويض غير موفر"
+
+msgid "Failed to retrieve access token"
+msgstr "فشل في استرجاع رمز الوصول"
+
+msgid "Failed to retrieve email"
+msgstr "فشل في استرجاع البريد الإلكتروني"
+
+msgid "Welcome back!"
+msgstr "مرحبًا بعودتك!"
+
+msgid "Failed to retrieve tokens"
+msgstr "فشل في استرجاع الرموز"
+
+msgid "Failed to retrieve email from ID token"
+msgstr "فشل في استرجاع البريد الإلكتروني من رمز الهوية"
+
+msgid "Username or phone number already exists."
+msgstr "اسم المستخدم أو رقم الهاتف موجود بالفعل."
+
+msgid "Passwords do not match!"
+msgstr "كلمات المرور غير متطابقة!"
+
+msgid "Your OTP is"
+msgstr "رمز التحقق الخاص بك هو"
+
+msgid "Failed to retrieve email."
+msgstr "فشل في استرجاع البريد الإلكتروني."
+
+msgid "Your OTP is {}"
+msgstr "رمز التحقق الخاص بك هو {}"
+
+msgid "Login successful!"
+msgstr "تم تسجيل الدخول بنجاح!"
+
+msgid "Account is inactive."
+msgstr "الحساب غير نشط."
+
+msgid "Invalid credentials."
+msgstr "بيانات الاعتماد غير صحيحة."
+
+msgid "Please enter a phone number."
+msgstr "يرجى إدخال رقم الهاتف."
+
+msgid "Phone number not found."
+msgstr "رقم الهاتف غير موجود."
+
+msgid "OTP {otp} sent to your phone number."
+msgstr "تم إرسال OTP {otp} إلى رقم هاتفك."
+
+msgid "Session expired. Please try again."
+msgstr "انتهت الجلسة. يرجى المحاولة مرة أخرى."
+
+msgid "Passwords do not match."
+msgstr "كلمات المرور غير متطابقة."
+
+msgid "Invalid phone number."
+msgstr "رقم الهاتف غير صالح."
+
+msgid "Password reset successful. Please log in."
+msgstr "تم إعادة تعيين كلمة المرور بنجاح. يرجى تسجيل الدخول."
