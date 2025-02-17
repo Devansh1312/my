@@ -4950,62 +4950,54 @@ class UserRoleStatsAPIView(APIView):
 
     def get_player_stats(self, user, time_filter):
         try:
-            # Tournament games
-            tournament_lineups = Lineup.objects.filter(player_id=user.id, **time_filter)
-            tournament_team_ids = list(tournament_lineups.values_list('team_id', flat=True))
-            tournament_game_ids = list(tournament_lineups.values_list('game_id', flat=True))
-            tournament_games = TournamentGames.objects.filter(id__in=tournament_game_ids)
+           # Check if the user is associated with any team
+            branches = JoinBranch.objects.filter(user_id=user.id)
+            
+            branch_ids = branches.values_list("branch_id", flat=True)
 
-            tournament_total_games_played = tournament_games.count()
-            tournament_games_won = tournament_games.filter(
-                Q(team_a__in=tournament_team_ids, winner_id=F('team_a')) |
-                Q(team_b__in=tournament_team_ids, winner_id=F('team_b'))
-            ).count()
-            tournament_games_lost = tournament_games.filter(
-                Q(team_a__in=tournament_team_ids, loser_id=F('team_a')) |
-                Q(team_b__in=tournament_team_ids, loser_id=F('team_b'))
-            ).count()
-            tournament_games_drawn = tournament_games.filter(is_draw=True).count()
+            # Fetch tournament and friendly games where the user's teams participated
+            tournament_games = TournamentGames.objects.filter(
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
+            )
 
-            tournament_stats = PlayerGameStats.objects.filter(player_id=user.id, **time_filter)
-            tournament_total_goals = tournament_stats.aggregate(Sum('goals'))['goals__sum'] or 0
-            tournament_total_assists = tournament_stats.aggregate(Sum('assists'))['assists__sum'] or 0
-            tournament_total_yellow_cards = tournament_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
-            tournament_total_red_cards = tournament_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
+            friendly_games = FriendlyGame.objects.filter(
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
+            )
 
-            # Friendly games
-            friendly_lineups = FriendlyGameLineup.objects.filter(player_id=user.id, **time_filter)
-            friendly_team_ids = list(friendly_lineups.values_list('team_id', flat=True))
-            friendly_game_ids = list(friendly_lineups.values_list('game_id', flat=True))
-            friendly_games = FriendlyGame.objects.filter(id__in=friendly_game_ids)
+            # Fetch user's stats from PlayerGameStats (tournament games)
+            tournament_player_stats = PlayerGameStats.objects.filter(
+                player_id=user.id, game_id__in=tournament_games.values_list("id", flat=True)
+            )
 
-            friendly_total_games_played = friendly_games.count()
-            friendly_games_won = friendly_games.filter(
-                Q(team_a__in=friendly_team_ids, winner_id=F('team_a')) |
-                Q(team_b__in=friendly_team_ids, winner_id=F('team_b'))
-            ).count()
-            friendly_games_lost = friendly_games.filter(
-                Q(team_a__in=friendly_team_ids, loser_id=F('team_a')) |
-                Q(team_b__in=friendly_team_ids, loser_id=F('team_b'))
-            ).count()
-            friendly_games_drawn = friendly_games.filter(is_draw=True).count()
+            # Fetch user's stats from FriendlyGamesPlayerGameStats (friendly games)
+            friendly_player_stats = FriendlyGamesPlayerGameStats.objects.filter(
+                player_id=user.id, game_id__in=friendly_games.values_list("id", flat=True)
+            )
 
-            friendly_stats = FriendlyGamesPlayerGameStats.objects.filter(player_id=user.id, **time_filter)
-            friendly_total_goals = friendly_stats.aggregate(Sum('goals'))['goals__sum'] or 0
-            friendly_total_assists = friendly_stats.aggregate(Sum('assists'))['assists__sum'] or 0
-            friendly_total_yellow_cards = friendly_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
-            friendly_total_red_cards = friendly_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
+            # Combine stats from both tournament and friendly games
+            total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
 
-            # Combine totals
-            total_games_played = tournament_total_games_played + friendly_total_games_played
-            total_games_won = tournament_games_won + friendly_games_won
-            total_games_lost = tournament_games_lost + friendly_games_lost
-            total_games_drawn = tournament_games_drawn + friendly_games_drawn
+            total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
+                        (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
 
-            total_goals = tournament_total_goals + friendly_total_goals
-            total_assists = tournament_total_assists + friendly_total_assists
-            total_yellow_cards = tournament_total_yellow_cards + friendly_total_yellow_cards
-            total_red_cards = tournament_total_red_cards + friendly_total_red_cards
+            total_assists = (tournament_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0)
+
+            total_yellow_cards = (tournament_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0) + \
+                                (friendly_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0)
+
+            total_red_cards = (tournament_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0)
+
+            # Calculate wins, losses, and draws across all teams user played for
+            total_wins = tournament_games.filter(winner_id__in=branch_ids).count() + \
+                        friendly_games.filter(winner_id__in=branch_ids).count()
+
+            total_losses = tournament_games.filter(loser_id__in=branch_ids).count() + \
+                        friendly_games.filter(loser_id__in=branch_ids).count()
+
+            total_draws = tournament_games.filter(is_draw=True).count() + \
+                        friendly_games.filter(is_draw=True).count()
 
             return Response({
                 "status": 1,
@@ -5017,9 +5009,9 @@ class UserRoleStatsAPIView(APIView):
                     "total_yellow_cards": total_yellow_cards,
                     "total_red_cards": total_red_cards,
                     "total_games_played": total_games_played,
-                    "games_won": total_games_won,
-                    "games_lost": total_games_lost,
-                    "games_drawn": total_games_drawn,
+                    "games_won": total_wins,
+                    "games_lost": total_losses,
+                    "games_drawn": total_draws,
                     "type": "Player",
                     "skills": {
                         "passing": user.passing,
@@ -5051,17 +5043,26 @@ class UserRoleStatsAPIView(APIView):
 
     def get_coach_stats(self, user, time_filter):
         try:
+            if time_filter is None:
+                time_filter = {}
+
             # Get branches where the user is a coach
             coach_branches = JoinBranch.objects.filter(
                 user_id=user.id,
                 joinning_type=JoinBranch.COACH_STAFF_TYPE
             ).values_list('branch_id', flat=True)
 
-            # Tournament games
+            # Tournament Games
             tournament_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
                 **time_filter
             )
+
+            # Friendly Games
+            friendly_games = FriendlyGame.objects.filter(
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches))
+
+            # Calculate Games Stats
             tournament_total_games = tournament_games.count()
             tournament_games_won = tournament_games.filter(
                 Q(team_a__in=coach_branches, winner_id=F('team_a')) |
@@ -5073,11 +5074,6 @@ class UserRoleStatsAPIView(APIView):
             ).count()
             tournament_games_drawn = tournament_games.filter(is_draw=True).count()
 
-            # Friendly games
-            friendly_games = FriendlyGame.objects.filter(
-                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
-            )
             friendly_total_games = friendly_games.count()
             friendly_games_won = friendly_games.filter(
                 Q(team_a__in=coach_branches, winner_id=F('team_a')) |
@@ -5089,19 +5085,18 @@ class UserRoleStatsAPIView(APIView):
             ).count()
             friendly_games_drawn = friendly_games.filter(is_draw=True).count()
 
-            # Combine stats
             total_games_played = tournament_total_games + friendly_total_games
             games_won = tournament_games_won + friendly_games_won
             games_lost = tournament_games_lost + friendly_games_lost
             games_drawn = tournament_games_drawn + friendly_games_drawn
 
-            # Goals conceded
+            # Goals Conceded Calculation
             goals_conceded = (
                 tournament_games.aggregate(
                     total_goals=Sum(
                         Case(
-                            When(team_a__in=coach_branches, then='team_b_goal'),
-                            When(team_b__in=coach_branches, then='team_a_goal'),
+                            When(team_a__in=coach_branches, then=F('team_b_goal')),
+                            When(team_b__in=coach_branches, then=F('team_a_goal')),
                             default=0,
                             output_field=models.IntegerField()
                         )
@@ -5111,8 +5106,8 @@ class UserRoleStatsAPIView(APIView):
                 friendly_games.aggregate(
                     total_goals=Sum(
                         Case(
-                            When(team_a__in=coach_branches, then='team_b_goal'),
-                            When(team_b__in=coach_branches, then='team_a_goal'),
+                            When(team_a__in=coach_branches, then=F('team_b_goal')),
+                            When(team_b__in=coach_branches, then=F('team_a_goal')),
                             default=0,
                             output_field=models.IntegerField()
                         )
@@ -5120,13 +5115,21 @@ class UserRoleStatsAPIView(APIView):
                 )['total_goals'] or 0
             )
 
-            # Cards stats
+
+            # Cards Stats
             player_stats = PlayerGameStats.objects.filter(
                 team_id__in=coach_branches,
                 **time_filter
             )
-            total_red_cards = player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0
-            total_yellow_cards = player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0
+            player_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id__in=coach_branches,
+                **time_filter
+            )
+            total_red_cards = (player_stats.aggregate(Sum('red_cards'))['red_cards__sum'] or 0) + \
+                              (player_stats_friendly.aggregate(Sum('red_cards'))['red_cards__sum'] or 0)
+
+            total_yellow_cards = (player_stats.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0) + \
+                                 (player_stats_friendly.aggregate(Sum('yellow_cards'))['yellow_cards__sum'] or 0)
 
             return Response({
                 "status": 1,
@@ -5154,32 +5157,45 @@ class UserRoleStatsAPIView(APIView):
 
     def get_referee_stats(self, user, time_filter):
         try:
-            # Tournament games officiated
+            if time_filter is None:
+                time_filter = {}
+
+            # 1. Tournament games officiated
             tournament_games_officiated = GameOfficials.objects.filter(
                 official_id=user.id,
-                officials_type_id__in=[2, 3, 4, 5],
+                officials_type_id__in=[2, 3, 4, 5],  # IDs representing referee roles
                 **time_filter
             ).values_list('game_id', flat=True)
 
-            # Friendly games officiated
+            # 2. Friendly games officiated
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],
                 **time_filter
             ).values_list('game_id', flat=True)
 
+            # 3. Calculate total games officiated
             total_games_officiated = len(tournament_games_officiated) + len(friendly_games_officiated)
 
-            # Cards stats
+            # 4. Cards stats (yellow and red cards)
             cards_stats = PlayerGameStats.objects.filter(
-                game_id__in=list(tournament_games_officiated) + list(friendly_games_officiated),
+                game_id__in=list(tournament_games_officiated),
                 **time_filter
             ).aggregate(
                 total_yellow_cards=Sum('yellow_cards'),
                 total_red_cards=Sum('red_cards')
             )
-            total_yellow_cards = cards_stats['total_yellow_cards'] or 0
-            total_red_cards = cards_stats['total_red_cards'] or 0
+
+            cards_stats_friendly = FriendlyGamesPlayerGameStats.objects.filter(
+                game_id__in=list(friendly_games_officiated),
+                **time_filter
+            ).aggregate(
+                total_yellow_cards=Sum('yellow_cards'),
+                total_red_cards=Sum('red_cards')
+            )
+           
+            total_yellow_cards = (cards_stats['total_yellow_cards'] or 0) + (cards_stats_friendly['total_yellow_cards'] or 0)
+            total_red_cards = (cards_stats['total_red_cards'] or 0) + (cards_stats_friendly['total_red_cards'] or 0)
 
             return Response({
                 "status": 1,

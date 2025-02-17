@@ -914,8 +914,6 @@ class UserDetailView(LoginRequiredMixin, View):
 
             # Extract branch details from all the matching JoinBranch records
             branches = [team_branch.branch_id for team_branch in team_branches]
-
-            print(branches)
             return {"branches": branches}
         except Exception as e:
             return {
@@ -1743,9 +1741,7 @@ class FieldDetailView(LoginRequiredMixin, View):
 
         # Filter Open and Closed Training sessions using training_type
         open_training = Training.objects.filter(field=field, training_type=1).order_by('-training_date')  # OPEN_TRAINING
-        
-        print(open_training)
-        
+                
         closed_training = Training.objects.filter(field=field, training_type=2).order_by('-training_date')  # CLOSED_TRAINING
 
         return render(
