@@ -951,20 +951,18 @@ class UserDetailView(LoginRequiredMixin, View):
             }
 
             # Check if the user is associated with any team
-            team = JoinBranch.objects.filter(user_id=user.id).first()
-            if team:
-                team_id = team.branch_id
-                # Fetch games where the user's team participated in tournaments
-                tournament_games = TournamentGames.objects.filter(
-                    (Q(team_a=team_id) | Q(team_b=team_id)), finish=True, **time_filter
-                )
-                # Fetch games where the user's team participated in friendly games
-                friendly_games = FriendlyGame.objects.filter(
-                    (Q(team_a=team_id) | Q(team_b=team_id)), finish=True, **time_filter
-                )
-            else:
-                tournament_games = TournamentGames.objects.filter(finish=True, **time_filter)
-                friendly_games = FriendlyGame.objects.filter(finish=True, **time_filter)
+            branches = JoinBranch.objects.filter(user_id=user.id)
+            
+            branch_ids = branches.values_list("branch_id", flat=True)
+
+            # Fetch tournament and friendly games where the user's teams participated
+            tournament_games = TournamentGames.objects.filter(
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
+            )
+
+            friendly_games = FriendlyGame.objects.filter(
+                (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
+            )
 
             # Fetch user's stats from PlayerGameStats (tournament games)
             tournament_player_stats = PlayerGameStats.objects.filter(
@@ -978,28 +976,28 @@ class UserDetailView(LoginRequiredMixin, View):
 
             # Combine stats from both tournament and friendly games
             total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
-            total_goals = (tournament_player_stats.aggregate(total_goals=Sum("goals"))["total_goals"] or 0) + \
-                        (friendly_player_stats.aggregate(total_goals=Sum("goals"))["total_goals"] or 0)
-            total_assists = (tournament_player_stats.aggregate(total_assists=Sum("assists"))["total_assists"] or 0) + \
-                            (friendly_player_stats.aggregate(total_assists=Sum("assists"))["total_assists"] or 0)
-            total_yellow_cards = (tournament_player_stats.aggregate(total_yellow_cards=Sum("yellow_cards"))["total_yellow_cards"] or 0) + \
-                                (friendly_player_stats.aggregate(total_yellow_cards=Sum("yellow_cards"))["total_yellow_cards"] or 0)
-            total_red_cards = (tournament_player_stats.aggregate(total_red_cards=Sum("red_cards"))["total_red_cards"] or 0) + \
-                            (friendly_player_stats.aggregate(total_red_cards=Sum("red_cards"))["total_red_cards"] or 0)
 
-            # If user is in a team, calculate team-based stats for both tournament and friendly games
-            if team:
-                total_wins = tournament_games.filter(winner_id=int(team_id.id)).count() + \
-                            friendly_games.filter(winner_id=int(team_id.id)).count()
-                total_losses = tournament_games.filter(loser_id=int(team_id.id)).count() + \
-                            friendly_games.filter(loser_id=int(team_id.id)).count()
-                total_draws = tournament_games.filter(is_draw=True).count() + \
-                            friendly_games.filter(is_draw=True).count()
-            else:
-                # If not in a team, set to 0
-                total_wins = 0
-                total_losses = 0
-                total_draws = 0
+            total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
+                        (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
+
+            total_assists = (tournament_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0)
+
+            total_yellow_cards = (tournament_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0) + \
+                                (friendly_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0)
+
+            total_red_cards = (tournament_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0) + \
+                            (friendly_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0)
+
+            # Calculate wins, losses, and draws across all teams user played for
+            total_wins = tournament_games.filter(winner_id__in=branch_ids).count() + \
+                        friendly_games.filter(winner_id__in=branch_ids).count()
+
+            total_losses = tournament_games.filter(loser_id__in=branch_ids).count() + \
+                        friendly_games.filter(loser_id__in=branch_ids).count()
+
+            total_draws = tournament_games.filter(is_draw=True).count() + \
+                        friendly_games.filter(is_draw=True).count()
 
             return {
                 "status": 1,
