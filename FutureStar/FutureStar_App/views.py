@@ -1143,7 +1143,7 @@ class UserDetailView(LoginRequiredMixin, View):
             ).values_list("game_id", flat=True)
 
             # Get the games the referee officiated in friendly games
-            friendly_game_ids = GameOfficials.objects.filter(
+            friendly_game_ids = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # Relevant official types
                 game_id__in=FriendlyGame.objects.filter(**time_filter).values_list("id", flat=True),
@@ -1164,13 +1164,11 @@ class UserDetailView(LoginRequiredMixin, View):
             ).aggregate(
                 total_yellow_cards=Sum("yellow_cards"), total_red_cards=Sum("red_cards")
             )
-
             # Combine cards from both tournament and friendly games
             total_yellow_cards = (tournament_cards_stats["total_yellow_cards"] or 0) + \
                                 (friendly_cards_stats["total_yellow_cards"] or 0)
             total_red_cards = (tournament_cards_stats["total_red_cards"] or 0) + \
                             (friendly_cards_stats["total_red_cards"] or 0)
-
             return {
                 "status": 1,
                 "matchplayed": games_count,
