@@ -1,12 +1,19 @@
-
 {
   "applinks": {
-    "apps": [],
-    "details": [
-      {
-        "appID": "3GM6AW6K4V.com.sportx.goalactico",
-        "paths": [ "/static/post/*" ]
-      }
-    ]
+     "apps": [],
+     "details": [
+        {
+           "appID": "3GM6AW6K4V.com.sportx.goalactico",
+           "paths": [
+              "/post/*",
+              "/all/event/*",
+              "/my/events/*",
+              "/training/open/*",
+              "/training/my/*",
+              "/training/join/*",
+              "/tournament/*"
+           ]
+        }
+     ]
   }
 }

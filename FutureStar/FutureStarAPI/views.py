@@ -4400,7 +4400,8 @@ class EventsAPIView(APIView):
                 # If no created events, look up joined events in EventBooking
                 joined_events = EventBooking.objects.filter(
                     creator_type=creator_type,
-                    created_by_id=created_by_id
+                    created_by_id=created_by_id,
+                    booking_status=1  # Only consider joined events with booking status 1 (booking confirmed)
                 )
 
                 if joined_events.exists():
