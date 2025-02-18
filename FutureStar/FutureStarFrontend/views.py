@@ -42,10 +42,6 @@ load_dotenv()
 
 
 def get_language(request):
-    """
-    Retrieves the language from the URL or session and updates the session values.
-    Ensures the language is either 'en' or 'ar', defaulting to 'en'.
-    """
     allowed_languages = {'en', 'ar'}
     language = request.GET.get('Language', '').lower()
 
@@ -60,9 +56,7 @@ def get_language(request):
     request.session['current_language'] = language  # Keep 'current_language' consistent
     return language
 
-
 ##############################################   HomePage   ########################################################
-
 class HomePage(View):
     def get(self, request, *args, **kwargs):
         # Use get_language to handle language logic
@@ -114,7 +108,6 @@ class HomePage(View):
         return response
 
 ##############################################   DiscoverPage   ########################################################
-
 class DiscoverPage(View):
     
     def get(self, request, *args, **kwargs):
@@ -200,7 +193,6 @@ class SuccessStoriesPage(View):
         return render(request, "success-stories.html", context)
 
 ##############################################   NewsPage   ########################################################
-
 class NewsPage(View):
     
     def get(self, request, *args, **kwargs):
@@ -234,7 +226,6 @@ class NewsPage(View):
     
 
 ##############################################   NewsDetailPage   ########################################################
-
 class NewsDetailPage(View):
     def get(self, request, pk):
         language_from_url = get_language(request)
@@ -257,7 +248,6 @@ class NewsDetailPage(View):
     
 
 ##############################################   AdvertisePage   ########################################################
-
 class AdvertisePage(View):
     
     def get(self, request, *args, **kwargs):
@@ -284,7 +274,6 @@ class AdvertisePage(View):
 
 
 ##############################################   AboutPage   ########################################################
-
 class AboutPage(View):
     
     def get(self, request, *args, **kwargs):
@@ -321,9 +310,7 @@ class AboutPage(View):
         return render(request, "about.html",context)
 
 
-
 ##############################################   ContactPage   ########################################################
-
 class ContactPage(View):
     
     def get(self, request, *args, **kwargs):
@@ -465,11 +452,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             stats = self.get_referee_stats(user, time_filter)
         elif user.role.id == 6:  # Manager role
             stats = self.get_manager_stats(user, time_filter)
-
-
         return teams, stats
-
-    
 
     def get_player_stats(self, user, time_filter):
         try:
@@ -644,7 +627,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "error": str(e),
             }
 
-
     def get_coach_stats(self, user, time_filter=None):
         try:
             # Default time_filter to an empty dictionary if None
@@ -719,7 +701,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                     )
                 )['total_goals'] or 0
             )
-
 
             # Cards Stats
             player_stats = PlayerGameStats.objects.filter(
@@ -836,14 +817,8 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
         except Exception as e:
             return {"status": 0, "message": "Failed to fetch coach stats.", "error": str(e)}
 
-
-
-
     def get_manager_stats(self, user, time_filter=None):
-        """
-        Fetch coach-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the coach's branches.
-        """
+        
         try:
             # Default time_filter to an empty dictionary if None
             if time_filter is None:
@@ -1031,12 +1006,8 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "error": str(e)
             }
 
-    
     def get_referee_stats(self, user, time_filter=None):
-        """
-        Fetch referee-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the referee.
-        """
+        
         try:
             if time_filter is None:
                 time_filter = {}
@@ -1080,9 +1051,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
 
             # 5. Fetch Upcoming Games
             current_datetime = localtime(now())
-
-           
-
+         
             # 6. Upcoming tournament games
             upcoming_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
@@ -1196,8 +1165,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
         except Exception as e:
             return {"status": 0, "message": "Failed to fetch referee stats.", "error": str(e)}
 
-
-
     def get(self, request, *args, **kwargs):
         user = request.user
         language_from_url = get_language(request)
@@ -1214,7 +1181,6 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             "stats": stats,
             
         }
-
         return render(request, "PlayerDashboard.html", context)
 
 
@@ -1404,7 +1370,6 @@ class verify_forgot_password_otp(View):
 
         return redirect("reset_password")
 
-
 ################ Reset Password Page ########################
 class ResetPasswordPage(View):
     def get(self, request, *args, **kwargs):
@@ -1466,9 +1431,11 @@ class ResetPasswordPage(View):
         return redirect("login")
 
 ########################################## Generate a random 6-digit OTP######################################################
+
 def generate_otp():
     return str(random.randint(100000, 999999))
-#################################### Register Page ##########################################
+
+########################################## Register Page #####################################################################
 class RegisterPage(View):
     def get(self, request, *args, **kwargs):
         language_from_url = get_language(request)
@@ -1539,6 +1506,7 @@ class RegisterPage(View):
         
         # Instead of passing context, include language as GET parameter
         return redirect(f"{reverse('verify_otp')}?Language={language_from_url}")
+    
 #################################### OTP Verification #######################################
 class OTPVerificationView(View):
     def get(self, request, *args, **kwargs):
@@ -1594,8 +1562,7 @@ class OTPVerificationView(View):
         messages.success(request, _("Registration successful! Please log in."))
         return redirect("login")
 
-
-
+################# User Info Update API After Google and Apple Auth #####################################
 class UserInfoUpdateView(View):
     template_name = 'user_info.html'
     success_url = reverse_lazy('verify_otp')
@@ -1947,7 +1914,6 @@ class AppleCallbackView(View):
 
 ######################## User Dashboard For Games #########################################################
 class UserDashboardGames(LoginRequiredMixin,View):
-
     def get(self, request, *args, **kwargs):
         user = request.user
         language_from_url = request.GET.get('Language', None)
@@ -1969,14 +1935,9 @@ class UserDashboardGames(LoginRequiredMixin,View):
         }
 
         return render(request, "PlayerDashboardGames.html", context)
-
     
     def get_user_dashboard_games(self, user, time_filter=None):
-        """
-        Fetch user-related data such as event bookings, teams, stats, and upcoming/latest games
-        based on the user's role.
-        """
-
+        
         stats = {
                 "upcoming_games": [],
                 "finished_games": [],
@@ -1993,13 +1954,8 @@ class UserDashboardGames(LoginRequiredMixin,View):
 
         return stats
 
-    from datetime import datetime
-
     def get_manager_games(self, user, time_filter=None):
-        """
-        Fetch coach-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the coach's branches.
-        """
+        
         try:
             # Default time_filter to an empty dictionary if None
             if time_filter is None:
@@ -2119,10 +2075,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
 
 
     def get_referee_games(self, user, time_filter=None):
-        """
-        Fetch referee-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the referee.
-        """
+        
         try:
             if time_filter is None:
                 time_filter = {}
@@ -2251,12 +2204,8 @@ class UserDashboardGames(LoginRequiredMixin,View):
             return {"status": 0, "message": "Failed to fetch referee stats.", "error": str(e)}
 
     
-
-
     def get_player_games(self, user, time_filter): 
-        """
-        Fetch upcoming and finished games where the player (role 2) is already in the lineup.
-        """
+       
         try:
             # Fetch the team the player is associated with
             team = JoinBranch.objects.filter(user_id=user.id).first()
@@ -2327,10 +2276,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 player_id=user.id,
                 game_id__game_date__lt=finished_games_date_filter.date(),
                 game_id__finish=True
-            ).select_related('game_id', 'team_id')
-
-            # Combine the finished games
-            
+            ).select_related('game_id', 'team_id') 
 
             for lineup in friendly_finished_games:
                 game = lineup.game_id
@@ -2372,12 +2318,8 @@ class UserDashboardGames(LoginRequiredMixin,View):
         except Exception as e:
             return {"status": 0, "message": "Failed to fetch player games.", "error": str(e)}
 
-        
     def get_coach_games(self, user, time_filter=None):
-        """
-        Fetch coach-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the coach's branches.
-        """
+        
         try:
             # Default time_filter to an empty dictionary if None
             if time_filter is None:
@@ -2401,7 +2343,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 **time_filter
             )
 
-           
             # Fetch Upcoming Games
             current_datetime = localtime(now())
 
@@ -2495,7 +2436,7 @@ class UserDashboardGames(LoginRequiredMixin,View):
         except Exception as e:
             return {"status": 0, "message": "Failed to fetch coach stats.", "error": str(e)}
         
-
+########################## Player Dashboard Event Bokking Detail ###############################
 class UserEventBookingInfo(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
@@ -2519,11 +2460,8 @@ class UserEventBookingInfo(LoginRequiredMixin, View):
 
         return render(request, "PlayerDashboardEvents.html", context)
 
-
     def get_user_event_bookings(self, user):
-        """
-        Fetches events booked by the user along with the relevant details.
-        """
+        
         bookings = EventBooking.objects.filter(created_by_id=user.id).order_by('-event__event_date')
         events = []
         for booking in bookings:
@@ -2538,6 +2476,7 @@ class UserEventBookingInfo(LoginRequiredMixin, View):
             })
         return events
     
+######################## Player Dashboard Created Field ###############################################################    
 class UserCreatedFieldsView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -2570,8 +2509,6 @@ class UserCreatedFieldsView(LoginRequiredMixin, View):
         }
         return render(request, 'PlayerDashboardFields.html', context)
 
-
-
 #################### User Training List of Dashboard #############################
 class UserDashboardTrainings(LoginRequiredMixin, View):
 
@@ -2598,11 +2535,7 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
         return render(request, "PlayerDashboardTraining.html", context)
 
     def get_user_dashboard_trainings(self, user):
-        """
-        Fetch user-related training data based on the user's role.
-        For Player role, return both joined and created trainings.
-        For other roles, return only created trainings.
-        """
+
         stats = {
                 "joined_trainings": [],
                 "created_trainings": [],
@@ -2613,15 +2546,13 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
             stats["joined_trainings"] = self.get_joined_trainings(user)
             stats["created_trainings"] = self.get_created_trainings(user)
         else:  # For other roles, fetch only created trainings
+            stats["joined_trainings"] = self.get_joined_trainings(user)
             stats["created_trainings"] = self.get_created_trainings(user)
 
         return stats
 
     def get_joined_trainings(self, user):
-        """
-        Get the trainings that the user has joined. This calls the `MyJoinedTrainingsView` logic.
-        """
-        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')
+        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')[:20]
         
         if not joined_trainings.exists():
             return []
@@ -2631,18 +2562,11 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
         return sorted(trainings, key=lambda x: x.training_date, reverse=True)
 
     def get_created_trainings(self, user):
-        """
-        Get the trainings created by the user. This calls the `MyTrainingsView` logic.
-        """
-        created_trainings = Training.objects.filter(created_by_id=user.id)
+        created_trainings = Training.objects.filter(created_by_id=user.id).order_by('-created_at')[:20]
         accessible_trainings = [training for training in created_trainings if self._has_access(training, user)]
         return sorted(accessible_trainings, key=lambda t: t.training_date, reverse=True)
 
     def _has_access(self, training, user):
-        """
-        Helper function to check if the user has access to the given training.
-        This is a simplified version of the logic from the `MyTrainingsView`.
-        """
         if training.creator_type == 1:  # USER_TYPE
             if training.created_by_id == user.id:  # Creator is the same user
                 return True
@@ -2665,10 +2589,6 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
                 return True
 
         return False
-
-
-
-
 
 ############################### SearchView ########################
 class SearchView(View):
