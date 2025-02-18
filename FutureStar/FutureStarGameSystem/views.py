@@ -24,17 +24,13 @@ import re
 from FutureStar.firebase_config import send_push_notification
 
 
-
-
 ################## participates players of particular team for particular tournament ###############
 class TeamPlayersAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, team_id):
-        """
-        Check if the user has the required role and valid membership in the team.
-        """
+       
         if user.role.id not in [3, 6]:
             return False
 
@@ -119,7 +115,6 @@ class TeamPlayersAPIView(APIView):
                 ]
             ).values_list('player_id', flat=True)
 
-
             # Get player details excluding those in the Lineup
             lineups = User.objects.filter(id__in=player_user_ids).exclude(id__in=excluded_player_ids)
 
@@ -153,14 +148,12 @@ class TeamPlayersAPIView(APIView):
                     "updated_at": player.updated_at,
                 })
 
-
             return Response({
                 'status': 1,
                 'message': _('Players fetched successfully.'),
                 'data': response_data
             }, status=status.HTTP_200_OK)
 ################## added players of particular team for particular tournament for particular games ###############
-
     def post(self, request, *args, **kwargs):
         # Set language
         language = request.headers.get('Language', 'en')
@@ -297,10 +290,6 @@ class TeamPlayersAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-
-
-    
-
 ################## Remove players of particular team for particular tournament for particular games ###############
     
     def delete(self, request, *args, **kwargs):
@@ -309,7 +298,6 @@ class TeamPlayersAPIView(APIView):
         player_id = request.query_params.get('player_id')
         game_id = request.query_params.get('game_id')
         tournament_id = request.query_params.get('tournament_id')
-
 
         # Ensure all required fields are provided
         if not team_id:
@@ -388,15 +376,11 @@ class TeamPlayersAPIView(APIView):
 
     
 ################## Added Players ###############
-
 class LineupPlayers(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, team_id):
-        """
-        Check if the user has the required role and valid membership in the team.
-        """
         # Check if the user has role 6
         if user.role.id not in [3, 6]:
             return False
@@ -413,8 +397,7 @@ class LineupPlayers(APIView):
         except ObjectDoesNotExist:
             return False
 
-    ################## Added Players lIST ###############
-
+################## Added Players lIST ###############
     def get(self, request, *args, **kwargs):
             language = request.headers.get('Language', 'en')
             if language in ['en', 'ar']:
@@ -454,7 +437,6 @@ class LineupPlayers(APIView):
                     'message': _('Tournament id is required.'),
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
-
 
             # Filter players in Lineup by team, game, and tournament, separating by status
             added_lineups = Lineup.objects.filter(
@@ -516,9 +498,7 @@ class LineupPlayers(APIView):
                 }
             }, status=status.HTTP_200_OK)
     
-    ################## Added Players TO STARTING 11 Drag n Drop ###############
-
-
+################## Added Players TO STARTING 11 Drag n Drop ###############
     def patch(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -582,7 +562,6 @@ class LineupPlayers(APIView):
                     'message': _('Both player_id and position_1 are required.'),
                 })
                 continue
-
             try:
                 # Fetch lineup by player_id, team_id, tournament_id, and game_id
                 lineup = Lineup.objects.get(
@@ -616,7 +595,6 @@ class LineupPlayers(APIView):
                 game_data={"id": game.id, 'tournament_id': tournament.id, "game_type": "Tournament", "team_id": team_id}
                 data={'type': "add_lineup_player", "opponent_team_id": opponent_team.id, 'game_data': game_data}
 
-
                 # Send notification to the player
                 send_push_notification(
                     device_token=lineup.player_id.device_token,
@@ -645,10 +623,6 @@ class LineupPlayers(APIView):
                         ),
                     )
                 notification.save()
-
-            
-
-
 
             except Lineup.DoesNotExist:
                 errors.append({
@@ -702,10 +676,7 @@ class LineupPlayers(APIView):
             }
         }, status=status.HTTP_200_OK if not errors else status.HTTP_400_BAD_REQUEST)
 
-
-  
-    ################## Remove Players TO STARTING 11 map Drag n Drop ###############
-
+################## Remove Players TO STARTING 11 map Drag n Drop ###############
     def post(self, request, *args, **kwargs):
     # Retrieve fields from the request data
         player_id = request.data.get('player_id')
@@ -803,7 +774,6 @@ class LineupPlayers(APIView):
                 'data': {
                     'already_added': already_added_data,
                     'substitute': substitute_data
-
                 }
             }, status=status.HTTP_200_OK)
 
@@ -814,15 +784,12 @@ class LineupPlayers(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 ################## Add player jersey of particular team of particular games in particular tournament ###############
-        
 class AddPlayerJerseyAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def _has_access(self, user, team_id):
-        """
-        Check if the user has the required role and valid membership in the team.
-        """
+        
         # Check if the user has role 6
         if user.role.id not in [3, 6]:
             return False
@@ -1070,7 +1037,6 @@ class AddPlayerJerseyAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 ################## Players games stats in tournament ###############
-
 class GameStatsLineupPlayers(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1222,9 +1188,7 @@ class GameStatsLineupPlayers(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-
-    
-
+####################################### Player Goal and Card Add in Game System #################################################
 class LineupPlayerStatusAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1394,8 +1358,6 @@ class LineupPlayerStatusAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-    
-    
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -1461,7 +1423,6 @@ class LineupPlayerStatusAPIView(APIView):
         lineup_entry.save()
 
         game = TournamentGames.objects.get(id=game_id, tournament_id=tournament_id)
-
 
         team_a_ready_count = Lineup.objects.filter(
             team_id=game.team_a.id,
@@ -1530,15 +1491,14 @@ class LineupPlayerStatusAPIView(APIView):
             )
             notification = Notifictions.objects.create(
                 created_by_id=referee,
-                creator_type=1,  # Assuming 1 is the type for creators
+                creator_type=1,  
                 targeted_id=user.id,
-                targeted_type=1,  # Assuming 1 is the type for users
+                targeted_type=1,  
                 title=_("Let's Go"),
                 content=body_message
             )
             notification.save()
             
-    
 ###### Game Official Types API Views ######
 class GameOficialTypesList(APIView):
     permission_classes = [IsAuthenticated]
@@ -1561,8 +1521,6 @@ class GameOficialTypesList(APIView):
            'data': serializer.data
         }, status=status.HTTP_200_OK)
     
-
-
 ############################### Game Officilas Search API #########################
 
 ############ Custom User Search Pagination ##############
@@ -1621,7 +1579,6 @@ class OfflicialSearchPaggination(PageNumberPagination):
             'current_page': self.page,
             'data': data
         })
-
 
 ############### User Search View ###############
 class OfficialSearchView(APIView):
@@ -1695,9 +1652,7 @@ class OfficialSearchView(APIView):
         return paginator.get_paginated_response(user_data)
 
 
-
 ################### Game Officilals API Views ###################
-
 class GameOfficialsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -1729,9 +1684,7 @@ class GameOfficialsAPIView(APIView):
         # Prepare the response data, grouping by official type
         officials_by_type = {}
         for official_type in all_official_types:
-            # Serialize the official type
-            # type_serializer = GameOficialTypeSerializer(official_type, context={'language': language})
-            # type_name = type_serializer.data['name']
+            
             type_name = official_type.name_en
 
             # Filter assigned officials for the current official type
@@ -1753,7 +1706,6 @@ class GameOfficialsAPIView(APIView):
             'message': _('Officials retrieved successfully.'),
             'data': officials_by_type
         }, status=status.HTTP_200_OK)
-
 
     def post(self, request, *args, **kwargs):
         # Set language from request headers
@@ -1789,7 +1741,6 @@ class GameOfficialsAPIView(APIView):
                 'message': _('officials_type_id is required.'),
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
         # Validate existence of the required objects
         game = get_object_or_404(TournamentGames, id=game_id)
@@ -1901,7 +1852,6 @@ class GameOfficialsAPIView(APIView):
                 'data': {}
             }, status=status.HTTP_400_BAD_REQUEST)
 
-
         # Attempt to delete the specified GameOfficial entry
         game_official = GameOfficials.objects.filter(game_id=game_id, official_id=official_id)
         if game_official.exists():
@@ -1917,7 +1867,7 @@ class GameOfficialsAPIView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-
+########################### Player Stats add API ############################
 class PlayerGameStatsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -2052,9 +2002,7 @@ class PlayerGameStatsAPIView(APIView):
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 
     def _send_stat_notification(self, player_instance, stat, tournament_instance, game_instance,created_by_id_role):
-        """
-        Sends a push notification when a player's statistics are updated.
-        """
+       
         # Define the notification content with translations
         stat_messages = {
             'goals': _('You just scored a goal!'),
@@ -2081,8 +2029,6 @@ class PlayerGameStatsAPIView(APIView):
         # Construct the notification body
         notification_body = "{} in {} - {}".format(translated_message, translated_tournament_name, translated_game_number)
         
-
-
         # Send the notification to the player
         if player_instance.device_token:
 
@@ -2103,9 +2049,7 @@ class PlayerGameStatsAPIView(APIView):
                             "tournament_id": tournament_instance.id,
                             "tournament_name": tournament_instance.tournament_name,
                         },}
-            push_data = {'type': 'player_stat','player_id': player_instance.id, 'game_data' : game_data,
-                       }
-            
+            push_data = {'type': 'player_stat','player_id': player_instance.id, 'game_data' : game_data,}
 
             send_push_notification(player_instance.device_token, _('Statistics Updated!'), notification_body, player_instance.device_type, data=push_data)
             notification = Notifictions.objects.create(
@@ -2119,9 +2063,7 @@ class PlayerGameStatsAPIView(APIView):
             notification.save()
 
     def _update_team_goals(self, game_instance):
-        """
-        Updates the total goals for both teams in a game instance.
-        """
+        
         game_instance.team_a_goal = PlayerGameStats.objects.filter(
             team_id=game_instance.team_a.id,
             game_id=game_instance.id
@@ -2135,9 +2077,7 @@ class PlayerGameStatsAPIView(APIView):
         game_instance.save()
 
     def _get_game_stats_response(self, game_instance, team_id, player_id, tournament_id, game_id):
-        """
-        Returns a formatted response with goals, lineups, and stats for the game and teams.
-        """
+        
         # Calculate team goals
         team_a_goals = PlayerGameStats.objects.filter(
             team_id=game_instance.team_a.id,
@@ -2723,10 +2663,7 @@ class PlayerSubstitutionAPIView(APIView):
             tournament_id=tournament_id,
             lineup_status=Lineup.SUBSTITUTE
         )
-        
-
-        # Prepare response data for added players
-        
+                
         # Prepare response data for substitute players
         substitute_data = [{
             'id': lineup.player_id.id,
@@ -2741,9 +2678,7 @@ class PlayerSubstitutionAPIView(APIView):
             'status': 1,
             'message': _('Lineup players fetched successfully with status "ADDED".'),
             'data': {
-                
                 'substitute_players': substitute_data,
-                
             }
         }, status=status.HTTP_200_OK)
 
@@ -2752,7 +2687,6 @@ class SwapPositionView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    
     def post(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -2825,9 +2759,7 @@ class SwapPositionView(APIView):
                     "player": SwapPositionSerializer(player_lineup).data
                 }
             }, status=status.HTTP_200_OK)
-
-        
-       
+     
     def get(self, request, *args, **kwargs):
         language = request.headers.get('Language', 'en')
         if language in ['en', 'ar']:
@@ -2868,7 +2800,6 @@ class SwapPositionView(APIView):
             'message': _('Lineups retrieved successfully.'),
             'data': serializer.data
         }, status=status.HTTP_200_OK)
-
 
 ################### Tournament Satustics for top Goal and all ###########################
 class TopPlayerStatsAPIView(APIView):
@@ -2938,9 +2869,7 @@ class TopPlayerStatsAPIView(APIView):
 
             # Format appearances data
             def format_appearance_data(data):
-                """
-                Helper function to format appearance data.
-                """
+                
                 formatted_data = []
                 for player in data:
                     # Fetch player username

@@ -39,8 +39,7 @@ from FutureStar import settings
 from .forms import *
 load_dotenv()  
 
-
-
+####################################### Get Language From URL or Session #############################################
 def get_language(request):
     allowed_languages = {'en', 'ar'}
     language = request.GET.get('Language', '').lower()
