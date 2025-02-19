@@ -412,8 +412,6 @@ class CreateFriendlyGame(APIView):
         return game_number_final
 
 
-
-
     def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None,game_id=None,created_by_id=None):
         """
         Notify eligible team members (coaches and managers) about a new friendly game.
@@ -445,11 +443,8 @@ class CreateFriendlyGame(APIView):
                     "game_type": "friendly",}
                 push_data = {
                     "created_by_id":created_by_id,  # Include the creator user ID,
-                    "game_data": friendly_data,  # Include the game data,
-                    
-                    "type":"friendly_game_scheduled"
-
-            
+                    "game_data": friendly_data,  # Include the game data,                    
+                    "type":"friendly_game_scheduled"   
                 }
                 if device_token:
                     send_push_notification(
@@ -496,7 +491,6 @@ class CreateFriendlyGame(APIView):
                             "game_id": game_id,  # Include the game ID
                             "game_type": "friendly",
                             "type":"friendly_game"  # Specify that this is a friendly game
-                            
                         }
                     if device_token:
                         send_push_notification(
