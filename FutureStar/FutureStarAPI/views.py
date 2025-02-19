@@ -3663,7 +3663,7 @@ class ListFollowersAPI(generics.ListAPIView):
 
         if search_key:
             # Separate filtering for each type
-            user_ids = User.objects.filter(username__icontains=search_key).values_list('id', flat=True)
+            user_ids = User.objects.filter((Q(username__icontains=search_key) | Q(fullname__icontains=search_key)) & ~Q(role_id=1)).values_list('id', flat=True)
             team_ids = Team.objects.filter(team_username__icontains=search_key).values_list('id', flat=True)
             group_ids = TrainingGroups.objects.filter(group_username__icontains=search_key).values_list('id', flat=True)
 
