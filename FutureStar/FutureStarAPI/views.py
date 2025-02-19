@@ -2816,6 +2816,7 @@ class LatestGallaryListAPIView(generics.ListCreateAPIView):
                 'created_by_id': album.get('created_by_id'),
                 'created_at': album.get('created_at'),
                 'updated_at': album.get('updated_at'),
+                'content_type':album.get('content_type'),
             }
             for album in album_serializer.data
             if (creator_type == str(Album.TEAM_TYPE) and album['creator_type'] == Album.TEAM_TYPE) or
@@ -5272,10 +5273,10 @@ class SearchAPIView(APIView):
             return Response({"status": 0, "message": _("Type is required."), "data": {}}, status=status.HTTP_400_BAD_REQUEST)
 
         if search_type.lower() == 'users':
-            users = User.objects.all().order_by('username')
+            users = User.objects.exclude(role_id=1).order_by('username')
             if search_query:
                 users = users.filter(
-                    (Q(username__icontains=search_query) | Q(fullname__icontains=search_query)) & ~Q(role_id=1)
+                    (Q(username__icontains=search_query) | Q(fullname__icontains=search_query)) & ~Q(role=1)
                 )
             # if creator_type and created_by_id:
             #     users = users.filter(creator_type=creator_type, created_by_id=created_by_id)
