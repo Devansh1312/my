@@ -2624,9 +2624,8 @@ class SearchView(View):
 
         # Render the template with the context data
         return render(request, 'search.html', context)
-    
 
-
+######################## Team Search Result View ###########################################################    
 class TeamPageSearchResults(View):
     def get_team_related_data(self, team):
         # Get branches sorted alphabetically by team_name
@@ -2690,9 +2689,7 @@ class TeamPageSearchResults(View):
         # Render the template with the updated context
         return render(request, 'team/teampage.html', context)
 
-
-
-
+######################### Player Info Page ####################################################
 class PlayerInfoPage(View):
     
     def get_user_related_data(self, user, time_filter=None):
@@ -2716,8 +2713,6 @@ class PlayerInfoPage(View):
             stats = self.get_referee_stats(user, time_filter)
         elif user.role.id == 6:  # Manager role
             stats = self.get_manager_stats(user, time_filter)
-
-
         return teams, stats
 
     def get_player_stats(self, user, time_filter):
@@ -3092,8 +3087,6 @@ class PlayerInfoPage(View):
             }
         except Exception as e:
             return {"status": 0, "message": "Failed to fetch coach stats.", "error": str(e)}
-
-
 
 
     def get_manager_stats(self, user, time_filter=None):
