@@ -2,7 +2,6 @@
 import os
 import time
 import random
-from datetime import datetime
 from django.utils.cache import add_never_cache_headers
 from django.utils.timezone import localtime, now
 
@@ -35,7 +34,6 @@ from FutureStarTournamentApp.models import *
 from FutureStarGameSystem.models import *
 from FutureStarFriendlyGame.models import *
 from FutureStarTrainingApp.models import *
-from FutureStar import settings
 from .forms import *
 load_dotenv()  
 

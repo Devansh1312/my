@@ -5879,10 +5879,7 @@ class UniformConfirmationNotificationView(APIView):
             "details": notifications_sent
         }, status=status.HTTP_200_OK)
 
-
-
-
-
+######################### Add Uniform Notification API ########################################################
 class UniformAddNotificationAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
@@ -5900,7 +5897,6 @@ class UniformAddNotificationAPIView(APIView):
             finish=False  # Only consider games that have not finished
         )
        
-
         # Get upcoming friendly games within the next 1 hour for today
         upcoming_friendly_games = FriendlyGame.objects.filter(
             game_date=current_date,  # Ensure it's today's date
@@ -5929,8 +5925,6 @@ class UniformAddNotificationAPIView(APIView):
         for game in upcoming_friendly_games:
             
             self._check_and_notify_missing_uniforms(game, "friendly", notifications_sent)
-
-       
 
         return Response({
             "status": "success",
@@ -5967,19 +5961,13 @@ class UniformAddNotificationAPIView(APIView):
                 branch_id=game.team_b,
                 joinning_type__in=[JoinBranch.COACH_STAFF_TYPE, JoinBranch.MANAGERIAL_STAFF_TYPE]
             )
-
             team_founder_a = game.team_a.team_id.team_founder
             team_founder_b = game.team_b.team_id.team_founder
-
-
-            
             # Notify staff members for Team A if any color is missing
             if missing_team_a_colors:
                 for staff_member in team_a_staff:
                     self._send_notification(staff_member.user_id, game, game_type, game.team_b.team_name, "Manager" if staff_member.joinning_type == JoinBranch.MANAGERIAL_STAFF_TYPE else "Coach", notifications_sent, game.team_a.team_name)
-                  
 
-            
                 # Notify the team founder for Team A
                 if team_founder_a and team_founder_a.device_token:
                     self._send_notification(team_founder_a, game, game_type, game.team_b.team_name, "Team Founder", notifications_sent, game.team_a.team_name)
@@ -5993,8 +5981,6 @@ class UniformAddNotificationAPIView(APIView):
                 if team_founder_b and team_founder_b.device_token:
                     self._send_notification(team_founder_b, game, game_type, game.team_a.team_name, "Team Founder", notifications_sent, game.team_b.team_name)
 
-
-
     def _send_notification(self, user, game, game_type, opponent_team_name, role, notifications_sent, team_name):
         # Set the notification title and body based on language
         notification_language = user.current_language
@@ -6007,11 +5993,8 @@ class UniformAddNotificationAPIView(APIView):
                 game_type.capitalize(), opponent_team_name
             )
         )
-
         title = _("Missing Uniform Colors!!")
-
         push_data = {'type': "assign_handler"}
-
         # Send the notification
         send_push_notification(
             device_token=user.device_token,
@@ -6020,7 +6003,6 @@ class UniformAddNotificationAPIView(APIView):
             device_type=user.device_type,
             data=push_data
         )
-    
         notification = Notifictions.objects.create(
                 created_by_id=1,  # Replace with appropriate user ID or dynamic value
                 creator_type=1,
@@ -6030,8 +6012,6 @@ class UniformAddNotificationAPIView(APIView):
                 content=body
         )
         notification.save()
-    
-
         # Log notification sent
         notifications_sent.append(
             "Notification sent to {} ({}) for {} game against {}".format(
@@ -6039,6 +6019,7 @@ class UniformAddNotificationAPIView(APIView):
             )
         )
 
+###########################################################Player Ready or not Notification Send to Refree of match ###################################################
 class PlayerReadyNotificationAPIView(APIView):
  
     def send_notifications_to_team_staff(self, team_branch, message_title, message_body):

@@ -7554,11 +7554,13 @@ class ApproveRejectBookingView(LoginRequiredMixin, View):
                 'status': status
             }
             send_push_notification(user.device_token, title, body, user.device_type, data=push_data)
-
+            targeted_id_user = created_by_id
             # **CREATE NOTIFICATION RECORD FOR USER**
             Notifictions.objects.create(
-                created_by_id=user.id,  # User who made the booking
+                created_by_id=1,  # User who made the booking
                 creator_type=1,  # User type = 1
+                targeted_type = 1,
+                targeted_id = targeted_id_user,
                 title=title,
                 content=body,
             )
