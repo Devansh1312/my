@@ -120,44 +120,44 @@
                         <div class="navbar-collapse collapse clearfix">
                             <ul class="navigation clearfix">
                                 <!-- Discover -->
-                                <li class="{% if request.resolver_match.url_name == 'discover' %}active{% endif %}">
-                                    <a href="{% url 'discover' %}">
+                                <li>
+                                    <a class="{% if request.resolver_match.url_name == 'discover' %}active{% endif %}" href="{% url 'discover' %}">
                                         {% if current_language == 'en' %} Discover {% elif current_language == 'ar' %} يكتشف {% endif %}
                                     </a>
                                 </li>
                         
                                 <!-- Success Stories -->
-                                <li class="{% if request.resolver_match.url_name == 'success-stories' %}active{% endif %}">
-                                    <a href="{% url 'success-stories' %}">
+                                <li>
+                                    <a class="{% if request.resolver_match.url_name == 'success-stories' %}active{% endif %}" href="{% url 'success-stories' %}">
                                         {% if current_language == 'en' %} Success Stories {% elif current_language == 'ar' %} قصص النجاح {% endif %}
                                     </a>
                                 </li>
                         
                                 <!-- News -->
-                                <li class="{% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news-detail' %}active{% endif %}">
-                                    <a href="{% url 'news' %}">
+                                <li>
+                                    <a class="{% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news-detail' %}active{% endif %}" href="{% url 'news' %}">
                                         {% if current_language == 'en' %} News {% elif current_language == 'ar' %} الأخبار {% endif %}
                                     </a>
                                 </li>
                         
                                 <!-- Advertise -->
-                                <li class="{% if request.resolver_match.url_name == 'advertise' %}active{% endif %}">
-                                    <a href="{% url 'advertise' %}">
+                                <li>
+                                    <a class="{% if request.resolver_match.url_name == 'advertise' %}active{% endif %}" href="{% url 'advertise' %}">
                                         {% if current_language == 'en' %} Advertise {% elif current_language == 'ar' %} إعلان {% endif %}
                                     </a>
                                 </li>
                         
                                 <!-- About -->
                                  <!-- Debug: Current URL Name -->
-                                <li class="{% if request.resolver_match.url_name == 'about' or request.path == '/about/' %}active{% endif %}">
-                                    <a href="{% url 'about' %}">
+                                <li>
+                                    <a class="{% if request.resolver_match.url_name == 'about' or request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">
                                         {% if current_language == 'en' %} About {% elif current_language == 'ar' %} حول {% endif %}
                                     </a>
                                 </li>
                         
                                 <!-- Contact Us -->
-                                <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
-                                    <a href="{% url 'contact' %}">
+                                <li>
+                                    <a class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">
                                         {% if current_language == 'en' %} Contact Us {% elif current_language == 'ar' %} اتصل بنا {% endif %}
                                     </a>
                                 </li>
@@ -165,12 +165,12 @@
                                 <!-- Login and Register (for unauthenticated users) -->
                                 {% if not user.is_authenticated %}
                                 <li class="menu-btns-mobile">
-                                    <a class="theme-btn style-one" href="{% url 'login' %}">
+                                    <a href="{% url 'login' %}" class="{% if request.resolver_match.url_name == 'login' %}theme-btn style-two{% else %}theme-btn style-one{% endif %}">
                                         {% if current_language == 'en' %} Login {% elif current_language == 'ar' %} تسجيل الدخول {% endif %}
                                     </a>
                                 </li>
                                 <li class="menu-btns-mobile">
-                                    <a class="theme-btn style-two" href="{% url 'register' %}">
+                                    <a href="{% url 'register' %}" class="{% if request.resolver_match.url_name == 'register' %}theme-btn style-two{% else %}theme-btn style-one{% endif %}">
                                         {% if current_language == 'en' %} Register {% elif current_language == 'ar' %} تسجيل {% endif %}
                                     </a>
                                 </li>
@@ -208,11 +208,11 @@
                 <!-- Menu Button -->
                 <div class="menu-btns">
                     {% if not user.is_authenticated %}
-                    <a href="{% url 'login' %}" class="theme-btn style-one">
+                    <a href="{% url 'login' %}" class="{% if request.resolver_match.url_name == 'login' %}theme-btn style-two{% else %}theme-btn style-one{% endif %}">
                         {% if current_language == 'en' %} Login {% elif current_language == 'ar' %} تسجيل الدخول {% endif %}
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
-                    <a href="{% url 'register' %}" class="theme-btn style-two">
+                    <a href="{% url 'register' %}" class="{% if request.resolver_match.url_name == 'register' %}theme-btn style-two{% else %}theme-btn style-one{% endif %}">
                         {% if current_language == 'en' %} Register {% elif current_language == 'ar' %} تسجيل {% endif %}
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
