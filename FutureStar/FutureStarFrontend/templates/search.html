@@ -169,10 +169,16 @@
 									{% if user.profile_picture %}
 										<img src="{{ user.profile_picture.url }}" class="img-fluid" alt="{{ user.username }}'s Profile Picture">
 									{% else %}
-										<img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="Default Profile Picture">
+										<img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="Default Profile Picture">
 									{% endif %}
 								</div>
-								<h5 class="player-name">{{ user.username }}</h5>
+								<h5 class="player-name">
+									{% if current_language == 'en' %}
+										@{{ user.username }}
+									{% elif current_language == 'ar' %}
+										{{ user.username }}@
+									{% endif %}
+								</h5>
 								<p class="player-designation">
 									{% if current_language == 'en' %}
 										{{ user.role.name_en }}
@@ -202,7 +208,7 @@
 									{% if team.team_logo %}
 										<img src="{{ team.team_logo.url }}" class="img-fluid" alt="{{ team.team_name }}">
 									{% else %}
-										<img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ team.team_name }}">
+										<img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="{{ team.team_name }}">
 									{% endif %}
 								</div>
 								<h5 class="player-name">{{ team.team_name }}</h5>
@@ -230,7 +236,7 @@
 									{% if branch.team_id.team_logo %}
 										<img src="{{ branch.team_id.team_logo.url }}" class="img-fluid" alt="{{ branch.team_name }}">
 									{% else %}
-										<img src="{% static 'frontend/assets/images/profile-pic.jpg' %}" class="img-fluid" alt="{{ branch.team_name }}">
+										<img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="{{ branch.team_name }}">
 									{% endif %}
 								</div>
 								<h5 class="player-name">{{ branch.team_name }}</h5>

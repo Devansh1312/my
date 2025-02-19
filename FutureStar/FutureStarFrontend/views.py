@@ -2603,8 +2603,14 @@ class SearchView(View):
         query = request.GET.get('q', '')
         
         # Filter results based on the query
-        user_results = User.objects.filter(Q(username__icontains=query) & ~Q(role=1)) if query else []
-        team_results = Team.objects.filter(team_name__icontains=query) if query else []
+        user_results = User.objects.filter(
+            (Q(username__icontains=query) | Q(fullname__icontains=query)) & ~Q(role=1)
+        ) if query else []
+
+        team_results = Team.objects.filter(
+            Q(team_name__icontains=query) | Q(team_username__icontains=query)
+        ) if query else []
+
         team_branch_results = TeamBranch.objects.filter(team_name__icontains=query) if query else []
 
         # Create context to pass to the template

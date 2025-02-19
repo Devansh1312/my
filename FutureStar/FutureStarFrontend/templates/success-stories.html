@@ -110,8 +110,12 @@
                         <h5 class="player-name">
                             {% if item.user.fullname %}
                             {{ item.user.fullname}}
-                            {% else %}  
-                            @{{ item.user.username }}
+                            {% else %}
+                                {% if current_language == 'en' %}
+                                    @{{ item.user.username }}
+                                {% elif current_language == 'ar' %}
+                                    {{ item.user.username }}@
+                                {% endif %}      
                             {% endif %}
                         </h5>
                         <p class="player-designation">
