@@ -2360,6 +2360,7 @@ class TeamGameStatsTimelineAPIView(APIView):
                 'data': {
                     'game_id': game_id,
                     'tournament_id': tournament_id,
+                    'is_finish':tournament_game.finish,
                     'tournament_logo': tournament.logo.url if tournament.logo else None,
                     'tournament_name': tournament.tournament_name,
                     'goals': {

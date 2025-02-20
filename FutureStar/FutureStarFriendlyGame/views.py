@@ -3593,6 +3593,7 @@ class FriendlyPlayerGameStatsTimelineAPIView(APIView):
                 'data': {
                     'game_id': game_id,
                     'tournament_logo':None,
+                    'is_finish':friendly_game.finish,
                     'tournament_name':"Friendly Game",
                     'goals': {
                         'team_a_id': friendly_game.team_a.id,
