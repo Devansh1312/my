@@ -60,7 +60,12 @@
 									<i class="fas fa-envelope"></i>{{ system_settings.email }}
 								</a>
 								<a class="callto" href="callto:{{ system_settings.phone }}">
-									<i class="fas fa-phone"></i>{{ system_settings.phone }}
+									<i class="fas fa-phone"></i>
+									{% if current_language == 'en' %}
+										+{{ system_settings.phone }}
+									{% elif current_language == 'ar' %}
+										{{ system_settings.phone }}+
+									{% endif %}
 								</a>
 							</div>
 						</div>
