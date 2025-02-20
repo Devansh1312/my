@@ -136,7 +136,14 @@
                     <ul class="list-style-two">
                         <li><i class="fa-solid fa-location-dot"></i><span>{{ system_settings.address }}</span></li>
                         <li><i class="fa-solid fa-envelope"></i><a href="mailto:{{ system_settings.email }}">{{ system_settings.email }}</a></li>
-                        <li><i class="fa-solid fa-phone"></i><a href="callto:{{ system_settings.phone }}">{{ system_settings.phone }}</a></li>
+                        <li><i class="fa-solid fa-phone"></i><a href="callto:{{ system_settings.phone }}">
+                            {% if current_language == 'en' %}
+                                +{{ system_settings.phone }}
+                            {% elif current_language == 'ar' %}
+                                {{ system_settings.phone }}+
+                            {% endif %}
+                            </a>
+                        </li>
                     </ul>
 
                 </div>

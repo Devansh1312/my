@@ -1435,6 +1435,12 @@ def generate_otp():
 ########################################## Register Page #####################################################################
 class RegisterPage(View):
     def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # Redirect based on user role
+            if request.user.role.id == 1:
+                return redirect('Dashboard')  # Redirect to the dashboard if role is 1
+            else:
+                return redirect('player-dashboard')  # Redirect to home for any other role
         language_from_url = get_language(request)
         if language_from_url in ['en', 'ar']:  # Adjust language list if needed
             activate(language_from_url)
@@ -1452,6 +1458,12 @@ class RegisterPage(View):
         return render(request, "register.html", context)
 
     def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # Redirect based on user role
+            if request.user.role.id == 1:
+                return redirect('Dashboard')  # Redirect to the dashboard if role is 1
+            else:
+                return redirect('player-dashboard')  # Redirect to home for any other role
         register_type = request.POST.get("register_type")
         language_from_url = get_language(request)
         if language_from_url in ['en', 'ar']:  # Adjust language list if needed

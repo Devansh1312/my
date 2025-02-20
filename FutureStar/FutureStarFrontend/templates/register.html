@@ -143,9 +143,9 @@
                                 <label>
                                     <input type="checkbox" required />
                                     {% if current_language == 'en' %}
-                                        I agree to the <a href="{% url 'terms-and-conditions' %}">Terms & Conditions</a> and acknowledge that I have read the <a href="{% url 'privacy-policy' %}">Privacy Policy</a>.
+                                        I agree to the <a style="color: #ffffff;" href="{% url 'terms-and-conditions' %}">Terms & Conditions</a> and acknowledge that I have read the <a style="color: #ffffff;" href="{% url 'privacy-policy' %}">Privacy Policy</a>.
                                     {% elif current_language == 'ar' %}
-                                        أوافق على <a href="{% url 'terms-and-conditions' %}">الشروط والأحكام</a> وأقر بأنني قرأت <a href="{% url 'privacy-policy' %}">سياسة الخصوصية</a>.
+                                        أوافق على <a style="color: #ffffff;" href="{% url 'terms-and-conditions' %}">الشروط والأحكام</a> وأقر بأنني قرأت <a style="color: #ffffff;" href="{% url 'privacy-policy' %}">سياسة الخصوصية</a>.
                                     {% endif %}
                                 </label>
                             </div>
