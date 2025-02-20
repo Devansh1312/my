@@ -1976,7 +1976,6 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 **time_filter
             )
 
-           
             # Fetch Upcoming Games
             current_datetime = localtime(now())
 
@@ -3530,14 +3529,12 @@ class TeamDetailsView(View):
 
         # 4. Get finished friendly games
         friendly_games = FriendlyGame.objects.filter(
-            Q(team_a=team) | Q(team_b=team), 
-            # finish=True
+            Q(team_a=team) | Q(team_b=team)
         ).order_by('-game_date')
 
         # 5. Get finished tournament games
         tournament_games = TournamentGames.objects.filter(
-            Q(team_a=team) | Q(team_b=team), 
-            # finish=True
+            Q(team_a=team) | Q(team_b=team)
         ).order_by('-game_date')
 
         # Combine friendly and tournament games
@@ -3547,7 +3544,7 @@ class TeamDetailsView(View):
             reverse=True  # Show latest games first
         )[:5]
 
-        # Calculate stats
+        # Initialize stats
         total_wins = 0
         total_losses = 0
         total_draws = 0
@@ -3567,14 +3564,6 @@ class TeamDetailsView(View):
                 tournament_name = game.tournament_id.tournament_name if game.tournament_id else "N/A"
                 group_name = game.group_id.group_name if game.group_id else "N/A"
 
-            # Calculate statistics
-            if game.winner_id == str(team.id):
-                total_wins += 1
-            elif game.loser_id == str(team.id):
-                total_losses += 1
-            elif game.is_draw:
-                total_draws += 1
-
             # Goals scored and conceded
             if game.team_a == team:
                 total_goals_scored += game.team_a_goal or 0
@@ -3582,6 +3571,14 @@ class TeamDetailsView(View):
             else:
                 total_goals_scored += game.team_b_goal or 0
                 total_goals_conceded += game.team_a_goal or 0
+
+            # Calculate statistics
+            if game.winner_id and str(game.winner_id) == str(team.id):
+                total_wins += 1
+            elif game.loser_id and str(game.loser_id) == str(team.id):
+                total_losses += 1
+            elif game.is_draw:
+                total_draws += 1
 
             # Append game data
             finished_games.append({

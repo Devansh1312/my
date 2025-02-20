@@ -1800,7 +1800,7 @@ class TournamentGamesAPIView(APIView):
 
         if finish:
             # If the game is finished, determine the result
-            if team_a_goals == 0 and team_b_goals == 0:
+            if team_a_goals == team_b_goals:
                 # If both teams have 0-0, set is_draw to True
                 game.is_draw = True
             else:

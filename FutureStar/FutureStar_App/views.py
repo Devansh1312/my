@@ -6264,122 +6264,103 @@ class BranchDetailView(LoginRequiredMixin, View):
             branch = TeamBranch.objects.get(id=branch_id)
 
             # Get related staff and players
-            staff_members = JoinBranch.objects.filter(
-                branch_id=branch.id, joinning_type__in=[1, 2, 3]
-            )
+            staff_members = JoinBranch.objects.filter(branch_id=branch.id, joinning_type__in=[1, 2, 3])
             players = JoinBranch.objects.filter(branch_id=branch.id, joinning_type=4)
 
             # Get all tournaments related to the branch
-            # tournaments = Tournament.objects.filter(team_id=branch.team_id)
             tournaments = Tournament.objects.filter(
                 id__in=TournamentGroupTeam.objects.filter(
                     team_branch_id=branch.id, status=TournamentGroupTeam.ACCEPTED
                 ).values('tournament_id')
             )
-            
-            game_friendly = FriendlyGame.objects.filter((Q(team_a=branch.id) | Q(team_b=branch.id)) & Q(team_a__isnull=False) & Q(team_b__isnull=False)).order_by('-game_number')            
+
+            # Fetch Friendly Games
+            game_friendly = FriendlyGame.objects.filter(
+                (Q(team_a=branch.id) | Q(team_b=branch.id)) & Q(team_a__isnull=False) & Q(team_b__isnull=False)
+            ).order_by('-game_number')
             game_friendly_count = game_friendly.count()
 
+            # Fetch Tournament Games
             games = TournamentGames.objects.filter(Q(team_a=branch.id) | Q(team_b=branch.id))
 
-            # Filter for friendly games where neither team_a nor team_b is None and the branch is involved
+            # Separate queries for Friendly Games and Tournament Games
             friendly_games_as_team_a = FriendlyGame.objects.filter(team_a=branch.id, team_a__isnull=False, team_b__isnull=False)
-
-            # Filter for friendly games where neither team_a nor team_b is None and the branch is involved
             friendly_games_as_team_b = FriendlyGame.objects.filter(team_b=branch.id, team_a__isnull=False, team_b__isnull=False)
 
-
-            # Count total games, wins, losses, draws, goals, and assists
-            total_games = (friendly_games_as_team_a | friendly_games_as_team_b).count()
-
-            total_wins = (
-                friendly_games_as_team_a.filter(finish=True, winner_id=branch.id)
-                | friendly_games_as_team_b.filter(finish=True, winner_id=branch.id)
-            ).count()
-
-            total_losses = (
-                friendly_games_as_team_a.filter(finish=True, loser_id=branch.id)
-                | friendly_games_as_team_b.filter(finish=True, loser_id=branch.id)
-            ).count()
-
-            total_draws = (
-                friendly_games_as_team_a.filter(finish=True, is_draw=True)
-                | friendly_games_as_team_b.filter(finish=True, is_draw=True)
-            ).count()
-
-            # Goals scored in friendly games (count goals for both teams)
-            total_goals_team_a = (
-                friendly_games_as_team_a.aggregate(total_goals=Sum("team_a_goal"))[
-                    "total_goals"
-                ]
-                or 0
-            )
-            total_goals_team_b = (
-                friendly_games_as_team_b.aggregate(total_goals=Sum("team_b_goal"))[
-                    "total_goals"
-                ]
-                or 0
-            )
-            total_goals = total_goals_team_a + total_goals_team_b
-
-            # Now, calculate conceded goals
-            conceded_goals = (
-                games.aggregate(
-                    total_conceded=Sum(
-                        Case(
-                            When(team_a=branch, then="team_b_goal"),
-                            When(team_b=branch, then="team_a_goal"),
-                            default=0,
-                            output_field=IntegerField(),
-                        )
-                    )
-                )["total_conceded"]
-            ) or 0
-
-            # Now, also calculate for TournamentGames (both as team_a and team_b)
             tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch.id)
             tournament_games_as_team_b = TournamentGames.objects.filter(team_b=branch.id)
 
+            # Total Games
+            total_games_friendly = (friendly_games_as_team_a | friendly_games_as_team_b).count()
             total_games_tournament = games.count()
+            total_games_combined = total_games_friendly + total_games_tournament
 
+            # Wins, Losses, Draws (Friendly Games)
+            total_wins_friendly = (
+                friendly_games_as_team_a.filter(finish=True, winner_id=branch.id) |
+                friendly_games_as_team_b.filter(finish=True, winner_id=branch.id)
+            ).count()
+
+            total_losses_friendly = (
+                friendly_games_as_team_a.filter(finish=True, loser_id=branch.id) |
+                friendly_games_as_team_b.filter(finish=True, loser_id=branch.id)
+            ).count()
+
+            total_draws_friendly = (
+                friendly_games_as_team_a.filter(finish=True, is_draw=True) |
+                friendly_games_as_team_b.filter(finish=True, is_draw=True)
+            ).count()
+
+            # Wins, Losses, Draws (Tournament Games)
             total_wins_tournament = (
-                tournament_games_as_team_a.filter(finish=True, winner_id=branch.id)
-                | tournament_games_as_team_b.filter(finish=True, winner_id=branch.id)
+                tournament_games_as_team_a.filter(finish=True, winner_id=branch.id) |
+                tournament_games_as_team_b.filter(finish=True, winner_id=branch.id)
             ).count()
 
             total_losses_tournament = (
-                tournament_games_as_team_a.filter(finish=True, loser_id=branch.id)
-                | tournament_games_as_team_b.filter(finish=True, loser_id=branch.id)
+                tournament_games_as_team_a.filter(finish=True, loser_id=branch.id) |
+                tournament_games_as_team_b.filter(finish=True, loser_id=branch.id)
             ).count()
 
             total_draws_tournament = (
-                tournament_games_as_team_a.filter(finish=True, is_draw=True)
-                | tournament_games_as_team_b.filter(finish=True, is_draw=True)
+                tournament_games_as_team_a.filter(finish=True, is_draw=True) |
+                tournament_games_as_team_b.filter(finish=True, is_draw=True)
             ).count()
 
-            total_goals_tournament_team_a = (
-                tournament_games_as_team_a.aggregate(total_goals=Sum("team_a_goal"))[
-                    "total_goals"
-                ]
-                or 0
-            )
-            total_goals_tournament_team_b = (
-                tournament_games_as_team_b.aggregate(total_goals=Sum("team_b_goal"))[
-                    "total_goals"
-                ]
-                or 0
-            )
-            total_goals_tournament = (
-                total_goals_tournament_team_a + total_goals_tournament_team_b
+            # Goals Scored (Friendly + Tournament)
+            total_goals_friendly = (
+                friendly_games_as_team_a.aggregate(total_goals=Sum("team_a_goal"))["total_goals"] or 0
+            ) + (
+                friendly_games_as_team_b.aggregate(total_goals=Sum("team_b_goal"))["total_goals"] or 0
             )
 
-            # Add up the statistics from both models
-            total_games_combined = total_games + total_games_tournament
-            total_wins_combined = total_wins + total_wins_tournament
-            total_losses_combined = total_losses + total_losses_tournament
-            total_draws_combined = total_draws + total_draws_tournament
-            total_goals_combined = total_goals + total_goals_tournament
-            total_conceded_goals = conceded_goals  # Combined conceded goals
+            total_goals_tournament = (
+                tournament_games_as_team_a.aggregate(total_goals=Sum("team_a_goal"))["total_goals"] or 0
+            ) + (
+                tournament_games_as_team_b.aggregate(total_goals=Sum("team_b_goal"))["total_goals"] or 0
+            )
+
+            total_goals_combined = total_goals_friendly + total_goals_tournament
+
+            # Goals Conceded (Friendly + Tournament)
+            total_goals_conceded_friendly = (
+                friendly_games_as_team_a.aggregate(total_conceded=Sum("team_b_goal"))["total_conceded"] or 0
+            ) + (
+                friendly_games_as_team_b.aggregate(total_conceded=Sum("team_a_goal"))["total_conceded"] or 0
+            )
+
+            total_goals_conceded_tournament = (
+                tournament_games_as_team_a.aggregate(total_conceded=Sum("team_b_goal"))["total_conceded"] or 0
+            ) + (
+                tournament_games_as_team_b.aggregate(total_conceded=Sum("team_a_goal"))["total_conceded"] or 0
+            )
+
+            total_goals_conceded_combined = total_goals_conceded_friendly + total_goals_conceded_tournament
+
+            # Final Count Summary
+            total_wins_combined = total_wins_friendly + total_wins_tournament
+            total_losses_combined = total_losses_friendly + total_losses_tournament
+            total_draws_combined = total_draws_friendly + total_draws_tournament
 
             member_count = staff_members.count() + players.count()
             tournament_count = tournaments.count()
@@ -6399,12 +6380,13 @@ class BranchDetailView(LoginRequiredMixin, View):
                 "total_losses": total_losses_combined,
                 "total_draws": total_draws_combined,
                 "total_goals": total_goals_combined,
-                "total_conceded_goals": total_conceded_goals,
+                "total_conceded_goals": total_goals_conceded_combined,
                 "game_friendly_count": game_friendly_count,
-                "game_friendly" : game_friendly,
+                "game_friendly": game_friendly,
             }
         except TeamBranch.DoesNotExist:
             raise ValueError("Branch not found")
+
 
     def get(self, request):
         branch_id = request.GET.get("team_id")

@@ -279,7 +279,7 @@
                         {% elif current_language == 'ar' %}
                         لعبة لعبت
                         {% endif %}</h6>
-                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.matchplayed|default:"0" }}</h5>
+                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.games_played|default:"0" }}</h5>
                 </div>
             </div>
         </div>
@@ -296,7 +296,7 @@
                         {% elif current_language == 'ar' %}
                         فوز
                         {% endif %}</h6>
-                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.win|default:"0" }}</h5>
+                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.wins|default:"0" }}</h5>
                     </h6>
 
                 </div>
@@ -315,7 +315,7 @@
                         {% elif current_language == 'ar' %}
                         خسارة
                         {% endif %}</h6>
-                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.loss|default:"0" }}</h5>
+                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.losses|default:"0" }}</h5>
 
                 </div>
             </div>
@@ -333,7 +333,7 @@
                         {% elif current_language == 'ar' %}
                         تعادل
                         {% endif %}</h6>
-                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.draw|default:"0" }}</h5>
+                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.draws|default:"0" }}</h5>
                 </div>
             </div>
         </div>
@@ -350,7 +350,7 @@
                         {% elif current_language == 'ar' %}
                         الأهداف المسجلة
                         {% endif %}</h6>
-                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.goals|default:"0" }}</h5>
+                    <h5 class="score {% if current_language == 'ar' %} text-right {% endif %}">{{ stats.goals_scored|default:"0" }}</h5>
                 </div>
             </div>
         </div>

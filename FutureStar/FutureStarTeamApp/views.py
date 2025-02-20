@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from FutureStar_App.models import *
 from FutureStarAPI.models import *
 from FutureStarTeamApp.models import *
+from FutureStarFriendlyGame.models import *
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.core.files.storage import default_storage
 from django.utils.translation import gettext as _
@@ -19,12 +20,11 @@ from django.core.paginator import Paginator, EmptyPage
 from django.db import IntegrityError
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count,Sum,Q,When,Case
+from django.db.models import Sum,Q,When,Case
 from FutureStar.firebase_config import send_push_notification
 # FutureStar\firebase_config.py
 from FutureStarGameSystem.models import *
 from FutureStarTournamentApp.models import *
-from firebase_admin import messaging
 
 
 ################################################################## TEAM API ###############################################################################################
@@ -1005,40 +1005,29 @@ class TeamStatsView(APIView):
                 'data': []
             }, status=status.HTTP_200_OK)
 
-        stats_per_branch = PlayerGameStats.objects.filter(
-            team_id__in=all_team_branches.values_list('id', flat=True),
-            **time_filter
-        ).values('team_id').annotate(
-            total_goals=Sum('goals') or 0,
-            total_assists=Sum('assists') or 0,
-            total_yellow_cards=Sum('yellow_cards') or 0,
-            total_red_cards=Sum('red_cards') or 0
-        )
-
-        stats_dict = {stat['team_id']: stat for stat in stats_per_branch}
-
         team_branch_data = []
 
         for team_branch in all_team_branches:
-            stats = stats_dict.get(team_branch.id, {
-                'total_goals': 0,
-                'total_assists': 0,
-                'total_yellow_cards': 0,
-                'total_red_cards': 0
-            })
-
-            # Step 3: Aggregate game statistics
-            games = TournamentGames.objects.filter(
-                (Q(team_a=team_branch) | Q(team_b=team_branch)),
-                **time_filter
+            # Step 3: Aggregate statistics for Tournament Games
+            tournament_stats = PlayerGameStats.objects.filter(
+                team_id=team_branch.id, **time_filter
+            ).aggregate(
+                total_goals=Sum('goals') or 0,
+                total_assists=Sum('assists') or 0,
+                total_yellow_cards=Sum('yellow_cards') or 0,
+                total_red_cards=Sum('red_cards') or 0
             )
 
-            total_games = games.count()
-            total_wins = games.filter(winner_id=str(team_branch.id)).count()
-            total_losses = games.filter(loser_id=str(team_branch.id)).count()
-            total_draws = games.filter(is_draw=True).count()
+            tournament_games = TournamentGames.objects.filter(
+                (Q(team_a=team_branch) | Q(team_b=team_branch)), **time_filter
+            )
 
-            conceded_goals = games.aggregate(
+            tournament_total_games = tournament_games.count()
+            tournament_total_wins = tournament_games.filter(winner_id=str(team_branch.id)).count()
+            tournament_total_losses = tournament_games.filter(loser_id=str(team_branch.id)).count()
+            tournament_total_draws = tournament_games.filter(is_draw=True).count()
+
+            tournament_conceded_goals = tournament_games.aggregate(
                 total_conceded=Sum(
                     Case(
                         When(team_a=team_branch, then='team_b_goal'),
@@ -1049,20 +1038,62 @@ class TeamStatsView(APIView):
                 )
             )['total_conceded'] or 0
 
+            # Step 4: Aggregate statistics for Friendly Games
+            friendly_stats = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id=team_branch.id, **time_filter
+            ).aggregate(
+                total_goals=Sum('goals') or 0,
+                total_assists=Sum('assists') or 0,
+                total_yellow_cards=Sum('yellow_cards') or 0,
+                total_red_cards=Sum('red_cards') or 0
+            )
+
+            friendly_games = FriendlyGame.objects.filter(
+                (Q(team_a=team_branch) | Q(team_b=team_branch)), **time_filter
+            )
+
+            friendly_total_games = friendly_games.count()
+            friendly_total_wins = friendly_games.filter(winner_id=str(team_branch.id)).count()
+            friendly_total_losses = friendly_games.filter(loser_id=str(team_branch.id)).count()
+            friendly_total_draws = friendly_games.filter(is_draw=True).count()
+
+            friendly_conceded_goals = friendly_games.aggregate(
+                total_conceded=Sum(
+                    Case(
+                        When(team_a=team_branch, then='team_b_goal'),
+                        When(team_b=team_branch, then='team_a_goal'),
+                        default=0,
+                        output_field=models.IntegerField()
+                    )
+                )
+            )['total_conceded'] or 0
+
+            # Step 5: Combine statistics from Tournament and Friendly Games
+            total_goals = (tournament_stats['total_goals'] or 0) + (friendly_stats['total_goals'] or 0)
+            total_assists = (tournament_stats['total_assists'] or 0) + (friendly_stats['total_assists'] or 0)
+            total_yellow_cards = (tournament_stats['total_yellow_cards'] or 0) + (friendly_stats['total_yellow_cards'] or 0)
+            total_red_cards = (tournament_stats['total_red_cards'] or 0) + (friendly_stats['total_red_cards'] or 0)
+
+            total_games = tournament_total_games + friendly_total_games
+            total_wins = tournament_total_wins + friendly_total_wins
+            total_losses = tournament_total_losses + friendly_total_losses
+            total_draws = tournament_total_draws + friendly_total_draws
+            total_conceded_goals = tournament_conceded_goals + friendly_conceded_goals
+
             team_branch_data.append({
                 "team_branch_id": team_branch.id,
                 "team_name": team_branch.team_name,
                 "age_group": team_branch.age_group_id.name_en if language == 'en' else team_branch.age_group_id.name_ar,
                 "team_stats": {
-                    "total_goals": stats['total_goals'] or 0,
-                    "total_assists": stats['total_assists'] or 0,
-                    "total_yellow_cards": stats['total_yellow_cards'] or 0,
-                    "total_red_cards": stats['total_red_cards'] or 0,
+                    "total_goals": total_goals,
+                    "total_assists": total_assists,
+                    "total_yellow_cards": total_yellow_cards,
+                    "total_red_cards": total_red_cards,
                     "total_games_played": total_games,
                     "total_wins": total_wins,
                     "total_losses": total_losses,
                     "total_draws": total_draws,
-                    "total_conceded_goals": conceded_goals
+                    "total_conceded_goals": total_conceded_goals
                 }
             })
 
