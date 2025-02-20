@@ -837,11 +837,11 @@ class TrainingDetailAPIView(APIView):
                 'message': _('Training not found'),
             }, status=status.HTTP_404_NOT_FOUND)
         
-        if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
-            return Response({
-                'status': 0,
-                'message': _('Unauthorized to Delete this training'),
-            }, status=status.HTTP_404_NOT_FOUND)
+        # if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
+        #     return Response({
+        #         'status': 0,
+        #         'message': _('Unauthorized to Delete this training'),
+        #     }, status=status.HTTP_404_NOT_FOUND)
 
         # Delete the training instance
         training_instance.delete()

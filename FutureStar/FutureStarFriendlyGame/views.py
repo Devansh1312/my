@@ -3346,7 +3346,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         ).order_by('-created_at').first()
                         latest_stat.delete()
                         self._update_team_goals(game_instance)
-                        return self._get_game_stats_response(game_instance, team_id, player_id)
+                        return self._get_game_stats_response(game_instance, team_id, player_id, game_instance.id)
                     else:
                         return Response(
                             {'status': 0, 'message': _('Cannot decrement {} as it cannot go below zero.'.format(stat.capitalize()))},
