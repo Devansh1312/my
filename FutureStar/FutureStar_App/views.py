@@ -6847,6 +6847,7 @@ class TournamentGamesListView(LoginRequiredMixin, View):
                 When(
                     game_date=current_time.date(),
                     game_start_time__gt=current_time.time(),
+                    finish=False,
                     then=1,
                 ),
                 default=0,
@@ -7043,6 +7044,7 @@ class FriendlyGamesListView(LoginRequiredMixin, View):
                 When(
                     game_date=current_time.date(),
                     game_start_time__gt=current_time.time(),
+                    finish=False,
                     then=1,
                 ),
                 default=0,
