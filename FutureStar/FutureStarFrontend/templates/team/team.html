@@ -619,6 +619,13 @@
                                 </th>
                                 <th>
                                     {% if current_language == 'en' %}
+                                        Game Number
+                                    {% elif current_language == 'ar' %}
+                                        رقم اللعبة
+                                    {% endif %}
+                                </th>
+                                <th>
+                                    {% if current_language == 'en' %}
                                     Tournament Name
                                     {% elif current_language == 'ar' %}
                                     اسم البطولة
@@ -653,6 +660,7 @@
                         <tbody> {% for finished_game in finished_games %} <tr>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ finished_game.game_type }}</td>
+                                <td>{{ finished_game.game_number }}</td>
                                 <td>{{ finished_game.tournament_name }}</td>
                                 <td>{{ finished_game.game_date }}</td>
                                 <td>
