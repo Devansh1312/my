@@ -791,6 +791,14 @@ class TrainingDetailAPIView(APIView):
                 # Save the image using the default storage
                 image_path = default_storage.save(file_name, image)
                 serializer.validated_data['training_photo'] = image_path
+            
+            if "end_time" in request.data:
+                start_time = datetime.strptime(request.data.get('start_time'), "%H:%M:%S").time()
+                end_time = datetime.strptime(request.data.get('end_time'), "%H:%M:%S").time()
+                training_duration = (datetime.combine(datetime.today(), end_time) - 
+                            datetime.combine(datetime.today(), start_time)).seconds // 60
+                
+                serializer.validated_data['training_duration'] = training_duration
 
             # Save the updated training instance
             updated_training_instance = serializer.save()
