@@ -1654,7 +1654,7 @@ class TournamentGamesAPIView(APIView):
                     )
                     notification = Notifictions.objects.create(
                         created_by_id=self.request.user.id,  # Requestor ID (could be dynamically set, e.g., the admin or the user making the change)
-                        creator_type=2,      # Creator type (admin or system)
+                        creator_type=1,      # Creator type (admin or system)
                         targeted_id=user.id,    # Targeted user ID (team member)
                         targeted_type=1,                # Assuming target is always a user
                         title=_("Game Scheduled"),
@@ -2410,29 +2410,18 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         team_b_id = request.query_params.get('team_b', None)
 
         if not tournament_id:
-            return Response({
-                'status': 0,
-                'message': _('Tournament ID is required'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Tournament ID is required')}, status=status.HTTP_400_BAD_REQUEST)
 
         if not team_a_id or not team_b_id:
-            return Response({
-                'status': 0,
-                'message': _('Both Team A and Team B IDs are required'),
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 0, 'message': _('Both Team A and Team B IDs are required')}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Query all completed games in the tournament (for stats)
-        all_games = TournamentGames.objects.filter(
-            tournament_id=tournament_id
-        )
+        # Query all completed tournament games
+        all_games = TournamentGames.objects.filter(tournament_id=tournament_id).select_related('team_a', 'team_b')
 
         if not all_games.exists():
-            return Response({
-                'status': 0,
-                'message': _('No games found for this tournament'),
-            }, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 0, 'message': _('No games found for this tournament')}, status=status.HTTP_404_NOT_FOUND)
 
-        # Calculate standings for all teams
+        # Calculate standings
         team_stats = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0, 'points': 0})
 
         for game in all_games:
@@ -2446,28 +2435,35 @@ class TournamentGamesh2hCompleteAPIView(APIView):
                     team_stats[int(game.winner_id)]['points'] += 1  # 1 point for a win
                     team_stats[int(game.loser_id)]['losses'] += 1
 
-        standings = [
-            {
-                'team_id': team_id,
-                'wins': stats['wins'],
-                'losses': stats['losses'],
-                'draws': stats['draws'],
-                'points': stats['points']
-            }
+        standings = sorted([
+            {'team_id': team_id, 'wins': stats['wins'], 'losses': stats['losses'],
+             'draws': stats['draws'], 'points': stats['points']}
             for team_id, stats in team_stats.items()
-        ]
+        ], key=lambda x: x['points'], reverse=True)
 
-        standings.sort(key=lambda x: x['points'], reverse=True)  # Sort by points descending
         team_positions = {team['team_id']: index + 1 for index, team in enumerate(standings)}
 
-        # Query games for H2H view (recent meetings)
-        h2h_games = TournamentGames.objects.filter(
-            finish=True,  # Filter only by game_finish for recent meetings
-            tournament_id=tournament_id
+        # Query H2H games (recent meetings)
+        tournament_h2h_games = TournamentGames.objects.filter(
+            finish=True, tournament_id=tournament_id
         ).filter(
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
-        ).order_by('-game_start_time')[:5]  # Get the latest 5 games by game_start_time
+        ).select_related('team_a', 'team_b', 'game_field_id')
+
+        friendly_h2h_games = FriendlyGame.objects.filter(
+            finish=True
+        ).filter(
+            (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
+            (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
+        ).select_related('team_a', 'team_b', 'game_field_id')
+
+        # Merge & sort games by game_start_time (most recent first)
+        all_h2h_games = sorted(
+            list(chain(tournament_h2h_games, friendly_h2h_games)),
+            key=lambda x: x.game_start_time, reverse=True
+        )
+        recent_meetings = all_h2h_games[:5]  # Get latest 5 games
 
         # Prepare stats
         team_a_stats = team_stats.get(int(team_a_id), {'wins': 0, 'losses': 0, 'draws': 0})
@@ -2482,29 +2478,23 @@ class TournamentGamesh2hCompleteAPIView(APIView):
             "team_b_lose": team_b_stats['losses'],
             "team_a_draw": team_a_stats['draws'],
             "team_b_draw": team_b_stats['draws'],
-            "team_a_Duel_success_rate" : 0,
-            "team_b_Duel_success_rate" : 0,
-            "team_a_Total_Long_passes" : 0,
-            "team_b_Total_Long_passes" : 0,
-            "team_a_Aerial_duels_success_rate" : 0,
-            "team_b_Aerial_duels_success_rate" : 0,
+            "team_a_Duel_success_rate": 0,
+            "team_b_Duel_success_rate": 0,
+            "team_a_Total_Long_passes": 0,
+            "team_b_Total_Long_passes": 0,
+            "team_a_Aerial_duels_success_rate": 0,
+            "team_b_Aerial_duels_success_rate": 0,
         }
 
         # Serialize H2H games
-        if h2h_games.exists():
-            serializer = TournamentGamesHead2HeadSerializer(
-                h2h_games, many=True, context={'tournament_id': tournament_id, 'team_positions': team_positions}
-            )
-            recent_meetings = serializer.data
-        else:
-            recent_meetings = []  # Return an empty list if no games are found
+        recent_meetings_data = TournamentGamesHead2HeadSerializer(recent_meetings, many=True).data if recent_meetings else []
 
         return Response({
             'status': 1,
             'message': _('H2H Fetch Successfully'),
             'data': {
                 "stats": stats,
-                "recent_meetings": recent_meetings
+                "recent_meetings": recent_meetings_data
             }
         }, status=status.HTTP_200_OK)
 

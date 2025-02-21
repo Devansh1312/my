@@ -4032,7 +4032,9 @@ class FriendlyGamesh2hCompleteAPIView(APIView):
             game_data = {
                 'id': game.id,
                 'team_a_name': game.team_a.team_name if game.team_a else None,
+                'team_a_logo': game.team_a.team_id.team_logo.url if game.team_a else None,
                 'team_b_name': game.team_b.team_name if game.team_b else None,
+                'team_b_logo': game.team_b.team_id.team_logo.url if game.team_b else None,
                 'team_a_goal': game.team_a_goal,
                 'team_b_goal': game.team_b_goal,
                 'game_date': game.game_date,

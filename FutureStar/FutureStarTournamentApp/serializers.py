@@ -319,25 +319,20 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
     team_a_name = serializers.SerializerMethodField()
     team_b_name = serializers.SerializerMethodField()
     game_field_name = serializers.SerializerMethodField()
-   
+
     class Meta:
-        model = TournamentGames
-        fields = ['id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal', 
-                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo'
-                ]
+        model = TournamentGames  # Default model, but will dynamically work for FriendlyGame
+        fields = ['id', 'team_a_name', 'team_b_name', 'team_a_goal', 'team_b_goal',
+                  'game_field_name', 'game_date', 'team_a_logo', 'team_b_logo']
 
     def get_team_a_logo(self, obj):
-        # Access the logo for team A through select_related to avoid extra queries
-        if obj.team_a and obj.team_a.team_id:
-            team_a_logo = obj.team_a.team_id.team_logo
-            return f"/media/{team_a_logo}" if team_a_logo else None
+        if obj.team_a and hasattr(obj.team_a, 'team_id') and obj.team_a.team_id:
+            return f"/media/{obj.team_a.team_id.team_logo}" if obj.team_a.team_id.team_logo else None
         return None
 
     def get_team_b_logo(self, obj):
-        # Access the logo for team B through select_related to avoid extra queries
-        if obj.team_b and obj.team_b.team_id:
-            team_b_logo = obj.team_b.team_id.team_logo
-            return f"/media/{team_b_logo}" if team_b_logo else None
+        if obj.team_b and hasattr(obj.team_b, 'team_id') and obj.team_b.team_id:
+            return f"/media/{obj.team_b.team_id.team_logo}" if obj.team_b.team_id.team_logo else None
         return None
 
     def get_team_a_name(self, obj):
@@ -347,8 +342,7 @@ class TournamentGamesHead2HeadSerializer(serializers.ModelSerializer):
         return obj.team_b.team_name if obj.team_b else None
 
     def get_game_field_name(self, obj):
-        return obj.game_field_id.field_name if obj.game_field_id else None
-    
+        return obj.game_field_id.field_name if hasattr(obj, 'game_field_id') and obj.game_field_id else None
 
 class TournamentGameSerializer(serializers.ModelSerializer):
     tournament_name = serializers.SerializerMethodField()
