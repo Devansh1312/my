@@ -1392,9 +1392,11 @@ class GameDetailsAPIView(APIView):
             "group_name": game.group_id.group_name if game.group_id else None,
             "game_type":"Tournament",
             "team_a_id": game.team_a.team_id.id if game.team_a and game.team_a.team_id else None,
+            "team_a": game.team_a.team_id.id if game.team_a and game.team_a.team_id else None,
             "team_a_name": game.team_a.team_name if game.team_a and game.team_a.team_id else None,
             "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
             "team_b_id": game.team_b.team_id.id if game.team_b and game.team_b.team_id else None,
+            "team_b": game.team_b.team_id.id if game.team_b and game.team_b.team_id else None,
             "team_b_name": game.team_b.team_name if game.team_b and game.team_b.team_id else None,
             "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b and game.team_b.team_id and game.team_b.team_id.team_logo else None,
             "game_field_id": game.game_field_id.id if game.game_field_id else None,
@@ -1728,10 +1730,12 @@ class TournamentGamesAPIView(APIView):
                 "group_id": game.group_id.id if game.group_id else None,
                 "group_id_name": game.group_id.group_name if game.group_id else None,
                 "team_a": game.team_a.id if game.team_a else None,
+                "team_a_id": game.team_a.id if game.team_a else None,
                 "team_a_name": team_a_name,
                 "team_a_logo": team_a_logo_path,
                 "team_a_goal": team_a_goals,
                 "team_b": game.team_b.id if game.team_b else None,
+                "team_b_id": game.team_b.id if game.team_b else None,
                 "team_b_name": team_b_name,
                 "team_b_logo": team_b_logo_path,
                 "team_b_goal": team_b_goals,
@@ -2408,6 +2412,7 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         tournament_id = request.query_params.get('tournament_id', None)
         team_a_id = request.query_params.get('team_a', None)
         team_b_id = request.query_params.get('team_b', None)
+        print(tournament_id)
 
         if not tournament_id:
             return Response({'status': 0, 'message': _('Tournament ID is required')}, status=status.HTTP_400_BAD_REQUEST)
@@ -2450,19 +2455,20 @@ class TournamentGamesh2hCompleteAPIView(APIView):
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
         ).select_related('team_a', 'team_b', 'game_field_id')
-
+        print(tournament_h2h_games)
         friendly_h2h_games = FriendlyGame.objects.filter(
             finish=True
         ).filter(
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
         ).select_related('team_a', 'team_b', 'game_field_id')
-
+        print(friendly_h2h_games)
         # Merge & sort games by game_start_time (most recent first)
         all_h2h_games = sorted(
             list(chain(tournament_h2h_games, friendly_h2h_games)),
             key=lambda x: x.game_start_time, reverse=True
         )
+        print(all_h2h_games)
         recent_meetings = all_h2h_games[:5]  # Get latest 5 games
 
         # Prepare stats
