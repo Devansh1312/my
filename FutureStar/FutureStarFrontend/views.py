@@ -967,6 +967,8 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
 
@@ -978,11 +980,14 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "score": f"{game.team_a_goal} - {game.team_b_goal}",
                 })
 
             # Sort Finished Games by Date
             finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            print(finished_games)
 
             # Return the stats
             return {
@@ -3251,6 +3256,8 @@ class PlayerInfoPage(View):
                     "game_type": "Friendly",
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_number":game.game_number,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
@@ -3262,6 +3269,8 @@ class PlayerInfoPage(View):
                     "game_type": game.tournament_id.tournament_name,
                     "team_a_vs_team_b": f"{game.team_a}    VS    {game.team_b}",
                     "game_number":game.game_number,
+                    "team_a_logo":game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
                     "game_date": game.game_date,
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,

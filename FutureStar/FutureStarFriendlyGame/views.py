@@ -1171,6 +1171,7 @@ class FriendlyGameDetailAPIView(APIView):
             "game_end_time": game.game_end_time,
             "game_duration": game_duration,  # Include game duration
             "created_by": game.created_by.id,
+            "is_finish" : game.finish,
         }
 
         return Response({

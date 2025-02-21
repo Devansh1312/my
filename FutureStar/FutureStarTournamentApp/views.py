@@ -1390,7 +1390,7 @@ class GameDetailsAPIView(APIView):
             "game_duration": game_duration,  # Include game duration
             "group_id": game.group_id.id if game.group_id else None,
             "group_name": game.group_id.group_name if game.group_id else None,
-
+            "game_type":"Tournament",
             "team_a_id": game.team_a.team_id.id if game.team_a and game.team_a.team_id else None,
             "team_a_name": game.team_a.team_name if game.team_a and game.team_a.team_id else None,
             "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a and game.team_a.team_id and game.team_a.team_id.team_logo else None,
@@ -1716,6 +1716,7 @@ class TournamentGamesAPIView(APIView):
 
             game_data = {
                 "id": game.id,
+                "game_type":"Tournament",
                 "tournament_id": game.tournament_id.id if game.tournament_id else None,
                 "tournament_name": game.tournament_id.tournament_name if game.tournament_id else None,
                 "tournament_banner" :game.tournament_id.tournament_banner.url if game.tournament_id.tournament_banner else None,
