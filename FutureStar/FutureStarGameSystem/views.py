@@ -2395,7 +2395,9 @@ class PlayerSubstitutionAPIView(APIView):
         if game_id and tournament_id:
             try:
                 game = TournamentGames.objects.get(id=game_id, tournament_id_id=tournament_id)
-                if game.game_statistics_handler == user:
+                print(game.game_statistics_handler.id)
+                print(user.id)
+                if game.game_statistics_handler.id == user.id:
                     return True
             except TournamentGames.DoesNotExist:
                 pass  # Game not found or doesn't match; access denied

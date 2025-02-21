@@ -3627,7 +3627,7 @@ class FriendlyPlayerSubstitutionAPIView(APIView):
         if game_id:
             try:
                 game = FriendlyGame.objects.get(id=game_id)
-                if game.game_statistics_handler == user:
+                if game.game_statistics_handler.id == user.id:
                     return True
             except FriendlyGame.DoesNotExist:
                 pass
