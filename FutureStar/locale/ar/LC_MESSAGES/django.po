@@ -1639,3 +1639,81 @@ msgstr "تذكير التدريب"
 
 msgid "Don't forget to mark the attendance of your players."
 msgstr "لا تنس تسجيل حضور لاعبيك."
+
+msgid "Attendance updated"
+msgstr "تم تحديث الحضور."
+
+msgid "Rating updated"
+msgstr "تم تحديث التقييم."
+
+msgid "Feedback updated"
+msgstr "تم تحديث الملاحظات."
+
+msgid "Someone Injured!!! Don't forget to add their injury to keep track."
+msgstr "أُصيب أحد اللاعبين!!! لا تنسَ إضافة إصابته لمتابعتها."
+
+msgid "Injury details updated and notification sent"
+msgstr "تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "New feedback added and injury notification sent"
+msgstr "تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "No changes made"
+msgstr "لم يتم إجراء أي تغييرات."
+
+msgid "Attendance updated, Rating updated"
+msgstr "تم تحديث الحضور، تم تحديث التقييم."
+
+msgid "Attendance updated, Feedback updated"
+msgstr "تم تحديث الحضور، تم تحديث الملاحظات."
+
+msgid "Attendance updated, Injury details updated and notification sent"
+msgstr "تم تحديث الحضور، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Attendance updated, New feedback added and injury notification sent"
+msgstr "تم تحديث الحضور، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Rating updated, Feedback updated"
+msgstr "تم تحديث التقييم، تم تحديث الملاحظات."
+
+msgid "Rating updated, Injury details updated and notification sent"
+msgstr "تم تحديث التقييم، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Rating updated, New feedback added and injury notification sent"
+msgstr "تم تحديث التقييم، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Feedback updated, Injury details updated and notification sent"
+msgstr "تم تحديث الملاحظات، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Feedback updated, New feedback added and injury notification sent"
+msgstr "تم تحديث الملاحظات، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Attendance updated, Rating updated, Feedback updated"
+msgstr "تم تحديث الحضور، تم تحديث التقييم، تم تحديث الملاحظات."
+
+msgid "Attendance updated, Rating updated, Injury details updated and notification sent"
+msgstr "تم تحديث الحضور، تم تحديث التقييم، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Attendance updated, Rating updated, New feedback added and injury notification sent"
+msgstr "تم تحديث الحضور، تم تحديث التقييم، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Attendance updated, Feedback updated, Injury details updated and notification sent"
+msgstr "تم تحديث الحضور، تم تحديث الملاحظات، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Attendance updated, Feedback updated, New feedback added and injury notification sent"
+msgstr "تم تحديث الحضور، تم تحديث الملاحظات، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Rating updated, Feedback updated, Injury details updated and notification sent"
+msgstr "تم تحديث التقييم، تم تحديث الملاحظات، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Rating updated, Feedback updated, New feedback added and injury notification sent"
+msgstr "تم تحديث التقييم، تم تحديث الملاحظات، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Attendance updated, Rating updated, Feedback updated, Injury details updated and notification sent"
+msgstr "تم تحديث الحضور، تم تحديث التقييم، تم تحديث الملاحظات، تم تحديث تفاصيل الإصابة وإرسال الإشعار."
+
+msgid "Attendance updated, Rating updated, Feedback updated, New feedback added and injury notification sent"
+msgstr "تم تحديث الحضور، تم تحديث التقييم، تم تحديث الملاحظات، تمت إضافة ملاحظات جديدة وإرسال إشعار بالإصابة."
+
+msgid "Training Notification"
+msgstr "إشعار التدريب"

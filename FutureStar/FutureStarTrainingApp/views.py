@@ -1721,16 +1721,14 @@ class TrainingFeedbackAPI(APIView):
 
         # Update attendance status if provided
         if attendance_status is not None:
-            # Normalize attendance status to handle different input formats
-            truthy_values = {"true", "1", "yes", "y",1}
-            falsy_values = {"false", "0", "no", "n",0}
+            truthy_values = {"true", "1", "yes", "y", 1}
+            falsy_values = {"false", "0", "no", "n", 0}
 
             if str(attendance_status).strip().lower() in truthy_values:
                 training_joined.attendance_status = True
             elif str(attendance_status).strip().lower() in falsy_values:
                 training_joined.attendance_status = False
             else:
-                # Handle invalid input or if you want to set a default value
                 return Response({
                     "status": 0,
                     "message": _("Invalid attendance status value.")
@@ -1753,7 +1751,6 @@ class TrainingFeedbackAPI(APIView):
         if feedback_id:
             feedback = get_object_or_404(Training_Feedback, id=feedback_id, user_id=user_id, training_id=training_id)
 
-            # Update feedback text if provided
             if feedback_text:
                 feedback.feedback = feedback_text
                 update_messages.append(_("Feedback updated"))
@@ -1818,7 +1815,7 @@ class TrainingFeedbackAPI(APIView):
             "feedbacks": feedback_data
         }
 
-        update_message = ", ".join(update_messages) if update_messages else _("No changes made")
+        update_message = ", ".join(update_messages) if update_messages else _("No changes made")        
         return Response({
             "status": 1,
             "message": update_message,
@@ -1826,9 +1823,6 @@ class TrainingFeedbackAPI(APIView):
         }, status=status.HTTP_200_OK)
 
     def notify_users(self, training, message, push_data):
-        """
-        Notify users based on the creator type of the training.
-        """
         notifications_sent = 0
 
         if training.creator_type == 1:  # Created by a User
@@ -1872,12 +1866,10 @@ class TrainingFeedbackAPI(APIView):
         send_push_notification(
             user.device_token,
             _("Training Notification"),
-            message,
+            _(message),
             device_type=user.device_type,
             data=push_data
         )
-
-      
 
         Notifictions.objects.create(
             created_by_id=1,  # Replace with the actual creator ID
@@ -1885,5 +1877,5 @@ class TrainingFeedbackAPI(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Notification"),
-            content=message 
+            content=_(message) 
         )
