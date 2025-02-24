@@ -94,15 +94,11 @@ def get_user_data(user, request):
         playing_foot = serializer.data['name']
     
     # Main and secondary playing positions with id and combined name-shortname fields
-    main_playing_position_name = None
     main_playing_position_id = user.main_playing_position.id if user.main_playing_position else None
-    secondary_playing_position_name = None
     secondary_playing_position_id = user.secondary_playing_position.id if user.secondary_playing_position else None
 
     language = request.headers.get('Language', 'en') if request else 'en'
     # Define playing positions dynamically based on language
-    main_playing_position_name = None
-    secondary_playing_position_name = None
 
     if user.main_playing_position:
         name = user.main_playing_position.name_ar if language == 'ar' else user.main_playing_position.name_en
