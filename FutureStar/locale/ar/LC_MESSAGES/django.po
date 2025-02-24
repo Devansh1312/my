@@ -1624,3 +1624,6 @@ msgstr "رقم الهاتف غير صالح."
 
 msgid "Password reset successful. Please log in."
 msgstr "تم إعادة تعيين كلمة المرور بنجاح. يرجى تسجيل الدخول."
+
+msgid "Don't forget to rate your players and add comments on their performance after the training session."
+msgstr "لا تنس تقييم لاعبيك وإضافة تعليقات على أدائهم بعد جلسة التدريب."
