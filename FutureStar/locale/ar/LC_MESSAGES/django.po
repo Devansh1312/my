@@ -1717,3 +1717,24 @@ msgstr "تم تحديث الحضور، تم تحديث التقييم، تم ت�
 
 msgid "Training Notification"
 msgstr "إشعار التدريب"
+
+msgid "Username or phone is required for normal login."
+msgstr "اسم المستخدم أو رقم الهاتف مطلوب لتسجيل الدخول العادي."
+
+msgid "Password is required for normal login."
+msgstr "كلمة المرور مطلوبة لتسجيل الدخول العادي."
+
+msgid "User with this username or phone does not exist."
+msgstr "المستخدم بهذا الاسم أو رقم الهاتف غير موجود."
+
+msgid "Invalid password."
+msgstr "كلمة المرور غير صحيحة."
+
+msgid "Email is required for type 2 and type 3 login."
+msgstr "البريد الإلكتروني مطلوب لتسجيل الدخول من النوع 2 والنوع 3."
+
+msgid "User with this email does not exist."
+msgstr "المستخدم بهذا البريد الإلكتروني غير موجود."
+
+msgid "Invalid input."
+msgstr "إدخال غير صالح"

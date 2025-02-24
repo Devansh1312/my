@@ -582,18 +582,16 @@ class LoginAPIView(APIView):
                 username_or_phone = serializer.validated_data['username']
                 password = serializer.validated_data['password']
 
-                # Check if the phone number is linked to a deleted user
-                deleted_user = User.objects.filter(phone=username_or_phone, is_deleted=True).first()
+                user_queryset = User.objects.filter(phone=username_or_phone)
+                deleted_user = user_queryset.filter(is_deleted=True).first()
+                active_user = user_queryset.filter(is_deleted=False).first()
 
-                if deleted_user:
-                    user = User.objects.filter(phone=username_or_phone, is_deleted=False).first()
-                    if not user:
-                        return Response({
-                            'status': 0,
-                            'message': _('This phone number is associated with a deleted account, you have to register again.'),
-                        }, status=status.HTTP_400_BAD_REQUEST)
+                if deleted_user and not active_user:
+                    return Response({
+                        'status': 0,  # Change status to 0 to indicate an error
+                        'message': _('User does not exist for the given username or phone.'),  # Remove _() if translation is not needed
+                    }, status=status.HTTP_400_BAD_REQUEST)  # Change status code to 400
 
-                # Now check if the phone number is linked to a normal (non-deleted) user
                 user = User.objects.filter(phone=username_or_phone, is_deleted=False).first() or \
                        User.objects.filter(username=username_or_phone).first()
 
@@ -643,13 +641,6 @@ class LoginAPIView(APIView):
                 user = User.objects.filter(email=email, is_deleted=False).first()
 
                 if user:
-                    # If the user already exists and is not deleted, log them in
-                    if user.is_deleted:
-                        return Response({
-                            'status': 0,
-                            'message': _('Your account has been deleted. Please contact support.'),
-                        }, status=status.HTTP_400_BAD_REQUEST)
-
                     if user.role.id == 1:
                         return Response({
                             'status': 0,
@@ -672,7 +663,7 @@ class LoginAPIView(APIView):
                                 'team': get_team_data(user, request),
                                 'group': get_group_data(user, request),
                                 'current_type': user.current_type,
-                            }
+                                }
                         }, status=status.HTTP_200_OK)
                     else:
                         return Response({
@@ -685,18 +676,26 @@ class LoginAPIView(APIView):
                         'message': _('Email does not exist. Please register first.'),
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Custom error handling
-        error_message = serializer.errors.get('non_field_errors')
-        if error_message:
+        # 🔹 **Updated Error Handling to Avoid Blank Messages**
+        if serializer.errors:
+            error_messages = []
+            for field, errors in serializer.errors.items():
+                if isinstance(errors, list):
+                    error_messages.extend(errors)
+
+            # Ensure at least one error message before joining
+            error_text = " ".join(error_messages) if error_messages else _("Invalid input.")
+
             return Response({
                 'status': 0,
-                'message': _(error_message[0])  # Ensures translation is applied
+                'message': str(error_text)  # Ensures a valid string response
             }, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({
-                'status': 0,
-                'message': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'status': 0,
+            'message': str(serializer.errors),  # Instead of "Unknown error", return actual errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 
 ##################################################### Logout API ###############################################################
 class LogoutAPIView(APIView):

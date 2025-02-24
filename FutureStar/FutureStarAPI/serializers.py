@@ -70,7 +70,12 @@ class LoginSerializer(serializers.Serializer):
             
             # Check if the user exists with the provided username or phone
             user = User.objects.filter(username=data['username']).first() or User.objects.filter(phone=data['username']).first()
+            
             if user is None:
+                raise serializers.ValidationError(_("User with this username or phone does not exist."))
+            
+            # Check if the user is deleted
+            if user.is_deleted:
                 raise serializers.ValidationError(_("User with this username or phone does not exist."))
             
             # Check if the password is correct
@@ -82,6 +87,16 @@ class LoginSerializer(serializers.Serializer):
             if not data.get('username'):
                 errors.append("Email is required for type 2 and type 3 login.")
                 raise serializers.ValidationError(_(" ".join(errors)))
+            
+            # Check if the user exists with the provided email
+            user = User.objects.filter(email=data['username']).first()
+            
+            if user is None:
+                raise serializers.ValidationError(_("User with this email does not exist."))
+            
+            # Check if the user is deleted
+            if user.is_deleted:
+                raise serializers.ValidationError(_("User with this email does not exist."))
         return data
 
 ############################# User Profile Update Serializer #####################################
