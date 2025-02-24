@@ -778,6 +778,8 @@ class DeleteAccountView(APIView):
         user.deleted_reason_id = delete_reason  # Assign the UserDeleteReason instance to the foreign key
         user.deleted_reason = deleted_reason_text  # Assign the additional text reason
         user.is_active = False  # Optionally, deactivate the user as well
+        user.device_type = None
+        user.device_token = None
         user.save()
 
         return Response({
