@@ -99,11 +99,20 @@ def get_user_data(user, request):
     secondary_playing_position_name = None
     secondary_playing_position_id = user.secondary_playing_position.id if user.secondary_playing_position else None
 
+    language = request.headers.get('Language', 'en') if request else 'en'
+    # Define playing positions dynamically based on language
+    main_playing_position_name = None
+    secondary_playing_position_name = None
+
     if user.main_playing_position:
-        main_playing_position_name = f"{user.main_playing_position.name_en} - {user.main_playing_position.shortname}"
+        name = user.main_playing_position.name_ar if language == 'ar' else user.main_playing_position.name_en
+        shortname = user.main_playing_position.shortname or ""
+        main_playing_position_name = f"{name} - {shortname}"
 
     if user.secondary_playing_position:
-        secondary_playing_position_name = f"{user.secondary_playing_position.name_en} - {user.secondary_playing_position.shortname}"
+        name = user.secondary_playing_position.name_ar if language == 'ar' else user.secondary_playing_position.name_en
+        shortname = user.secondary_playing_position.shortname or ""
+        secondary_playing_position_name = f"{name} - {shortname}"
 
     return {
         'id': user.id,
