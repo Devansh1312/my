@@ -99,7 +99,8 @@ def get_user_data(user, request):
 
     language = request.headers.get('Language', 'en') if request else 'en'
     # Define playing positions dynamically based on language
-
+    main_playing_position_name = None
+    secondary_playing_position_name = None
     if user.main_playing_position:
         name = user.main_playing_position.name_ar if language == 'ar' else user.main_playing_position.name_en
         shortname = user.main_playing_position.shortname or ""
