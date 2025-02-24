@@ -94,6 +94,8 @@ def get_user_data(user, request):
         playing_foot = serializer.data['name']
     
     # Main and secondary playing positions with id and combined name-shortname fields
+    main_playing_position_id = None
+    secondary_playing_position_id = None
     main_playing_position_id = user.main_playing_position.id if user.main_playing_position else None
     secondary_playing_position_id = user.secondary_playing_position.id if user.secondary_playing_position else None
 
@@ -3610,9 +3612,6 @@ class CustomFollowRequestPagination(PageNumberPagination):
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request, view=None):
-        language = request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
         try:
             page_number = request.query_params.get(self.page_query_param, 1)
             self.page = int(page_number)
@@ -3659,9 +3658,6 @@ class ListFollowersAPI(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
-        language = self.request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
         creator_type = self.request.query_params.get('creator_type')
         created_by_id = self.request.query_params.get('created_by_id')
         search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
@@ -3752,9 +3748,6 @@ class ListFollowingAPI(generics.ListAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
-        language = self.request.headers.get('Language', 'en')
-        if language in ['en', 'ar']:
-            activate(language)
         creator_type = self.request.query_params.get('creator_type')
         created_by_id = self.request.query_params.get('created_by_id')
         search_key = self.request.query_params.get('search_key', '')  # Get search key if provided
@@ -5267,9 +5260,10 @@ class CustomSearchPagination(PageNumberPagination):
 class SearchAPIView(APIView):
     pagination_class = CustomSearchPagination
 
-   
-
     def get(self, request, *args, **kwargs):
+        language = self.request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         search_query = request.query_params.get('search', '')
         search_type = request.query_params.get('type')
         creator_type = request.query_params.get('creator_type')
