@@ -5390,7 +5390,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
 
             # Check if the training is within the next hour
             if current_time <= training_start_time <= one_hour_later:
-                attendance_message = _("Don't forget to mark your attendance")
+                attendance_message = _("Don't forget to mark the attendance of your players.")
                 # comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
