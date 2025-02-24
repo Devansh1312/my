@@ -5450,7 +5450,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         send_push_notification(
             user.device_token,
             _("Training Reminder"),
-            attendance_message,
+            _(attendance_message),
             device_type=user.device_type,
             data=push_data
         )
@@ -5462,7 +5462,7 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=attendance_message 
+            content=_(attendance_message) 
         )
 
 #################### Training End Time Notification API ######################
@@ -5522,7 +5522,13 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         notifications_sent += 1
 
         return Response(
-            {"message": "Notifications sent to {} users.".format(notifications_sent)},
+            {
+             "message": "Notifications sent to {} users.".format(notifications_sent), 
+             "data": timezone.localtime(timezone.localtime(timezone.now())),
+             "current_time": current_time,
+             "current_date": current_date,
+             "one_hour_later": one_hour_later,
+             "notified_users": notified_users},
             status=status.HTTP_200_OK
         )
 
@@ -5530,18 +5536,18 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
         notification_language = user.current_language
         if notification_language in ['ar', 'en']:
             activate(notification_language)
-
+        activate(notification_language)
         send_push_notification(
             user.device_token,
             _("Training Reminder"),
-            message,
+            _(message),
             device_type=user.device_type,
             data=push_data
         )
         send_push_notification(
             user.device_token,
             _("Training Reminder"),
-            comments_message,
+            _(comments_message),
             device_type=user.device_type,
             data=push_data
         )
@@ -5552,7 +5558,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=message  
+            content=_(message)  
         )
 
         Notifictions.objects.create(
@@ -5561,7 +5567,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=comments_message
+            content=_(message)
         )
 #################### Tournament Game LineUp Notification API ######################
 class LineupNotificationAPIView(APIView):

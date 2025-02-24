@@ -1627,3 +1627,12 @@ msgstr "تم إعادة تعيين كلمة المرور بنجاح. يرجى ت
 
 msgid "Don't forget to rate your players and add comments on their performance after the training session."
 msgstr "لا تنس تقييم لاعبيك وإضافة تعليقات على أدائهم بعد جلسة التدريب."
+
+msgid "Don't forget to rate your players after the training session."
+msgstr "لا تنس تقييم لاعبيك بعد جلسة التدريب."
+
+msgid "Don't forget to add your comments on your players' performance."
+msgstr "لا تنس إضافة تعليقاتك على أداء لاعبيك."
+
+msgid "Training Reminder"
+msgstr "تذكير التدريب"
