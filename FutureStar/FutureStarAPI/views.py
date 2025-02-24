@@ -5466,30 +5466,23 @@ class CheckTrainingTimeAndSendNotificationsAPIView(APIView):
         )
 
 #################### Training End Time Notification API ######################
-#################### Training End Time Notification API ######################
 class CheckEndTimeAndSendNotificationsAPIView(APIView):
     def get(self, request, *args, **kwargs):
-        # Get the current datetime
         current_time = timezone.localtime(timezone.now())
         one_hour_later = current_time + timedelta(hours=1)
         current_date = current_time.date()
-
-        # Query all training sessions for today
+        
         trainings = Training.objects.filter(training_date=current_date)
-        notifications_sent = 0  # Counter for sent notifications
-        notified_users = set()  # To track users who already received notifications
+        notifications_sent = 0
+        notified_users = set()  # Set to track notified users
 
         for training in trainings:
             training_end_time = timezone.make_aware(
                 datetime.combine(training.training_date, training.end_time)
             )
-
-            # Check if the training ends within the next hour
             if current_time <= training_end_time <= one_hour_later:
-                # Combine both messages into one
-                message = _(
-                    "Don't forget to rate your players and add comments on their performance after the training session."
-                )
+                message = _("Don't forget to rate your players after the training session.")
+                comments_message = _("Don't forget to add your comments on your players' performance.")
                 push_data = {
                     "training_id": training.id,
                     "type": "my_training"
@@ -5502,7 +5495,6 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     ).values_list('branch_id', flat=True)
 
                     if creator_branches.exists():
-                        # Notify the team's branch manager and coach
                         branch_managers_and_coaches = JoinBranch.objects.filter(
                             branch_id__in=creator_branches,
                             joinning_type__in=[1, 3]  # 1 = Coach, 3 = Manager
@@ -5511,14 +5503,13 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                         for branch in branch_managers_and_coaches:
                             manager_or_coach = branch.user_id
                             if manager_or_coach.id not in notified_users:
-                                self.send_notification(manager_or_coach, message, push_data)
+                                self.send_notification(manager_or_coach, message, comments_message, push_data)
                                 notified_users.add(manager_or_coach.id)
                                 notifications_sent += 1
                     else:
-                        # Notify the training creator directly
                         user = User.objects.get(id=training.created_by_id)
                         if user.id not in notified_users:
-                            self.send_notification(user, message, push_data)
+                            self.send_notification(user, message, comments_message, push_data)
                             notified_users.add(user.id)
                             notifications_sent += 1
 
@@ -5526,7 +5517,7 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
                     team = Team.objects.get(id=training.created_by_id)
                     team_founder = team.team_founder
                     if team_founder.id not in notified_users:
-                        self.send_notification(team_founder, message, push_data)
+                        self.send_notification(team_founder, message, comments_message, push_data)
                         notified_users.add(team_founder.id)
                         notifications_sent += 1
 
@@ -5535,15 +5526,11 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
-    def send_notification(self, user, message, push_data):
-        """
-        Helper method to send a single notification to a user.
-        """
+    def send_notification(self, user, message, comments_message, push_data):
         notification_language = user.current_language
         if notification_language in ['ar', 'en']:
             activate(notification_language)
 
-        # Send a single push notification with a combined message
         send_push_notification(
             user.device_token,
             _("Training Reminder"),
@@ -5551,17 +5538,31 @@ class CheckEndTimeAndSendNotificationsAPIView(APIView):
             device_type=user.device_type,
             data=push_data
         )
+        send_push_notification(
+            user.device_token,
+            _("Training Reminder"),
+            comments_message,
+            device_type=user.device_type,
+            data=push_data
+        )
 
-        # Store a single notification in the database
         Notifictions.objects.create(
             created_by_id=1,
             creator_type=1,
             targeted_id=user.id,
             targeted_type=1,
             title=_("Training Reminder"),
-            content=message
+            content=message  
         )
 
+        Notifictions.objects.create(
+            created_by_id=1,
+            creator_type=1,
+            targeted_id=user.id,
+            targeted_type=1,
+            title=_("Training Reminder"),
+            content=comments_message
+        )
 #################### Tournament Game LineUp Notification API ######################
 class LineupNotificationAPIView(APIView):
 
