@@ -2843,7 +2843,7 @@ class PlayerInfoPage(View):
                 player_id=user,
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP,
                 game_id__game_date__lt=finished_games_date_filter.date(),
-                # game_id__finish=True
+                game_id__finish=True
             ).select_related('game_id', 'team_id').order_by('game_id__game_date')[:5]
 
             # Tournament Games - Finished
@@ -2851,7 +2851,7 @@ class PlayerInfoPage(View):
                 player_id=user,
                 lineup_status=Lineup.ALREADY_IN_LINEUP,
                 game_id__game_date__lt=finished_games_date_filter.date(),
-                # game_id__finish=True
+                game_id__finish=True
             ).select_related('game_id', 'team_id').order_by('game_id__game_date')[:5]
 
             # Combine the finished games
