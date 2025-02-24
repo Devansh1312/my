@@ -139,8 +139,13 @@ class TournamentSerializer(serializers.ModelSerializer):
         # Return the relative path of the tournament banner
         return obj.tournament_banner.url if obj.tournament_banner else None
     def get_age_group_name(self, obj):
-        return obj.age_group.name_en if obj.age_group else None
-
+        request = self.context.get('request')
+        language = request.headers.get('Language', 'en')
+        if language == 'en':
+            return obj.age_group.name_en if obj.age_group else None
+        elif language == 'ar':
+            return obj.age_group.name_ar if obj.age_group else None
+        
 
     def create(self, validated_data):
         # Automatically associate the tournament with the currently logged-in user
