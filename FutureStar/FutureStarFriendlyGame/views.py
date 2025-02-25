@@ -1,6 +1,5 @@
 from collections import defaultdict
 import re
-from datetime import date
 from itertools import chain
 from operator import attrgetter
 
@@ -84,8 +83,7 @@ class ManagerBranchDetail(APIView):
                 'data': []
             }, status=status.HTTP_404_NOT_FOUND)
 
-
-
+################################# Game Detail Update API #########################################################
 class UpdateFriendlyGameDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -191,6 +189,7 @@ class UpdateFriendlyGameDetailAPIView(APIView):
                 'message': _('An unexpected error occurred.'),
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 ################## Create Friedndly game With Request Refree For Game ###############################
 class CreateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
@@ -319,11 +318,11 @@ class CreateFriendlyGame(APIView):
 
                             # Prepare push notification content
                             title = _("Referee Request: Friendly Game")
-                            body = _("You have been requested as a referee for a friendly game on {date} at {time} at {field}. Please review the request.").format(
-                                date=friendly_game.game_date.strftime('%d-%m'),
-                                time=friendly_game.game_start_time.strftime('%H:%M'),
-                                field=friendly_game.game_field_id.field_name
-                            )
+                            body = _("You have been requested as a referee for a friendly game on ") + \
+                                    friendly_game.game_date.strftime('%d-%m') + _(" at ") + \
+                                    friendly_game.game_start_time.strftime('%H:%M') + _(" at ") + \
+                                    friendly_game.game_field_id.field_name + _(". Please review the request.")
+
                             friendly_data = {"id": friendly_game.id,  # Include the game ID
                                              "game_type": "friendly",}
                             push_data = {
@@ -413,9 +412,6 @@ class CreateFriendlyGame(APIView):
 
 
     def notify_team_members(self, team_id, creator_user, team_b_id=None, opponent_team_name=None, team_b_name=None, game_field_name=None, game_date=None, start_time=None,game_id=None,created_by_id=None):
-        """
-        Notify eligible team members (coaches and managers) about a new friendly game.
-        """
         # Notify Team B Members
         if team_b_id:
             team_b_members = JoinBranch.objects.filter(
@@ -433,12 +429,8 @@ class CreateFriendlyGame(APIView):
                 device_token = user.device_token  # Assuming `device_token` is stored in the User model
                 device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
                 title = _("Your Game is Scheduled")
-                body = _("You have a Friendly Game against {opponent_team_name} at {game_date} {start_time} at {game_field_name}").format(
-                    opponent_team_name=opponent_team_name,  # Dynamically added opponent team name
-                    game_date=game_date,
-                    start_time=start_time,
-                    game_field_name=game_field_name
-                )
+                body = _("You have a Friendly Game against ") + opponent_team_name + _(" at ") + game_date + _(" ") + start_time + _(" at ") + game_field_name
+
                 friendly_data= {"id": game_id,  # Include the game ID
                     "game_type": "friendly",}
                 push_data = {
@@ -485,7 +477,6 @@ class CreateFriendlyGame(APIView):
                     device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
                     title = _("Friendly Game Reminder")
                     body = _("A new friendly game has been created! Make sure to check it out.")
-
 
                     push_data = {
                             "game_id": game_id,  # Include the game ID
@@ -739,8 +730,6 @@ class CreateFriendlyGame(APIView):
 
 
 # ########### search referee ############
-
-
 class OfficialListView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser,)
@@ -772,7 +761,7 @@ class OfficialListView(APIView):
             'data': user_data
         }, status=status.HTTP_200_OK)
 
-############### Update Friendly Game ################
+############### Add Team B in Friendly Game API ################
 class UpdateFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -842,8 +831,6 @@ class UpdateFriendlyGame(APIView):
             game.team_b = team_b_instance  # Assign the TeamBranch instance
             game.game_status = 1  # Set status to started
             game.save()
-
-
             team_a_id=game.team_a_id
             team_b_name = game.team_b.team_name if team_b_id else None
             game_field_name=game.game_field_id.field_name
@@ -851,8 +838,6 @@ class UpdateFriendlyGame(APIView):
             date=game.game_date.strftime('%d-%m')
             game_id=game.id
             
-        
-
             # Notify team_a's coach and manager
             self.notify_team_a_coach_and_manager(team_a_id,team_b_id,team_b_name, date, start_time, game_field_name,game_id)
 
@@ -870,9 +855,6 @@ class UpdateFriendlyGame(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
     def notify_team_a_coach_and_manager(self,team_a_id,team_b_id, team_b_name, game_date, start_time, game_field_name,game_id):
-        """
-        Notify coach and manager of team A when team B is assigned.
-        """
         team_a_members = JoinBranch.objects.filter(
             branch_id=team_a_id,  # Filter users by role (Coach or Manager)
             joinning_type__in=[JoinBranch.MANAGERIAL_STAFF_TYPE, JoinBranch.COACH_STAFF_TYPE]  # Staff types only
@@ -888,24 +870,17 @@ class UpdateFriendlyGame(APIView):
             device_token = user.device_token  # Assuming `device_token` is stored in the User model
             device_type = user.device_type    # Assuming `device_type` is stored in the User model (1 for Android, 2 for iOS)
             title = _("Your Game is Scheduled")
-            body = _("You have a Friendly Game against {opponent_team_name} at {game_date} {start_time} at {game_field_name}").format(
-                opponent_team_name=team_b_name,  # Dynamically added opponent team name (team B)
-                game_date=game_date,
-                start_time=start_time,
-                game_field_name=game_field_name
-            )
-           
-              
-            friendly_data= {"id": game_id,
-                            "game_id":game_id,   # Include the game ID
-                    "game_type": "friendly",}
-            push_data = {
-                   
-                    "game_data": friendly_data,  # Include the game data,
-                    
-                    "type":"friendly_game_scheduled"
+            body = _("You have a Friendly Game against ") + team_b_name + _(" at ") + game_date + _(" ") + start_time + _(" at ") + game_field_name
 
-            
+                      
+            friendly_data={
+                    "id": game_id,
+                    "game_id":game_id,
+                    "game_type": "friendly"
+                }
+            push_data = {
+                    "game_data": friendly_data,  
+                    "type":"friendly_game_scheduled"
                 }
             if device_token:
                 send_push_notification(
@@ -913,20 +888,19 @@ class UpdateFriendlyGame(APIView):
                     title=title,
                     body=body,
                     device_type=device_type,
-                    data=push_data  # Optionally include game-related data
+                    data=push_data
                 )
                 notification = Notifictions.objects.create(
-                    created_by_id=self.request.user.id,  # Requestor ID (assumes request.user is available)
-                    creator_type=1,  # Assuming 1 represents the creator type
-                    targeted_id=user.id,  # Team A's coach or manager ID
-                    targeted_type=1,  # Assuming 1 represents a user
+                    created_by_id=self.request.user.id,
+                    creator_type=1,
+                    targeted_id=user.id,
+                    targeted_type=1,
                     title=title,
                     content=body
                 )
                 notification.save()
 
-
-################## Delete Friendly Game ################
+################## Delete Friendly Game ######################################################
 class DeleteFriendlyGame(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
@@ -981,9 +955,6 @@ class DeleteFriendlyGame(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         
-
-
-
 ################ Pagination ##################
 # Custom Pagination class with fixed paginate_queryset
 class CustomFriendlyGamesPagination(PageNumberPagination): 
@@ -1036,9 +1007,7 @@ class CustomFriendlyGamesPagination(PageNumberPagination):
             'data': data
         })
 
-        
 ################ List OF Friendly Games Where Only One Team is There  #######################
-
 class ListOfFridlyGamesForJoin(APIView):
     pagination_class = CustomFriendlyGamesPagination
     permission_classes = [IsAuthenticated]
@@ -1112,7 +1081,6 @@ class TeamBranchListView(APIView):
         }, status=status.HTTP_200_OK)
 
 ####################### Fetch Friendly Games Detail #####################
-
 class FriendlyGameDetailAPIView(APIView):
     def get(self, request, *args, **kwargs):
         game_id = request.query_params.get('game_id')
@@ -1181,7 +1149,6 @@ class FriendlyGameDetailAPIView(APIView):
             "data": game_data
         }, status=status.HTTP_200_OK)
 
-
 ################## send notification to referee ###############
 class SendRefereeNotification(APIView):
 
@@ -1216,22 +1183,19 @@ class SendRefereeNotification(APIView):
                 # Prepare push notification content
                 title = _("Invitation to Referee a Friendly Game")
                
-                body = _("A new friendly game '{game_name}' has been scheduled on {game_date} at {game_time} at {field}. "
-                         "Would you like to participate as a referee?").format(
-                    game_name=friendly_game.game_name,
-                    game_date=friendly_game.game_date.strftime('%d-%m'),
-                    game_time=friendly_game.game_start_time.strftime('%H:%M'),
-                    field=friendly_game.game_field_id.field_name
-                )
+                body = _("A new friendly game '") + friendly_game.game_name + _("' has been scheduled on ") + \
+                        friendly_game.game_date.strftime('%d-%m') + _(" at ") + \
+                        friendly_game.game_start_time.strftime('%H:%M') + _(" at ") + \
+                        friendly_game.game_field_id.field_name + _(". Would you like to participate as a referee?")
 
                 friendly_data = {
-                    "id": friendly_game.id,  # Include the game ID
-                    "game_type": "friendly"
-                }
+                        "id": friendly_game.id,  # Include the game ID
+                        "game_type": "friendly"
+                    }
                 push_data = {
-                    "game_data": friendly_data,  # Include the game data
-                    "type": "friendly_game_scheduled"
-                }
+                        "game_data": friendly_data,  # Include the game data
+                        "type": "friendly_game_scheduled"
+                    }
 
                 # Check device token for each referee and send push notification if exists
                 device_token = referee.device_token
@@ -1803,15 +1767,7 @@ class FriendlyGameLineupPlayers(APIView):
                     send_push_notification(
                         device_token=lineup.player_id.device_token,
                         title=_("You have been added to a game"),
-                        body=_(
-                            "You have been added to a game of {game_name} against {opponent_team}"
-                        ).format(
-                            game_name=game.game_name,
-                    
-                        
-                        
-                            opponent_team=opponent_team.team_name
-                        ),
+                        body = _("You have been added to a game of ") + game.game_name + _(" against ") + opponent_team.team_name,
                         device_type=lineup.player_id.device_type,
                         data=data
                     )
@@ -1821,15 +1777,7 @@ class FriendlyGameLineupPlayers(APIView):
                         targeted_id=lineup.player_id.id,  # Team A's coach or manager ID
                         targeted_type=1,  # Assuming 1 represents a user
                         title=_("You have been added to a game"),
-                        content=_(
-                            "You have been added to a game of {game_name} against {opponent_team}"
-                        ).format(
-                            game_name=game.game_name,
-                    
-                        
-                        
-                            opponent_team=opponent_team.team_name
-                        ),
+                        content = _("You have been added to a game of ") + game.game_name + _(" against ") + opponent_team.team_name
                     )
                     notification.save()
 
@@ -2742,7 +2690,7 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-    def send_notifications(self, game, team, message,referee):
+    def send_notifications(self, game, team, message, referee):
         team_name = team.team_name
         coaches_and_managers = JoinBranch.objects.filter(
             branch_id=team.id,
@@ -2754,11 +2702,10 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
             notification_language = user.current_language
             if notification_language in ['ar', 'en']:
                 activate(notification_language)
-           
 
-            game_data={"id": game.id,"game_type": "friendly", "team_id": game.team_b.id}
-            data={'type': "add_lineup_player", 'game_data': game_data}
-            body_message=_(message).format(team_name=team_name)
+            game_data = {"id": game.id, "game_type": "friendly", "team_id": game.team_b.id}
+            data = {'type': "add_lineup_player", 'game_data': game_data}
+            body_message = _(message) + " " + team_name  # String concatenation instead of .format()
 
             send_push_notification(
                 device_token=user.device_token,
@@ -2931,9 +2878,6 @@ class FriendlyGameOficialTypesList(APIView):
            'data': serializer.data
         }, status=status.HTTP_200_OK)
     
-
-
-
 # ################### Game Officilals API Views ###################
 
 class FriendlyGameOfficialsAPIView(APIView):
@@ -2966,11 +2910,7 @@ class FriendlyGameOfficialsAPIView(APIView):
         # Prepare the response data, grouping by official type
         officials_by_type = {}
         for official_type in all_official_types:
-            # Serialize the official type
-            # type_serializer = FriendlyGameOficialTypeSerializer(official_type, context={'language': language})
-            # type_name = type_serializer.data['name']
             type_name = official_type.name_en
-
             # Filter assigned officials for the current official type
             assigned_officials = assigned_game_officials.filter(officials_type_id=official_type)
 
@@ -3058,8 +2998,6 @@ class FriendlyGameOfficialsAPIView(APIView):
                     "game_id":int(game_id),
                     "game_type": "friendly"
                 }
-
-
                 # Send the push notification to the official
                 send_push_notification(device_token, title, body, device_type=official.device_type,data=push_data)  # device_type: 1 for Android, 2 for iOS
                 notification = Notifictions.objects.create(
@@ -3351,9 +3289,13 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         return self._get_game_stats_response(game_instance, team_id, player_id, game_instance.id)
                     else:
                         return Response(
-                            {'status': 0, 'message': _('Cannot decrement {} as it cannot go below zero.'.format(stat.capitalize()))},
+                            {
+                                'status': 0,
+                                'message': _(f"Cannot decrement {stat.capitalize()} as it cannot go below zero.")
+                            },
                             status=status.HTTP_400_BAD_REQUEST
                         )
+
 
         return Response({'status': 0, 'message': _('Invalid request data.')}, status=status.HTTP_400_BAD_REQUEST)
 

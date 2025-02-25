@@ -1759,3 +1759,69 @@ msgstr " للمباراة بين "
 
 msgid " and "
 msgstr " و "
+
+msgid "A new friendly game '"
+msgstr "تمت جدولة مباراة ودية جديدة '"
+
+msgid "' has been scheduled on "
+msgstr "' تم تحديد موعدها في "
+
+msgid ". Would you like to participate as a referee?"
+msgstr ". هل ترغب في المشاركة كحكم؟"
+
+msgid "You have been added to a game of "
+msgstr "لقد تمت إضافتك إلى مباراة "
+
+msgid " against "
+msgstr " ضد "
+
+msgid "Cannot decrement {stat} as it cannot go below zero."
+msgstr "Cannot decrement {stat} as it cannot go below zero."
+
+msgid "You have been requested as a referee for a friendly game on "
+msgstr "لقد طُلب منك أن تكون حكماً في مباراة ودية يوم "
+
+msgid ". Please review the request."
+msgstr " .يرجى مراجعة الطلب"
+
+msgid "You have a Friendly Game against "
+msgstr "لديك مباراة ودية ضد "
+
+msgid " "
+msgstr " \"  # This space is needed to preserve formattin"
+
+msgid "Team "
+msgstr "الفريق "
+
+msgid " has sent a request to join the tournament "
+msgstr " قد أرسل طلبًا للانضمام إلى البطولة "
+
+msgid "."
+msgstr "."
+
+msgid "Your team has been accepted to join the "
+msgstr "تم قبول فريقك للانضمام إلى "
+
+msgid " tournament."
+msgstr " البطولة."
+
+msgid "Your team ("
+msgstr "فريقك ("
+
+msgid "), has been scheduled to a match in "
+msgstr ")، تم جدولة مباراة في "
+
+msgid "TBD"
+msgstr "لم يتحدد بعد"
+
+msgid "Your uniform has been rejected for the tournament "
+msgstr "تم رفض زيك الرسمي للبطولة "
+
+msgid " by the referee. Please add a new uniform ASAP."
+msgstr " من قبل الحكم. يرجى إضافة زي جديد في أقرب وقت ممكن."
+
+msgid "Upcoming "
+msgstr "القادم "
+
+msgid " game fetched successfully."
+msgstr " تم جلب المباراة بنجاح."

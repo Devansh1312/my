@@ -886,11 +886,7 @@ class TeamJoiningRequest(APIView):
                     activate(notification_language)  # Activate the user's preferred language
                 
                 title = _("Tournament Joining Request")  # Use the translation function
-                body = _("Team {team_name} has sent a request to join the tournament {tournament_name}.").format(
-                    team_name=team_branch.team_name,
-                    tournament_name=tournament.tournament_name
-                )
-                  # Include tournament_id in the push data
+                body = _("Team ") + team_branch.team_name + _(" has sent a request to join the tournament ") + tournament.tournament_name + _(".")
                 push_data = {
                     "tournament_id": tournament.id,  # Assuming `tournament.id` is the correct attribute for the ID
                     "team_brach_id": team_branch.id,
@@ -995,7 +991,7 @@ class TeamRequestApproved(APIView):
                     send_push_notification(
                         device_token=device_token,
                         title=_("Team Approved"),
-                        body=_("Your team has been accepted to join the {} tournament.").format(tournament.tournament_name),
+                        body = _("Your team has been accepted to join the ") + tournament.tournament_name + _(" tournament."),
                         device_type=device_type,
                         data=push_data,
                     )
@@ -1005,7 +1001,7 @@ class TeamRequestApproved(APIView):
                         targeted_id=user.id,
                         targeted_type=1,  # Assuming 1 is for user
                         title=_("Team Approved"),
-                        content=_("Your team has been accepted to join the {} tournament.").format(tournament.tournament_name),
+                        content=_("Your team has been accepted to join the ") + tournament.tournament_name + _(" tournament.")
                     )
                     notification.save()
             return Response({
@@ -1623,13 +1619,18 @@ class TournamentGamesAPIView(APIView):
                 opponent_team_name = game.team_a.team_name
 
             # Create the notification message
-            notification_message = _("Your team ({}), has been scheduled to a match in {} against {} on {} at {}.").format(
-                team_name,
-                tournament.tournament_name,
-                opponent_team_name,
-                game.game_date.strftime("%Y-%m-%d") if game.game_date else _("TBD"),
-                game.game_start_time.strftime("%H:%M") if game.game_start_time else _("TBD"),
+            notification_message = (
+                _("Your team (") + team_name + _(
+                    "), has been scheduled to a match in "
+                ) + tournament.tournament_name + _(
+                    " against "
+                ) + opponent_team_name + _(
+                    " on "
+                ) + (game.game_date.strftime("%Y-%m-%d") if game.game_date else _("TBD")) + _(
+                    " at "
+                ) + (game.game_start_time.strftime("%H:%M") if game.game_start_time else _("TBD")) + "."
             )
+
             push_data = {
                     "tournament_id": tournament.id,  # The tournament ID
                     "game_id": game.id,  # The game ID
@@ -2357,9 +2358,12 @@ class FetchTeamUniformColorAPIView(APIView):
             )
 
             # Create the notification message
-            notification_message = _("Your uniform has been rejected for the tournament {} by the referee. Please add a new uniform ASAP.").format(
-                game.tournament_id.tournament_name
+            notification_message = (
+                _("Your uniform has been rejected for the tournament ") 
+                + game.tournament_id.tournament_name 
+                + _(" by the referee. Please add a new uniform ASAP.")
             )
+
 
             # Send notification to team A managers
             self.send_rejection_notification(team_a_managers, notification_message, game)
@@ -2820,7 +2824,7 @@ class UpcomingGameView(APIView):
 
             response_data = {
                 "status": 1,
-                "message": "Upcoming {} game fetched successfully.".format(game_type),
+                "message": _("Upcoming ") + game_type + _(" game fetched successfully."),
                 "data": {
                     "game_type": game_type,
                     "game_start_time": first_game.game_start_time,
