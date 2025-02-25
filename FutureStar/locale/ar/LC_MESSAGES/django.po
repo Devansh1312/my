@@ -1825,3 +1825,15 @@ msgstr "القادم "
 
 msgid " game fetched successfully."
 msgstr " تم جلب المباراة بنجاح."
+
+msgid "Can not decrement "
+msgstr "لا يمكن الإنقاص "
+
+msgid " as it can not go below zero."
+msgstr " لأنه لا يمكن أن يكون أقل من الصفر."
+
+msgid "Your "
+msgstr "فريقك "
+
+msgid " team is ready to play!"
+msgstr " جاهز للعب!"

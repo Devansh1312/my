@@ -2396,16 +2396,20 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
         if not lineup_entries.exists():
             return Response({
                 'status': 1,
-                'message': _('No players found.'),
+                'message': _('No players found for the specified criteria.'),
                 'data': {
                     'team_a': {
-                    'added_players': [],
-                    'substitute_players': [],
-                },
-                'team_b': {
-                    'added_players': [],
-                    'substitute_players': [],
-                }
+                        'team_id': game.team_a.id,
+                        'team_name': game.team_a.team_name, 
+                        'added_players': [],
+                        'substitute_players': [],
+                    },
+                    'team_b': {
+                        'team_id': game.team_b.id,
+                        'team_name': game.team_b.team_name, 
+                        'added_players': [],
+                        'substitute_players': [],
+                    }
                 }
             }, status=status.HTTP_200_OK)
 
@@ -2562,10 +2566,10 @@ class FriendlyGameLineupPlayerStatusAPIView(APIView):
 
         # Send notifications based on the change and ready counts
         if is_team_a and team_a_ready_count == 11:
-            self.send_notifications(game, game.team_a,  "Your {team_name} team is ready to play!",lineup_entry.created_by_id)
+            self.send_notifications(game, game.team_a, _("Your ") + game.team_a.team_name + _(" team is ready to play!"), lineup_entry.created_by_id)
 
         if is_team_b and team_b_ready_count == 11:
-            self.send_notifications(game, game.team_b,  "Your {team_name} team is ready to play!",lineup_entry.created_by_id)
+            self.send_notifications(game, game.team_b, _("Your ") + game.team_b.team_name + _(" team is ready to play!"), lineup_entry.created_by_id)
 
         if team_a_ready_count == 11 and team_b_ready_count == 11:
             self.send_notifications(game, game.team_a,  "Both teams are ready to play! Let's Go",lineup_entry.created_by_id)
@@ -3183,7 +3187,7 @@ class FriendlyPlayerGameStatsAPIView(APIView):
                         return Response(
                             {
                                 'status': 0,
-                                'message': _(f"Cannot decrement {stat.capitalize()} as it cannot go below zero.")
+                                "message": _("Can not decrement ") + stat.capitalize() + _(" as it can not go below zero.")
                             },
                             status=status.HTTP_400_BAD_REQUEST
                         )
