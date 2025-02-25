@@ -7093,27 +7093,7 @@ class AssignUserToFriendlyGameView(LoginRequiredMixin, View):
         return JsonResponse({"error": "GET method not allowed"}, status=405)
 
 
-############################ Tournamemt Games State Add ####################################
-
-
-# @method_decorator(user_role_check, name="dispatch")
-# class TournamentGameStatsView(LoginRequiredMixin, View):
-#     template_name = "Admin/Games/ListOfGames.html"
-
-#     def get(self, request):
-#         games = TournamentGames.objects.all().select_related(
-#             "tournament_id", "team_a", "team_b"
-#         )
-#         return render(
-#             request,
-#             self.template_name,
-#             {
-#                 "games": games,
-#                 "breadcrumb": {"parent": "Tournament", "child": "Game Stats"},
-#             },
-#         )
-
-
+############################ Tournamemt Games State Edit ####################################
 @method_decorator(user_role_check, name="dispatch")
 class TournamentGameEditStatsView(LoginRequiredMixin, View):
     template_name = "Admin/Games/EditGameStatsModal.html"
@@ -7164,25 +7144,7 @@ class TournamentGameEditStatsView(LoginRequiredMixin, View):
             return JsonResponse({"success": False, "html": html})
 
 
-############################ Friendly Games State Add ####################################
-
-
-# @method_decorator(user_role_check, name="dispatch")
-# class FriendlyGameStatsView(LoginRequiredMixin, View):
-#     template_name = "Admin/Friendly_Games/ListOfGames.html"
-
-#     def get(self, request):
-#         # Fetch friendly games, adjust the query based on your model relationships
-#         games = FriendlyGame.objects.all().select_related("team_a", "team_b")
-#         return render(
-#             request,
-#             self.template_name,
-#             {
-#                 "games": games,
-#                 "breadcrumb": {"parent": "Friendly Games", "child": "Game Stats"},
-#             },
-#         )
-
+############################ Friendly Games State Edit ####################################
 
 @method_decorator(user_role_check, name="dispatch")  # Custom decorator for role check
 class FriendlyGameEditStatsView(LoginRequiredMixin, View):
@@ -7259,7 +7221,7 @@ class UserRoleAppliedListView(LoginRequiredMixin, View):
             },
         )
 
-
+#################### User Role Apllied Approval #####################
 class UserRoleActionView(LoginRequiredMixin, View):
     template_name = "Admin/User/user_role_action.html"
 
