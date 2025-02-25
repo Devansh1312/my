@@ -140,8 +140,11 @@ class SuccessStoriesPage(View):
             for team_branch in team_branches:
                 branches_win = TournamentGames.objects.filter(
                     winner_id=team_branch.id, finish=True
-                )
-                win_count = branches_win.count()
+                ).count()
+                branches_win1 = FriendlyGame.objects.filter(
+                    winner_id=team_branch.id, finish=True
+                ).count()
+                win_count = branches_win + branches_win1
                
                 team_wins.append({"team_branch": team_branch, "win_count": win_count})
 

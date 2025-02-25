@@ -1299,12 +1299,14 @@ class LineupPlayerStatusAPIView(APIView):
 
         for lineup in lineup_entries:
             player = lineup.player_id
+            jersey_entry = PlayerJersey.objects.filter(lineup_players=lineup).first()  # Fetch the jersey number
             player_data = {
                 'player_id': player.id,
                 'player_username': player.username,
                 'player_profile_picture': player.profile_picture.url if player.profile_picture else None,
                 'position_1': lineup.position_1,
                 'player_ready': lineup.player_ready,
+                'jersey_number': jersey_entry.jersey_number if jersey_entry else None,  # Include jersey number
                 'created_at': lineup.created_at,
                 'updated_at': lineup.updated_at,
             }
