@@ -776,9 +776,6 @@ msgstr "تفاصيل اللاعبين مطلوبة."
 msgid "Players fetched successfully."
 msgstr "تم جلب اللاعبين بنجاح."
 
-msgid "Playing 11 Updated Successfully"
-msgstr "تم تحديث التشكيلة الأساسية بنجاح."
-
 msgid "Playing 11 Updated Successfully."
 msgstr "تم تحديث التشكيلة الأساسية بنجاح."
 
@@ -1738,3 +1735,27 @@ msgstr "المستخدم بهذا البريد الإلكتروني غير مو�
 
 msgid "Invalid input."
 msgstr "إدخال غير صالح"
+
+msgid "You have been appointed as {officials_type} to the game between {team_a} and {team_b} on {date} {time} at {location}."
+msgstr "لقد تم تعيينك كـ {officials_type} للمباراة بين {team_a} و {team_b} في {date} {time} في {location}."
+
+msgid "You have been appointed as {officials_type} to the friendly game between {team_a} and {team_b} on {date} {time} at {location}."
+msgstr "لقد تم تعيينك كـ {officials_type} للمباراة الودية بين {team_a} و {team_b} في {date} {time} في {location}."
+
+msgid "You have been appointed as "
+msgstr "لقد تم تعيينك كـ "
+
+msgid " to the friendly game between "
+msgstr " للمباراة الودية بين "
+
+msgid " on "
+msgstr " في "
+
+msgid " at "
+msgstr " في "
+
+msgid " to the game between "
+msgstr " للمباراة بين "
+
+msgid " and "
+msgstr " و "

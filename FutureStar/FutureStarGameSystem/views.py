@@ -664,7 +664,9 @@ class LineupPlayers(APIView):
         added_data = prepare_lineup_data(added_lineups)
         substitute_data = prepare_lineup_data(substitute_lineups)
         already_added_data = prepare_lineup_data(already_added_lineups)
-
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Prepare final response
         return Response({
             'status': 1 if not errors else 0,
@@ -1779,23 +1781,24 @@ class GameOfficialsAPIView(APIView):
                 title = _('You have been appointed to officiate a game.')
 
                 # Include detailed information in the body
-                body = _(
-                    'You have been appointed as {officials_type} to the game between {team_a} and {team_b} on {date} {time} at {location} .'
-                ).format(
-                    team_a=game.team_a.team_name,  # Assuming `team_a_name` is a field in the `game` object
-                    team_b=game.team_b.team_name,  # Assuming `team_b_name` is a field in the `game` object
-                    date=game.game_date.strftime('%d-%m'),  # Format the date and time
-                    time=game.game_start_time.strftime('%H:%M'),
-                    location=game.game_field_id.field_name,  # Assuming `location` is a field in the `game` object
-                    officials_type=type_serializer.data['name']
-                )
+                body = _('You have been appointed as ') + type_serializer.data['name'] + \
+                        _(' to the game between ') + game.team_a.team_name + \
+                        _(' and ') + game.team_b.team_name + \
+                        _(' on ') + game.game_date.strftime('%d-%m') + ' ' + game.game_start_time.strftime('%H:%M') + \
+                        _(' at ') + game.game_field_id.field_name + '.'
+                
+                game_data = {
+                        "game_id": int(game_id),  # Include the game ID
+                        "tournament_id":game.tournament_id.id,
+                        "game_type": "Tournament",
+                        "id": int(game_id)
+                        }
+
                 push_data = {
-                    "tournament_id": game.tournament_id.id,  # The tournament ID
-                    "game_id": game.id,  # The game ID
                     "official_id": official.id,
                     "officials_type_id": officials_type.id,
-                 
-                    "game_type":"tournament"
+                    "game_data":game_data,
+                    "type":"friendly_game_scheduled",
                 }
 
                 # Send the push notification to the official
@@ -1811,7 +1814,9 @@ class GameOfficialsAPIView(APIView):
                 notification.save()
         except Exception as e:
             logging.error(f"Error sending push notification: {str(e)}", exc_info=True)
-
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         return Response({
             'status': 1,
             'message': _('Official added successfully.'),
