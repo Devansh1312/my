@@ -2821,7 +2821,9 @@ class UpcomingGameView(APIView):
 
             # Default response for other roles
             game_type = "Tournament" if isinstance(first_game, TournamentGames) else "Friendly"
-
+            language = request.headers.get('Language', 'en')
+            if language in ['en', 'ar']:
+                activate(language)
             response_data = {
                 "status": 1,
                 "message": _("Upcoming ") + game_type + _(" game fetched successfully."),
@@ -2855,7 +2857,6 @@ class UpcomingGameView(APIView):
             },
             status=200,
         )
-
 
 ################### Fetch My Games ################################
 
