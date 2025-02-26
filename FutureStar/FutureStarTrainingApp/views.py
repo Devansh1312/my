@@ -554,7 +554,7 @@ class CreateTrainingView(APIView):
 
     def handle_training_notifications(self, training_instances, training_name):
         for training_instance in training_instances:
-            message = f"New training session: {training_name} on {training_instance.training_date}"
+            message = _("New training session: ") + training_name + _(" on ") + str(training_instance.training_date)
             push_data = {"training_id": training_instance.id, "type": "training"}
             self.notify_users(training_instance, message, push_data)
     
@@ -824,6 +824,9 @@ class TrainingDetailAPIView(APIView):
 
 ###################### Delete Training ############################
     def delete(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
         # Retrieve the training ID from the query parameters
         training_id = request.query_params.get('training_id')
         created_by_id = int(request.query_params.get('created_by_id'))
@@ -845,11 +848,11 @@ class TrainingDetailAPIView(APIView):
                 'message': _('Training not found'),
             }, status=status.HTTP_404_NOT_FOUND)
         
-        # if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
-        #     return Response({
-        #         'status': 0,
-        #         'message': _('Unauthorized to Delete this training'),
-        #     }, status=status.HTTP_404_NOT_FOUND)
+        if training_instance.created_by_id != created_by_id or training_instance.creator_type != creator_type:
+            return Response({
+                'status': 0,
+                'message': _('Unauthorized to Delete this training'),
+            }, status=status.HTTP_404_NOT_FOUND)
 
         # Delete the training instance
         training_instance.delete()

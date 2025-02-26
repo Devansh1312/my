@@ -3331,4 +3331,71 @@ class ExtraTimeAPIView(APIView):
 
 
 
+############################################### Crone Job For Finish Game API #####################################
+class FinishPastGamesAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Get today's date
+        today = now().date()
 
+        # Get the date two days ago
+        two_days_ago = today - timedelta(days=1)
+
+        # Find all unfinished games before two_days_ago
+        past_games = TournamentGames.objects.filter(finish=False, date__lt=two_days_ago)
+
+        if not past_games.exists():
+            return Response({
+                "status": 1,
+                "message": _("No unfinished past games found.")
+            }, status=status.HTTP_200_OK)
+
+        updated_games = []
+
+        for game in past_games:
+            # Retrieve goals for each team
+            team_a_goals = PlayerGameStats.objects.filter(
+                team_id=game.team_a.id,
+                game_id=game.id,
+                tournament_id=game.tournament_id.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            team_b_goals = PlayerGameStats.objects.filter(
+                team_id=game.team_b.id,
+                game_id=game.id,
+                tournament_id=game.tournament_id.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            # Determine game result
+            if team_a_goals == team_b_goals:
+                game.is_draw = True
+            else:
+                game.is_draw = False
+                if team_a_goals > team_b_goals:
+                    game.winner_id = game.team_a.id
+                    game.loser_id = game.team_b.id
+                else:
+                    game.winner_id = game.team_b.id
+                    game.loser_id = game.team_a.id
+
+            # Mark game as finished and update scores
+            game.finish = True
+            game.team_a_goal = team_a_goals
+            game.team_b_goal = team_b_goals
+            game.save()
+
+            updated_games.append({
+                "id": game.id,
+                "tournament_id": game.tournament_id.id,
+                "is_draw": game.is_draw,
+                "finish": game.finish,
+                "team_a_goal": game.team_a_goal,
+                "team_b_goal": game.team_b_goal,
+                "winner_id": game.winner_id,
+                "loser_id": game.loser_id,
+            })
+
+        return Response({
+            "status": 1,
+            "message": _("Past unfinished games have been updated."),
+            "data": updated_games
+        }, status=status.HTTP_200_OK)

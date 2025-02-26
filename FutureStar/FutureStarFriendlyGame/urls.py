@@ -55,6 +55,9 @@ urlpatterns = [
       path('api/friendlygames/team_uniform/create/', FriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
       path('api/friendlygames/team_uniform/', FetchFriendlyGameUniformColorAPIView.as_view(), name='friendly_game_stats'),
       path('api/friendlygames/uniform_fetch/',FriendlyGameUniformAPIView.as_view()),
+
+      ########################## Crone Job For Finish All games if Day's Has been Gone ################
+      path('api/friendlygames/finish_all_games/', FinishPastFriendlyGamesAPIView.as_view()),
 ]
        
    

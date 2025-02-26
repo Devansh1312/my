@@ -4602,3 +4602,73 @@ class FriendlyGameResult(APIView):
                     "loser_id": game.loser_id,
                 }
             }, status=status.HTTP_200_OK)
+
+
+########################## Crone Job For Finish All games if Day's Has been Gone ################
+class FinishPastFriendlyGamesAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        language = request.headers.get('Language', 'en')
+        if language in ['en', 'ar']:
+            activate(language)
+
+        # Get today's date and the date two days ago
+        today = now().date()
+        two_days_ago = today - timedelta(days=2)
+
+        # Find all unfinished friendly games before two_days_ago
+        past_games = FriendlyGame.objects.filter(finish=False, date__lt=two_days_ago)
+
+        if not past_games.exists():
+            return Response({
+                "status": 1,
+                "message": _("No unfinished past friendly games found.")
+            }, status=status.HTTP_200_OK)
+
+        updated_games = []
+
+        for game in past_games:
+            # Retrieve goals for each team
+            team_a_goals = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id=game.team_a.id,
+                game_id=game.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            team_b_goals = FriendlyGamesPlayerGameStats.objects.filter(
+                team_id=game.team_b.id,
+                game_id=game.id
+            ).aggregate(total_goals=Sum('goals'))['total_goals'] or 0
+
+            # Determine game result
+            if team_a_goals == team_b_goals:
+                game.is_draw = True
+            else:
+                game.is_draw = False
+                if team_a_goals > team_b_goals:
+                    game.winner_id = game.team_a.id
+                    game.loser_id = game.team_b.id
+                else:
+                    game.winner_id = game.team_b.id
+                    game.loser_id = game.team_a.id
+
+            # Mark game as finished and update scores
+            game.finish = True
+            game.team_a_goal = team_a_goals
+            game.team_b_goal = team_b_goals
+            game.save()
+
+            updated_games.append({
+                "id": game.id,
+                "is_draw": game.is_draw,
+                "finish": game.finish,
+                "team_a_goal": game.team_a_goal,
+                "team_b_goal": game.team_b_goal,
+                "winner_id": game.winner_id,
+                "loser_id": game.loser_id,
+            })
+
+        return Response({
+            "status": 1,
+            "message": _("Past unfinished friendly games have been updated."),
+            "data": updated_games
+        }, status=status.HTTP_200_OK)

@@ -46,4 +46,7 @@ urlpatterns = [
         path('api/tournament/game_detail_stats/', TeamGameDetailStatsAPIView.as_view()),
         ############ Extra time ############\
         path('api/update_extra_time/', ExtraTimeAPIView.as_view(), name='update_extra_time'),
+
+        #################### Crone Job For Finish All games if Day's Has been Gone ################
+        path('api/tournament/finish_all_games/',FinishPastGamesAPIView.as_view()),
     ]

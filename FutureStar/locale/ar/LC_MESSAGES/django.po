@@ -1837,3 +1837,9 @@ msgstr "فريقك "
 
 msgid " team is ready to play!"
 msgstr " جاهز للعب!"
+
+msgid "Both teams are ready to play! Let's Go"
+msgstr "كلا الفريقين مستعدان للعب! لننطلق"
+
+msgid "New training session: "
+msgstr "جلسة تدريب جديدة: "
