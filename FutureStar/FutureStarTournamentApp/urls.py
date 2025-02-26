@@ -48,5 +48,5 @@ urlpatterns = [
         path('api/update_extra_time/', ExtraTimeAPIView.as_view(), name='update_extra_time'),
 
         #################### Crone Job For Finish All games if Day's Has been Gone ################
-        path('api/tournament/finish_all_games/',FinishPastGamesAPIView.as_view()),
+        path('api/if/not/complete/tournament/finish_all_games/',FinishPastGamesAPIView.as_view()),
     ]
