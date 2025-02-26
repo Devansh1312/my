@@ -3341,7 +3341,7 @@ class FinishPastGamesAPIView(APIView):
         two_days_ago = today - timedelta(days=1)
 
         # Find all unfinished games before two_days_ago
-        past_games = TournamentGames.objects.filter(finish=False, date__lt=two_days_ago)
+        past_games = TournamentGames.objects.filter(finish=False, game_date__lt=two_days_ago)
 
         if not past_games.exists():
             return Response({

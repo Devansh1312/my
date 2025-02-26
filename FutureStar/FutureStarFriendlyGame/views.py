@@ -4614,10 +4614,10 @@ class FinishPastFriendlyGamesAPIView(APIView):
 
         # Get today's date and the date two days ago
         today = now().date()
-        two_days_ago = today - timedelta(days=2)
+        two_days_ago = today - timedelta(days=1)
 
         # Find all unfinished friendly games before two_days_ago
-        past_games = FriendlyGame.objects.filter(finish=False, date__lt=two_days_ago)
+        past_games = FriendlyGame.objects.filter(finish=False, game_date__lt=two_days_ago)
 
         if not past_games.exists():
             return Response({
