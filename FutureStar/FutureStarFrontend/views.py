@@ -1024,6 +1024,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             tournament_games_officiated = GameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # IDs representing referee roles
+                game_id__in=TournamentGames.objects.filter(finish=True).values_list("id", flat=True),
                 **time_filter
             ).values_list('game_id', flat=True)
 
@@ -1031,6 +1032,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],
+                game_id__in=FriendlyGame.objects.filter(finish=True).values_list("id", flat=True),
                 **time_filter
             ).values_list('game_id', flat=True)
 
@@ -3324,6 +3326,7 @@ class PlayerInfoPage(View):
             tournament_games_officiated = GameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # IDs representing referee roles
+                game_id__in=TournamentGames.objects.filter(finish=True).values_list("id", flat=True),
                 **time_filter
             ).values_list('game_id', flat=True)
 
@@ -3331,6 +3334,7 @@ class PlayerInfoPage(View):
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],
+                game_id__in=FriendlyGame.objects.filter(finish=True).values_list("id", flat=True),
                 **time_filter
             ).values_list('game_id', flat=True)
         
@@ -3562,12 +3566,14 @@ class TeamDetailsView(View):
 
         # 4. Get finished friendly games
         friendly_games = FriendlyGame.objects.filter(
-            Q(team_a=team) | Q(team_b=team)
+            Q(team_a=team) | Q(team_b=team),
+            finish=True
         ).order_by('-game_date')
 
         # 5. Get finished tournament games
         tournament_games = TournamentGames.objects.filter(
-            Q(team_a=team) | Q(team_b=team)
+            Q(team_a=team) | Q(team_b=team),
+            finish=True
         ).order_by('-game_date')
 
         # Combine friendly and tournament games
