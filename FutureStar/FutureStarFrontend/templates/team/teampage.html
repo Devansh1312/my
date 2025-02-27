@@ -15,14 +15,105 @@
         /* Space between logos */
         margin-left: 5px;
     }
-.text a {
+
+    /* Responsive styling */
+    @media (max-width: 768px) {
+        .team-profile-area {
+            padding-top: 100px;
+            padding-bottom: 80px;
+        }
+
+        .team-profile-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .team-profile-content {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .team-profile-content h2 {
+            font-size: 22px;
+        }
+
+        .team-sub-title h4 {
+            font-size: 20px;
+        }
+
+        .contact-info-item .icon {
+            font-size: 18px;
+        }
+
+        .contact-info-item .content {
+            font-size: 14px;
+        }
+
+        .table th,
+        .table td {
+            font-size: 14px;
+        }
+    }
+
+    /* For smaller screens like mobile */
+    @media (max-width: 576px) {
+        .team-profile-area {
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
+
+        .team-profile-image {
+            text-align: center;
+        }
+
+        .team-profile-content {
+            padding: 10px;
+        }
+
+        .total-info-wrapper {
+            text-align: center;
+        }
+
+        .total-info-wrapper .img-wrapper img {
+            width: 60px;
+        }
+
+        .stats-info-wrapper h5 {
+            font-size: 18px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+
+    .team-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 5px;
+        margin-left: 5px;
+    }
+    .text a {
     word-break: break-word;
     overflow-wrap: break-word;
     display: block;
     max-width: 100%;
     white-space: normal;
 }
+.team-profile-image img {
+    width: 600px;
+    height: 600px;
+}
 
+/* Responsive for smaller screens (mobile) */
+@media (max-width: 576px) {
+    .team-profile-image img {
+        width: 300px;
+        height: 300px;
+    }
+}
 </style>
 {% endblock %} 
 {% block title %} Goalactico || Team-Page-Detail{% endblock %} 
@@ -411,5 +502,18 @@
 {% endblock %} 
 {% block script %} 
 <script>
+    // Block right-click context menu
+	document.addEventListener('contextmenu', function(e) {
+		e.preventDefault();
+		return false;
+	});
+	// Optional: Block common developer tools shortcuts
+	document.addEventListener('keydown', function(e) {
+		// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+		if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) {
+			e.preventDefault();
+			return false;
+		}
+	});
     new WOW().init();
 </script> {% endblock %}

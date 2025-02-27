@@ -107,7 +107,18 @@
     max-width: 100%;
     white-space: normal;
 }
+.team-profile-image img {
+    width: 600px;
+    height: 600px;
+}
 
+/* Responsive for smaller screens (mobile) */
+@media (max-width: 576px) {
+    .team-profile-image img {
+        width: 300px;
+        height: 300px;
+    }
+}
 </style>
 <div class="page-wrapper">
     <section class="team-profile-area pt-220 rpt-150 pb-130 rpb-100 rel">
@@ -705,6 +716,19 @@
 {% endblock %}
 {% block script %}
 <script>
+    // Block right-click context menu
+	document.addEventListener('contextmenu', function(e) {
+		e.preventDefault();
+		return false;
+	});
+	// Optional: Block common developer tools shortcuts
+	document.addEventListener('keydown', function(e) {
+		// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+		if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) {
+			e.preventDefault();
+			return false;
+		}
+	});
     new WOW().init();
 </script>
 {% endblock %}
