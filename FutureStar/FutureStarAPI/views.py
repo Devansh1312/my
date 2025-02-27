@@ -5168,6 +5168,7 @@ class UserRoleStatsAPIView(APIView):
             tournament_games_officiated = GameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # IDs representing referee roles
+                game_id__in=TournamentGames.objects.filter(finish=True).values_list("id", flat=True),
                 **time_filter
             ).values_list('game_id', flat=True)
 
@@ -5175,6 +5176,7 @@ class UserRoleStatsAPIView(APIView):
             friendly_games_officiated = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],
+                game_id__in=FriendlyGame.objects.filter(finish=True).values_list("id", flat=True),
                 **time_filter
             ).values_list('game_id', flat=True)
 
