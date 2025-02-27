@@ -4977,7 +4977,7 @@ class UserRoleStatsAPIView(APIView):
             )
 
             # Combine stats from both tournament and friendly games
-            total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
+            total_games_played = tournament_games.count() + friendly_games.count()
 
             total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
                         (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)

@@ -567,7 +567,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             )
 
             # Combine stats from both tournament and friendly games
-            total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
+            total_games_played = tournament_games.count() + friendly_games.count()
 
             total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
                         (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
@@ -3028,7 +3028,7 @@ class PlayerInfoPage(View):
             )
 
             # Combine stats from both tournament and friendly games
-            total_games_played = tournament_player_stats.count() + friendly_player_stats.count()
+            total_games_played = tournament_games.count() + friendly_games.count()
 
             total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
                         (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
@@ -3734,20 +3734,14 @@ class PlayerInfoPage(View):
 
 
     def get(self, request, *args, **kwargs):
-        user_id = request.GET.get('user_id')  # Fetch user_id from query parameters
+        user_id = request.GET.get('user_id') or request.session.get('Search_user_id')
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return redirect('search')
 
         # Handle language from URL or session
-        language_from_url = request.GET.get('Language', None)
-        if language_from_url:
-            # Save language to the session if it's provided in the URL
-            request.session['language'] = language_from_url
-        else:
-            # Fallback to the session's language or default to 'en'
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         if user.role.id == 1:
             return redirect('Dashboard')
@@ -3770,15 +3764,7 @@ class PlayerInfoPage(View):
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return redirect('search')
-        language_from_url = request.GET.get('Language', None)
-        
-        
-        if language_from_url:
-            # If 'Language' parameter is in the URL, save it to the session
-            request.session['language'] = language_from_url
-        else:
-            # If not, fall back to session language
-            language_from_url = request.session.get('language', 'en')
+        language_from_url = get_language(request)
 
         if user.role.id == 1:
             return redirect('Dashboard')
@@ -3793,6 +3779,7 @@ class PlayerInfoPage(View):
             "infouser":user,
             
         }
+        request.session['Search_user_id'] = user_id  # Store in session
 
         return render(request, "PlayerInfo.html", context)
 
