@@ -1135,14 +1135,14 @@ class UserDetailView(LoginRequiredMixin, View):
             tournament_game_ids = GameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # Relevant official types
-                game_id__in=TournamentGames.objects.filter(**time_filter).values_list("id", flat=True),
+                game_id__in=TournamentGames.objects.filter(**time_filter,finish=True).values_list("id", flat=True),
             ).values_list("game_id", flat=True)
 
             # Get the games the referee officiated in friendly games
             friendly_game_ids = FriendlyGameGameOfficials.objects.filter(
                 official_id=user.id,
                 officials_type_id__in=[2, 3, 4, 5],  # Relevant official types
-                game_id__in=FriendlyGame.objects.filter(**time_filter).values_list("id", flat=True),
+                game_id__in=FriendlyGame.objects.filter(**time_filter,finish=True).values_list("id", flat=True),
             ).values_list("game_id", flat=True)
 
             # Combine game IDs from both tournament and friendly games
@@ -6276,19 +6276,19 @@ class BranchDetailView(LoginRequiredMixin, View):
 
             # Fetch Friendly Games
             game_friendly = FriendlyGame.objects.filter(
-                (Q(team_a=branch.id) | Q(team_b=branch.id)) & Q(team_a__isnull=False) & Q(team_b__isnull=False)
+                (Q(team_a=branch.id) | Q(team_b=branch.id)) & Q(team_a__isnull=False) & Q(team_b__isnull=False),finish=True
             ).order_by('-game_number')
             game_friendly_count = game_friendly.count()
 
             # Fetch Tournament Games
-            games = TournamentGames.objects.filter(Q(team_a=branch.id) | Q(team_b=branch.id))
+            games = TournamentGames.objects.filter(Q(team_a=branch.id) | Q(team_b=branch.id),finish=True)
 
             # Separate queries for Friendly Games and Tournament Games
-            friendly_games_as_team_a = FriendlyGame.objects.filter(team_a=branch.id, team_a__isnull=False, team_b__isnull=False)
-            friendly_games_as_team_b = FriendlyGame.objects.filter(team_b=branch.id, team_a__isnull=False, team_b__isnull=False)
+            friendly_games_as_team_a = FriendlyGame.objects.filter(team_a=branch.id, team_a__isnull=False, team_b__isnull=False,finish=True)
+            friendly_games_as_team_b = FriendlyGame.objects.filter(team_b=branch.id, team_a__isnull=False, team_b__isnull=False,finish=True)
 
-            tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch.id)
-            tournament_games_as_team_b = TournamentGames.objects.filter(team_b=branch.id)
+            tournament_games_as_team_a = TournamentGames.objects.filter(team_a=branch.id,finish=True)
+            tournament_games_as_team_b = TournamentGames.objects.filter(team_b=branch.id,finish=True)
 
             # Total Games
             total_games_friendly = (friendly_games_as_team_a | friendly_games_as_team_b).count()
