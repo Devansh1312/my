@@ -552,7 +552,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                 })
-
+            upcoming_games = sorted(upcoming_games, key=lambda x: x["game_date"], reverse=True)[:5]
             # Fetch Finished Games where the player was in the lineup
             finished_games_date_filter = localtime(now())
 
@@ -561,7 +561,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 player_id=user,
                 lineup_status=FriendlyGameLineup.ALREADY_IN_LINEUP,
                 game_id__game_date__lt=finished_games_date_filter.date(),
-                # game_id__finish=True
+                game_id__finish=True
             ).select_related('game_id', 'team_id').order_by('game_id__game_date')[:5]
 
             # Tournament Games - Finished
@@ -569,7 +569,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 player_id=user,
                 lineup_status=Lineup.ALREADY_IN_LINEUP,
                 game_id__game_date__lt=finished_games_date_filter.date(),
-                # game_id__finish=True
+                game_id__finish=True
             ).select_related('game_id', 'team_id').order_by('game_id__game_date')[:5]
 
             # Combine the finished games
@@ -604,7 +604,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
 
             return {
@@ -642,12 +642,14 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             # Tournament Games
             tournament_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches))
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
+                finish=True)
 
             # Calculate Games Stats
             tournament_total_games = tournament_games.count()
@@ -800,7 +802,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Return the stats
             return {
@@ -811,7 +813,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "yellow_card": total_yellow_cards,
                 "red": total_red_cards,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:5],
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -833,13 +835,15 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             # Tournament Games
             tournament_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Calculate Games Stats
@@ -989,8 +993,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
-            print(finished_games)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Return the stats
             return {
@@ -1001,7 +1004,7 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
                 "red": total_red_cards if total_red_cards is not None else 0,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:5],
                 "finished_games": finished_games
             }
         
@@ -1111,13 +1114,13 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             finished_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
                 game_date__lt=current_datetime.date(),
-                # finish=True
+                finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
 
             finished_friendly_games = FriendlyGame.objects.filter(
                 id__in=friendly_games_officiated,
                 game_date__lt=current_datetime.date(),
-                # finish=True
+                finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
 
             finished_games = []
@@ -1157,14 +1160,14 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
                 })
 
             # 13. Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
                 "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
                 "red": total_red_cards if total_red_cards is not None else 0,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:5],
                 "finished_games": finished_games,
             }
         except Exception as e:
@@ -2079,11 +2082,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -2170,13 +2173,13 @@ class UserDashboardGames(LoginRequiredMixin,View):
             finished_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
                 game_date__lt=current_datetime.date(),
-                # finish=True  # Ensure the game is finished
+                finish=True  # Ensure the game is finished
             ).order_by('game_date')
 
             finished_friendly_games = FriendlyGame.objects.filter(
                 id__in=friendly_games_officiated,
                 game_date__lt=current_datetime.date(),
-                # finish=True  # Ensure the game is finished
+                finish=True  # Ensure the game is finished
             ).order_by('game_date')
 
             finished_games = []
@@ -2208,11 +2211,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
                 "finished_games": finished_games,
             }
 
@@ -2323,11 +2326,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
 
             # Return stats and upcoming games
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
                 "finished_games": finished_games
             }
 
@@ -2442,11 +2445,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -2837,6 +2840,8 @@ class PlayerInfoPage(View):
                     "game_start_time": game.game_start_time,
                     "game_end_time": game.game_end_time,
                 })
+            
+            upcoming_games = sorted(upcoming_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Fetch Finished Games where the player was in the lineup
             finished_games_date_filter = localtime(now())
@@ -2889,7 +2894,7 @@ class PlayerInfoPage(View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
 
             return {
@@ -2929,12 +2934,14 @@ class PlayerInfoPage(View):
             # Tournament Games
             tournament_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches))
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
+                finish=True)
 
             # Calculate Games Stats
             tournament_total_games = tournament_games.count()
@@ -3088,7 +3095,7 @@ class PlayerInfoPage(View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Return the stats
             return {
@@ -3099,7 +3106,7 @@ class PlayerInfoPage(View):
                 "yellow_card": total_yellow_cards,
                 "red": total_red_cards,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:5],
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -3125,13 +3132,15 @@ class PlayerInfoPage(View):
             # Tournament Games
             tournament_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Calculate Games Stats
@@ -3281,7 +3290,7 @@ class PlayerInfoPage(View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Return the stats
             return {
@@ -3292,7 +3301,7 @@ class PlayerInfoPage(View):
                 "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
                 "red": total_red_cards if total_red_cards is not None else 0,
                 "goals_conceded": goals_conceded,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"])[:5],
                 "finished_games": finished_games
             }
         
@@ -3406,13 +3415,13 @@ class PlayerInfoPage(View):
             finished_tournament_games = TournamentGames.objects.filter(
                 id__in=tournament_games_officiated,
                 game_date__lt=current_datetime.date(),
-                # finish=True
+                finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
 
             finished_friendly_games = FriendlyGame.objects.filter(
                 id__in=friendly_games_officiated,
                 game_date__lt=current_datetime.date(),
-                # finish=True
+                finish=True
             ).order_by('game_date')[:5]  # Get the last 5 finished games
 
             finished_games = []
@@ -3452,14 +3461,14 @@ class PlayerInfoPage(View):
                 })
 
             # 13. Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_number"], reverse=True)
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
 
             # Return the stats
             return {
                 "matchplayed": total_games_officiated,
                 "yellow_card": total_yellow_cards if total_yellow_cards is not None else 0,
                 "red": total_red_cards if total_red_cards is not None else 0,
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_number"]),
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:5],
                 "finished_games": finished_games,
             }
         except Exception as e:

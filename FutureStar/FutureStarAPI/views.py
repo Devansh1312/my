@@ -5057,12 +5057,14 @@ class UserRoleStatsAPIView(APIView):
             # Tournament Games
             tournament_games = TournamentGames.objects.filter(
                 Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
-                **time_filter
+                **time_filter,
+                finish=True
             )
 
             # Friendly Games
             friendly_games = FriendlyGame.objects.filter(
-                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches))
+                Q(team_a__in=coach_branches) | Q(team_b__in=coach_branches),
+                finish=True)
 
             # Calculate Games Stats
             tournament_total_games = tournament_games.count()
