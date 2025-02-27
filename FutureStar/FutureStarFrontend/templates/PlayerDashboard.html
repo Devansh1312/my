@@ -422,7 +422,20 @@
                 
                 {% endif %}
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
-                    <h5>{% if current_language == 'en' %} Upcoming Games {% elif current_language == 'ar' %} الألعاب القادمة {% endif %}
+                    <h5>
+                        {% if user.role.id == 5 %}
+                            {% if current_language == 'en' %}
+                                Handlers Upcoming Games
+                            {% elif current_language == 'ar' %}
+                                الألعاب القادمة للمسؤولين
+                            {% endif %}
+                        {% else %}
+                            {% if current_language == 'en' %}
+                                Upcoming Games
+                            {% elif current_language == 'ar' %}
+                                الألعاب القادمة
+                            {% endif %}
+                        {% endif %}
                     </h5>
                     <div class="table-responsive">
                         <table class="table">
@@ -460,7 +473,7 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ game.game_type }}</td>
                                         <td>{{ game.game_number }}</td>
-                                        <td>
+                                        <td style="direction: ltr !important; text-align: center;">
                                             <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
                                             <span> {{ game.team_a_vs_team_b }} </span>
                                             <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
@@ -482,7 +495,19 @@
                 </div>
                 <div class="stats-info-wrapper wow fadeInUp delay-0-5s animated">
                     <h5>
-                        {% if current_language == 'en' %}Last 5 Games{% elif current_language == 'ar' %}آخر 5 مباريات{% endif %}
+                        {% if user.role.id == 5 %}
+                            {% if current_language == 'en' %}
+                                Handlers Last 5 Games
+                            {% elif current_language == 'ar' %}
+                                آخر 5 مباريات للمسؤولين
+                            {% endif %}
+                        {% else %}
+                            {% if current_language == 'en' %}
+                                Last 5 Games
+                            {% elif current_language == 'ar' %}
+                                آخر 5 مباريات
+                            {% endif %}
+                        {% endif %}
                     </h5>
                     <div class="table-responsive">
                         <table class="table">
@@ -522,13 +547,13 @@
                                         <td>
                                             {{ game.game_number }}
                                         </td>
-                                        <td>
+                                        <td style="direction: ltr !important; text-align: center;">
                                             <img src = "{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
                                             <span> {{ game.team_a_vs_team_b }} </span>
                                             <img src = "{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
                                         </td>
                                         <td>{{ game.game_date }}</td>
-                                        <td>{{ game.score }}</td>
+                                        <td style="direction: ltr !important;">{{ game.score }}</td>
                                     </tr>
                                 {% endfor %}
                                 {% else %}

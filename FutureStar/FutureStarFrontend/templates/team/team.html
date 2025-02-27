@@ -663,12 +663,12 @@
                                 <td>{{ finished_game.game_number }}</td>
                                 <td>{{ finished_game.tournament_name }}</td>
                                 <td>{{ finished_game.game_date }}</td>
-                                <td>
+                                <td style="direction: ltr !important;">
                                     <img src="{{ finished_game.team_a_logo }}" class="team-logo">
                                     <span> {{ finished_game.team_a_vs_team_b }} </span>
                                     <img src="{{ finished_game.team_b_logo }}" class="team-logo">
                                 </td>
-                                <td>{{ finished_game.score }}</td>
+                                <td style="direction: ltr !important;">{{ finished_game.score }}</td>
                             </tr> {% empty %} <tr>
                                 <td colspan="8">
                                     {% if current_language == 'en' %}
