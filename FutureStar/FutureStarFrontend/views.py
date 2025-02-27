@@ -450,9 +450,94 @@ class PlayerDashboardPage(LoginRequiredMixin, View):
             stats = self.get_coach_stats(user, time_filter)
         elif user.role.id == 4:  # Referee role
             stats = self.get_referee_stats(user, time_filter)
+        elif user.role.id == 5:  # Game Statistics Handler role
+            stats = self.get_game_statistics_handler_stats(user, time_filter)
         elif user.role.id == 6:  # Manager role
             stats = self.get_manager_stats(user, time_filter)
         return teams, stats
+    
+    def get_game_statistics_handler_stats(self, user, time_filter):
+        """
+        Fetch upcoming and finished games where the user is assigned as game_statistics_handler.
+        """
+        try:
+            if time_filter is None:
+                time_filter = {}
+
+            current_datetime = localtime(now())
+
+            # Fetch upcoming games where the user is assigned as game_statistics_handler
+            tournament_upcoming_games = TournamentGames.objects.filter(
+                game_statistics_handler=user,
+                game_date__gte=current_datetime.date(),
+                finish=False,
+                **time_filter
+            ).order_by('game_date')[:5]
+
+            friendly_upcoming_games = FriendlyGame.objects.filter(
+                game_statistics_handler=user,
+                game_date__gte=current_datetime.date(),
+                finish=False,
+                **time_filter
+            ).order_by('game_date')[:5]
+
+            # Fetch finished games where the user was the game_statistics_handler
+            tournament_finished_games = TournamentGames.objects.filter(
+                game_statistics_handler=user,
+                game_date__lt=current_datetime.date(),
+                finish=True,
+                **time_filter
+            ).order_by('-game_date')[:5]
+
+            friendly_finished_games = FriendlyGame.objects.filter(
+                game_statistics_handler=user,
+                game_date__lt=current_datetime.date(),
+                finish=True,
+                **time_filter
+            ).order_by('-game_date')[:5]
+
+            # Combine upcoming games
+            upcoming_games = [
+                {
+                    "game_type": game.tournament_id.tournament_name if hasattr(game, 'tournament_id') else "Friendly",
+                    "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
+                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "game_date": game.game_date,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                }
+                for game in list(tournament_upcoming_games) + list(friendly_upcoming_games)
+            ]
+
+            # Combine finished games
+            finished_games = [
+                {
+                    "game_type": game.tournament_id.tournament_name if hasattr(game, 'tournament_id') else "Friendly",
+                    "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
+                    "game_date": game.game_date,
+                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                    "score": f"{game.team_a_goal} - {game.team_b_goal}",
+                }
+                for game in list(tournament_finished_games) + list(friendly_finished_games)
+            ]
+
+            # Sort finished games by game date
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
+
+            return {
+                "upcoming_games": upcoming_games,
+                "finished_games": finished_games
+            }
+
+        except Exception as e:
+            return {"status": 0, "message": "Failed to fetch game statistics handler stats.", "error": str(e)}
+
 
     def get_player_stats(self, user, time_filter):
         try:
@@ -1971,10 +2056,94 @@ class UserDashboardGames(LoginRequiredMixin,View):
             stats = self.get_coach_games(user, time_filter)
         elif user.role.id == 4:  # Referee role
             stats = self.get_referee_games(user, time_filter)
+        elif user.role.id == 5:  # Game Statistics Handler role
+            stats = self.get_game_statistics_handler_stats(user, time_filter)
         elif user.role.id == 6:  # Manager role
             stats = self.get_manager_games(user, time_filter)
 
         return stats
+    
+    def get_game_statistics_handler_stats(self, user, time_filter):
+        """
+        Fetch upcoming and finished games where the user is assigned as game_statistics_handler.
+        """
+        try:
+            if time_filter is None:
+                time_filter = {}
+
+            current_datetime = localtime(now())
+
+            # Fetch upcoming games where the user is assigned as game_statistics_handler
+            tournament_upcoming_games = TournamentGames.objects.filter(
+                game_statistics_handler=user,
+                game_date__gte=current_datetime.date(),
+                finish=False,
+                **time_filter
+            ).order_by('game_date')[:5]
+
+            friendly_upcoming_games = FriendlyGame.objects.filter(
+                game_statistics_handler=user,
+                game_date__gte=current_datetime.date(),
+                finish=False,
+                **time_filter
+            ).order_by('game_date')[:5]
+
+            # Fetch finished games where the user was the game_statistics_handler
+            tournament_finished_games = TournamentGames.objects.filter(
+                game_statistics_handler=user,
+                game_date__lt=current_datetime.date(),
+                finish=True,
+                **time_filter
+            ).order_by('-game_date')[:5]
+
+            friendly_finished_games = FriendlyGame.objects.filter(
+                game_statistics_handler=user,
+                game_date__lt=current_datetime.date(),
+                finish=True,
+                **time_filter
+            ).order_by('-game_date')[:5]
+
+            # Combine upcoming games
+            upcoming_games = [
+                {
+                    "game_type": game.tournament_id.tournament_name if hasattr(game, 'tournament_id') else "Friendly",
+                    "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
+                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "game_date": game.game_date,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                }
+                for game in list(tournament_upcoming_games) + list(friendly_upcoming_games)
+            ]
+
+            # Combine finished games
+            finished_games = [
+                {
+                    "game_type": game.tournament_id.tournament_name if hasattr(game, 'tournament_id') else "Friendly",
+                    "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
+                    "game_date": game.game_date,
+                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                    "score": f"{game.team_a_goal} - {game.team_b_goal}",
+                }
+                for game in list(tournament_finished_games) + list(friendly_finished_games)
+            ]
+
+            # Sort finished games by game date
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
+
+            return {
+                "upcoming_games": upcoming_games,
+                "finished_games": finished_games
+            }
+
+        except Exception as e:
+            return {"status": 0, "message": "Failed to fetch game statistics handler stats.", "error": str(e)}
 
     def get_manager_games(self, user, time_filter=None):
         
@@ -2733,9 +2902,98 @@ class PlayerInfoPage(View):
             stats = self.get_coach_stats(user, time_filter)
         elif user.role.id == 4:  # Referee role
             stats = self.get_referee_stats(user, time_filter)
+
+        elif user.role.id == 5:  # Game Statistics Handler role
+            stats = self.get_game_statistics_handler_stats(user, time_filter)
+
         elif user.role.id == 6:  # Manager role
             stats = self.get_manager_stats(user, time_filter)
+            
         return teams, stats
+    
+    
+    def get_game_statistics_handler_stats(self, user, time_filter):
+        """
+        Fetch upcoming and finished games where the user is assigned as game_statistics_handler.
+        """
+        try:
+            if time_filter is None:
+                time_filter = {}
+
+            current_datetime = localtime(now())
+
+            # Fetch upcoming games where the user is assigned as game_statistics_handler
+            tournament_upcoming_games = TournamentGames.objects.filter(
+                game_statistics_handler=user,
+                game_date__gte=current_datetime.date(),
+                finish=False,
+                **time_filter
+            ).order_by('game_date')[:5]
+
+            friendly_upcoming_games = FriendlyGame.objects.filter(
+                game_statistics_handler=user,
+                game_date__gte=current_datetime.date(),
+                finish=False,
+                **time_filter
+            ).order_by('game_date')[:5]
+
+            # Fetch finished games where the user was the game_statistics_handler
+            tournament_finished_games = TournamentGames.objects.filter(
+                game_statistics_handler=user,
+                game_date__lt=current_datetime.date(),
+                finish=True,
+                **time_filter
+            ).order_by('-game_date')[:5]
+
+            friendly_finished_games = FriendlyGame.objects.filter(
+                game_statistics_handler=user,
+                game_date__lt=current_datetime.date(),
+                finish=True,
+                **time_filter
+            ).order_by('-game_date')[:5]
+
+            # Combine upcoming games
+            upcoming_games = [
+                {
+                    "game_type": game.tournament_id.tournament_name if hasattr(game, 'tournament_id') else "Friendly",
+                    "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
+                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "game_date": game.game_date,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                }
+                for game in list(tournament_upcoming_games) + list(friendly_upcoming_games)
+            ]
+
+            # Combine finished games
+            finished_games = [
+                {
+                    "game_type": game.tournament_id.tournament_name if hasattr(game, 'tournament_id') else "Friendly",
+                    "team_a_vs_team_b": f"{game.team_a} VS {game.team_b}",
+                    "game_number": game.game_number,
+                    "game_date": game.game_date,
+                    "team_a_logo": game.team_a.team_id.team_logo.url if game.team_a.team_id.team_logo else None,
+                    "team_b_logo": game.team_b.team_id.team_logo.url if game.team_b.team_id.team_logo else None,
+                    "game_start_time": game.game_start_time,
+                    "game_end_time": game.game_end_time,
+                    "score": f"{game.team_a_goal} - {game.team_b_goal}",
+                }
+                for game in list(tournament_finished_games) + list(friendly_finished_games)
+            ]
+
+            # Sort finished games by game date
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:5]
+
+            return {
+                "upcoming_games": upcoming_games,
+                "finished_games": finished_games
+            }
+
+        except Exception as e:
+            return {"status": 0, "message": "Failed to fetch game statistics handler stats.", "error": str(e)}
+
 
     def get_player_stats(self, user, time_filter):
         """
@@ -3314,10 +3572,6 @@ class PlayerInfoPage(View):
             }
     
     def get_referee_stats(self, user, time_filter=None):
-        """
-        Fetch referee-specific stats, including stats for tournament and friendly games,
-        and return upcoming and finished games for the referee.
-        """
         try:
             if time_filter is None:
                 time_filter = {}
