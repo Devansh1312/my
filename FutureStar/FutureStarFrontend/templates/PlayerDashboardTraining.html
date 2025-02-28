@@ -26,6 +26,27 @@
 {% endblock %}
 {% load lang_filter %} <!-- Loading your custom filter -->
 {% block content %}
+<style>
+    .pagination {
+        margin-top: 10px;
+        text-align: right;
+    }
+
+    .rtl-pagination {
+        text-align: left;
+    }
+
+    .pagination button {
+        padding: 8px 12px;
+        margin: 5px;
+        cursor: pointer;
+    }
+
+    .pagination button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
 <section class="services-area-six pt-150 pb-100">
     <div class="container">
         <div class="row">
@@ -203,7 +224,7 @@
                                     </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="6">
+                                    <tr class="upcoming-game-row"><td colspan="6">
                                         {% if current_language == 'en' %}
                                             No Joined Trainings Found
                                         {% elif current_language == 'ar' %}
@@ -214,6 +235,60 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="pagination {% if current_language == 'ar' %}rtl-pagination{% endif %}">
+                        <button class="theme-btn style-one" id="prevUpcomingPage" disabled>
+                            {% if current_language == 'en' %}
+                                Previous
+                            {% elif current_language == 'ar' %}
+                                السابق
+                            {% endif %}
+                        </button>
+                        <span id="upcomingPageInfo"></span>
+                        <button class="theme-btn style-one" id="nextUpcomingPage">
+                            {% if current_language == 'en' %}
+                                Next
+                            {% elif current_language == 'ar' %}
+                                التالي
+                            {% endif %}
+                        </button>
+                    </div>
+                    
+                    <script>
+                        $(document).ready(function () {
+                            var rowsPerPage = 10;
+                            var rows = $(".upcoming-game-row");
+                            var totalRows = rows.length;
+                            var currentPage = 1;
+                            var totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+                    
+                            function showPage(page) {
+                                var start = (page - 1) * rowsPerPage;
+                                var end = start + rowsPerPage;
+                    
+                                rows.hide().slice(start, end).show();
+                    
+                                $("#upcomingPageInfo").text("Page " + page + " of " + totalPages);
+                                $("#prevUpcomingPage").prop("disabled", page === 1);
+                                $("#nextUpcomingPage").prop("disabled", page === totalPages);
+                            }
+                    
+                            $("#prevUpcomingPage").click(function () {
+                                if (currentPage > 1) {
+                                    currentPage--;
+                                    showPage(currentPage);
+                                }
+                            });
+                    
+                            $("#nextUpcomingPage").click(function () {
+                                if (currentPage < totalPages) {
+                                    currentPage++;
+                                    showPage(currentPage);
+                                }
+                            });
+                    
+                            showPage(currentPage);
+                        });
+                    </script>
                     
                     <!-- Created Trainings Section -->
                     <h5>
@@ -268,7 +343,7 @@
                             <tbody>
                                 {% if created_trainings %}
                                     {% for training in created_trainings %}
-                                    <tr>
+                                    <tr class="game-row">
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ training.training_name }}</td>
                                         <td>{{ training.training_date }}</td>
@@ -289,6 +364,63 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Pagination Controls -->
+                    <div class="pagination {% if current_language == 'ar' %}rtl-pagination{% endif %}">
+                        <button class="theme-btn style-one" id="prevPage" disabled>
+                            {% if current_language == 'en' %}
+                                Previous
+                            {% elif current_language == 'ar' %}
+                                السابق
+                            {% endif %}
+                        </button>
+                        <span id="pageInfo"></span>
+                        <button class="theme-btn style-one" id="nextPage">
+                            {% if current_language == 'en' %}
+                                Next
+                            {% elif current_language == 'ar' %}
+                                التالي
+                            {% endif %}
+                        </button>
+                    </div>
+                    
+                    <!-- JavaScript for Pagination -->
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script>
+                        $(document).ready(function () {
+                            var rowsPerPage = 10;
+                            var rows = $(".game-row");
+                            var totalRows = rows.length;
+                            var currentPage = 1;
+                            var totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+                    
+                            function showPage(page) {
+                                var start = (page - 1) * rowsPerPage;
+                                var end = start + rowsPerPage;
+                    
+                                rows.hide().slice(start, end).show();
+                    
+                                $("#pageInfo").text("Page " + page + " of " + totalPages);
+                                $("#prevPage").prop("disabled", page === 1);
+                                $("#nextPage").prop("disabled", page === totalPages);
+                            }
+                    
+                            $("#prevPage").click(function () {
+                                if (currentPage > 1) {
+                                    currentPage--;
+                                    showPage(currentPage);
+                                }
+                            });
+                    
+                            $("#nextPage").click(function () {
+                                if (currentPage < totalPages) {
+                                    currentPage++;
+                                    showPage(currentPage);
+                                }
+                            });
+                    
+                            showPage(currentPage);
+                        });
+                    </script>
                 </div>
             </div>
         </div>

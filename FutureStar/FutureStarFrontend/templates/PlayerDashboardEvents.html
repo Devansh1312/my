@@ -28,7 +28,7 @@
 {% block content %}
 
 <style>
-    .team-logo {
+.team-logo {
     width: 30px;  /* Adjust the size as needed */
     height: 30px;
     border-radius: 50%;  /* Makes the image round */
@@ -36,7 +36,25 @@
     margin-right: 5px;  /* Space between logos */
     margin-left: 5px;
 }
+.pagination {
+    margin-top: 10px;
+    text-align: right;
+}
 
+.rtl-pagination {
+    text-align: left;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 </style>
 <section class="services-area-six pt-150 pb-100">
     <div class="container">
@@ -210,7 +228,7 @@
                             <tbody>
                                 {% if events %}
                                     {% for event in events %}
-                                        <tr>
+                                        <tr class="upcoming-game-row">
                                             <td>{{ forloop.counter }}</td>
                                             <td>{{ event.event_name }}</td>
                                             <td>{{ event.event_type }}</td>
@@ -233,6 +251,60 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="pagination {% if current_language == 'ar' %}rtl-pagination{% endif %}">
+                        <button class="theme-btn style-one" id="prevUpcomingPage" disabled>
+                            {% if current_language == 'en' %}
+                                Previous
+                            {% elif current_language == 'ar' %}
+                                السابق
+                            {% endif %}
+                        </button>
+                        <span id="upcomingPageInfo"></span>
+                        <button class="theme-btn style-one" id="nextUpcomingPage">
+                            {% if current_language == 'en' %}
+                                Next
+                            {% elif current_language == 'ar' %}
+                                التالي
+                            {% endif %}
+                        </button>
+                    </div>
+                    
+                    <script>
+                        $(document).ready(function () {
+                            var rowsPerPage = 10;
+                            var rows = $(".upcoming-game-row");
+                            var totalRows = rows.length;
+                            var currentPage = 1;
+                            var totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+                    
+                            function showPage(page) {
+                                var start = (page - 1) * rowsPerPage;
+                                var end = start + rowsPerPage;
+                    
+                                rows.hide().slice(start, end).show();
+                    
+                                $("#upcomingPageInfo").text("Page " + page + " of " + totalPages);
+                                $("#prevUpcomingPage").prop("disabled", page === 1);
+                                $("#nextUpcomingPage").prop("disabled", page === totalPages);
+                            }
+                    
+                            $("#prevUpcomingPage").click(function () {
+                                if (currentPage > 1) {
+                                    currentPage--;
+                                    showPage(currentPage);
+                                }
+                            });
+                    
+                            $("#nextUpcomingPage").click(function () {
+                                if (currentPage < totalPages) {
+                                    currentPage++;
+                                    showPage(currentPage);
+                                }
+                            });
+                    
+                            showPage(currentPage);
+                        });
+                    </script>
                 </div>  
             </div>
         </div>
