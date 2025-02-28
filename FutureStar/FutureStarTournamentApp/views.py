@@ -2416,7 +2416,6 @@ class TournamentGamesh2hCompleteAPIView(APIView):
         tournament_id = request.query_params.get('tournament_id', None)
         team_a_id = request.query_params.get('team_a', None)
         team_b_id = request.query_params.get('team_b', None)
-        print(tournament_id)
 
         if not tournament_id:
             return Response({'status': 0, 'message': _('Tournament ID is required')}, status=status.HTTP_400_BAD_REQUEST)
@@ -2454,25 +2453,22 @@ class TournamentGamesh2hCompleteAPIView(APIView):
 
         # Query H2H games (recent meetings)
         tournament_h2h_games = TournamentGames.objects.filter(
-            finish=True, tournament_id=tournament_id
+            finish=True
         ).filter(
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
         ).select_related('team_a', 'team_b', 'game_field_id')
-        print(tournament_h2h_games)
         friendly_h2h_games = FriendlyGame.objects.filter(
             finish=True
         ).filter(
             (Q(team_a__id=team_a_id) & Q(team_b__id=team_b_id)) |
             (Q(team_a__id=team_b_id) & Q(team_b__id=team_a_id))
         ).select_related('team_a', 'team_b', 'game_field_id')
-        print(friendly_h2h_games)
         # Merge & sort games by game_start_time (most recent first)
         all_h2h_games = sorted(
             list(chain(tournament_h2h_games, friendly_h2h_games)),
             key=lambda x: x.game_start_time, reverse=True
         )
-        print(all_h2h_games)
         recent_meetings = all_h2h_games[:5]  # Get latest 5 games
 
         # Prepare stats
