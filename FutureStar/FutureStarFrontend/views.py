@@ -2253,11 +2253,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -2382,11 +2382,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games,
             }
 
@@ -2497,11 +2497,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort finished games by game date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
 
             # Return stats and upcoming games
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
             }
 
@@ -2616,11 +2616,11 @@ class UserDashboardGames(LoginRequiredMixin,View):
                 })
 
             # Sort Finished Games by Date
-            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)[:20]
+            finished_games = sorted(finished_games, key=lambda x: x["game_date"], reverse=True)
 
             # Return the stats
             return {
-                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"])[:20],
+                "upcoming_games": sorted(upcoming_games, key=lambda x: x["game_date"]),
                 "finished_games": finished_games
             }
         except Exception as e:
@@ -2742,7 +2742,7 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
         return stats
 
     def get_joined_trainings(self, user):
-        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')[:20]
+        joined_trainings = Training_Joined.objects.filter(user=user).select_related('training')
         
         if not joined_trainings.exists():
             return []
@@ -2752,7 +2752,7 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
         return sorted(trainings, key=lambda x: x.training_date, reverse=True)
 
     def get_created_trainings(self, user):
-        created_trainings = Training.objects.filter(created_by_id=user.id).order_by('-created_at')[:20]
+        created_trainings = Training.objects.filter(created_by_id=user.id).order_by('-created_at')
         accessible_trainings = [training for training in created_trainings if self._has_access(training, user)]
         return sorted(accessible_trainings, key=lambda t: t.training_date, reverse=True)
 
