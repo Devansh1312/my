@@ -1704,7 +1704,7 @@ class FieldListView(LoginRequiredMixin, View):
     template_name = "Admin/FieldsData/field_list.html"
 
     def get(self, request):
-        fields = Field.objects.all()
+        fields = Field.objects.all().order_by('field_name')
      
          
         return render(
@@ -1715,19 +1715,7 @@ class FieldListView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": "Field List"},
             },
         )
-    def post(self, request):
-        fields = Field.objects.all()
-     
-         
-        return render(
-            request,
-            self.template_name,
-            {
-                "fields": fields,
-                "breadcrumb": {"child": "Field List"},
-            },
-        )
-
+    
 ########### Field Create #################
 @method_decorator(user_role_check, name="dispatch")
 class FieldDetailView(LoginRequiredMixin, View):
@@ -1793,15 +1781,23 @@ class EventListView(LoginRequiredMixin, View):
     template_name = "Admin/EventsData/event_list.html"
 
     def get(self, request):
-        # Fetch events with pending status first and sort by event_date in descending order
-        events = Event.objects.all().order_by('-event_date')
+        # Custom sorting: Pending first, then Approved, then Rejected, sorted by event_date in descending order
+        events = Event.objects.annotate(
+            status_order=Case(
+                When(event_status=Event.STATUS_PENDING, then=0),
+                When(event_status=Event.STATUS_APPROVED, then=1),
+                When(event_status=Event.STATUS_REJECTED, then=2),
+                default=3,
+                output_field=IntegerField(),
+            )
+        ).order_by("status_order", "-event_date")
 
         return render(
             request,
             self.template_name,
             {
                 "events": events,
-                "breadcrumb": {"child": "Events List"},
+                "breadcrumb": {"child": "Event List"},
             },
         )
 
@@ -1939,7 +1935,7 @@ class NewsListView(LoginRequiredMixin, View):
     template_name = "Admin/News_List.html"
 
     def get(self, request):
-        news = News.objects.all()
+        news = News.objects.all().order_by('-news_date')
         return render(
             request,
             self.template_name,
@@ -6094,16 +6090,16 @@ class TeamListView(LoginRequiredMixin, View):
 
     def get(self, request):
         # Get all categories for the filter dropdown
-        categories = Category.objects.all()
+        categories = Category.objects.all().order_by('name_en')
         
         # Get the selected category IDs from the request
         selected_category_ids = request.GET.getlist('category_id[]')  # Adjusted to handle multiple IDs
 
         # Filter teams by the selected categories, or show all if none selected
         if selected_category_ids:
-            teams = Team.objects.filter(team_type__in=selected_category_ids)  # Use __in for multiple values
+            teams = Team.objects.filter(team_type__in=selected_category_ids).order_by('team_name')  # Use __in for multiple values
         else:
-            teams = Team.objects.all()
+            teams = Team.objects.all().order_by('team_name')
 
         return render(
             request,
