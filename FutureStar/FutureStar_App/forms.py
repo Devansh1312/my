@@ -25,11 +25,8 @@ class LoginForm(forms.Form):
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
-        
-        # Check if the phone number is numeric
-        if not phone.isdigit():
-            raise ValidationError("Phone number must contain only digits.")
-        
+        if not phone:
+            raise forms.ValidationError('Phone is required')
         return phone
 
 
