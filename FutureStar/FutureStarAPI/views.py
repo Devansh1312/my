@@ -6302,15 +6302,18 @@ class MarkAllNotificationsReadView(APIView):
             if not notifications.exists():
                 return Response({
                     'status': 1,
-                    'message': _('All notifications Clear successfully.'),
+                    'message': _('All notifications are already cleared.'),
                 }, status=status.HTTP_200_OK)
+
+            # Mark all notifications as read before deletion
+            notifications.update(read=True)
 
             # Delete all notifications
             notifications.delete()
 
             return Response({
                 'status': 1,
-                'message': _('All notifications Clear successfully.'),
+                'message': _('All notifications marked as read and deleted successfully.'),
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -6318,7 +6321,6 @@ class MarkAllNotificationsReadView(APIView):
                 'status': 0,
                 'message': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 
@@ -6402,7 +6404,9 @@ class NotificationsListView(APIView):
 
             # Filter notifications
             notifications = Notifictions.objects.filter(
-                targeted_id=created_by_id, targeted_type=creator_type
+                targeted_id=created_by_id, 
+                targeted_type=creator_type,
+                read=False  # Exclude notifications that are already read
             ).order_by('-date_created')
 
             # Count unread notifications
