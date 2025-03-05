@@ -71,6 +71,19 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True 
 
+CORS_ALLOWED_ORIGINS = [
+    "https://futurestar.redspark.redspark.a2hosted.com",
+    "https://redsparkinfo.in",
+    "https://goalactico.com",
+    "https://www.goalactico.com",
+    "http://goalactico.com",
+    "http://www.goalactico.com",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1",
+    "https://127.0.0.1:8000",
+    "https://127.0.0.1",
+]
+
 ROOT_URLCONF = 'FutureStar.urls'
 
 LOGIN_URL = '/login/' 
