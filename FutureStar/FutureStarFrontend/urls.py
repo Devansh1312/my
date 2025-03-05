@@ -6,6 +6,7 @@ urlpatterns = [
 
     #Dashboard URL
     path('contact/', ContactPage.as_view(),name="contact"),
+    path('index.php', HomePage.as_view(),name="index1"),
     path('', HomePage.as_view(),name="index"),
     path('discover/', DiscoverPage.as_view(),name="discover"),
     path('success-stories/', SuccessStoriesPage.as_view(),name="success-stories"),
