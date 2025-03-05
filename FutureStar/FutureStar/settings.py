@@ -189,13 +189,12 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
 
-########################################### Social Login ####################################
+######### twilio ########
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-GOOGLE_CLIENT_SECRET = "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"
-APPLE_CLIENT_ID = os.getenv('APPLE_CLIENT_ID')
-APPLE_REDIRECT_URI = os.getenv('APPLE_REDIRECT_URI')
-SOCIAL_AUTH_STATE_STRING = os.getenv('SOCIAL_AUTH_STATE_STRING')
+
 
 # TIME_ZONE = 'UTC'
 TIME_ZONE = 'Asia/Riyadh'
