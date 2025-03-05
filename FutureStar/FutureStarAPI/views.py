@@ -186,8 +186,26 @@ def get_group_data(user, request):
     
     # Return serialized group data
     return serializer.data
-###################################################### Send OTP API #############################################################################################################
-              
+
+###################################################### General function to send SMS ################################################
+# def send_sms(phone_number, otp):
+#     """Send OTP via SMS using Twilio (or any other provider)."""
+#     try:
+#         account_sid = settings.TWILIO_ACCOUNT_SID
+#         auth_token = settings.TWILIO_AUTH_TOKEN
+#         twilio_phone = settings.TWILIO_PHONE_NUMBER
+
+#         client = Client(account_sid, auth_token)
+#         message = client.messages.create(
+#             body=f"Your OTP is: {otp}",
+#             from_=twilio_phone,
+#             to=phone_number
+#         )
+#         return message.sid  # Return message ID for reference
+#     except Exception as e:
+#         return str(e)  # Return error message for debugging
+
+###################################################### Send OTP API #############################################################################################################              
 # Generate a random 6-digit OTP
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -196,9 +214,6 @@ class send_otp(APIView):
     permission_classes = [AllowAny]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    def generate_random_password(self, length=8):
-        characters = string.ascii_letters + string.digits
-        return ''.join(random.choice(characters) for i in range(length))
     
     def post(self, request, *args, **kwargs):        
         language = request.headers.get('Language', 'en')
@@ -229,6 +244,7 @@ class send_otp(APIView):
                         phone=phone,
                         defaults={'phone': phone, 'OTP': otp}
                     )
+                    #send_sms(phone, otp)  # Call general function
                     return Response({
                         'status': 1,
                         'message': _('OTP sent successfully.'),
@@ -247,7 +263,7 @@ class send_otp(APIView):
                     phone=phone,
                     defaults={'phone': phone, 'OTP': otp}
                 )
-
+                #send_sms(phone, otp)  # Call general function
                 return Response({
                     'status': 1,
                     'message': _('OTP sent successfully.'),
@@ -295,12 +311,11 @@ class send_otp(APIView):
                     if user and user.is_deleted:
                         # User is soft deleted, proceed with registration
                         otp = generate_otp()
-                        random_password = self.generate_random_password()
                         otp_record, created = OTPSave.objects.update_or_create(
                             phone=phone,
                             defaults={'phone': phone, 'OTP': otp}
                         )
-
+                        #send_sms(phone, otp)  # Call general function
                         return Response({
                             'status': 1,
                             'message': _('OTP sent successfully.'),
@@ -314,12 +329,11 @@ class send_otp(APIView):
                         }, status=status.HTTP_400_BAD_REQUEST)
 
                     otp = generate_otp()
-                    random_password = self.generate_random_password()
                     otp_record, created = OTPSave.objects.update_or_create(
                         phone=phone,
                         defaults={'phone': phone, 'OTP': otp}
                     )
-
+                    #send_sms(phone, otp)  # Call general function
                     return Response({
                         'status': 1,
                         'message': _('OTP sent successfully.'),
@@ -807,7 +821,7 @@ class ForgotPasswordAPIView(APIView):
                 otp = str(random.randint(100000, 999999))
                 user.otp = otp
                 user.save()
-
+                # send_sms(phone, otp)  # Call general function
                 return Response({
                     'status': 1,
                     'message': _('OTP sent to your phone number.'),

@@ -53,6 +53,25 @@ def get_language(request):
     request.session['current_language'] = language  # Keep 'current_language' consistent
     return language
 
+###################################################### General function to send SMS ################################################
+# def send_sms(phone_number, otp):
+#     """Send OTP via SMS using Twilio (or any other provider)."""
+#     try:
+#         account_sid = settings.TWILIO_ACCOUNT_SID
+#         auth_token = settings.TWILIO_AUTH_TOKEN
+#         twilio_phone = settings.TWILIO_PHONE_NUMBER
+
+#         client = Client(account_sid, auth_token)
+#         message = client.messages.create(
+#             body=f"Your OTP is: {otp}",
+#             from_=twilio_phone,
+#             to=phone_number
+#         )
+#         return message.sid  # Return message ID for reference
+#     except Exception as e:
+#         return str(e)  # Return error message for debugging
+
+
 ##############################################   HomePage   ########################################################
 class HomePage(View):
     def get(self, request, *args, **kwargs):
@@ -1408,7 +1427,7 @@ class ForgotPasswordPage(View):
         otp = generate_otp()
         user.otp = otp
         user.save()
-
+        #send_sms(phone, otp)  # Call general function
         # Store phone number in session instead of URL
         request.session["reset_phone"] = phone
         request.session['language'] = language_from_url
@@ -1601,6 +1620,7 @@ class RegisterPage(View):
         # Generate OTP and save user details in OTPSave table
         otp = generate_otp()
         OTPSave.objects.create(phone=phone, OTP=otp)
+        #send_sms(phone, otp)  # Call general function
 
         # Log the OTP for development purposes
 
@@ -1743,7 +1763,7 @@ class UserInfoUpdateView(View):
                 phone=phone,
                 defaults={'OTP': otp}
             )
-
+            #send_sms(phone, otp)  # Call general function
             request.session['phone'] = phone
             request.session['username'] = username
             request.session['email'] = email
