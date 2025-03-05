@@ -38,6 +38,10 @@ from FutureStar.firebase_config import send_push_notification
 
 # JWT Token Imports
 from rest_framework_simplejwt.tokens import RefreshToken
+
+#### Twilio Imports
+from twilio.rest import Client
+
 ##################################################### User Current Type Switch API Z###############################################
 class UpdateCurrentTypeAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -188,22 +192,24 @@ def get_group_data(user, request):
     return serializer.data
 
 ###################################################### General function to send SMS ################################################
-# def send_sms(phone_number, otp):
-#     """Send OTP via SMS using Twilio (or any other provider)."""
-#     try:
-#         account_sid = settings.TWILIO_ACCOUNT_SID
-#         auth_token = settings.TWILIO_AUTH_TOKEN
-#         twilio_phone = settings.TWILIO_PHONE_NUMBER
+def send_sms(phone_number, otp, language='en'):
+    if language in ['en', 'ar']:
+        activate(language)
+    """Send OTP via SMS using Twilio (or any other provider)."""
+    try:
+        account_sid = settings.TWILIO_ACCOUNT_SID
+        auth_token = settings.TWILIO_AUTH_TOKEN
+        twilio_phone = "+19035604511"
 
-#         client = Client(account_sid, auth_token)
-#         message = client.messages.create(
-#             body=f"Your OTP is: {otp}",
-#             from_=twilio_phone,
-#             to=phone_number
-#         )
-#         return message.sid  # Return message ID for reference
-#     except Exception as e:
-#         return str(e)  # Return error message for debugging
+        client = Client(account_sid, auth_token)
+        message = client.messages.create(
+            body = _("Your secure OTP for Goalactico is: ") + str(otp) + _(". For your safety, never share this code. It will expire in 10 minutes."),
+            from_=twilio_phone,
+            to=phone_number
+        )
+        return message.sid  # Return message ID for reference
+    except Exception as e:
+        return str(e)  # Return error message for debugging
 
 ###################################################### Send OTP API #############################################################################################################              
 # Generate a random 6-digit OTP
@@ -244,7 +250,7 @@ class send_otp(APIView):
                         phone=phone,
                         defaults={'phone': phone, 'OTP': otp}
                     )
-                    #send_sms(phone, otp)  # Call general function
+                    # send_sms(phone, otp,language)  # Call general function
                     return Response({
                         'status': 1,
                         'message': _('OTP sent successfully.'),
@@ -263,7 +269,7 @@ class send_otp(APIView):
                     phone=phone,
                     defaults={'phone': phone, 'OTP': otp}
                 )
-                #send_sms(phone, otp)  # Call general function
+                # send_sms(phone, otp,language)  # Call general function
                 return Response({
                     'status': 1,
                     'message': _('OTP sent successfully.'),
@@ -315,7 +321,7 @@ class send_otp(APIView):
                             phone=phone,
                             defaults={'phone': phone, 'OTP': otp}
                         )
-                        #send_sms(phone, otp)  # Call general function
+                        # send_sms(phone, otp,language)  # Call general function
                         return Response({
                             'status': 1,
                             'message': _('OTP sent successfully.'),
@@ -333,7 +339,7 @@ class send_otp(APIView):
                         phone=phone,
                         defaults={'phone': phone, 'OTP': otp}
                     )
-                    #send_sms(phone, otp)  # Call general function
+                    # send_sms(phone, otp,language)  # Call general function
                     return Response({
                         'status': 1,
                         'message': _('OTP sent successfully.'),
@@ -821,7 +827,7 @@ class ForgotPasswordAPIView(APIView):
                 otp = str(random.randint(100000, 999999))
                 user.otp = otp
                 user.save()
-                # send_sms(phone, otp)  # Call general function
+                # send_sms(phone, otp,language)  # Call general function
                 return Response({
                     'status': 1,
                     'message': _('OTP sent to your phone number.'),
