@@ -6426,16 +6426,12 @@ class NotificationsListView(APIView):
             notifications = Notifictions.objects.filter(
                 targeted_id=created_by_id, 
                 targeted_type=creator_type,
-                read=False  # Exclude notifications that are already read
             ).order_by('-date_created')
 
             # Count unread notifications
             notification_count = Notifictions.objects.filter(
                 targeted_id=created_by_id, targeted_type=creator_type, read=False
             ).count()
-
-            # Mark notifications as read
-            notifications.update(read=True)
 
             # Apply pagination
             paginator = self.pagination_class()
