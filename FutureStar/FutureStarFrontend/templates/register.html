@@ -245,13 +245,6 @@
         $(this).find('i').toggleClass('fa-eye fa-eye-slash');
     });
 
-    // Ensure that the phone field accepts only numeric input
-    $('#phone').on('keypress', function(e) {
-        if (!/\d/.test(String.fromCharCode(e.which))) {
-            e.preventDefault(); // Prevent non-numeric input
-        }
-    });
-
     // Block right-click context menu
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
@@ -268,5 +261,33 @@ document.addEventListener('keydown', function(e) {
         return false;
     }
 });
+
+$(document).ready(function () {
+    let errorMessage = "{% if current_language == 'en' %}Only 9 digits are allowed{% elif current_language == 'ar' %}مسموح فقط بـ 9 أرقام{% endif %}";
+
+    $('#phone').on('keypress', function (e) {
+        // Allow only numbers (0-9)
+        if (!/\d/.test(String.fromCharCode(e.which))) {
+            e.preventDefault();
+        }
+    });
+
+    $('#phone').on('input', function () {
+        let value = $(this).val();
+        // Remove non-numeric characters
+        value = value.replace(/\D/g, '');
+        
+        if (value.length > 9) {
+            value = value.slice(0, 9); // Limit input to 9 digits
+            $('#phoneError').text(errorMessage).show(); // Show localized error message
+        } else {
+            $('#phoneError').hide(); // Hide error message if within limit
+        }
+
+        $(this).val(value);
+    });
+});
+
+
 </script>
 {% endblock %}

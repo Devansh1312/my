@@ -290,3 +290,46 @@ CSRF_TRUSTED_ORIGINS = [
     "https://127.0.0.1:8000",
     "https://127.0.0.1",
 ]
+
+import os
+
+# LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs')
+
+# if not os.path.exists(LOG_DIR):
+#     os.makedirs(LOG_DIR)
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',  # Change to INFO or ERROR in production
+#             'class': 'logging.FileHandler',
+#             'filename': os.path.join(LOG_DIR, 'django_requests.log'),  # Log file
+#             'formatter': 'detailed',
+#         },
+#     },
+#     'formatters': {
+#         'detailed': {
+#             'format': '{levelname} {asctime} {module} {message} {pathname}:{lineno}',
+#             'style': '{',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#         'django.request': {  # Logs every request
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#         'django.server': {  # Logs every response
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
