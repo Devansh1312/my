@@ -4,6 +4,7 @@ import os
 import random
 import re
 import string
+import requests
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -192,22 +193,60 @@ def get_group_data(user, request):
     return serializer.data
 
 ###################################################### General function to send SMS ################################################
+# def send_sms(phone_number, otp, language='en'):
+#     if language in ['en', 'ar']:
+#         activate(language)
+#     """Send OTP via SMS using Twilio (or any other provider)."""
+#     try:
+#         account_sid = settings.TWILIO_ACCOUNT_SID
+#         auth_token = settings.TWILIO_AUTH_TOKEN
+#         twilio_phone = "+19035604511"
+
+#         client = Client(account_sid, auth_token)
+#         message = client.messages.create(
+#             body = _("Your secure OTP for Goalactico is: ") + str(otp) + _(". For your safety, never share this code. It will expire in 10 minutes."),
+#             from_=twilio_phone,
+#             to=phone_number
+#         )
+#         return message.sid  # Return message ID for reference
+#     except Exception as e:
+#         return str(e)  # Return error message for debugging
+
 def send_sms(phone_number, otp, language='en'):
+    """Send OTP via SMS using Taqnyat."""
+    
     if language in ['en', 'ar']:
         activate(language)
-    """Send OTP via SMS using Twilio (or any other provider)."""
-    try:
-        account_sid = settings.TWILIO_ACCOUNT_SID
-        auth_token = settings.TWILIO_AUTH_TOKEN
-        twilio_phone = "+19035604511"
 
-        client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body = _("Your secure OTP for Goalactico is: ") + str(otp) + _(". For your safety, never share this code. It will expire in 10 minutes."),
-            from_=twilio_phone,
-            to=phone_number
-        )
-        return message.sid  # Return message ID for reference
+    try:
+        api_key = settings.TAQNYAT_API_KEY
+        sender_name = settings.TAQNYAT_SENDER_NAME
+        url = "https://api.taqnyat.sa/v1/messages"
+
+        if len(phone_number) == 9 and phone_number.isdigit():
+            phone_number = f"966{phone_number}"  # Add Saudi country code
+
+        message_body = _("Your secure OTP for Goalactico is: ") + str(otp) + _(". For your safety, never share this code. It will expire in 10 minutes.")
+
+        payload = {
+            "recipients": [phone_number],
+            "body": message_body,
+            "sender": sender_name
+        }
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
+        response_data = response.json()
+
+        if response.status_code == 200:
+            return response_data  # Return response from Taqnyat
+        else:
+            return f"Error: {response_data}"  # Return error details
+
     except Exception as e:
         return str(e)  # Return error message for debugging
 
@@ -250,7 +289,7 @@ class send_otp(APIView):
                         phone=phone,
                         defaults={'phone': phone, 'OTP': otp}
                     )
-                    # send_sms(phone, otp,language)  # Call general function
+                    send_sms(phone, otp,language)  # Call general function
                     return Response({
                         'status': 1,
                         'message': _('OTP sent successfully.'),
@@ -269,7 +308,7 @@ class send_otp(APIView):
                     phone=phone,
                     defaults={'phone': phone, 'OTP': otp}
                 )
-                # send_sms(phone, otp,language)  # Call general function
+                send_sms(phone, otp,language)  # Call general function
                 return Response({
                     'status': 1,
                     'message': _('OTP sent successfully.'),
@@ -321,7 +360,7 @@ class send_otp(APIView):
                             phone=phone,
                             defaults={'phone': phone, 'OTP': otp}
                         )
-                        # send_sms(phone, otp,language)  # Call general function
+                        send_sms(phone, otp,language)  # Call general function
                         return Response({
                             'status': 1,
                             'message': _('OTP sent successfully.'),
@@ -339,7 +378,7 @@ class send_otp(APIView):
                         phone=phone,
                         defaults={'phone': phone, 'OTP': otp}
                     )
-                    # send_sms(phone, otp,language)  # Call general function
+                    send_sms(phone, otp,language)  # Call general function
                     return Response({
                         'status': 1,
                         'message': _('OTP sent successfully.'),
@@ -827,7 +866,7 @@ class ForgotPasswordAPIView(APIView):
                 otp = str(random.randint(100000, 999999))
                 user.otp = otp
                 user.save()
-                # send_sms(phone, otp,language)  # Call general function
+                send_sms(phone, otp,language)  # Call general function
                 return Response({
                     'status': 1,
                     'message': _('OTP sent to your phone number.'),

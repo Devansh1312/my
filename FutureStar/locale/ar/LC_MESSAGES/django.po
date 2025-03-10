@@ -1849,3 +1849,9 @@ msgstr "رمز OTP الآمن الخاص بك لـ جولأكتكو هو: "
 
 msgid ". For your safety, never share this code. It will expire in 10 minutes."
 msgstr ". من أجل سلامتك، لا تشارك هذا الرمز أبدًا. سينتهي صلاحيته خلال 10 دقائق."
+
+msgid "All notifications are already cleared."
+msgstr "تم مسح جميع الإشعارات بالفعل."
+
+msgid "All notifications marked as read and deleted successfully."
+msgstr "تم وضع علامة مقروء لجميع الإشعارات وحذفها بنجاح."

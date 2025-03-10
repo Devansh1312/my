@@ -4,6 +4,7 @@ import time
 import random
 from django.utils.cache import add_never_cache_headers
 from django.utils.timezone import localtime, now
+from django.conf import settings
 
 #################
 from django.utils.translation import gettext as _
@@ -53,7 +54,7 @@ def get_language(request):
     request.session['current_language'] = language  # Keep 'current_language' consistent
     return language
 
-###################################################### General function to send SMS ################################################
+# ###################################################### General function to send SMS ################################################
 # def send_sms(phone_number, otp):
 #     """Send OTP via SMS using Twilio (or any other provider)."""
 #     try:
@@ -71,7 +72,38 @@ def get_language(request):
 #     except Exception as e:
 #         return str(e)  # Return error message for debugging
 
+def send_sms(phone_number, otp):
+    """Send OTP via SMS using Taqnyat."""
+    try:
+        api_key = settings.TAQNYAT_API_KEY
+        sender_name = settings.TAQNYAT_SENDER_NAME
+        url = "https://api.taqnyat.sa/v1/messages"
 
+        if len(phone_number) == 9 and phone_number.isdigit():
+            phone_number = f"966{phone_number}"  # Add Saudi country code
+
+
+        payload = {
+            "recipients": [phone_number],
+            "body": f"Your secure OTP for Goalactico is: {otp}",
+            "sender": sender_name
+        }
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
+        response_data = response.json()
+
+        if response.status_code == 200:
+            return response_data  # Return response from Taqnyat
+        else:
+            return f"Error: {response_data}"  # Return error details
+
+    except Exception as e:
+        return str(e)  # Return error message for debugging
 ##############################################   HomePage   ########################################################
 class HomePage(View):
     def get(self, request, *args, **kwargs):
@@ -1427,7 +1459,7 @@ class ForgotPasswordPage(View):
         otp = generate_otp()
         user.otp = otp
         user.save()
-        #send_sms(phone, otp)  # Call general function
+        send_sms(phone, otp)  # Call general function
         # Store phone number in session instead of URL
         request.session["reset_phone"] = phone
         request.session['language'] = language_from_url
@@ -1620,7 +1652,7 @@ class RegisterPage(View):
         # Generate OTP and save user details in OTPSave table
         otp = generate_otp()
         OTPSave.objects.create(phone=phone, OTP=otp)
-        #send_sms(phone, otp)  # Call general function
+        send_sms(phone, otp)  # Call general function
 
         # Log the OTP for development purposes
 
@@ -1763,7 +1795,7 @@ class UserInfoUpdateView(View):
                 phone=phone,
                 defaults={'OTP': otp}
             )
-            #send_sms(phone, otp)  # Call general function
+            send_sms(phone, otp)  # Call general function
             request.session['phone'] = phone
             request.session['username'] = username
             request.session['email'] = email

@@ -110,19 +110,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FutureStar.wsgi.application'
 
 ### Local ####
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'futurestar',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '3306',
-         'OPTIONS': {
-            'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
-        }
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'futurestar',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#          'OPTIONS': {
+#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
+#         }
+#     }
+# }
 
 
 # ### A2Hosting ####
@@ -157,19 +157,19 @@ DATABASES = {
 # }
 
 ################### Client Server Main #########################
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'goalactico_goalactico',
-#         'USER': 'goalactico_goalactico',
-#         'PASSWORD': 'Redspark@2025',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#         'OPTIONS': {
-#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
-#         },
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'goalactico_goalactico',
+        'USER': 'goalactico_goalactico',
+        'PASSWORD': 'Redspark@2025',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
+        },
+    }
+}
 
 AUTH_USER_MODEL = 'FutureStar_App.User'
 
@@ -203,9 +203,8 @@ LOCALE_PATHS = [
 ]
 
 ######### twilio ########
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+TAQNYAT_API_KEY = os.getenv("TAQNYAT_API_KEY")
+TAQNYAT_SENDER_NAME = os.getenv("TAQNYAT_SENDER_NAME")
 
 
 
@@ -256,26 +255,26 @@ SIMPLE_JWT = {
 APPEND_SLASH=False
 
 ############ For Secure Password And Not Visible in Network ################
-SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
-SESSION_COOKIE_HTTPONLY = True  # Prevent access to cookies via JavaScript
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
+# SESSION_COOKIE_HTTPONLY = True  # Prevent access to cookies via JavaScript
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
+# CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_HTTPONLY = True
 
 
 ######################## Client Server Main ############################
-# SESSION_COOKIE_SECURE = False  # Set to True in production (requires HTTPS)
-# SESSION_COOKIE_HTTPONLY = True  # Prevent access to cookies via JavaScript
-# SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
+SESSION_COOKIE_SECURE = False  # Set to True in production (requires HTTPS)
+SESSION_COOKIE_HTTPONLY = True  # Prevent access to cookies via JavaScript
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
 
-# CSRF_COOKIE_SECURE = False  # Set to True in production (requires HTTPS)
-# CSRF_COOKIE_HTTPONLY = True  # Prevent client-side JavaScript access
+CSRF_COOKIE_SECURE = False  # Set to True in production (requires HTTPS)
+CSRF_COOKIE_HTTPONLY = True  # Prevent client-side JavaScript access
 
-# CORS_ALLOW_CREDENTIALS = True  # Allow cookies to be sent with cross-origin requests
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies to be sent with cross-origin requests
 
-# # Adjust SAMESITE settings for local development
-# CSRF_COOKIE_SAMESITE = 'Lax'  # 'Lax' allows cookies on same-site navigation
-# SESSION_COOKIE_SAMESITE = 'Lax'  # Prevents cross-site attacks while allowing normal use
+# Adjust SAMESITE settings for local development
+CSRF_COOKIE_SAMESITE = 'Lax'  # 'Lax' allows cookies on same-site navigation
+SESSION_COOKIE_SAMESITE = 'Lax'  # Prevents cross-site attacks while allowing normal use
 
 ########### Trusted Origins for CSRF ################
 CSRF_TRUSTED_ORIGINS = [
