@@ -899,6 +899,7 @@
 											<th>No</th>
 											<th>Training Name</th>
 											<th>Training Type</th>
+											<th>Date</th>
 											<th>Rating</th>
 											<th>Attendance Status</th>
 										</tr>
@@ -907,6 +908,7 @@
 											<td>{{ forloop.counter }}</td>
 											<td>{{ training.training.training_name }}</td>
 											<td>{{ training.training.get_training_type_display }}</td>
+											<td>{{ training.training.training_date|date:"d-M-Y" }}</td>
 											<td>
 												{% if training.rating and training.rating > 0 %}
 													<div class="ratting style-two">
