@@ -447,22 +447,30 @@ class System_Settings(LoginRequiredMixin, View):
 
 #######################################   Player Coach And Refree LIST VIEW MODULE ##############################################
 
-# User Active & Deactive Function
+# User Active & Deactivate Function
 @method_decorator(user_role_check, name="dispatch")
 class ToggleUserStatusView(View):
     def post(self, request, pk, *args, **kwargs):
         user = get_object_or_404(User, pk=pk)
         new_status = request.POST.get("status")
-        source_page = request.POST.get(
-            "source_page", "Dashboard"
-        )  # Default to Dashboard if not provided
+        
+        # Determine the source page based on user role
+        role_redirect_map = {
+            2: "player_list",
+            3: "coach_list",
+            4: "referee_list",
+            5: "default_user_list",
+            6: "manager_list",
+        }
 
-        # Check if the user is a superuser
+        source_page = role_redirect_map.get(user.role_id, "Dashboard")  # Default to Dashboard if role_id not found
+
+        # Check if the user is a superuser (role_id == 1)
         if user.role_id == 1:
             messages.error(request, "Superuser status cannot be changed.")
-            return redirect(source_page)
+            return redirect("Dashboard")
 
-        # Check if the current user is trying to deactivate their own account
+        # Prevent self-deactivation
         if user == request.user and new_status == "deactivate":
             messages.info(
                 request, "Your account has been deactivated. Please log in again."
@@ -475,26 +483,15 @@ class ToggleUserStatusView(View):
         if new_status == "activate":
             user.is_active = True
             messages.success(request, "{} has been activated.".format(user.username))
-
         elif new_status == "deactivate":
             user.is_active = False
-            messages.success(request, "{} has been activated.".format(user.username))
+            messages.success(request, "{} has been deactivated.".format(user.username))
 
         user.save()
 
-        # Redirect to the appropriate list based on source_page
-        if source_page == "player_list":
-            return redirect(reverse("player_list"))
-        elif source_page == "coach_list":
-            return redirect(reverse("coach_list"))
-        elif source_page == "referee_list":
-            return redirect(reverse("referee_list"))
-        elif source_page == "default_user_list":
-            return redirect(reverse("default_user_list"))
-        elif source_page == "manager_list":
-            return redirect(reverse("manager_list"))
-        else:
-            return redirect(reverse("Dashboard"))
+        # Redirect based on user role
+        return redirect(reverse(source_page))
+
 
 
 # Player List View

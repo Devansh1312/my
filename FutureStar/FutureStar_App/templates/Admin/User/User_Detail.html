@@ -60,7 +60,21 @@
 					<div class="card-header d-flex justify-content-between align-items-center">
 						<h4 class="card-title mb-0">Profile Details</h4>
 						<!-- Back Button -->									
-						<a class="btn btn-secondary btn-sm" href="{% url source_page %}">
+						{% if user.role.id == 2 %}
+							{% url 'player_list' as back_url %}
+						{% elif user.role.id == 3 %}
+							{% url 'coach_list' as back_url %}
+						{% elif user.role.id == 4 %}
+							{% url 'referee_list' as back_url %}
+						{% elif user.role.id == 5 %}
+							{% url 'default_user_list' as back_url %}
+						{% elif user.role.id == 6 %}
+							{% url 'manager_list' as back_url %}
+						{% else %}
+							{% url 'Dashboard' as back_url %}
+						{% endif %}
+
+						<a class="btn btn-secondary btn-sm" href="{{ back_url }}">
 							<i class="fa fa-arrow-left me-1"></i> Back
 						</a>
 					</div>
