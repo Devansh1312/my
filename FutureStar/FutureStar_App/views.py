@@ -36,6 +36,7 @@ from django.utils.translation import gettext as _
 from django.core.files.storage import default_storage
 from django.utils.translation import activate
 from FutureStar.firebase_config import send_push_notification
+from django.utils.timezone import now
 
 # User Role Check
 def user_role_check(view_func):
@@ -880,7 +881,8 @@ class UserDetailView(LoginRequiredMixin, View):
             created_by_id=user.id, creator_type=EventBooking.USER_TYPE
         )
         teams = JoinBranch.objects.filter(user_id=user.id)
-
+        joined_trainings = Training_Joined.objects.filter(user=user.id)
+        training_feedbacks = Training_Feedback.objects.filter(user=user.id).order_by("-created_at")
         # Initialize stats
         stats = {}
 
@@ -893,7 +895,7 @@ class UserDetailView(LoginRequiredMixin, View):
         elif user.role.id == 6:
             stats = self.get_manager_stats(user, time_filter)
 
-        return posts, events, event_bookings, teams, stats
+        return posts, events, event_bookings, teams, joined_trainings, training_feedbacks, stats
 
     def get_manager_stats(self, user, time_filter):
         """
@@ -922,16 +924,19 @@ class UserDetailView(LoginRequiredMixin, View):
             }
 
     def get_player_stats(self, user, time_filter):
-        """
-        Fetch player-specific stats, including total wins, losses, draws, games played, goals, assists, and cards.
-        This method now includes stats from both TournamentGames and FriendlyGame.
-        """
+        print("Function get_player_stats called")
+        
         try:
+            print("User ID:", user.id)
+            print("Received time_filter:", time_filter)
+
             # Ensure time_filter is a valid dictionary
             time_filter = time_filter or {}
 
             # Fetch user's individual performance stats
+            print("Fetching player details...")
             player = User.objects.get(id=user.id)
+            print("Player fetched successfully:", player)
 
             performance_stats = {
                 "passing": player.passing or 0,
@@ -947,56 +952,96 @@ class UserDetailView(LoginRequiredMixin, View):
                 "balance": player.balance or 0,
                 "agility": player.agility or 0,
             }
+            print("Performance stats:", performance_stats)
 
             # Check if the user is associated with any team
+            print("Fetching branches associated with user...")
             branches = JoinBranch.objects.filter(user_id=user.id)
-            
-            branch_ids = branches.values_list("branch_id", flat=True)
+            branch_ids = list(branches.values_list("branch_id", flat=True))
+            print("Branch IDs:", branch_ids)
 
             # Fetch tournament and friendly games where the user's teams participated
+            print("Fetching tournament games...")
             tournament_games = TournamentGames.objects.filter(
                 (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
             )
+            print("Tournament games count:", tournament_games.count())
 
+            print("Fetching friendly games...")
             friendly_games = FriendlyGame.objects.filter(
                 (Q(team_a__in=branch_ids) | Q(team_b__in=branch_ids)), finish=True, **time_filter
             )
+            print("Friendly games count:", friendly_games.count())
 
             # Fetch user's stats from PlayerGameStats (tournament games)
+            print("Fetching tournament player stats...")
             tournament_player_stats = PlayerGameStats.objects.filter(
                 player_id=user.id, game_id__in=tournament_games.values_list("id", flat=True)
             )
+            print("Tournament player stats count:", tournament_player_stats.count())
 
             # Fetch user's stats from FriendlyGamesPlayerGameStats (friendly games)
+            print("Fetching friendly player stats...")
             friendly_player_stats = FriendlyGamesPlayerGameStats.objects.filter(
                 player_id=user.id, game_id__in=friendly_games.values_list("id", flat=True)
             )
+            print("Friendly player stats count:", friendly_player_stats.count())
 
             # Combine stats from both tournament and friendly games
             total_games_played = tournament_games.count() + friendly_games.count()
+            print("Total games played:", total_games_played)
 
             total_goals = (tournament_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0) + \
                         (friendly_player_stats.aggregate(Sum("goals"))["goals__sum"] or 0)
+            print("Total goals:", total_goals)
 
             total_assists = (tournament_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0) + \
                             (friendly_player_stats.aggregate(Sum("assists"))["assists__sum"] or 0)
+            print("Total assists:", total_assists)
 
             total_yellow_cards = (tournament_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0) + \
                                 (friendly_player_stats.aggregate(Sum("yellow_cards"))["yellow_cards__sum"] or 0)
+            print("Total yellow cards:", total_yellow_cards)
 
             total_red_cards = (tournament_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0) + \
                             (friendly_player_stats.aggregate(Sum("red_cards"))["red_cards__sum"] or 0)
+            print("Total red cards:", total_red_cards)
 
             # Calculate wins, losses, and draws across all teams user played for
+            print("Calculating wins, losses, and draws...")
             total_wins = tournament_games.filter(winner_id__in=branch_ids).count() + \
                         friendly_games.filter(winner_id__in=branch_ids).count()
+            print("Total wins:", total_wins)
 
             total_losses = tournament_games.filter(loser_id__in=branch_ids).count() + \
                         friendly_games.filter(loser_id__in=branch_ids).count()
+            print("Total losses:", total_losses)
 
             total_draws = tournament_games.filter(is_draw=True).count() + \
                         friendly_games.filter(is_draw=True).count()
+            print("Total draws:", total_draws)
 
+            # Fetch player's past/ongoing training attendance data
+            print("Fetching training sessions...")
+            today = now().date()
+            training_sessions = Training_Joined.objects.filter(user=user.id, training__training_date__lte=today)
+            print("Total training sessions:", training_sessions.count())
+
+            absent_count = training_sessions.filter(attendance_status=False).count()
+            print("Total absences:", absent_count)
+
+            total_ratings = training_sessions.aggregate(Sum("rating"))["rating__sum"] or 0
+            print("Total ratings sum:", total_ratings)
+
+            # Calculate Absence Percentage
+            absence_percentage = round((absent_count / training_sessions.count()) * 100, 2) if training_sessions.count() > 0 else 0
+            print("Absence percentage:", absence_percentage)
+
+            # Calculate Average Rating
+            avg_rating = round(total_ratings / training_sessions.count(), 2) if training_sessions.count() > 0 else 0
+            print("Average rating:", avg_rating)
+
+            print("Returning final response...")
             return {
                 "status": 1,
                 "matchplayed": total_games_played or 0,
@@ -1008,10 +1053,13 @@ class UserDetailView(LoginRequiredMixin, View):
                 "yellow_card": total_yellow_cards or 0,
                 "red": total_red_cards or 0,
                 "player_stats": performance_stats,
+                "absence_percentage": absence_percentage,
+                "avg_rating": avg_rating,
                 "message": "Stats calculated successfully."
             }
 
         except Exception as e:
+            print("An error occurred:", str(e))
             return {
                 "status": 0,
                 "message": "Failed to fetch player stats.",
@@ -1187,9 +1235,8 @@ class UserDetailView(LoginRequiredMixin, View):
             return redirect("Dashboard")
         try:
             user = User.objects.get(id=user_id)
-            posts, events, event_bookings, teams, stats = self.get_user_related_data(
-                user
-            )
+            posts, events, event_bookings, teams, joined_trainings, training_feedbacks, stats = self.get_user_related_data(user)
+
              
        
             time_filter = {}
@@ -1215,6 +1262,8 @@ class UserDetailView(LoginRequiredMixin, View):
                     "events_bookings": event_bookings,
                     "teams": teams,
                     "stats": stats,  # Add stats to context
+                    "joined_trainings": joined_trainings,
+                    "training_feedbacks": training_feedbacks,
                     "player_stats":player_stats,
                 },
             )
@@ -1229,9 +1278,8 @@ class UserDetailView(LoginRequiredMixin, View):
         try:
             user = User.objects.get(id=user_id)
             # Now unpack all 5 values: posts, events, event_bookings, teams, and stats
-            posts, events, event_bookings, teams, stats = self.get_user_related_data(
-                user
-            )
+            posts, events, event_bookings, teams, joined_trainings, training_feedbacks, stats = self.get_user_related_data(user)
+
             time_filter = {}  # This will parse the time filter from the request
         
         # Get player-specific stats, including passing time_filter
@@ -1255,6 +1303,8 @@ class UserDetailView(LoginRequiredMixin, View):
                     "events": events,
                     "events_bookings": event_bookings,
                     "teams": teams,
+                    "joined_trainings": joined_trainings,
+                    "training_feedbacks": training_feedbacks,
                     "stats": stats,  # Include stats in the context if needed
                     "player_stats":player_stats,
 

@@ -40,8 +40,6 @@ from FutureStar.firebase_config import send_push_notification
 # JWT Token Imports
 from rest_framework_simplejwt.tokens import RefreshToken
 
-#### Twilio Imports
-from twilio.rest import Client
 
 ##################################################### User Current Type Switch API Z###############################################
 class UpdateCurrentTypeAPIView(APIView):

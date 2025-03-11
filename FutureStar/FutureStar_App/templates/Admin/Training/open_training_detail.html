@@ -222,6 +222,7 @@
 													<th>Joined Date</th>
 													<th>Attendance Status</th>
 													<th>Rating</th>
+													<th>View</th>
 												</tr>
 											</thead>
 											<tbody> {% for user in joined_users %} <tr>
@@ -230,9 +231,31 @@
 													<td>{{ user.created_at|date:"Y-m-d" }}</td>
 													<td> {% if user.attendance_status %} <span class="badge bg-success">Present</span> {% else %} <span class="badge bg-danger">Absent</span> {% endif %} </td>
 													<td> {% if user.rating %} {% for i in "12345"|make_list %} {% if forloop.counter <= user.rating %} <i class="fa fa-star text-warning"></i> {# Filled Star #} {% else %} <i class="fa fa-star-o text-warning"></i> {# Empty Star #  {# Empty Star #} {% endif %} {% endfor %} {% else %} <span>Not Rated</span> {% endif %} </td>
-												</tr> {% empty %} <tr>
-													<td colspan="5" class="text-center">No users have joined this training.</td>
-												</tr> {% endfor %} </tbody>
+													<td>
+														<div class="action-menu-container" style="position: relative; display: inline-block;">
+															<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																<i data-feather="more-vertical"></i>
+															</a>
+															<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+																<ul style="list-style: none; padding: 0; margin: 0;">
+																	<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																		<a href="#" class="view-details" data-id="{{ user.user.id }}">View</a>
+																		<form id="view-form-{{ user.user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;"> {% csrf_token %} <input type="hidden" name="user_id" value="{{ user.user.id }}">
+																			<input type="hidden" name="source_page" value="player_list">
+																			<input type="hidden" name="title" value="Player">
+																		</form>
+																	</li>
+																</ul>
+															</div>
+														</div>
+													</td>
+												</tr> 
+												{% empty %} 
+												<tr>
+													<td colspan="6" class="text-center">No users have joined this training.</td>
+												</tr> 
+												{% endfor %} 
+											</tbody>
 										</table>
 									</div>
 								</div>
@@ -251,46 +274,66 @@
 <script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
 <script src="{% static 'assets/js/tooltip-init.js' %}"></script>
-
-
 <script>
-    // Toggle the visibility of the action card
-   document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
-        menu.addEventListener('click', function(event) {
-            event.preventDefault();
-            var actionCard = menu.nextElementSibling;
-            actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
-            // Close other open action cards
-            document.querySelectorAll('.action-card').forEach(function(card) {
-                if (card !== actionCard) {
-                    card.style.display = 'none';
-            }
-        });
-    });
-});
-document.querySelectorAll('.view-details').forEach(function(link) {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            var branchId = link.getAttribute('data-id');
-            var form = document.getElementById('view-form-' + branchId);
-            form.submit(); // Submits the form programmatically
-        });
-    });
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function() {
 
-    $('#joined-users-table').DataTable();
-    
-    // Adjust tables when tabs are switched
-    $('#dataTab a').on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr('href');
-        if (target === '#game') {
-            $('#game-table').DataTable().columns.adjust().draw();
-        } else if (target === '#team') {
-            $('#team-table').DataTable().columns.adjust().draw();
-        } 
-    });
-});
+	// View User Details
+	document.querySelectorAll('.view-details').forEach(function(link) {
+		link.addEventListener('click', function(e) {
+			e.preventDefault();
+			var userId = this.getAttribute('data-id');
+			var form = document.getElementById('view-form-' + userId);
+			form.submit();
+		});
+	});
 
+	// Toggle the visibility of the action card
+	document.querySelectorAll('.three-dots-menu').forEach(function(menu) {
+		menu.addEventListener('click', function(event) {
+			event.preventDefault();
+			var actionCard = menu.nextElementSibling;
+			actionCard.style.display = (actionCard.style.display === 'none' || actionCard.style.display === '') ? 'block' : 'none';
+			// Close other open action cards
+			document.querySelectorAll('.action-card').forEach(function(card) {
+				if (card !== actionCard) {
+					card.style.display = 'none';
+				}
+			});
+		});
+	});
+
+	// Hide action card if clicking outside
+	document.addEventListener('click', function(event) {
+		var isClickInside = event.target.closest('.action-menu-container');
+		if (!isClickInside) {
+			document.querySelectorAll('.action-card').forEach(function(card) {
+				card.style.display = 'none';
+			});
+		}
+	});
+	});
+	document.querySelectorAll('.view-details').forEach(function(link) {
+	link.addEventListener('click', function(event) {
+		event.preventDefault();
+		var branchId = link.getAttribute('data-id');
+		var form = document.getElementById('view-form-' + branchId);
+		form.submit(); // Submits the form programmatically
+	});
+	});
+	$(document).ready(function() {
+
+	$('#joined-users-table').DataTable();
+
+	// Adjust tables when tabs are switched
+	$('#dataTab a').on('shown.bs.tab', function(e) {
+		var target = $(e.target).attr('href');
+		if (target === '#game') {
+			$('#game-table').DataTable().columns.adjust().draw();
+		} else if (target === '#team') {
+			$('#team-table').DataTable().columns.adjust().draw();
+		}
+	});
+});
 </script>
 
 

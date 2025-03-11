@@ -110,19 +110,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FutureStar.wsgi.application'
 
 ### Local ####
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'futurestar',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#          'OPTIONS': {
-#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
-#         }
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'futurestar',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+         'OPTIONS': {
+            'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
+        }
+    }
+}
 
 
 # ### A2Hosting ####
@@ -157,19 +157,19 @@ WSGI_APPLICATION = 'FutureStar.wsgi.application'
 # }
 
 ################### Client Server Main #########################
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'goalactico_goalactico',
-        'USER': 'goalactico_goalactico',
-        'PASSWORD': 'Redspark@2025',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'goalactico_goalactico',
+#         'USER': 'goalactico_goalactico',
+#         'PASSWORD': 'Redspark@2025',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',  # Set charset to utf8mb4 to support emojis
+#         },
+#     }
+# }
 
 AUTH_USER_MODEL = 'FutureStar_App.User'
 
