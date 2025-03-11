@@ -10,6 +10,22 @@
 
 <!-- Plugins css Ends-->
  <style>
+	.star-rating {
+		display: inline-block;
+		font-size: 20px;
+		color: lightgray;
+		position: relative;
+	}
+
+	.star-rating .filled-stars {
+		color: rgb(17, 167, 12);
+		position: absolute;
+		top: 0;
+		left: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		width: 0%;
+	}
     .custom-card {
         border: 1px solid #0000003b  !important;
         border-radius: 8px;
@@ -222,32 +238,30 @@
 													<th>Joined Date</th>
 													<th>Attendance Status</th>
 													<th>Rating</th>
-													<th>View</th>
 												</tr>
 											</thead>
 											<tbody> {% for user in joined_users %} <tr>
 													<td>{{ forloop.counter }}</td>
-													<td>{{ user.user.username }}</td>
+													<td class="text-truncate" style="max-width: 150px;">
+														<a href="{% url 'user_detail' %}" onclick="redirectToDetail(event, '{{ user.user.id }}')">
+															{{ user.user.username }}
+														</a>
+													</td>
 													<td>{{ user.created_at|date:"Y-m-d" }}</td>
 													<td> {% if user.attendance_status %} <span class="badge bg-success">Present</span> {% else %} <span class="badge bg-danger">Absent</span> {% endif %} </td>
-													<td> {% if user.rating %} {% for i in "12345"|make_list %} {% if forloop.counter <= user.rating %} <i class="fa fa-star text-warning"></i> {# Filled Star #} {% else %} <i class="fa fa-star-o text-warning"></i> {# Empty Star #  {# Empty Star #} {% endif %} {% endfor %} {% else %} <span>Not Rated</span> {% endif %} </td>
 													<td>
-														<div class="action-menu-container" style="position: relative; display: inline-block;">
-															<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-																<i data-feather="more-vertical"></i>
-															</a>
-															<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
-																<ul style="list-style: none; padding: 0; margin: 0;">
-																	<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-																		<a href="#" class="view-details" data-id="{{ user.user.id }}">View</a>
-																		<form id="view-form-{{ user.user.id }}" method="post" action="{% url 'user_detail' %}" style="display: none;"> {% csrf_token %} <input type="hidden" name="user_id" value="{{ user.user.id }}">
-																			<input type="hidden" name="source_page" value="player_list">
-																			<input type="hidden" name="title" value="Player">
-																		</form>
-																	</li>
-																</ul>
+														{% if user.rating and user.rating > 0 %}
+															<div class="ratting style-two">
+																<div class="star-rating" data-rating="{{ user.rating }}">
+																	<div class="filled-stars" style="width: {{ user.rating|floatformat:0|divisibleby:5|floatformat:0 }}%;">
+																		★★★★★
+																	</div>
+																	★★★★★
+																</div>
 															</div>
-														</div>
+														{% else %}
+															Not Rated
+														{% endif %}
 													</td>
 												</tr> 
 												{% empty %} 
@@ -334,6 +348,47 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 });
+function redirectToDetail(event, userId) {
+        event.preventDefault();
+        let form = document.createElement("form");
+        form.method = "post";
+        form.action = "{% url 'user_detail' %}";
+
+        let csrfToken = document.createElement("input");
+        csrfToken.type = "hidden";
+        csrfToken.name = "csrfmiddlewaretoken";
+        csrfToken.value = "{{ csrf_token }}";
+
+        let userIdInput = document.createElement("input");
+        userIdInput.type = "hidden";
+        userIdInput.name = "user_id";
+        userIdInput.value = userId;
+
+        let sourcePage = document.createElement("input");
+        sourcePage.type = "hidden";
+        sourcePage.name = "source_page";
+        sourcePage.value = "player_list";
+
+        let title = document.createElement("input");
+        title.type = "hidden";
+        title.name = "title";
+        title.value = "Player";
+
+        form.appendChild(csrfToken);
+        form.appendChild(userIdInput);
+        form.appendChild(sourcePage);
+        form.appendChild(title);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+	// Initialize star ratings
+	const starRatings = document.querySelectorAll('.star-rating');
+	starRatings.forEach(function(starRating) {
+		const rating = parseFloat(starRating.getAttribute('data-rating'));
+		const widthPercentage = (rating / 5) * 100;
+		starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
+	});
 </script>
 
 
