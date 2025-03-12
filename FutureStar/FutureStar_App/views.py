@@ -1242,7 +1242,6 @@ class UserDetailView(LoginRequiredMixin, View):
                 player_stats = self.get_player_stats(user, time_filter)["player_stats"]
             else:
                 player_stats = {}  # If the role isn't 2, don't fetch player stats
-            source_page = request.GET.get("source_page")
             title = request.GET.get("title")
             role = user.role_id
 
@@ -1253,7 +1252,6 @@ class UserDetailView(LoginRequiredMixin, View):
                     "user": user,
                     "role": role,
                     "title": title,
-                    "source_page": source_page,
                     "posts": posts,
                     "events": events,
                     "events_bookings": event_bookings,
@@ -1284,7 +1282,6 @@ class UserDetailView(LoginRequiredMixin, View):
                 player_stats = self.get_player_stats(user, time_filter)["player_stats"]
             else:
                 player_stats = {}  # If the role isn't 2, don't fetch player stats
-            source_page = request.POST.get("source_page")
             title = request.POST.get("title")
             role = user.role_id
 
@@ -1295,7 +1292,6 @@ class UserDetailView(LoginRequiredMixin, View):
                     "user": user,
                     "role": role,
                     "title": title,
-                    "source_page": source_page,
                     "posts": posts,
                     "events": events,
                     "events_bookings": event_bookings,
