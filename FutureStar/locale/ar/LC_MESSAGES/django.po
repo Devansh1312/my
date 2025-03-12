@@ -1855,3 +1855,6 @@ msgstr "تم مسح جميع الإشعارات بالفعل."
 
 msgid "All notifications marked as read and deleted successfully."
 msgstr "تم وضع علامة مقروء لجميع الإشعارات وحذفها بنجاح."
+
+msgid "Account deleted successfully."
+msgstr "تم حذف الحساب بنجاح."

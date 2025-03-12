@@ -1,0 +1,137 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% load lang_filter %}
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Delete Account
+    {% elif current_language == 'ar' %}
+        جولأكتكو || حذف الحساب  
+    {% endif %}
+{% endblock %}
+{% block content %}
+
+<section class="services-area-six pt-150 pb-60 rel">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 col-12">
+                <h4 class="text-center mb-4">
+                    {% if current_language == 'en' %}
+                        Enter your phone number to Delete your account
+                    {% elif current_language == 'ar' %}
+                        أدخل رقم هاتفك لحذف حسابك
+                    {% endif %}
+                </h4>
+                <form id="DeleteAccountForm" name="DeleteAccountForm" 
+                      class="form-style-one z-1 rel wow fadeInUp delay-0-3s" 
+                      method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="phone">
+                                    {% if current_language == 'en' %}
+                                        Enter Your Phone Number
+                                    {% elif current_language == 'ar' %}
+                                        أدخل رقم هاتفك
+                                    {% endif %}
+                                </label>
+                                <input type="text" id="phone" name="phone" 
+                                       class="form-control" 
+                                       placeholder="{% if current_language == 'en' %}Enter your phone number{% elif current_language == 'ar' %}أدخل رقم هاتفك{% endif %}" 
+                                       pattern="[0-9]+" inputmode="numeric" required>
+                                <div class="error-message text-danger" id="phoneError" style="display:none;">
+                                    This field is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group pt-4 mb-4 text-center">
+                                <button type="submit" class="theme-btn style-two w-100">
+                                    {% if current_language == 'en' %}
+                                        Send OTP
+                                    {% elif current_language == 'ar' %}
+                                        إرسال OTP
+                                    {% endif %}
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center">
+                            <a href="{% url 'login' %}" class="d-block">
+                                {% if current_language == 'en' %}
+                                    Back to Login
+                                {% elif current_language == 'ar' %}
+                                    العودة إلى تسجيل الدخول
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('#DeleteAccountForm').on('submit', function (e) {
+            let isValid = true;
+
+            if ($('#phone').val().trim() === '') {
+                $('#phoneError').show();
+                isValid = false;
+            } else {
+                $('#phoneError').hide();
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert("Please provide your phone number.");
+            }
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const phoneInput = document.getElementById("phone");
+
+        phoneInput.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, "");  // Remove non-numeric characters
+        });
+
+        phoneInput.addEventListener("keydown", function (e) {
+            // Allow control keys like backspace, delete, arrow keys
+            if (
+                e.key === "Backspace" || e.key === "Delete" || e.key === "ArrowLeft" || e.key === "ArrowRight" ||
+                e.key === "Tab" || (e.ctrlKey && e.key === "v") // Allow Ctrl+V for pasting
+            ) {
+                return;
+            }
+            
+            // Prevent input if it's not a number
+            if (!/^\d$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    });
+    // Block right-click context menu
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+    
+// Optional: Block common developer tools shortcuts
+document.addEventListener('keydown', function(e) {
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'u')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base1.html' %} {% load static %} {% load lang_filter %} {% block css %}
+<!-- Plugins css start-->
+<!-- Plugins css Ends--> {% endblock %} 
+{% block title %}
+    {% if current_language == 'en' %}
+        Goalactico || Otp - Verify
+    {% elif current_language == 'ar' %}
+        جولاكتكو || التحقق من OTP
+    {% endif %}
+{% endblock %}
+ {% block content %}
+<!-- Page Banner Start -->
+<section class="services-area-six pt-150 pb-60 rel">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-12">
+                <div class="section-title pb-50 text-center wow fadeInUp delay-0-2s">
+                    <h2>
+                        {% if current_language == 'en' %}
+                            Delete Account Verify OTP
+                        {% elif current_language == 'ar' %}
+                            التحقق من OTP الحذف
+                        {% endif %}
+                    </h2>
+                    <p>
+                        {% if current_language == 'en' %}
+                            Enter your One Time Password
+                        {% elif current_language == 'ar' %}
+                            أدخل كلمة المرور لمرة واحدة
+                        {% endif %}
+                    </p>
+                </div>
+            </div>            
+            <div class="col-xl-6 col-lg-8 col-md-10 col-12">
+                <form id="otpForm" class="form-style-one z-1 rel wow fadeInUp delay-0-3s" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="phone" value="{{ phone }}">
+                    <div class="row justify-content-center">
+                        <!-- Six OTP input fields with better mobile responsiveness -->
+                        <div class="col-2 px-1">
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp2')" id="otp1" required>
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp3')" id="otp2" required>
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp4')" id="otp3" required>
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp5')" id="otp4" required>
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" oninput="moveToNext(this, 'otp6')" id="otp5" required>
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" id="otp6" oninput="combineOTP()" required>
+                        </div>
+                        <input type="hidden" id="otp" name="otp">
+                        <div class="col-12 mt-4">
+                            <div class="form-group">
+                                <label for="reason">
+                                    {% if current_language == 'en' %}
+                                        Delete Account Reason
+                                    {% elif current_language == 'ar' %}
+                                        سبب حذف الحساب
+                                    {% endif %}
+                                </label>
+                                <input type="text" id="reason" name="reason" class="form-control" placeholder="{% if current_language == 'en' %}Enter the reason for deleting your account{% elif current_language == 'ar' %}أدخل سبب حذف حسابك{% endif %}" required>
+                                <div class="error-message text-danger" id="reasonError" style="display:none;">
+                                    {% if current_language == 'en' %}
+                                        This field is required
+                                    {% elif current_language == 'ar' %}
+                                        هذا الحقل مطلوب
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="theme-btn style-two w-100">
+                                {% if current_language == 'en' %}
+                                    Submit
+                                {% elif current_language == 'ar' %}
+                                    إرسال
+                                {% endif %}
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}
+
+{% block scriptcontent %}
+<script>
+    // Function to move to the next input field automatically
+    function moveToNext(current, nextFieldId) {
+        if (current.value.length == 1 && /^[0-9]$/.test(current.value)) {
+            document.getElementById(nextFieldId).focus();
+        }
+        combineOTP();
+    }
+
+    // Combine the values of all six fields and set it to the hidden input
+    function combineOTP() {
+        let otp = '';
+        for (let i = 1; i <= 6; i++) {
+            otp += document.getElementById('otp' + i).value;
+        }
+        document.getElementById('otp').value = otp;
+    }
+
+    // Restrict input to only numbers
+    document.querySelectorAll('.otp-input').forEach(function(input) {
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');  // Remove non-numeric characters
+        });
+    });
+    // Block right-click context menu
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+    
+// Optional: Block common developer tools shortcuts
+document.addEventListener('keydown', function(e) {
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'u')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+
+{% endblock %}
+{% block script %} 
+{% endblock %}

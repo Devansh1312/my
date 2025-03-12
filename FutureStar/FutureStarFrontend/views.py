@@ -4062,3 +4062,106 @@ class UserJoinedTeamInfo(LoginRequiredMixin, View):
             })
         
         return team_branches
+
+
+
+############################# User Delete Account  #############################
+class UserDeleteAccountWeb(View):
+    template_name = 'DeleteAccount.html'
+
+    def get(self, request, *args, **kwargs):
+        # Handle language selection
+        language_from_url = get_language(request)
+
+        return render(request, self.template_name, {'current_language': language_from_url})
+    
+    def post(self, request, *args, **kwargs):
+
+        language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
+        phone = request.POST.get("phone").strip()
+        if not phone:
+            messages.error(request, _("Please enter a phone number."))
+            return render(request, "DeleteAccount.html", {"current_language": language_from_url})
+
+        user = User.objects.filter(phone=phone,is_deleted=False).first()
+        if not user:
+            messages.error(request, _("Phone number not found."))
+            return render(request, "DeleteAccount.html", {"current_language": language_from_url})
+
+        # Generate and save OTP
+        otp = generate_otp()
+        user.otp = otp
+        user.save()
+        send_sms(phone, otp)  # Call general function
+        # Store phone number in session instead of URL
+        request.session["reset_phone"] = phone
+        request.session['language'] = language_from_url
+        request.session['current_language'] = language_from_url 
+
+        messages.success(request, _("OTP {otp} sent to your phone number.").format(otp=otp))
+        return redirect("verify_delete_account_otp")
+
+################################ Verify OTP at Time of Delete ###################################
+class verify_delete_account_otp(View):
+    def get(self, request, *args, **kwargs):
+        phone = request.session.get("reset_phone")
+        print(phone)
+        language_from_url = get_language(request)
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
+        # Store language in session
+        request.session["language"] = language_from_url
+        request.session["current_language"] = language_from_url
+        request.session.save()
+
+        if not phone:
+            messages.error(request, _("Session expired. Please try again."))
+            return redirect("forgot_password")
+        
+        context = {
+            "phone": phone,
+            "reset_phone": phone,
+            "current_language": language_from_url,
+        }
+        return render(request, "verify_delete_account_otp.html", context)
+
+    def post(self, request, *args, **kwargs):
+        phone = request.session.get("reset_phone")
+        otp = request.POST.get("otp")
+        reason = request.POST.get("reason")
+        language_from_url = get_language(request)
+        
+        if language_from_url in ['en', 'ar']:  # Adjust language list if needed
+            activate(language_from_url)
+
+        # Store language in session
+        request.session["language"] = language_from_url
+        request.session["current_language"] = language_from_url
+        request.session.save()
+
+        user = User.objects.filter(phone=phone, otp=otp, is_deleted=False).first()
+
+        if not user:
+            messages.error(request, _("Invalid OTP. Please try again."))
+            context = {
+                "phone": phone,
+                "current_language": language_from_url,
+            }
+            return render(request, "verify_delete_account_otp.html", context)
+
+        # Mark user as deleted
+        user.deleted_reason = reason
+        user.is_active = False
+        user.is_deleted = True
+        user.save()
+
+        # Remove phone from session
+        if "reset_phone" in request.session:
+            del request.session["reset_phone"]
+
+        messages.success(request, _("Account deleted successfully."))
+        return redirect("index")

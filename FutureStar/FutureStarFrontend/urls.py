@@ -49,4 +49,8 @@ urlpatterns = [
 
     path('auth/apple/', AppleAuthView.as_view(), name='apple_auth'),
     path('auth/apple/callback/', AppleCallbackView.as_view(), name='apple_callback'),
+
+    path("delete-account-web/", UserDeleteAccountWeb.as_view(), name="delete_account_web"),
+    path('verify_delete_account_otp/', verify_delete_account_otp.as_view(), name='verify_delete_account_otp'),
+
     ]
