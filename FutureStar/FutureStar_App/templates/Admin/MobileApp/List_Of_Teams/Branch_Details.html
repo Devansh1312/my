@@ -258,6 +258,7 @@ Team Detail Page
 														<th>Email</th>
 														<th>Mobile</th>
 														<th>Role</th>
+														<th>Joining Date</th>
 													</tr>
 												</thead>
 												<tbody> 
@@ -272,6 +273,7 @@ Team Detail Page
 														<td> {% if member.user_id and member.user_id.email %} {{ member.user_id.email }} {% else %} None {% endif %} </td>
 														<td>{{ member.user_id.phone }}</td>
 														<td>{{ member.get_joinning_type_display }}</td>
+														<td>{{ member.created_at|date:"M. d, Y" }}</td>
 													</tr> 
                                                     {% endfor %} 
                                                 </tbody>
