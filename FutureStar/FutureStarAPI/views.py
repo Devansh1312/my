@@ -191,25 +191,6 @@ def get_group_data(user, request):
     return serializer.data
 
 ###################################################### General function to send SMS ################################################
-# def send_sms(phone_number, otp, language='en'):
-#     if language in ['en', 'ar']:
-#         activate(language)
-#     """Send OTP via SMS using Twilio (or any other provider)."""
-#     try:
-#         account_sid = settings.TWILIO_ACCOUNT_SID
-#         auth_token = settings.TWILIO_AUTH_TOKEN
-#         twilio_phone = "+19035604511"
-
-#         client = Client(account_sid, auth_token)
-#         message = client.messages.create(
-#             body = _("Your secure OTP for Goalactico is: ") + str(otp) + _(". For your safety, never share this code. It will expire in 10 minutes."),
-#             from_=twilio_phone,
-#             to=phone_number
-#         )
-#         return message.sid  # Return message ID for reference
-#     except Exception as e:
-#         return str(e)  # Return error message for debugging
-
 def send_sms(phone_number, otp, language='en'):
     """Send OTP via SMS using Taqnyat."""
     
@@ -240,7 +221,7 @@ def send_sms(phone_number, otp, language='en'):
         response = requests.post(url, json=payload, headers=headers)
         response_data = response.json()
 
-        if response.status_code == 200:
+        if response.status_code in [200, 201]:
             return response_data  # Return response from Taqnyat
         else:
             return f"Error: {response_data}"  # Return error details

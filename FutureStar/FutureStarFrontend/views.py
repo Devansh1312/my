@@ -72,8 +72,12 @@ def get_language(request):
 #     except Exception as e:
 #         return str(e)  # Return error message for debugging
 
-def send_sms(phone_number, otp):
+def send_sms(phone_number, otp, language='en'):
     """Send OTP via SMS using Taqnyat."""
+    
+    if language in ['en', 'ar']:
+        activate(language)
+
     try:
         api_key = settings.TAQNYAT_API_KEY
         sender_name = settings.TAQNYAT_SENDER_NAME
@@ -82,10 +86,11 @@ def send_sms(phone_number, otp):
         if len(phone_number) == 9 and phone_number.isdigit():
             phone_number = f"966{phone_number}"  # Add Saudi country code
 
+        message_body = _("Your secure OTP for Goalactico is: ") + str(otp) + _(". For your safety, never share this code. It will expire in 10 minutes.")
 
         payload = {
             "recipients": [phone_number],
-            "body": f"Your secure OTP for Goalactico is: {otp}",
+            "body": message_body,
             "sender": sender_name
         }
         
@@ -97,7 +102,7 @@ def send_sms(phone_number, otp):
         response = requests.post(url, json=payload, headers=headers)
         response_data = response.json()
 
-        if response.status_code == 200:
+        if response.status_code in [200, 201]:
             return response_data  # Return response from Taqnyat
         else:
             return f"Error: {response_data}"  # Return error details
