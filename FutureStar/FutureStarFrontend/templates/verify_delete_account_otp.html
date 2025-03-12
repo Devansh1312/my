@@ -8,7 +8,17 @@
         جولاكتكو || التحقق من OTP
     {% endif %}
 {% endblock %}
- {% block content %}
+{% block content %}
+{% if request.GET.reference == "app" %}
+<style>
+    .header-upper {
+        display: none;
+    }
+    .main-footer {
+        display: none;
+    }
+</style>
+{% endif %}
 <!-- Page Banner Start -->
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
