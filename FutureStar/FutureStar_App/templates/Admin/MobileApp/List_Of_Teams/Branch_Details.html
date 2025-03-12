@@ -28,466 +28,429 @@ Team Detail Page
 
 {% block content %}
 <div class="page-body">
-    <div class="container-fluid">
-        <div class="page-title"></div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                     
-                     <form method="POST" action="{% url 'team_detail' %}" style="float: right;">
-                        {% csrf_token %}
-                        <input type="hidden" name="team_id" value="{{ branch.team_id.id }}">
-                        <button type="submit" class="btn btn-secondary btn-sm">
-                            <i class="fa fa-arrow-left"></i> Back
-                        </button>
-                    </form>
-                    
-                    
-                    
-                        <h3 class="text-center text-md-start fs-4">Team Details</h3>
-                        <div class="row">
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Team Name:</strong> {{ branch.team_name }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Age Group:</strong> {{ branch.age_group_id }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Field Size:</strong> {{ branch.field_size }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Phone:</strong> {{ branch.phone }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Email:</strong> {{ branch.email }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Gender:</strong> {{ branch.gender }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Address:</strong> {{ branch.address }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>City:</strong> {{ branch.city }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>State:</strong> {{ branch.state }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Country:</strong> {{ branch.country_name }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Postal Code:</strong> {{ branch.postalCode }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Country Code:</strong> {{ branch.country_code }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Entry Fees:</strong> {{ branch.entry_fees }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Description:</strong> {{ branch.description }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Created At:</strong> {{ branch.created_at }}
-                           </div>
-                           <div class="col-12 col-md-6 col-lg-4 mb-3">
-                              <strong>Team Image:</strong>
-                              {% if branch.upload_image %}
-                              <img src="{{ branch.upload_image.url }}" alt="Team Image" class="img-fluid" height="50" width="100">
-                              {% else %}
-                              No Image Available
-                              {% endif %}
-                           </div>
-                        </div>
-                        <br>
-                        <h3 class="text-center text-md-start fs-4">Team Stats</h3>
-                        <div class="row">
-                            <!-- Games Played -->
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                               <div class="card widget-1">
-                                  <div class="card-body">
-                                     <div class="widget-content">
-                                        <div class="widget-round">
-                                           <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
-                                           </div>
-                                        </div>
-                                        <div>
-                                           <h4>
-                                              <span class="counter">{{ total_games }}</span>
-                                           </h4>
-                                           <span class="f-light">Games Played</span>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                            <!-- Wins -->
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                               <div class="card widget-1">
-                                  <div class="card-body">
-                                     <div class="widget-content">
-                                        <div class="widget-round">
-                                           <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
-                                           </div>
-                                        </div>
-                                        <div>
-                                           <h4>
-                                              <span class="counter">{{ total_wins }}</span>
-                                           </h4>
-                                           <span class="f-light">Wins</span>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                            <!-- Losses -->
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                               <div class="card widget-1">
-                                  <div class="card-body">
-                                     <div class="widget-content">
-                                        <div class="widget-round">
-                                           <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
-                                           </div>
-                                        </div>
-                                        <div>
-                                           <h4>
-                                              <span class="counter">{{ total_losses }}</span>
-                                           </h4>
-                                           <span class="f-light">Losses</span>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                            <!-- Draws -->
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                               <div class="card widget-1">
-                                  <div class="card-body">
-                                     <div class="widget-content">
-                                        <div class="widget-round">
-                                           <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
-                                           </div>
-                                        </div>
-                                        <div>
-                                           <h4>
-                                              <span class="counter">{{ total_draws }}</span>
-                                           </h4>
-                                           <span class="f-light">Draws</span>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                            <!-- Goals -->
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                               <div class="card widget-1">
-                                  <div class="card-body">
-                                     <div class="widget-content">
-                                        <div class="widget-round">
-                                           <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/goal/goal.png' %}" width="70%">
-                                           </div>
-                                        </div>
-                                        <div>
-                                           <h4>
-                                              <span class="counter">{{ total_goals }}</span>
-                                           </h4>
-                                           <span class="f-light">Goals</span>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                            <!-- Assists -->
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                               <div class="card widget-1">
-                                  <div class="card-body">
-                                     <div class="widget-content">
-                                        <div class="widget-round">
-                                           <div class="bg-round">
-                                              <img src="{% static 'assets/images/dashboard/goal/assists.png' %}" width="70%">
-                                           </div>
-                                        </div>
-                                        <div>
-                                           <h4>
-                                              <span class="counter">{{ total_conceded_goals }}</span>
-                                           </h4>
-                                           <span class="f-light">Conceded Goals</span>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                        </div>
-                    </div>                     
-                </div>
-                <!-- Datatable Section  -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <!-- Add tab navigation -->
-                                <ul class="nav nav-tabs nav-justified" id="dataTab" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true">
-                                            Staff Members <span class="badge badge-info">{{ staff_members|length }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="player-tab" data-toggle="tab" href="#player" role="tab" aria-controls="player" aria-selected="false">
-                                            Players <span class="badge badge-info">{{ players|length }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="tournament-tab" data-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="false">
-                                            Joined Tournaments <span class="badge badge-info">{{ tournament_count }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="games-tab" data-toggle="tab" href="#games" role="tab" aria-controls="games" aria-selected="false">
-                                            Tournament Games <span class="badge badge-info">{{ game_count }}</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                       <a class="nav-link" id="game_friendly_count-tab" data-toggle="tab" href="#game_friendly_count" role="tab" aria-controls="game_friendly_count" aria-selected="false">
-                                          Friendly Games <span class="badge badge-info">{{ game_friendly_count }}</span>
-                                       </a>
-                                   </li>
-                                </ul>
-                
-                                <div class="tab-content mt-3" id="dataTabContent">
-                                    <!-- Staff Members Tab -->
-                                    <div class="tab-pane fade show active" id="member" role="tabpanel" aria-labelledby="member-tab">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-bordered table-hover" id="staff-member-table">
-                                                <thead>
+	<div class="container-fluid">
+		<div class="page-title"></div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="card">
+					<div class="card-body">
+						<form method="POST" action="{% url 'team_detail' %}" style="float: right;"> 
+                            {% csrf_token %} 
+                            <input type="hidden" name="team_id" value="{{ branch.team_id.id }}">
+							<button type="submit" class="btn btn-secondary btn-sm">
+								<i class="fa fa-arrow-left"></i> Back 
+                            </button>
+						</form>
+						<h3 class="text-center text-md-start fs-4">Team Details</h3>
+						<div class="row">
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Team Name:</strong> {{ branch.team_name }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Age Group:</strong> {{ branch.age_group_id }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Field Size:</strong> {{ branch.field_size }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Phone:</strong> {{ branch.phone }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Email:</strong> {{ branch.email }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Gender:</strong> {{ branch.gender }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Address:</strong> {{ branch.address }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>City:</strong> {{ branch.city }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>State:</strong> {{ branch.state }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Country:</strong> {{ branch.country_name }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Postal Code:</strong> {{ branch.postalCode }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Country Code:</strong> {{ branch.country_code }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Entry Fees:</strong> {{ branch.entry_fees }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Description:</strong> {{ branch.description }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Created At:</strong> {{ branch.created_at }}
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 mb-3">
+								<strong>Team Image:</strong> {% if branch.upload_image %} <img src="{{ branch.upload_image.url }}" alt="Team Image" class="img-fluid" height="50" width="100"> {% else %} No Image Available {% endif %}
+							</div>
+						</div>
+						<br>
+						<h3 class="text-center text-md-start fs-4">Team Stats</h3>
+						<div class="row">
+							<!-- Games Played -->
+							<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+								<div class="card widget-1">
+									<div class="card-body">
+										<div class="widget-content">
+											<div class="widget-round">
+												<div class="bg-round">
+													<img src="{% static 'assets/images/dashboard/goal/game-played.png' %}" width="70%">
+												</div>
+											</div>
+											<div>
+												<h4>
+													<span class="counter">{{ total_games }}</span>
+												</h4>
+												<span class="f-light">Games Played</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Wins -->
+							<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+								<div class="card widget-1">
+									<div class="card-body">
+										<div class="widget-content">
+											<div class="widget-round">
+												<div class="bg-round">
+													<img src="{% static 'assets/images/dashboard/goal/wins.png' %}" width="70%">
+												</div>
+											</div>
+											<div>
+												<h4>
+													<span class="counter">{{ total_wins }}</span>
+												</h4>
+												<span class="f-light">Wins</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Losses -->
+							<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+								<div class="card widget-1">
+									<div class="card-body">
+										<div class="widget-content">
+											<div class="widget-round">
+												<div class="bg-round">
+													<img src="{% static 'assets/images/dashboard/goal/losses.png' %}" width="70%">
+												</div>
+											</div>
+											<div>
+												<h4>
+													<span class="counter">{{ total_losses }}</span>
+												</h4>
+												<span class="f-light">Losses</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Draws -->
+							<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+								<div class="card widget-1">
+									<div class="card-body">
+										<div class="widget-content">
+											<div class="widget-round">
+												<div class="bg-round">
+													<img src="{% static 'assets/images/dashboard/goal/draw.png' %}" width="70%">
+												</div>
+											</div>
+											<div>
+												<h4>
+													<span class="counter">{{ total_draws }}</span>
+												</h4>
+												<span class="f-light">Draws</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Goals -->
+							<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+								<div class="card widget-1">
+									<div class="card-body">
+										<div class="widget-content">
+											<div class="widget-round">
+												<div class="bg-round">
+													<img src="{% static 'assets/images/dashboard/goal/goal.png' %}" width="70%">
+												</div>
+											</div>
+											<div>
+												<h4>
+													<span class="counter">{{ total_goals }}</span>
+												</h4>
+												<span class="f-light">Goals</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Assists -->
+							<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+								<div class="card widget-1">
+									<div class="card-body">
+										<div class="widget-content">
+											<div class="widget-round">
+												<div class="bg-round">
+													<img src="{% static 'assets/images/dashboard/goal/assists.png' %}" width="70%">
+												</div>
+											</div>
+											<div>
+												<h4>
+													<span class="counter">{{ total_conceded_goals }}</span>
+												</h4>
+												<span class="f-light">Conceded Goals</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Datatable Section  -->
+				<div class="row">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-body">
+								<!-- Add tab navigation -->
+								<ul class="nav nav-tabs nav-justified" id="dataTab" role="tablist">
+									<li class="nav-item">
+										<a class="nav-link active" id="member-tab" data-toggle="tab" href="#member" role="tab" aria-controls="member" aria-selected="true"> Staff Members <span class="badge badge-info">{{ staff_members|length }}</span>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="player-tab" data-toggle="tab" href="#player" role="tab" aria-controls="player" aria-selected="false"> Players <span class="badge badge-info">{{ players|length }}</span>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="tournament-tab" data-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="false"> Joined Tournaments <span class="badge badge-info">{{ tournament_count }}</span>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="games-tab" data-toggle="tab" href="#games" role="tab" aria-controls="games" aria-selected="false"> Tournament Games <span class="badge badge-info">{{ game_count }}</span>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="game_friendly_count-tab" data-toggle="tab" href="#game_friendly_count" role="tab" aria-controls="game_friendly_count" aria-selected="false"> Friendly Games <span class="badge badge-info">{{ game_friendly_count }}</span>
+										</a>
+									</li>
+								</ul>
+								<div class="tab-content mt-3" id="dataTabContent">
+									<!-- Staff Members Tab -->
+									<div class="tab-pane fade show active" id="member" role="tabpanel" aria-labelledby="member-tab">
+										<div class="table-responsive">
+											<table class="table table-striped table-bordered table-hover" id="staff-member-table">
+												<thead>
+													<tr>
+														<th>No</th>
+														<th>Username</th>
+														<th>Email</th>
+														<th>Mobile</th>
+														<th>Role</th>
+													</tr>
+												</thead>
+												<tbody> 
+                                                    {% for member in staff_members %} 
                                                     <tr>
-                                                        <th>No</th>
-                                                        <th>Username</th>
-                                                        <th>Email</th>
-                                                        <th>Mobile</th>
-                                                        <th>Role</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for member in staff_members %}
+														<td>{{ forloop.counter }}</td>
+														<td class="text-truncate" style="max-width: 150px;">
+															<a href="{% url 'user_detail' %}" onclick="redirectToDetail(event, '{{ member.user_id.id }}')">
+																{{ member.user_id.username }}
+															</a>
+														</td>
+														<td> {% if member.user_id and member.user_id.email %} {{ member.user_id.email }} {% else %} None {% endif %} </td>
+														<td>{{ member.user_id.phone }}</td>
+														<td>{{ member.get_joinning_type_display }}</td>
+													</tr> 
+                                                    {% endfor %} 
+                                                </tbody>
+											</table>
+										</div>
+									</div>
+									<!-- Players Tab -->
+									<div class="tab-pane fade" id="player" role="tabpanel" aria-labelledby="player-tab">
+										<div class="table-responsive">
+											<table class="table table-striped table-bordered table-hover" id="player-table">
+												<thead>
+													<tr>
+														<th>No</th>
+														<th>Username</th>
+														<th>Email</th>
+														<th>Mobile</th>
+														<th>Joining Date</th>
+													</tr>
+												</thead>
+												<tbody> 
+                                                    {% for player in players %} 
                                                     <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td class="text-truncate" style="max-width: 150px;">{{ member.user_id.username }}</td>
-                                                        <td>
-                                                            {% if member.user_id and member.user_id.email %}
-                                                                {{ member.user_id.email }}
-                                                            {% else %}
-                                                                None
-                                                            {% endif %}
-                                                        </td>
-                                                        <td>{{ member.user_id.phone }}</td>
-                                                        <td>{{ member.get_joinning_type_display }}</td>
-                                                    </tr>
+														<td>{{ forloop.counter }}</td>
+														<td class="text-truncate" style="max-width: 150px;">
+															<a href="{% url 'user_detail' %}" onclick="redirectToDetail(event, '{{ player.user_id.id }}')">
+																{{ player.user_id.username }}
+															</a>
+														</td>
+														<td> {% if player.user_id and player.user_id.email %} {{ player.user_id.email }} {% else %} None {% endif %} </td>
+														<td>{{ player.user_id.phone }}</td>
+														<td>{{ player.created_at|date:"M. d, Y" }}</td>
+													</tr> 
+                                                    {% endfor %} 
+                                                </tbody>
+											</table>
+										</div>
+									</div>
+									<!-- Tournament Tab -->
+									<div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
+										<div class="table-responsive">
+											<table class="table table-striped table-bordered table-hover" id="tournament-table">
+												<thead>
+													<tr>
+														<th>No</th>
+														<th>Tournament Name</th>
+														<th>Start Date</th>
+														<th>Age Group</th>
+														<th>City</th>
+														<th>Joining Cost</th>
+														<th>Actions</th>
+													</tr>
+												</thead>
+												<tbody> 
+                                                    {% for tournament in tournaments %} 
+                                                    <tr>
+														<td>{{ forloop.counter }}</td>
+														<td>{{ tournament.tournament_name }}</td>
+														<td>{{ tournament.tournament_starting_date }}</td>
+														<td>{{ tournament.age_group }}</td>
+														<td>{{ tournament.city }}</td>
+														<td>{{ tournament.tournament_joining_cost }}</td>
+														<td>
+															<div class="action-menu-container" style="position: relative; display: inline-block;">
+																<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																	<i data-feather="more-vertical"></i>
+																</a>
+																<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+																	<ul style="list-style: none; padding: 0; margin: 0;">
+																		<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																			<a href="#" class="view-details" data-id="{{ tournament.id }}">View</a>
+																			<form id="view-form-{{ tournament.id }}" method="post" action="{% url 'tournament_detail' pk=tournament.id %}" style="display: none;"> {% csrf_token %} <input type="hidden" name="tournament_id" value="{{ tournament.id }}">
+																				<script>
+																					console.log("{{ tournament.id }}");
+																				</script>
+																			</form>
+																		</li>
+																	</ul>
+																</div>
+															</div>
+														</td>
+													</tr> 
+                                                    {% endfor %} 
+                                                </tbody>
+											</table>
+										</div>
+									</div>
+									<!-- Games Tab -->
+									<div class="tab-pane fade" id="games" role="tabpanel" aria-labelledby="games-tab">
+										<div class="table-responsive">
+											<table class="table table-striped table-bordered table-hover" id="games-table">
+												<thead>
+													<tr>
+														<th>No</th>
+														<th>Tournament Name</th>
+														<th>Game Number</th>
+														<th>Game Date</th>
+														<th>Group Name</th>
+														<th>Actions</th>
+													</tr>
+												</thead>
+												<tbody> 
+                                                    {% for game in games %} 
+                                                    <tr>
+														<td>{{ forloop.counter }}</td>
+														<td>{{ game.tournament_id.tournament_name }}</td>
+														<td>{{ game.game_number }}</td>
+														<td>{{ game.game_date }}</td>
+														<td> {% if game.group_id and game.group_id.group_name %} {{ game.group_id.group_name }} {% else %} None {% endif %} </td>
+														<td>
+															<!-- Action buttons -->
+															<div class="action-menu-container" style="position: relative; display: inline-block;">
+																<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																	<i data-feather="more-vertical"></i>
+																</a>
+																<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+																	<ul style="list-style: none; padding: 0; margin: 0;">
+																		<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																			<a href="{% url 'game_detail' game.id %}">View</a>
+																		</li>
+																	</ul>
+																</div>
+															</div>
+														</td>
+													</tr>
                                                     {% endfor %}
                                                 </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                
-                                    <!-- Players Tab -->
-                                    <div class="tab-pane fade" id="player" role="tabpanel" aria-labelledby="player-tab">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-bordered table-hover" id="player-table">
-                                                <thead>
+											</table>
+										</div>
+									</div>
+									<!-- Friendly Games Tab -->
+									<div class="tab-pane fade" id="game_friendly_count" role="tabpanel" aria-labelledby="game_friendly_count-tab">
+										<div class="table-responsive">
+											<table class="table table-striped table-bordered table-hover" id="game_friendly_count-table">
+												<thead>
+													<tr>
+														<th>No</th>
+														<th>Game Name</th>
+														<th>Game Number</th>
+														<th>Game Date</th>
+														<th>Team A Vs Team B</th>
+														<th>Actions</th>
+													</tr>
+												</thead>
+												<tbody> {% for game in game_friendly %} 
                                                     <tr>
-                                                        <th>No</th>
-                                                        <th>Username</th>
-                                                        <th>Email</th>
-                                                        <th>Mobile</th>
-                                                        <th>Joining Date</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for player in players %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td class="text-truncate" style="max-width: 150px;">
-                                                            <a href="{% url 'user_detail' %}" onclick="redirectToDetail(event, '{{ player.user_id.id }}')">
-                                                                {{ player.user_id.username }}
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            {% if player.user_id and player.user_id.email %}
-                                                                {{ player.user_id.email }}
-                                                            {% else %}
-                                                                None
-                                                            {% endif %}
-                                                        </td>
-                                                        <td>{{ player.user_id.phone }}</td>
-                                                        <td>{{ player.created_at|date:"M. d, Y" }}</td>
-                                                      </tr>
+														<td>{{ forloop.counter }}</td>
+														<td>{{ game.game_name }}</td>
+														<td>{{ game.game_number }}</td>
+														<td>{{ game.game_date }}</td>
+														<td>{{ game.team_a }} Vs {{ game.team_b }}</td>
+														<td>
+															<!-- Action buttons -->
+															<div class="action-menu-container" style="position: relative; display: inline-block;">
+																<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																	<i data-feather="more-vertical"></i>
+																</a>
+																<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
+																	<ul style="list-style: none; padding: 0; margin: 0;">
+																		<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																			<a href="{% url 'friendly_game_detail' game.id %}">View</a>
+																		</li>
+																	</ul>
+																</div>
+															</div>
+														</td>
+													</tr> 
                                                     {% endfor %}
                                                 </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                
-                                    <!-- Tournament Tab -->
-                                    <div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-bordered table-hover" id="tournament-table">
-                                                <thead>
-                                                    <tr>
-                                                         <th>No</th>
-                                                        <th>Tournament Name</th>
-                                                        <th>Start Date</th>
-                                                        <th>Age Group</th>
-                                                        <th>City</th>
-                                                        <th>Joining Cost</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for tournament in tournaments %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ tournament.tournament_name }}</td>
-                                                        <td>{{ tournament.tournament_starting_date }}</td>
-                                                        <td>{{ tournament.age_group }}</td>
-                                                        <td>{{ tournament.city }}</td>
-                                                        <td>{{ tournament.tournament_joining_cost }}</td>
-                                                        <td>
-                                                         <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                            <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                               <i data-feather="more-vertical"></i>
-                                                            </a>
-                                                            <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
-                                                               <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                   <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                       <a href="#" class="view-details" data-id="{{ tournament.id }}">View</a>
-                                                                       <form id="view-form-{{ tournament.id }}" method="post" action="{% url 'tournament_detail' pk=tournament.id %}" style="display: none;">
-                                                                           {% csrf_token %}
-                                                                           <input type="hidden" name="tournament_id" value="{{ tournament.id }}">
-                                                                           <script>
-                                                                              console.log("{{ tournament.id }}");
-                                                                           </script>
-                                                                       </form>
-                                                                   </li>
-                                                               </ul>
-                                                            </div>
-                                                         </div>
-                                                      </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                
-                                    <!-- Games Tab -->
-                                    <div class="tab-pane fade" id="games" role="tabpanel" aria-labelledby="games-tab">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-bordered table-hover" id="games-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Tournament Name</th>
-                                                        <th>Game Number</th>
-                                                        <th>Game Date</th>
-                                                        <th>Group Name</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for game in games %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ game.tournament_id.tournament_name }}</td>
-                                                        <td>{{ game.game_number }}</td>
-                                                        <td>{{ game.game_date }}</td>
-                                                        <td>
-                                                         {% if game.group_id and game.group_id.group_name %}
-                                                            {{ game.group_id.group_name }}
-                                                         {% else %}
-                                                            None
-                                                         {% endif %}
-                                                      </td>
-                                                      <td>
-                                                         <!-- Action buttons -->
-                                                         <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                             <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                 <i data-feather="more-vertical"></i>
-                                                             </a>
-                                                             <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
-                                                                 <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                     <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                         <a href="{% url 'game_detail' game.id %}">View</a>
-                                                                     </li>
-                                                                 </ul>
-                                                             </div>
-                                                         </div>
-                                                     </td>
-                                                   </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- Friendly Games Tab -->
-                                    <div class="tab-pane fade" id="game_friendly_count" role="tabpanel" aria-labelledby="game_friendly_count-tab">
-                                       <div class="table-responsive">
-                                           <table class="table table-striped table-bordered table-hover" id="game_friendly_count-table">
-                                               <thead>
-                                                   <tr>
-                                                       <th>No</th>
-                                                       <th>Game Name</th>
-                                                       <th>Game Number</th>
-                                                       <th>Game Date</th>
-                                                       <th>Team A Vs Team B</th>
-                                                       <th>Actions</th>
-                                                   </tr>
-                                               </thead>
-                                               <tbody>
-                                                   {% for game in game_friendly %}
-                                                   <tr>
-                                                       <td>{{ forloop.counter }}</td>
-                                                       <td>{{ game.game_name }}</td>
-                                                       <td>{{ game.game_number }}</td>
-                                                       <td>{{ game.game_date }}</td>
-                                                       <td>{{ game.team_a }} Vs {{ game.team_b }}</td>
-                                                       <td>
-                                                         <!-- Action buttons -->
-                                                         <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                             <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                 <i data-feather="more-vertical"></i>
-                                                             </a>
-                                                             <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 10; width: auto;">
-                                                                 <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                     <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                         <a href="{% url 'friendly_game_detail' game.id %}">View</a>
-                                                                     </li>
-                                                                 </ul>
-                                                             </div>
-                                                         </div>
-                                                     </td>     
-                                                  </tr>
-                                                   {% endfor %}
-                                               </tbody>
-                                           </table>
-                                       </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>                
-            </div>
-         </div>
-      </div>
-   </div>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock %}
 
