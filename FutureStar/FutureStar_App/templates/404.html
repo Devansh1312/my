@@ -1,78 +1,125 @@
 {% extends 'base1.html' %}
-{% load custom_filters %}
+
 {% load static %}
-{% load sass_tags %}
 
 {% block css %}
 <!-- Plugins css start-->
-<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
 <!-- Plugins css Ends-->
 {% endblock %}
-<style>
-   .is-invalid {
-   border-color: #dc3545;
-   background-color: #f8d7da;
-}
-
-</style>
-{% block title %}
-    {% if current_language == 'en' %}
-        Goalactico | 404 Page Not Found
-    {% elif current_language == 'ar' %}
-    جولأكتكو | 404 الصفحة غير موجودة
-    {% endif %}
+{% load lang_filter %} <!-- Loading your custom filter -->
+{% block meta_title %}
+{% lang cmsdata current_language "meta_title" as meta_title %}
+{{meta_title}}
 {% endblock %}
 
+{% block meta_description %}
+{% lang cmsdata current_language "meta_content" as meta_content %}
+{{meta_content}}
+{% endblock %}
+{% block title %}
+     {% if current_language == 'en' %}
+          Goalactico | 404 Page Not Found
+     {% elif current_language == 'ar' %}
+          جولأكتكو | 404 الصفحة غير موجودة
+     {% endif %}
+{% endblock %}
 
 {% block content %}
+<!-- Conditional styles based on URL parameters -->
+{% if request.GET.reference == "app" %}
+<style>
+    .header-upper {
+        display: none;
+    }
+    .main-footer {
+        display: none;
+    }
+</style>
+{% endif %}
 <div class="page-body">
-  <div class="container-fluid">
-       <!-- 404 Error Section Start -->
-       <section class="error-section pt-220 rpt-120 pb-100 rpb-80 rel z-1">
-            <div class="container container-1290">
-                 <div class="row align-items-center">
-                      <div class="col-5">
-                           <div class="error-content rmb-55 wow fadeInRight delay-0-2s">
-                                <h1> {% if current_language == 'en' %} OOPS! {% elif current_language == 'ar' %} عذرًا! {% endif %} </h1>
-                                <div class="section-title mb-50 rmb-35">
-                                     <h2> {% if current_language == 'en' %} Page Not Found - Error 404 {% elif current_language == 'ar' %} الصفحة غير موجودة - خطأ 404 {% endif %} </h2>
-                                </div>
-                                <a href="{% url 'index' %}" class="theme-btn style-two"> {% if current_language == 'en' %} Go to Home <i class="fa-solid fa-arrow-right"></i> {% elif current_language == 'ar' %} الانتقال إلى الصفحة الرئيسية <i class="fa-solid fa-arrow-right"></i> {% endif %} </a>
-                                <div class="social-style-four d-flex mt-60 rmt-35">
-                                     <a href="{{ system_settings.facebook }}" target="_blank">
-                                          <i class="fa-brands fa-facebook-f"></i>
-                                          <span> {% if current_language == 'en' %} Facebook {% elif current_language == 'ar' %} فيسبوك {% endif %} </span>
-                                     </a>
-                                     <a href="{{ system_settings.twitter }}" target="_blank">
-                                          <i class="fa-brands fa-x-twitter"></i>
-                                          <span> {% if current_language == 'en' %} Twitter {% elif current_language == 'ar' %} تويتر {% endif %} </span>
-                                     </a>
-                                     <a href="{{ system_settings.instagram }}" target="_blank">
-                                          <i class="fa-brands fa-instagram"></i>
-                                          <span> {% if current_language == 'en' %} Instagram {% elif current_language == 'ar' %} انستجرام {% endif %} </span>
-                                     </a>
-                                </div>
-                           </div>
-                      </div> {% if current_language == 'en' %} {% elif current_language == 'ar' %} <div class="col-2"></div> {% endif %} <div class="col-5">
-                           <div class="error-image wow zoomIn delay-0-2s">
-                                <img src="{% static 'frontend/assets/images/success-stories/404-img.webp' %}" alt="404 Error">
-                           </div>
-                      </div>
+     <div class="container-fluid">
+         <!-- 404 Error Section Start -->
+         <section class="error-section pt-220 rpt-120 pb-100 rpb-80 rel z-1">
+             <div class="container container-1290">
+                 <div class="row align-items-left justify-content-left text-left text-md-start">
+                     <div class="col-12 col-md-6">
+                         <div class="error-content rmb-55 wow fadeInRight delay-0-2s">
+                             <h1>
+                                 {% if current_language == 'en' %} OOPS! {% elif current_language == 'ar' %} عذرًا! {% endif %}
+                             </h1>
+                             <div class="section-title mb-50 rmb-35">
+                                 <h2>
+                                     {% if current_language == 'en' %} Page Not Found - Error 404 {% elif current_language == 'ar' %} الصفحة غير موجودة - خطأ 404 {% endif %}
+                                 </h2>
+                             </div>
+                             <a href="{% url 'index' %}" class="theme-btn style-two">
+                                 {% if current_language == 'en' %} Go to Home <i class="fa-solid fa-arrow-right"></i> {% elif current_language == 'ar' %} الانتقال إلى الصفحة الرئيسية <i class="fa-solid fa-arrow-right"></i> {% endif %}
+                             </a>
+                              <div class="social-style-four d-flex flex-column flex-md-row justify-content-left mt-60 rmt-35">
+                                   <a href="{{ system_settings.facebook }}" target="_blank" class="mb-2 mb-md-0">
+                                   <i class="fa-brands fa-facebook-f"></i>
+                                   <span>
+                                        {% if current_language == 'en' %} Facebook {% elif current_language == 'ar' %} فيسبوك {% endif %}
+                                   </span>
+                                   </a>
+                                   <a href="{{ system_settings.twitter }}" target="_blank" class="mb-2 mb-md-0 mx-md-3">
+                                   <i class="fa-brands fa-x-twitter"></i>
+                                   <span>
+                                        {% if current_language == 'en' %} Twitter {% elif current_language == 'ar' %} تويتر {% endif %}
+                                   </span>
+                                   </a>
+                                   <a href="{{ system_settings.instagram }}" target="_blank">
+                                   <i class="fa-brands fa-instagram"></i>
+                                   <span>
+                                        {% if current_language == 'en' %} Instagram {% elif current_language == 'ar' %} انستجرام {% endif %}
+                                   </span>
+                                   </a>
+                              </div>
+                         </div>
+                     </div>
+                     <div class="col-12 col-md-6 text-left">
+                         <div class="error-image wow zoomIn delay-0-2s">
+                             <img src="{% static 'frontend/assets/images/success-stories/404-img.webp' %}" alt="404 Error" class="img-fluid">
+                         </div>
+                     </div>
                  </div>
-            </div>
-       </section>
-       <!-- 404 Error Section End -->
-  </div>
+             </div>
+         </section>
+         <!-- 404 Error Section End -->
+     </div>
 </div>
 {% endblock %}
 
-{% block script %}
-<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js'%}"></script>
-<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js'%}"></script>
-<script src="{% static 'assets/js/tooltip-init.js'%}"></script>
-<!-- Plugins JS Ends-->
+{% block scriptcontent %}
 <script>
-  
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        document.getElementById('language-selector').value = currentLanguage;
 
+        document.getElementById('change-language-btn').addEventListener('click', function() {
+            const selectedLanguage = document.getElementById('language-selector').value;
+            localStorage.setItem('language', selectedLanguage);
+        });
+    });
+    // Block right-click context menu
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+    
+// Optional: Block common developer tools shortcuts
+document.addEventListener('keydown', function(e) {
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'u')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+{% endblock %}
+
+{% block script %} 
+<script>new WOW().init();</script>
 {% endblock %}
