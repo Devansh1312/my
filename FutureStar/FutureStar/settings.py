@@ -203,8 +203,8 @@ LOCALE_PATHS = [
 ]
 
 ######### twilio ########
-TAQNYAT_API_KEY = '008a71c7ae03153205cf784359e8d0ad'
-TAQNYAT_SENDER_NAME = 'Goalactico'
+TAQNYAT_API_KEY = os.getenv("TAQNYAT_API_KEY")
+TAQNYAT_SENDER_NAME = os.getenv("TAQNYAT_SENDER_NAME")
 
 # TIME_ZONE = 'UTC'
 TIME_ZONE = 'Asia/Riyadh'
