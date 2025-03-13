@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<!-- Plugins css start-->
+<link rel="stylesheet" type="text/css" href="{% sass_src 'assets/scss/vendors/datatables.scss' %}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Plugins css Ends-->
+{% endblock %}
+
+{% block title %}
+Deleted User Accounts
+{% endblock %}
+
+{% block content %}
+<!-- Additional Custom CSS for Mobile Responsiveness -->
+<style>
+   /* Table Responsiveness */
+   .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+   }
+
+   /* Adjust modal sizes for mobile */
+   .modal-dialog {
+      max-width: 100%;
+      width: 90%;
+   }
+
+   .modal-dialog-centered {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+   }
+
+   /* Ensure the action menu is mobile-friendly */
+   .action-menu-container {
+      position: relative;
+      display: inline-block;
+   }
+
+   .action-card {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      width: 150px;
+   }
+
+   /* Adjust fonts and padding for smaller screens */
+   @media (max-width: 767px) {
+      .page-title h3 {
+         font-size: 18px;
+      }
+
+      .card-body {
+         padding: 1rem;
+      }
+
+      .table th, .table td {
+         padding: 8px;
+         font-size: 14px;
+      }
+
+      .btn {
+         font-size: 14px;
+         padding: 8px;
+      }
+   }
+</style>
+<div class="page-body">
+	<div class="container-fluid">
+		<div class="page-title">
+			<div class="row">
+				<div class="col-12">
+					<h3>{{ breadcrumb.child }}</h3>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="card">
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-bordered" id="basic-1">
+								<thead>
+									<tr>
+										<th>No.</th>
+										<th>Username</th>
+										<th>Account Delete Reason</th>
+										<th>Email</th>
+										<th>Phone</th>
+										<th>Role</th>
+										<th>Comment</th>
+									</tr>
+								</thead>
+								<tbody> {% for user in users %} <tr>
+										<td>{{ forloop.counter }}</td>
+										<td class="text-truncate" style="max-width: 150px;">
+											<a href="{% url 'user_detail' %}" onclick="redirectToDetail(event, '{{ user.id }}')">
+												{{ user.username }}
+											</a>
+										</td>
+										<td>{{ user.deleted_reason_id.name_en|default:"None" }}</td>
+										<td>{{ user.email|default:"None" }}</td>
+										<td>{{ user.phone|default:"None" }}</td>
+										<td>{{ user.role.name_en|default:"None" }}</td>
+										<td>{{ user.deleted_reason|default:"None" }}</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scriptcontent %}
+<!-- Plugins JS start-->
+<script src="{% static 'assets/js/datatable/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/datatable/datatables/datatable.custom.js' %}"></script>
+<script src="{% static 'assets/js/tooltip-init.js' %}"></script>
+<!-- Plugins JS Ends-->
+
+<script>
+function redirectToDetail(event, userId) {
+        event.preventDefault();
+        let form = document.createElement("form");
+        form.method = "post";
+        form.action = "{% url 'user_detail' %}";
+
+        let csrfToken = document.createElement("input");
+        csrfToken.type = "hidden";
+        csrfToken.name = "csrfmiddlewaretoken";
+        csrfToken.value = "{{ csrf_token }}";
+
+        let userIdInput = document.createElement("input");
+        userIdInput.type = "hidden";
+        userIdInput.name = "user_id";
+        userIdInput.value = userId;
+
+        let sourcePage = document.createElement("input");
+        sourcePage.type = "hidden";
+        sourcePage.name = "source_page";
+        sourcePage.value = "player_list";
+
+        let title = document.createElement("input");
+        title.type = "hidden";
+        title.name = "title";
+        title.value = "Player";
+
+        form.appendChild(csrfToken);
+        form.appendChild(userIdInput);
+        form.appendChild(sourcePage);
+        form.appendChild(title);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+{% endblock %}

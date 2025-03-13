@@ -493,8 +493,28 @@ class ToggleUserStatusView(View):
         return redirect(reverse(source_page))
 
 
+########################################### Deleted Account User List ###########################################
+@method_decorator(user_role_check, name="dispatch")
+class DeletedAccountUserList(LoginRequiredMixin, View):
+    template_name = "Admin/User/DeletedAccountUserList.html"
 
-# Player List View
+    def get(self, request):
+        User = get_user_model()  # Get the custom user model
+        users = User.objects.filter(is_deleted=True).order_by(
+            "-id"
+        )  # Order by latest created first
+        return render(
+            request,
+            self.template_name,
+            {
+                "users": users,
+                "breadcrumb": {"child": "Deleted Account User List"},
+            },
+        )
+
+
+
+########################################### Player List View ###########################################################
 @method_decorator(user_role_check, name="dispatch")
 class PlayerListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Player_List.html"
@@ -516,7 +536,7 @@ class PlayerListView(LoginRequiredMixin, View):
         )
 
 
-# Coach List View
+############################################# Coach List View #######################################################
 @method_decorator(user_role_check, name="dispatch")
 class CoachListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Coach_List.html"
@@ -538,7 +558,7 @@ class CoachListView(LoginRequiredMixin, View):
         )
 
 
-# Refree List View
+############################################### Refree List View ##########################################################
 @method_decorator(user_role_check, name="dispatch")
 class RefereeListView(LoginRequiredMixin, View):
     template_name = "Admin/User/Referee_List.html"

@@ -26,6 +26,8 @@ urlpatterns = [
     path('players/', PlayerListView.as_view(), name='player_list'),
     path('coach/', CoachListView.as_view(), name='coach_list'),
     path('manager/', ManagerListView.as_view(), name='manager_list'),
+    path('Deleted-Accounts/', DeletedAccountUserList.as_view(), name='DeletedAccountUserList'),
+
 
 
     path('referee/', RefereeListView.as_view(), name='referee_list'),
