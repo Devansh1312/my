@@ -899,7 +899,11 @@
 									</thead>
 									<tbody> {% for teams in teams %} <tr>
 											<td>{{ forloop.counter }}</td>
-											<td>{{ teams.branch_id.team_name }}</td>
+											<td class="text-truncate" style="max-width: 150px;">
+												<a href="{% url 'branch_detail' %}" onclick="redirectToBranchDetail(event, '{{ teams.branch_id.id }}')">
+													{{ teams.branch_id.team_name }}
+												</a>
+											</td>
 											<td>{{ teams.branch_id.age_group_id }}</td>
 											<td>{{ teams.get_joinning_type_display }}</td>
 											<td>{{ teams.created_at|date:"d-M-Y" }}</td>
@@ -1182,5 +1186,30 @@
 		const widthPercentage = (rating / 5) * 100;
 		starRating.querySelector('.filled-stars').style.width = widthPercentage + '%';
 	});
+	function redirectToBranchDetail(event, branchId) {
+		event.preventDefault();
+		
+		let form = document.createElement("form");
+		form.method = "post";
+		form.action = "{% url 'branch_detail' %}";
+	
+		let csrfToken = document.createElement("input");
+		csrfToken.type = "hidden";
+		csrfToken.name = "csrfmiddlewaretoken";
+		csrfToken.value = "{{ csrf_token }}";
+	
+		let branchIdInput = document.createElement("input");
+		branchIdInput.type = "hidden";
+		branchIdInput.name = "branch_id";
+		branchIdInput.value = branchId;
+	
+	
+		form.appendChild(csrfToken);
+		form.appendChild(branchIdInput);
+		
+		
+		document.body.appendChild(form);
+		form.submit();
+	}
 </script>
 {% endblock %}

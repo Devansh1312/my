@@ -86,308 +86,255 @@
 
 {% block content %}
 <div class="page-body">
-    <div class="container-fluid">
-        <div class="page-title">
-
-         </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                        <a href="{% url 'field_list' %}" class="btn btn-secondary" style="float: right;">
-                            <i class="fa fa-arrow-left"></i> Back
-                        </a>                        
-                        <h3>{{ breadcrumb.child }}</h3>
-                        <hr>
-
-                        <!-- Field Info Section -->
-                        <div class="container mt-5">
-                            <div class="row">
-                                <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field Name:</strong> {{ field.field_name }}
-                                </div>
-                                <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field Capacity:</strong> {{ field.field_capacity.name }}
-                                </div>
-                                <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field Type:</strong> {{ field.ground_type.name_en }}
-                                </div>
-                                <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field Address:</strong> {{ field.address }}
-                                </div>
-                                <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field City & Country:</strong>
-                                    {% if field.city_id.name and field.country_id.name %}
-                                        {{ field.city_id.name }}, {{ field.country_id.name }}
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </div>
-                                <div class="col-12 col-md-4 mb-3">
-                                    <strong>Field Creator:</strong>   {% if field.user_id.fullname %}
-                                    {{ field.user_id.fullname }}
-                                {% else %}
-                                    {{ field.user_id.first_name }} {{ field.user_id.last_name }}
-                                {% endif %}
-                                </div>
-                            </div>
-                            
-
-                            <!-- Logo Section -->
-                            <h4 class="mt-5">Field</h4>
-                            <div class="row">
-                                <div class="col-12 col-md-6 col-lg-4 mb-3">
-                                    <strong>Field Image:</strong>
-                                    {% if field.image %}
-                                    <img src="{{ field.image.url }}" alt="Field Image" class="img-fluid" height="50" width="100">
-                                    {% else %}
-                                    No Image Available
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3>Games</h3>
-                            <hr>
-                            <!-- Add tab navigation -->
-                            <ul class="nav nav-tabs" id="dataTab" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="tournament-tab" data-bs-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="true">Tournament Games</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="friendly-tab" data-bs-toggle="tab" href="#friendly" role="tab" aria-controls="friendly" aria-selected="false">Friendly Games</a>
-                                </li>
-                            </ul>
-            
-                            <div class="tab-content" id="dataTabContent">
-                            
-                                <!-- Tournament Games Tab -->
-                                <div class="tab-pane fade show active" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-bordered" id="tournament-game-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Game Number</th>
-                                                    <th>Team A</th>
-                                                    <th>Team B</th>
-                                                    <th>Game Date</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for tournament_game in tournament_games %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ tournament_game.game_number }}</td>
-                                                        <td>{{ tournament_game.team_a.team_name }}</td>
-                                                        <td>{{ tournament_game.team_b.team_name }}</td>
-                                                        <td>{{ tournament_game.game_date }}</td>
-                                                        <td>
-                                                            <!-- Action buttons -->
-                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                    <i data-feather="more-vertical"></i>
-                                                                </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
-                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                            <a href="{% url 'game_detail' tournament_game.id %}">View</a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="5">No Data available.</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-            
-                                <!-- Friendly Games Tab -->
-                                <div class="tab-pane fade" id="friendly" role="tabpanel" aria-labelledby="friendly-tab">
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-bordered" id="friendly-game-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Game Name</th>
-
-                                                    <th>Game Number</th>
-                                                    <th>Team A</th>
-                                                    <th>Team B</th>
-                                                    <th>Game Date</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for friendly_game in friendly_games %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ friendly_game.game_name }}</td>
-                                                        <td>{{ friendly_game.game_number }}</td>
-                                                        <td>{{ friendly_game.team_a.team_name }}</td>
-                                                        <td>{{ friendly_game.team_b.team_name }}</td>
-                                                        <td>{{ friendly_game.game_date }}</td>
-                                                        <td>
-                                                            <!-- Action buttons -->
-                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                    <i data-feather="more-vertical"></i>
-                                                                </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
-                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                            <a href="{% url 'friendly_game_detail' friendly_game.id %}">View</a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </td>     
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="5">No Data available.</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3>Training Sessions</h3>
-                            <hr>
-                            <!-- Tab navigation -->
-                            <ul class="nav nav-tabs" id="trainingTab" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="open-training-tab" data-bs-toggle="tab" href="#open-training" role="tab" aria-controls="open-training" aria-selected="true">Open Training</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="closed-training-tab" data-bs-toggle="tab" href="#closed-training" role="tab" aria-controls="closed-training" aria-selected="false">Closed Training</a>
-                                </li>
-                            </ul>
-            
-                            <div class="tab-content" id="trainingTabContent">
-                                <!-- Open Training Tab -->
-                                <div class="tab-pane fade show active" id="open-training" role="tabpanel" aria-labelledby="open-training-tab">
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-bordered" id="open-training-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Training Name</th>
-                                                    <th>Training Date</th>
-
-                                                    <th>No. of Participants</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for training in open_training %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ training.training_name }}</td>
-                                                        <td>{{ training.training_date }}</td>
-                                                        <td>{{ training.no_of_participants }}</td>
-                                                        <td>
-                                                            <!-- Action buttons -->
-                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                    <i data-feather="more-vertical"></i>
-                                                                </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
-                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                            <a href="{% url 'open_training_detail' training.id %}">View</a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="5">No Data available.</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-            
-                                <!-- Closed Training Tab -->
-                                <div class="tab-pane fade" id="closed-training" role="tabpanel" aria-labelledby="closed-training-tab">
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-bordered" id="closed-training-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Training Name</th>
-                                                    <th>Training Date</th>
-                                                    <th>No. of Participants</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for training in closed_training %}
-                                                    <tr>
-                                                        <td>{{ forloop.counter }}</td>
-                                                        <td>{{ training.training_name }}</td>
-                                                        <td>{{ training.training_date }}</td>
-                                                        <td>{{ training.no_of_participants }}</td>
-                                                        <td>
-                                                            <!-- Action buttons -->
-                                                            <div class="action-menu-container" style="position: relative; display: inline-block;">
-                                                                <a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
-                                                                    <i data-feather="more-vertical"></i>
-                                                                </a>
-                                                                <div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
-                                                                    <ul style="list-style: none; padding: 0; margin: 0;">
-                                                                        <li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
-                                                                            <a href="{% url 'close_training_detail' training.id %}">View</a>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="5">No Data available.</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>            
-            
-        
-        </div>
-    </div>
+	<div class="container-fluid">
+		<div class="page-title"></div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="card">
+					<div class="card-body">
+						<a href="{% url 'field_list' %}" class="btn btn-secondary" style="float: right;">
+							<i class="fa fa-arrow-left"></i> Back </a>
+						<h3>{{ breadcrumb.child }}</h3>
+						<hr>
+						<!-- Field Info Section -->
+						<div class="container mt-5">
+							<div class="row">
+								<div class="col-12 col-md-4 mb-3">
+									<strong>Field Name:</strong> {{ field.field_name }}
+								</div>
+								<div class="col-12 col-md-4 mb-3">
+									<strong>Field Capacity:</strong> {{ field.field_capacity.name }}
+								</div>
+								<div class="col-12 col-md-4 mb-3">
+									<strong>Field Type:</strong> {{ field.ground_type.name_en }}
+								</div>
+								<div class="col-12 col-md-4 mb-3">
+									<strong>Field Address:</strong> {{ field.address }}
+								</div>
+								<div class="col-12 col-md-4 mb-3">
+									<strong>Field City & Country:</strong> {% if field.city_id.name and field.country_id.name %} {{ field.city_id.name }}, {{ field.country_id.name }} {% else %} N/A {% endif %}
+								</div>
+								<div class="col-12 col-md-4 mb-3">
+									<strong>Field Creator:</strong> {% if field.user_id.fullname %} {{ field.user_id.fullname }} {% else %} {{ field.user_id.first_name }} {{ field.user_id.last_name }} {% endif %}
+								</div>
+							</div>
+							<!-- Logo Section -->
+							<h4 class="mt-5">Field</h4>
+							<div class="row">
+								<div class="col-12 col-md-6 col-lg-4 mb-3">
+									<strong>Field Image:</strong> {% if field.image %} <img src="{{ field.image.url }}" alt="Field Image" class="img-fluid" height="50" width="100"> {% else %} No Image Available {% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="card">
+						<div class="card-body">
+							<h3>Games</h3>
+							<hr>
+							<!-- Add tab navigation -->
+							<ul class="nav nav-tabs" id="dataTab" role="tablist">
+								<li class="nav-item">
+									<a class="nav-link active" id="tournament-tab" data-bs-toggle="tab" href="#tournament" role="tab" aria-controls="tournament" aria-selected="true">Tournament Games</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" id="friendly-tab" data-bs-toggle="tab" href="#friendly" role="tab" aria-controls="friendly" aria-selected="false">Friendly Games</a>
+								</li>
+							</ul>
+							<div class="tab-content" id="dataTabContent">
+								<!-- Tournament Games Tab -->
+								<div class="tab-pane fade show active" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
+									<div class="table-responsive mt-3">
+										<table class="table table-bordered" id="tournament-game-table">
+											<thead>
+												<tr>
+													<th>No</th>
+													<th>Game Number</th>
+													<th>Team A</th>
+													<th>Team B</th>
+													<th>Game Date</th>
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody> {% for tournament_game in tournament_games %} <tr>
+													<td>{{ forloop.counter }}</td>
+													<td>{{ tournament_game.game_number }}</td>
+													<td>{{ tournament_game.team_a.team_name }}</td>
+													<td>{{ tournament_game.team_b.team_name }}</td>
+													<td>{{ tournament_game.game_date }}</td>
+													<td>
+														<!-- Action buttons -->
+														<div class="action-menu-container" style="position: relative; display: inline-block;">
+															<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																<i data-feather="more-vertical"></i>
+															</a>
+															<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
+																<ul style="list-style: none; padding: 0; margin: 0;">
+																	<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																		<a href="{% url 'game_detail' tournament_game.id %}">View</a>
+																	</li>
+																</ul>
+															</div>
+														</div>
+													</td>
+												</tr> {% empty %} <tr>
+													<td colspan="5">No Data available.</td>
+												</tr> {% endfor %} </tbody>
+										</table>
+									</div>
+								</div>
+								<!-- Friendly Games Tab -->
+								<div class="tab-pane fade" id="friendly" role="tabpanel" aria-labelledby="friendly-tab">
+									<div class="table-responsive mt-3">
+										<table class="table table-bordered" id="friendly-game-table">
+											<thead>
+												<tr>
+													<th>No</th>
+													<th>Game Name</th>
+													<th>Game Number</th>
+													<th>Team A</th>
+													<th>Team B</th>
+													<th>Game Date</th>
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody> {% for friendly_game in friendly_games %} <tr>
+													<td>{{ forloop.counter }}</td>
+													<td>{{ friendly_game.game_name }}</td>
+													<td>{{ friendly_game.game_number }}</td>
+													<td>{{ friendly_game.team_a.team_name }}</td>
+													<td>{{ friendly_game.team_b.team_name }}</td>
+													<td>{{ friendly_game.game_date }}</td>
+													<td>
+														<!-- Action buttons -->
+														<div class="action-menu-container" style="position: relative; display: inline-block;">
+															<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																<i data-feather="more-vertical"></i>
+															</a>
+															<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
+																<ul style="list-style: none; padding: 0; margin: 0;">
+																	<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																		<a href="{% url 'friendly_game_detail' friendly_game.id %}">View</a>
+																	</li>
+																</ul>
+															</div>
+														</div>
+													</td>
+												</tr> {% empty %} <tr>
+													<td colspan="5">No Data available.</td>
+												</tr> {% endfor %} </tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="card">
+						<div class="card-body">
+							<h3>Training Sessions</h3>
+							<hr>
+							<!-- Tab navigation -->
+							<ul class="nav nav-tabs" id="trainingTab" role="tablist">
+								<li class="nav-item">
+									<a class="nav-link active" id="open-training-tab" data-bs-toggle="tab" href="#open-training" role="tab" aria-controls="open-training" aria-selected="true">Open Training</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" id="closed-training-tab" data-bs-toggle="tab" href="#closed-training" role="tab" aria-controls="closed-training" aria-selected="false">Closed Training</a>
+								</li>
+							</ul>
+							<div class="tab-content" id="trainingTabContent">
+								<!-- Open Training Tab -->
+								<div class="tab-pane fade show active" id="open-training" role="tabpanel" aria-labelledby="open-training-tab">
+									<div class="table-responsive mt-3">
+										<table class="table table-bordered" id="open-training-table">
+											<thead>
+												<tr>
+													<th>No</th>
+													<th>Training Name</th>
+													<th>Training Date</th>
+													<th>No. of Participants</th>
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody> {% for training in open_training %} <tr>
+													<td>{{ forloop.counter }}</td>
+													<td>{{ training.training_name }}</td>
+													<td>{{ training.training_date }}</td>
+													<td>{{ training.no_of_participants }}</td>
+													<td>
+														<!-- Action buttons -->
+														<div class="action-menu-container" style="position: relative; display: inline-block;">
+															<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																<i data-feather="more-vertical"></i>
+															</a>
+															<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
+																<ul style="list-style: none; padding: 0; margin: 0;">
+																	<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																		<a href="{% url 'open_training_detail' training.id %}">View</a>
+																	</li>
+																</ul>
+															</div>
+														</div>
+													</td>
+												</tr> {% empty %} <tr>
+													<td colspan="5">No Data available.</td>
+												</tr> {% endfor %} </tbody>
+										</table>
+									</div>
+								</div>
+								<!-- Closed Training Tab -->
+								<div class="tab-pane fade" id="closed-training" role="tabpanel" aria-labelledby="closed-training-tab">
+									<div class="table-responsive mt-3">
+										<table class="table table-bordered" id="closed-training-table">
+											<thead>
+												<tr>
+													<th>No</th>
+													<th>Training Name</th>
+													<th>Training Date</th>
+													<th>No. of Participants</th>
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody> {% for training in closed_training %} <tr>
+													<td>{{ forloop.counter }}</td>
+													<td>{{ training.training_name }}</td>
+													<td>{{ training.training_date }}</td>
+													<td>{{ training.no_of_participants }}</td>
+													<td>
+														<!-- Action buttons -->
+														<div class="action-menu-container" style="position: relative; display: inline-block;">
+															<a href="#" class="three-dots-menu" onclick="toggleMenu(this)">
+																<i data-feather="more-vertical"></i>
+															</a>
+															<div class="action-card" style="display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); z-index: 5; width: auto;">
+																<ul style="list-style: none; padding: 0; margin: 0;">
+																	<li style="padding: 8px 12px; border-top: 1px solid #eee; font-size: small;">
+																		<a href="{% url 'close_training_detail' training.id %}">View</a>
+																	</li>
+																</ul>
+															</div>
+														</div>
+													</td>
+												</tr> {% empty %} <tr>
+													<td colspan="5">No Data available.</td>
+												</tr> {% endfor %} </tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock %}
 
@@ -403,43 +350,27 @@
 
 <!-- Initialize DataTables for the booking table -->
 <script>
-    $(document).ready(function() {
-        // Initialize DataTable with custom settings
-        $('#tournament-game-table').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "searching": true,
-            "lengthChange": true,
-            "pageLength": 10
-        });
-        $('#open-training-table').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "searching": true,
-            "lengthChange": true,
-            "pageLength": 10
-        });
-        $('#closed-training-table').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "searching": true,
-            "lengthChange": true,
-            "pageLength": 10
+    $(document).ready(function () {
+        // Initialize DataTables for all relevant tables
+        let tables = ['#tournament-game-table', '#friendly-game-table', '#open-training-table', '#closed-training-table'];
+        tables.forEach(function (table) {
+            $(table).DataTable();
         });
 
-        $('#friendly-game-table').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "searching": true,
-            "lengthChange": true,
-            "pageLength": 10
+        // Adjust DataTables when tabs are switched
+        $('#dataTab a, #trainingTab a').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href"); // Get the target tab
+            var tableMap = {
+                "#tournament": "#tournament-game-table",
+                "#friendly": "#friendly-game-table",
+                "#open-training": "#open-training-table",
+                "#closed-training": "#closed-training-table"
+            };
+            if (tableMap[target]) {
+                $(tableMap[target]).DataTable().columns.adjust().draw();
+            }
         });
     });
-
 
     function toggleMenu(menu) {
         event.preventDefault();
