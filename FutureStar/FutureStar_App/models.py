@@ -383,21 +383,7 @@ class Global_Clients(models.Model):
     class Meta:
         db_table = 'futurestar_app_global_clients'        
 
-# Tryout Club Blog Management    
-class Tryout_Club(models.Model):
-    title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='tryout_club/')
-    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
-
-    def __str__(self):
-        return self.title
-    
-    class Meta:
-        db_table = 'futurestar_app_tryout_club'
-
-
-# Tryout Club Blog Management    
+# Testimonial Management    
 class Testimonial(models.Model):
     name_en = models.CharField(max_length=255)
     name_ar = models.CharField(max_length=255, blank=True, null=True)
