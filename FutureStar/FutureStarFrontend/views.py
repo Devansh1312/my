@@ -2840,6 +2840,10 @@ class UserDashboardTrainings(LoginRequiredMixin, View):
 ############################### SearchView ########################
 class SearchView(View):
     def get(self, request, *args, **kwargs):
+        check_login = request.user
+        if not check_login.is_authenticated:
+            messages.error(request, "You must be logged in to view this page.")
+            return redirect('login')
         language_from_url = request.GET.get('Language', None)
         
         if language_from_url:
@@ -2901,6 +2905,10 @@ class TeamPageSearchResults(View):
         return branches, sponsors, events_with_sales
 
     def get(self, request, *args, **kwargs):
+        check_login = request.user
+        if not check_login.is_authenticated:
+            messages.error(request, "You must be logged in to view this page.")
+            return redirect('login')
         # Language handling
         language_from_url = request.GET.get('Language', None)
         if language_from_url:
@@ -3791,6 +3799,10 @@ class PlayerInfoPage(View):
 
 
     def get(self, request, *args, **kwargs):
+        check_login = request.user
+        if not check_login.is_authenticated:
+            messages.error(request, "You must be logged in to view this page.")
+            return redirect('login')
         user_id = request.GET.get('user_id') or request.session.get('Search_user_id')
         try:
             user = User.objects.get(id=user_id)
@@ -3799,7 +3811,6 @@ class PlayerInfoPage(View):
 
         # Handle language from URL or session
         language_from_url = get_language(request)
-
         if user.role.id == 1:
             return redirect('Dashboard')
 
@@ -3816,13 +3827,16 @@ class PlayerInfoPage(View):
         return render(request, "PlayerInfo.html", context)
 
     def post(self, request, *args, **kwargs):
+        check_login = request.user
+        if not check_login.is_authenticated:
+            messages.error(request, "You must be logged in to view this page.")
+            return redirect('login')
         user_id = request.POST.get('user_id')
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             return redirect('search')
         language_from_url = get_language(request)
-
         if user.role.id == 1:
             return redirect('Dashboard')
 
@@ -3955,6 +3969,12 @@ class TeamDetailsView(View):
         else:
             # Use session language or default to 'en'
             language_from_url = request.session.get('language', 'en')
+        
+        user = request.user
+        if not user.is_authenticated:
+            messages.error(request, "You must be logged in to view this page.")
+            return redirect('login')
+        
 
         # Fetch the team_id from GET parameters
         team_id = request.GET.get("team_id")
