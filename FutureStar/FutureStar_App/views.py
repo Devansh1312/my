@@ -38,6 +38,12 @@ from django.utils.translation import activate
 from FutureStar.firebase_config import send_push_notification
 from django.utils.timezone import now
 
+from django.views.decorators.http import require_GET
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+
+
+
 # User Role Check
 def user_role_check(view_func):
     @wraps(view_func)
@@ -7737,3 +7743,29 @@ class CloseTrainingDetailView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
             },
         )
+
+
+##################### Apple Configartion ############################
+@method_decorator(require_GET, name='dispatch')
+class AppleAppSiteAssociation(View):
+    def get(self, request, *args, **kwargs):
+        data = {
+            "applinks": {
+                "apps": [],
+                "details": [
+                    {
+                        "appID": "3GM6AW6K4V.com.sportx.goalactico",
+                        "paths": [
+                            "/post/*",
+                            "/all/event/*",
+                            "/my/events/*",
+                            "/training/open/*",
+                            "/training/my/*",
+                            "/training/join/*",
+                            "/tournament/*"
+                        ]
+                    }
+                ]
+            }
+        }
+        return JsonResponse(data)
