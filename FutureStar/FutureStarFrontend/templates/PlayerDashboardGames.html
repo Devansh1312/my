@@ -232,10 +232,14 @@
                                             <td>{{ game.game_type }}</td>
                                             <td>{{ game.game_number }}</td>
                                             <td style="direction: ltr; text-align: center;">
-                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
-                                                <span> {{ game.team_a_vs_team_b }} </span>
-                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
-                                            </td>
+                                                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+                                                    <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo" style="width: 30px; height: 30px; flex-shrink: 0;">
+                                                    <span style="flex-grow: 1; text-align: center; white-space: nowrap; font-weight: bold;">
+                                                        {{ game.team_a_vs_team_b }}
+                                                    </span>
+                                                    <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo" style="width: 30px; height: 30px; flex-shrink: 0;">
+                                                </div>
+                                            </td>                                            
                                             <td>{{ game.game_date }}</td>
                                         </tr>
                                     {% endfor %}
@@ -379,10 +383,14 @@
                                             <td>{{ game.game_type }}</td>
                                             <td>{{ game.game_number }}</td>
                                             <td style="direction: ltr; text-align: center;">
-                                                <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo">
-                                                <span> {{ game.team_a_vs_team_b }} </span>
-                                                <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo">
-                                            </td>
+                                                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+                                                    <img src="{{ game.team_a_logo }}" alt="Team A Logo" class="team-logo" style="width: 30px; height: 30px; flex-shrink: 0;">
+                                                    <span style="flex-grow: 1; text-align: center; white-space: nowrap; font-weight: bold;">
+                                                        {{ game.team_a_vs_team_b }}
+                                                    </span>
+                                                    <img src="{{ game.team_b_logo }}" alt="Team B Logo" class="team-logo" style="width: 30px; height: 30px; flex-shrink: 0;">
+                                                </div>
+                                            </td>                                            
                                             <td>{{ game.game_date }}</td>
                                             <td style="direction: ltr !important;">{{ game.score }}</td>
                                         </tr>
