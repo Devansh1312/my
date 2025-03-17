@@ -6,6 +6,7 @@
 <!-- Plugins css Ends-->
 <style>
     /* Default position for left-to-right (LTR) direction */
+    
     .eye-icon {
         position: absolute;
         top: 70%;
@@ -13,6 +14,12 @@
         transform: translateY(-50%);
         cursor: pointer;
         color: rgb(255, 255, 255);
+        z-index: 10;
+        transition: all 0.3s ease-in-out; /* Smooth movement */
+    }
+
+    .eye-icon.error {
+        top: 50%; /* Adjust position when there is an error */
     }
 
     /* Adjust position for right-to-left (RTL) direction */
@@ -20,14 +27,19 @@
         right: auto;
         left: 15px;
     }
+    /* Style for input fields */
+    .form-control {
+        padding-right: 40px; /* Ensure space for eye icon */
+    }
 
     .form-group {
         position: relative; /* Make form-group relative for absolute positioning of the icon */
     }
 
     /* Red border for required fields */
-    .required-field {
-        border: 2px solid red;
+    .form-group {
+        position: relative; /* Keeps the eye-icon positioned relative to this */
+        margin-bottom: 20px; /* Ensure spacing between fields */
     }
 
     /* Red border for form group on error */
@@ -42,6 +54,7 @@
         display: none; /* Hidden by default */
         margin-top: 5px; /* Add some spacing above the error message */
     }
+    
 </style>
 {% endblock %}
 {% block meta_title %}
@@ -85,7 +98,7 @@
                                         اسم المستخدم
                                     {% endif %}
                                 </label>
-                                <input type="text" id="username" name="username" class="form-control" required placeholder="">
+                                <input type="text" id="username" name="username" class="form-control" placeholder="">
                                 <div class="error-message" id="usernameError">This field is required</div>
                             </div>
                         </div>
@@ -98,7 +111,7 @@
                                         رقم الهاتف
                                     {% endif %}
                                 </label>
-                                <input type="text" id="phone" name="phone" class="form-control" required placeholder="" pattern="[0-9]*" inputmode="numeric">
+                                <input type="text" id="phone" name="phone" class="form-control" placeholder="" pattern="[0-9]*" inputmode="numeric">
                                 <div class="error-message" id="phoneError">This field is required</div>
                             </div>
                         </div>
@@ -112,7 +125,7 @@
                                         كلمة السر
                                     {% endif %}
                                 </label>
-                                <input type="password" id="password" name="password" class="form-control" required placeholder="">
+                                <input type="password" id="password" name="password" class="form-control" placeholder="">
                                 <span class="eye-icon" id="togglePassword">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </span>
@@ -130,7 +143,7 @@
                                         تأكيد كلمة السر
                                     {% endif %}
                                 </label>
-                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required placeholder="">
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="">
                                 <span class="eye-icon" id="toggleConfirmPassword">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </span>
@@ -141,7 +154,7 @@
                         <div class="col-md-12">
                             <div class="d-flex mb-30 justify-content-between">
                                 <label>
-                                    <input type="checkbox" required />
+                                    <input type="checkbox"/>
                                     {% if current_language == 'en' %}
                                         I agree to the <a style="color: #ffffff;" href="{% url 'terms-and-conditions' %}">Terms & Conditions</a> and acknowledge that I have read the <a style="color: #ffffff;" href="{% url 'privacy-policy' %}">Privacy Policy</a>.
                                     {% elif current_language == 'ar' %}
@@ -149,6 +162,7 @@
                                     {% endif %}
                                 </label>
                             </div>
+                            <div id="checkboxError" class="error-message" style="display: none; color: red; font-size: 14px;"></div>
                         </div>
                 
                         <div class="col-md-12">
@@ -211,83 +225,175 @@
 
 {% block script %}
 <script>
-    function validateForm() {
-        let valid = true;
-
-        // Clear previous error messages and styles
-        $('.form-group').removeClass('error'); // Remove error class from all form groups
-        $('.error-message').hide();
-
-        // Validate required fields
-        $('#teamForm input[required]').each(function() {
-            if ($(this).val() === '') {
-                valid = false;
-                $(this).closest('.form-group').addClass('error'); // Add error class to the form group
-                const errorId = $(this).attr('id') + 'Error';
-                $('#' + errorId).show(); // Show error message
+    $(document).ready(function () {
+        // Define all error messages using the same template syntax
+        let phoneErrorMessage = "{% if current_language == 'en' %}Only 9 digits are allowed{% elif current_language == 'ar' %}مسموح فقط بـ 9 أرقام{% endif %}";
+        let usernameErrorMessage = "{% if current_language == 'en' %}Username cannot be empty or contain spaces{% elif current_language == 'ar' %}اسم المستخدم لا يمكن أن يكون فارغًا أو يحتوي على مسافات{% endif %}";
+        let passwordErrorMessage = "{% if current_language == 'en' %}Password must be at least 8 characters with uppercase, lowercase, number, and special character{% elif current_language == 'ar' %}يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتحتوي على أحرف كبيرة وصغيرة وأرقام وحرف خاص{% endif %}";
+        let confirmPasswordErrorMessage = "{% if current_language == 'en' %}Passwords do not match{% elif current_language == 'ar' %}كلمات المرور غير متطابقة{% endif %}";
+        let checkboxErrorMessage = "{% if current_language == 'en' %}You must agree to the Terms & Conditions and Privacy Policy{% elif current_language == 'ar' %}يجب أن توافق على الشروط والأحكام وسياسة الخصوصية{% endif %}";
+    
+        // Username validation (no blank spaces)
+        $("#username").on("input", function () {
+            let username = $(this).val().trim();
+            if (username === "" || /\s/.test(username)) {
+                $("#usernameError").text(usernameErrorMessage).show();
+                $(this).css("border", "1px solid red");
+            } else {
+                $("#usernameError").hide();
+                $(this).css("border", "");
+            }
+        });
+    
+        // Phone validation: Allow only numbers, enforce max length 9, and check for empty field
+        $('#phone').on('keypress', function (e) {
+            if (!/\d/.test(String.fromCharCode(e.which))) {
+                e.preventDefault(); // Prevent non-numeric input
             }
         });
 
-        return valid; // Allow form submission if all required fields are filled
-    }
+        $('#phone').on('input', function () {
+            let value = $(this).val().replace(/\D/g, ''); // Remove non-numeric characters
+            let phoneError = $('#phoneError');
 
-    $('#togglePassword').on('click', function() {
-        const passwordField = $('#password');
-        const passwordFieldType = passwordField.attr('type');
-        passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
-        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-    }); 
+            if (value.length <= 0) {
+                // If the field is empty, show "This field is required"
+                phoneError.text("{% if current_language == 'en' %}This field is required{% elif current_language == 'ar' %}هذا الحقل مطلوب{% endif %}").show();
+            } else if (value.length !== 9) {
+                // If the field is not empty but not exactly 9 digits, show "Only 9 digits are allowed"
+                phoneError.text(phoneErrorMessage).show();
+            } else {
+                // If the input is valid, hide the error message
+                phoneError.hide();
+            }
 
-    $('#toggleConfirmPassword').on('click', function() {
-        const passwordField = $('#confirmPassword');
-        const passwordFieldType = passwordField.attr('type');
-        passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
-        $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-    });
-
-    // Block right-click context menu
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
+            // Update the field value (remove non-numeric characters and limit to 9 digits)
+            $(this).val(value.slice(0, 9));
+        });
     
-// Optional: Block common developer tools shortcuts
-document.addEventListener('keydown', function(e) {
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-    if (e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-        (e.ctrlKey && e.key === 'u')) {
+        // Password validation: min 8 characters, upper, lower, number, special character
+        $("#password").on("input", function () {
+            let password = $(this).val();
+            let passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                $("#passwordError").text(passwordErrorMessage).show();
+                $(this).css("border", "1px solid red");
+                $("#togglePassword").addClass("error"); // Add error class to eye icon
+            } else {
+                $("#passwordError").hide();
+                $(this).css("border", "");
+                $("#togglePassword").removeClass("error"); // Remove error class from eye icon
+            }
+        });
+    
+        // Confirm password validation
+        $("#confirmPassword").on("input", function () {
+            let confirmPassword = $(this).val();
+            let password = $("#password").val();
+            if (confirmPassword !== password || confirmPassword === "") {
+                $("#confirmPasswordError").text(confirmPasswordErrorMessage).show();
+                $(this).css("border", "1px solid red");
+                $("#toggleConfirmPassword").addClass("error"); // Add error class to eye icon
+            } else {
+                $("#confirmPasswordError").hide();
+                $(this).css("border", "");
+                $("#toggleConfirmPassword").removeClass("error"); // Remove error class from eye icon
+            }
+        });
+    
+        // Remove red border and error message when checkbox is clicked
+        $("input[type=checkbox]").change(function () {
+            $("#checkboxError").hide();
+            $(this).parent().css("border", "").css("padding", "");
+        });
+    
+        // Form submission validation
+        $("#teamForm").submit(function (event) {
+            let isValid = true;
+    
+            // Username validation
+            let username = $("#username").val().trim();
+            if (username === "" || /\s/.test(username)) {
+                $("#usernameError").text(usernameErrorMessage).show();
+                $("#username").css("border", "1px solid red");
+                isValid = false;
+            }
+    
+            // Phone validation
+            let phone = $("#phone").val().trim();
+            let phonePattern = /^[0-9]{9}$/;
+            if (!phonePattern.test(phone)) {
+                $("#phoneError").text(phoneErrorMessage).show();
+                $("#phone").css("border", "1px solid red");
+                isValid = false;
+            }
+    
+            // Password validation
+            let password = $("#password").val();
+            let passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                $("#passwordError").text(passwordErrorMessage).show();
+                $("#password").css("border", "1px solid red");
+                $("#togglePassword").addClass("error"); // Add error class to eye icon
+                isValid = false;
+            }
+    
+            // Confirm password validation
+            let confirmPassword = $("#confirmPassword").val();
+            if (confirmPassword !== password || confirmPassword === "") {
+                $("#confirmPasswordError").text(confirmPasswordErrorMessage).show();
+                $("#confirmPassword").css("border", "1px solid red");
+                $("#toggleConfirmPassword").addClass("error"); // Add error class to eye icon
+                isValid = false;
+            }
+    
+            // Checkbox validation
+            let checkbox = $("input[type=checkbox]");
+            if (!checkbox.is(":checked")) {
+                $("#checkboxError").text(checkboxErrorMessage).show();
+                checkbox.parent().css("border", "1px solid red").css("padding", "5px");
+                isValid = false;
+            }
+    
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+    
+        // Toggle password visibility
+        $("#togglePassword").click(function () {
+            let passwordField = $("#password");
+            let type = passwordField.attr("type") === "password" ? "text" : "password";
+            passwordField.attr("type", type);
+        });
+    
+        $("#toggleConfirmPassword").click(function () {
+            let confirmPasswordField = $("#confirmPassword");
+            let type = confirmPasswordField.attr("type") === "password" ? "text" : "password";
+            confirmPasswordField.attr("type", type);
+        });
+    
+        // Hide error messages on input change
+        $("input").on("input", function () {
+            $(this).css("border", "");
+            $(this).next(".error-message").hide();
+        });
+    });
+    // Block right-click context menu
+    document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         return false;
-    }
-});
-
-$(document).ready(function () {
-    let errorMessage = "{% if current_language == 'en' %}Only 9 digits are allowed{% elif current_language == 'ar' %}مسموح فقط بـ 9 أرقام{% endif %}";
-
-    $('#phone').on('keypress', function (e) {
-        // Allow only numbers (0-9)
-        if (!/\d/.test(String.fromCharCode(e.which))) {
+    });
+    
+    // Optional: Block common developer tools shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+            (e.ctrlKey && e.key === 'u')) {
             e.preventDefault();
+            return false;
         }
     });
-
-    $('#phone').on('input', function () {
-        let value = $(this).val();
-        // Remove non-numeric characters
-        value = value.replace(/\D/g, '');
-        
-        if (value.length > 9) {
-            value = value.slice(0, 9); // Limit input to 9 digits
-            $('#phoneError').text(errorMessage).show(); // Show localized error message
-        } else {
-            $('#phoneError').hide(); // Hide error message if within limit
-        }
-
-        $(this).val(value);
-    });
-});
-
-
-</script>
+</script>    
 {% endblock %}

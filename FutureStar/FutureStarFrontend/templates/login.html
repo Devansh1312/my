@@ -13,7 +13,6 @@
 {{meta_content}}
 {% endblock %}
 
-
 {% block title %}
     {% if current_language == 'en' %}
         Goalactico || Login
@@ -22,7 +21,29 @@
     {% endif %}
 {% endblock %}
 {% block content %}
+<style>
+    /* Default position for left-to-right (LTR) direction */
+    .form-group.position-relative .eye-icon {
+        position: absolute;
+        top: 70%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: rgb(255, 255, 255);
+        transition: all 0.3s ease-in-out; /* Smooth movement */
+    }
 
+    /* Adjust position for right-to-left (RTL) direction */
+    html[dir="rtl"] .form-group.position-relative .eye-icon {
+        right: auto;
+        left: 15px;
+    }
+
+    /* Error state for eye icon */
+    .form-group.position-relative .eye-icon.error {
+        top: 50%; /* Move eye icon up when there's an error */
+    }
+</style>
 <section class="services-area-six pt-150 pb-60 rel">
     <div class="container">
         <div class="row justify-content-center">
@@ -52,8 +73,7 @@
                                 </label>
                                 <input type="text" id="username_or_phone" name="username_or_phone" class="form-control"
                                 value="{{ username_or_phone }}" 
-                                placeholder="{% if current_language == 'en' %}Enter your username or phone{% elif current_language == 'ar' %}أدخل اسم المستخدم أو الهاتف{% endif %}" 
-                                required>
+                                placeholder="{% if current_language == 'en' %}Enter your username or phone{% elif current_language == 'ar' %}أدخل اسم المستخدم أو الهاتف{% endif %}" >
                                 <div class="error-message text-danger" id="usernameError" style="display:none;">This field is required</div>
                             </div>
                         </div>
@@ -66,7 +86,7 @@
                                         كلمة المرور
                                     {% endif %}
                                 </label>
-                                <input type="password" id="password" name="password" class="form-control" required placeholder="{% if current_language == 'en' %}Enter your password{% elif current_language == 'ar' %}أدخل كلمة المرور{% endif %}">
+                                <input type="password" id="password" name="password" class="form-control"  placeholder="{% if current_language == 'en' %}Enter your password{% elif current_language == 'ar' %}أدخل كلمة المرور{% endif %}">
                                 <span class="eye-icon" id="togglePassword">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </span>
@@ -156,72 +176,77 @@
 {% block script %}
 <script>
     $(document).ready(function () {
+        // Define error messages
+        const requiredFieldErrorMessage = "{% if current_language == 'en' %}This field is required{% elif current_language == 'ar' %}هذا الحقل مطلوب{% endif %}";
+
+        // Form submission validation
         $('#teamForm').on('submit', function (e) {
             let isValid = true;
 
-            if ($('#username_or_phone').val().trim() === '') {
-                $('#usernameError').show();
+            // Username/Phone validation
+            const usernameOrPhone = $('#username_or_phone').val().trim();
+            if (usernameOrPhone === '') {
+                $('#usernameError').text(requiredFieldErrorMessage).show();
+                $('#username_or_phone').css('border', '1px solid red');
                 isValid = false;
             } else {
                 $('#usernameError').hide();
+                $('#username_or_phone').css('border', '');
             }
 
-            if ($('#password').val().trim() === '') {
-                $('#passwordError').show();
+            // Password validation
+            const password = $('#password').val().trim();
+            if (password === '') {
+                $('#passwordError').text(requiredFieldErrorMessage).show();
+                $('#password').css('border', '1px solid red');
+                $('#togglePassword').addClass('error'); // Add error class to eye icon
                 isValid = false;
             } else {
                 $('#passwordError').hide();
+                $('#password').css('border', '');
+                $('#togglePassword').removeClass('error'); // Remove error class from eye icon
             }
 
             if (!isValid) {
-                e.preventDefault();
-                alert("Please fill in all required fields.");
+                e.preventDefault(); // Prevent form submission if validation fails
             }
         });
 
-        $('#togglePassword').on('click', function() {
+        // Toggle password visibility
+        $('#togglePassword').on('click', function () {
             const passwordField = $('#password');
             const passwordFieldType = passwordField.attr('type');
             passwordField.attr('type', passwordFieldType === 'password' ? 'text' : 'password');
             $(this).find('i').toggleClass('fa-eye fa-eye-slash');
         });
+
+        // Hide error messages on input change
+        $('#username_or_phone').on('input', function () {
+            $(this).css('border', '');
+            $('#usernameError').hide();
+        });
+
+        $('#password').on('input', function () {
+            $(this).css('border', '');
+            $('#passwordError').hide();
+            $('#togglePassword').removeClass('error'); // Remove error class from eye icon
+        });
     });
-</script>
-
-<style>
-/* Default position for left-to-right (LTR) direction */
-.form-group.position-relative .eye-icon {
-    position: absolute;
-    top: 70%;
-    right: 15px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: rgb(255, 255, 255);
-}
-
-/* Adjust position for right-to-left (RTL) direction */
-html[dir="rtl"] .form-group.position-relative .eye-icon {
-    right: auto;
-    left: 15px;
-}
-
-</style>
-<script>
     // Block right-click context menu
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
-    
-// Optional: Block common developer tools shortcuts
-document.addEventListener('keydown', function(e) {
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-    if (e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-        (e.ctrlKey && e.key === 'u')) {
+    document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         return false;
-    }
-});
+    });
+    
+    // Optional: Block common developer tools shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+            (e.ctrlKey && e.key === 'u')) {
+            e.preventDefault();
+            return false;
+        }
+    });
 </script>
 {% endblock %}
