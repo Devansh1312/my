@@ -1670,6 +1670,39 @@ class RegisterPage(View):
         
         # Instead of passing context, include language as GET parameter
         return redirect(f"{reverse('verify_otp')}?Language={language_from_url}")
+
+############################ Resend OTP #######################################################
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ResendOTPView(View):
+    def post(self, request, *args, **kwargs):
+        import json
+        data = json.loads(request.body)
+        username = data.get('username')
+        phone = data.get('phone')
+        password = data.get('password')
+
+        # Generate new OTP
+        otp = generate_otp()
+
+        # Create or update the OTP entry for the given phone number
+        OTPSave.objects.update_or_create(
+            phone=phone,
+            defaults={'OTP': otp}
+        )
+
+        # Send the OTP via SMS
+        send_sms(phone, otp)
+
+        # Store phone and username in the session
+        request.session['phone'] = phone
+        request.session['username'] = username
+        request.session['password'] = password
+
+        # Return success message
+        success_message = _("Your OTP is {}").format(otp)
+        return JsonResponse({'success': True, 'message': success_message})
     
 #################################### OTP Verification #######################################
 class OTPVerificationView(View):

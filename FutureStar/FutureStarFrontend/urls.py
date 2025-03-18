@@ -35,6 +35,7 @@ urlpatterns = [
 
 
     path('register/', RegisterPage.as_view(), name='register'),
+    path('resend-otp/', ResendOTPView.as_view(), name='resend_otp'),
     path('verify_otp/', OTPVerificationView.as_view(), name='verify_otp'),
 
     path('search/', SearchView.as_view(), name='search'),
