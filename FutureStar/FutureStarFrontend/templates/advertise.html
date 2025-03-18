@@ -138,7 +138,6 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
 </section>
 <!-- Partnership With Us Area end -->
 
-
 <!-- Apps Advertise Area start -->
 <section class="apps-advertise py-100 text-center">
     <div class="container">
@@ -149,7 +148,7 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
                         {% lang cmsdata current_language "section_4_heading" as section_4_heading %}
                         {{section_4_heading}}
                     </span>
-                    <h3> 
+                    <h3>
                         {% lang cmsdata current_language "section_4_title" as section_4_title %}
                         {{section_4_title}}
                     </h3>
@@ -158,28 +157,24 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
         </div>
 
         <div class="apps-advertise-slider">
-
-            <div class="wow fadeInUp delay-0-2s animated">
-                <img src="/media/{{cmsdata.section_4_image}}" class="img-fluid" alt="">
-            </div>
             {% for ads_dynamic_field in ads_dynamic_field %}
-            <div class="wow fadeInUp delay-0-4s animated">
-                <img src="/media/{{ads_dynamic_field.images}}" class="img-fluid" alt="">
+            <div class="wow fadeInUp delay-0-2s animated">
+                <img src="/media/{{ads_dynamic_field.images}}" class="img-fluid" alt="Ads Images">
             </div>
             {% endfor %}
         </div>
         <div class="work-gallery-controls">
             <button class="apps-advertise-slider-prev">
-                <i class="fa-solid fa-chevron-left"></i>
+                <i class="far fa-chevron-left"></i>
             </button>
             <div class="apps-advertise-slider-dots"></div>
             <button class="apps-advertise-slider-next">
-                <i class="fa-solid fa-chevron-right"></i>
+                <i class="far fa-chevron-right"></i>
             </button>
         </div>
     </div>
 </section>
-<!-- Apps Advertise Area end -->
+
 
 <!-- Premium Features Area start -->
 <section class="premium-features py-100">
@@ -282,7 +277,7 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
                 </div>
                 <p>
                     {% lang cmsdata current_language "section_9_title" as section_9_title %}
-                    {{section_9_title}}
+                    {{section_9_title|safe}}
                 </p>
             </div>
             <div class="col-lg-6">
@@ -297,22 +292,22 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
 </section>
 <!-- End Training Section -->
 <script>
-    // Block right-click context menu
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
+//     // Block right-click context menu
+// document.addEventListener('contextmenu', function(e) {
+//     e.preventDefault();
+//     return false;
+// });
     
-// Optional: Block common developer tools shortcuts
-document.addEventListener('keydown', function(e) {
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-    if (e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-        (e.ctrlKey && e.key === 'u')) {
-        e.preventDefault();
-        return false;
-    }
-});
+// // Optional: Block common developer tools shortcuts
+// document.addEventListener('keydown', function(e) {
+//     // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+//     if (e.key === 'F12' || 
+//         (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+//         (e.ctrlKey && e.key === 'u')) {
+//         e.preventDefault();
+//         return false;
+//     }
+// });
 </script>
 
 {% endblock %}
