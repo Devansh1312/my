@@ -262,7 +262,7 @@ class NewsPage(View):
 
         # Pagination
         page = request.GET.get('page', 1)
-        paginator = Paginator(news_list, 6)  # Display 6 items per page
+        paginator = Paginator(news_list, 8)  # Display 6 items per page
         
         try:
             news = paginator.page(page)
