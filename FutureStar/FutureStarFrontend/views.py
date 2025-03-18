@@ -1671,9 +1671,7 @@ class RegisterPage(View):
         # Instead of passing context, include language as GET parameter
         return redirect(f"{reverse('verify_otp')}?Language={language_from_url}")
 
-############################ Resend OTP #######################################################
-
-
+############################ Resend OTP ##############################################
 @method_decorator(csrf_exempt, name='dispatch')
 class ResendOTPView(View):
     def post(self, request, *args, **kwargs):

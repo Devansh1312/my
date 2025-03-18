@@ -7743,29 +7743,3 @@ class CloseTrainingDetailView(LoginRequiredMixin, View):
                 "breadcrumb": {"child": f"Training Detail: {training.training_name}"},
             },
         )
-
-
-##################### Apple Configartion ############################
-@method_decorator(require_GET, name='dispatch')
-class AppleAppSiteAssociation(View):
-    def get(self, request, *args, **kwargs):
-        data = {
-            "applinks": {
-                "apps": [],
-                "details": [
-                    {
-                        "appID": "3GM6AW6K4V.com.sportx.goalactico",
-                        "paths": [
-                            "/post/*",
-                            "/all/event/*",
-                            "/my/events/*",
-                            "/training/open/*",
-                            "/training/my/*",
-                            "/training/join/*",
-                            "/tournament/*"
-                        ]
-                    }
-                ]
-            }
-        }
-        return JsonResponse(data)
