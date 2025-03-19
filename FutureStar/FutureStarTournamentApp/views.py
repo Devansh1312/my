@@ -348,7 +348,7 @@ class TournamentAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('Tournament created successfully.'),
-                'data': TournamentSerializer(tournament_instance).data
+                'data': TournamentSerializer(tournament_instance, context={'request': request}).data
             }, status=status.HTTP_200_OK)
 
         return Response({
@@ -415,7 +415,7 @@ class TournamentAPIView(APIView):
             return Response({
                 'status': 1,
                 'message': _('Tournament updated successfully.'),
-                'data': TournamentSerializer(tournament_instance).data
+                'data': TournamentSerializer(tournament_instance, context={'request': request}).data
             }, status=status.HTTP_200_OK)
         
         return Response({
