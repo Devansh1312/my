@@ -1156,6 +1156,7 @@ class EditProfileAPIView(APIView):
 
         # Handle gender - retain old value if None or blank
         gender_id = request.data.get('gender')
+        gender_id = int(gender_id)
         if gender_id not in [None, '','0', 'null']:  # Ensure 'null' is also checked
             try:
                 user.gender = UserGender.objects.get(id=gender_id)

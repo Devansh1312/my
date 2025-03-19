@@ -84,11 +84,10 @@
 
 {% block scriptcontent %}
 <script>
-    // Move to the next field and combine OTP
+    // Function to move to the next input field automatically
     function moveToNext(current, nextFieldId) {
         if (current.value.length == 1 && /^[0-9]$/.test(current.value)) {
-            const nextInput = document.getElementById(nextFieldId);
-            if (nextInput) nextInput.focus();
+            document.getElementById(nextFieldId).focus();
         }
         combineOTP();
     }
@@ -103,9 +102,19 @@
     }
 
     // Restrict input to only numbers
-    document.querySelectorAll('.otp-input').forEach(input => {
-        input.addEventListener('input', function () {
-            this.value = this.value.replace(/[^0-9]/g, '');  // Allow numbers only
+    document.querySelectorAll('.otp-input').forEach((input, index, inputs) => {
+        input.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, ''); // Allow numbers only
+            if (this.value.length === 1 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+            combineOTP();
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                inputs[index - 1].focus();
+            }
         });
     });
 // // Block right-click context menu

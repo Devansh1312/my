@@ -1656,7 +1656,10 @@ class RegisterPage(View):
 
         # Generate OTP and save user details in OTPSave table
         otp = generate_otp()
-        OTPSave.objects.create(phone=phone, OTP=otp)
+        OTPSave.objects.update_or_create(
+            phone=phone,
+            defaults={'OTP': otp}
+        )
         send_sms(phone, otp)  # Call general function
 
         # Log the OTP for development purposes
