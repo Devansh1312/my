@@ -80,7 +80,13 @@
 							</div>							
 						</div>
 					</div>
-					<h5>Follow Us</h5>
+					<h5>
+						{% if current_language == 'en' %}
+							Follow Us
+						{% elif current_language == 'ar' %}
+							تابعنا	
+						{% endif %}
+					</h5>
 					<div class="social-style-two pt-2">
 						<a href="{{ system_settings.facebook }}" target="_blank">
 							<i class="fa-brands fa-facebook-f"></i>
