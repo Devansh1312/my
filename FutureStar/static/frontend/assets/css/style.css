@@ -12,6 +12,11 @@
   box-shadow: none;
 }
 
+.fa-regular, .far {
+  font-weight: 600 !important;
+}
+
+
 body {
   color: var(--future-body-color);
   background: #344A6C;

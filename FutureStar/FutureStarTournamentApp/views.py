@@ -754,9 +754,10 @@ class TeamJoiningRequest(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
-                'status': 0,
+                'status': 1,
                 'message': _('Only managers, coaches, or team founders can perform this action.'),
-            }, status=status.HTTP_403_FORBIDDEN)
+                'data': []
+            }, status=status.HTTP_200_OK)
 
         teams_data = []
         tournament_id = request.query_params.get('tournament_id')
