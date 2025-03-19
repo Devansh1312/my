@@ -2885,9 +2885,9 @@ class SearchView(View):
             language_from_url = request.session.get('language', 'en')
         query = request.GET.get('q', '')
         
-        # Filter results based on the query
+        # Filter results based on the query and exclude the logged-in user
         user_results = User.objects.filter(
-            (Q(username__icontains=query) | Q(fullname__icontains=query)) & ~Q(role=1)
+            (Q(username__icontains=query) | Q(fullname__icontains=query)) & ~Q(role=1) & ~Q(id=request.user.id)
         ) if query else []
 
         team_results = Team.objects.filter(
