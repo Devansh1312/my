@@ -116,7 +116,13 @@
 }
 </style>
 {% endblock %} 
-{% block title %} Goalactico || Team-Page-Detail{% endblock %} 
+{% block title %} 
+    {% if current_language == 'en' %}
+        Goalactico || Team Page Detail
+    {% elif current_language == 'ar' %}
+        جولأكتكو ||  تفاصيل صفحة الفريق
+    {% endif %}
+{% endblock %} 
 {% block content %} 
 <!-- Main Content Here-->
 <div class="page-wrapper">

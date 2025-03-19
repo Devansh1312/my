@@ -5,7 +5,13 @@
 <!-- Plugins css start-->
 <!-- Plugins css Ends-->
 {% endblock %}
-{% block title %} Goalactico || Team-Detail {% endblock %}
+{% block title %}
+{% if current_language == 'en' %}
+Goalactico || Team-Detail
+{% elif current_language == 'ar' %}
+جولأكتكو ||  تفاصيل الفريق
+{% endif %}
+{% endblock %}
 {% block content %}
 <style>
     .sponsor-logo {
