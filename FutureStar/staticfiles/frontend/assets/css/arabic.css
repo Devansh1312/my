@@ -7,16 +7,21 @@ html[dir=rtl] {
 
     header .theme-btn,
     header .selectLanguage {
-        margin-right: 0;
-        margin-left: 10px;
+        margin-right: 10px;
+        margin-left: 30px;
+        direction: ltr;
     }
 
     .theme-btn i,
     a.theme-btn i {
-        margin-left: 0px;
+        margin-left: 10px;
         margin-right: 7px;
-        transform: rotate(-120deg);
+        transform: rotate(-40deg);
 
+    }
+    .theme-btn i, a.theme-btn i :hover {
+       
+        transform: rotate(0deg);
     }
 
     .section-title .sub-title:before {
@@ -75,6 +80,7 @@ html[dir=rtl] {
 
     .slick-list {
         display: -webkit-box;
+        direction: ltr;
 
     }
 
@@ -82,20 +88,26 @@ html[dir=rtl] {
         transform: rotate(-120deg);
     }
 
-    .nav-links{
+    .nav-links {
         margin-right: auto;
         margin-left: 0px;
-      
-      }
-      .star-rating .filled-stars {
-        right: 0;
-       
+
     }
-      @media only screen and (max-width: 480px) {
-      
-        .main-menu .mobile-logo{
+
+    .star-rating .filled-stars {
+        right: 0;
+
+    }
+
+    @media only screen and (max-width: 480px) {
+
+        .main-menu .mobile-logo {
             margin-left: auto;
         }
 
-}
+    }
+
+
+
+
 }

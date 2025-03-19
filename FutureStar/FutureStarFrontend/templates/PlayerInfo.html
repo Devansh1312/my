@@ -72,14 +72,14 @@
                                     <i class="fa fa-phone"></i>
                                 </div>
                                 <div class="content" style="text-align: {% if current_language == 'ar' %}right{% else %}left{% endif %};">
-                                    <b class="title">
+                                    <b class="title" style="margin-right: 10px !important;">
                                         {% if current_language == 'en' %}
                                             Phone
                                         {% elif current_language == 'ar' %}
                                             الهاتف
                                         {% endif %}
                                     </b>
-                                    <span class="text">{{ infouser.phone }}</span>
+                                    <span class="text" style="margin-right: 10px !important;">{{ infouser.phone }}</span>
                                 </div>
                                 
 
@@ -90,12 +90,12 @@
                                 </div>
                                 <div class="content" style="text-align: {% if current_language == 'ar' %}right{% else %}left{% endif %};">
 
-                                    <b class="title">{% if current_language == 'en' %}
+                                    <b class="title" style="margin-right: 10px !important;">{% if current_language == 'en' %}
                                         Email
                                     {% elif current_language == 'ar' %}
                                          إيميل       
                                     {% endif %}</b>
-                                    <span class="text">{{infouser.email}}</span>
+                                    <span class="text" style="margin-right: 10px !important;">{{infouser.email}}</span>
                                 </div>
 
                             </div>
@@ -697,22 +697,22 @@ window.onclick = function(event) {
    }
  }
 }
-// Block right-click context menu
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
+// // Block right-click context menu
+// document.addEventListener('contextmenu', function(e) {
+//     e.preventDefault();
+//     return false;
+// });
     
-// Optional: Block common developer tools shortcuts
-document.addEventListener('keydown', function(e) {
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-    if (e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-        (e.ctrlKey && e.key === 'u')) {
-        e.preventDefault();
-        return false;
-    }
-});
+// // Optional: Block common developer tools shortcuts
+// document.addEventListener('keydown', function(e) {
+//     // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+//     if (e.key === 'F12' || 
+//         (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+//         (e.ctrlKey && e.key === 'u')) {
+//         e.preventDefault();
+//         return false;
+//     }
+// });
 </script>
 {% endblock %}
 

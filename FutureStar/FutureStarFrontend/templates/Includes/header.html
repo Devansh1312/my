@@ -116,7 +116,7 @@
                                 </form>
 
                                 <!-- Language Select Dropdown -->
-                                <select class="selectLanguage">
+                                <select class="selectLanguage" style="margin-right: 10px !important;">
                                     <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
                                     <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
                                 </select>
@@ -247,7 +247,7 @@
                         <span>{{ user.username }}</span>
                     </a>
                     {% endif %}
-                    <select class="selectLanguage">
+                    <select class="selectLanguage" style="margin-right: 10px !important;">
                         <option value="en" {% if current_language == 'en' %} selected {% endif %}>En</option>
                         <option value="ar" {% if current_language == 'ar' %} selected {% endif %}>Ar</option>
                     </select>
