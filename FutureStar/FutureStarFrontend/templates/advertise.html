@@ -163,6 +163,8 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
             </div>
             {% endfor %}
         </div>
+
+        {% if current_language == 'en' %} 
         <div class="work-gallery-controls">
             <button class="apps-advertise-slider-prev">
                 <i class="far fa-chevron-left"></i>
@@ -172,6 +174,18 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
                 <i class="far fa-chevron-right"></i>
             </button>
         </div>
+        {% elif current_language == 'ar' %} 
+        <div class="work-gallery-controls">
+            <button class="apps-advertise-slider-prev">
+                <i class="far fa-chevron-right"></i>
+            </button>
+            <div class="apps-advertise-slider-dots"></div>
+            <button class="apps-advertise-slider-next">
+                <i class="far fa-chevron-left"></i>
+            </button>
+        </div>    
+        {% endif %}
+
     </div>
 </section>
 
@@ -308,6 +322,9 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
 //         return false;
 //     }
 // });
+
+
+
 </script>
 
 {% endblock %}
@@ -318,3 +335,4 @@ style="background-image: url('media/{{ cmsdata.heading_image_1 }}');">
 {% block script %} 
 <script>new WOW().init();</script>
 {% endblock %}
+

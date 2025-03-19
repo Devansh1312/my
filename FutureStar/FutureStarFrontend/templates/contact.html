@@ -130,7 +130,7 @@
 											الاسم الكامل
 										{% endif %}
 									</label>
-									<input type="text" id="fullname" name="fullname" class="form-control" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your name{% elif current_language == 'ar' %}يرجى إدخال اسمك{% endif %}">
+									<input type="text" id="fullname" name="fullname" class="form-control" placeholder="" data-error="{% if current_language == 'en' %}Please enter your name{% elif current_language == 'ar' %}يرجى إدخال اسمك{% endif %}">
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
@@ -143,7 +143,7 @@
 											رقم الهاتف
 										{% endif %}
 									</label>
-									<input type="text" id="phone" name="phone" class="form-control" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your Number{% elif current_language == 'ar' %}يرجى إدخال رقمك{% endif %}">
+									<input type="text" id="phone" name="phone" class="form-control" placeholder="" data-error="{% if current_language == 'en' %}Please enter your Number{% elif current_language == 'ar' %}يرجى إدخال رقمك{% endif %}">
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
@@ -156,7 +156,7 @@
 											عنوان البريد الإلكتروني
 										{% endif %}
 									</label>
-									<input type="email" id="email" name="email" class="form-control" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your Email Address{% elif current_language == 'ar' %}يرجى إدخال بريدك الإلكتروني{% endif %}">
+									<input type="text" id="email" name="email" class="form-control" placeholder="" data-error="{% if current_language == 'en' %}Please enter your Email Address{% elif current_language == 'ar' %}يرجى إدخال بريدك الإلكتروني{% endif %}">
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
@@ -169,7 +169,7 @@
 											رسالة
 										{% endif %}
 									</label>
-									<textarea name="message" id="message" class="form-control" rows="2" placeholder="" required data-error="{% if current_language == 'en' %}Please enter your Message{% elif current_language == 'ar' %}يرجى إدخال رسالتك{% endif %}"></textarea>
+									<textarea name="message" id="message" class="form-control" rows="2" placeholder="" data-error="{% if current_language == 'en' %}Please enter your Message{% elif current_language == 'ar' %}يرجى إدخال رسالتك{% endif %}"></textarea>
 									<div class="help-block with-errors"></div>
 								</div>
 							</div>
@@ -204,63 +204,92 @@
 			localStorage.setItem('language', selectedLanguage);
 		});
 	});
-	document.addEventListener('DOMContentLoaded', function() {
-		const phoneInput = document.getElementById('phone');
-		phoneInput.addEventListener('keypress', function(event) {
-			const charCode = event.which ? event.which : event.keyCode;
-			const charStr = String.fromCharCode(charCode);
-			// Allow numbers, backspace, and the "+" symbol
-			if (!charStr.match(/[0-9+]/) && charCode !== 8) {
-				event.preventDefault();
-			}
-			// Prevent more than one "+" at the beginning
-			if (charStr === "+" && phoneInput.value.includes("+")) {
-				event.preventDefault();
-			}
-		});
-		phoneInput.addEventListener('paste', function(event) {
-			// Handle paste input (only allow numbers and +)
-			let paste = (event.clipboardData || window.clipboardData).getData('text');
-			if (!paste.match(/^[0-9+]+$/)) {
-				event.preventDefault();
-			}
-		});
-	});
-	document.addEventListener('DOMContentLoaded', function() {
-		const emailInput = document.getElementById('email');
-		const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-		emailInput.addEventListener('input', function() {
-			const emailValue = emailInput.value;
-			const errorDiv = document.createElement('div');
-			errorDiv.className = 'email-error';
-			// Remove previous error message
-			const prevError = document.querySelector('.email-error');
-			if (prevError) prevError.remove();
-			// Validate email using regex
-			if (!emailRegex.test(emailValue)) {
-				emailInput.classList.add('is-invalid'); // Add invalid class for styling
-				errorDiv.textContent = 'Please enter a valid email address';
-				emailInput.parentNode.appendChild(errorDiv);
-			} else {
-				emailInput.classList.remove('is-invalid'); // Remove invalid class if valid
-			}
-		});
-	});
+	document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('contactForm');
+    const fullname = document.getElementById('fullname');
+    const phone = document.getElementById('phone');
+    const email = document.getElementById('email');
+    const message = document.getElementById('message');
 
-// Block right-click context menu
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
-    
-// Optional: Block common developer tools shortcuts
-document.addEventListener('keydown', function(e) {
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-    if (e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-        (e.ctrlKey && e.key === 'u')) {
-        e.preventDefault();
-        return false;
+    // Restrict phone input to digits only and limit to 9 numbers
+    phone.addEventListener('input', function () {
+        phone.value = phone.value.replace(/\D/g, ''); // Remove non-digit characters
+        if (phone.value.length > 9) {
+            phone.value = phone.value.slice(0, 9); // Limit to 9 digits
+        }
+    });
+
+    form.addEventListener('submit', function (event) {
+        let isValid = true;
+
+        // Clear previous errors
+        document.querySelectorAll('.error-message').forEach(function (el) {
+            el.remove();
+        });
+
+        // Validation for Full Name
+        if (!fullname.value.trim()) {
+            showError(fullname, `{% if current_language == 'en' %}Please enter your Full Name{% elif current_language == 'ar' %}يرجى إدخال اسمك الكامل{% endif %}`);
+            isValid = false;
+        } else {
+            removeError(fullname);
+        }
+
+        // Validation for Phone Number
+        if (!phone.value.trim()) {
+            showError(phone, `{% if current_language == 'en' %}Please enter your Phone Number{% elif current_language == 'ar' %}يرجى إدخال رقم هاتفك{% endif %}`);
+            isValid = false;
+        } else if (phone.value.length !== 9) {
+            showError(phone, `{% if current_language == 'en' %}Phone number must be 9 digits{% elif current_language == 'ar' %}يجب أن يتكون رقم الهاتف من 9 أرقام{% endif %}`);
+            isValid = false;
+        } else {
+            removeError(phone);
+        }
+
+        // Validation for Email
+        const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+        if (!email.value.trim()) {
+            showError(email, `{% if current_language == 'en' %}Please enter your Email Address{% elif current_language == 'ar' %}يرجى إدخال بريدك الإلكتروني{% endif %}`);
+            isValid = false;
+        } else if (!emailRegex.test(email.value)) {
+            showError(email, `{% if current_language == 'en' %}Please enter a valid Email Address{% elif current_language == 'ar' %}يرجى إدخال بريد إلكتروني صالح{% endif %}`);
+            isValid = false;
+        } else {
+            removeError(email);
+        }
+
+        // Validation for Message
+        if (!message.value.trim()) {
+            showError(message, `{% if current_language == 'en' %}Please enter your Message{% elif current_language == 'ar' %}يرجى إدخال رسالتك{% endif %}`);
+            isValid = false;
+        } else {
+            removeError(message);
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+
+    // Function to show error
+    function showError(input, message) {
+        input.classList.add('is-invalid');
+        if (!input.parentNode.querySelector('.error-message')) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message text-danger';
+            errorDiv.textContent = message;
+            input.parentNode.appendChild(errorDiv);
+        }
+    }
+
+    // Function to remove error
+    function removeError(input) {
+        input.classList.remove('is-invalid');
+        const errorMessage = input.parentNode.querySelector('.error-message');
+        if (errorMessage) {
+            errorMessage.remove();
+        }
     }
 });
+
 </script> {% endblock %} {% block script %} {% endblock %}

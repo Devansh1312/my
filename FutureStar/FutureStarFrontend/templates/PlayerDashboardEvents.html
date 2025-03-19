@@ -270,38 +270,45 @@
                     </div>
                     
                     <script>
-                        $(document).ready(function () {
+                       $(document).ready(function () {
                             var rowsPerPage = 10;
                             var rows = $(".upcoming-game-row");
                             var totalRows = rows.length;
                             var currentPage = 1;
                             var totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-                    
+
+                            var currentLanguage = "{{ current_language }}";
+
                             function showPage(page) {
                                 var start = (page - 1) * rowsPerPage;
                                 var end = start + rowsPerPage;
-                    
+
                                 rows.hide().slice(start, end).show();
-                    
-                                $("#upcomingPageInfo").text("Page " + page + " of " + totalPages);
+
+                                // Language-specific pagination text
+                                var pageInfoText = currentLanguage === 'ar'
+                                    ? `الصفحة ${page} من ${totalPages}`
+                                    : `Page ${page} of ${totalPages}`;
+
+                                $("#upcomingPageInfo").text(pageInfoText);
                                 $("#prevUpcomingPage").prop("disabled", page === 1);
                                 $("#nextUpcomingPage").prop("disabled", page === totalPages);
                             }
-                    
+
                             $("#prevUpcomingPage").click(function () {
                                 if (currentPage > 1) {
                                     currentPage--;
                                     showPage(currentPage);
                                 }
                             });
-                    
+
                             $("#nextUpcomingPage").click(function () {
                                 if (currentPage < totalPages) {
                                     currentPage++;
                                     showPage(currentPage);
                                 }
                             });
-                    
+
                             showPage(currentPage);
                         });
                     </script>

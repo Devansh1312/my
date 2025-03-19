@@ -50,7 +50,13 @@
                             <img src="{% static 'frontend/assets/images/success-stories/player-1.png' %}" class="img-fluid" alt="Default Player Image">
                         {% endif %}
                     </div>
-                    <h5 class="player-name">@{{ infouser.username }}</h5>
+                    <h5 class="player-name">
+                        {% if current_language == 'en' %}
+                            @{{ infouser.username }}
+                        {% elif current_language == 'ar' %}
+                            {{ infouser.username }}@
+                        {% endif %}
+                    </h5>
                     <p class="player-designation">
                         {% if current_language == 'en' %}
                             {{ infouser.role.name_en }}

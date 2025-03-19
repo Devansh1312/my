@@ -2,6 +2,19 @@
 {% load lang_filter %}
 
 <style>
+    /* Clear Button Styling */
+    .clear-btn {
+        background: transparent;
+        border: none;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #888; /* Icon color */
+    }
+
+    .clear-btn:hover {
+        color: #000; /* Darken color on hover */
+    }
     /* Search Bar Wrapper */
     .search-bar {
         position: relative;
@@ -28,19 +41,25 @@
         width: 220px;
     }
 
-    /* Input Field Wrapper */
+    /* Adjust Search Input Wrapper */
     .search-input-wrapper {
         display: flex;
         align-items: center;
         border: 1px solid #ddd;
-        /* Add border */
         border-radius: 0;
-        /* Remove curve */
         padding: 5px 10px;
         background-color: #fff;
-        /* Background color */
+        width: 100%;
     }
-
+    
+    /* Adjust Input Field */
+    #search-input {
+        border: none;
+        outline: none;
+        width: 100%;
+        padding: 5px;
+        font-size: 14px;
+    }
     /* Input Field Style */
     #search-form input {
         border: none;
@@ -183,7 +202,6 @@
 
                 <!-- Search Bar -->
                 {% if user.is_authenticated %}
-
                 <div class="search-bar">
                     <button id="search-btn" class="search-toggle-btn">
                         <i class="fas fa-search"></i>
@@ -194,6 +212,13 @@
                         <form id="search-form" method="GET" action="{% url 'search' %}">
                             <div class="search-input-wrapper">
                                 <input type="text" name="q" id="search-input" placeholder="Search..." value="{{ query }}" autocomplete="off">
+                                
+                                <!-- Clear Button (❌) -->
+                                <button type="button" id="clear-btn" class="clear-btn" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                
+                                <!-- Search Button -->
                                 <button type="submit" class="search-icon-btn">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -201,8 +226,8 @@
                         </form>
                     </div>
                 </div>
-
                 {% endif %}
+
 
 
                 <!-- Menu Button -->
@@ -288,55 +313,71 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-    // Handle language change
-    $('.selectLanguage').change(function () {
-        var selectedLanguage = $(this).val();
-        var currentUrl = new URL(window.location.href);
-    
-        // Update the 'language' parameter in the URL
-        currentUrl.searchParams.set('Language', selectedLanguage);
-    
-        // Reload the page with the updated URL
-        window.location.href = currentUrl.toString();
-    });
-    
-    // Toggle the visibility of the search input field below the button when the button is clicked
-    $('#search-btn').click(function (event) {
-        $('#search-container').toggle(); // Toggle the visibility of the container
-        event.stopPropagation(); // Prevent closing the form if the search button is clicked
-    });
-    
-    // Close search form when clicking outside
-    $(document).click(function (event) {
-        if (!$(event.target).closest('#search-container, #search-btn').length) {
-            $('#search-container').hide(); // Hide the input field if clicked outside
-        }
-    });
-    
-    // Handle form submission
-    $('#search-form').on('submit', function (event) {
-        var query = $('#search-input').val();
-    
-        // Check if the input is empty or contains only spaces
-        if (!query.trim()) {
-            event.preventDefault(); // Prevent form submission
-            return false;
-        }
-    });
-    
-    // Prevent Enter from submitting empty query
-    $('#search-input').keypress(function (event) {
-        if (event.which === 13) { // "Enter" key code
-            var query = $(this).val();
-    
-            // Check if the input is empty or contains only spaces
-            if (!query.trim()) {
-                event.preventDefault(); // Prevent form submission
-                return false;
-            }
-        }
-    });
-    });
+    $(document).ready(function() {
+	// Handle language change
+	$('.selectLanguage').change(function() {
+		var selectedLanguage = $(this).val();
+		var currentUrl = new URL(window.location.href);
+
+		// Update the 'language' parameter in the URL
+		currentUrl.searchParams.set('Language', selectedLanguage);
+
+		// Reload the page with the updated URL
+		window.location.href = currentUrl.toString();
+	});
+
+	$(document).ready(function() {
+		var searchInput = $('#search-input');
+		var clearBtn = $('#clear-btn');
+
+		// Show or hide the clear button based on input value
+		function toggleClearButton() {
+			if (searchInput.val().trim() !== '') {
+				clearBtn.show();
+			} else {
+				clearBtn.hide();
+			}
+		}
+
+		// Toggle search container
+		$('#search-btn').click(function(event) {
+			$('#search-container').toggle();
+			event.stopPropagation();
+		});
+
+		// Close search form when clicking outside
+		$(document).click(function(event) {
+			if (!$(event.target).closest('#search-container, #search-btn').length) {
+				$('#search-container').hide();
+			}
+		});
+
+		// Clear input on clicking the clear button
+		clearBtn.click(function() {
+			searchInput.val('');
+			clearBtn.hide();
+		});
+
+		// Handle input change for showing/hiding the clear button
+		searchInput.on('input', toggleClearButton);
+
+		// Prevent empty search submission
+		$('#search-form').on('submit', function(event) {
+			if (!searchInput.val().trim()) {
+				event.preventDefault();
+			}
+		});
+
+		// Prevent Enter from submitting an empty query
+		searchInput.keypress(function(event) {
+			if (event.which === 13 && !searchInput.val().trim()) {
+				event.preventDefault();
+			}
+		});
+
+		// Initialize clear button visibility
+		toggleClearButton();
+	});
+});
     
 </script>

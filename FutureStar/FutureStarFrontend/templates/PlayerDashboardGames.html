@@ -280,34 +280,42 @@
                             var totalRows = rows.length;
                             var currentPage = 1;
                             var totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-                    
+                            
+                            var currentLanguage = "{{ current_language }}"; // Get current language from the template
+
                             function showPage(page) {
                                 var start = (page - 1) * rowsPerPage;
                                 var end = start + rowsPerPage;
-                    
+
                                 rows.hide().slice(start, end).show();
-                    
-                                $("#upcomingPageInfo").text("Page " + page + " of " + totalPages);
+
+                                // Display language-specific pagination text
+                                var pageInfoText = currentLanguage === 'ar'
+                                    ? `الصفحة ${page} من ${totalPages}`
+                                    : `Page ${page} of ${totalPages}`;
+
+                                $("#upcomingPageInfo").text(pageInfoText);
                                 $("#prevUpcomingPage").prop("disabled", page === 1);
                                 $("#nextUpcomingPage").prop("disabled", page === totalPages);
                             }
-                    
+
                             $("#prevUpcomingPage").click(function () {
                                 if (currentPage > 1) {
                                     currentPage--;
                                     showPage(currentPage);
                                 }
                             });
-                    
+
                             $("#nextUpcomingPage").click(function () {
                                 if (currentPage < totalPages) {
                                     currentPage++;
                                     showPage(currentPage);
                                 }
                             });
-                    
+
                             showPage(currentPage);
                         });
+
                     </script>
                 </div>
             
@@ -436,32 +444,40 @@
                             var totalRows = rows.length;
                             var currentPage = 1;
                             var totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
-                    
+
+                            // Get the current language using Django
+                            var currentLanguage = "{{ current_language }}";
+
                             function showPage(page) {
                                 var start = (page - 1) * rowsPerPage;
                                 var end = start + rowsPerPage;
-                    
+
                                 rows.hide().slice(start, end).show();
-                    
-                                $("#pageInfo").text("Page " + page + " of " + totalPages);
+
+                                // Set pagination text based on language
+                                var pageInfoText = currentLanguage === 'ar'
+                                    ? `الصفحة ${page} من ${totalPages}`
+                                    : `Page ${page} of ${totalPages}`;
+
+                                $("#pageInfo").text(pageInfoText);
                                 $("#prevPage").prop("disabled", page === 1);
                                 $("#nextPage").prop("disabled", page === totalPages);
                             }
-                    
+
                             $("#prevPage").click(function () {
                                 if (currentPage > 1) {
                                     currentPage--;
                                     showPage(currentPage);
                                 }
                             });
-                    
+
                             $("#nextPage").click(function () {
                                 if (currentPage < totalPages) {
                                     currentPage++;
                                     showPage(currentPage);
                                 }
                             });
-                    
+
                             showPage(currentPage);
                         });
                     </script>

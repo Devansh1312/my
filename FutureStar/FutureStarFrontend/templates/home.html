@@ -373,16 +373,29 @@
 						{{sub_title}}
 					</a>
 				</div>
-			</div> {% endfor %} </div>
-		<div class="work-gallery-controls">
-			<button class="work-gallery-prev">
-				<i class="fa-solid fa-chevron-left"></i>
-			</button>
-			<div class="work-gallery-dots"></div>
-			<button class="work-gallery-next">
-				<i class="fa-solid fa-chevron-right"></i>
-			</button>
+			</div> {% endfor %} 
 		</div>
+		{% if current_language == 'en' %} 
+			<div class="work-gallery-controls">
+				<button class="work-gallery-prev">
+					<i class="fa-solid fa-chevron-left"></i>
+				</button>
+				<div class="work-gallery-dots"></div>
+				<button class="work-gallery-next">
+					<i class="fa-solid fa-chevron-right"></i>
+				</button>
+			</div>
+		{% elif current_language == 'ar' %}
+			<div class="work-gallery-controls">
+				<button class="work-gallery-prev">
+					<i class="fa-solid fa-chevron-right"></i>
+				</button>
+				<div class="work-gallery-dots"></div>
+				<button class="work-gallery-next">
+					<i class="fa-solid fa-chevron-left"></i>
+				</button>
+			</div>
+		{% endif %}
 	</div>
 </section>
 <!-- Work Gallery Area end -->
@@ -393,28 +406,28 @@
 			<div class="col-md-3 col-6">
 				<div class="counter-item counter-text-wrap wow fadeInUp delay-0-2s">
 					<i class="fa-regular fa-circle-check"></i>
-					<span class="count-text" data-speed="3000" data-stop="{{ number_of_users }}">{{ number_of_users }}</span>
+					<span class="count-text" data-speed="3000" data-stop="{{ number_of_users }}"></span>
 					<span class="counter-title"> {% if current_language == 'en' %} Happy User {% elif current_language == 'ar' %} مستخدم سعيد {% endif %} </span>
 				</div>
 			</div>
 			<div class="col-md-3 col-6">
 				<div class="counter-item counter-text-wrap wow fadeInUp delay-0-3s">
 					<i class="fa-regular fa-circle-check"></i>
-					<span class="count-text" data-speed="3000" data-stop="{{ team_created }}">0</span>
+					<span class="count-text" data-speed="3000" data-stop="{{ team_created }}"></span>
 					<span class="counter-title"> {% if current_language == 'en' %} Teams Created {% elif current_language == 'ar' %} الفرق التي تم إنشاؤها {% endif %} </span>
 				</div>
 			</div>
 			<div class="col-md-3 col-6">
 				<div class="counter-item counter-text-wrap wow fadeInUp delay-0-4s">
 					<i class="fa-regular fa-circle-check"></i>
-					<span class="count-text" data-speed="3000" data-stop="{{ tournament_organized }}">0</span>
+					<span class="count-text" data-speed="3000" data-stop="{{ tournament_organized }}"></span>
 					<span class="counter-title"> {% if current_language == 'en' %} Tournaments Organized {% elif current_language == 'ar' %} البطولات المنظمة {% endif %} </span>
 				</div>
 			</div>
 			<div class="col-md-3 col-6">
 				<div class="counter-item counter-text-wrap wow fadeInUp delay-0-5s">
 					<i class="fa-regular fa-circle-check"></i>
-					<span class="count-text" data-speed="3000" data-stop="{{ games_played }}">0</span>
+					<span class="count-text" data-speed="3000" data-stop="{{ games_played }}"></span>
 					<span class="counter-title">
                         {% if current_language == 'en' %} 
                             Games Played 
@@ -592,19 +605,19 @@
 			localStorage.setItem('language', selectedLanguage);
 		});
 	});
-	// Block right-click context menu
-	document.addEventListener('contextmenu', function(e) {
-		e.preventDefault();
-		return false;
-	});
-	// Optional: Block common developer tools shortcuts
-	document.addEventListener('keydown', function(e) {
-		// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-		if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) {
-			e.preventDefault();
-			return false;
-		}
-	});
+	// // Block right-click context menu
+	// document.addEventListener('contextmenu', function(e) {
+	// 	e.preventDefault();
+	// 	return false;
+	// });
+	// // Optional: Block common developer tools shortcuts
+	// document.addEventListener('keydown', function(e) {
+	// 	// Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+	// 	if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) {
+	// 		e.preventDefault();
+	// 		return false;
+	// 	}
+	// });
 	new WOW().init();
 </script> 
 <script>
