@@ -2080,6 +2080,20 @@ class TeamUniformColorAPIView(APIView):
         if language in ['en', 'ar']:
             activate(language)
 
+        primary_color_player = request.data.get('primary_color_player')
+        secondary_color_player = request.data.get('secondary_color_player')
+        third_color_player = request.data.get('third_color_player')
+        primary_color_goalkeeper = request.data.get('primary_color_goalkeeper')
+        secondary_color_goalkeeper = request.data.get('secondary_color_goalkeeper')
+        third_color_goalkeeper = request.data.get('third_color_goalkeeper')
+
+        if not primary_color_player or not secondary_color_player or not third_color_player or not primary_color_goalkeeper or not secondary_color_goalkeeper or not third_color_goalkeeper:
+            return Response({
+                'status': 0,
+                'message': _('All Uniform colors are required.'),
+                'data': None,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = TeamUniformColorSerializer(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
