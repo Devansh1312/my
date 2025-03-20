@@ -283,11 +283,19 @@
                     </div>
                     <div class="testimonial-controls mt-75 rmt-40">
                         <button class="testimonial-prev">
+                            {% if current_language == 'en' %}
                             <i class="fa-solid fa-chevron-left"></i>
+                            {% elif current_language == 'ar' %}
+                            <i class="fa-solid fa-chevron-right"></i>
+                            {% endif %}
                         </button>
                         <div class="testimonial-dots"></div>
                         <button class="testimonial-next">
+                            {% if current_language == 'en' %}
                             <i class="fa-solid fa-chevron-right"></i>
+                            {% elif current_language == 'ar' %}
+                            <i class="fa-solid fa-chevron-left"></i>
+                            {% endif %}
                         </button>
                     </div>
                 </div>
@@ -316,11 +324,19 @@
         </div>
         <div class="work-gallery-controls">
             <button class="clients-logo-slider-prev">
+                {% if current_language == 'en' %}
                 <i class="fa-solid fa-chevron-left"></i>
+                {% elif current_language == 'ar' %}
+                <i class="fa-solid fa-chevron-right"></i>
+                {% endif %}
             </button>
             <div class="clients-logo-slider-dots"></div>
             <button class="clients-logo-slider-next">
+                {% if current_language == 'en' %}
                 <i class="fa-solid fa-chevron-right"></i>
+                {% elif current_language == 'ar' %}
+                <i class="fa-solid fa-chevron-left"></i>
+                {% endif %}
             </button>
         </div>
     </div>

@@ -17,11 +17,13 @@ html[dir=rtl] {
         margin-left: 10px;
         margin-right: 7px;
         transform: rotate(-40deg);
+        direction: ltr;
 
     }
-    .theme-btn i, a.theme-btn i :hover {
-       
-        transform: rotate(0deg);
+    
+    .theme-btn:hover i,
+    a.theme-btn:hover i {
+    transform: rotate(0deg);
     }
 
     .section-title .sub-title:before {

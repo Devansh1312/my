@@ -89,9 +89,15 @@
                         <a class="page-link" href="?page={{ news.previous_page_number }}"><i class="fas fa-angle-left"></i></a>
                     </li>
                     {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="fas fa-angle-left"></i></span>
-                    </li>
+                        {% if current_language == 'en' %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                            </li>
+                        {% elif current_language == 'ar' %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                            </li>
+                        {% endif %}
                     {% endif %}
             
                     {% for num in news.paginator.page_range %}
@@ -111,9 +117,15 @@
                         <a class="page-link" href="?page={{ news.next_page_number }}"><i class="fas fa-angle-right"></i></a>
                     </li>
                     {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="fas fa-angle-right"></i></span>
-                    </li>
+                        {% if current_language == 'en' %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                        </li>
+                        {% elif current_language == 'ar' %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                        </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
             </div>
