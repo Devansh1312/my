@@ -1440,6 +1440,16 @@ class UpdateTournamentGameDetailAPIView(APIView):
         # Extract the game ID from the URL
         game_id =request.data.get("game_id")
         group_id = request.data.get("group_id")
+        team_a = int(request.data.get("team_a")) # Team A ID
+        team_b = int(request.data.get("team_b")) # Team B ID
+
+        if team_a == team_b:
+            return Response({
+                'status': 0,
+                'message': _('Team B cannot be the same as Team A.')
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
         if group_id == 0 or group_id == "0":
             request.data["group_id"] = None
         if not game_id:

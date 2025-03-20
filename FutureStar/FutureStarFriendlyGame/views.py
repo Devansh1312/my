@@ -163,6 +163,14 @@ class UpdateFriendlyGameDetailAPIView(APIView):
                     'message': _('Invalid Team B specified.'),
                     'data': {}
                 }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate team_b against team_a
+        if team_b_id == game.team_a.id:
+            return Response({
+                'status': 0,
+                'message': _('Team B cannot be the same as Team A.'),
+                'data': {}
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # Save the updated game object
         game.save()
