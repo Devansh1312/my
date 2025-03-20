@@ -527,9 +527,7 @@ class PlayerListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=2).order_by(
-            "-id"
-        )  # Order by latest created first
+        users = User.objects.filter(role_id=2).exclude(is_deleted=True).order_by("-id")
         roles = Role.objects.filter(id=2)
         return render(
             request,
@@ -549,7 +547,7 @@ class CoachListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=3).order_by(
+        users = User.objects.filter(role_id=3).exclude(is_deleted=True).order_by(
             "-id"
         )  # Order by latest created first  # Fetch users where role_id is 3
         roles = Role.objects.filter(id=3)  # Fetch roles with id 3
@@ -571,7 +569,7 @@ class RefereeListView(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=4).order_by(
+        users = User.objects.filter(role_id=4).exclude(is_deleted=True).order_by(
             "-id"
         )  # Order by latest created first  # Fetch users where role_id is 2
         roles = Role.objects.filter(id=4)  # Fetch roles with id 2
@@ -595,7 +593,7 @@ class ManagerListView(LoginRequiredMixin, View):
         User = get_user_model()
 
         # Fetch all managers with role_id = 6
-        managers = User.objects.filter(role_id=6).order_by("-id")
+        managers = User.objects.filter(role_id=6).exclude(is_deleted=True).order_by("-id")
 
         # Get all managerial staff entries
         managerial_staff = JoinBranch.objects.filter(
@@ -877,7 +875,7 @@ class DefaultUserList(LoginRequiredMixin, View):
 
     def get(self, request):
         User = get_user_model()  # Get the custom user model
-        users = User.objects.filter(role_id=5)
+        users = User.objects.filter(role_id=5).exclude(is_deleted=True).order_by("-id")
         roles = Role.objects.filter(id=5)
         return render(
             request,
